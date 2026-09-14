@@ -1,0 +1,260 @@
+# Google Gemini CLI artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: gemini_cli
+title: Gemini CLI
+vendor: Google
+description: |-
+  Google's command line agent. The one agent in this catalogue that documents an automatic
+  deletion policy for its own conversations, which changes what a collection means: the
+  default is to delete chats older than thirty days, so an absent conversation is the
+  expected state rather than a sign that anybody removed it.
+references:
+- https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
+- https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/utils/paths.ts
+env_overrides:
+- name: GEMINI_CLI_HOME
+  effect: |-
+    Relocates the whole .gemini directory. homedir() in packages/core/src/utils/paths.ts returns this value when it is set and the user's home directory otherwise, so a collection keyed on ~/.gemini finds nothing on such a host and cannot tell that apart from Gemini CLI never having run.
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/utils/paths.ts
+- name: GEMINI_CLI_SYSTEM_SETTINGS_PATH
+  effect: |-
+    Moves the machine-wide settings file, which is where an administrator would enforce policy. Reading only the documented location can therefore report no policy on a host that has one.
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
+- name: GEMINI_CLI_SYSTEM_DEFAULTS_PATH
+  effect: |-
+    Moves the machine-wide defaults file, the lowest layer of the four-layer settings stack.
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
+- name: GEMINI_CLI_TRUSTED_FOLDERS_PATH
+  effect: |-
+    Moves trustedFolders.json, the record of which directories the user allowed the agent to work in. That record is the answer to what the agent was permitted to touch.
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
+- name: GEMINI_SYSTEM_MD
+  effect: |-
+    Replaces the built-in system prompt with a file of the operator's choosing, anywhere on disk. Prompt-injection surface that lives outside every directory this catalogue names: follow the value.
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
+artifacts:
+- id: gemini_cli.chats
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.gemini\chats\'
+  - '%USERPROFILE%\.gemini\sessions\'
+  - ~/.gemini/chats/
+  - ~/.gemini/sessions/
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
+  source_kind: official
+  volatility: |-
+    Deleted on a timer by default, which is unusual and is the most important fact about this agent. general.sessionRetention has enabled default true, maxAge default "30d" described as "Automatically delete chats older than this time period", an optional maxCount as the "Maximum number of sessions to keep", and minRetention default "1d" as a "Minimum retention period (safety limit)".
+  notes: |-
+    The primary evidence, and the entry whose status matters most. Google documents the retention policy for chats precisely and does not say where the chats are written, so the path here is a plausible reading of the setting's name and nothing more. It is marked unverified for that reason and collected anyway.
+
+    What follows for a report. An absent conversation older than thirty days is the documented default behaviour, not a sign of anti-forensics, and saying otherwise would invert the finding. The settings file is where to check whether the default was in force, whether retention was disabled, and whether maxCount was set lower.
+
+    Verify this path before relying on it. If it is wrong, the directory glob in gemini_cli.home_tree still collects the content and the manifest will attribute it there instead.
+  parser: null
+- id: gemini_cli.home_tree
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.gemini\'
+  - ~/.gemini/
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/utils/paths.ts
+  source_kind: source_code
+  volatility: |-
+    Mixed. Some of what is in here is deleted on a timer, see gemini_cli.chats, and the rest persists until edited.
+  notes: |-
+    GEMINI_DIR = '.gemini' in packages/core/src/utils/paths.ts. Claimed as a whole tree on purpose: the vendor documents the directory and several files in it, and not everything that lands here is documented anywhere. A glob over the tree means an undocumented file is still collected and still appears in the manifest, rather than being absent because nobody had written it down.
+
+    The named entries in this catalogue give attribution; this one gives coverage. A file claimed by both appears once, attributed to the specific entry, with artifact_ids recording that this glob matched it too. See ADR 0014.
+  parser: null
+- id: gemini_cli.shell_history
+  category: shell_history
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.gemini\tmp\<project-hash>\shell_history'
+  - ~/.gemini/tmp/<project-hash>/shell_history
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
+  source_kind: official
+  volatility: |-
+    Under tmp, so treat it as something the agent may clear at any time. No retention policy for it was found in the sources read.
+  notes: |-
+    Documented as ~/.gemini/tmp/<project_hash>/shell_history, where the hash derives from the project path. Every shell command the agent ran, per working copy.
+
+    Two things this gives an analyst that a transcript does not. The set of hash directories enumerates the projects the agent was used in, even where the conversations have been deleted by the retention policy. And the commands themselves are what actually happened, as opposed to what the model said it would do.
+
+    The hash is one-way, so the directory name identifies a project only by comparison: hash the candidate paths from the other agents' state and match.
+  parser: null
+- id: gemini_cli.user_settings
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.gemini\settings.json'
+  - ~/.gemini/settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    The user layer of a four-layer settings stack: system defaults, then user, then project, then system settings, with the project layer overriding the user one. Read all four or report a configuration that was not the effective one.
+
+    Read it first in any case involving a missing conversation. general.sessionRetention here decides whether chats are being deleted on a timer, and general.checkpointing.enabled, off by default, decides whether recoverable session checkpoints exist at all. The telemetry section can point at a local outfile, which is another on-disk record of the same activity.
+
+    Also here: the MCP server definitions and context.fileName, which renames the instruction file the agent reads from GEMINI.md to something else.
+  parser: null
+- id: gemini_cli.system_settings
+  category: permissions
+  root: system
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%PROGRAMDATA%\gemini-cli\settings.json'
+  - '%PROGRAMDATA%\gemini-cli\system-defaults.json'
+  - /Library/Application Support/GeminiCli/settings.json
+  - /Library/Application Support/GeminiCli/system-defaults.json
+  - /etc/gemini-cli/settings.json
+  - /etc/gemini-cli/system-defaults.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
+  source_kind: official
+  volatility: Persistent until an administrator edits it.
+  notes: |-
+    Machine-wide policy, in two layers with the user's settings between them: system-defaults.json is the floor that user and project settings override, and settings.json is the ceiling that overrides them. Which file a restriction is written in therefore decides whether it was in force, and reporting a control from the wrong layer describes a machine that does not exist.
+
+    Both are relocatable, by GEMINI_CLI_SYSTEM_SETTINGS_PATH and GEMINI_CLI_SYSTEM_DEFAULTS_PATH, so an absent file is not evidence that no policy was applied.
+  parser: null
+- id: gemini_cli.google_accounts
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.gemini\google_accounts.json'
+  - ~/.gemini/google_accounts.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/utils/paths.ts
+  source_kind: source_code
+  volatility: Rewritten on sign-in.
+  notes: |-
+    GOOGLE_ACCOUNTS_FILENAME = 'google_accounts.json'. Which account the agent ran as, which is the attribution question: a transcript says what was asked, this says whose credentials answered it, and on a shared or handed-over machine those are different people.
+  parser: null
+- id: gemini_cli.trusted_folders
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.gemini\trustedFolders.json'
+  - ~/.gemini/trustedFolders.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/utils/paths.ts
+  source_kind: source_code
+  volatility: Appended to as the user trusts directories; nothing observed that expires an entry.
+  notes: |-
+    TRUSTED_FOLDERS_FILENAME = 'trustedFolders.json'. The directories the user allowed the agent to operate in, which is both the permission record and a list of working copies to collect project-anchored artifacts from.
+
+    GEMINI_CLI_TRUSTED_FOLDERS_PATH moves it, so check the environment before reading an empty result as a cautious user.
+  parser: null
+- id: gemini_cli.credentials
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.gemini\oauth_creds.json'
+  - ~/.gemini/oauth_creds.json
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
+  source_kind: official
+  volatility: Rewritten on sign-in and on token refresh.
+  notes: |-
+    Metadata and a hash only. The configuration reference describes OAuth as an authentication method and the paths module names the directory, but no page read here names the credential file itself, so the filename is unverified.
+
+    Collected anyway, because its existence and its timestamps date the sign-in, which is the forensic question. If the name is wrong the file is still collected by gemini_cli.home_tree, and that is the one case where this catalogue's redundancy costs something: it would be collected as evidence rather than withheld as a credential. Verify this entry.
+  parser: null
+- id: gemini_cli.project_config
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.gemini/
+  - <project>/.gemini/.env
+  - <project>/.gemini/sandbox.Dockerfile
+  - <project>/.gemini/settings.json
+  - <project>/GEMINI.md
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
+  source_kind: official
+  volatility: Lives and dies with the working copy, and is usually under version control.
+  notes: |-
+    The project layer, which overrides the user's own settings, and the instruction file the agent reads before every turn.
+
+    This is the prompt-injection surface, and it travels with a checkout: cloning a repository can change the agent's configuration, add MCP servers, point it at a different model endpoint and give it standing instructions, all without the user seeing a prompt. GEMINI.md is the default name and context.fileName renames it, so read the settings before concluding a repository carried no instructions.
+
+    sandbox.Dockerfile defines the container the agent's commands run in, so it decides what the sandbox could reach.
+  parser: null

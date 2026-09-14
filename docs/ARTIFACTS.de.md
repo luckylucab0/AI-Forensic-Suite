@@ -6,7 +6,7 @@
 
 Erzeugt aus catalog/ durch scripts/gen_artifact_docs.py. Nicht von Hand bearbeiten: die CI erzeugt diese Datei neu und schlägt fehl, wenn sie abweicht.
 
-334 Artefakte über 26 Agent(en), davon 248 auf einer abgerufenen Herstellerquelle beruhend.
+343 Artefakte über 27 Agent(en), davon 255 auf einer abgerufenen Herstellerquelle beruhend.
 
 Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
 
@@ -539,6 +539,48 @@ Vendor: Factory
 | `factory_droid.mcp_and_hooks` | mcp and hooks | mcp_config | macOS, Linux, Windows | `<project>/.factory/mcp.json`<br>`~/.factory/hooks.json`<br>`~/.factory/mcp.json` | json | normal | [EN] Persistent until edited. | **unbestätigt** | [community](https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift) |
 | `factory_droid.sessions` | sessions | transcript | macOS, Linux, Windows | `<project>/.factory/sessions/`<br>`~/.factory/sessions/**/settings.json`<br>`~/.factory/sessions/*/*.jsonl`<br>`~/.factory/sessions/<uuid>.json` | jsonl | normal | [EN] No documented expiry. | **unbestätigt** | [community](https://github.com/code-yeongyu/oh-my-openagent/blob/main/packages/shared-skills/skills/coding-agent-sessions/references/all-platforms.md) |
 | `factory_droid.skills_and_droids` | skills and droids | instructions | macOS, Linux, Windows | `<project>/AGENTS.md`<br>`~/.factory/commands/`<br>`~/.factory/droids/`<br>`~/.factory/skills/` | markdown | normal | [EN] Persistent until removed. | **unbestätigt** | [community](https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift) |
+
+## Gemini CLI
+
+Vendor: Google
+
+[EN] Google's command line agent. The one agent in this catalogue that documents an automatic
+deletion policy for its own conversations, which changes what a collection means: the
+default is to delete chats older than thirty days, so an absent conversation is the
+expected state rather than a sign that anybody removed it.
+
+<https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md>, <https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/utils/paths.ts>
+
+### Verschiebende Variablen
+
+- `GEMINI_CLI_HOME`: [EN] Relocates the whole .gemini directory. homedir() in packages/core/src/utils/paths.ts returns this value when it is set and the user's home directory otherwise, so a collection keyed on ~/.gemini finds nothing on such a host and cannot tell that apart from Gemini CLI never having run.
+- `GEMINI_CLI_SYSTEM_SETTINGS_PATH`: [EN] Moves the machine-wide settings file, which is where an administrator would enforce policy. Reading only the documented location can therefore report no policy on a host that has one.
+- `GEMINI_CLI_SYSTEM_DEFAULTS_PATH`: [EN] Moves the machine-wide defaults file, the lowest layer of the four-layer settings stack.
+- `GEMINI_CLI_TRUSTED_FOLDERS_PATH`: [EN] Moves trustedFolders.json, the record of which directories the user allowed the agent to work in. That record is the answer to what the agent was permitted to touch.
+- `GEMINI_SYSTEM_MD`: [EN] Replaces the built-in system prompt with a file of the operator's choosing, anywhere on disk. Prompt-injection surface that lives outside every directory this catalogue names: follow the value.
+
+### first
+
+**Zuerst sichern.** Rotieren oder verfallen aggressiv, nach Anzahl oder bei jedem Aufräumlauf statt nach einer bequemen Frist. Einige davon zerstört die Benutzerin schon dadurch, dass sie eine weitere Sitzung startet.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `gemini_cli.chats` | chats | transcript | macOS, Windows, Linux | `%USERPROFILE%\.gemini\chats\`<br>`%USERPROFILE%\.gemini\sessions\`<br>`~/.gemini/chats/`<br>`~/.gemini/sessions/` | json | normal | [EN] Deleted on a timer by default, which is unusual and is the most important fact about this agent. general.sessionRetention has enabled default true, maxAge default "30d" described as "Automatically delete chats older than this time period", an optional maxCount as the "Maximum number of sessions to keep", and minRetention default "1d" as a "Minimum retention period (safety limit)". | **unbestätigt** | [official](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md) |
+| `gemini_cli.home_tree` | home tree | config | macOS, Windows, Linux | `%USERPROFILE%\.gemini\`<br>`~/.gemini/` | directory | normal | [EN] Mixed. Some of what is in here is deleted on a timer, see gemini_cli.chats, and the rest persists until edited. | bestätigt | [source_code](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/utils/paths.ts) |
+| `gemini_cli.shell_history` | shell history | shell_history | macOS, Windows, Linux | `%USERPROFILE%\.gemini\tmp\<project-hash>\shell_history`<br>`~/.gemini/tmp/<project-hash>/shell_history` | text | normal | [EN] Under tmp, so treat it as something the agent may clear at any time. No retention policy for it was found in the sources read. | bestätigt | [official](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md) |
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `gemini_cli.credentials` | credentials | credentials | macOS, Windows, Linux | `%USERPROFILE%\.gemini\oauth_creds.json`<br>`~/.gemini/oauth_creds.json` | json | secret | [EN] Rewritten on sign-in and on token refresh. | **unbestätigt** | [official](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md) |
+| `gemini_cli.google_accounts` | google accounts | config | macOS, Windows, Linux | `%USERPROFILE%\.gemini\google_accounts.json`<br>`~/.gemini/google_accounts.json` | json | normal | [EN] Rewritten on sign-in. | bestätigt | [source_code](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/utils/paths.ts) |
+| `gemini_cli.project_config` | project config | project_instructions | macOS, Windows, Linux | `<project>/.gemini/`<br>`<project>/.gemini/.env`<br>`<project>/.gemini/sandbox.Dockerfile`<br>`<project>/.gemini/settings.json`<br>`<project>/GEMINI.md` | json | normal | [EN] Lives and dies with the working copy, and is usually under version control. | bestätigt | [official](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md) |
+| `gemini_cli.system_settings` | system settings | permissions | macOS, Windows, Linux | `%PROGRAMDATA%\gemini-cli\settings.json`<br>`%PROGRAMDATA%\gemini-cli\system-defaults.json`<br>`/Library/Application Support/GeminiCli/settings.json`<br>`/Library/Application Support/GeminiCli/system-defaults.json`<br>`/etc/gemini-cli/settings.json`<br>`/etc/gemini-cli/system-defaults.json` | json | normal | [EN] Persistent until an administrator edits it. | bestätigt | [official](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md) |
+| `gemini_cli.trusted_folders` | trusted folders | permissions | macOS, Windows, Linux | `%USERPROFILE%\.gemini\trustedFolders.json`<br>`~/.gemini/trustedFolders.json` | json | normal | [EN] Appended to as the user trusts directories; nothing observed that expires an entry. | bestätigt | [source_code](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/utils/paths.ts) |
+| `gemini_cli.user_settings` | user settings | config | macOS, Windows, Linux | `%USERPROFILE%\.gemini\settings.json`<br>`~/.gemini/settings.json` | json | normal | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md) |
 
 ## Goose
 

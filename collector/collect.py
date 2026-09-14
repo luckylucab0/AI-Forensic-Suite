@@ -4143,6 +4143,173 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         },
         {
+            "agent": "gemini_cli",
+            "artifacts": [
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "gemini_cli.chats",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\chats\\",
+                        "%USERPROFILE%\\.gemini\\sessions\\",
+                        "~/.gemini/chats/",
+                        "~/.gemini/sessions/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "gemini_cli.credentials",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\oauth_creds.json",
+                        "~/.gemini/oauth_creds.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "gemini_cli.google_accounts",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\google_accounts.json",
+                        "~/.gemini/google_accounts.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "gemini_cli.home_tree",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\",
+                        "~/.gemini/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "gemini_cli.project_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.gemini/",
+                        "<project>/.gemini/.env",
+                        "<project>/.gemini/sandbox.Dockerfile",
+                        "<project>/.gemini/settings.json",
+                        "<project>/GEMINI.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "shell_history",
+                    "collect_priority": "first",
+                    "id": "gemini_cli.shell_history",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\tmp\\<project-hash>\\shell_history",
+                        "~/.gemini/tmp/<project-hash>/shell_history"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "gemini_cli.system_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%PROGRAMDATA%\\gemini-cli\\settings.json",
+                        "%PROGRAMDATA%\\gemini-cli\\system-defaults.json",
+                        "/Library/Application Support/GeminiCli/settings.json",
+                        "/Library/Application Support/GeminiCli/system-defaults.json",
+                        "/etc/gemini-cli/settings.json",
+                        "/etc/gemini-cli/system-defaults.json"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "gemini_cli.trusted_folders",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\trustedFolders.json",
+                        "~/.gemini/trustedFolders.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "gemini_cli.user_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\settings.json",
+                        "~/.gemini/settings.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
             "agent": "goose",
             "artifacts": [
                 {
@@ -6287,7 +6454,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "ab6057d1481144a027fc692b2574336bc7a589be2e24b103ccb833267442d896"
+    "sha256": "bafae099c57de0f22475a58f09bdc8ed6ce948e3003d3bed34da0f38b79c906b"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)
