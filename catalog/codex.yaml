@@ -1,0 +1,347 @@
+# OpenAI Codex CLI artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: codex
+title: OpenAI Codex CLI
+vendor: OpenAI
+description: |-
+  The Codex command line agent, and the Codex app and IDE extension that share its data
+  tree. One directory holds the conversations, the prompt history, seven SQLite state
+  databases and the credentials, which makes it the richest single tree of any agent here
+  after Claude Code.
+references:
+- https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/config/mod.rs
+- https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/config.schema.json
+- https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/lib.rs
+- https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/recorder.rs
+- https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/list.rs
+- https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/compression.rs
+- https://raw.githubusercontent.com/openai/codex/main/codex-rs/state/src/lib.rs
+- https://raw.githubusercontent.com/openai/codex/main/codex-rs/state/src/sqlite.rs
+env_overrides:
+- name: CODEX_HOME
+  effect: |-
+    Moves the whole Codex directory away from ~/.codex, taking the rollouts, the prompt history, the state databases and auth.json with it. A collection keyed on ~/.codex alone finds nothing on such a host, which is indistinguishable from Codex never having run. Resolved by find_codex_home(), which falls back to ~/.codex.
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/config/mod.rs
+- name: CODEX_SQLITE_HOME
+  effect: |-
+    Moves only the SQLite state databases out of the Codex home, so the rollouts can be present while the thread index, the logs database and the memories are somewhere else entirely. The constant is SQLITE_HOME_ENV = "CODEX_SQLITE_HOME".
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/state/src/lib.rs
+artifacts:
+- id: codex.sqlite_write_ahead_logs
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\*.sqlite-shm'
+  - '%USERPROFILE%\.codex\*.sqlite-wal'
+  - ~/.codex/*.sqlite-shm
+  - ~/.codex/*.sqlite-wal
+  format: binary
+  sensitivity: normal
+  collect_priority: live_only
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/state/src/sqlite.rs
+  source_kind: source_code
+  volatility: |-
+    Destroyed by a clean shutdown. Every Codex database is opened with journal_mode(SqliteJournalMode::Wal), so the newest writes live in the -wal sidecar until a checkpoint folds them into the main file. Collect the sidecars together with the database or lose the most recent activity, which is usually the activity under investigation.
+  notes: |-
+    Not an artifact in its own right so much as the missing half of every other .sqlite entry here. A bundle holding state_5.sqlite without state_5.sqlite-wal can be internally consistent and still be missing the last session, and nothing in the database says so.
+
+    Collect all three parts of each database, always: the .sqlite, the -wal and the -shm. Analysis must open a copy, never the original, and must not let SQLite checkpoint the evidence.
+  parser: null
+- id: codex.rollouts
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\sessions\'
+  - ~/.codex/sessions/
+  - ~/.codex/sessions/<year>/<month>/<day>/
+  format: jsonl
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/recorder.rs
+  source_kind: source_code
+  volatility: |-
+    No age-based deletion was found in the sources read, but rollouts older than seven days are rewritten in place as Zstandard archives by a background worker (MIN_ROLLOUT_AGE = 7 * 24 * 60 * 60 seconds, spawn_rollout_compression_worker). A running Codex can therefore compress a file while it is being collected, which is why this is first rather than normal.
+  notes: |-
+    The primary evidence for Codex: the full conversation, one JSON object per line. precompute_new_rollout_path() builds CODEX_HOME/sessions/YYYY/MM/DD/ from the session start time, so the directory tree alone dates activity even if the files cannot be read, and the year, month and day are zero-padded two-digit components.
+
+    Record structure: the first record is a SessionMeta whose fields answer most of the who and where questions on their own: session_id, id, forked_from_id, forked_from_ordinal_exclusive, parent_thread_id, timestamp, cwd, runtime_workspace_roots, originator, cli_version, agent_nickname, agent_role, agent_path, source, thread_source, model_provider, base_instructions, dynamic_tools, selected_capability_roots, memory_mode, history_mode, history_base, subagent_history_start_ordinal, multi_agent_version, context_window. forked_from_id means a conversation can continue in a different file, so one rollout is not necessarily the whole story.
+
+    thread_source distinguishes where the session came from. INTERACTIVE_SESSION_SOURCES lists SessionSource::Cli, SessionSource::VSCode, SessionSource::Custom("atlas") and SessionSource::Custom("chatgpt"), so this one tree holds the CLI, the IDE extension and the desktop app together.
+  parser: null
+- id: codex.rollouts_compressed
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\sessions\**\rollout-*.jsonl.tmp'
+  - '%USERPROFILE%\.codex\sessions\**\rollout-*.jsonl.zst'
+  - ~/.codex/sessions/**/rollout-*.jsonl.tmp
+  - ~/.codex/sessions/**/rollout-*.jsonl.zst
+  format: binary
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/compression.rs
+  source_kind: source_code
+  volatility: |-
+    These ARE the older sessions. A background worker compresses any rollout at least seven days old in place, writing through a .tmp file, so the plain .jsonl form exists only for the last week of activity.
+  notes: |-
+    The single most likely way to miss almost everything. A collection or a viewer that globs rollout-*.jsonl finds the last seven days and silently reports nothing older, on a host where a year of conversations is sitting right next to it under a different extension. Constants: COMPRESSED_SUFFIX = ".zst", TEMP_SUFFIX = ".tmp".
+
+    A .tmp file present at collection time means the worker was interrupted mid-compression, so both the archive and the original may exist, or neither may be complete. Collect it and say so rather than choosing.
+  parser: null
+- id: codex.archived_sessions
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\archived_sessions\'
+  - ~/.codex/archived_sessions/
+  format: jsonl
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/lib.rs
+  source_kind: source_code
+  volatility: |-
+    Where a rollout goes when the user archives a thread rather than where it goes when it ages. Nothing in the sources read deletes this tree on a timer.
+  notes: |-
+    ARCHIVED_SESSIONS_SUBDIR = "archived_sessions", a sibling of sessions/ and not a subdirectory of it, so a collection rooted at sessions/ misses every archived conversation. Archiving is a user action, which makes a populated tree here more interesting than the same content under sessions/: somebody chose to take these out of the list they see.
+  parser: null
+- id: codex.prompt_history
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\history.jsonl'
+  - ~/.codex/history.jsonl
+  format: jsonl
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/config.schema.json
+  source_kind: source_code
+  volatility: |-
+    Trimmed from the front, not by age. The schema documents history.max_bytes as "If set, the maximum size of the history file in bytes. The oldest entries are dropped once the file exceeds this limit", so on a busy host the earliest prompts are already gone and the file gives no sign of how many.
+  notes: |-
+    What the user typed, across every project, in one file. Worth collecting even when the rollouts are present: it survives the deletion of a conversation, and it is the cheapest way to see that a session existed at all.
+  parser: null
+- id: codex.state_databases
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\goals_1.sqlite'
+  - '%USERPROFILE%\.codex\logs_2.sqlite'
+  - '%USERPROFILE%\.codex\memories_1.sqlite'
+  - '%USERPROFILE%\.codex\memories_v2_1.sqlite'
+  - '%USERPROFILE%\.codex\queue_1.sqlite'
+  - '%USERPROFILE%\.codex\state_5.sqlite'
+  - '%USERPROFILE%\.codex\thread_history_1.sqlite'
+  - ~/.codex/goals_1.sqlite
+  - ~/.codex/logs_2.sqlite
+  - ~/.codex/memories_1.sqlite
+  - ~/.codex/memories_v2_1.sqlite
+  - ~/.codex/queue_1.sqlite
+  - ~/.codex/state_5.sqlite
+  - ~/.codex/thread_history_1.sqlite
+  format: sqlite
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/state/src/sqlite.rs
+  source_kind: source_code
+  volatility: |-
+    Live databases in WAL mode, rewritten continuously while Codex runs. Collect them with their -wal and -shm sidecars, see codex.sqlite_write_ahead_logs.
+  notes: |-
+    Seven databases, each with a schema version baked into its filename, which is why the paths are listed individually and a `*.sqlite` glob is kept alongside them in codex.sqlite_glob: the next version is state_6.sqlite and this list will be wrong before the tool is.
+
+    memories_1.sqlite and memories_v2_1.sqlite are the agent's persistent memory, which is a different question from what it was told in one session: content here influences future sessions the user may not connect to it, and it is where an injected instruction would persist. thread_history_1.sqlite indexes the rollouts, so it can name conversations whose files have been deleted.
+
+    CODEX_SQLITE_HOME moves all seven out of the Codex home.
+  parser: null
+- id: codex.sqlite_glob
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\*.sqlite'
+  - ~/.codex/*.sqlite
+  format: sqlite
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/state/src/sqlite.rs
+  source_kind: source_code
+  volatility: |-
+    As codex.state_databases.
+  notes: |-
+    Deliberately redundant with codex.state_databases. Every one of those filenames carries a schema version, and the vendor bumps it: an analyst running this tool against a newer Codex than the catalogue knows about would otherwise collect nothing and see a clean directory. The named entries give attribution, this one gives coverage, and the manifest records both claims on a file.
+  parser: null
+- id: codex.log_dir
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\log\'
+  - ~/.codex/log/
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/config/mod.rs
+  source_kind: source_code
+  volatility: |-
+    Rewritten per run. The sources read do not state a rotation policy, and the field is only populated when logging is configured, so an empty directory says nothing about whether Codex ran.
+  notes: |-
+    log_dir defaults to $CODEX_HOME/log. Setting it explicitly also turns on the terminal UI text log, so the presence of content here can mean the user was debugging Codex, which is context worth having.
+  parser: null
+- id: codex.config
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\*.config.toml'
+  - '%USERPROFILE%\.codex\config.toml'
+  - ~/.codex/*.config.toml
+  - ~/.codex/config.toml
+  format: toml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/config/mod.rs
+  source_kind: source_code
+  volatility: Persistent until edited.
+  notes: |-
+    CONFIG_TOML_FILE = "config.toml" in the Codex home, plus per-profile files named <profile>.config.toml (CONFIG_PROFILE_V2_SUFFIX), resolved by resolve_profile_v2_config_path(). A profile can carry its own model provider and its own instructions file, so the active profile decides which of several configurations was in force and reading only config.toml can describe a setup that was not the one used.
+
+    Also here: model_catalog_json and model_instructions_file, both paths to files elsewhere on disk that shape the agent's behaviour, and experimental_compact_prompt_file. Follow them: they are prompt-injection surface that lives outside every directory this catalogue names.
+  parser: null
+- id: codex.mcp_and_notify
+  category: mcp_config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\config.toml'
+  - ~/.codex/config.toml
+  format: toml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/config.schema.json
+  source_kind: source_code
+  volatility: Persistent until edited.
+  notes: |-
+    Codex keeps its MCP servers inside config.toml rather than in a separate file, so the same bytes are both the configuration artifact and the MCP artifact. Listed twice on purpose: a report grouped by category would otherwise show no MCP configuration for an agent that has one.
+
+    The notify hook also lives here and runs an external program on agent events, which makes it an execution path configured by a text file.
+  parser: null
+- id: codex.requirements_and_permissions
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\permissions.toml'
+  - '%USERPROFILE%\.codex\requirements.toml'
+  - ~/.codex/permissions.toml
+  - ~/.codex/requirements.toml
+  format: toml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/config/mod.rs
+  source_kind: source_code
+  volatility: Persistent until edited.
+  notes: |-
+    The two files that decide what the agent was allowed to do without asking. allow_managed_hooks_only is honoured only in requirements.toml and is ignored in config.toml, so a control that looks configured can have no effect: check which file a restriction is written in before reporting that it was in force.
+  parser: null
+- id: codex.auth
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\auth.json'
+  - ~/.codex/auth.json
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/config.schema.json
+  source_kind: source_code
+  volatility: Rewritten on login and on token refresh.
+  notes: |-
+    The schema's AuthCredentialsStoreMode documents the file option as "Persist credentials in CODEX_HOME/auth.json". Metadata and a hash only: its existence and its timestamps date the login, which is the forensic question, and the token itself is a liability in a bundle.
+
+    Mode "keyring" puts the same credential in the operating system keystore instead and "auto" prefers the keyring when one is available, so an absent auth.json does not mean the user was not signed in.
+  parser: null
+- id: codex.mcp_oauth_credentials
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\.credentials.json'
+  - ~/.codex/.credentials.json
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/config.schema.json
+  source_kind: source_code
+  volatility: Rewritten when an MCP server's OAuth token is issued or refreshed.
+  notes: |-
+    OAuth tokens for MCP servers. The schema says of the file option: "CODEX_HOME/.credentials.json This file will be readable to Codex and other applications running as the same user", which is the vendor stating the exposure rather than an inference.
+
+    Worth naming in a report even though the content is withheld: each entry is a third-party service the agent held a live token for, and the set of services is the data-egress question.
+  parser: null

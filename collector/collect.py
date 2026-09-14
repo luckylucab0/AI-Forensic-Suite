@@ -2297,6 +2297,253 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         },
         {
+            "agent": "codex",
+            "artifacts": [
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "codex.archived_sessions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\archived_sessions\\",
+                        "~/.codex/archived_sessions/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "codex.auth",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\auth.json",
+                        "~/.codex/auth.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "codex.config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\*.config.toml",
+                        "%USERPROFILE%\\.codex\\config.toml",
+                        "~/.codex/*.config.toml",
+                        "~/.codex/config.toml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "codex.log_dir",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\log\\",
+                        "~/.codex/log/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "codex.mcp_and_notify",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\config.toml",
+                        "~/.codex/config.toml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "codex.mcp_oauth_credentials",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\.credentials.json",
+                        "~/.codex/.credentials.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "first",
+                    "id": "codex.prompt_history",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\history.jsonl",
+                        "~/.codex/history.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "codex.requirements_and_permissions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\permissions.toml",
+                        "%USERPROFILE%\\.codex\\requirements.toml",
+                        "~/.codex/permissions.toml",
+                        "~/.codex/requirements.toml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "codex.rollouts",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\sessions\\",
+                        "~/.codex/sessions/",
+                        "~/.codex/sessions/<year>/<month>/<day>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "codex.rollouts_compressed",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\sessions\\**\\rollout-*.jsonl.tmp",
+                        "%USERPROFILE%\\.codex\\sessions\\**\\rollout-*.jsonl.zst",
+                        "~/.codex/sessions/**/rollout-*.jsonl.tmp",
+                        "~/.codex/sessions/**/rollout-*.jsonl.zst"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "codex.sqlite_glob",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\*.sqlite",
+                        "~/.codex/*.sqlite"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "live_only",
+                    "id": "codex.sqlite_write_ahead_logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\*.sqlite-shm",
+                        "%USERPROFILE%\\.codex\\*.sqlite-wal",
+                        "~/.codex/*.sqlite-shm",
+                        "~/.codex/*.sqlite-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "codex.state_databases",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\goals_1.sqlite",
+                        "%USERPROFILE%\\.codex\\logs_2.sqlite",
+                        "%USERPROFILE%\\.codex\\memories_1.sqlite",
+                        "%USERPROFILE%\\.codex\\memories_v2_1.sqlite",
+                        "%USERPROFILE%\\.codex\\queue_1.sqlite",
+                        "%USERPROFILE%\\.codex\\state_5.sqlite",
+                        "%USERPROFILE%\\.codex\\thread_history_1.sqlite",
+                        "~/.codex/goals_1.sqlite",
+                        "~/.codex/logs_2.sqlite",
+                        "~/.codex/memories_1.sqlite",
+                        "~/.codex/memories_v2_1.sqlite",
+                        "~/.codex/queue_1.sqlite",
+                        "~/.codex/state_5.sqlite",
+                        "~/.codex/thread_history_1.sqlite"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
             "agent": "continue",
             "artifacts": [
                 {
@@ -2448,6 +2695,187 @@ EMBEDDED_CATALOGUE_JSON = r"""
             "agent": "copilot",
             "artifacts": [
                 {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "copilot.agents_skills_hooks",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\agents\\",
+                        "%USERPROFILE%\\.copilot\\hooks\\",
+                        "%USERPROFILE%\\.copilot\\skills\\",
+                        "~/.copilot/agents/",
+                        "~/.copilot/hooks/",
+                        "~/.copilot/skills/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "durable",
+                    "id": "copilot.cache",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\copilot\\",
+                        "$XDG_CACHE_HOME/copilot/",
+                        "~/.cache/copilot/",
+                        "~/Library/Caches/copilot/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "first",
+                    "id": "copilot.command_history",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\command-history-state\\",
+                        "~/.copilot/command-history-state/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "copilot.config_json",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\config.json",
+                        "~/.copilot/config.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "copilot.extensions_and_plugins",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\extensions\\",
+                        "%USERPROFILE%\\.copilot\\installed-plugins\\",
+                        "%USERPROFILE%\\.copilot\\plugin-data\\",
+                        "~/.copilot/extensions/",
+                        "~/.copilot/installed-plugins/",
+                        "~/.copilot/plugin-data/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "live_only",
+                    "id": "copilot.ide_locks",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\ide\\",
+                        "~/.copilot/ide/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "copilot.instructions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\copilot-instructions.md",
+                        "%USERPROFILE%\\.copilot\\instructions\\",
+                        "~/.copilot/copilot-instructions.md",
+                        "~/.copilot/instructions/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "copilot.logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\logs\\",
+                        "~/.copilot/logs/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "copilot.lsp_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\lsp-config.json",
+                        "~/.copilot/lsp-config.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "copilot.lsp_config_repo",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.github/lsp.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "mcp_config",
                     "collect_priority": "normal",
                     "id": "copilot.mcp_config",
@@ -2457,8 +2885,166 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
+                        "%USERPROFILE%\\.copilot\\mcp-config.json",
+                        "~/.copilot/mcp-config.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "copilot.mcp_config_jetbrains",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
                         "%LOCALAPPDATA%\\github-copilot\\intellij\\mcp.json",
+                        "~/.config/github-copilot/",
                         "~/.config/github-copilot/intellij/mcp.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "copilot.mcp_credentials",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\mcp-oauth-config\\",
+                        "%USERPROFILE%\\.copilot\\mcp-secrets\\",
+                        "~/.copilot/mcp-oauth-config/",
+                        "~/.copilot/mcp-secrets/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "copilot.permissions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\permissions-config.json",
+                        "~/.copilot/permissions-config.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "copilot.providers",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\providers.json",
+                        "~/.copilot/providers.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "copilot.session_event_log",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.copilot/session-state/<session-id>/events.jsonl",
+                        "~/.copilot/session-state/<session-id>/workspace.yaml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "copilot.session_state",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\session-state\\",
+                        "~/.copilot/session-state/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "copilot.session_store",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\session-store.db",
+                        "~/.copilot/session-store.db"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "live_only",
+                    "id": "copilot.session_store_sidecars",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\session-store.db-shm",
+                        "%USERPROFILE%\\.copilot\\session-store.db-wal",
+                        "~/.copilot/session-store.db-shm",
+                        "~/.copilot/session-store.db-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "copilot.settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.copilot\\settings.json",
+                        "~/.copilot/settings.json"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -5701,7 +6287,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "7ff23a5b8b355a141c29503896b1110b4a9daf8d108a4aecc6b0cec42426e07b"
+    "sha256": "ab6057d1481144a027fc692b2574336bc7a589be2e24b103ccb833267442d896"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

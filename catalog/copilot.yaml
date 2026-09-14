@@ -1,4 +1,4 @@
-# GitHub Copilot artifact catalogue.
+# GitHub Copilot CLI artifact catalogue.
 #
 # Generated from vendor documentation and then maintained by hand. status: verified
 # means somebody fetched that URL and the page states that path; anything else is
@@ -10,12 +10,229 @@
 # live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
 
 agent: copilot
-title: GitHub Copilot
+title: GitHub Copilot CLI
 vendor: GitHub
+description: |-
+  The Copilot command line agent. GitHub documents the whole configuration directory file
+  by file, including which files hold credentials and what is lost by deleting each one,
+  which makes this one of the few agents where the catalogue rests on the vendor's own
+  inventory rather than on reading its source.
 references:
-- |-
-  https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt
+- https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+- https://raw.githubusercontent.com/github/copilot-cli/main/README.md
+- https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt
+env_overrides:
+- name: COPILOT_HOME
+  effect: |-
+    Overrides the default ~/.copilot location, and the CLI then reads all configuration from there. A collection keyed on ~/.copilot alone finds nothing on such a host, which is indistinguishable from Copilot CLI never having run.
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+- name: COPILOT_CACHE_HOME
+  effect: |-
+    Moves the cache directory, which otherwise follows platform convention rather than sitting under ~/.copilot. Only ephemeral data, but it is where marketplace and auto-update material lands.
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+- name: COPILOT_PROVIDERS_CONFIG
+  effect: |-
+    Moves providers.json, the registry of bring-your-own-key providers and models. Relevant to a data-egress question: it names the endpoints the agent was configured to talk to, and this variable can put that file anywhere.
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
 artifacts:
+- id: copilot.ide_locks
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\ide\'
+  - ~/.copilot/ide/
+  format: text
+  sensitivity: normal
+  collect_priority: live_only
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: |-
+    Lock files, so they exist while an integration is live and are cleaned up when it is not. Documented as "Lock files and state for IDE integrations" that are "automatically managed", which is another way of saying they will not be there later.
+  notes: |-
+    Worth collecting first precisely because it is worthless later: a lock file present at collection time says an IDE integration was running at that moment, which no durable artifact can establish.
+  parser: null
+- id: copilot.session_store_sidecars
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\session-store.db-shm'
+  - '%USERPROFILE%\.copilot\session-store.db-wal'
+  - ~/.copilot/session-store.db-shm
+  - ~/.copilot/session-store.db-wal
+  format: binary
+  sensitivity: normal
+  collect_priority: live_only
+  status: unverified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: |-
+    If present, destroyed by a clean shutdown, and holding writes that are not yet in the database file.
+  notes: |-
+    Deliberately unverified. GitHub documents session-store.db and says nothing about journal mode, so whether these sidecars exist depends on how the database is opened, which no vendor page read here states. They are collected anyway because the cost of collecting two files that do not exist is nothing and the cost of leaving the newest records behind is the investigation.
+
+    Their absence therefore means either that Copilot was shut down cleanly or that it does not use write-ahead logging at all. Do not report it as either.
+  parser: null
+- id: copilot.logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\logs\'
+  - ~/.copilot/logs/
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: |-
+    One file per session, and the vendor calls the directory safe to delete because "log files are re-created each session". Treat what is here as the current and recent sessions only.
+  notes: |-
+    Documented as "Session log files" created one per session, plus extension-specific logs. A per-session log alongside a per-session state directory means two independent records of the same session, which is exactly what an analyst wants when one of them has been tampered with.
+  parser: null
+- id: copilot.session_state
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\session-state\'
+  - ~/.copilot/session-state/
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: |-
+    The vendor describes this as session history data and says that deleting it "removes session history" and that "You will no longer be able to resume past sessions", so it is user-deletable in one step with no copy elsewhere. Other vendor material calls session state ephemeral and advises against backing it up, which is guidance to a user and a warning to an analyst: do not expect it to still be there.
+  notes: |-
+    The primary evidence for Copilot CLI. One directory per session; the vendor states each "stores an event log and workspace artifacts" without naming the files.
+
+    Record structure: the event log is line-delimited JSON covering user and assistant turns, tool activity, model changes, hooks and session lifecycle events with timestamps. The viewer in this repository parses it. The specific filenames are claimed by copilot.session_event_log rather than here, so that this entry's verified status covers only what the vendor actually documents.
+  parser: null
+- id: copilot.session_event_log
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.copilot/session-state/<session-id>/events.jsonl
+  - ~/.copilot/session-state/<session-id>/workspace.yaml
+  format: jsonl
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: |-
+    As copilot.session_state, inside which these live.
+  notes: |-
+    The filenames inside a session directory, split out from copilot.session_state and left unverified on purpose. The vendor documents that each session directory holds "an event log and workspace artifacts" but does not name events.jsonl or workspace.yaml, and this catalogue does not mark a path verified on the strength of a filename nobody published.
+
+    Coverage does not depend on getting the names right: copilot.session_state collects the whole tree. What this entry buys is attribution, so a report can say which file a finding came from, and a warning if the names turn out to be wrong.
+  parser: null
+- id: copilot.command_history
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\command-history-state\'
+  - ~/.copilot/command-history-state/
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: |-
+    Deleting it "removes command history" and the user then "will no longer be able to search previous commands". One user action, no second copy.
+  notes: |-
+    Documented as "Command history data used for reverse search". This is what the user typed, which survives independently of whether the session it belonged to still exists, so it is often the only remaining evidence that a deleted session ever happened.
+  parser: null
+- id: copilot.config_json
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\config.json'
+  - ~/.copilot/config.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  contains_credentials:
+  - authentication data
+  volatility: Rewritten as internal state changes, including on login.
+  notes: |-
+    The vendor's own description is "Stores internal application state...including authentication data, installed plugin metadata", and a community reference adds that trusted folders are kept here under a trusted_folders key.
+
+    Collected in full, and flagged rather than withheld. It is evidence of what the agent was permitted to touch and what was installed, and withholding it to protect the token inside would remove the evidence with it. Handle the bundle accordingly: see SECURITY.md.
+  parser: null
+- id: copilot.settings
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\settings.json'
+  - ~/.copilot/settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    The "Primary configuration file" for user preferences. Documented as supporting JSON with comments, so a strict JSON parser will fail on a valid file: parse it as JSONC or record the parse failure rather than reporting no settings.
+  parser: null
+- id: copilot.permissions
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\permissions-config.json'
+  - ~/.copilot/permissions-config.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: Appended to as the user approves things; nothing observed that expires an entry.
+  notes: |-
+    "Stores your saved tool and directory permission decisions, organized by project". The direct answer to whether a safety control was bypassed, and by project, so it shows where the user decided to stop being asked.
+  parser: null
 - id: copilot.mcp_config
   category: mcp_config
   root: user_profile
@@ -24,15 +241,248 @@ artifacts:
   - windows
   - linux
   paths:
+  - '%USERPROFILE%\.copilot\mcp-config.json'
+  - ~/.copilot/mcp-config.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    "Defines MCP (Model Context Protocol) servers available at user level", and it persists across all sessions and workspaces. Each entry is a process the agent could start or a network endpoint it could reach, which is the data-egress surface.
+  parser: null
+- id: copilot.mcp_config_jetbrains
+  category: mcp_config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
   - '%LOCALAPPDATA%\github-copilot\intellij\mcp.json'
+  - ~/.config/github-copilot/
   - ~/.config/github-copilot/intellij/mcp.json
   format: json
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: |-
-    https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt
-  source_kind: official
+  source: https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt
+  source_kind: source_code
+  volatility: Persistent until edited.
   notes: |-
-    Verified from JetBrains source (detectGitHubCopilotJetBrains): macOS AND Linux both use ~/.config/github-copilot/intellij/mcp.json (note: macOS uses the XDG-style ~/.config path here, NOT ~/Library), Windows uses %LOCALAPPDATA%/github-copilot/intellij/mcp.json. The detector treats the existence of the PARENT DIRECTORY as the signal, so ~/.config/github-copilot/intellij/ is itself install evidence for the Copilot JetBrains plugin. Recommend enumerating the whole ~/.config/github-copilot/ tree for the Copilot family - it is the JetBrains-side sibling of the VS Code Copilot artifacts and belongs in the Copilot family entry too.
+    The JetBrains-side sibling of the CLI's own configuration, in a different tree entirely. From JetBrains source (detectGitHubCopilotJetBrains): macOS and Linux both use ~/.config/github-copilot/intellij/mcp.json, note the XDG-style path on macOS rather than ~/Library, and Windows uses %LOCALAPPDATA%/github-copilot/intellij/mcp.json.
+
+    The detector treats the existence of the parent directory as the signal, so ~/.config/github-copilot/intellij/ is itself install evidence for the Copilot JetBrains plugin. The whole ~/.config/github-copilot/ tree is claimed here for that reason.
+  parser: null
+- id: copilot.mcp_credentials
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\mcp-oauth-config\'
+  - '%USERPROFILE%\.copilot\mcp-secrets\'
+  - ~/.copilot/mcp-oauth-config/
+  - ~/.copilot/mcp-secrets/
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: Written when a token is issued or refreshed.
+  notes: |-
+    Documented as holding an "MCP OAuth token...and PKCE fallback files" and "Fallback file storage and index for MCP secret placeholders", in both cases specifically when the keychain is unavailable. Metadata and hashes only.
+
+    Two things follow for a report. Content here means the operating system keystore was not usable, which is worth noting on its own. And an empty directory does not mean there were no MCP credentials, only that they went to the keychain instead.
+  parser: null
+- id: copilot.instructions
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\copilot-instructions.md'
+  - '%USERPROFILE%\.copilot\instructions\'
+  - ~/.copilot/copilot-instructions.md
+  - ~/.copilot/instructions/
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    "Personal custom instructions that apply to all your sessions", plus additional *.instructions.md files under instructions/ organised by topic.
+
+    Read these before reading a transcript. They are prepended to every session, so an instruction here explains agent behaviour that otherwise looks unprompted, and they are the first place to look when the question is whether the agent was manipulated.
+  parser: null
+- id: copilot.agents_skills_hooks
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\agents\'
+  - '%USERPROFILE%\.copilot\hooks\'
+  - '%USERPROFILE%\.copilot\skills\'
+  - ~/.copilot/agents/
+  - ~/.copilot/hooks/
+  - ~/.copilot/skills/
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: Persistent until deleted.
+  notes: |-
+    "Personal custom agent definitions", "User-level hook scripts" and "Personal custom skill definitions". Grouped because they answer one question: what ran, or was injected, that the transcript does not show.
+
+    hooks/ is the sharp end. A hook is a script the agent executes on an event, so this directory is arbitrary code that runs without appearing as a tool call. Collect the scripts and hash them.
+  parser: null
+- id: copilot.extensions_and_plugins
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\extensions\'
+  - '%USERPROFILE%\.copilot\installed-plugins\'
+  - '%USERPROFILE%\.copilot\plugin-data\'
+  - ~/.copilot/extensions/
+  - ~/.copilot/installed-plugins/
+  - ~/.copilot/plugin-data/
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: |-
+    plugin-data/ is called safe to delete because the "data is re-created as needed", so treat its contents as the current state and not as a history.
+  notes: |-
+    "User-level extension files...available across sessions", "Files for plugins you have installed" and "Persistent data for installed plugins, organized by marketplace and plugin name".
+
+    The marketplace and plugin names are the finding here, before anyone opens a file: they say which third-party code the agent was extended with, and by whom.
+  parser: null
+- id: copilot.lsp_config
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\lsp-config.json'
+  - ~/.copilot/lsp-config.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/github/copilot-cli/main/README.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    "Defines Language Server Protocol (LSP) servers available at user level". Another set of processes the agent starts, configured by a file the user can edit, and a path to code execution that is not a tool call.
+  parser: null
+- id: copilot.lsp_config_repo
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.github/lsp.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/github/copilot-cli/main/README.md
+  source_kind: official
+  volatility: Lives and dies with the working copy, and is usually under version control.
+  notes: |-
+    The repository-level counterpart of lsp-config.json. It travels with a checkout, which makes it reachable by anyone who can open a pull request: cloning a repository can configure which processes the agent starts.
+  parser: null
+- id: copilot.providers
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\providers.json'
+  - ~/.copilot/providers.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    "Defines a registry of bring-your-own-key (BYOK) providers and models". Directly relevant to which data left the device and where it went: an entry here can point the agent at a model endpoint that is not GitHub's, and the prompts then go there instead.
+
+    COPILOT_PROVIDERS_CONFIG relocates this file, so check the environment before concluding that no custom provider was configured.
+  parser: null
+- id: copilot.cache
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%LOCALAPPDATA%\copilot\'
+  - $XDG_CACHE_HOME/copilot/
+  - ~/.cache/copilot/
+  - ~/Library/Caches/copilot/
+  format: directory
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: |-
+    Ephemeral by design and safe to lose. It is last in collection order for that reason, not because it is uninteresting.
+  notes: |-
+    The one part of Copilot CLI that does not live under ~/.copilot: macOS ~/Library/Caches/copilot, Linux $XDG_CACHE_HOME/copilot or ~/.cache/copilot, Windows %LOCALAPPDATA%/copilot, and COPILOT_CACHE_HOME overrides all of them.
+
+    Documented as holding ephemeral data such as marketplace caches and auto-update packages. A downloaded update package here dates a version change, which is how to tell which build produced a transcript when nothing else records it.
+  parser: null
+- id: copilot.session_store
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.copilot\session-store.db'
+  - ~/.copilot/session-store.db
+  format: sqlite
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
+  source_kind: official
+  volatility: |-
+    Rebuildable, which is the forensic problem: the vendor says the "file is re-created automatically" and can be rebuilt with a reindex command. A rebuilt index describes the sessions that still exist, so a row missing here is not evidence that a session never existed, and a full index is not evidence that nothing was deleted.
+  notes: |-
+    "SQLite database...for cross-session data such as checkpoint indexing". Useful for the same reason any index is: it can name conversations whose own directories are gone, at least until somebody reindexes.
+
+    Copy it with its sidecars and open only a copy, so that reading the evidence does not check the evidence's own write-ahead log into it.
   parser: null

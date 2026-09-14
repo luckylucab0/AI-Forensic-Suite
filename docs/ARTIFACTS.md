@@ -6,7 +6,7 @@ English | [Deutsch](ARTIFACTS.de.md)
 
 Generated from catalog/ by scripts/gen_artifact_docs.py. Do not edit by hand: CI regenerates this file and fails if it differs.
 
-302 artifacts across 25 agent(s), 218 of them resting on a fetched vendor source.
+334 artifacts across 26 agent(s), 248 of them resting on a fetched vendor source.
 
 Entries marked unverified are collected anyway, but no vendor source confirms the path. Treat the absence of such an artifact as inconclusive rather than as evidence that the agent was not used.
 
@@ -263,6 +263,56 @@ Paths below are no longer written or read by current versions. They are still co
 - `cline.data_dir_root`: `%USERPROFILE%\.cline\data\`, `~/.cline/`, `~/.cline/data/`
 - `cline.vscode_task_transcripts`: `<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/api_conversation_history.json`, `<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/context_history.json`, `<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/task_metadata.json`, `<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/ui_messages.json`
 
+## OpenAI Codex CLI
+
+Vendor: OpenAI
+
+The Codex command line agent, and the Codex app and IDE extension that share its data
+tree. One directory holds the conversations, the prompt history, seven SQLite state
+databases and the credentials, which makes it the richest single tree of any agent here
+after Claude Code.
+
+<https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/config/mod.rs>, <https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/config.schema.json>, <https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/lib.rs>, <https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/recorder.rs>, <https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/list.rs>, <https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/compression.rs>, <https://raw.githubusercontent.com/openai/codex/main/codex-rs/state/src/lib.rs>, <https://raw.githubusercontent.com/openai/codex/main/codex-rs/state/src/sqlite.rs>
+
+### Relocating variables
+
+- `CODEX_HOME`: Moves the whole Codex directory away from ~/.codex, taking the rollouts, the prompt history, the state databases and auth.json with it. A collection keyed on ~/.codex alone finds nothing on such a host, which is indistinguishable from Codex never having run. Resolved by find_codex_home(), which falls back to ~/.codex.
+- `CODEX_SQLITE_HOME`: Moves only the SQLite state databases out of the Codex home, so the rollouts can be present while the thread index, the logs database and the memories are somewhere else entirely. The constant is SQLITE_HOME_ENV = "CODEX_SQLITE_HOME".
+
+### live_only
+
+**Collect from a running machine or not at all.** These exist only while the agent or the session is running, or are destroyed by a clean shutdown. They cannot be recovered from a powered-off image, so if the endpoint is still up, start here.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `codex.sqlite_write_ahead_logs` | sqlite write ahead logs | transcript | macOS, Windows, Linux | `%USERPROFILE%\.codex\*.sqlite-shm`<br>`%USERPROFILE%\.codex\*.sqlite-wal`<br>`~/.codex/*.sqlite-shm`<br>`~/.codex/*.sqlite-wal` | binary | normal | Destroyed by a clean shutdown. Every Codex database is opened with journal_mode(SqliteJournalMode::Wal), so the newest writes live in the -wal sidecar until a checkpoint folds them into the main file. Collect the sidecars together with the database or lose the most recent activity, which is usually the activity under investigation. | verified | [source_code](https://raw.githubusercontent.com/openai/codex/main/codex-rs/state/src/sqlite.rs) |
+
+### first
+
+**Collect first.** Rotated or swept aggressively, by count or on every sweep rather than after a comfortable interval. Some of these can be destroyed by the user simply starting another session.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `codex.archived_sessions` | archived sessions | transcript | macOS, Windows, Linux | `%USERPROFILE%\.codex\archived_sessions\`<br>`~/.codex/archived_sessions/` | jsonl | normal | Where a rollout goes when the user archives a thread rather than where it goes when it ages. Nothing in the sources read deletes this tree on a timer. | verified | [source_code](https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/lib.rs) |
+| `codex.log_dir` | log dir | log | macOS, Windows, Linux | `%USERPROFILE%\.codex\log\`<br>`~/.codex/log/` | text | normal | Rewritten per run. The sources read do not state a rotation policy, and the field is only populated when logging is configured, so an empty directory says nothing about whether Codex ran. | verified | [source_code](https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/config/mod.rs) |
+| `codex.prompt_history` | prompt history | prompt_history | macOS, Windows, Linux | `%USERPROFILE%\.codex\history.jsonl`<br>`~/.codex/history.jsonl` | jsonl | normal | Trimmed from the front, not by age. The schema documents history.max_bytes as "If set, the maximum size of the history file in bytes. The oldest entries are dropped once the file exceeds this limit", so on a busy host the earliest prompts are already gone and the file gives no sign of how many. | verified | [source_code](https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/config.schema.json) |
+| `codex.rollouts` | rollouts | transcript | macOS, Windows, Linux | `%USERPROFILE%\.codex\sessions\`<br>`~/.codex/sessions/`<br>`~/.codex/sessions/<year>/<month>/<day>/` | jsonl | normal | No age-based deletion was found in the sources read, but rollouts older than seven days are rewritten in place as Zstandard archives by a background worker (MIN_ROLLOUT_AGE = 7 * 24 * 60 * 60 seconds, spawn_rollout_compression_worker). A running Codex can therefore compress a file while it is being collected, which is why this is first rather than normal. | verified | [source_code](https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/recorder.rs) |
+| `codex.rollouts_compressed` | rollouts compressed | transcript | macOS, Windows, Linux | `%USERPROFILE%\.codex\sessions\**\rollout-*.jsonl.tmp`<br>`%USERPROFILE%\.codex\sessions\**\rollout-*.jsonl.zst`<br>`~/.codex/sessions/**/rollout-*.jsonl.tmp`<br>`~/.codex/sessions/**/rollout-*.jsonl.zst` | binary | normal | These ARE the older sessions. A background worker compresses any rollout at least seven days old in place, writing through a .tmp file, so the plain .jsonl form exists only for the last week of activity. | verified | [source_code](https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/compression.rs) |
+| `codex.sqlite_glob` | sqlite glob | transcript | macOS, Windows, Linux | `%USERPROFILE%\.codex\*.sqlite`<br>`~/.codex/*.sqlite` | sqlite | normal | As codex.state_databases. | verified | [source_code](https://raw.githubusercontent.com/openai/codex/main/codex-rs/state/src/sqlite.rs) |
+| `codex.state_databases` | state databases | transcript | macOS, Windows, Linux | `%USERPROFILE%\.codex\goals_1.sqlite`<br>`%USERPROFILE%\.codex\logs_2.sqlite`<br>`%USERPROFILE%\.codex\memories_1.sqlite`<br>`%USERPROFILE%\.codex\memories_v2_1.sqlite`<br>`%USERPROFILE%\.codex\queue_1.sqlite`<br>`%USERPROFILE%\.codex\state_5.sqlite`<br>`%USERPROFILE%\.codex\thread_history_1.sqlite`<br>`~/.codex/goals_1.sqlite`<br>`~/.codex/logs_2.sqlite`<br>`~/.codex/memories_1.sqlite`<br>`~/.codex/memories_v2_1.sqlite`<br>`~/.codex/queue_1.sqlite`<br>`~/.codex/state_5.sqlite`<br>`~/.codex/thread_history_1.sqlite` | sqlite | normal | Live databases in WAL mode, rewritten continuously while Codex runs. Collect them with their -wal and -shm sidecars, see codex.sqlite_write_ahead_logs. | verified | [source_code](https://raw.githubusercontent.com/openai/codex/main/codex-rs/state/src/sqlite.rs) |
+
+### normal
+
+**Collect normally.** Subject to the agent's ordinary retention period, which for several agents defaults to 30 days.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `codex.auth` | auth | credentials | macOS, Windows, Linux | `%USERPROFILE%\.codex\auth.json`<br>`~/.codex/auth.json` | json | secret | Rewritten on login and on token refresh. | verified | [source_code](https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/config.schema.json) |
+| `codex.config` | config | config | macOS, Windows, Linux | `%USERPROFILE%\.codex\*.config.toml`<br>`%USERPROFILE%\.codex\config.toml`<br>`~/.codex/*.config.toml`<br>`~/.codex/config.toml` | toml | normal | Persistent until edited. | verified | [source_code](https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/config/mod.rs) |
+| `codex.mcp_and_notify` | mcp and notify | mcp_config | macOS, Windows, Linux | `%USERPROFILE%\.codex\config.toml`<br>`~/.codex/config.toml` | toml | normal | Persistent until edited. | verified | [source_code](https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/config.schema.json) |
+| `codex.mcp_oauth_credentials` | mcp oauth credentials | credentials | macOS, Windows, Linux | `%USERPROFILE%\.codex\.credentials.json`<br>`~/.codex/.credentials.json` | json | secret | Rewritten when an MCP server's OAuth token is issued or refreshed. | verified | [source_code](https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/config.schema.json) |
+| `codex.requirements_and_permissions` | requirements and permissions | permissions | macOS, Windows, Linux | `%USERPROFILE%\.codex\permissions.toml`<br>`%USERPROFILE%\.codex\requirements.toml`<br>`~/.codex/permissions.toml`<br>`~/.codex/requirements.toml` | toml | normal | Persistent until edited. | verified | [source_code](https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/config/mod.rs) |
+
 ## Continue
 
 Vendor: Continue
@@ -284,11 +334,43 @@ Vendor: Continue
 | `continue.index` | index | cache | macOS, Linux, Windows | `~/.continue/index/autocompleteCache.sqlite`<br>`~/.continue/index/docs.sqlite`<br>`~/.continue/index/index.sqlite`<br>`~/.continue/index/lancedb/`<br>`~/.continue/repo_map.txt` | sqlite | normal | Rebuildable caches; may be wiped by a reindex without affecting the agent's function. | verified | [source_code](https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts) |
 | `continue.sessions` | sessions | transcript | macOS, Linux, Windows | `$CONTINUE_GLOBAL_DIR/sessions/`<br>`%USERPROFILE%\.continue\sessions\*.json`<br>`~/.continue/sessions/<session-id>.json`<br>`~/.continue/sessions/sessions.json` | json | normal | One file per session, retained indefinitely; no rotation in the code reviewed. | verified | [source_code](https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts) |
 
-## GitHub Copilot
+## GitHub Copilot CLI
 
 Vendor: GitHub
 
-<https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt>
+The Copilot command line agent. GitHub documents the whole configuration directory file
+by file, including which files hold credentials and what is lost by deleting each one,
+which makes this one of the few agents where the catalogue rests on the vendor's own
+inventory rather than on reading its source.
+
+<https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md>, <https://raw.githubusercontent.com/github/copilot-cli/main/README.md>, <https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt>
+
+### Relocating variables
+
+- `COPILOT_HOME`: Overrides the default ~/.copilot location, and the CLI then reads all configuration from there. A collection keyed on ~/.copilot alone finds nothing on such a host, which is indistinguishable from Copilot CLI never having run.
+- `COPILOT_CACHE_HOME`: Moves the cache directory, which otherwise follows platform convention rather than sitting under ~/.copilot. Only ephemeral data, but it is where marketplace and auto-update material lands.
+- `COPILOT_PROVIDERS_CONFIG`: Moves providers.json, the registry of bring-your-own-key providers and models. Relevant to a data-egress question: it names the endpoints the agent was configured to talk to, and this variable can put that file anywhere.
+
+### live_only
+
+**Collect from a running machine or not at all.** These exist only while the agent or the session is running, or are destroyed by a clean shutdown. They cannot be recovered from a powered-off image, so if the endpoint is still up, start here.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `copilot.ide_locks` | ide locks | install_evidence | macOS, Windows, Linux | `%USERPROFILE%\.copilot\ide\`<br>`~/.copilot/ide/` | text | normal | Lock files, so they exist while an integration is live and are cleaned up when it is not. Documented as "Lock files and state for IDE integrations" that are "automatically managed", which is another way of saying they will not be there later. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+| `copilot.session_store_sidecars` | session store sidecars | transcript | macOS, Windows, Linux | `%USERPROFILE%\.copilot\session-store.db-shm`<br>`%USERPROFILE%\.copilot\session-store.db-wal`<br>`~/.copilot/session-store.db-shm`<br>`~/.copilot/session-store.db-wal` | binary | normal | If present, destroyed by a clean shutdown, and holding writes that are not yet in the database file. | **unverified** | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+
+### first
+
+**Collect first.** Rotated or swept aggressively, by count or on every sweep rather than after a comfortable interval. Some of these can be destroyed by the user simply starting another session.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `copilot.command_history` | command history | prompt_history | macOS, Windows, Linux | `%USERPROFILE%\.copilot\command-history-state\`<br>`~/.copilot/command-history-state/` | json | normal | Deleting it "removes command history" and the user then "will no longer be able to search previous commands". One user action, no second copy. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+| `copilot.logs` | logs | log | macOS, Windows, Linux | `%USERPROFILE%\.copilot\logs\`<br>`~/.copilot/logs/` | text | normal | One file per session, and the vendor calls the directory safe to delete because "log files are re-created each session". Treat what is here as the current and recent sessions only. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+| `copilot.session_event_log` | session event log | transcript | macOS, Windows, Linux | `~/.copilot/session-state/<session-id>/events.jsonl`<br>`~/.copilot/session-state/<session-id>/workspace.yaml` | jsonl | normal | As copilot.session_state, inside which these live. | **unverified** | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+| `copilot.session_state` | session state | transcript | macOS, Windows, Linux | `%USERPROFILE%\.copilot\session-state\`<br>`~/.copilot/session-state/` | directory | normal | The vendor describes this as session history data and says that deleting it "removes session history" and that "You will no longer be able to resume past sessions", so it is user-deletable in one step with no copy elsewhere. Other vendor material calls session state ephemeral and advises against backing it up, which is guidance to a user and a warning to an analyst: do not expect it to still be there. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+| `copilot.session_store` | session store | transcript | macOS, Windows, Linux | `%USERPROFILE%\.copilot\session-store.db`<br>`~/.copilot/session-store.db` | sqlite | normal | Rebuildable, which is the forensic problem: the vendor says the "file is re-created automatically" and can be rebuilt with a reindex command. A rebuilt index describes the sessions that still exist, so a row missing here is not evidence that a session never existed, and a full index is not evidence that nothing was deleted. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
 
 ### normal
 
@@ -296,7 +378,26 @@ Vendor: GitHub
 
 | Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `copilot.mcp_config` | mcp config | mcp_config | macOS, Windows, Linux | `%LOCALAPPDATA%\github-copilot\intellij\mcp.json`<br>`~/.config/github-copilot/intellij/mcp.json` | json | normal |  | verified | [official](https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt) |
+| `copilot.agents_skills_hooks` | agents skills hooks | instructions | macOS, Windows, Linux | `%USERPROFILE%\.copilot\agents\`<br>`%USERPROFILE%\.copilot\hooks\`<br>`%USERPROFILE%\.copilot\skills\`<br>`~/.copilot/agents/`<br>`~/.copilot/hooks/`<br>`~/.copilot/skills/` | directory | normal | Persistent until deleted. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+| `copilot.config_json` | config json | config | macOS, Windows, Linux | `%USERPROFILE%\.copilot\config.json`<br>`~/.copilot/config.json` | json | normal | Rewritten as internal state changes, including on login. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+| `copilot.extensions_and_plugins` | extensions and plugins | install_evidence | macOS, Windows, Linux | `%USERPROFILE%\.copilot\extensions\`<br>`%USERPROFILE%\.copilot\installed-plugins\`<br>`%USERPROFILE%\.copilot\plugin-data\`<br>`~/.copilot/extensions/`<br>`~/.copilot/installed-plugins/`<br>`~/.copilot/plugin-data/` | directory | normal | plugin-data/ is called safe to delete because the "data is re-created as needed", so treat its contents as the current state and not as a history. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+| `copilot.instructions` | instructions | instructions | macOS, Windows, Linux | `%USERPROFILE%\.copilot\copilot-instructions.md`<br>`%USERPROFILE%\.copilot\instructions\`<br>`~/.copilot/copilot-instructions.md`<br>`~/.copilot/instructions/` | markdown | normal | Persistent until edited. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+| `copilot.lsp_config` | lsp config | config | macOS, Windows, Linux | `%USERPROFILE%\.copilot\lsp-config.json`<br>`~/.copilot/lsp-config.json` | json | normal | Persistent until edited. | verified | [official](https://raw.githubusercontent.com/github/copilot-cli/main/README.md) |
+| `copilot.lsp_config_repo` | lsp config repo | project_instructions | macOS, Windows, Linux | `<project>/.github/lsp.json` | json | normal | Lives and dies with the working copy, and is usually under version control. | verified | [official](https://raw.githubusercontent.com/github/copilot-cli/main/README.md) |
+| `copilot.mcp_config` | mcp config | mcp_config | macOS, Windows, Linux | `%USERPROFILE%\.copilot\mcp-config.json`<br>`~/.copilot/mcp-config.json` | json | normal | Persistent until edited. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+| `copilot.mcp_config_jetbrains` | mcp config jetbrains | mcp_config | macOS, Windows, Linux | `%LOCALAPPDATA%\github-copilot\intellij\mcp.json`<br>`~/.config/github-copilot/`<br>`~/.config/github-copilot/intellij/mcp.json` | json | normal | Persistent until edited. | verified | [source_code](https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt) |
+| `copilot.mcp_credentials` | mcp credentials | credentials | macOS, Windows, Linux | `%USERPROFILE%\.copilot\mcp-oauth-config\`<br>`%USERPROFILE%\.copilot\mcp-secrets\`<br>`~/.copilot/mcp-oauth-config/`<br>`~/.copilot/mcp-secrets/` | json | secret | Written when a token is issued or refreshed. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+| `copilot.permissions` | permissions | permissions | macOS, Windows, Linux | `%USERPROFILE%\.copilot\permissions-config.json`<br>`~/.copilot/permissions-config.json` | json | normal | Appended to as the user approves things; nothing observed that expires an entry. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+| `copilot.providers` | providers | config | macOS, Windows, Linux | `%USERPROFILE%\.copilot\providers.json`<br>`~/.copilot/providers.json` | json | normal | Persistent until edited. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+| `copilot.settings` | settings | config | macOS, Windows, Linux | `%USERPROFILE%\.copilot\settings.json`<br>`~/.copilot/settings.json` | json | normal | Persistent until edited. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
+
+### durable
+
+**Usually still there.** Not covered by the retention sweep, so these routinely outlive the transcripts they describe. When the transcripts are already gone, this group is what is left, and it is often enough to establish that an agent ran, what it was allowed to do, and what the user asked.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `copilot.cache` | cache | cache | macOS, Windows, Linux | `%LOCALAPPDATA%\copilot\`<br>`$XDG_CACHE_HOME/copilot/`<br>`~/.cache/copilot/`<br>`~/Library/Caches/copilot/` | directory | normal | Ephemeral by design and safe to lose. It is last in collection order for that reason, not because it is uninteresting. | verified | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md) |
 
 ## Cross-cutting evidence
 
