@@ -1,0 +1,46 @@
+# Structural labels for the generated documents. Free text (an artifact's notes, a
+# rule's description) is not here: it lives in the catalogue and rule files, where it can
+# be a plain string or an {en: ..., de: ...} mapping.
+language_name: English
+other_language_name: Deutsch
+
+artifacts:
+  title: Artifact catalogue
+  generated_note: >-
+    Generated from catalog/ by scripts/gen_artifact_docs.py. Do not edit by hand:
+    CI regenerates this file and fails if it differs.
+  toc: Agents
+  col_id: Id
+  col_category: Category
+  col_os: Operating systems
+  col_paths: Paths
+  col_format: Format
+  col_sensitivity: Sensitivity
+  col_volatility: Retention
+  col_status: Status
+  col_source: Source
+  col_notes: Notes
+  status_verified: verified
+  status_unverified: unverified
+  unverified_warning: >-
+    Entries marked unverified are collected anyway, but no vendor source confirms the
+    path. Treat the absence of such an artifact as inconclusive rather than as evidence
+    that the agent was not used.
+  untranslated_marker: "[EN]"
+
+rules:
+  title: Detection rules
+  generated_note: >-
+    Generated from rules/ by scripts/gen_rule_docs.py. Do not edit by hand.
+  col_id: Id
+  col_title: Title
+  col_severity: Severity
+  col_agents: Agents
+  col_kinds: Event kinds
+  col_tags: Tags
+  section_rationale: Why an analyst cares
+  section_false_positives: Known false positives
+  section_references: References
+  heuristic_warning: >-
+    Every rule is a heuristic. A finding is a lead that needs analyst review, never a
+    verdict.

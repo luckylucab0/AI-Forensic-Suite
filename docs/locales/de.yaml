@@ -1,0 +1,47 @@
+# Strukturbezeichnungen für die generierten Dokumente. Freitext (die Notizen eines
+# Artefakts, die Beschreibung einer Regel) steht nicht hier, sondern in den Katalog- und
+# Regeldateien, wo er ein einfacher String oder eine Zuordnung {en: ..., de: ...} sein
+# kann.
+language_name: Deutsch
+other_language_name: English
+
+artifacts:
+  title: Artefaktkatalog
+  generated_note: >-
+    Erzeugt aus catalog/ durch scripts/gen_artifact_docs.py. Nicht von Hand bearbeiten:
+    die CI erzeugt diese Datei neu und schlägt fehl, wenn sie abweicht.
+  toc: Agenten
+  col_id: Kennung
+  col_category: Kategorie
+  col_os: Betriebssysteme
+  col_paths: Pfade
+  col_format: Format
+  col_sensitivity: Sensitivität
+  col_volatility: Aufbewahrung
+  col_status: Status
+  col_source: Quelle
+  col_notes: Anmerkungen
+  status_verified: bestätigt
+  status_unverified: unbestätigt
+  unverified_warning: >-
+    Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine
+    Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher
+    kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
+  untranslated_marker: "[EN]"
+
+rules:
+  title: Erkennungsregeln
+  generated_note: >-
+    Erzeugt aus rules/ durch scripts/gen_rule_docs.py. Nicht von Hand bearbeiten.
+  col_id: Kennung
+  col_title: Titel
+  col_severity: Schweregrad
+  col_agents: Agenten
+  col_kinds: Ereignisarten
+  col_tags: Schlagworte
+  section_rationale: Warum das für die Analyse zählt
+  section_false_positives: Bekannte Fehlalarme
+  section_references: Quellen
+  heuristic_warning: >-
+    Jede Regel ist eine Heuristik. Ein Fund ist ein Hinweis, der von einer Analystin oder
+    einem Analysten geprüft werden muss, niemals ein Urteil.
