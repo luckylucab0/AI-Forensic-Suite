@@ -1,0 +1,38 @@
+# GitHub Copilot artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: copilot
+title: GitHub Copilot
+vendor: GitHub
+references:
+- |-
+  https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt
+artifacts:
+- id: copilot.mcp_config
+  category: mcp_config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%LOCALAPPDATA%\github-copilot\intellij\mcp.json'
+  - ~/.config/github-copilot/intellij/mcp.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt
+  source_kind: official
+  notes: |-
+    Verified from JetBrains source (detectGitHubCopilotJetBrains): macOS AND Linux both use ~/.config/github-copilot/intellij/mcp.json (note: macOS uses the XDG-style ~/.config path here, NOT ~/Library), Windows uses %LOCALAPPDATA%/github-copilot/intellij/mcp.json. The detector treats the existence of the PARENT DIRECTORY as the signal, so ~/.config/github-copilot/intellij/ is itself install evidence for the Copilot JetBrains plugin. Recommend enumerating the whole ~/.config/github-copilot/ tree for the Copilot family - it is the JetBrains-side sibling of the VS Code Copilot artifacts and belongs in the Copilot family entry too.
+  parser: null

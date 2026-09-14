@@ -27,6 +27,14 @@ artifacts:
     Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine
     Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher
     kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
+  verified_meaning: >-
+    Was bestätigt hier bedeutet: der Eintrag wurde anhand der in seiner Zeile verlinkten
+    Quelle geschrieben, und das Schema erlaubt für diese Markierung nur die Dokumentation
+    oder den Quellcode des Herstellers. Es bedeutet nicht, dass eine zweite Person die
+    Seite geöffnet und bestätigt hat, dass dort genau dieser Pfad steht; diesen Durchgang
+    hat der Katalog noch nicht hinter sich. Eine bestätigte Zeile ist also belegt, aber
+    nicht unabhängig geprüft. Folgen Sie dem Link, wenn eine Schlussfolgerung am Pfad
+    hängt.
   untranslated_marker: "[EN]"
 
 rules:

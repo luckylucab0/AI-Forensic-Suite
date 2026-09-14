@@ -1,0 +1,68 @@
+# Devin artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: devin
+title: Devin
+vendor: Cognition
+references:
+- |-
+  https://github.com/datadog-labs/trajectory/blob/9a96337689899dd4e6a0122a49cf4455d33cc58a/docs/SUPPORTED-CLIENTS.md
+- https://github.com/junhoyeo/tokscale/blob/4ee45700370461e337ebef4053dbdb04ae98299a/README.md
+artifacts:
+- id: devin.acp_events
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Devin\User\acp-events\'
+  - ~/.config/Devin/User/acp-events/
+  - ~/.config/Devin/logs/<launch>/window*/exthost/output_logging_*/1-Devin Desktop.log
+  - ~/Library/Application Support/Devin/User/acp-events/
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://github.com/junhoyeo/tokscale/blob/4ee45700370461e337ebef4053dbdb04ae98299a/README.md
+  source_kind: community
+  volatility: Per-launch log directories rotate. acp-events retention unknown.
+  notes: |-
+    Successor-product artifact: Devin Desktop is the rebranded Windsurf IDE (shared Codeium/Cognition lineage). Worth cataloguing now because it is where third-party agents driven THROUGH the IDE leave their only local trace. Two independent sources (a usage-tracking tool with per-OS paths, and an extension-development skill doc for the log path).
+
+    Record structure: NDJSON stream of ACP protocol events including usage_update records. Only ACP-CONNECTED agents (Cascade/Windsurf, claude-code, opencode) emit local events; the default cloud agent keeps its activity server-side and leaves NO local record.
+  parser: null
+- id: devin.sessions_db
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.local\share\devin\cli\sessions.db'
+  - ~/.local/share/devin/cli/sessions.db
+  - ~/.local/share/devin/cli/transcripts/<session-id>.json
+  - ~/Library/Application Support/devin/cli/sessions.db
+  - ~/Library/Application Support/devin/cli/transcripts/<session-id>.json
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://github.com/datadog-labs/trajectory/blob/9a96337689899dd4e6a0122a49cf4455d33cc58a/docs/SUPPORTED-CLIENTS.md
+  source_kind: community
+  notes: |-
+    Adjacent-product entry, included because it shows up on the same hosts as Windsurf and is easy to mistake for a Cascade store. One source explicitly retracted an earlier model that assumed a workspaceStorage chat store plus an encrypted Cascade .pb store for the desktop app — there is NO separate Devin desktop chat store; both surfaces write to sessions.db.
+
+    Record structure: A single SQLite database (sessions.db) shared by the Devin CLI and the Devin desktop app, with per-session JSON transcripts in a sibling transcripts/ directory. Format is entirely separate from Windsurf's Cascade .pb files despite the shared vendor lineage.
+  parser: null

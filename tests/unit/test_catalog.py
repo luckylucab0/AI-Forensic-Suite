@@ -26,6 +26,18 @@ from agentforensics.catalog import (
 CATALOG_DIR = Path(__file__).resolve().parents[2] / "catalog"
 
 
+def normalise_path(path: str) -> str:
+    """One spelling for a path, so two artifacts claiming the same file compare equal.
+
+    Separators, the profile placeholders and variable segments all vary between entries
+    for the same file, and a comparison that missed that would let the conflict this
+    module tests for slip through.
+    """
+    text = path.lower().replace("\\", "/")
+    text = re.sub(r"^(%userprofile%|%appdata%|%localappdata%|\$[a-z_]+|~)", "~", text)
+    return re.sub(r"<[^>]+>", "*", text).rstrip("/")
+
+
 @pytest.fixture(scope="module")
 def catalogue() -> Catalogue:
     return load_catalogue(CATALOG_DIR)
@@ -90,6 +102,60 @@ def test_no_transcript_or_history_is_withheld(catalogue: Catalogue) -> None:
             assert artifact.content_collected_by_default, artifact.id
 
 
+def test_no_path_is_claimed_as_both_secret_and_evidence(catalogue: Catalogue) -> None:
+    """One file, one decision about whether its bytes are copied.
+
+    When two artifacts claim the same path with different sensitivity, the collector's
+    behaviour depends on which one it happens to reach first. That is not hypothetical: a
+    JetBrains directory glob marked normal matches the c.kdbx password database that the
+    catalogue marks secret, and VS Code's state.vscdb was filed as credential material
+    although it holds every stored conversation.
+
+    Both shapes are now expressible without a conflict. A container that holds credential
+    material stays evidence and lists what is inside it in contains_credentials. A genuine
+    credential store is its own artifact and claims no path that evidence also claims.
+    """
+    claims: dict[str, list[str]] = {}
+    sensitivities: dict[str, set[str]] = {}
+    for artifact in catalogue.artifacts:
+        for path in artifact.paths:
+            key = normalise_path(path)
+            claims.setdefault(key, []).append(artifact.id)
+            sensitivities.setdefault(key, set()).add(artifact.sensitivity)
+    conflicts = {path: claims[path] for path, kinds in sensitivities.items() if len(kinds) > 1}
+    assert not conflicts, f"paths claimed as both secret and evidence: {conflicts}"
+
+
+def test_a_container_of_credentials_is_still_collected(catalogue: Catalogue) -> None:
+    """contains_credentials names what to redact, it does not withhold the file.
+
+    Several agents keep conversations and tokens in one container. Withholding it to
+    protect the tokens throws away the transcripts an investigation exists to read, so the
+    file is collected and the names tell an exporter what to strip on the way out.
+    """
+    holders = [a for a in catalogue.artifacts if a.holds_credentials_inside]
+    assert holders, "the catalogue should describe at least one such container"
+    for artifact in holders:
+        assert artifact.sensitivity == "normal", artifact.id
+        assert artifact.content_collected_by_default, artifact.id
+        assert artifact.category != "credentials", artifact.id
+
+
+def test_paths_are_paths_and_not_prose(catalogue: Catalogue) -> None:
+    """A path with an explanation appended to it matches nothing, silently.
+
+    This arrived repeatedly from research, in shapes like
+    "…/state.vscdb  (same ItemTable keys)" and "macOS Keychain: generic-password …".
+    Neither exists on disk, so the artifact is never collected and nobody is told. The
+    schema rejects these now; this is the same rule stated where a reader will see it.
+    """
+    for artifact in catalogue.artifacts:
+        for path in artifact.paths:
+            assert "(" not in path and ")" not in path, f"{artifact.id}: {path!r}"
+            assert "  " not in path, f"{artifact.id}: {path!r}"
+            assert ": " not in path, f"{artifact.id}: {path!r}"
+
+
 def test_credentials_are_always_withheld(catalogue: Catalogue) -> None:
     for artifact in catalogue.artifacts:
         if artifact.category == "credentials":
@@ -128,9 +194,14 @@ def test_windows_paths_are_present_for_profile_anchored_windows_artifacts(
     copy whose location the collector discovers rather than to anything platform-specific.
     """
     for artifact in catalogue.artifacts:
-        if "windows" not in artifact.os or artifact.needs_project_roots:
+        if "windows" not in artifact.os or artifact.needs_project_roots or artifact.is_registry:
             continue
         joined = " ".join(artifact.paths)
+        # <vscode-user> is a real placeholder, not a wildcard: the collector expands it to
+        # the per-OS user directory of VS Code and of every fork that inherits its storage
+        # layout, which is where a dozen agentic extensions keep their conversations.
+        if "<vscode-user>" in joined:
+            continue
         assert re.search(r"%[A-Z]+%|^~|\s~|[A-Z]:\\|\\", joined), artifact.id
 
 

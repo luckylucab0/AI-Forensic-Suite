@@ -18,6 +18,32 @@ references:
 - |-
   https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift
 artifacts:
+- id: factory_droid.auth
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.factory/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: recollection
+  source_kind: recollection
+  contains_credentials:
+  - config.json BYOK keys
+  - settings.json customModels keys
+  volatility: Unknown.
+  notes: |-
+    recollection, needs verification - filename deliberately not asserted. Known related facts: BYOK keys go in ~/.factory/config.json and customModels keys in ~/.factory/settings.json, and both are documented as staying local, so credentials may simply live in those config files rather than a separate auth file.
+
+    Filed as a container rather than as credential material: the file is evidence and is collected, and contains_credentials names what an exporter redacts. Withholding it to protect the credentials inside would throw away the conversations an investigation exists to read.
+
+    Record structure: I could not establish the filename of Droid's credential/session-token store from any source I was able to fetch. Do NOT guess at auth.json or cli-config.json here. Enumerate ~/.factory/ on a live image and identify the credential file empirically.
+  parser: null
 - id: factory_droid.config
   category: config
   root: project
@@ -43,27 +69,6 @@ artifacts:
     The allow/deny lists in settings.json are the permission record for Droid - collect both the global and every project-level copy, and diff them, since a project-local settings.local.json can quietly widen what the agent may do. Note that customModels entries can contain plaintext API keys even though this is catalogued as config.
 
     Record structure: config.json holds model configuration and BYOK settings; settings.json is the personal CLI configuration including allow/deny lists; a settings.local.json may sit alongside settings.json in any .factory/ folder for local overrides. Custom API keys are added to settings.json via a customModels array with provider types such as anthropic or openai, and are documented as staying local. Path strings retrieved via GitHub code search content fragments.
-  parser: null
-- id: factory_droid.auth
-  category: credentials
-  root: user_profile
-  os:
-  - macos
-  - linux
-  - windows
-  paths:
-  - ~/.factory/
-  format: json
-  sensitivity: secret
-  collect_priority: normal
-  status: unverified
-  source: recollection
-  source_kind: recollection
-  volatility: Unknown.
-  notes: |-
-    recollection, needs verification - filename deliberately not asserted. Known related facts: BYOK keys go in ~/.factory/config.json and customModels keys in ~/.factory/settings.json, and both are documented as staying local, so credentials may simply live in those config files rather than a separate auth file.
-
-    Record structure: I could not establish the filename of Droid's credential/session-token store from any source I was able to fetch. Do NOT guess at auth.json or cli-config.json here. Enumerate ~/.factory/ on a live image and identify the credential file empirically.
   parser: null
 - id: factory_droid.skills_and_droids
   category: instructions

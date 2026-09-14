@@ -1,0 +1,455 @@
+# Cline artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: cline
+title: Cline
+vendor: Cline
+references:
+- https://raw.githubusercontent.com/cline/cline/main/apps/vscode/package.json
+- https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts
+- https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/shared/storage/storage-context.ts
+- https://raw.githubusercontent.com/cline/cline/main/docs/enterprise-solutions/monitoring/prompt-storage.mdx
+artifacts:
+- id: cline.cache_and_remote_config
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/cache/
+  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/cline_recommended_models.json
+  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/remote_config_<orgId>.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts
+  source_kind: source_code
+  volatility: Cache is regenerable.
+  notes: |-
+    ensureCacheDirectoryExists() = getGlobalStorageDir("cache"). GlobalFileNames.clineRecommendedModels = "cline_recommended_models.json" and remoteConfig = (orgId) => `remote_config_${orgId}.json`. The remote_config_<orgId>.json filename LEAKS THE ENTERPRISE ORG ID - useful for attribution, and a reason to sanitise before publishing sample data.
+  parser: null
+- id: cline.data_dir_root
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.cline\data\'
+  - ~/.cline/
+  - ~/.cline/data/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+  source_kind: source_code
+  notes: |-
+    MAJOR LAYOUT CHANGE the brief does not cover. Cline 4.x resolves a product data dir outside VS Code entirely: resolveClineDir() = join(HOME, ".cline"), resolveClineDataDir() = join(that, "data"). Resolution order per apps/vscode/src/shared/storage/storage-context.ts and apps/vscode/src/sdk/legacy-state-reader.ts: $CLINE_DATA_DIR (trimmed) > $CLINE_DIR + "/data" > ~/.cline/data. A third override $CLINE_DB_DATA_DIR (= <dataDir>/db) appears in apps/cli/src/tests/helpers/env.ts. COLLECTION IMPLICATION: a globs-only collector will miss a relocated tree - read the process environment / shell profiles for CLINE_DIR, CLINE_DATA_DIR, CLINE_DB_DATA_DIR before concluding no Cline data exists.
+  parser: null
+- id: cline.global_settings
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cline/data/settings/global-settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+  source_kind: source_code
+  notes: resolveGlobalSettingsPath() = join(resolveClineDataDir(), "settings", "global-settings.json").
+  parser: null
+- id: cline.global_state_json
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cline/data/globalState.json
+  - ~/.cline/data/workspaces/<hash>/workspaceState.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/shared/storage/storage-context.ts
+  source_kind: source_code
+  notes: |-
+    createStorageContext() writes globalState.json and per-workspace workspaceState.json under data/workspaces/<hash>/. This is the 4.x replacement for VS Code globalState in state.vscdb - so on 4.x the task index and settings are plain readable JSON on disk instead of SQLite BLOBs. The <hash> is a workspace-isolation hash (not reversible to a path directly; correlate via content).
+  parser: null
+- id: cline.home_config_tree
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.agents/plugins/
+  - ~/.cline/agents/
+  - ~/.cline/cron/
+  - ~/.cline/hooks/
+  - ~/.cline/plugins/
+  - ~/.cline/rules/
+  - ~/.cline/skills/
+  - ~/.cline/tasks/
+  - ~/.cline/workflows/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+  source_kind: source_code
+  notes: |-
+    Verified resolvers in paths.ts: resolveRulesConfigSearchPaths/resolveWorkflowsConfigSearchPaths/resolveSkillsConfigSearchPaths/resolveHooksConfigSearchPaths/resolveAgentsConfigDirPath/resolvePluginConfigSearchPaths each include join(resolveClineDir(), <name>); resolveGlobalTaskSpecsDir() = join(resolveClineDir(),"tasks"); resolveGlobalCronSpecsDir() = join(resolveClineDir(),"cron"); resolveAgentPluginSearchPaths() = join(HOME, ".agents", "plugins") with AGENT_PLUGIN_MANIFEST_FILE_NAME = "plugin.json". ~/.cline/hooks and ~/.cline/plugins are executable-content artifacts (persistence / tampering interest). ~/.cline/cron plus data/db/cron.db together describe scheduled autonomous agent runs.
+  parser: null
+- id: cline.workspace_specs
+  category: config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.cline/cron/
+  - <project>/.cline/tasks/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+  source_kind: source_code
+  notes: |-
+    resolveWorkspaceTaskSpecsDir(workspaceRoot) = join(workspaceRoot, ".cline", "tasks"); resolveWorkspaceCronSpecsDir(workspaceRoot) = join(workspaceRoot, ".cline", "cron"). Committed task/cron specs are 'what the agent was told to do, repeatedly' - distinct from .clinerules.
+  parser: null
+- id: cline.provider_settings
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cline/data/settings/providers.json
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+  source_kind: source_code
+  notes: |-
+    resolveProviderSettingsPath() = join(resolveClineDataDir(), "settings", "providers.json"). apps/cli/src/tests/helpers/env.ts comments that authenticated configs 'read real OAuth credentials from ~/.cline/data/settings/providers.json' - so this file holds OAuth tokens (Cline account, Anthropic, OpenAI/Codex ChatGPT subscription, Bedrock/Vertex, etc.), not just model ids. apps/vscode/src/sdk/provider-migration.ts migrates into it. Metadata + hash only.
+  parser: null
+- id: cline.secrets_json
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cline/data/secrets.json
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/shared/storage/storage-context.ts
+  source_kind: source_code
+  notes: |-
+    IMPORTANT FINDING: Cline 4.x writes provider API keys to a PLAINTEXT JSON file, not to VS Code SecretStorage. storage-context.ts constructs `new ClineFileStorage<string>(path.join(dataDir, "secrets.json"), "Secrets", { fileMode: 0o600 // Owner read/write only - protects API keys })`. Protection is POSIX file mode only; there is no encryption and no OS keychain involvement. Forensically this means Cline 4.x API keys ARE recoverable from a disk image, unlike the <=3.x SecretStorage path. Collect metadata + hash only per the sensitivity rule; note the 0600 mode and owner uid as part of the metadata.
+  parser: null
+- id: cline.checkpoint_refs_in_workspace
+  category: file_snapshot
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.git/logs/refs/cline/checkpoints/
+  - <project>/.git/packed-refs
+  - <project>/.git/refs/cline/checkpoints/<session-id>/<runCount>
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/core/src/hooks/checkpoint-hooks.ts
+  source_kind: source_code
+  volatility: |-
+    Deleted by deleteCheckpointRefs() when the session/task is deleted. Stash objects become unreachable and GC-able once the ref is gone - but may survive in .git/objects until `git gc`.
+  notes: |-
+    CLINE 4.x MECHANISM CHANGE - this is the single biggest correction to the brief's checkpoint model. There is no longer a shadow repo in globalStorage. Cline runs `git stash create` in the USER'S OWN workspace and then `git update-ref refs/cline/checkpoints/<sessionId>/<runCount> <sha>` in that same repo. The source comment states the intent: 'Store the stash commit under a private ref namespace so it is invisible to the user's normal git stash list workflow. refs/stash is what populates that list; writing to any other ref path keeps the object reachable (GC-safe) without surfacing it to the user.' Consequences for us: (a) per-tool-use workspace snapshots live inside the evidence repo itself, so a repo-only acquisition already contains them; (b) `git stash list` will NOT show them - you must enumerate refs/cline/**; (c) untracked-at-snapshot files are captured as a THIRD PARENT of the stash commit (createUntrackedParentCommit / createWorktreeStashCommit), so a naive two-parent stash read misses them; (d) checkpoints only exist if the workspace is a git repo - SdkController.ts surfaces 'Checkpoints require the workspace to be a git repository.'
+
+    Record structure: Stash message marker constant CHECKPOINT_STASH_MESSAGE_PREFIX = 'cline checkpoint session=' - grep .git/logs and commit messages for it. Checkpoint kinds are "stash" | "commit"; telemetry outcomes are stash / head_clean / head_fallback / skipped.
+  parser: null
+- id: cline.checkpoint_scratch
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cline/data/checkpoint-scratch/<key>/index
+  - ~/.cline/data/checkpoint-scratch/<key>/pathspec
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/core/src/hooks/checkpoint-hooks.ts
+  source_kind: source_code
+  volatility: |-
+    SCRATCH_DIR_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000 - directories idle for 14 days are reaped opportunistically by pruneStaleScratchDirs(); also removed by deleteCheckpointRefs(). COLLECT EARLY.
+  notes: |-
+    HIGH-VALUE, SHORT-LIVED. checkpointScratchDir(cwd, sessionId) = join(resolveClineDataDir(), "checkpoint-scratch", sha256(`${cwd}\0${sessionId}`).hex.slice(0,32)). The source comment says it deliberately avoids the OS tmpdir because 'the index and pathspec files enumerate workspace paths' - i.e. these two files are a FILE LISTING of the victim workspace, including untracked files, at checkpoint time, and the index carries git's stat cache (size + mtime + mode per path). Directory mtime is refreshed every turn, so mtime is a per-session last-activity timestamp. The 32-hex key is sha256(cwd + NUL + sessionId) so it can be recomputed to attribute a scratch dir to a known workspace + session id.
+
+    Record structure: `index` is a standard git index file (GIT_INDEX_FILE); parse with any git index reader. `pathspec` is a plain path list.
+  parser: null
+- id: cline.checkpoints_shadow_git_legacy
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/checkpoints/<cwdHash>/.git/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/v3.20.0/src/integrations/checkpoints/CheckpointUtils.ts
+  source_kind: source_code
+  volatility: |-
+    Survives task deletion in some versions (see issue #9631 checkpoint-corruption reports); orphaned <cwdHash> dirs persist after the workspace is deleted.
+  notes: |-
+    CLINE 3.x MECHANISM. CheckpointUtils.ts getShadowGitPath() documents the layout verbatim as 'globalStorage/ checkpoints/ {cwdHash}/ .git/'. hashWorkingDir() is NOT a cryptographic hash: it iterates the cwd characters multiplying by 31 and accumulating char codes, then renders a 13-character numeric string - which means an analyst can BRUTE-FORCE / precompute the hash for candidate workspace paths to attribute a checkpoint dir to a project. Exclusions are written by writeExcludesFile() from src/integrations/checkpoints/CheckpointExclusions.ts into the shadow repo's info/exclude. Related known bug: the feature has renamed real .git dirs to .git_disabled in monorepos (issue #9590), and the 4.x CHANGELOG has an entry 'Retry nested git restore and prevent silent .git_disabled leftovers in checkpoints' - so look for stray .git_disabled directories in the workspace as checkpoint-activity evidence.
+
+    Record structure: A bare git repo: every checkpoint is a commit whose tree is the full workspace state at that tool call. `git log` / `git cat-file` recovers per-tool-use file snapshots with timestamps.
+  parser: null
+- id: cline.extension_id
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/package.json
+  source_kind: source_code
+  notes: |-
+    Confirmed exact: package.json name="claude-dev", publisher="saoudrizwan", displayName="Cline", version 4.1.17 on main as of 2026-09-14. The extension id is therefore saoudrizwan.claude-dev and is already all-lowercase, so the globalStorage folder needs no case folding.
+  parser: null
+- id: cline.rules_global
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/Cline/Rules/
+  - ~/Documents/Cline/Hooks/
+  - ~/Documents/Cline/MCP/
+  - ~/Documents/Cline/Rules/
+  - ~/Documents/Cline/Workflows/
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts
+  source_kind: source_code
+  notes: |-
+    disk.ts helper functions resolve 'Cline/Rules', 'Cline/Workflows', 'Cline/MCP' and 'Cline/Hooks' inside the user's Documents folder - an unusual choice that a home-directory-dotfile-only collector will miss entirely. docs/customization/cline-rules.mdx adds: 'Linux/WSL users: If you don't find global rules in ~/Documents/Cline/Rules, check ~/Cline/Rules.' The CHANGELOG 4.1.16 entry explains why: the VS Code Rules tab resolves Documents with `xdg-user-dir DOCUMENTS`, which prints bare $HOME on WSL and headless installs. Collect BOTH. On macOS/Windows also account for a redirected/iCloud Documents folder.
+  parser: null
+- id: cline.connector_settings_and_logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cline/data/connectors/settings.json
+  - ~/.cline/data/logs/
+  - ~/.cline/data/logs/connectors/<channel>/<instanceKey>.log
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+  source_kind: source_code
+  volatility: Log rotation/retention not documented in the source read.
+  notes: |-
+    resolveConnectorDataDir() = join(dataDir,"connectors"); resolveConnectorSettingsPath() = join(that,"settings.json"); resolveConnectorLogPath(channel, instanceKey) = join(dataDir, "logs", "connectors", safeChannel, `${safeKey}.log`); ensureHookLogDir() = join(dataDir, "logs"). Hook logs are the record of what user-authored hook scripts did - a high-value execution-evidence artifact.
+  parser: null
+- id: cline.mcp_settings
+  category: mcp_config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
+  - ~/.cline/data/settings/cline_mcp_settings.json
+  - ~/Documents/Cline/MCP/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts
+  source_kind: source_code
+  notes: |-
+    Two live locations. disk.ts: GlobalFileNames.mcpSettings = "cline_mcp_settings.json" and getMcpSettingsFilePath() resolves it inside ensureSettingsDirectoryExists() = getGlobalStorageDir("settings"); ensureMcpServersDirectoryExists() points at "Cline/MCP" under Documents (installed MCP server code). paths.ts: CLINE_MCP_SETTINGS_FILE_NAME = "cline_mcp_settings.json", resolveMcpSettingsPath() = join(resolveClineDataDir(), "settings", <that>). The brief's path is correct but incomplete - the ~/.cline copy must be collected too. Treat as normal sensitivity but expect embedded env vars / bearer tokens for remote MCP servers; flag for review.
+
+    Record structure: Standard mcpServers object. Remote SSE/streamable-HTTP servers get a 10s connect budget (CHANGELOG 4.1.x), and an OAuth prompt on 401 - so OAuth material for MCP servers may exist separately.
+  parser: null
+- id: cline.rules_project
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.agents/skills/
+  - <project>/.claude/skills/
+  - <project>/.cline/skills/
+  - <project>/.clinerules
+  - <project>/.clinerules/**/*.md
+  - <project>/.clinerules/hooks/
+  - <project>/.clinerules/skills/
+  - <project>/.clinerules/workflows/
+  - <project>/.cursor/rules/
+  - <project>/.cursorrules
+  - <project>/.windsurfrules
+  - <project>/AGENTS.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts
+  source_kind: source_code
+  volatility: Lives in the repo - shares the repo's fate and is usually committed, so also recoverable
+    from git history.
+  notes: |-
+    Both forms exist and both are verified from GlobalFileNames verbatim: clineRules=".clinerules" (single file) and workflows=".clinerules/workflows", hooksDir=".clinerules/hooks", clineruleSkillsDir=".clinerules/skills" (directory form). docs/customization/cline-rules.mdx shows the directory form with per-concern .md files. docs/customization/skills.mdx lists the skill search order '.cline/skills/ (recommended), .clinerules/skills/, .claude/skills/'. NOTABLE CROSS-CONTAMINATION: Cline deliberately also ingests other agents' rule files - cursorRulesDir=".cursor/rules", cursorRulesFile=".cursorrules", windsurfRules=".windsurfrules", agentsRulesFile="AGENTS.md". So the presence of .cursorrules is NOT by itself evidence that Cursor was used. .clinerules/hooks is the highest-risk sub-artifact: it holds user-authored scripts Cline executes (CHANGELOG 3.56.0: 'Hook scripts now run from the workspace repository root instead of filesystem root').
+  parser: null
+- id: cline.cli_sessions
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cline/data/sessions/<session-id>/<session-id>.hooks.jsonl
+  - ~/.cline/data/sessions/<session-id>/<session-id>.json
+  - ~/.cline/data/sessions/<session-id>/<session-id>.messages.json
+  - ~/.cline/data/sessions/<session-id>/subagents/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+  source_kind: source_code
+  volatility: No automatic pruning found in the sources read.
+  notes: |-
+    resolveSessionDataDir() = join(resolveClineDataDir(), "sessions"). File naming verified three ways: sdk/packages/core/docs/messages-contract-v1.md states the canonical path '~/.cline/data/sessions/<sessionId>/<sessionId>.messages.json'; sdk/packages/core/src/runtime/host/local-runtime-host.ts builds join(sessionDir, `${sessionId}.messages.json`) and join(sessionDir, `${sessionId}.json`); apps/examples/desktop-app/README.md names `<sessionId>.hooks.jsonl` as observability telemetry. Child/teammate sessions use a compound id of the form <rootSessionId>__teamtask__<agent>__<hash> (see sdk/packages/core/src/runtime/host/history.test.ts), which is how sub-agent transcripts are correlated to their parent.
+
+    Record structure: <sessionId>.messages.json is the 'messages contract v1' replay artifact: ordered messages plus assistant modelInfo and metrics (incl. cache token fields). <sessionId>.json is the session manifest. <sessionId>.hooks.jsonl is newline-delimited hook telemetry.
+  parser: null
+- id: cline.data_tasks
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cline/data/tasks/<taskId>/api_conversation_history.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/docs/enterprise-solutions/monitoring/prompt-storage.mdx
+  source_kind: official
+  notes: |-
+    Cline's own enterprise 'prompt storage' doc states verbatim: 'Every Cline task conversation is stored locally in ~/.cline/data/tasks/<taskId>/api_conversation_history.json'. Same doc documents an optional background sync worker that uploads these to a customer S3/R2 bucket - i.e. on an enterprise endpoint the transcripts may ALSO exist off-host, and apps/vscode/src/shared/services/worker/{queue,sync}.ts implement the outbound queue. Worth checking for a queue/outbox on disk.
+
+    Record structure: S3 object key shape observed in sdk/packages/shared/src/vcr.ts: /tasks/<userId>/<taskId>/api_conversation_history.json
+  parser: null
+- id: cline.sqlite_dbs
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cline/data/db/connectors.db
+  - ~/.cline/data/db/cron.db
+  - ~/.cline/data/db/tasks.db
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+  source_kind: source_code
+  volatility: SQLite - collect any -wal/-shm siblings in the same pass or lose the most recent writes.
+  notes: |-
+    resolveDbDataDir() = join(resolveClineDataDir(), "db"); resolveTasksDbPath/resolveConnectorsDbPath/resolveCronDbPath resolve tasks.db, connectors.db, cron.db inside it. tasks.db is the session/task index that the VS Code history view and `cline` CLI read; cron.db holds scheduled/recurring agent runs (a persistence-mechanism artifact in its own right). Overridable via $CLINE_DB_DATA_DIR.
+
+    Record structure: Schema not documented in the sources read - enumerate tables on the acquired copy rather than assuming.
+  parser: null
+- id: cline.vscode_task_transcripts
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/api_conversation_history.json
+  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/context_history.json
+  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/task_metadata.json
+  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/ui_messages.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts
+  source_kind: source_code
+  volatility: Deleted when the user deletes a task or clears history from the Cline UI. No automatic
+    age-based expiry found.
+  notes: |-
+    All four names verified verbatim from GlobalFileNames in disk.ts: apiConversationHistory="api_conversation_history.json", contextHistory="context_history.json", uiMessages="ui_messages.json", taskMetadata="task_metadata.json". The task dir is built by ensureTaskDirectoryExists(taskId) -> getGlobalStorageDir("tasks", taskId). Corroborated by apps/vscode/src/core/controller/file/openDiskConversationHistory.ts, which joins HostProvider.get().globalStorageFsPath + "tasks" + taskId + "api_conversation_history.json". NOTE: in Cline 4.x this is treated as the LEGACY store - apps/vscode/src/sdk/legacy-state-reader.ts reads it for migration - so on a 4.x endpoint expect it alongside the ~/.cline tree.
+
+    Record structure: api_conversation_history.json is an Anthropic MessageParam array (role + content blocks: text / tool_use / tool_result) per docs/enterprise-solutions/monitoring/prompt-storage.mdx. ui_messages.json is Cline's own say/ask event stream; token accounting lives in say/api_req_started events. task_metadata.json carries files_in_context.
+  parser: null

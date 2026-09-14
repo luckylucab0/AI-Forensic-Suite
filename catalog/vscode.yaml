@@ -1,0 +1,132 @@
+# Visual Studio Code host storage artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: vscode
+title: Visual Studio Code host storage
+vendor: Microsoft
+description: |-
+  Visual Studio Code and its forks, as a storage host rather than as an agent. A dozen agentic extensions keep their conversations under workspaceStorage and globalStorage or inside state.vscdb, so these paths are worth collecting even when it is not yet known which extension was installed.
+references:
+- https://github.com/microsoft/vscode-discussions/discussions/748
+- https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-modes.md
+- |-
+  https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/configure/extensions/extension-marketplace.md
+artifacts:
+- id: vscode.state_vscdb
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Code\User\globalStorage\state.vscdb'
+  - ~/.config/Code/User/globalStorage/state.vscdb
+  - ~/Library/Application Support/Code/User/globalStorage/state.vscdb
+  - ~/Library/Application Support/Code/User/globalStorage/state.vscdb.backup
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/microsoft/vscode-discussions/discussions/748
+  source_kind: official
+  contains_credentials:
+  - SecretStorage ItemTable rows
+  volatility: |-
+    Rewritten continuously while the editor runs; SQLite may carry -wal/-shm siblings. Cleared by 'reset user data'.
+  notes: |-
+    OPERATIONAL SPLIT: this one file holds BOTH non-secret extension globalState (collect as evidence) and SecretStorage ciphertext (do not exfiltrate). Recommend the collector copy state.vscdb (+ .backup) as normal evidence but treat the ItemTable rows under the secret key prefix as secret. Cline <=3.x stored its task index here via context.globalState.update("taskHistory", ...) and its API keys via context.secrets.store(...) - verified in https://raw.githubusercontent.com/cline/cline/v3.20.0/src/core/storage/state.ts. Secrets are encrypted with Electron safeStorage (AES-128-CBC); the key lives in the macOS Keychain item 'Code Safe Storage' / 'Code - Insiders Safe Storage', Windows DPAPI via Chromium OSCrypt, Linux libsecret/KeyStorageLinux. Without that keychain material the ciphertext is unrecoverable - so acquire keychain artifacts separately or record the secret as non-recoverable.
+
+    Filed as a container rather than as credential material: the file is evidence and is collected, and contains_credentials names what an exporter redacts. Withholding it to protect the credentials inside would throw away the conversations an investigation exists to read.
+
+    Record structure: SQLite table ItemTable(key TEXT PRIMARY KEY, value BLOB). Extension globalState keys are namespaced; secrets appear under a 'secret://' style key.
+  parser: null
+- id: vscode.extension_dirs
+  category: install_evidence
+  root: user_profile
+  os:
+  - windows
+  - macos
+  - linux
+  paths:
+  - '%USERPROFILE%\.vscode\extensions\'
+  - ~/.cursor/extensions/
+  - ~/.vscode-insiders/extensions/
+  - ~/.vscode-server/extensions/
+  - ~/.vscode/extensions/
+  - ~/.windsurf/extensions/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/configure/extensions/extension-marketplace.md
+  source_kind: official
+  volatility: |-
+    Old versions are removed on update, but extensions.json in the parent directory retains install/update bookkeeping.
+  notes: |-
+    Only ~/.vscode and ~/.vscode-insiders are vendor-documented; the FORK paths (~/.cursor/extensions, ~/.windsurf/extensions) follow VS Code's convention and I corroborated ~/.cursor only indirectly (it appears as an allowlisted subpath in public sandbox profiles alongside ~/.vscode). Treat the fork spellings as medium confidence until confirmed on a live install. Extensions to look for: anthropic.claude-code, openai.chatgpt / openai.codex, github.copilot and github.copilot-chat, google.gemini-cli-vscode-ide-companion, saoudrizwan.claude-dev (Cline), continue.continue. Also sweep the sibling user-data dirs (%APPDATA%\Code, ~/Library/Application Support/Code, ~/.config/Code) which hold each extension's globalStorage/workspaceStorage - often where an extension's own chat history lives.
+
+    Record structure: Verbatim per-OS paths from the official docs: Windows %USERPROFILE%\.vscode\extensions, macOS ~/.vscode/extensions, Linux ~/.vscode/extensions. Relocatable via `--extensions-dir <dir>` or the VSCODE_EXTENSIONS environment variable ("particularly useful in enterprise settings where centralized extension management is desired"). Each subdirectory is named publisher.name-version, which alone gives you the agent extension and its exact version; read its package.json for more. Also parse ../extensions/extensions.json for the install metadata index.
+  parser: null
+- id: vscode.extension_install_evidence
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.vscode\extensions\'
+  - ~/.vscode-server/extensions/
+  - ~/.vscode/extensions/extensions.json
+  - ~/.vscode/extensions/kilocode.kilo-code-*/
+  - ~/.vscode/extensions/rooveterinaryinc.roo-cline-*/
+  - ~/.vscode/extensions/saoudrizwan.claude-dev-*/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: unverified
+  source: recollection
+  source_kind: recollection
+  volatility: |-
+    Removed on uninstall, but extensions.json often retains stale entries and the versioned directory name preserves the exact version that ran.
+  notes: |-
+    recollection, needs verification - I did not fetch a source that states the VS Code extensions-directory layout, so the exact paths here must be confirmed against Microsoft's documentation before they go in the catalogue as verified. Forensic value if confirmed is high and cheap: the versioned directory name pins WHICH version of Cline/Roo/Kilo ran, which is what lets us decide between the mutually exclusive layouts above (Cline 3.x shadow-git vs 4.x workspace refs; Kilo legacy tasks vs kilo.db; Roo pre/post customStoragePath).
+  parser: null
+- id: vscode.user_data_roots
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Code\User\globalStorage\'
+  - ~/.config/Code/User/globalStorage/
+  - ~/.config/VSCodium/User/globalStorage/
+  - ~/.vscode-server/data/User/globalStorage/
+  - ~/Library/Application Support/Code - Insiders/User/globalStorage/
+  - ~/Library/Application Support/Code/User/globalStorage/
+  format: binary
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-modes.md
+  source_kind: official
+  volatility: Persists until the editor variant's user-data dir is deleted; survives extension uninstall
+    in most cases.
+  notes: |-
+    The `<vscode-user>` root is NOT one path - enumerate every editor variant present on the image: Code, 'Code - Insiders', VSCodium, 'Cursor', 'Windsurf', plus remote roots ~/.vscode-server/data/User and ~/.vscode-remote/data/User (the codeburn and tokscale collectors enumerate exactly this set). The Kilo official docs give the macOS/Linux/Windows triple for the Code variant verbatim.
+
+    Record structure: Every Cline-family extension hangs its tree off <vscode-user>/globalStorage/<publisher.extension-lowercased>/.
+  parser: null

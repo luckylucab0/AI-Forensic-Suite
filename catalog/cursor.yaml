@@ -1,0 +1,646 @@
+# Cursor artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: cursor
+title: Cursor
+vendor: Anysphere
+references:
+- |-
+  https://github.com/AltimateAI/vscode-dbt-power-user/blob/5fc912ee821cf1e42feb826ad48f9a01e2e98a80/documentation/docs/setup/cursor_installation_workaround.md
+- |-
+  https://github.com/pradipta/wallfacer/blob/94a58b79a47c4e815e60ffe6bfc5fb604351d2c3/internal/agent/cursor/cursor.go
+- |-
+  https://raw.githubusercontent.com/OpenAgentsInc/openagents/a2de475d2ee3a2f00865944c79c15600c1ada45c/docs/teardowns/2026-07-11-cursor-product-teardown.md
+- |-
+  https://raw.githubusercontent.com/VasiHemanth/tokentelemetry/0d691ae343ed31991e504a738bb1b288eea3b2ee/docs/research/harness-survey/harness-cursor-vscode.md
+artifacts:
+- id: cursor.retrieval_index
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/Library/Application Support/Cursor/CachedData/
+  - |-
+    ~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/anysphere.cursor-retrieval/embeddable_files.txt
+  - |-
+    ~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/anysphere.cursor-retrieval/high_level_folder_description.txt
+  - ~/Library/Caches/cursor-compile-cache/
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/OpenAgentsInc/openagents/a2de475d2ee3a2f00865944c79c15600c1ada45c/docs/teardowns/2026-07-11-cursor-product-teardown.md
+  source_kind: community
+  volatility: Overwritten wholesale on each index rebuild — no history.
+  notes: |-
+    FILE-NAME INVENTORY, not content: proves which files existed in a workspace and were eligible for upload to the vendor's indexing service, even if the files themselves are gone. Low session linkage. CachedData is keyed by commit hash (219 MB / 11 directories observed) and is useful only for version dating.
+
+    Record structure: embeddable_files.txt is a newline-delimited list of workspace-relative paths (100,000 unique paths / 9.51 MB observed, mean 94 chars, max 273). high_level_folder_description.txt is a one-line marker (39 bytes observed). A 'Crepe' local index (index.bin, postings.bin, metadata.json, built by the bundled crepectl helper) is referenced but was not present in the audited profile.
+  parser: null
+- id: cursor.agent_cli_state
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - .cursor/commands/*.md
+  - ~/.cursor/agent-cli-state.json
+  - ~/.cursor/agents/
+  - ~/.cursor/browser-logs/
+  - ~/.cursor/hooks.json
+  - ~/.cursor/plugins/
+  - ~/.cursor/sandbox-policies/
+  - ~/.cursor/skills-cursor/
+  - ~/.cursor/skills/
+  - ~/.cursor/snapshots/
+  - ~/.cursor/worktrees/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/OpenAgentsInc/openagents/a2de475d2ee3a2f00865944c79c15600c1ada45c/docs/teardowns/2026-07-11-cursor-product-teardown.md
+  source_kind: community
+  volatility: browser-logs and snapshots are transient working state and are the first things a cleanup
+    deletes.
+  notes: |-
+    Grab-bag of cursor-agent auxiliary state. Individually each path has 1-2 sources; collectively they are confirmed by a full ~/.cursor teardown, a cleanup tool's exclusion list, and a devcontainer seeding script. Treat each as medium confidence.
+
+    Record structure: skills-cursor/.sync-manifest.json is skill-sync bookkeeping. hooks.json configures preToolUse / beforeReadFile style gates and is the record of what interception was active. sandbox-policies/ and worktrees/ appear in a container-seeding script's list of cursor-agent state dirs.
+  parser: null
+- id: cursor.project_metadata
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cursor/projects-metadata.json
+  - ~/.cursor/projects/<escaped-abs-cwd>/mcp-approvals.json
+  - ~/.cursor/projects/<escaped-abs-cwd>/repo.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/poe-platform/poe-code/77505a0e76b178ef7fde1fd3089dbf5d3b4fbcfb/docs/research/cursor-agent-research.md
+  source_kind: community
+  notes: |-
+    repo.json and mcp-approvals.json each come from a single source; projects-metadata.json from a separate audit listing. High value for mapping the opaque escaped-cwd directory names back to real project paths and for proving what the agent was authorised to invoke.
+
+    Record structure: repo.json = repository metadata with a project UUID. mcp-approvals.json = which MCP servers the user approved for this project (a consent/authorisation record). projects-metadata.json observed at the ~/.cursor root in one home-directory audit tree listing.
+  parser: null
+- id: cursor.auth_credentials
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $XDG_CONFIG_HOME/cursor/auth.json
+  - '%APPDATA%\Cursor\auth.json'
+  - ~/.config/cursor/auth.json
+  - ~/.cursor/auth.json
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/depalmar/ai-dfir-toolkit/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/catalog/cursor.yml
+  source_kind: community
+  volatility: |-
+    Refresh tokens ROTATE on each run — a token captured after the fact is not the token that was in use. Collect metadata and hash before any agent restart or logout.
+  notes: |-
+    RECORD HASH AND METADATA ONLY, never copy contents. Also note CURSOR_API_KEY / CURSOR_AUTH_TOKEN environment variables as a non-file credential path.
+
+    The catalogued path had an explanation appended to it, kept here: ~/.cursor/cli-config.json  (key: authInfo)
+
+    Record structure: JSON with accessToken, refreshToken, apiKey (often null), bedrockCredentials (often null). Written at mode 0600 inside 0700 directories by tooling that manages it. macOS additionally/preferentially uses Keychain generic-password items named cursor-access-token, cursor-refresh-token, cursor-api-key, plus a safeStorage master key at service 'Cursor Safe Storage', account 'Cursor Key'. AGENT_CLI_CREDENTIAL_STORE=file forces the file store. One source states the macOS file credential store ignores CURSOR_CONFIG_DIR and always reads ~/.cursor/auth.json.
+  parser: null
+- id: cursor.commit_checkpoints
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Cursor\User\globalStorage\anysphere.cursor-commits\checkpoints\'
+  - ~/.config/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/
+  - ~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/<id>/diffs/<uuid>
+  - ~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/<id>/files/<uuid>
+  - |-
+    ~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/<id>/metadata.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/tuo-lei/vibe-replay/28d7d853daa121f1c06b17c8d44732aebd891f0b/website/src/content/blog/cursor-local-storage.md
+  source_kind: community
+  volatility: |-
+    Bounded by Cursor's own rewind retention (6 checkpoint rows observed in one survey). A sibling workspaceStorage/<hash>/snapshots/ directory is expected by the code but was ABSENT in an audited profile.
+  notes: |-
+    PRE-EDIT FILE CONTENT — recovers what a file looked like before the agent touched it, including changes never committed to git. metadata.json.agentRequestId joins to cursorDiskKV agentKv:* and to ai_code_hashes.requestId, giving a file-change → prompt linkage.
+
+    Record structure: metadata.json fields: agentRequestId, requestFiles, deduplicatedGitInfos, workspaceId, startTrackingDateUnixMilliseconds. Diff payload fields: fsPath, fileUuid, diffChanges, gitInfo, kind. files/<uuid> are pre-edit file bodies.
+  parser: null
+- id: cursor.local_file_history
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Cursor\User\History\'
+  - ~/.config/Cursor/User/History/
+  - ~/Library/Application Support/Cursor/User/History/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/tclahr/uac/db563110cb9d2d3a5ad8aa985c267205d45ce4da/artifacts/files/applications/ai_tools/cursor.yaml
+  source_kind: community
+  volatility: |-
+    VS Code prunes local history by count and age per the workbench.localHistory.* settings; 25 resource histories observed in one profile.
+  notes: |-
+    Inherited VS Code artifact, NOT AI-specific — but it is the fallback record of agent-driven edits when Cursor's own checkpoints have aged out. Explicitly named as a collection target by the UAC Cursor artifact file.
+
+    Record structure: Standard VS Code local-history layout: one directory per tracked resource containing an entries.json manifest (resource URI + timestamped entry list) plus the numbered content snapshots themselves.
+  parser: null
+- id: cursor.extensions
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.cursor\extensions\extensions.json'
+  - ~/.cursor-server/extensions/
+  - ~/.cursor/extensions/
+  - ~/.cursor/extensions/extensions.json
+  - ~/Library/Application Support/Cursor/extensions/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://github.com/AltimateAI/vscode-dbt-power-user/blob/5fc912ee821cf1e42feb826ad48f9a01e2e98a80/documentation/docs/setup/cursor_installation_workaround.md
+  source_kind: community
+  volatility: |-
+    extensions.json is rebuilt from the directory on next launch if deleted; a sibling .obsolete file marks pending removals.
+  notes: |-
+    User-installed extensions live in ~/.cursor/extensions/ (confirmed by a third-party install guide with explicit macOS/Linux and Windows paths, a Metasploit persistence module's target list, and multiple theme installers). SEPARATELY, one full product teardown places the ~17 FIRST-PARTY extensions (cursor-agent-exec, cursor-agent-worker, cursor-browser-automation, cursor-mcp, cursor-retrieval, cursor-commits, cursor-shadow-workspace, cursor-always-local, …) under ~/Library/Application Support/Cursor/extensions/. Collect BOTH. ~/.cursor-server/extensions/ is the remote/SSH server-side copy. This directory is a known IDE-extension persistence location.
+
+    Record structure: extensions.json is a JSON ARRAY of installed-extension records (identifier, version, location, metadata). Each extension unpacks to its own <publisher>.<name>-<version>/ directory beside it.
+  parser: null
+- id: cursor.install_and_machine_identity
+  category: install_evidence
+  root: registry
+  os:
+  - windows
+  paths:
+  - '%LOCALAPPDATA%\Programs\cursor\'
+  - '%LOCALAPPDATA%\cursor-updater\'
+  - HKCU\Software\Classes\cursor\shell\open\command
+  - HKCU\Software\Microsoft\Windows\CurrentVersion\Run
+  - ~/Library/Application Support/Cursor/User/globalStorage/statsig-cache.json
+  - ~/Library/Application Support/Cursor/User/globalStorage/storage.json
+  - ~/Library/Application Support/Cursor/machineid
+  - ~/Library/Preferences/com.todesktop.230313mzl4w4u92.plist
+  format: registry
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/depalmar/ai-dfir-toolkit/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/catalog/cursor.yml
+  source_kind: community
+  volatility: |-
+    machineid and telemetry ids are stable across launches but are exactly what account-resetter tools rewrite — a mismatch between machineid and storage.json telemetry ids is a tamper indicator.
+  notes: |-
+    macOS bundle identifier is com.todesktop.230313mzl4w4u92 (a ToDesktop-built Electron app), which is why naive sweeps keyed on the string 'Cursor' miss ~/Library/Preferences, ~/Library/HTTPStorages and the ByHost ShipIt updater plist. Registry paths come from a DFIR catalogue; the macOS bundle-id paths from a product teardown.
+
+    Variable location, not globbable: HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\<Cursor GUID>
+
+    Record structure: storage.json holds window state, profile association, theme/splash state, shutdown timing, openedPathsList / backupWorkspaces.folders[].folderUri (the workspace-hash resolver), and telemetry.machineId / devDeviceId / sqmId. Registry Uninstall key yields InstallLocation and DisplayVersion. The cursor:// protocol-handler command key and the Run key are persistence-relevant. Bundle version dating: Contents/Resources/app/product.json (observed version 3.11.13, vscodeVersion 1.125.0, date 2026-07-10T01:45:28Z, commit 3f21b08f0b436a07be29fbfe00b304fa15553350).
+  parser: null
+- id: cursor.ai_code_tracking_db
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cursor/ai-tracking/*.db
+  - ~/.cursor/ai-tracking/ai-code-tracking.db
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/tuo-lei/vibe-replay/28d7d853daa121f1c06b17c8d44732aebd891f0b/website/src/content/blog/cursor-local-storage.md
+  source_kind: community
+  volatility: |-
+    Observed empty (0 active rows) on one surveyed machine while still carrying schema — an empty DB is not proof of no AI-assisted editing.
+  notes: |-
+    The single best Cursor artifact for AI-vs-human code attribution per commit, and conversation_summaries is a lightweight session index that avoids re-parsing every JSONL. ai_code_hashes.conversationId and the checkpoint metadata.agentRequestId cross-join with cursorDiskKV composerData/agentKv ids — this is the pivot that ties a commit to a specific prompt. Confirmed by three independent sources.
+
+    Record structure: Six tables. ai_code_hashes: links code hashes to a source category ('cli' or 'composer'), file name/extension, requestId, conversationId, timestamp, model. scored_commits: commitHash, branchName, tabLinesAdded, composerLinesAdded, humanLinesAdded, v1AiPercentage, v2AiPercentage, message/date. tracked_file_content: git path, conversation, model, timestamp. conversation_summaries: title, TLDR, overview, bullets, model, mode. ai_deleted_files. tracking_state.
+  parser: null
+- id: cursor.logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Cursor\logs\'
+  - ~/.config/Cursor/logs/
+  - ~/Library/Application Support/Cursor/User/process-monitor/
+  - ~/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log
+  - ~/Library/Application Support/Cursor/logs/<launch-timestamp>/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/tclahr/uac/db563110cb9d2d3a5ad8aa985c267205d45ce4da/artifacts/files/applications/ai_tools/cursor.yaml
+  source_kind: community
+  volatility: |-
+    One directory per application launch, rotated by VS Code's own log-folder-per-launch scheme. Observed: 11 launch directories / 860 files / 142 MB spanning ~3 weeks. Older launches are dropped, so the log window is short.
+  notes: |-
+    Note the log directory is a SIBLING of User/, not inside it (…/Cursor/logs, not …/Cursor/User/logs) — the UAC artifact file collects both paths explicitly.
+
+    Record structure: Per-launch subdirectories containing window, renderer, extension-host, terminal, Git, MCP, grep and indexing/retrieval logs. workbench.mcp.*.log records MCP connect/oauth/allowlist events — unstructured text but the only timeline of MCP server startup and authorisation. process-monitor/ holds 1.5 MB of timestamped process logs.
+  parser: null
+- id: cursor.mcp_config
+  category: mcp_config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.cursor\mcp.json'
+  - <project>/.cursor/mcp.json
+  - <project>/.mcp.json
+  - ~/.cursor/mcp.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/depalmar/ai-dfir-toolkit/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/catalog/cursor.yml
+  source_kind: community
+  volatility: |-
+    MCP servers spawn at IDE/agent start; capture the config BEFORE remediation because it is the record of what the agent was authorised to execute. One teardown found this file at mode 0600 while the surrounding ~/.cursor was 0755.
+  notes: |-
+    Flagged as an execution primitive and highest-value config by two DFIR catalogues. MCP OAuth/client-registration secret envelopes are additionally stored in the IDE's state.vscdb ItemTable in byte-array Buffer form.
+
+    Record structure: { "mcpServers": { "<id": { "command", "args", "env", "url", "disabled" } } }. The per-server `env` block routinely holds plaintext API keys and bearer tokens — hash those values on export while keeping the rest of the file. Project-scoped .cursor/mcp.json travels with the repository, so it can arrive on a host via git clone with no local user action.
+  parser: null
+- id: cursor.cli_config
+  category: permissions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $XDG_CONFIG_HOME/cursor/cli-config.json
+  - '%USERPROFILE%\.cursor\cli-config.json'
+  - <project>/.cursor/cli.json
+  - ~/.cursor/cli-config.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/poe-platform/poe-code/77505a0e76b178ef7fde1fd3089dbf5d3b4fbcfb/docs/research/cursor-agent-research.md
+  source_kind: community
+  contains_credentials:
+  - auth_credentials
+  volatility: |-
+    Allowlist entries accumulate as the user approves commands — this file grows into a de-facto record of every tool class ever permitted. One reported bug wrote project-scoped approvals into the global file instead of <project>/.cursor/cli.json.
+  notes: |-
+    Location override precedence: CURSOR_CONFIG_DIR wins; else $XDG_CONFIG_HOME/cursor on Linux/BSD; else ~/.cursor. Two independent DFIR catalogues list this path as a primary collection target (family=config).
+
+    This file also holds credential material. That is recorded here rather than as a separate entry, because a separate entry marked secret would stop the collector copying a file that is itself the evidence. Folded in from cursor.auth_credentials: RECORD HASH AND METADATA ONLY, never copy contents. Also note CURSOR_API_KEY / CURSOR_AUTH_TOKEN environment variables as a non-file credential path.
+
+    The catalogued path had an explanation appended to it, kept here: ~/.cursor/cli-config.json  (key: authInfo)
+
+    Record structure: Permission grammar uses four rule kinds: Shell(commandBase) where commandBase is the first token of the command line, Read(pathOrGlob), Write(pathOrGlob), WebFetch(domainOrPattern). Only permissions are configurable at project level; all other CLI settings are global. Newer cursor-agent builds ALSO store credentials in this same file under the top-level "authInfo" key — treat that subtree as secret and hash it rather than exporting it, but still collect the file for the permission evidence.
+  parser: null
+- id: cursor.project_instructions
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.cursor/agents/
+  - <project>/.cursor/commands/*.md
+  - <project>/.cursor/plans/
+  - <project>/.cursor/rules/*.mdc
+  - <project>/.cursor/skills/
+  - <project>/.cursorrules
+  - <project>/AGENTS.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/r3nzsec/irflow-timeline/a0af054723ef5db771098156979c52bb42ae703e/docs/dfir-tips/ai-apps/cursor.md
+  source_kind: community
+  volatility: |-
+    Version-controlled in most repos, so git history gives you the change timeline for free — check `git log` on these paths.
+  notes: |-
+    PRIMARY PROMPT-INJECTION SURFACE — labelled as such by a DFIR catalogue. An attacker who lands a .mdc file in a repo gets persistent instruction injection for every contributor who opens it in Cursor. Collect the full text, not just filenames.
+
+    Record structure: .mdc = markdown with YAML frontmatter; frontmatter keys include alwaysApply (boolean), description (drives agent-requested activation) and globs (path-scoped attachment). Legacy flat `.cursorrules` in the repo root is still read by older builds but is deprecated in favour of .cursor/rules/ and AGENTS.md.
+  parser: null
+- id: cursor.chat_session_prompt_history
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/prompt_history.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/skillsynchq/txcript/c545075461a45edf609a252b8be932ad3a6c5052/docs/formats/cursor.md
+  source_kind: source_code
+  notes: |-
+    Per-session prompt log. Survives independently of the blob store, so it can recover user intent even when store.db is corrupt or truncated.
+
+    Record structure: Array of raw user prompt strings, in order. No timestamps, no assistant text.
+  parser: null
+- id: cursor.global_prompt_history
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $HOME/.cursor/prompt_history.json
+  - '%USERPROFILE%\.cursor\prompt_history.json'
+  - ~/.cursor/prompt_history.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/tuo-lei/vibe-replay/28d7d853daa121f1c06b17c8d44732aebd891f0b/website/src/content/blog/cursor-local-storage.md
+  source_kind: community
+  volatility: |-
+    Rolling list with a version-dependent entry/size cap — older prompts are silently dropped, so this is a decaying artifact. Collect early.
+  notes: |-
+    Independently listed as a first-class collection target by two DFIR tools (UAC artifact file for Cursor; a Windows/osquery artifact catalogue that tags it family=history).
+
+    Record structure: Flat JSON array of user prompt strings (workspace-wide, not per-session).
+  parser: null
+- id: cursor.acp_session_store
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cursor/acp-sessions/<session-uuid>/meta.json
+  - ~/.cursor/acp-sessions/<session-uuid>/store.db
+  - ~/.cursor/acp-sessions/<session-uuid>/store.db-shm
+  - ~/.cursor/acp-sessions/<session-uuid>/store.db-wal
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/xintaofei/codeg/18046ea4ecc11a68f8f7bac9e54c99b28658dfe6/src-tauri/src/parsers/cursor.rs
+  source_kind: source_code
+  volatility: |-
+    WAL/SHM present for live and recent stores. One teardown counted 74 session directories but only 71 store.db files — some sessions leave a directory with meta.json and no database.
+  notes: |-
+    STRUCTURALLY SEPARATE third Cursor CLI store, used when cursor-agent runs in ACP mode (`cursor-agent acp`, IDE/third-party harness integrations). Keyed by ACP session id, not by workspace hash — there is no md5(cwd) directory level. Rich tool-call arguments persist here that are absent from the legacy chats layout. Relocatable via CURSOR_CONFIG_DIR.
+
+    Record structure: Same schema as the chats store: blobs(id TEXT PRIMARY KEY, data BLOB) + meta(key TEXT PRIMARY KEY, value TEXT). meta.json here is plain JSON with schemaVersion, cwd, title — cwd is the only reliable workspace attribution for ACP sessions, because ACP-only sessions never produce an agent-transcripts entry.
+  parser: null
+- id: cursor.agent_transcripts_jsonl
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.cursor\projects\<escaped-abs-cwd>\agent-transcripts\...'
+  - ~/.cursor/projects/<escaped-abs-cwd>/agent-tools/*.txt
+  - ~/.cursor/projects/<escaped-abs-cwd>/agent-transcripts/<composer-id>.txt
+  - ~/.cursor/projects/<escaped-abs-cwd>/agent-transcripts/<session-uuid>.jsonl
+  - ~/.cursor/projects/<escaped-abs-cwd>/agent-transcripts/<session-uuid>/<session-uuid>.jsonl
+  - ~/.cursor/projects/<escaped-abs-cwd>/agent-transcripts/<session-uuid>/transcript.jsonl
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/r3nzsec/irflow-timeline/a0af054723ef5db771098156979c52bb42ae703e/docs/dfir-tips/ai-apps/cursor.md
+  source_kind: community
+  volatility: |-
+    Append-only mirror, unbounded, no rotation observed. An ACP-only session never appears here at all (live-tested and confirmed by one source), so absence here is NOT absence of activity.
+  notes: |-
+    Plaintext canonical transcript, by far the easiest Cursor CLI artifact to read. Paired sidecars: agent-tools/*.txt. Some tooling also reports a per-transcript index .db built by third parties, not by Cursor — do not attribute that to the product.
+
+    Record structure: One JSON object per line, shape {role, message:{content:[blocks]}} with `text` and `tool_use` blocks often in one record. NO per-record timestamps — order is positional and wall-clock must come from the paired store.db meta/createdAt or file mtime. Directory name is the project's absolute path with path separators flattened to '-' (e.g. Users-alice-repos-proj). At least three on-disk layouts exist across versions (nested <uuid>/<uuid>.jsonl, nested <uuid>/transcript.jsonl, flat <uuid>.jsonl) plus an older <composerId>.txt form — glob all four.
+  parser: null
+- id: cursor.chat_session_meta_json
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/meta.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/skillsynchq/txcript/c545075461a45edf609a252b8be932ad3a6c5052/docs/formats/cursor.md
+  source_kind: source_code
+  volatility: Rewritten on each session update; updatedAtMs is the last-touch timestamp.
+  notes: |-
+    Sidecar beside store.db. This is the cheap session index for triage: title plus timestamps without opening the SQLite store. Do not confuse with the store.db `meta` TABLE, which is hex-encoded.
+
+    Record structure: Plain (not hex-encoded) JSON: title, createdAtMs, updatedAtMs, schemaVersion, hasConversation.
+  parser: null
+- id: cursor.chat_store_db
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $XDG_CONFIG_HOME/cursor/chats/<md5>/<session-uuid>/store.db
+  - '%USERPROFILE%\.cursor\chats\<md5>\<session-uuid>\store.db'
+  - ~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/store.db
+  - ~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/store.db-shm
+  - ~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/store.db-wal
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/skillsynchq/txcript/c545075461a45edf609a252b8be932ad3a6c5052/docs/formats/cursor.md
+  source_kind: source_code
+  volatility: |-
+    No rotation or pruning observed; transcripts described as unbounded. SQLite is WAL-mode and the file descriptor is held open for the whole session, so -wal and -shm must be acquired with the main file or the newest turns are lost.
+  notes: |-
+    Cursor CLI (cursor-agent) interactive/print-mode store; distinct from the IDE's state.vscdb and from acp-sessions. Workspace bucket = lowercase hex MD5 of the absolute workspace path, empirically char-for-char matched against real data by one source. Relocatable via CURSOR_CONFIG_DIR. Image/pasted attachments live here as blobs and are NOT in the JSONL transcript.
+
+    Record structure: Two tables. blobs(id TEXT PRIMARY KEY, data BLOB) is content-addressed: id = lowercase-hex sha256(data) (64 hex chars). meta(key TEXT PRIMARY KEY, value TEXT) holds a SINGLE row whose key is the literal string "0" and whose value is HEX-ENCODED UTF-8 JSON (hex-decode before JSON parse) carrying agentId, latestRootBlobId, name, createdAt (unix ms), mode (e.g. "auto-run"/"manual"), lastUsedModel, and in newer builds isRunEverything, approvalMode, subagentInfo. Blob payloads are MIXED encodings: message blobs are plain JSON objects starting with the byte 0x7B '{' ({role, content, id, createdAt, providerOptions.cursor.modelName}); linking/tree blobs are protobuf-framed lists of child references, each frame 0x0A 0x20 followed by a 32-byte raw sha256, repeated, with optional trailing embedded JSON. Walk from meta.latestRootBlobId to reconstruct the turn DAG. One independent source instead describes the blobs as protobuf agent.v1.* messages — treat the encoding as per-blob sniffed, not fixed.
+  parser: null
+- id: cursor.conversation_search_db
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Cursor\User\globalStorage\conversation-search.db'
+  - ~/.config/Cursor/User/globalStorage/conversation-search.db
+  - ~/Library/Application Support/Cursor/User/globalStorage/conversation-search.db
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/r3nzsec/irflow-timeline/a0af054723ef5db771098156979c52bb42ae703e/docs/dfir-tips/ai-apps/cursor.md
+  source_kind: community
+  volatility: |-
+    CRITICAL: retains indexed body text AFTER the underlying transcript files/rows are deleted. This is an anti-forensics-resistant copy — collect it even when the primary stores look empty or wiped.
+  notes: |-
+    Two independent sources (a DFIR timeline tool and a full product teardown). Added in a recent Cursor version; may be absent on older installs. Best single recovery target when a subject has cleared chat history.
+
+    Record structure: SQLite user-version 7. conversation_fts is an FTS5 virtual table: fts5(title, body, tokenize='unicode61 remove_diacritics 2', prefix='2 3') — plus the usual FTS5 shadow tables (_data, _idx, _content, _docsize, _config) which may hold recoverable text even after a delete. A `conversations` table carries source/scope/id, archive state, timestamps and root/cache fingerprints. Observed size 287 KB.
+  parser: null
+- id: cursor.global_state_vscdb
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Cursor\User\globalStorage\state.vscdb'
+  - ~/.config/Cursor/User/globalStorage/state.vscdb
+  - ~/Library/Application Support/Cursor/User/globalStorage/state.vscdb
+  - ~/Library/Application Support/Cursor/User/globalStorage/state.vscdb-shm
+  - ~/Library/Application Support/Cursor/User/globalStorage/state.vscdb-wal
+  - ~/Library/Application Support/Cursor/User/globalStorage/state.vscdb.backup
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/tclahr/uac/db563110cb9d2d3a5ad8aa985c267205d45ce4da/artifacts/files/applications/ai_tools/cursor.yaml
+  source_kind: community
+  contains_credentials:
+  - auth_tokens
+  volatility: |-
+    cursorDiskKV is append-only per message/checkpoint/blob with NO observed pruning — excellent retention. But WAL-mode: acquire .vscdb + -wal + -shm together, and note that the WAL checkpoints on Cursor exit. state.vscdb.backup is a stale snapshot (one teardown found it ~2 months older than the live DB) and is therefore a free second point in time. Observed live sizes: 48.5 MB main / 41.2 MB backup; 839-2937 rows per key family.
+  notes: |-
+    THE primary Cursor IDE / Composer / in-editor-agent transcript store. As of early 2026 message text lives in individual bubbleId rows, NOT in a conversationMap field inside composerData — older extractors that only read composerData will silently return empty conversations. Cursor 3.0 (2026-04-02) centralised the chat index from the per-workspace DBs into composerHeaders here, each row carrying a workspaceIdentifier. Chat data stays LOCAL even for remote-SSH workspaces.
+
+    This file also holds credential material. That is recorded here rather than as a separate entry, because a separate entry marked secret would stop the collector copying a file that is itself the evidence. Folded in from cursor.auth_tokens: IMPORTANT FOR THE COLLECTOR: this entry marks the KEYS secret, not the database. The same state.vscdb MUST still be collected in full under cursor_ide.global_state_vscdb — that is the primary transcript evidence. Implement this as a redaction rule applied during export, never as a file-level skip. cursorAuth/cachedEmail is also the cleanest account-attribution artifact in the whole Cursor footprint.
+
+    The catalogued path had an explanation appended to it, kept here: ~/Library/Application Support/Cursor/User/globalStorage/state.vscdb  (ItemTable keys: cursorAuth/accessToken, cursorAuth/refreshToken, cursorAuth/cachedEmail)
+
+    The catalogued path had an explanation appended to it, kept here: %APPDATA%\Cursor\User\globalStorage\state.vscdb  (same ItemTable keys)
+
+    The catalogued path had an explanation appended to it, kept here: ~/.config/Cursor/User/globalStorage/state.vscdb  (same ItemTable keys)
+
+    Variable location, not globbable: macOS Keychain: generic-password cursor-access-token / cursor-refresh-token / cursor-api-key; service 'Cursor Safe Storage' account 'Cursor Key'
+
+    Record structure: Tables: ItemTable(key TEXT UNIQUE ON CONFLICT REPLACE, value BLOB); cursorDiskKV(key TEXT UNIQUE ON CONFLICT REPLACE, value BLOB); and since Cursor 3.0 a real relational table composerHeaders(composerId TEXT PRIMARY KEY, workspaceId TEXT, createdAt INTEGER, lastUpdatedAt INTEGER, isArchived INTEGER, isSubagent INTEGER, recency INTEGER, checkpointAt INTEGER, value TEXT). cursorDiskKV key families: composerData:<composerId> (conversation metadata, model config, context, changed/added/removed files, checkpoints, branches/worktrees, subagent links, todos, token breakdown; fields name, isAgentic, fullConversationHeadersOnly[], _v schema version observed at 13); bubbleId:<composerId>:<bubbleId> (ONE ROW PER MESSAGE — text, type (1=user, 2=assistant), codeBlocks, toolResults, toolFormerData, tokenCount{inputTokens,outputTokens}, images, thinkingDurationMs, todos[], mcpDescriptors, relevantFiles, recentlyViewedFiles, pullRequests, errorDetails; largest single row observed 1.49 MB); checkpointId:<composerId>:<checkpointId> (file-state manifests {files, nonExistentFiles, activeInlineDiffs}); messageRequestContext:<composerId>:<messageId> (full prompt-building context snapshot); composer.content.<hash> and agentKv:blob:<contentId> (content-addressed agent messages, tool payloads, raw provider request/response bodies including SYSTEM PROMPTS, plaintext source, binary protobuf and JPEG attachments — the single largest family, ~2937 rows / 30 MB observed, i.e. ~80% of DB bloat); ofsContent:<contentId> (original-file snapshots); inlineDiff:*. ItemTable keys: composer.composerData, composer.composerHeaders, cursorAuth/* (see cursor_ide.auth_tokens), cursorTrustedExtensionAuthAccess, terminal command/directory history, recently-opened paths, browser-automation history, MCP OAuth secret envelopes in byte-array Buffer form, per-workspace Git IPC secret. Values are predominantly UTF-8 JSON stored in a BLOB column (so SELECT returns bytes — decode before parsing); agentKv:blob values are mixed JSON/binary/JPEG and must be sniffed.
+  parser: null
+- id: cursor.pasted_text
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cursor/chats/<md5>/<session-uuid>/pasted_text.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: |-
+    https://github.com/pradipta/wallfacer/blob/94a58b79a47c4e815e60ffe6bfc5fb604351d2c3/internal/agent/cursor/cursor.go
+  source_kind: source_code
+  notes: |-
+    SINGLE SOURCE, retrieved as a code-search snippet from a Go doc comment, not a full fetch. High analytical value if real (pasted credentials/log excerpts land here rather than in the transcript) so worth globbing, but do not assert the field layout.
+
+    Record structure: Described only as "pasted buffers" in a doc comment enumerating the per-session directory contents. Structure unknown.
+  parser: null
+- id: cursor.workspace_state_vscdb
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Cursor\User\workspaceStorage\<workspace-hash>\state.vscdb'
+  - ~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb
+  - ~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb
+  - ~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/workspace.json
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/VasiHemanth/tokentelemetry/0d691ae343ed31991e504a738bb1b288eea3b2ee/docs/research/harness-survey/harness-cursor-vscode.md
+  source_kind: community
+  volatility: |-
+    ItemTable is last-write-wins per key, so this DB overwrites rather than appends — the legacy aiService.* histories are the most fragile Cursor chat evidence there is.
+  notes: |-
+    The aiService.prompts / aiService.generations / aichat.chatdata keys are EARLY-VERSION artifacts. On Cursor 3.0+ the workspace DB retains mainly selectedComposerIds and UI state — so finding populated aiService.* keys is itself a dating signal for an older install or an older workspace. workspace.json is the only reliable hash-to-path resolver; VS Code proper does not store folder paths per workspace and needs globalStorage/storage.json openedPathsList instead.
+
+    Record structure: ItemTable only (plus cursorDiskKV in some builds). Keys: aiService.prompts (LEGACY prompt-only history: prompt text + commandType), aiService.generations (LEGACY generation event log: UUID + timestamp + type), workbench.panel.aichat.view.aichat.chatdata (LEGACY chat: tabs[] + bubbles[]), composer.composerData (selected/focused composer ids), cursor/pinnedComposers, history.entries, workbench.backgroundComposer.workspacePersistentData, workbench.panel.composerChatViewPane.*, workbench.panel.aichat.<uuid>.numberOfVisibleViews, newAgentSidebar.*, cursor/agentLayout.*, agentSidebar.section.*.collapsed, interactive.sessions. workspace.json beside it maps the opaque hash to the real folder: a "folder" or "workspace" key with a file:// or vscode-remote://ssh-remote+<host>/ URI.
+  parser: null

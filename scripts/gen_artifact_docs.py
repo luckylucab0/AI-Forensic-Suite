@@ -246,6 +246,10 @@ def render(catalogue: Catalogue, lang: str) -> str:
         "",
         loc["unverified_warning"],
         "",
+        # Said in the generated reference rather than only in an ADR, because this is the
+        # file an analyst reads while deciding whether a missing artifact means anything.
+        loc["verified_meaning"],
+        "",
     ]
     for agent in catalogue:
         out.extend(agent_section(agent, loc, lang))

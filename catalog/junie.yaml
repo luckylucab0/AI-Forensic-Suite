@@ -1,0 +1,235 @@
+# Junie artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: junie
+title: Junie
+vendor: JetBrains
+references:
+- |-
+  https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt
+- https://raw.githubusercontent.com/JetBrains/junie-guidelines/main/README.md
+- https://raw.githubusercontent.com/dmeehan1968/junie-explorer/main/README.md
+- |-
+  https://raw.githubusercontent.com/tinesoft/aikill/8869151c7be74ae4bcdbd0de96f908c53d59634a/.scratch/aikill/research/agent-path-junie.md
+artifacts:
+- id: junie.home_config
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.junie\AGENTS.md'
+  - '%USERPROFILE%\.junie\config.json'
+  - ~/.junie/AGENTS.md
+  - ~/.junie/config.json
+  - ~/.junie/settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/tinesoft/aikill/8869151c7be74ae4bcdbd0de96f908c53d59634a/.scratch/aikill/research/agent-path-junie.md
+  source_kind: community
+  notes: |-
+    recollection, needs verification - the community source labels these '[docs]' (junie-cli-configuration.html / guidelines-and-memory.html) and I could not reach junie.jetbrains.com to confirm. The Windows %USERPROFILE%\.junie\AGENTS.md form is reported as an explicit vendor-documented path. ~/.junie itself IS confirmed to exist as a real directory by JetBrains' own source (McpClientDetector.kt resolves ~/.junie/mcp/mcp.json and treats the parent's existence as the detection signal), so the tree is real even where individual filenames are not confirmed. config.json is reported to carry 'mcp-locations', 'skill-locations', 'command-locations', 'agent-locations' and 'model-locations' keys - i.e. it can REDIRECT where MCP servers, skills, commands and sub-agents are loaded from, which makes it a prerequisite read before trusting any default glob.
+  parser: null
+- id: junie.trust_and_auth_key
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.junie\trust\'
+  - ~/.junie/trust/
+  - ~/.junie/trust/authentication-key
+  format: text
+  sensitivity: secret
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/tinesoft/aikill/8869151c7be74ae4bcdbd0de96f908c53d59634a/.scratch/aikill/research/agent-path-junie.md
+  source_kind: community
+  notes: |-
+    recollection, needs verification - single community source labelled '[docs]', page unreachable from here. Described as: ~/.junie/trust/ holds 'Authentication trust markers (one per project/parent-directory scope)' and ~/.junie/trust/authentication-key is the 'Fallback auth-key file when OS secure storage (Keychain/Credential Manager/Secret Service) is unavailable (headless/containers)', with owner-only permissions, and is 'literal credential material'. If confirmed this is exactly the high-value case the secret sensitivity class exists for: on a headless/container endpoint the bearer credential is a plain file, whereas on a desktop it is in the OS keychain and unrecoverable from the filesystem alone. Metadata + hash only. The trust/ markers are separately interesting as a list of directories the user authorised Junie to operate in.
+  parser: null
+- id: junie.plugin_install_evidence
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\JetBrains\<Product><Version>\plugins\ml-llm\'
+  - ~/.local/share/JetBrains/<Product><Version>/ml-llm/
+  - ~/Library/Application Support/JetBrains/<Product><Version>/options/InstallJunieHubActionManager.xml
+  - |-
+    ~/Library/Application Support/JetBrains/<Product><Version>/plugins/ml-llm/lib/modules/intellij.ml.llm.junie.*.jar
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/tinesoft/aikill/8869151c7be74ae4bcdbd0de96f908c53d59634a/.scratch/aikill/research/agent-path-junie.md
+  source_kind: community
+  notes: |-
+    Junie is NOT a standalone app and NOT a separate top-level plugin directory: it ships inside the ml-llm plugin (marketplace listing 'Junie, the AI coding agent by JetBrains', plugin id com.intellij.ml.llm, codename matterhorn) which is bundled into IntelliJ-platform IDEs. The macOS jar path and the options file were directly observed on a live install by the aikill researcher ([verified], with the options file content quoted as `<option name="wasBadgeRead" value="true"/>`). Linux/Windows equivalents are [docs+inferred] there. options/InstallJunieHubActionManager.xml is a tiny but useful presence/interaction marker. Also check <config>/plugins/ generally and the IDE's disabled_plugins.txt for whether AI features were turned off.
+  parser: null
+- id: junie.jcp_outbox
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%LOCALAPPDATA%\JetBrains\<Product><Version>\junie-jcp-outbox\'
+  - ~/.cache/JetBrains/<Product><Version>/junie-jcp-outbox/
+  - ~/Library/Caches/JetBrains/<Product><Version>/junie-jcp-outbox/event-logs/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/tinesoft/aikill/8869151c7be74ae4bcdbd0de96f908c53d59634a/.scratch/aikill/research/agent-path-junie.md
+  source_kind: community
+  volatility: |-
+    Name implies a queued-for-upload buffer, i.e. contents are drained (deleted) once transmitted - so it is a narrow-window artifact.
+  notes: |-
+    The macOS path was directly observed on a live IntelliJ IDEA install by the aikill researcher (marked [verified] there, directory present but empty at inspection). Linux/Windows forms are extrapolation onto the confirmed system roots and are marked [inferred only] in that source - treat those two as unverified. Purpose is undocumented; 'jcp' is unexplained. Forensic value: a telemetry OUTBOX may retain event payloads that the durable stores have already rotated away, and its mere presence dates Junie usage.
+  parser: null
+- id: junie.mcp_config
+  category: mcp_config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.junie\mcp\mcp.json'
+  - <project>/.junie/mcp/mcp.json
+  - ~/.junie/mcp/mcp.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt
+  source_kind: official
+  notes: |-
+    VERIFIED FROM JETBRAINS' OWN SOURCE - the strongest Junie path I have. McpClientDetector.detectJunie() does `Paths.get(OSAgnosticPathUtil.expandUserHome("~/.junie/mcp/mcp.json"))` for global scope, and detectJunieProject() does `Paths.get(projectBasePath, ".junie", "mcp", "mcp.json")` for project scope. Both are gated on looksLikeMcpJson(), which checks the file content contains "mcpServers". Independently corroborated by many third-party integration docs (oraios/serena, dagger/container-use, unoplatform/uno's spec which explicitly notes the older {ws}/.idea/mcpServers.json path is NOT the documented location). Expect embedded env vars / API keys for MCP servers - normal sensitivity, flag for review. YouTrack JUNIE-1331 notes the IDE and CLI mcp.json formats are not fully compatible, so parse defensively.
+
+    Record structure: Top-level 'mcpServers' object, Claude-Desktop-style.
+  parser: null
+- id: junie.allowlist
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.junie\allowlist.json'
+  - ~/.junie/allowlist.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/tinesoft/aikill/8869151c7be74ae4bcdbd0de96f908c53d59634a/.scratch/aikill/research/agent-path-junie.md
+  source_kind: community
+  notes: |-
+    recollection, needs verification - single community source, labelled '[docs: junie.jetbrains.com/docs/junie-cli.html]' there, and that page is unreachable from here. Described as the 'Allowlist of shell commands/patterns Junie may run without asking'. If real this is a first-class permissions artifact: it records exactly which dangerous commands the user pre-authorised the agent to run unattended, and it 'encodes user trust decisions'. High investigative value - worth confirming on a live endpoint.
+  parser: null
+- id: junie.project_dir
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.aiignore
+  - <project>/.junie/AGENTS.md
+  - <project>/.junie/config.json
+  - <project>/.junie/guidelines.md
+  - <project>/.junie/guidelines/
+  - <project>/.junie/playbook.md
+  - <project>/.junie/rules/*.md
+  - <project>/AGENTS.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: verified
+  source: https://raw.githubusercontent.com/JetBrains/junie-guidelines/main/README.md
+  source_kind: official
+  volatility: Committed to the repo in practice, so also recoverable from git history.
+  notes: |-
+    JetBrains' own junie-guidelines repo README states guidelines 'can be stored in two places: .junie/AGENTS.md [or] AGENTS.md' and that a custom guidelines path can be set in 'Settings | Tools | Junie | Project Settings' - so the path may be OVERRIDDEN per project and .junie/ absence is not proof of no guidelines. CORRECTION TO THE BRIEF: .junie/guidelines.md is the LEGACY form; the current form is .junie/AGENTS.md then root AGENTS.md, with discovery order .junie/AGENTS.md -> AGENTS.md -> legacy .junie/guidelines.md or .junie/guidelines/. The legacy form is nonetheless extremely common in the wild - GitHub code search returns 432 repositories with a committed .junie/guidelines.md - so keep globbing for it. playbook.md, rules/*.md and .aiignore are reported by community sources citing vendor docs I could not fetch; .aiignore is a user-authored file-access boundary (gitignore syntax) and is worth collecting as a permissions-adjacent artifact.
+  parser: null
+- id: junie.cli_sessions
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.junie\sessions\<session-id>\'
+  - ~/.junie/sessions/<session-id>/events.jsonl
+  - ~/.junie/sessions/<session-id>/subagents/
+  - ~/.junie/sessions/<session-id>/transcript.md
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/tinesoft/aikill/8869151c7be74ae4bcdbd0de96f908c53d59634a/.scratch/aikill/research/agent-path-junie.md
+  source_kind: community
+  volatility: |-
+    CRITICAL: the CLI reportedly keeps full context for only THE LAST 10 SESSIONS and prunes older ones automatically. This is the most aggressively self-deleting artifact in this whole family - collect it before anything else, and expect gaps.
+  notes: |-
+    recollection, needs verification - specifically: the attesting community source labels this path '[docs]' (cited to junie.jetbrains.com/docs/junie-cli.html and slash-commands.html) rather than directly observed on disk, and junie.jetbrains.com is unreachable from this environment so I could not confirm it at the primary source. Independent partial corroboration: a web search result for Junie docs states 'Junie opens a continuously updated transcript.md file stored next to the session's events.jsonl file' and that /history opens Task history, and vshulcz/deja-vu issue #3104 independently says 'Junie (agent mode) produces separate events.jsonl and transcript.md files per session in an undocumented directory location'. So the FILE NAMES are well attested from two directions; the ~/.junie/sessions/<sessionId>/ parent is the part resting on one docs-citation. Treat the whole ~/.junie tree as a directory to enumerate wholesale. Attribution note: session ids are opaque and no embedded project-path field is documented, so project attribution requires grepping transcript/event contents for a working directory.
+  parser: null
+- id: junie.matterhorn_project_logs
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%LOCALAPPDATA%\JetBrains\<Product><Version>\projects\<ProjectName>\matterhorn\.matterhorn\'
+  - ~/.cache/JetBrains/<Product><Version>/projects/<ProjectName>/matterhorn/.matterhorn/
+  - |-
+    ~/Library/Caches/JetBrains/<Product><Version>/projects/<ProjectName>/matterhorn/.matterhorn/events/<issueId> <taskId>-events.jsonl
+  - |-
+    ~/Library/Caches/JetBrains/<Product><Version>/projects/<ProjectName>/matterhorn/.matterhorn/issues/chain-<issueId>.json
+  - |-
+    ~/Library/Caches/JetBrains/<Product><Version>/projects/<ProjectName>/matterhorn/.matterhorn/issues/chain-<issueId>/task-<index>.json
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/dmeehan1968/junie-explorer/main/README.md
+  source_kind: community
+  volatility: |-
+    HIGH RISK: this lives in the IDE's CACHES/system root, which 'File > Invalidate Caches / Restart' and every IDE-cleanup utility will happily wipe, and which is discarded when an old <Product><Version> directory is removed after an upgrade. Retention policy unknown. YouTrack JUNIE-272 reports the directory growing quickly, which invites user deletion.
+  notes: |-
+    This is Junie's IDE-plugin session store - the closest thing to a Junie transcript inside the IDE - and the brief flagged it as unknown. Structure quoted verbatim from junie-explorer's README, a tool built specifically to parse it, which also gives the three cache roots ('Windows: %APPDATA%\..\Local\JetBrains' i.e. %LOCALAPPDATA%, 'macOS: /Users/<username>/Library/Caches/JetBrains', 'Linux: ~/.cache/JetBrains'). Corroborated by tinesoft/aikill's research note, which cites JetBrains' own privacy KB article as confirming Library/Caches/JetBrains holds 'Project logs with issues, tasks, events, trajectories, and steps', and which verified from a live idea.log that the Junie plugin's internal module namespace is org.jetbrains.junie_$implicit and its packaging codename is matterhorn (plugin id com.intellij.ml.llm, shipped inside the ml-llm plugin). Marked medium confidence because neither I nor the aikill researcher saw a populated tree - the field names come from the parser. ATTRIBUTION WEAKNESS worth recording in the catalogue: the path segment is <ProjectName>, not an absolute path or a path hash, so two unrelated projects with the same name collide and a moved/renamed project silently orphans its logs; no per-project manifest naming the original filesystem path was found.
+
+    Record structure: Note the SPACE in the events filename: '<issueId> <taskId>-events.jsonl'. Event stream carries LLM request/response records with token usage, AgentActionExecutionStarted / AgentActionExecutionFinished pairs (action timeline), and agent-type attribution (Assistant, TaskSummarizer, Memorizer, ErrorAnalyzer, LanguageIdentifier, MemoryCompactor) derivable from each request's system prompt. issues/chain-*.json carry issue/task-chain metadata; task-<index>.json carries per-task planning state. junie-explorer distinguishes 'chain-*.json' issues from 'AIA tasks from *-events.jsonl'.
+  parser: null

@@ -76,6 +76,7 @@ class Artifact:
     legacy: bool = False
     record_types: tuple[str, ...] = ()
     tables: tuple[str, ...] = ()
+    contains_credentials: tuple[str, ...] = ()
     volatility: Text | None = None
     notes: Text | None = None
 
@@ -107,6 +108,15 @@ class Artifact:
         artifacts can be collected at all.
         """
         return self.root in ("project", "repo_root", "plugin")
+
+    @property
+    def holds_credentials_inside(self) -> bool:
+        """Whether this artifact is evidence that also contains credential material.
+
+        Such a file is collected in full. The names in contains_credentials are what an
+        exporter redacts, so a finding can leave the case without carrying a live token.
+        """
+        return bool(self.contains_credentials)
 
     @property
     def is_registry(self) -> bool:
@@ -230,6 +240,7 @@ def _artifact(data: Mapping[str, Any]) -> Artifact:
         legacy=bool(data.get("legacy", False)),
         record_types=_tuple(data.get("record_types")),
         tables=_tuple(data.get("tables")),
+        contains_credentials=_tuple(data.get("contains_credentials")),
         volatility=data.get("volatility"),
         notes=data.get("notes"),
     )

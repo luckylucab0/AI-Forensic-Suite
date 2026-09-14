@@ -1,0 +1,176 @@
+# Roo Code artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: roo_code
+title: Roo Code
+vendor: Roo Code
+references:
+- https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/core/prompts/sections/custom-instructions.ts
+- https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/package.json
+- https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/services/checkpoints/ShadowCheckpointService.ts
+- https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/services/roo-config/index.ts
+artifacts:
+- id: roo_code.custom_storage_path
+  category: config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.vscode/settings.json
+  - <vscode-user>/settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/package.json
+  source_kind: source_code
+  notes: |-
+    COLLECTION-CRITICAL. package.json contributes the setting `roo-cline.customStoragePath` (string, default ""): 'a custom location for storing extension data'. src/utils/storage.ts reads it via vscode.workspace.getConfiguration(Package.name), validates that the path is absolute, and falls back to the default global storage path only if it is inaccessible. So the ENTIRE tasks/settings/cache/checkpoints tree can legitimately live anywhere on the volume (or a network share). Always parse the VS Code settings.json for roo-cline.customStoragePath and roo-cline.autoImportSettingsPath before reporting 'no Roo Code data'. autoImportSettingsPath is a second lead: it names a settings file Roo imports on startup, which may point at an exported config containing provider profiles.
+  parser: null
+- id: roo_code.extension_id
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/package.json
+  source_kind: source_code
+  notes: |-
+    EXACT ID: package.json name="roo-cline", publisher="RooVeterinaryInc", version 3.53.0 on main. Marketplace/Open VSX identifiers confirmed independently from the vendor's own docs site source (RooCodeInc/Roo-Code-Docs src/constants.ts): VSCODE_MARKETPLACE_URL '...itemName=RooVeterinaryInc.roo-cline' and OPEN_VSX_URL 'https://open-vsx.org/extension/RooVeterinaryInc/roo-cline'. The publisher segment is MIXED CASE in the marketplace id but the on-disk globalStorage folder is all-lowercase 'rooveterinaryinc.roo-cline' (observed consistently across independent third-party collectors). Make the glob case-insensitive rather than betting on one spelling. The old 'roo-cline' name is retained for backwards compatibility after the rebrand to Roo Code.
+  parser: null
+- id: roo_code.global_dirs
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.roo\'
+  - ~/.agents/
+  - ~/.roo/
+  - ~/.roo/rules-<mode>/
+  - ~/.roo/rules/
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/services/roo-config/index.ts
+  source_kind: source_code
+  notes: |-
+    getGlobalRooDirectory() = path.join(os.homedir(), ".roo") with the doc comment giving the per-OS examples verbatim ('macOS/Linux: ~/.roo/ ... Windows: %USERPROFILE%\.roo\'). getProjectRooDirectoryForCwd(cwd) = path.join(cwd, ".roo"). The same file also resolves a global '.agents' directory (the emerging cross-agent convention). Global rules apply to every project and are therefore the best single source for 'what standing instructions did this user give their agent'.
+  parser: null
+- id: roo_code.settings
+  category: mcp_config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/cache/
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/settings/custom_modes.yaml
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/settings/mcp_settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/utils/storage.ts
+  source_kind: source_code
+  notes: |-
+    CORRECTION TO THE BRIEF'S IMPLICIT ASSUMPTION: Roo's MCP file is mcp_settings.json, NOT cline_mcp_settings.json - do not reuse the Cline filename for the fork. storage.ts builds `path.join(basePath, "settings")` and `path.join(basePath, "cache")`. custom_modes.yaml defines custom agent personas including their tool/file-access restrictions, i.e. it is effectively a permissions artifact as well as config.
+  parser: null
+- id: roo_code.rules
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.clinerules
+  - <project>/.clinerules-<mode>
+  - <project>/.roo/rules-<mode>/
+  - <project>/.roo/rules/
+  - <project>/.rooignore
+  - <project>/.roorules
+  - <project>/.roorules-<mode>
+  - <project>/AGENT.md
+  - <project>/AGENTS.local.md
+  - <project>/AGENTS.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: verified
+  source: https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/core/prompts/sections/custom-instructions.ts
+  source_kind: source_code
+  notes: |-
+    Precedence verified from custom-instructions.ts: it first checks '.roo/rules/ directories in order (global, project-local, and optionally subfolders)' and returns them under the header 'Rules from .roo directories'; only if none are found does it 'Fall back to existing behavior for legacy .roorules/.clinerules files' with `const ruleFiles = [".roorules", ".clinerules"]`. Mode-specific equivalents: `.roo/rules-${mode}/` then `.roorules-${mode}` then `.clinerules-${mode}`. Separately it loads agent rules files with `const filenames = ["AGENTS.md", "AGENT.md"]` plus "AGENTS.local.md" for 'personal overrides (not checked in to version control)' - AGENTS.local.md is therefore a high-value uncommitted artifact that will NOT be in git history. .rooignore appears as options.rooIgnoreInstructions (a user-authored file-access boundary). In a monorepo, .roo dirs in SUBDIRECTORIES are also discovered - glob recursively, not just at the repo root.
+  parser: null
+- id: roo_code.tasks
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/tasks/**/_index.json
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/tasks/<taskId>/api_conversation_history.json
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/tasks/<taskId>/history_item.json
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/tasks/<taskId>/task_metadata.json
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/tasks/<taskId>/ui_messages.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/shared/globalFileNames.ts
+  source_kind: source_code
+  volatility: |-
+    Roo Code's tasks directory is notorious for unbounded growth (issue #4174, 'Excessive Disk Space Consumption in tasks Directory Leading to Full Home Directory') - users are advised to delete it, so absence is not evidence of non-use.
+  notes: |-
+    File names verified verbatim from GlobalFileNames: apiConversationHistory="api_conversation_history.json", uiMessages="ui_messages.json", mcpSettings="mcp_settings.json", customModes="custom_modes.yaml", taskMetadata="task_metadata.json", historyItem="history_item.json", historyIndex="_index.json". Directory layout verified from src/utils/storage.ts: `const taskDir = path.join(basePath, "tasks", taskId)`. TWO EXTRA FILES the brief does not mention: history_item.json (per-task history record, so unlike Cline <=3.x the task index is on disk, not only in state.vscdb) and _index.json (history index).
+
+    Record structure: Cline-family shape: api_conversation_history.json is Anthropic-shaped; ui_messages.json is the say/ask stream where say/api_req_started carries token+cost. I could not confirm from source whether _index.json sits directly under tasks/ or under settings/ - glob for it under the extension root.
+  parser: null
+- id: roo_code.checkpoints
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/checkpoints/<workspaceHash>/.git/
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/checkpoints/<workspaceHash>/.git/info/exclude
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/tasks/<taskId>/checkpoints/
+  format: binary
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/services/checkpoints/ShadowCheckpointService.ts
+  source_kind: source_code
+  volatility: Orphaned <workspaceHash> dirs outlive deleted workspaces.
+  notes: |-
+    Roo Code KEPT the shadow-git model that Cline 4.x abandoned. ShadowCheckpointService.ts builds `path.join(globalStorageDir, "checkpoints", this.hashWorkspaceDir(workspaceDir))` and, for the task-scoped variant, `path.join(globalStorageDir, "tasks", taskId, "checkpoints")`. hashWorkspaceDir = crypto.createHash("sha256").update(workspaceDir).digest("hex").slice(0, 8) - a real SHA-256 truncated to 8 hex chars, so an analyst can confirm attribution by hashing candidate absolute workspace paths (8 hex chars = collisions are possible; corroborate). One branch PER TASK named `roo-${taskId}`, which directly links a shadow repo to a task transcript dir. Exclusions are written to `path.join(this.dotGitDir, "info", "exclude")` from getExcludePatterns(workspaceDir), with the source noting it is 'local to the shadow git repo, so it's not shared with the main repo'. The test suite also globs '**/.git_disabled', so the same .git-renaming hazard as Cline 3.x exists - stray .git_disabled dirs in a workspace are checkpoint-activity evidence.
+
+    Record structure: `git branch -a` in the shadow repo enumerates roo-<taskId> branches; `git log <branch>` gives per-tool-use snapshots; info/exclude tells you what was deliberately NOT snapshotted.
+  parser: null

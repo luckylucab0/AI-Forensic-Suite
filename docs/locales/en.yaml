@@ -26,6 +26,13 @@ artifacts:
     Entries marked unverified are collected anyway, but no vendor source confirms the
     path. Treat the absence of such an artifact as inconclusive rather than as evidence
     that the agent was not used.
+  verified_meaning: >-
+    What verified means here: the entry was written from the source linked in its row, and
+    the schema accepts only the vendor's own documentation or source code for that mark. It
+    does not mean a second reader has opened that page and confirmed it states the path,
+    which is a pass this catalogue has not been through yet. Read a verified row as
+    sourced rather than as independently confirmed, and follow the link when a conclusion
+    depends on the path.
   untranslated_marker: "[EN]"
 
 rules:

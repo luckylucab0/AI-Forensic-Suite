@@ -1923,6 +1923,375 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         },
         {
+            "agent": "cline",
+            "artifacts": [
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "cline.cache_and_remote_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/cache/",
+                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/cline_recommended_models.json",
+                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/remote_config_<orgId>.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "normal",
+                    "id": "cline.checkpoint_refs_in_workspace",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.git/logs/refs/cline/checkpoints/",
+                        "<project>/.git/packed-refs",
+                        "<project>/.git/refs/cline/checkpoints/<session-id>/<runCount>"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "normal",
+                    "id": "cline.checkpoint_scratch",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cline/data/checkpoint-scratch/<key>/index",
+                        "~/.cline/data/checkpoint-scratch/<key>/pathspec"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "normal",
+                    "id": "cline.checkpoints_shadow_git_legacy",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/checkpoints/<cwdHash>/.git/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "cline.cli_sessions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cline/data/sessions/<session-id>/<session-id>.hooks.jsonl",
+                        "~/.cline/data/sessions/<session-id>/<session-id>.json",
+                        "~/.cline/data/sessions/<session-id>/<session-id>.messages.json",
+                        "~/.cline/data/sessions/<session-id>/subagents/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "cline.connector_settings_and_logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cline/data/connectors/settings.json",
+                        "~/.cline/data/logs/",
+                        "~/.cline/data/logs/connectors/<channel>/<instanceKey>.log"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "cline.data_dir_root",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.cline\\data\\",
+                        "~/.cline/",
+                        "~/.cline/data/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "cline.data_tasks",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cline/data/tasks/<taskId>/api_conversation_history.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "cline.extension_id",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "cline.global_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cline/data/settings/global-settings.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "cline.global_state_json",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cline/data/globalState.json",
+                        "~/.cline/data/workspaces/<hash>/workspaceState.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "cline.home_config_tree",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.agents/plugins/",
+                        "~/.cline/agents/",
+                        "~/.cline/cron/",
+                        "~/.cline/hooks/",
+                        "~/.cline/plugins/",
+                        "~/.cline/rules/",
+                        "~/.cline/skills/",
+                        "~/.cline/tasks/",
+                        "~/.cline/workflows/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "cline.mcp_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json",
+                        "~/.cline/data/settings/cline_mcp_settings.json",
+                        "~/Documents/Cline/MCP/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "cline.provider_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cline/data/settings/providers.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "cline.rules_global",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/Cline/Rules/",
+                        "~/Documents/Cline/Hooks/",
+                        "~/Documents/Cline/MCP/",
+                        "~/Documents/Cline/Rules/",
+                        "~/Documents/Cline/Workflows/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "cline.rules_project",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.agents/skills/",
+                        "<project>/.claude/skills/",
+                        "<project>/.cline/skills/",
+                        "<project>/.clinerules",
+                        "<project>/.clinerules/**/*.md",
+                        "<project>/.clinerules/hooks/",
+                        "<project>/.clinerules/skills/",
+                        "<project>/.clinerules/workflows/",
+                        "<project>/.cursor/rules/",
+                        "<project>/.cursorrules",
+                        "<project>/.windsurfrules",
+                        "<project>/AGENTS.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "cline.secrets_json",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cline/data/secrets.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "cline.sqlite_dbs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cline/data/db/connectors.db",
+                        "~/.cline/data/db/cron.db",
+                        "~/.cline/data/db/tasks.db"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "cline.vscode_task_transcripts",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/api_conversation_history.json",
+                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/context_history.json",
+                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/task_metadata.json",
+                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/ui_messages.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "cline.workspace_specs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.cline/cron/",
+                        "<project>/.cline/tasks/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
             "agent": "continue",
             "artifacts": [
                 {
@@ -2063,6 +2432,28 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "%USERPROFILE%\\.continue\\sessions\\*.json",
                         "~/.continue/sessions/<session-id>.json",
                         "~/.continue/sessions/sessions.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
+            "agent": "copilot",
+            "artifacts": [
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "copilot.mcp_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\github-copilot\\intellij\\mcp.json",
+                        "~/.config/github-copilot/intellij/mcp.json"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -2496,27 +2887,6 @@ EMBEDDED_CATALOGUE_JSON = r"""
                 {
                     "category": "install_evidence",
                     "collect_priority": "normal",
-                    "id": "crosscutting.vscode_extension_dirs",
-                    "os": [
-                        "windows",
-                        "macos",
-                        "linux"
-                    ],
-                    "paths": [
-                        "%USERPROFILE%\\.vscode\\extensions\\",
-                        "~/.cursor/extensions/",
-                        "~/.vscode-insiders/extensions/",
-                        "~/.vscode-server/extensions/",
-                        "~/.vscode/extensions/",
-                        "~/.windsurf/extensions/"
-                    ],
-                    "root": "user_profile",
-                    "sensitivity": "normal",
-                    "status": "verified"
-                },
-                {
-                    "category": "install_evidence",
-                    "collect_priority": "normal",
                     "id": "crosscutting.windows_appdata_program_dirs",
                     "os": [
                         "windows"
@@ -2558,10 +2928,501 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         },
         {
+            "agent": "cursor",
+            "artifacts": [
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "cursor.acp_session_store",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cursor/acp-sessions/<session-uuid>/meta.json",
+                        "~/.cursor/acp-sessions/<session-uuid>/store.db",
+                        "~/.cursor/acp-sessions/<session-uuid>/store.db-shm",
+                        "~/.cursor/acp-sessions/<session-uuid>/store.db-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "cursor.agent_cli_state",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        ".cursor/commands/*.md",
+                        "~/.cursor/agent-cli-state.json",
+                        "~/.cursor/agents/",
+                        "~/.cursor/browser-logs/",
+                        "~/.cursor/hooks.json",
+                        "~/.cursor/plugins/",
+                        "~/.cursor/sandbox-policies/",
+                        "~/.cursor/skills-cursor/",
+                        "~/.cursor/skills/",
+                        "~/.cursor/snapshots/",
+                        "~/.cursor/worktrees/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "cursor.agent_transcripts_jsonl",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.cursor\\projects\\<escaped-abs-cwd>\\agent-transcripts\\...",
+                        "~/.cursor/projects/<escaped-abs-cwd>/agent-tools/*.txt",
+                        "~/.cursor/projects/<escaped-abs-cwd>/agent-transcripts/<composer-id>.txt",
+                        "~/.cursor/projects/<escaped-abs-cwd>/agent-transcripts/<session-uuid>.jsonl",
+                        "~/.cursor/projects/<escaped-abs-cwd>/agent-transcripts/<session-uuid>/<session-uuid>.jsonl",
+                        "~/.cursor/projects/<escaped-abs-cwd>/agent-transcripts/<session-uuid>/transcript.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "cursor.ai_code_tracking_db",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cursor/ai-tracking/*.db",
+                        "~/.cursor/ai-tracking/ai-code-tracking.db"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "cursor.auth_credentials",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/cursor/auth.json",
+                        "%APPDATA%\\Cursor\\auth.json",
+                        "~/.config/cursor/auth.json",
+                        "~/.cursor/auth.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "cursor.chat_session_meta_json",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/meta.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "normal",
+                    "id": "cursor.chat_session_prompt_history",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/prompt_history.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "cursor.chat_store_db",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/cursor/chats/<md5>/<session-uuid>/store.db",
+                        "%USERPROFILE%\\.cursor\\chats\\<md5>\\<session-uuid>\\store.db",
+                        "~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/store.db",
+                        "~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/store.db-shm",
+                        "~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/store.db-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "cursor.cli_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/cursor/cli-config.json",
+                        "%USERPROFILE%\\.cursor\\cli-config.json",
+                        "<project>/.cursor/cli.json",
+                        "~/.cursor/cli-config.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "normal",
+                    "id": "cursor.commit_checkpoints",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Cursor\\User\\globalStorage\\anysphere.cursor-commits\\checkpoints\\",
+                        "~/.config/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/",
+                        "~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/<id>/diffs/<uuid>",
+                        "~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/<id>/files/<uuid>",
+                        "~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/<id>/metadata.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "cursor.conversation_search_db",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Cursor\\User\\globalStorage\\conversation-search.db",
+                        "~/.config/Cursor/User/globalStorage/conversation-search.db",
+                        "~/Library/Application Support/Cursor/User/globalStorage/conversation-search.db"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "cursor.extensions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.cursor\\extensions\\extensions.json",
+                        "~/.cursor-server/extensions/",
+                        "~/.cursor/extensions/",
+                        "~/.cursor/extensions/extensions.json",
+                        "~/Library/Application Support/Cursor/extensions/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "normal",
+                    "id": "cursor.global_prompt_history",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$HOME/.cursor/prompt_history.json",
+                        "%USERPROFILE%\\.cursor\\prompt_history.json",
+                        "~/.cursor/prompt_history.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "cursor.global_state_vscdb",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Cursor\\User\\globalStorage\\state.vscdb",
+                        "~/.config/Cursor/User/globalStorage/state.vscdb",
+                        "~/Library/Application Support/Cursor/User/globalStorage/state.vscdb",
+                        "~/Library/Application Support/Cursor/User/globalStorage/state.vscdb-shm",
+                        "~/Library/Application Support/Cursor/User/globalStorage/state.vscdb-wal",
+                        "~/Library/Application Support/Cursor/User/globalStorage/state.vscdb.backup"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "cursor.install_and_machine_identity",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Programs\\cursor\\",
+                        "%LOCALAPPDATA%\\cursor-updater\\",
+                        "HKCU\\Software\\Classes\\cursor\\shell\\open\\command",
+                        "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                        "~/Library/Application Support/Cursor/User/globalStorage/statsig-cache.json",
+                        "~/Library/Application Support/Cursor/User/globalStorage/storage.json",
+                        "~/Library/Application Support/Cursor/machineid",
+                        "~/Library/Preferences/com.todesktop.230313mzl4w4u92.plist"
+                    ],
+                    "root": "registry",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "normal",
+                    "id": "cursor.local_file_history",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Cursor\\User\\History\\",
+                        "~/.config/Cursor/User/History/",
+                        "~/Library/Application Support/Cursor/User/History/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "cursor.logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Cursor\\logs\\",
+                        "~/.config/Cursor/logs/",
+                        "~/Library/Application Support/Cursor/User/process-monitor/",
+                        "~/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log",
+                        "~/Library/Application Support/Cursor/logs/<launch-timestamp>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "cursor.mcp_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.cursor\\mcp.json",
+                        "<project>/.cursor/mcp.json",
+                        "<project>/.mcp.json",
+                        "~/.cursor/mcp.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "cursor.pasted_text",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cursor/chats/<md5>/<session-uuid>/pasted_text.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "cursor.project_instructions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.cursor/agents/",
+                        "<project>/.cursor/commands/*.md",
+                        "<project>/.cursor/plans/",
+                        "<project>/.cursor/rules/*.mdc",
+                        "<project>/.cursor/skills/",
+                        "<project>/.cursorrules",
+                        "<project>/AGENTS.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "cursor.project_metadata",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cursor/projects-metadata.json",
+                        "~/.cursor/projects/<escaped-abs-cwd>/mcp-approvals.json",
+                        "~/.cursor/projects/<escaped-abs-cwd>/repo.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "first",
+                    "id": "cursor.retrieval_index",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/Cursor/CachedData/",
+                        "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/anysphere.cursor-retrieval/embeddable_files.txt",
+                        "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/anysphere.cursor-retrieval/high_level_folder_description.txt",
+                        "~/Library/Caches/cursor-compile-cache/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "cursor.workspace_state_vscdb",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Cursor\\User\\workspaceStorage\\<workspace-hash>\\state.vscdb",
+                        "~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb",
+                        "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb",
+                        "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/workspace.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                }
+            ]
+        },
+        {
+            "agent": "devin",
+            "artifacts": [
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "devin.acp_events",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Devin\\User\\acp-events\\",
+                        "~/.config/Devin/User/acp-events/",
+                        "~/.config/Devin/logs/<launch>/window*/exthost/output_logging_*/1-Devin Desktop.log",
+                        "~/Library/Application Support/Devin/User/acp-events/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "devin.sessions_db",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.local\\share\\devin\\cli\\sessions.db",
+                        "~/.local/share/devin/cli/sessions.db",
+                        "~/.local/share/devin/cli/transcripts/<session-id>.json",
+                        "~/Library/Application Support/devin/cli/sessions.db",
+                        "~/Library/Application Support/devin/cli/transcripts/<session-id>.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                }
+            ]
+        },
+        {
             "agent": "factory_droid",
             "artifacts": [
                 {
-                    "category": "credentials",
+                    "category": "config",
                     "collect_priority": "normal",
                     "id": "factory_droid.auth",
                     "os": [
@@ -2573,7 +3434,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.factory/"
                     ],
                     "root": "user_profile",
-                    "sensitivity": "secret",
+                    "sensitivity": "normal",
                     "status": "unverified"
                 },
                 {
@@ -3101,6 +3962,396 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.hermes/state.db",
                         "~/.hermes/state.db-shm",
                         "~/.hermes/state.db-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
+            "agent": "jetbrains_ai",
+            "artifacts": [
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "jetbrains_ai.aia_task_history",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\JetBrains\\<Product><Version>\\aia-task-history\\",
+                        "~/.config/JetBrains/<Product><Version>/aia-task-history/",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/aia-task-history/<session-id>.agentsession",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/aia-task-history/<session-id>.checkpoints",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/aia-task-history/<session-id>.events",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/aia-task-history/<session-id>.lastid"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "jetbrains_ai.base_directories",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\JetBrains\\<Product><Version>\\",
+                        "%APPDATA%\\JetBrains\\<Product><Version>\\plugins\\",
+                        "%LOCALAPPDATA%\\JetBrains\\<Product><Version>\\",
+                        "%LOCALAPPDATA%\\JetBrains\\<Product><Version>\\log\\",
+                        "~/.cache/JetBrains/<Product><Version>/",
+                        "~/.cache/JetBrains/<Product><Version>/log/",
+                        "~/.config/JetBrains/<Product><Version>/",
+                        "~/.local/share/JetBrains/<Product><Version>/",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/plugins/",
+                        "~/Library/Caches/JetBrains/<Product><Version>/",
+                        "~/Library/Logs/JetBrains/<Product><Version>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "jetbrains_ai.ide_logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\JetBrains\\<Product><Version>\\log\\idea.log",
+                        "~/.cache/JetBrains/<Product><Version>/log/idea.log",
+                        "~/Library/Logs/JetBrains/<Product><Version>/acp.log",
+                        "~/Library/Logs/JetBrains/<Product><Version>/idea.log",
+                        "~/Library/Logs/JetBrains/<Product><Version>/idea.log.*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "jetbrains_ai.log_data",
+                    "os": [
+                        "windows",
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\JetBrains\\<Product><Version>\\ai-assistant-log-data\\",
+                        "~/.cache/JetBrains/<Product><Version>/ai-assistant-log-data/",
+                        "~/Library/Caches/JetBrains/<Product><Version>/ai-assistant-log-data/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "jetbrains_ai.mcp_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/JetBrains/Air/mcp.json",
+                        "%APPDATA%\\JetBrains\\Air\\mcp.json",
+                        "<project>/.air/mcp.json",
+                        "~/.config/JetBrains/Air/mcp.json",
+                        "~/Library/Application Support/JetBrains/Air/mcp.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "jetbrains_ai.password_safe",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\JetBrains\\<Product><Version>\\c.kdbx",
+                        "%APPDATA%\\JetBrains\\<Product><Version>\\c.pwd",
+                        "~/.config/JetBrains/<Product><Version>/c.kdbx",
+                        "~/.config/JetBrains/<Product><Version>/c.pwd",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/c.kdbx",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/c.pwd",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/options/security.xml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
+            "agent": "junie",
+            "artifacts": [
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "junie.allowlist",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.junie\\allowlist.json",
+                        "~/.junie/allowlist.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "junie.cli_sessions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.junie\\sessions\\<session-id>\\",
+                        "~/.junie/sessions/<session-id>/events.jsonl",
+                        "~/.junie/sessions/<session-id>/subagents/",
+                        "~/.junie/sessions/<session-id>/transcript.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "junie.home_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.junie\\AGENTS.md",
+                        "%USERPROFILE%\\.junie\\config.json",
+                        "~/.junie/AGENTS.md",
+                        "~/.junie/config.json",
+                        "~/.junie/settings.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "junie.jcp_outbox",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\JetBrains\\<Product><Version>\\junie-jcp-outbox\\",
+                        "~/.cache/JetBrains/<Product><Version>/junie-jcp-outbox/",
+                        "~/Library/Caches/JetBrains/<Product><Version>/junie-jcp-outbox/event-logs/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "junie.matterhorn_project_logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\JetBrains\\<Product><Version>\\projects\\<ProjectName>\\matterhorn\\.matterhorn\\",
+                        "~/.cache/JetBrains/<Product><Version>/projects/<ProjectName>/matterhorn/.matterhorn/",
+                        "~/Library/Caches/JetBrains/<Product><Version>/projects/<ProjectName>/matterhorn/.matterhorn/events/<issueId> <taskId>-events.jsonl",
+                        "~/Library/Caches/JetBrains/<Product><Version>/projects/<ProjectName>/matterhorn/.matterhorn/issues/chain-<issueId>.json",
+                        "~/Library/Caches/JetBrains/<Product><Version>/projects/<ProjectName>/matterhorn/.matterhorn/issues/chain-<issueId>/task-<index>.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "junie.mcp_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.junie\\mcp\\mcp.json",
+                        "<project>/.junie/mcp/mcp.json",
+                        "~/.junie/mcp/mcp.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "junie.plugin_install_evidence",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\JetBrains\\<Product><Version>\\plugins\\ml-llm\\",
+                        "~/.local/share/JetBrains/<Product><Version>/ml-llm/",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/options/InstallJunieHubActionManager.xml",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/plugins/ml-llm/lib/modules/intellij.ml.llm.junie.*.jar"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "junie.project_dir",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.aiignore",
+                        "<project>/.junie/AGENTS.md",
+                        "<project>/.junie/config.json",
+                        "<project>/.junie/guidelines.md",
+                        "<project>/.junie/guidelines/",
+                        "<project>/.junie/playbook.md",
+                        "<project>/.junie/rules/*.md",
+                        "<project>/AGENTS.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "junie.trust_and_auth_key",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.junie\\trust\\",
+                        "~/.junie/trust/",
+                        "~/.junie/trust/authentication-key"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "unverified"
+                }
+            ]
+        },
+        {
+            "agent": "kilo_code",
+            "artifacts": [
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "kilo_code.cli_db",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.local\\share\\kilo\\kilo.db",
+                        "~/.local/share/kilo/kilo.db",
+                        "~/.local/share/kilo/kilo.db-shm",
+                        "~/.local/share/kilo/kilo.db-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "kilo_code.extension_id_legacy_tree",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Code\\User\\globalStorage\\kilocode.kilo-code\\tasks\\",
+                        "~/.config/Code/User/globalStorage/kilocode.kilo-code/tasks/",
+                        "~/.vscode-server/data/User/globalStorage/kilocode.kilo-code/tasks/",
+                        "~/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/tasks/<taskId>/api_conversation_history.json",
+                        "~/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/tasks/<taskId>/task_metadata.json",
+                        "~/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/tasks/<taskId>/ui_messages.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "kilo_code.home_dir",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.kilocodemodes",
+                        "~/.kilocode/cli/global/settings/custom_modes.yaml"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "kilo_code.settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Code\\User\\globalStorage\\kilocode.kilo-code\\settings\\custom_modes.yaml",
+                        "~/.config/Code/User/globalStorage/kilocode.kilo-code/settings/custom_modes.yaml",
+                        "~/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/settings/custom_modes.yaml"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -3756,6 +5007,232 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         },
         {
+            "agent": "roo_code",
+            "artifacts": [
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "durable",
+                    "id": "roo_code.checkpoints",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<vscode-user>/globalStorage/rooveterinaryinc.roo-cline/checkpoints/<workspaceHash>/.git/",
+                        "<vscode-user>/globalStorage/rooveterinaryinc.roo-cline/checkpoints/<workspaceHash>/.git/info/exclude",
+                        "<vscode-user>/globalStorage/rooveterinaryinc.roo-cline/tasks/<taskId>/checkpoints/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "roo_code.custom_storage_path",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.vscode/settings.json",
+                        "<vscode-user>/settings.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "roo_code.extension_id",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<vscode-user>/globalStorage/rooveterinaryinc.roo-cline/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "roo_code.global_dirs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.roo\\",
+                        "~/.agents/",
+                        "~/.roo/",
+                        "~/.roo/rules-<mode>/",
+                        "~/.roo/rules/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "roo_code.rules",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.clinerules",
+                        "<project>/.clinerules-<mode>",
+                        "<project>/.roo/rules-<mode>/",
+                        "<project>/.roo/rules/",
+                        "<project>/.rooignore",
+                        "<project>/.roorules",
+                        "<project>/.roorules-<mode>",
+                        "<project>/AGENT.md",
+                        "<project>/AGENTS.local.md",
+                        "<project>/AGENTS.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "roo_code.settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<vscode-user>/globalStorage/rooveterinaryinc.roo-cline/cache/",
+                        "<vscode-user>/globalStorage/rooveterinaryinc.roo-cline/settings/custom_modes.yaml",
+                        "<vscode-user>/globalStorage/rooveterinaryinc.roo-cline/settings/mcp_settings.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "roo_code.tasks",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<vscode-user>/globalStorage/rooveterinaryinc.roo-cline/tasks/**/_index.json",
+                        "<vscode-user>/globalStorage/rooveterinaryinc.roo-cline/tasks/<taskId>/api_conversation_history.json",
+                        "<vscode-user>/globalStorage/rooveterinaryinc.roo-cline/tasks/<taskId>/history_item.json",
+                        "<vscode-user>/globalStorage/rooveterinaryinc.roo-cline/tasks/<taskId>/task_metadata.json",
+                        "<vscode-user>/globalStorage/rooveterinaryinc.roo-cline/tasks/<taskId>/ui_messages.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
+            "agent": "vscode",
+            "artifacts": [
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "vscode.extension_dirs",
+                    "os": [
+                        "windows",
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.vscode\\extensions\\",
+                        "~/.cursor/extensions/",
+                        "~/.vscode-insiders/extensions/",
+                        "~/.vscode-server/extensions/",
+                        "~/.vscode/extensions/",
+                        "~/.windsurf/extensions/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "vscode.extension_install_evidence",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.vscode\\extensions\\",
+                        "~/.vscode-server/extensions/",
+                        "~/.vscode/extensions/extensions.json",
+                        "~/.vscode/extensions/kilocode.kilo-code-*/",
+                        "~/.vscode/extensions/rooveterinaryinc.roo-cline-*/",
+                        "~/.vscode/extensions/saoudrizwan.claude-dev-*/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "vscode.state_vscdb",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Code\\User\\globalStorage\\state.vscdb",
+                        "~/.config/Code/User/globalStorage/state.vscdb",
+                        "~/Library/Application Support/Code/User/globalStorage/state.vscdb",
+                        "~/Library/Application Support/Code/User/globalStorage/state.vscdb.backup"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "vscode.user_data_roots",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Code\\User\\globalStorage\\",
+                        "~/.config/Code/User/globalStorage/",
+                        "~/.config/VSCodium/User/globalStorage/",
+                        "~/.vscode-server/data/User/globalStorage/",
+                        "~/Library/Application Support/Code - Insiders/User/globalStorage/",
+                        "~/Library/Application Support/Code/User/globalStorage/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
             "agent": "warp",
             "artifacts": [
                 {
@@ -3777,6 +5254,299 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "unverified"
+                }
+            ]
+        },
+        {
+            "agent": "windsurf",
+            "artifacts": [
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "windsurf.auth_credentials",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cache/nvim/codeium/config.json",
+                        "~/.codeium/config.json",
+                        "~/.local/share/devin/credentials.toml",
+                        "~/AppData/Local/devin/credentials.toml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "windsurf.cascade_trajectories",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$WINDSURF_CONFIG_DIR/cascade/<cascade-id>.pb",
+                        "%USERPROFILE%\\.codeium\\windsurf\\cascade\\<cascade-id>.pb",
+                        "~/.codeium/windsurf/cascade/<cascade-id-uuid>.pb",
+                        "~/.codeium/windsurf/cascade/<cascade-id-uuid>.pb.archived"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "windsurf.code_tracker_and_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.codeium/windsurf/code_tracker/",
+                        "~/.codeium/windsurf/installation_id",
+                        "~/.codeium/windsurf/user_settings.pb"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "windsurf.embedding_database",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codeium\\windsurf\\database\\<hash>\\",
+                        "~/.codeium/windsurf/database/<hash>/embedding_database.sqlite",
+                        "~/.codeium/windsurf/database/<md5-of-workspace-id>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "windsurf.enterprise_policy",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "/Applications/Devin.app/Contents/Resources/app/policies",
+                        "/etc/windsurf/policies/policy.json",
+                        "C:\\Windows\\PolicyDefinitions\\en-US\\windsurf.adml",
+                        "C:\\Windows\\PolicyDefinitions\\windsurf.admx",
+                        "HKCU\\Software\\Policies\\Windsurf\\<ProductName>",
+                        "HKLM\\Software\\Policies\\Windsurf\\<ProductName>"
+                    ],
+                    "root": "registry",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "first",
+                    "id": "windsurf.global_rules",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Codeium\\windsurf\\global_rules.md",
+                        "%USERPROFILE%\\.codeium\\windsurf\\memories\\global_rules.md",
+                        "~/.codeium/windsurf/global_rules.md",
+                        "~/.codeium/windsurf/memories/global_rules.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "windsurf.hooks",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codeium\\windsurf\\hooks.json",
+                        "<project>/.windsurf/hooks.json",
+                        "~/.codeium/windsurf/hooks.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "windsurf.ide_global_state_vscdb",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Devin\\User\\globalStorage\\state.vscdb",
+                        "%APPDATA%\\Windsurf - Next\\User\\globalStorage\\state.vscdb",
+                        "%APPDATA%\\Windsurf Insiders\\User\\globalStorage\\state.vscdb",
+                        "%APPDATA%\\Windsurf\\User\\globalStorage\\state.vscdb",
+                        "~/.config/Devin/User/globalStorage/state.vscdb",
+                        "~/.config/Windsurf/User/globalStorage/state.vscdb",
+                        "~/Library/Application Support/Devin/User/globalStorage/state.vscdb",
+                        "~/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb",
+                        "~/Library/Application Support/Windsurf/User/globalStorage/state.vscdb",
+                        "~/Library/Application Support/Windsurf/User/globalStorage/storage.json",
+                        "~/Library/Application Support/Windsurf/machineId"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "windsurf.ide_workspace_state_vscdb",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Windsurf\\User\\workspaceStorage\\<hash>\\state.vscdb",
+                        "~/.config/Windsurf/User/settings.json",
+                        "~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb",
+                        "~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "windsurf.implicit_trajectories",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codeium\\windsurf\\implicit\\*.pb",
+                        "~/.codeium/windsurf/implicit/*.pb"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "windsurf.language_server_binaries_and_logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Programs\\Windsurf\\",
+                        "/Applications/Devin.app",
+                        "/usr/share/windsurf/resources/app/extensions/windsurf/bin/language_server_linux_x64",
+                        "C:\\Program Files\\Windsurf\\",
+                        "~/.codeium/<version>/language_server_linux_x64",
+                        "~/.codeium/<version>/language_server_macos_arm",
+                        "~/.codeium/<version>/language_server_windows_x64.exe",
+                        "~/.windsurf-server/data/logs/<timestamp>/1-windsurf.log"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "windsurf.mcp_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codeium\\windsurf\\mcp_config.json",
+                        "<project>/.windsurf/mcp_config.json",
+                        "~/.codeium/windsurf/mcp_config.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "memory",
+                    "collect_priority": "durable",
+                    "id": "windsurf.memories",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codeium\\windsurf\\memories\\*.pb",
+                        "~/.codeium/windsurf/memories/*.pb"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "windsurf.project_instructions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.windsurf/rules/*.md",
+                        "<project>/.windsurf/settings.json",
+                        "<project>/.windsurfrules",
+                        "<project>/AGENTS.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "windsurf.workflows_and_skills",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.windsurf/skills/",
+                        "<project>/.windsurf/workflows/*.md",
+                        "~/.codeium/windsurf/global_workflows/*.md",
+                        "~/.codeium/windsurf/skills/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 }
             ]
         },
@@ -3894,7 +5664,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "d963a63299ebbe7dceeac1b371070a843ed521ad7394a51a1dc74ff2135c500d"
+    "sha256": "ab9dbf834a899204c81d2f5adc8eeb47699ce4aac8b87e9973fb6102bafd078f"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

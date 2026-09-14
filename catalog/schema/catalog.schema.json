@@ -119,8 +119,12 @@
           "items": {
             "type": "string",
             "minLength": 1,
-            "description": "A placeholder in angle brackets must be a single token, because the collector turns a leftover placeholder into a wildcard. Prose in a path, such as <path from some config key>, would therefore expand to a wildcard that matches everything: put that in notes instead.",
-            "pattern": "^[^<>]*(<[A-Za-z0-9_.:+-]+>[^<>]*)*$"
+            "description": "A placeholder in angle brackets must be a single token, because the collector turns a leftover placeholder into a wildcard. Prose in a path, such as <path from some config key>, would therefore expand to a wildcard that matches everything: put that in notes instead. Parentheses, a colon followed by a space, and two consecutive spaces are also rejected: a real path effectively never contains them, and each has arrived as an explanation appended to a path, such as a database path followed by the name of the key inside it. Such a path matches nothing and the artifact is silently never collected.",
+            "pattern": "^[^<>()]*(<[A-Za-z0-9_.:+-]+>[^<>()]*)*$",
+            "allOf": [
+              { "not": { "pattern": ": " } },
+              { "not": { "pattern": "  " } }
+            ]
           }
         },
         "format": {
@@ -173,6 +177,11 @@
         "source_kind": {
           "description": "Where the claim comes from. Separated from source so the honesty rule can be checked mechanically: only 'official' and 'source_code' may accompany status 'verified'.",
           "enum": ["official", "source_code", "community", "observed", "recollection"]
+        },
+        "contains_credentials": {
+          "description": "Names of keys, tables or fields INSIDE this artifact that hold credential material. This is not a reason to withhold the file: several agents keep their conversations and their tokens in the same container, VS Code's state.vscdb being the clearest case, and withholding it to protect the tokens would throw away the transcripts an investigation exists to read. The file is collected, and these names tell the analyzer what to redact when a finding or an export leaves the case. An artifact that lists these must therefore be sensitivity: normal, and the separate credential-only entry for the same path must not exist, because two entries claiming one path with different sensitivity make the collector's behaviour depend on which one it reaches first.",
+          "type": "array",
+          "items": { "type": "string" }
         },
         "record_types": {
           "description": "For a structured log, the record or event type values seen in it. Used by the parsers to detect a type they do not know yet, which must be preserved rather than dropped.",

@@ -149,34 +149,6 @@ artifacts:
 
     Record structure: Documented: tools default to a `tools/` subdirectory of the persistent data directory - Unix $XDG_DATA_HOME/uv or $HOME/.local/share/uv, Windows %APPDATA%\uv\data - i.e. ~/.local/share/uv/tools and %APPDATA%\uv\data\tools; override UV_TOOL_DIR. Python installs go to python/ (UV_PYTHON_INSTALL_DIR). Cache: Unix $XDG_CACHE_HOME/uv or $HOME/.cache/uv, Windows %LOCALAPPDATA%\uv\cache. Executables land in $XDG_BIN_HOME, else $XDG_DATA_HOME/../bin, else $HOME/.local/bin (Windows %USERPROFILE%\.local\bin); overrides UV_PYTHON_BIN_DIR, UV_TOOL_BIN_DIR, UV_INSTALL_DIR. Each tools/<name>/ venv has a uv-receipt.toml naming the requested spec.
   parser: null
-- id: crosscutting.vscode_extension_dirs
-  category: install_evidence
-  root: user_profile
-  os:
-  - windows
-  - macos
-  - linux
-  paths:
-  - '%USERPROFILE%\.vscode\extensions\'
-  - ~/.cursor/extensions/
-  - ~/.vscode-insiders/extensions/
-  - ~/.vscode-server/extensions/
-  - ~/.vscode/extensions/
-  - ~/.windsurf/extensions/
-  format: json
-  sensitivity: normal
-  collect_priority: normal
-  status: verified
-  source: |-
-    https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/configure/extensions/extension-marketplace.md
-  source_kind: official
-  volatility: |-
-    Old versions are removed on update, but extensions.json in the parent directory retains install/update bookkeeping.
-  notes: |-
-    Only ~/.vscode and ~/.vscode-insiders are vendor-documented; the FORK paths (~/.cursor/extensions, ~/.windsurf/extensions) follow VS Code's convention and I corroborated ~/.cursor only indirectly (it appears as an allowlisted subpath in public sandbox profiles alongside ~/.vscode). Treat the fork spellings as medium confidence until confirmed on a live install. Extensions to look for: anthropic.claude-code, openai.chatgpt / openai.codex, github.copilot and github.copilot-chat, google.gemini-cli-vscode-ide-companion, saoudrizwan.claude-dev (Cline), continue.continue. Also sweep the sibling user-data dirs (%APPDATA%\Code, ~/Library/Application Support/Code, ~/.config/Code) which hold each extension's globalStorage/workspaceStorage - often where an extension's own chat history lives.
-
-    Record structure: Verbatim per-OS paths from the official docs: Windows %USERPROFILE%\.vscode\extensions, macOS ~/.vscode/extensions, Linux ~/.vscode/extensions. Relocatable via `--extensions-dir <dir>` or the VSCODE_EXTENSIONS environment variable ("particularly useful in enterprise settings where centralized extension management is desired"). Each subdirectory is named publisher.name-version, which alone gives you the agent extension and its exact version; read its package.json for more. Also parse ../extensions/extensions.json for the install metadata index.
-  parser: null
 - id: crosscutting.windows_appdata_program_dirs
   category: install_evidence
   root: user_profile
