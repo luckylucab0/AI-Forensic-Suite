@@ -1,0 +1,2363 @@
+#!/usr/bin/env python3
+"""Collect AI coding agent artifacts from a macOS or Linux endpoint into an evidence bundle.
+
+Single file, standard library only, Python 3.8 or newer. That is not minimalism: it is what
+lets this be pushed through EDR live response, a remote shell or a USB stick and run on a
+machine where nothing may be installed and nothing may be downloaded. Several agents delete
+their own history on a 30 day default schedule, so the difference between collecting today
+and scheduling it for next week is evidence.
+
+The format it writes is specified in docs/BUNDLE_FORMAT.md and implemented twice, here and
+in collect.ps1 for Windows. Where this file and that document disagree, the document is
+right and this is a bug.
+
+Non-negotiable behaviors, each of which has a test:
+
+  * Nothing outside --out is ever written. No temp files, no logs, no config.
+  * Nothing on the target is modified, moved, renamed or deleted, and no agent binary is
+    executed.
+  * Access times are preserved where the platform allows it, and recorded from before the
+    read where it does not, so the manifest never reports a time this tool caused.
+  * Artifacts marked sensitivity: secret are recorded as metadata and a hash only. Their
+    content is copied only with --include-secrets, and that choice goes in the manifest.
+  * Collection is ordered by how fast an artifact disappears, not alphabetically.
+  * Output is deterministic: two runs over an unchanged tree produce identical manifests
+    apart from the fields docs/BUNDLE_FORMAT.md lists as allowed to differ.
+
+Usage:
+    python3 collect.py --out /tmp/case-001
+    python3 collect.py --out ./bundle --all-users --zip
+    python3 collect.py --out ./bundle --root /mnt/image --os macos
+    python3 collect.py --dry-run --json
+"""
+
+from __future__ import annotations
+
+import argparse
+import errno
+import fnmatch
+import getpass
+import hashlib
+import json
+import os
+import platform
+import re
+import socket
+import stat
+import sys
+import time
+import uuid
+import zipfile
+from datetime import datetime
+
+TOOL_NAME = "collect.py"
+TOOL_VERSION = "0.1.0"
+FORMAT_VERSION = 1
+
+# Generous by default: a transcript of a long session runs to tens of megabytes, and a
+# skipped transcript is a hole in the evidence. Skipped files are still listed with a
+# reason, so the hole is never silent.
+DEFAULT_MAX_FILE_SIZE = 256 * 1024 * 1024
+
+EXIT_OK = 0
+EXIT_ERRORS = 1
+EXIT_USAGE = 2
+EXIT_NOTHING_FOUND = 3
+
+# Collection order. live_only artifacts are destroyed by a clean shutdown and cannot be
+# recovered from a powered-off image, so they come first however small they are.
+PRIORITY_ORDER = ("live_only", "first", "normal", "durable")
+
+# --- BEGIN EMBEDDED CATALOGUE ---
+# Rendered from catalog/*.yaml by scripts/build_collectors.py. Do not edit by hand: CI
+# regenerates it and fails if this block is stale.
+EMBEDDED_CATALOGUE = {
+    "agents": [
+        {
+            "agent": "claude_code",
+            "artifacts": [
+                {
+                    "category": "memory",
+                    "collect_priority": "durable",
+                    "id": "claude_code.agent_memory",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.claude\\agent-memory\\*",
+                        "<project>/.claude/agent-memory-local/<agent-name>/",
+                        "<project>/.claude/agent-memory/<agent-name>/",
+                        "<project>/.claude/agent-memory/<agent-name>/MEMORY.md",
+                        "~/.claude/agent-memory/<agent-name>/",
+                        "~/.claude/agent-memory/<agent-name>/MEMORY.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "claude_code.agents",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/agents/*.md",
+                        "<project>/.claude/agents/*.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "claude_code.anthropic_active_config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.config/anthropic/active_config",
+                        "%APPDATA%\\Anthropic\\active_config",
+                        "$ANTHROPIC_CONFIG_DIR/active_config"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "claude_code.anthropic_profile_configs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.config/anthropic/configs/<profile>.json",
+                        "%APPDATA%\\Anthropic\\configs\\<profile>.json",
+                        "$ANTHROPIC_CONFIG_DIR/configs/<profile>.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "claude_code.anthropic_profile_credentials",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.config/anthropic/credentials/<profile>.json",
+                        "%APPDATA%\\Anthropic\\credentials\\<profile>.json",
+                        "$ANTHROPIC_CONFIG_DIR/credentials/<profile>.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "memory",
+                    "collect_priority": "durable",
+                    "id": "claude_code.auto_memory",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.claude\\projects\\*\\memory\\*.md",
+                        "~/.claude/projects/<project>/memory/*.md",
+                        "~/.claude/projects/<project>/memory/MEMORY.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "claude_code.changelog_cache",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.claude\\cache\\changelog.md",
+                        "~/.claude/cache/changelog.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "claude_code.commands",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/commands/*.md",
+                        "<project>/.claude/commands/*.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "claude_code.config_backups",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.claude\\backups\\*",
+                        "~/.claude/backups/",
+                        "~/.claude/backups/*",
+                        "~/.claude/backups/.claude.json.corrupted.<timestamp>"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "first",
+                    "id": "claude_code.credentials",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CLAUDE_CONFIG_DIR/.credentials.json",
+                        "%USERPROFILE%\\.claude\\.credentials.json",
+                        "~/.claude/.credentials.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "claude_code.daemon_state",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.claude\\daemon.log",
+                        "%USERPROFILE%\\.claude\\daemon\\roster.json",
+                        "~/.claude/daemon.lock",
+                        "~/.claude/daemon.log",
+                        "~/.claude/daemon/roster.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "claude_code.debug_logs",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CLAUDE_CODE_DEBUG_LOGS_DIR/",
+                        "%USERPROFILE%\\.claude\\debug\\*.txt",
+                        "~/.claude/debug/*.txt",
+                        "~/.claude/debug/<session-id>.txt"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "claude_code.feedback_bundles",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.claude\\feedback-bundles\\*",
+                        "~/.claude/feedback-bundles/",
+                        "~/.claude/feedback-bundles/*",
+                        "~/.claude/feedback/drafts/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "claude_code.feedback_drafts",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/feedback/drafts/",
+                        "~/.claude/feedback/drafts/*",
+                        "%USERPROFILE%\\.claude\\feedback\\drafts\\*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "first",
+                    "id": "claude_code.file_history_snapshots",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/file-history/<session-id>/",
+                        "~/.claude/file-history/*/*",
+                        "%USERPROFILE%\\.claude\\file-history\\*\\*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "claude_code.git_global_excludes",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/git/ignore",
+                        "~/.config/git/ignore"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "claude_code.global_config",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CLAUDE_CONFIG_DIR/.claude.json",
+                        "%USERPROFILE%\\.claude.json",
+                        "~/.claude.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "durable",
+                    "id": "claude_code.history_jsonl",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CLAUDE_CONFIG_DIR/history.jsonl",
+                        "%USERPROFILE%\\.claude\\history.jsonl",
+                        "~/.claude/history.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "first",
+                    "id": "claude_code.image_cache",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/image-cache/<session-id>/",
+                        "~/.claude/image-cache/*/*",
+                        "%USERPROFILE%\\.claude\\image-cache\\*\\*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "claude_code.install_legacy_and_npm",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.claude/local/",
+                        "<node-prefix>/lib/node_modules/@anthropic-ai/claude-code",
+                        "~/.nvm/versions/node/<version>/lib/node_modules/@anthropic-ai/claude-code",
+                        "~/Library/Application Support/Claude/claude-code/<version>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "claude_code.install_native",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.local/bin/claude",
+                        "~/.local/share/claude/versions/<version>",
+                        "%USERPROFILE%\\.local\\bin\\claude.exe"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "durable",
+                    "id": "claude_code.jobs",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.claude\\jobs\\*\\state.json",
+                        "~/.claude/jobs/*/state.json",
+                        "~/.claude/jobs/*/tmp/*",
+                        "~/.claude/jobs/<id>/state.json",
+                        "~/.claude/jobs/<id>/tmp/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "claude_code.keybindings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/keybindings.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "claude_code.known_marketplaces",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/plugins/known_marketplaces.json",
+                        "$CLAUDE_CODE_PLUGIN_CACHE_DIR/known_marketplaces.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "claude_code.legacy_dirs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/todos/",
+                        "~/.claude/statsig/",
+                        "~/.claude/logs/",
+                        "%USERPROFILE%\\.claude\\todos\\*",
+                        "%USERPROFILE%\\.claude\\statsig\\*",
+                        "%USERPROFILE%\\.claude\\logs\\*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "claude_code.legacy_state_dirs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/todos/",
+                        "~/.claude/statsig/",
+                        "~/.claude/logs/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "claude_code.loop_instructions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/loop.md",
+                        "<project>/.claude/loop.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "first",
+                    "id": "claude_code.macos_keychain_credentials",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Keychains/login.keychain-db"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "claude_code.managed_claude_md",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "/Library/Application Support/ClaudeCode/CLAUDE.md",
+                        "/etc/claude-code/CLAUDE.md",
+                        "C:\\Program Files\\ClaudeCode\\CLAUDE.md"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "durable",
+                    "id": "claude_code.managed_mcp_json",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "/Library/Application Support/ClaudeCode/managed-mcp.json",
+                        "/etc/claude-code/managed-mcp.json",
+                        "C:\\Program Files\\ClaudeCode\\managed-mcp.json"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "claude_code.managed_settings_dropins",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "/Library/Application Support/ClaudeCode/managed-settings.d/*.json",
+                        "/etc/claude-code/managed-settings.d/*.json",
+                        "C:\\Program Files\\ClaudeCode\\managed-settings.d\\*.json"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "durable",
+                    "id": "claude_code.managed_settings_file",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "/Library/Application Support/ClaudeCode/managed-settings.json",
+                        "/etc/claude-code/managed-settings.json",
+                        "C:\\Program Files\\ClaudeCode\\managed-settings.json",
+                        "C:\\ProgramData\\ClaudeCode\\managed-settings.json"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "claude_code.managed_settings_macos_profile",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "/Library/Managed Preferences/com.anthropic.claudecode.plist",
+                        "/Library/Managed Preferences/<user>/com.anthropic.claudecode.plist"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "claude_code.managed_settings_registry",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "HKLM\\SOFTWARE\\Policies\\ClaudeCode",
+                        "HKCU\\SOFTWARE\\Policies\\ClaudeCode"
+                    ],
+                    "root": "registry",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "durable",
+                    "id": "claude_code.mcp_logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/Library/Caches/claude-cli-nodejs/<encoded-cwd>/mcp-logs-<server>/<timestamp>.jsonl",
+                        "%LOCALAPPDATA%\\claude-cli-nodejs\\Cache\\<encoded-cwd>\\mcp-logs-<server>\\<timestamp>.jsonl",
+                        "$XDG_CACHE_HOME/claude-cli-nodejs/<encoded-cwd>/mcp-logs-<server>/<timestamp>.jsonl",
+                        "~/.cache/claude-cli-nodejs/<encoded-cwd>/mcp-logs-<server>/<timestamp>.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "claude_code.org_policy_cache",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.claude\\policy-limits.json",
+                        "%USERPROFILE%\\.claude\\remote-settings.json",
+                        "~/.claude/policy-limits.json",
+                        "~/.claude/remote-settings.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "claude_code.output_styles",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/output-styles/*.md",
+                        "<project>/.claude/output-styles/*.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "claude_code.paste_cache",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/paste-cache/",
+                        "~/.claude/paste-cache/*",
+                        "%USERPROFILE%\\.claude\\paste-cache\\*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "claude_code.plans",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/plans/*.md",
+                        "%USERPROFILE%\\.claude\\plans\\*.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "claude_code.plugin_cache",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "claude_code.plugin_data",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/plugins/data/<sanitized-plugin-id>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "claude_code.plugin_manifests",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<plugin-root>/.claude-plugin/plugin.json",
+                        "<marketplace-root>/.claude-plugin/marketplace.json",
+                        "<plugin-root>/hooks/hooks.json",
+                        "<plugin-root>/.mcp.json",
+                        "<plugin-root>/.lsp.json",
+                        "<plugin-root>/monitors/monitors.json"
+                    ],
+                    "root": "plugin",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "claude_code.plugin_marketplaces_clones",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/plugins/marketplaces/<name>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "claude_code.plugins_root",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/plugins/",
+                        "$CLAUDE_CODE_PLUGIN_CACHE_DIR/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "claude_code.plugins_synced",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/plugins/synced/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "claude_code.policy_limits",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/policy-limits.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "claude_code.project_claude_local_md",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/CLAUDE.local.md",
+                        "<project>/**/CLAUDE.local.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "claude_code.project_claude_md",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/CLAUDE.md",
+                        "<project>/.claude/CLAUDE.md",
+                        "<project>/**/CLAUDE.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "claude_code.project_mcp_json",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.mcp.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "claude_code.project_rules",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.claude/rules/**/*.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "claude_code.project_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.claude/settings.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "durable",
+                    "id": "claude_code.project_settings_local",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.claude/settings.local.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "claude_code.session_env",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.claude\\session-env\\*",
+                        "~/.claude/session-env/",
+                        "~/.claude/session-env/*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "live_only",
+                    "id": "claude_code.sessions_dir",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.claude\\sessions\\*",
+                        "~/.claude/sessions/",
+                        "~/.claude/sessions/*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "claude_code.settings_referenced_executables",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.claude/hooks/*",
+                        "~/.claude/hooks/*"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "durable",
+                    "id": "claude_code.shell_profile_evidence",
+                    "os": [
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.zshrc",
+                        "$ZDOTDIR/.zshrc",
+                        "~/.bashrc",
+                        "~/.bash_profile",
+                        "~/.bash_login",
+                        "~/.profile",
+                        "~/.config/fish/config.fish"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "shell_history",
+                    "collect_priority": "live_only",
+                    "id": "claude_code.shell_snapshots",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.claude\\shell-snapshots\\*",
+                        "/tmp/claude-shell-snapshot*",
+                        "~/.claude/shell-snapshots/",
+                        "~/.claude/shell-snapshots/*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "claude_code.skills",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/skills/<skill-name>/SKILL.md",
+                        "<project>/.claude/skills/<skill-name>/SKILL.md",
+                        "/Library/Application Support/ClaudeCode/.claude/skills/<skill-name>/SKILL.md",
+                        "/etc/claude-code/.claude/skills/<skill-name>/SKILL.md",
+                        "C:\\Program Files\\ClaudeCode\\.claude\\skills\\<skill-name>\\SKILL.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "claude_code.skills_trash",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/skills/.trash/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "durable",
+                    "id": "claude_code.stats_cache",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.claude\\stats-cache.json",
+                        "~/.claude/stats-cache.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "claude_code.subagent_transcripts",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/projects/<project>/<session-id>/subagents/agent-<agentId>.jsonl",
+                        "~/.claude/projects/<project>/<session-id>/subagents/agent-<agentId>.meta.json",
+                        "~/.claude/projects/*/*/subagents/*.jsonl",
+                        "%USERPROFILE%\\.claude\\projects\\*\\*\\subagents\\*.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "claude_code.synced_skills",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/skills/synced/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "memory",
+                    "collect_priority": "durable",
+                    "id": "claude_code.task_lists",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/tasks/",
+                        "~/.claude/tasks/*/*",
+                        "%USERPROFILE%\\.claude\\tasks\\*\\*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "claude_code.themes",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/themes/*.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "claude_code.tool_result_spills",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/projects/<project>/<session-id>/tool-results/",
+                        "~/.claude/projects/*/*/tool-results/*",
+                        "%USERPROFILE%\\.claude\\projects\\*\\*\\tool-results\\*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "claude_code.transcripts",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/projects/<project>/<session-id>.jsonl",
+                        "~/.claude/projects/*/*.jsonl",
+                        "%USERPROFILE%\\.claude\\projects\\*\\*.jsonl",
+                        "$CLAUDE_CONFIG_DIR/projects/*/*.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "claude_code.transcripts_set_aside",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/projects/<project>/<session-id>.orphaned-<timestamp>-<suffix>.jsonl",
+                        "~/.claude/projects/<project>/<session-id>.jsonl.superseded-<timestamp>",
+                        "~/.claude/projects/*/*.orphaned-*.jsonl",
+                        "~/.claude/projects/*/*.jsonl.superseded-*",
+                        "%USERPROFILE%\\.claude\\projects\\*\\*.jsonl.superseded-*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "claude_code.uploads",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/uploads/<session-id>/",
+                        "~/.claude/uploads/*/*",
+                        "%USERPROFILE%\\.claude\\uploads\\*\\*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "claude_code.usage_data",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/usage-data/",
+                        "~/.claude/usage-data/report.html"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "claude_code.usage_reports",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/usage-data/report.html",
+                        "~/.claude/usage-data/*",
+                        "%USERPROFILE%\\.claude\\usage-data\\*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "claude_code.user_claude_md",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/CLAUDE.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "claude_code.user_rules",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/rules/**/*.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "claude_code.user_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/settings.json",
+                        "$CLAUDE_CONFIG_DIR/settings.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "durable",
+                    "id": "claude_code.user_settings_local",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/settings.local.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "claude_code.workflow_runs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/projects/<project>/<session-id>/subagents/workflows/<runId>/journal.jsonl",
+                        "~/.claude/projects/<project>/<session-id>/subagents/workflows/<runId>/agent-<agentId>.jsonl",
+                        "~/.claude/projects/<project>/<session-id>/subagents/workflows/<runId>/agent-<agentId>.meta.json",
+                        "~/.claude/projects/<project>/<session-id>/workflows/<runId>.json",
+                        "~/.claude/projects/*/*/subagents/workflows/*/*.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "claude_code.workflows",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/workflows/*.js",
+                        "<project>/.claude/workflows/*.js"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "claude_code.worktreeinclude",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.worktreeinclude"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "normal",
+                    "id": "claude_code.worktrees",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.claude/worktrees/",
+                        "<repo-root>/.claude/worktrees/*"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        }
+    ],
+    "sha256": "e80e5356d1efe22fe0709fe6b105b73488be59fbcca8ba20a94e961f0b9ead9b"
+}
+# --- END EMBEDDED CATALOGUE ---
+
+
+# ---------------------------------------------------------------------------- utilities
+
+
+def utc(seconds: float | None) -> str | None:
+    """Format a POSIX timestamp as the bundle's one timestamp format.
+
+    Microseconds are always present and the zone is always UTC, because a manifest that
+    sometimes carries them and sometimes not cannot be compared byte for byte. A time the
+    platform cannot supply is None, never zero and never the epoch: the epoch is a real
+    instant and would read as a genuine 1970 timestamp in a timeline.
+    """
+    if seconds is None:
+        return None
+    return datetime.utcfromtimestamp(seconds).strftime("%Y-%m-%dT%H:%M:%S.%f") + "Z"
+
+
+def sha256_file(path: str, preserve_atime: bool) -> tuple[str, int]:
+    """Hash a file's bytes, trying not to disturb its access time.
+
+    O_NOATIME only works for a file we own or as root, and only on Linux, so the caller
+    also captures atime beforehand and writes that value into the manifest. Between the
+    two, the manifest never reports an access time this tool caused.
+    """
+    flags = os.O_RDONLY
+    if preserve_atime:
+        flags |= getattr(os, "O_NOATIME", 0)
+    digest = hashlib.sha256()
+    size = 0
+    try:
+        fd = os.open(path, flags)
+    except OSError as exc:
+        if preserve_atime and exc.errno in (errno.EPERM, errno.EACCES):
+            fd = os.open(path, os.O_RDONLY)
+        else:
+            raise
+    try:
+        while True:
+            chunk = os.read(fd, 1024 * 1024)
+            if not chunk:
+                break
+            digest.update(chunk)
+            size += len(chunk)
+    finally:
+        os.close(fd)
+    return digest.hexdigest(), size
+
+
+def sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def canonical_json(obj: object) -> str:
+    """Serialize deterministically, so two runs can be compared by hash."""
+    return json.dumps(obj, sort_keys=True, indent=2, ensure_ascii=False) + "\n"
+
+
+# ------------------------------------------------------------------------ path mapping
+
+# Bytes that cannot appear in a path component on at least one supported platform, plus
+# the separator itself. See docs/BUNDLE_FORMAT.md, "Path mapping".
+_RESERVED_CHARS = set('<>:"|?*\\/')
+_RESERVED_NAMES = (
+    {"CON", "PRN", "AUX", "NUL"}
+    | {"COM%d" % i for i in range(10)}
+    | {"LPT%d" % i for i in range(10)}
+)
+
+
+def _pct(char: str) -> str:
+    """Percent-encode one character, including one that is not valid UTF-8.
+
+    A filename on Linux is a byte string, so it can hold bytes that are not valid UTF-8.
+    Python surfaces those as lone surrogates, and str.encode("utf-8") raises on a
+    surrogate. Using surrogateescape here means one oddly named file cannot abort a whole
+    collection, which on a compromised endpoint is exactly the file worth having.
+    """
+    return "".join("%%%02X" % b for b in char.encode("utf-8", "surrogateescape"))
+
+
+def encode_segment(segment: str) -> str:
+    """Make one path component safe on every supported filesystem, reversibly."""
+    # '%' first, or the encoding of anything else below would be ambiguous.
+    out = []
+    for char in segment.replace("%", "\x00"):
+        if char == "\x00":
+            out.append("%25")
+        elif char in _RESERVED_CHARS or ord(char) < 0x20 or 0xD800 <= ord(char) <= 0xDFFF:
+            out.append(_pct(char))
+        else:
+            out.append(char)
+    encoded = "".join(out)
+
+    # Windows strips a trailing dot or space from a file name, which would silently change
+    # the name and could collide with a sibling.
+    if encoded and encoded[-1] in ". ":
+        encoded = encoded[:-1] + _pct(encoded[-1])
+
+    # A reserved device name cannot be a file name on Windows at all.
+    stem = encoded.split(".", 1)[0].upper()
+    if stem in _RESERVED_NAMES:
+        encoded = _pct(encoded[0]) + encoded[1:]
+
+    # Over-long components. Not reversible, which is why original_path is mandatory.
+    raw = encoded.encode("utf-8", "surrogateescape")
+    if len(raw) > 200:
+        cut = raw[:190]
+        # Do not split a multi-byte character.
+        while cut and (cut[-1] & 0xC0) == 0x80:
+            cut = cut[:-1]
+        tag = sha256_bytes(segment.encode("utf-8", "surrogateescape"))[:10]
+        encoded = cut.decode("utf-8", "ignore") + "~" + tag
+    return encoded
+
+
+def bundle_path_for(original: str, used: dict, target_os: str) -> str:
+    """Map an original absolute path to its path inside the bundle.
+
+    `used` maps a case-folded bundle path to the original it came from, so a collision
+    between two paths that differ only in case can be detected and broken. Without that, a
+    case-sensitive source written to a case-insensitive destination silently loses one of
+    them.
+    """
+    if target_os == "windows":
+        norm = original.replace("\\", "/")
+        if norm.startswith("//"):
+            segments = ["UNC"] + [s for s in norm[2:].split("/") if s]
+        elif re.match(r"^[A-Za-z]:/", norm):
+            segments = [norm[0].upper()] + [s for s in norm[3:].split("/") if s]
+        else:
+            segments = [s for s in norm.split("/") if s]
+    else:
+        segments = [s for s in original.split("/") if s]
+
+    encoded = [encode_segment(s) for s in segments]
+    candidate = "/".join(encoded)
+    folded = candidate.lower()
+    if folded in used and used[folded] != original:
+        suffix = "~" + sha256_bytes(original.encode("utf-8", "surrogateescape"))[:10]
+        encoded[-1] = encoded[-1] + suffix
+        candidate = "/".join(encoded)
+        folded = candidate.lower()
+    used[folded] = original
+    return candidate
+
+
+# ------------------------------------------------------------- placeholder expansion
+
+_XDG_DEFAULTS = {
+    "XDG_DATA_HOME": ".local/share",
+    "XDG_CONFIG_HOME": ".config",
+    "XDG_CACHE_HOME": ".cache",
+    "XDG_STATE_HOME": ".local/state",
+}
+
+# Windows placeholders, expanded relative to a profile. Used when collecting a mounted
+# Windows profile from an analyst workstation with --root and --os windows.
+_WIN_PLACEHOLDERS = {
+    "%USERPROFILE%": "",
+    "%APPDATA%": "AppData/Roaming",
+    "%LOCALAPPDATA%": "AppData/Local",
+}
+
+
+def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> list[str]:
+    """Turn one catalogue path pattern into concrete glob patterns on this filesystem.
+
+    An angle-bracket segment is a human-readable placeholder in the catalogue. Here it
+    becomes a single-level wildcard, which is always safe: a false match costs a skipped
+    entry in the manifest, while treating it literally would collect nothing.
+    """
+    text = pattern
+    if target_os == "windows":
+        for placeholder, relative in _WIN_PLACEHOLDERS.items():
+            if text.upper().startswith(placeholder):
+                tail = text[len(placeholder) :].lstrip("\\/")
+                text = "/".join(x for x in (home, relative, tail) if x)
+                break
+        else:
+            if text.startswith("%PROGRAMFILES%"):
+                text = "C:/Program Files" + text[len("%PROGRAMFILES%") :]
+            elif text.startswith("%PROGRAMDATA%"):
+                text = "C:/ProgramData" + text[len("%PROGRAMDATA%") :]
+        text = text.replace("\\", "/")
+    else:
+        for name, default in _XDG_DEFAULTS.items():
+            token = "$" + name
+            if text.startswith(token):
+                base = os.environ.get(name) or os.path.join(home, default)
+                text = base + text[len(token) :]
+                break
+        if text.startswith("~"):
+            text = home + text[1:]
+        # An environment-variable placeholder we do not know stays literal and simply
+        # will not match, which shows up as a skipped entry rather than as a wrong one.
+
+    text = re.sub(r"<[^>]+>", "*", text)
+
+    if root and not text.startswith(root.rstrip("/") + "/") and text != root.rstrip("/"):
+        # Re-anchor under the mounted root, but only when it is not already anchored there.
+        #
+        # Three kinds of path reach this point and one prefix test handles all of them. A
+        # profile-relative path already carries the root, because `home` was discovered
+        # inside it. An absolute system path does not. And a project root read out of the
+        # agent's own state carries the ORIGINAL machine's absolute path, which also does
+        # not exist under the root. Re-anchoring unconditionally double-prefixed the first
+        # kind, which made every profile artifact silently fail to match: the collection
+        # came back empty and looked like a host with no agents on it.
+        #
+        # lstrip() takes a character set rather than a prefix, so the drive letter is
+        # removed with an explicit match: lstrip("C:/") would also eat a leading 'C' from
+        # a directory name.
+        relative = re.sub(r"^[A-Za-z]:/", "", text).lstrip("/")
+        text = os.path.join(root, relative)
+
+    # A pattern that reduces to a bare wildcard near the top of the tree would collect the
+    # whole filesystem under one artifact id. That is not hypothetical: a catalogue entry
+    # carried prose in angle brackets, this function turned it into a wildcard, and one
+    # artifact swallowed an entire home directory. The schema now rejects such an entry,
+    # and this is the second line of defence, because a collector in the field has to fail
+    # closed rather than hoover.
+    stripped = text.rstrip("/")
+    if stripped.endswith("/*") and stripped.count("/") <= 1:
+        return []
+    if re.sub(r"[*?/]", "", stripped) == "":
+        return []
+
+    return [text if ("*" in text or "?" in text) else os.path.normpath(text)]
+
+
+# --------------------------------------------------------------------- discovery
+
+
+def iter_matches(pattern: str) -> list[str]:
+    """Expand a glob without following symlinks into directories outside the tree.
+
+    glob.glob would work, but it has surprising behavior with '**' across versions, and
+    this needs to be identical in the PowerShell implementation, so the walk is explicit.
+    """
+    if "*" not in pattern and "?" not in pattern:
+        return [pattern] if os.path.lexists(pattern) else []
+
+    parts = pattern.split("/")
+    # An absolute pattern starts with an empty first part.
+    bases = ["/"] if pattern.startswith("/") else ["."]
+    if parts and parts[0] == "":
+        parts = parts[1:]
+    elif re.match(r"^[A-Za-z]:$", parts[0] if parts else ""):
+        bases = [parts[0] + "/"]
+        parts = parts[1:]
+
+    for index, part in enumerate(parts):
+        nxt = []
+        if part == "**":
+            for base in bases:
+                for dirpath, dirnames, _files in os.walk(base):
+                    # Do not descend into symlinked directories: a link out of the profile
+                    # would take the collection with it.
+                    dirnames[:] = [
+                        d for d in dirnames if not os.path.islink(os.path.join(dirpath, d))
+                    ]
+                    nxt.append(dirpath)
+        elif "*" in part or "?" in part:
+            for base in bases:
+                try:
+                    entries = sorted(os.listdir(base))
+                except OSError:
+                    continue
+                for name in entries:
+                    if fnmatch.fnmatch(name, part):
+                        nxt.append(os.path.join(base, name))
+        else:
+            for base in bases:
+                candidate = os.path.join(base, part)
+                if os.path.lexists(candidate):
+                    nxt.append(candidate)
+        bases = nxt
+        if not bases:
+            return []
+        is_last = index == len(parts) - 1
+        if not is_last:
+            bases = [b for b in bases if os.path.isdir(b)]
+    return sorted(set(bases))
+
+
+def discover_users(root: str | None, all_users: bool, named: list) -> list:
+    """Return [{'name', 'home'}] for the profiles to scan."""
+    if root:
+        # A mounted image or an exported profile. Look for the usual profile parents, and
+        # fall back to treating the root itself as one profile.
+        found = []
+        for parent in ("Users", "home", "root"):
+            base = os.path.join(root, parent)
+            if not os.path.isdir(base):
+                continue
+            if parent == "root":
+                found.append({"name": "root", "home": base})
+                continue
+            try:
+                for name in sorted(os.listdir(base)):
+                    home = os.path.join(base, name)
+                    if os.path.isdir(home):
+                        found.append({"name": name, "home": home})
+            except OSError:
+                continue
+        if not found:
+            found = [{"name": os.path.basename(root.rstrip("/")) or "root", "home": root}]
+        if named:
+            found = [u for u in found if u["name"] in named]
+        return found
+
+    if all_users:
+        found = []
+        for parent in ("/Users", "/home"):
+            if not os.path.isdir(parent):
+                continue
+            try:
+                for name in sorted(os.listdir(parent)):
+                    home = os.path.join(parent, name)
+                    if os.path.isdir(home) and not os.path.islink(home):
+                        found.append({"name": name, "home": home})
+            except OSError:
+                continue
+        if os.path.isdir("/var/root"):
+            found.append({"name": "root", "home": "/var/root"})
+        elif os.path.isdir("/root"):
+            found.append({"name": "root", "home": "/root"})
+        if named:
+            found = [u for u in found if u["name"] in named]
+        return found
+
+    if named:
+        out = []
+        for name in named:
+            for parent in ("/Users", "/home"):
+                home = os.path.join(parent, name)
+                if os.path.isdir(home):
+                    out.append({"name": name, "home": home})
+                    break
+        return out
+
+    try:
+        who = getpass.getuser()
+    except Exception:
+        who = os.environ.get("USER") or "unknown"
+    return [{"name": who, "home": os.path.expanduser("~")}]
+
+
+def discover_project_roots(home: str) -> list:
+    """Find the working copies whose project-anchored artifacts we should collect.
+
+    Project instruction files (CLAUDE.md, .claude/rules and the rest) live inside a user's
+    repositories, not under the profile, and they are the prompt-injection surface. They
+    cannot be found by expanding a profile, so the agent's own state is read for the list:
+    the projects key of ~/.claude.json is authoritative, and the encoded directory names
+    under projects/ are a fallback hint. The encoding replaces every non-alphanumeric
+    character with a dash and is therefore not reversible, so a decoded name is only used
+    when it happens to name a directory that exists.
+    """
+    roots = []
+    config = os.path.join(home, ".claude.json")
+    if os.path.isfile(config):
+        try:
+            with open(config, "rb") as handle:
+                data = json.loads(handle.read().decode("utf-8", "replace"))
+            projects = data.get("projects")
+            if isinstance(projects, dict):
+                for path in sorted(projects):
+                    if os.path.isdir(path):
+                        roots.append({"path": path, "source": "claude_code.global_config"})
+        except (OSError, ValueError):
+            pass
+
+    projects_dir = os.path.join(home, ".claude", "projects")
+    if os.path.isdir(projects_dir):
+        try:
+            for name in sorted(os.listdir(projects_dir)):
+                guess = "/" + name.lstrip("-").replace("-", "/")
+                if os.path.isdir(guess) and all(r["path"] != guess for r in roots):
+                    roots.append({"path": guess, "source": "claude_code.projects_dir_name"})
+        except OSError:
+            pass
+    return roots
+
+
+# ------------------------------------------------------------------------- collection
+
+# A single glob can match an unbounded number of files, for example a project directory
+# with tens of thousands of transcripts. The cap keeps one artifact from consuming a whole
+# collection window, and hitting it is recorded as an error rather than passing silently.
+DEFAULT_MAX_FILES_PER_ARTIFACT = 20000
+
+
+def _stat_times(st: os.stat_result) -> dict:
+    """Read every timestamp the platform offers, and say null for the ones it does not.
+
+    st_birthtime exists on macOS and on some BSDs, and does not exist on Linux. st_ctime
+    means inode change time on Unix and creation time on Windows: the same field name with
+    two meanings, which docs/BUNDLE_FORMAT.md documents rather than tries to reconcile.
+    """
+    birth = getattr(st, "st_birthtime", None)
+    return {
+        "mtime_utc": utc(st.st_mtime),
+        "ctime_utc": utc(st.st_ctime),
+        "atime_utc": utc(st.st_atime),
+        "birthtime_utc": utc(birth) if birth else None,
+    }
+
+
+def collect_file(
+    artifact: dict,
+    original: str,
+    profile_home: str,
+    user_name: str,
+    files_dir: str | None,
+    used: dict,
+    target_os: str,
+    args: argparse.Namespace,
+) -> dict:
+    """Collect one file and return its manifest entry.
+
+    Every path out of this function produces an entry. A file that could not be read is
+    still described, with a reason, because a collection that silently omits what it could
+    not open leaves the analyst unable to tell "absent" from "unreadable".
+    """
+    entry = {
+        "artifact_id": artifact["id"],
+        "agent": artifact["id"].split(".", 1)[0],
+        "category": artifact["category"],
+        "status": artifact.get("status", "unverified"),
+        "user": user_name,
+        "original_path": original,
+        "bundle_path": None,
+        "size": None,
+        "sha256": None,
+        "collected": False,
+        "reason": None,
+        "symlink": None,
+        "reparse_point": False,
+        "changed_while_reading": False,
+        "mtime_utc": None,
+        "ctime_utc": None,
+        "atime_utc": None,
+        "birthtime_utc": None,
+    }
+
+    try:
+        st = os.lstat(original)
+    except OSError as exc:
+        entry["reason"] = "permission_denied" if exc.errno == errno.EACCES else "unreadable"
+        return entry
+
+    if stat.S_ISLNK(st.st_mode):
+        try:
+            target = os.readlink(original)
+        except OSError:
+            target = None
+        entry["symlink"] = target
+        resolved = os.path.realpath(original)
+        # A link out of the profile would take the collection somewhere it was never
+        # authorized to read. Recorded, not followed.
+        if not resolved.startswith(os.path.realpath(profile_home) + os.sep):
+            entry["reason"] = "skipped_symlink"
+            return entry
+        try:
+            st = os.stat(original)
+        except OSError:
+            entry["reason"] = "unreadable"
+            return entry
+
+    if not stat.S_ISREG(st.st_mode):
+        entry["reason"] = "not_a_file"
+        return entry
+
+    entry.update(_stat_times(st))
+    entry["size"] = st.st_size
+
+    if st.st_size > args.max_file_size:
+        entry["reason"] = "too_large"
+        return entry
+
+    if args.dry_run:
+        # No read at all: hashing would touch access times and cost the time a dry run
+        # exists to save. The entry says what would have happened.
+        entry["reason"] = "dry_run"
+        return entry
+
+    secret = artifact.get("sensitivity") == "secret" and not args.include_secrets
+
+    try:
+        digest, read_size = sha256_file(original, preserve_atime=True)
+    except OSError as exc:
+        entry["reason"] = "permission_denied" if exc.errno == errno.EACCES else "unreadable"
+        return entry
+
+    entry["sha256"] = digest
+    entry["size"] = read_size
+
+    try:
+        after = os.stat(original)
+        if after.st_mtime != st.st_mtime or after.st_size != st.st_size:
+            entry["changed_while_reading"] = True
+    except OSError:
+        pass
+
+    if secret:
+        # Presence, identity and timestamps are recorded; the bytes are not copied. See
+        # SECURITY.md: the tool locates credential material, and copying it by default
+        # would make every bundle a liability of its own.
+        entry["reason"] = "secret_policy"
+        return entry
+
+    if files_dir is None:
+        entry["collected"] = True
+        return entry
+
+    relative = bundle_path_for(original, used, target_os)
+    destination = os.path.join(files_dir, *relative.split("/"))
+    try:
+        os.makedirs(os.path.dirname(destination), exist_ok=True)
+        with open(original, "rb") as src, open(destination, "wb") as dst:
+            while True:
+                chunk = src.read(1024 * 1024)
+                if not chunk:
+                    break
+                dst.write(chunk)
+        # Carry the original mtime onto the copy, so a bundle extracted on another machine
+        # still shows when the evidence was last written.
+        os.utime(destination, (st.st_atime, st.st_mtime))
+    except OSError as exc:
+        entry["reason"] = "permission_denied" if exc.errno == errno.EACCES else "unreadable"
+        return entry
+
+    entry["bundle_path"] = "files/" + relative
+    entry["collected"] = True
+    return entry
+
+
+def walk_regular_files(base: str, limit: int) -> tuple[list, bool]:
+    """List regular files under a directory without following symlinked directories."""
+    found = []
+    truncated = False
+    for dirpath, dirnames, filenames in os.walk(base):
+        dirnames[:] = sorted(d for d in dirnames if not os.path.islink(os.path.join(dirpath, d)))
+        for name in sorted(filenames):
+            found.append(os.path.join(dirpath, name))
+            if len(found) >= limit:
+                return found, True
+    return found, truncated
+
+
+def run(args: argparse.Namespace) -> dict:
+    """Collect everything the catalogue describes for this platform."""
+    started = time.time()
+    target_os = args.os or {"Darwin": "macos", "Linux": "linux"}.get(platform.system(), "linux")
+
+    artifacts = []
+    for agent in EMBEDDED_CATALOGUE.get("agents", []):
+        if args.agents and agent["agent"] not in args.agents:
+            continue
+        for artifact in agent.get("artifacts", []):
+            if target_os in artifact.get("os", []):
+                artifacts.append(artifact)
+    # Most volatile first, then by id so two runs queue the same work in the same order.
+    artifacts.sort(
+        key=lambda a: (PRIORITY_ORDER.index(a.get("collect_priority", "normal")), a["id"])
+    )
+
+    users = discover_users(args.root, args.all_users, args.user or [])
+    files_dir = None
+    if not args.dry_run:
+        files_dir = os.path.join(args.out, "files")
+        os.makedirs(files_dir, exist_ok=True)
+
+    entries: list = []
+    errors: list = []
+    project_roots: list = []
+    used: dict = {}
+
+    for user in users:
+        home = user["home"]
+        if not os.path.isdir(home):
+            user["collected"] = False
+            user["reason"] = "unreadable"
+            continue
+        user["collected"] = True
+        roots = discover_project_roots(home)
+        for root in roots:
+            if all(r["path"] != root["path"] for r in project_roots):
+                project_roots.append(root)
+
+        for artifact in artifacts:
+            anchors = [home]
+            if artifact.get("root") in ("project", "repo_root", "plugin"):
+                anchors = [r["path"] for r in roots]
+                if not anchors:
+                    continue
+            for anchor in anchors:
+                for pattern in artifact["paths"]:
+                    concrete = pattern
+                    if artifact.get("root") in ("project", "repo_root", "plugin"):
+                        concrete = re.sub(r"^<[^>]+>", anchor.rstrip("/"), pattern)
+                    for expanded in expand_paths(concrete, home, target_os, args.root):
+                        for match in iter_matches(expanded):
+                            targets = [match]
+                            if os.path.isdir(match) and not os.path.islink(match):
+                                targets, truncated = walk_regular_files(
+                                    match, args.max_files_per_artifact
+                                )
+                                if truncated:
+                                    errors.append(
+                                        {
+                                            "path": match,
+                                            "error": "too_many_files",
+                                            "detail": "stopped after %d files; raise "
+                                            "--max-files-per-artifact"
+                                            % args.max_files_per_artifact,
+                                        }
+                                    )
+                            for target in targets:
+                                if any(e["original_path"] == target for e in entries):
+                                    continue
+                                entry = collect_file(
+                                    artifact,
+                                    target,
+                                    home,
+                                    user["name"],
+                                    files_dir,
+                                    used,
+                                    target_os,
+                                    args,
+                                )
+                                entries.append(entry)
+                                if entry["reason"] in ("permission_denied", "unreadable"):
+                                    errors.append(
+                                        {
+                                            "path": target,
+                                            "error": entry["reason"],
+                                            "detail": entry["artifact_id"],
+                                        }
+                                    )
+
+    entries.sort(key=lambda e: (e["artifact_id"], e["original_path"]))
+
+    offset = time.strftime("%z")
+    manifest = {
+        "format_version": FORMAT_VERSION,
+        "tool": {
+            "name": TOOL_NAME,
+            "version": TOOL_VERSION,
+            "sha256": tool_sha256(),
+            "catalogue_version": EMBEDDED_CATALOGUE.get("sha256", ""),
+        },
+        "collection": {
+            "uuid": str(uuid.uuid4()),
+            "started_utc": utc(started),
+            "finished_utc": utc(time.time()),
+            "local_timezone": (offset[:3] + ":" + offset[3:]) if offset else None,
+            "local_timezone_name": time.tzname[time.daylight and time.localtime().tm_isdst > 0],
+            "hostname": socket.gethostname(),
+            "os": target_os,
+            "os_version": platform.release(),
+            "architecture": platform.machine(),
+            "collector_user": _current_user(),
+            "elevated": hasattr(os, "geteuid") and os.geteuid() == 0,
+            "argv": [os.path.basename(sys.argv[0]), *sys.argv[1:]],
+            "include_secrets": bool(args.include_secrets),
+            "max_file_size": args.max_file_size,
+            "root": args.root,
+            "agents_filter": sorted(args.agents) if args.agents else None,
+        },
+        "users": users,
+        "project_roots": sorted(project_roots, key=lambda r: r["path"]),
+        "files": entries,
+        "counts": {
+            "hit": len(entries),
+            "collected": sum(1 for e in entries if e["collected"]),
+            "skipped": sum(1 for e in entries if not e["collected"]),
+            "errors": len(errors),
+        },
+        "errors": sorted(errors, key=lambda e: (e["path"], e["error"])),
+    }
+    return manifest
+
+
+def _current_user() -> str:
+    try:
+        return getpass.getuser()
+    except Exception:
+        return os.environ.get("USER") or "unknown"
+
+
+def tool_sha256() -> str:
+    """Hash this file as it ran, so a bundle can be tied to the exact collector build."""
+    try:
+        with open(os.path.abspath(__file__), "rb") as handle:
+            return sha256_bytes(handle.read())
+    except OSError:
+        return ""
+
+
+# --------------------------------------------------------------------- bundle writing
+
+
+def custody_record(seq: int, event: str, manifest_sha: str, prev_sha: str | None, **extra) -> dict:
+    """Build one hash-chained custody record.
+
+    Each record commits to the previous one, so removing or editing a single record breaks
+    the chain at a detectable point. This is tamper-evident, not tamper-proof: anyone who
+    can write the file can rewrite the whole chain. See docs/BUNDLE_FORMAT.md.
+    """
+    record = {
+        "seq": seq,
+        "event": event,
+        "time_utc": utc(time.time()),
+        "actor": _current_user(),
+        "host": socket.gethostname(),
+        "tool": "%s %s" % (TOOL_NAME, TOOL_VERSION),
+        "manifest_sha256": manifest_sha,
+        "prev_sha256": prev_sha,
+    }
+    record.update(extra)
+    record["sha256"] = sha256_bytes(
+        json.dumps(record, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    )
+    return record
+
+
+def write_bundle(out: str, manifest: dict) -> str:
+    manifest_text = canonical_json(manifest)
+    manifest_sha = sha256_bytes(manifest_text.encode("utf-8"))
+    with open(os.path.join(out, "manifest.json"), "w") as handle:
+        handle.write(manifest_text)
+    record = custody_record(0, "collected", manifest_sha, None)
+    with open(os.path.join(out, "chain_of_custody.jsonl"), "w") as handle:
+        handle.write(json.dumps(record, sort_keys=True) + "\n")
+    return manifest_sha
+
+
+# Fixed timestamp for the two metadata files inside the zip. The zip format cannot store
+# anything before 1980, and using the collection time would make two zips over an
+# unchanged tree differ in more places than their content.
+ZIP_METADATA_TIME = (1980, 1, 1, 0, 0, 0)
+
+
+def write_zip(out: str, manifest: dict) -> str:
+    """Pack the bundle, in manifest order, and write a .sha256 sidecar beside it."""
+    archive = out.rstrip(os.sep) + ".zip"
+    base = os.path.basename(out.rstrip(os.sep))
+    with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as zf:
+        for name in ("manifest.json", "chain_of_custody.jsonl"):
+            info = zipfile.ZipInfo(base + "/" + name, ZIP_METADATA_TIME)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            with open(os.path.join(out, name), "rb") as handle:
+                zf.writestr(info, handle.read())
+        for entry in manifest["files"]:
+            if not entry.get("bundle_path"):
+                continue
+            source = os.path.join(out, *entry["bundle_path"].split("/"))
+            if not os.path.isfile(source):
+                continue
+            st = os.stat(source)
+            info = zipfile.ZipInfo(
+                base + "/" + entry["bundle_path"], time.localtime(st.st_mtime)[:6]
+            )
+            info.compress_type = zipfile.ZIP_DEFLATED
+            with open(source, "rb") as handle:
+                zf.writestr(info, handle.read())
+    with open(archive, "rb") as handle:
+        digest = sha256_bytes(handle.read())
+    with open(archive + ".sha256", "w") as handle:
+        handle.write("%s  %s\n" % (digest, os.path.basename(archive)))
+    return archive
+
+
+# ------------------------------------------------------------------------------- CLI
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog=TOOL_NAME,
+        description=__doc__.strip().splitlines()[0],
+        epilog="Use requires proper authorization. Exit codes: 0 collected, 1 collected "
+        "with errors, 2 could not run, 3 nothing found.",
+    )
+    parser.add_argument("--out", help="bundle directory to create. Required unless --dry-run")
+    parser.add_argument("--zip", action="store_true", help="also write <out>.zip and a .sha256")
+    parser.add_argument("--user", action="append", metavar="NAME", help="repeatable")
+    parser.add_argument(
+        "--all-users",
+        action="store_true",
+        help="scan every profile. Needs elevation, which is recorded in the manifest",
+    )
+    parser.add_argument("--agents", action="append", metavar="KEY", help="repeatable")
+    parser.add_argument(
+        "--include-secrets",
+        action="store_true",
+        help="copy the content of credential artifacts too. Off by default: their "
+        "presence, hash and timestamps are recorded without copying the material",
+    )
+    parser.add_argument("--max-file-size", type=int, default=DEFAULT_MAX_FILE_SIZE)
+    parser.add_argument(
+        "--max-files-per-artifact", type=int, default=DEFAULT_MAX_FILES_PER_ARTIFACT
+    )
+    parser.add_argument(
+        "--root", metavar="PATH", help="collect from a mounted image or an exported profile"
+    )
+    parser.add_argument(
+        "--os",
+        choices=("macos", "linux", "windows"),
+        help="target platform, for use with --root when it differs from this machine",
+    )
+    parser.add_argument("--dry-run", action="store_true", help="list what would be collected")
+    parser.add_argument("--json", action="store_true", help="machine-readable summary on stdout")
+    parser.add_argument("--version", action="version", version="%s %s" % (TOOL_NAME, TOOL_VERSION))
+    return parser
+
+
+def main(argv: list | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+
+    if not EMBEDDED_CATALOGUE.get("agents"):
+        sys.stderr.write(
+            "%s: the embedded catalogue is empty. This file was not built by "
+            "scripts/build_collectors.py.\n" % TOOL_NAME
+        )
+        return EXIT_USAGE
+
+    if not args.dry_run:
+        if not args.out:
+            parser.error("--out is required unless --dry-run is given")
+        try:
+            os.makedirs(args.out, exist_ok=True)
+        except OSError as exc:
+            sys.stderr.write("%s: cannot create %s: %s\n" % (TOOL_NAME, args.out, exc))
+            return EXIT_USAGE
+        if os.listdir(args.out):
+            sys.stderr.write(
+                "%s: %s is not empty. Refusing to write into an existing bundle, because "
+                "mixing two collections makes both unusable as evidence.\n" % (TOOL_NAME, args.out)
+            )
+            return EXIT_USAGE
+
+    if args.all_users and hasattr(os, "geteuid") and os.geteuid() != 0:
+        sys.stderr.write(
+            "%s: --all-users without elevation will miss other users' profiles. "
+            "Continuing, and recording that this run was not elevated.\n" % TOOL_NAME
+        )
+
+    manifest = run(args)
+
+    if not args.dry_run:
+        write_bundle(args.out, manifest)
+        if args.zip:
+            write_zip(args.out, manifest)
+
+    summary = {
+        "bundle": None if args.dry_run else os.path.abspath(args.out),
+        "dry_run": bool(args.dry_run),
+        "users": [u["name"] for u in manifest["users"]],
+        "project_roots": [r["path"] for r in manifest["project_roots"]],
+        "counts": manifest["counts"],
+        "by_priority": {},
+    }
+    priorities = {}
+    for agent in EMBEDDED_CATALOGUE.get("agents", []):
+        for artifact in agent.get("artifacts", []):
+            priorities[artifact["id"]] = artifact.get("collect_priority", "normal")
+    for entry in manifest["files"]:
+        key = priorities.get(entry["artifact_id"], "normal")
+        bucket = summary["by_priority"].setdefault(key, {"hit": 0, "collected": 0})
+        bucket["hit"] += 1
+        bucket["collected"] += 1 if entry["collected"] else 0
+
+    if args.json:
+        sys.stdout.write(json.dumps(summary, sort_keys=True, indent=2) + "\n")
+    else:
+        counts = manifest["counts"]
+        sys.stderr.write(
+            "%s: %d hit, %d collected, %d skipped, %d error(s)\n"
+            % (TOOL_NAME, counts["hit"], counts["collected"], counts["skipped"], counts["errors"])
+        )
+        for priority in PRIORITY_ORDER:
+            bucket = summary["by_priority"].get(priority)
+            if bucket:
+                sys.stderr.write("  %-10s %d/%d\n" % (priority, bucket["collected"], bucket["hit"]))
+        if not args.dry_run:
+            sys.stderr.write("  bundle: %s\n" % os.path.abspath(args.out))
+
+    if manifest["counts"]["hit"] == 0:
+        # Distinct from failure on purpose: a host with no agent artifacts is a valid and
+        # useful result, and a fleet sweep that cannot tell the two apart draws a wrong
+        # picture of where agents are in use.
+        return EXIT_NOTHING_FOUND
+    if manifest["counts"]["errors"]:
+        return EXIT_ERRORS
+    return EXIT_OK
+
+
+if __name__ == "__main__":
+    sys.exit(main())

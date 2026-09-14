@@ -14,4 +14,10 @@ ignore = ["UP", "E501"]
 [lint.per-file-ignores]
 # A collector is a command line tool whose output is its interface, it must walk paths the
 # operating system gives it, and it deliberately reads files that may be unreadable.
-"*.py" = ["T20", "S101", "PTH"]
+#
+# S108 (insecure temporary directory) is a false positive here and worth spelling out: the
+# embedded catalogue contains paths where AGENTS write their own files, and one of them is
+# under /tmp. The collector reads that path as evidence; it never writes there. Suppressing
+# the rule for a data literal is right, and the alternative would be to hide a real
+# artifact location from the catalogue to please a linter.
+"*.py" = ["T20", "S101", "PTH", "S108"]

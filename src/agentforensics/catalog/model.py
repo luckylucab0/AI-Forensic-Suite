@@ -26,7 +26,7 @@ Text = str | Mapping[str, str]
 # What a path is anchored to. Profile and system paths the collector can resolve on its
 # own; project, repo and plugin paths need a list of roots discovered from the agent's own
 # state, so an artifact that is mis-labelled here is simply never collected.
-PathRoot = Literal["user_profile", "system", "project", "repo_root", "plugin"]
+PathRoot = Literal["user_profile", "system", "project", "repo_root", "plugin", "registry"]
 
 Sensitivity = Literal["normal", "secret"]
 Status = Literal["verified", "unverified"]
@@ -107,6 +107,11 @@ class Artifact:
         artifacts can be collected at all.
         """
         return self.root in ("project", "repo_root", "plugin")
+
+    @property
+    def is_registry(self) -> bool:
+        """Windows registry keys rather than files, readable only by the PowerShell collector."""
+        return self.root == "registry"
 
     def applies_to(self, os_name: str) -> bool:
         return os_name in self.os
