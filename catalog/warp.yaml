@@ -1,0 +1,47 @@
+# Warp artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: warp
+title: Warp
+vendor: Warp
+references:
+- |-
+  https://raw.githubusercontent.com/marcus/sidecar/main/.claude/skills/create-adapter/references/warp-sqlite-schema.md
+artifacts:
+- id: warp.sqlite
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ${XDG_STATE_HOME:-~/.local/state}/warp-terminal/warp.sqlite
+  - '%LOCALAPPDATA%\warp\Warp\data\warp.sqlite'
+  - ~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite
+  - |-
+    ~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm
+  - |-
+    ~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/marcus/sidecar/main/.claude/skills/create-adapter/references/warp-sqlite-schema.md
+  source_kind: community
+  volatility: |-
+    WAL mode - all three files (warp.sqlite, -wal, -shm) are required for a consistent read, and recent activity may live only in -wal. Deletion of a conversation in Warp is a SQL transaction against agent_tasks/ai_queries for that conversation id, not removal of the file, so freelist and WAL carving can recover deleted conversations.
+  notes: |-
+    TWO MAJOR CORRECTIONS. (1) The macOS path in the starting brief is WRONG: the database is inside an App Group container at ~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite, not directly under ~/Library/Application Support/. Group Containers is routinely excluded from home-directory collection scripts. (2) THE SOURCE STATES WARP DOES NOT STORE AI ASSISTANT TEXT RESPONSES LOCALLY - only queries, executed tools and statistics persist. So Warp gives you the operator's prompts and the commands actually run, but the model's replies must be obtained from the vendor. Say this explicitly in any report, or a reader will assume the absent assistant text means the conversation did not happen. blocks is effectively a rich shell history (command, output, cwd, exit code, timing) and is the best evidence of what the agent actually executed. The 'Warp-Stable' path segment implies channel-specific directories for Preview/Canary builds, but I could not source those names - enumerate the Group Container directory rather than assuming.
+
+    Record structure: Tables and the columns that matter: ai_queries (id, exchange_id, conversation_id, start_ts, input, working_directory, output_status, model_id, planning_model_id, coding_model_id) holds USER PROMPTS in ai_queries.input as JSON arrays; agent_conversations (id, conversation_id, conversation_data JSON, last_modified_at) holds usage metadata including tokens/credits; agent_tasks (id, conversation_id, task_id, task BLOB, last_modified_at) holds AGENT TASK LISTS as PROTOBUF in the task BLOB; blocks (id, pane_leaf_uuid, stylized_command BLOB, stylized_output BLOB, pwd, exit_code, start_ts, completed_ts, ai_metadata JSON) holds COMMAND AND OUTPUT HISTORY with ANSI escapes embedded (strip with \x1b\[[0-9;]*m). Also present: terminal_panes, commands, projects, workspace_metadata, mcp_server_installations.
+  parser: null

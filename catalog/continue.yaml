@@ -1,0 +1,204 @@
+# Continue artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: continue
+title: Continue
+vendor: Continue
+references:
+- https://github.com/continuedev/continue/blob/main/core/config/ConfigHandler.ts
+- https://github.com/continuedev/continue/blob/main/extensions/cli/src/commands/devbox-entrypoint.md
+- https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts
+- https://raw.githubusercontent.com/continuedev/continue/main/docs/customize/deep-dives/configuration.mdx
+artifacts:
+- id: continue.index
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.continue/index/autocompleteCache.sqlite
+  - ~/.continue/index/docs.sqlite
+  - ~/.continue/index/index.sqlite
+  - ~/.continue/index/lancedb/
+  - ~/.continue/repo_map.txt
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts
+  source_kind: source_code
+  volatility: Rebuildable caches; may be wiped by a reindex without affecting the agent's function.
+  notes: |-
+    index.sqlite enumerates every file and chunk Continue ingested - a list of source files the agent had visibility into, including files since deleted. autocompleteCache.sqlite can retain completion text (i.e. model output) that never appeared in any session transcript because it was inline autocomplete rather than chat. docs.sqlite and lancedb record which external documentation sites were ingested.
+
+    Record structure: paths.ts: index folder = join(getContinueGlobalPath(), 'index'); index.sqlite, autocompleteCache.sqlite and docs.sqlite are its named databases; lancedb is the vector store directory; getRepoMapFilePath() returns repo_map.txt.
+  parser: null
+- id: continue.agents
+  category: config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.continue/agents/*.yaml
+  - <project>/.continue/assistants/*.yaml
+  - ~/.continue/agents/*.yaml
+  - ~/.continue/assistants/*.yaml
+  format: yaml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/continuedev/continue/blob/main/core/config/ConfigHandler.ts
+  source_kind: source_code
+  volatility: Persistent until removed.
+  notes: |-
+    CORRECTION to the starting brief: the current folder name is agents/, and assistants/ is the PREVIOUS name. Glob both - an old assistants/ directory left behind is exactly the kind of stale configuration evidence that survives a user tidying up the current one. These files commonly embed apiKey values and declare capabilities such as tool_use.
+
+    Record structure: core/config/ConfigHandler.ts comment: 'Users can define as many local agents as they want in a `.continue/agents` (or previous .continue/assistants) folder'. Retrieved via GitHub code search content fragment. Each file is a local agent definition with name, version, schema, models, roles, capabilities, defaultCompletionOptions.
+  parser: null
+- id: continue.aux_config
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.continue/.configs/
+  - ~/.continue/.continueignore
+  - ~/.continue/.migrations/
+  - ~/.continue/prompts/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts
+  source_kind: source_code
+  volatility: Persistent.
+  notes: |-
+    Two useful signals: .configs holds configuration pulled from a REMOTE server (so the effective policy may not have originated on this endpoint), and .migrations dates each Continue version upgrade, giving a version timeline to correlate with format changes.
+
+    Record structure: paths.ts: getRemoteConfigsFolderPath() = '.configs', getGlobalPromptsPath() = 'prompts', migrations dir = '.migrations', getGlobalContinueIgnorePath() = the global .continueignore.
+  parser: null
+- id: continue.config
+  category: config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.continuerc.json
+  - ~/.continue/config.json
+  - ~/.continue/config.ts
+  - ~/.continue/config.yaml
+  format: yaml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/continuedev/continue/main/docs/customize/deep-dives/configuration.mdx
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    Collect ALL of them, not just config.yaml: a stale config.json is a record of an earlier configuration (models, providers, MCP servers) that config.yaml has since superseded. config.ts is executable TypeScript and must be reviewed as code. Model blocks frequently contain inline apiKey values.
+
+    Record structure: config.yaml is the current standard for 2026; config.json is the deprecated original format at the same location; config.ts is deprecated programmatic config; .continuerc.json is deprecated workspace config with merge behaviour. If config.yaml exists it is loaded instead of config.json. Windows: %USERPROFILE%\.continue\config.yaml.
+  parser: null
+- id: continue.devbox_env
+  category: credentials
+  root: user_profile
+  os:
+  - linux
+  paths:
+  - ~/.continue/devbox-env
+  format: text
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://github.com/continuedev/continue/blob/main/extensions/cli/src/commands/devbox-entrypoint.md
+  source_kind: source_code
+  volatility: Written at devbox start and sourced before 'cn serve'; persists so keys survive suspend/resume.
+  notes: |-
+    Record metadata and hash only. Presence indicates a Continue devbox / control-plane hosted runtime rather than a local desktop install - a materially different custody and logging story that should be called out.
+
+    Record structure: The devbox entrypoint doc states the control plane 'writes all env vars to ~/.continue/devbox-env and sources it before cn serve, so keys survive suspend/resume'. Retrieved via GitHub code search content fragment.
+  parser: null
+- id: continue.diffs
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.continue/.diffs/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts
+  source_kind: source_code
+  volatility: |-
+    Working scratch area for the diff/apply flow; expect files to be replaced or removed as edits are accepted or rejected. Collect early.
+  notes: |-
+    One of the most valuable artifacts in this whole family: it holds the pre-edit and proposed-edit file contents used by the apply flow. That can recover the ORIGINAL text of a file the agent overwrote, and the exact text of a change that was never committed - neither of which exists in git or in the transcript.
+
+    Record structure: paths.ts getDiffsDirectoryPath() returns the '.diffs' directory under the Continue global dir.
+  parser: null
+- id: continue.dev_data
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.continue/dev_data/
+  - ~/.continue/logs/core.log
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts
+  source_kind: source_code
+  volatility: Append-only in the code reviewed; no rotation implemented.
+  notes: |-
+    dev_data is Continue's own development-telemetry store: per-event records of accepted/rejected suggestions, tokens generated, and edit outcomes. It is an independent, event-level timeline that survives deletion of the session JSON files.
+
+    Record structure: paths.ts defines getDevDataFilePath() and getDevDataSqlitePath() under dev_data, and getLogsDirPath() with core.log.
+  parser: null
+- id: continue.sessions
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/sessions/
+  - '%USERPROFILE%\.continue\sessions\*.json'
+  - ~/.continue/sessions/<session-id>.json
+  - ~/.continue/sessions/sessions.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts
+  source_kind: source_code
+  volatility: One file per session, retained indefinitely; no rotation in the code reviewed.
+  notes: |-
+    sessions.json is an index - compare it against the actual *.json files present. An id listed in the index with no corresponding file, or a file not in the index, is a direct indicator of selective deletion.
+
+    Record structure: paths.ts: sessions folder = join(getContinueGlobalPath(), 'sessions'); per-session file = join(getSessionsFolderPath(), `${sessionId}.json`); index/list file = join(getSessionsFolderPath(), 'sessions.json'). The CLI also treats a session file as a transcript_path (see extensions/cli). CONTINUE_GLOBAL_DIR relocates the whole tree (absolute, or resolved against cwd).
+  parser: null

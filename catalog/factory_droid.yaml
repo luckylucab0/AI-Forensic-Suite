@@ -1,0 +1,163 @@
+# Factory Droid artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: factory_droid
+title: Factory Droid
+vendor: Factory
+references:
+- |-
+  https://github.com/code-yeongyu/oh-my-openagent/blob/main/packages/shared-skills/skills/coding-agent-sessions/references/all-platforms.md
+- |-
+  https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift
+artifacts:
+- id: factory_droid.config
+  category: config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.factory/settings.json
+  - <project>/.factory/settings.local.json
+  - ~/.factory/config.json
+  - ~/.factory/settings.json
+  - ~/.factory/settings.local.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift
+  source_kind: community
+  volatility: Persistent until edited. settings.json is created with defaults on first run of droid.
+  notes: |-
+    The allow/deny lists in settings.json are the permission record for Droid - collect both the global and every project-level copy, and diff them, since a project-local settings.local.json can quietly widen what the agent may do. Note that customModels entries can contain plaintext API keys even though this is catalogued as config.
+
+    Record structure: config.json holds model configuration and BYOK settings; settings.json is the personal CLI configuration including allow/deny lists; a settings.local.json may sit alongside settings.json in any .factory/ folder for local overrides. Custom API keys are added to settings.json via a customModels array with provider types such as anthropic or openai, and are documented as staying local. Path strings retrieved via GitHub code search content fragments.
+  parser: null
+- id: factory_droid.auth
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.factory/
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: unverified
+  source: recollection
+  source_kind: recollection
+  volatility: Unknown.
+  notes: |-
+    recollection, needs verification - filename deliberately not asserted. Known related facts: BYOK keys go in ~/.factory/config.json and customModels keys in ~/.factory/settings.json, and both are documented as staying local, so credentials may simply live in those config files rather than a separate auth file.
+
+    Record structure: I could not establish the filename of Droid's credential/session-token store from any source I was able to fetch. Do NOT guess at auth.json or cli-config.json here. Enumerate ~/.factory/ on a live image and identify the credential file empirically.
+  parser: null
+- id: factory_droid.skills_and_droids
+  category: instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/AGENTS.md
+  - ~/.factory/commands/
+  - ~/.factory/droids/
+  - ~/.factory/skills/
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift
+  source_kind: community
+  volatility: Persistent until removed.
+  notes: |-
+    Partially unverified: skills/ is corroborated, droids/ and commands/ are recollection, needs verification. Custom droid definitions are user-authored agent personas with their own tool grants and are a common vector for privilege widening.
+
+    Record structure: ~/.factory/skills was observed in a code-search content fragment. droids/ and commands/ come only from a WebSearch summary of the Factory docs, which I could not fetch (docs.factory.ai is blocked from this environment) - treat those two as unconfirmed. Custom droid definitions carry their own instructions and tool sets.
+  parser: null
+- id: factory_droid.logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.factory/bug-reports/
+  - ~/.factory/logs/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: recollection
+  source_kind: community
+  volatility: Unknown.
+  notes: |-
+    recollection, needs verification. bug-reports/ is worth chasing if it exists: user-generated support bundles typically snapshot configuration and recent session state at a moment in time, which makes them an independent point-in-time copy of evidence.
+
+    Record structure: Both directories come only from a WebSearch summary of the Factory docs directory listing; docs.factory.ai was unreachable and I found no code-search corroboration. Enumerate ~/.factory/ directly rather than globbing these names.
+  parser: null
+- id: factory_droid.mcp_and_hooks
+  category: mcp_config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.factory/mcp.json
+  - ~/.factory/hooks.json
+  - ~/.factory/mcp.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift
+  source_kind: community
+  volatility: Persistent until edited.
+  notes: |-
+    hooks.json is the standout: hooks are shell commands the harness runs automatically around agent events, so this file can contain arbitrary code execution that is attributable to configuration rather than to any prompt in a transcript. Always review it, and compare its mtime against session times.
+
+    Record structure: ~/.factory/mcp.json and ~/.factory/hooks.json path strings retrieved via GitHub code search content fragments. A project-level .factory/mcp.json was also observed.
+  parser: null
+- id: factory_droid.sessions
+  category: transcript
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.factory/sessions/
+  - ~/.factory/sessions/**/settings.json
+  - ~/.factory/sessions/*/*.jsonl
+  - ~/.factory/sessions/<uuid>.json
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://github.com/code-yeongyu/oh-my-openagent/blob/main/packages/shared-skills/skills/coding-agent-sessions/references/all-platforms.md
+  source_kind: community
+  volatility: No documented expiry.
+  notes: |-
+    CORRECTION/addition to the starting brief, which lists only ~/.factory/: sessions became DIRECTORY-SCOPED at CLI 0.26.7, so project-specific sessions live in <project-root>/.factory/sessions/ and only cross-project sessions live under ~/.factory/sessions/. Collecting only the home directory will miss most work on a developer machine. The per-session settings snapshot is unusually valuable - it records the AUTONOMY LEVEL and enabled tools in force for that specific session, which most agents do not persist per-session.
+
+    Record structure: Path pattern ~/.factory/sessions/*/*.jsonl observed in a community cross-agent reference; ~/.factory/sessions/**/settings.json observed in a separate project. Sessions are UUID-identified and come as a file pair: a .jsonl transcript plus a .settings.json (or <uuid>.json) carrying authoritative per-session metadata - configuration snapshot, model selection, autonomy level, enabled tools, creation time and token usage. Session metadata includes a transcript_path field pointing at the .jsonl. Path strings retrieved via GitHub code search content fragments, not a full page fetch; docs.factory.ai was unreachable from this environment.
+  parser: null

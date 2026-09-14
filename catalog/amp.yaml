@@ -1,0 +1,177 @@
+# Amp artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: amp
+title: Amp
+vendor: Sourcegraph
+references:
+- https://github.com/Eric-Song-Nop/agentstat/blob/main/AGENTS_MONITORING_SOLUTIONS.md
+- https://github.com/Untrivial-ai/agent-orchestrator/blob/main/backend/internal/adapters/agent/amp/auth.go
+- https://github.com/plurigrid/asi/blob/main/skills/amp-continue/SKILL.md
+- https://raw.githubusercontent.com/janekbaraniewski/openusage/main/docs/site/docs/providers/amp.md
+artifacts:
+- id: amp.session_pointer
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.local/share/amp/session.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: https://github.com/Eric-Song-Nop/agentstat/blob/main/AGENTS_MONITORING_SOLUTIONS.md
+  source_kind: community
+  volatility: Overwritten on each session; holds only the current/last state.
+  notes: |-
+    Names the most recent thread id even after the corresponding threads/ file is gone, giving you an id to request from the server. agentMode records the autonomy setting in force.
+
+    Record structure: Contains lastThreadId and the current agentMode. Path string retrieved via GitHub code search content fragments from two independent projects.
+  parser: null
+- id: amp.settings
+  category: config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_CONFIG_HOME/amp/settings.json
+  - <project>/.amp/settings.json
+  - <project>/.amp/settings.jsonc
+  - ~/.config/amp/settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/sourcegraph/amp-examples-and-guides/main/guides/cli/README.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    Carries the MCP inventory and, critically, amp.url - which can point the CLI at a self-hosted or proxied Amp server instead of ampcode.com. A non-default amp.url materially changes where the transcripts actually live.
+
+    Record structure: Same property set as the Amp VS Code extension, including MCP server configuration. AMP_SETTINGS_FILE relocates it entirely (and a --settings-file flag exists). Workspace settings are searched upward from cwd to the repository root.
+  parser: null
+- id: amp.secrets
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\amp\secrets.json'
+  - ~/.amp/oauth/
+  - ~/.local/share/amp/secrets.json
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: unverified
+  source: https://github.com/Untrivial-ai/agent-orchestrator/blob/main/backend/internal/adapters/agent/amp/auth.go
+  source_kind: community
+  volatility: Persistent until logout. One reviewed source notes the schema has changed across CLI releases.
+  notes: |-
+    Record metadata and hash only. This is the one Amp local path that IS documented first-party, which makes its presence the most reliable proof that the Amp CLI was authenticated on this host - useful when threads/ is empty because the transcripts are server-side.
+
+    Record structure: Independently corroborated across many projects. Known key shape: 'apiKey@https://ampcode.com/'. A separate ~/.amp/oauth/ credential directory is also referenced. Not stored in the macOS Keychain. Path strings retrieved via GitHub code search content fragments.
+  parser: null
+- id: amp.ledger
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_DATA_HOME/amp/ledger.jsonl
+  - '%APPDATA%\amp\ledger.jsonl'
+  - ~/.local/share/amp/ledger.jsonl
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/janekbaraniewski/openusage/main/docs/site/docs/providers/amp.md
+  source_kind: community
+  volatility: Append-only; no documented rotation.
+  notes: |-
+    Extremely useful when threads/ is incomplete: the ledger proves an assistant response with a given message id occurred and when, even if the transcript body is only on the server. Gives a billing-grade activity timeline.
+
+    Record structure: One JSON object per line per billed assistant response, keyed by toMessageId, carrying authoritative credits (or cost) and optional token metadata.
+  parser: null
+- id: amp.thread_logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  paths:
+  - ~/.cache/amp/logs/threads/*.log
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/jbdamask/john-claude-skills/main/.pass-along/2026-08-19-1157-PASS-ALONG.md
+  source_kind: community
+  volatility: Cache directory - expect OS and application cache eviction. Collect early.
+  notes: |-
+    The fallback that matters: for an in-progress or unsynced thread this may be the ONLY local record. Because it is under ~/.cache it is also the first thing lost to cleanup tools.
+
+    Record structure: Referenced as the fallback record for a live thread when ~/.local/share/amp/threads/T-*.json is not present. AMP_LOG_LEVEL controls verbosity, so content varies greatly between hosts.
+  parser: null
+- id: amp.continuations
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.local/share/amp/continuations/*.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://github.com/plurigrid/asi/blob/main/skills/amp-continue/SKILL.md
+  source_kind: community
+  volatility: Unknown.
+  notes: |-
+    recollection, needs verification
+
+    Record structure: Seen in a single community skill definition alongside the threads path. Path string retrieved via GitHub code search content fragment. Not corroborated elsewhere.
+  parser: null
+- id: amp.threads
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_DATA_HOME/amp/threads/T-*.json
+  - '%APPDATA%\amp\threads\T-*.json'
+  - ~/.local/share/amp/threads/T-*.json
+  - ~/Library/Application Support/amp/threads/T-*.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/janekbaraniewski/openusage/main/docs/site/docs/providers/amp.md
+  source_kind: community
+  volatility: |-
+    CAVEAT: the authoritative thread store is server-side. A fetched community playbook warns the local directory 'is only an offline fallback for that exact id, not a current inventory', so local files may be stale, partial, or absent for threads that certainly happened.
+  notes: |-
+    CORRECTION to the starting brief, twice over. (1) The path is per-OS, not just ~/.local/share/amp - macOS and Windows differ. (2) Amp's own first-party docs describe conversations as stored server-side (Amp Server / PostgreSQL) and do not document a local thread store; the local threads/ directory is corroborated only by many third-party parsers. Treat local files as corroborating evidence and expect to need 'amp threads list --include-archived --json' or a provider request for the complete set. AMP_DATA_HOME is used as an override by at least one third-party tool.
+
+    Record structure: One JSON document per thread, filename T-<uuid>.json matching the thread id (the T- prefix is checked by multiple independent parsers). Contains a messages[] array with role/content blocks in Anthropic-API shape, with per-assistant-message token usage under both snake_case and camelCase aliases (input/inputTokens, output/outputTokens, cache_read/cacheReadInputTokens, cache_write/cacheWriteInputTokens). Data dir resolution order: $XDG_DATA_HOME/amp, then macOS ~/Library/Application Support/amp, Linux ~/.local/share/amp, Windows %APPDATA%/amp.
+  parser: null

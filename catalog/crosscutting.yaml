@@ -1,0 +1,634 @@
+# Cross-cutting evidence artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: crosscutting
+title: Cross-cutting evidence
+description: |-
+  Evidence that belongs to no single agent: shell history showing how an agent was invoked and with which flags, package manager traces proving it was installed, and the instruction-file conventions that several agents read, which are the surface through which injected instructions reach an agent.
+references:
+- https://code.claude.com/docs/en/setup
+- https://github.com/Adyen/adyen-web/blob/main/.windsurf/rules/code-guide.md
+- https://github.com/cline/cline/blob/main/.clinerules/hooks/README.md
+- https://github.com/cline/cline/blob/main/docs/customization/cline-rules.mdx
+artifacts:
+- id: crosscutting.npm_global_install_dirs
+  category: install_evidence
+  root: system
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\npm\'
+  - '%APPDATA%\npm\node_modules\'
+  - /opt/homebrew/lib/node_modules/
+  - /usr/local/bin/
+  - /usr/local/lib/node_modules/
+  - ~/.nvm/versions/node/*/lib/node_modules/
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/npm/cli/latest/docs/lib/content/configuring-npm/folders.md
+  source_kind: official
+  volatility: |-
+    Overwritten in place on upgrade, so the installed version reflects only the CURRENT state; use ~/.npm/_logs for the install history.
+  notes: |-
+    The prefix is NOT fixed - it follows the node install, so nvm/fnm/volta/asdf and Homebrew node all relocate it. Resolve it from `npm prefix -g` on a live box, or on an image enumerate candidate node installs. Agent packages to look for: @anthropic-ai/claude-code (plus its per-platform optional deps such as @anthropic-ai/claude-code-darwin-arm64), @openai/codex, @google/gemini-cli, @github/copilot.
+
+    Record structure: Verbatim: "The prefix config defaults to the location where node is installed. On most systems, this is /usr/local. On Windows, it's %AppData%\npm." "Global installs on Unix systems go to {prefix}/lib/node_modules. Global installs on Windows go to {prefix}/node_modules (that is, no lib folder.)" "When in global mode, executables are linked into {prefix}/bin on Unix, or directly into {prefix} on Windows." Read each package's package.json for name + version; that is the install evidence. Scoped packages sit under node_modules/@scope/name.
+  parser: null
+- id: crosscutting.npm_debug_logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%LOCALAPPDATA%\npm-cache\_logs\*-debug-*.log'
+  - ~/.npm/_logs/*-debug-*.log
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/npm/cli/latest/docs/lib/content/using-npm/logging.md
+  source_kind: official
+  volatility: |-
+    PRUNED AGGRESSIVELY - COLLECT FIRST. Verbatim: "Log files will be removed from the logs-dir when the number of log files exceeds logs-max, with the oldest logs being deleted first." logs-max defaults to 10 (visible as `logs-max:10` in npm's own log-file test snapshot), so roughly the last ten npm invocations survive. On a busy dev box that can be hours.
+  notes: |-
+    HIGH-VALUE and HIGHLY PERISHABLE. Directory is `_logs` inside the npm cache (verbatim: "The default location of the logs directory is a directory named _logs inside the npm cache"), and the cache is "~/.npm on Posix, or %LocalAppData%/npm-cache on Windows". Relocatable via the logs-dir config; --logs-max=0 turns logging off.
+
+    Record structure: Filename is `${ISO-ish timestamp}-debug-${n}.log` (log-file.js: `${this.#path}debug-${count}.log`, with the date prefix forming #path; tests show e.g. 2024-01-01T00_00_00_000Z-debug-0.log). The filename timestamp alone dates an npm invocation. Body records the full argv, the resolved registry, the packages added/removed and the cwd - so a single log can prove `npm install -g @anthropic-ai/claude-code` happened, at what time, by which user.
+  parser: null
+- id: crosscutting.homebrew_prefixes
+  category: install_evidence
+  root: system
+  os:
+  - macos
+  - linux
+  paths:
+  - /home/linuxbrew/.linuxbrew/
+  - /home/linuxbrew/.linuxbrew/Cellar/
+  - /opt/homebrew/
+  - /opt/homebrew/Caskroom/
+  - /opt/homebrew/Cellar/
+  - /opt/homebrew/bin/
+  - /usr/local/
+  - /usr/local/Cellar/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/Homebrew/brew/main/docs/Installation.md
+  source_kind: official
+  volatility: |-
+    Verbatim from the docs: "Homebrew keeps old versions on disk after upgrades. Run `brew cleanup` periodically to reclaim disk space." That is good for us - the Cellar often holds a VERSION HISTORY of an agent, not just the current build.
+  notes: |-
+    CHECK BOTH PREFIXES ON APPLE SILICON. Homebrew's own Common-Issues.md notes that "Migration Assistant or an x86_64 terminal on Apple Silicon can leave both /usr/local and /opt/homebrew installations active" - so two independent sets of agent installs can coexist on one Mac, at different versions. Custom prefixes are supported (Support-Tiers.md), so do not treat the three defaults as exhaustive; prefer resolving `brew --prefix`. Relevant casks: claude-code, claude-code@latest, chatgpt, chatgpt-classic, ollama-app, lm-studio.
+
+    Record structure: Verbatim default prefixes: "/opt/homebrew for Apple Silicon, /usr/local for macOS Intel and /home/linuxbrew/.linuxbrew for Linux". Enumerate {prefix}/Cellar/<formula>/<version>/ and {prefix}/Caskroom/<cask>/<version>/ - the directory names ARE the install evidence, with mtimes dating each install. Also read {prefix}/var/homebrew/locks and the git logs in {prefix}/Library/Taps/*/.git for tap history.
+  parser: null
+- id: crosscutting.pipx_home_and_bin
+  category: install_evidence
+  root: system
+  os:
+  - linux
+  - macos
+  - windows
+  paths:
+  - '%LOCALAPPDATA%\pipx\pipx\venvs\*\'
+  - /opt/pipx/
+  - ~/.local/bin/
+  - ~/.local/pipx/
+  - ~/.local/share/pipx/venvs/*/
+  - ~/Library/Application Support/pipx/venvs/*/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/pypa/pipx/main/docs/reference/environment-variables.rst
+  source_kind: official
+  notes: |-
+    VERSION-DEPENDENT PATHS - a real dating signal. Verbatim: "After version 1.16.0, pipx moved its default paths from ~/.local/pipx to per-platform user directories from the platformdirs library." So finding ~/.local/pipx means an older pipx (or an old install never migrated), and the collector must check both. Relevant for Python-based agents installed this way (aider-chat, various MCP servers).
+
+    Record structure: Verbatim PIPX_HOME: "Root directory for pipx virtual environments. Default: platformdirs.user_data_path(\"pipx\") - Linux ~/.local/share/pipx, macOS ~/Library/Application Support/pipx, Windows %LOCALAPPDATA%\\pipx\\pipx." PIPX_BIN_DIR: "Directory for application entry-point symlinks. Default: ~/.local/bin." PIPX_MAN_DIR: "~/.local/share/man". PIPX_SHARED_LIBS: "$PIPX_HOME/shared". PIPX_GLOBAL_HOME: "/opt/pipx". Each venv directory is named for the package; read venvs/<pkg>/pipx_metadata.json for the pinned version, the injected packages and the exposed entry points.
+  parser: null
+- id: crosscutting.uv_tool_dir
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_DATA_HOME/uv/tools/*/
+  - '%APPDATA%\uv\data\tools\*\'
+  - '%LOCALAPPDATA%\uv\cache\'
+  - ~/.cache/uv/
+  - ~/.local/bin/
+  - ~/.local/share/uv/python/
+  - ~/.local/share/uv/tools/*/
+  format: toml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/astral-sh/uv/main/docs/reference/storage.md
+  source_kind: official
+  volatility: The cache is prunable (`uv cache clean`); tool installs persist.
+  notes: |-
+    uv is now the common installer for Python MCP servers and agents, so this dir often reveals tooling that never appears in pip or pipx. Note uv and pipx SHARE ~/.local/bin - a shim there tells you a tool exists but not which installer put it; resolve the symlink target to attribute it.
+
+    Record structure: Documented: tools default to a `tools/` subdirectory of the persistent data directory - Unix $XDG_DATA_HOME/uv or $HOME/.local/share/uv, Windows %APPDATA%\uv\data - i.e. ~/.local/share/uv/tools and %APPDATA%\uv\data\tools; override UV_TOOL_DIR. Python installs go to python/ (UV_PYTHON_INSTALL_DIR). Cache: Unix $XDG_CACHE_HOME/uv or $HOME/.cache/uv, Windows %LOCALAPPDATA%\uv\cache. Executables land in $XDG_BIN_HOME, else $XDG_DATA_HOME/../bin, else $HOME/.local/bin (Windows %USERPROFILE%\.local\bin); overrides UV_PYTHON_BIN_DIR, UV_TOOL_BIN_DIR, UV_INSTALL_DIR. Each tools/<name>/ venv has a uv-receipt.toml naming the requested spec.
+  parser: null
+- id: crosscutting.vscode_extension_dirs
+  category: install_evidence
+  root: user_profile
+  os:
+  - windows
+  - macos
+  - linux
+  paths:
+  - '%USERPROFILE%\.vscode\extensions\'
+  - ~/.cursor/extensions/
+  - ~/.vscode-insiders/extensions/
+  - ~/.vscode-server/extensions/
+  - ~/.vscode/extensions/
+  - ~/.windsurf/extensions/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/configure/extensions/extension-marketplace.md
+  source_kind: official
+  volatility: |-
+    Old versions are removed on update, but extensions.json in the parent directory retains install/update bookkeeping.
+  notes: |-
+    Only ~/.vscode and ~/.vscode-insiders are vendor-documented; the FORK paths (~/.cursor/extensions, ~/.windsurf/extensions) follow VS Code's convention and I corroborated ~/.cursor only indirectly (it appears as an allowlisted subpath in public sandbox profiles alongside ~/.vscode). Treat the fork spellings as medium confidence until confirmed on a live install. Extensions to look for: anthropic.claude-code, openai.chatgpt / openai.codex, github.copilot and github.copilot-chat, google.gemini-cli-vscode-ide-companion, saoudrizwan.claude-dev (Cline), continue.continue. Also sweep the sibling user-data dirs (%APPDATA%\Code, ~/Library/Application Support/Code, ~/.config/Code) which hold each extension's globalStorage/workspaceStorage - often where an extension's own chat history lives.
+
+    Record structure: Verbatim per-OS paths from the official docs: Windows %USERPROFILE%\.vscode\extensions, macOS ~/.vscode/extensions, Linux ~/.vscode/extensions. Relocatable via `--extensions-dir <dir>` or the VSCODE_EXTENSIONS environment variable ("particularly useful in enterprise settings where centralized extension management is desired"). Each subdirectory is named publisher.name-version, which alone gives you the agent extension and its exact version; read its package.json for more. Also parse ../extensions/extensions.json for the install metadata index.
+  parser: null
+- id: crosscutting.windows_appdata_program_dirs
+  category: install_evidence
+  root: user_profile
+  os:
+  - windows
+  paths:
+  - '%APPDATA%\'
+  - '%LOCALAPPDATA%\Ollama\'
+  - '%LOCALAPPDATA%\Packages\'
+  - '%LOCALAPPDATA%\Programs\'
+  - '%LOCALAPPDATA%\Programs\Ollama\'
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/ollama/ollama/main/docs/troubleshooting.mdx
+  source_kind: official
+  notes: |-
+    The %LOCALAPPDATA%\Programs pattern is why AI tooling so often installs without admin rights and without appearing in Add/Remove Programs - enumerate it directly rather than trusting the uninstall registry. %TEMP%\ollama* is a reminder to sweep %TEMP% for agent-extracted runners generally.
+
+    Record structure: POINTER-LEVEL. Per-user (non-admin) installs land in %LOCALAPPDATA%\Programs\<Vendor> and add themselves to the user PATH; MSIX/Store apps land in %LOCALAPPDATA%\Packages\<PackageFamilyName>\ with LocalCache/LocalState/RoamingState subtrees. Ollama's own docs give the concrete pattern: "explorer %LOCALAPPDATA%\Ollama" for logs and downloaded updates, "explorer %LOCALAPPDATA%\Programs\Ollama" for binaries ("The installer adds this to your user PATH"), "explorer %HOMEPATH%\.ollama" for models and configuration, and "explorer %TEMP%" for "temporary executable files in ollama* directories".
+  parser: null
+- id: crosscutting.windows_execution_artifacts
+  category: install_evidence
+  root: user_profile
+  os:
+  - windows
+  paths:
+  - '%SystemRoot%\AppCompat\Programs\Amcache.hve'
+  - '%SystemRoot%\AppCompat\Programs\Amcache.hve.LOG1'
+  - '%SystemRoot%\AppCompat\Programs\Amcache.hve.LOG2'
+  - '%SystemRoot%\Prefetch\*.pf'
+  - HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run
+  - HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce
+  - HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\AppCompatCache
+  - HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\bam\State\UserSettings\*
+  - HKEY_USERS\%%users.sid%%\Software\Microsoft\Windows\CurrentVersion\Run
+  - HKEY_USERS\%%users.sid%%\Software\Microsoft\Windows\CurrentVersion\RunOnce
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/ForensicArtifacts/artifacts/main/artifacts/data/windows.yaml
+  source_kind: community
+  volatility: |-
+    Prefetch is capped (1024 entries on modern Windows) and can be disabled on SSD-era builds; ShimCache is written to the registry mainly at shutdown so a live-acquired SYSTEM hive may lag; BAM entries are per-SID and get cleared with the profile.
+  notes: |-
+    Deliberately scoped as pointers per the brief. Two more the ForensicArtifacts windows.yaml did NOT contain and which I sourced separately (Eric Zimmerman's RECmd batch files, EricZimmerman/RECmd BatchExamples/Kroll_Batch.reb) - treat as community, medium confidence: UserAssist at 'Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\*\Count' (ROT13-encoded GUI-launch history with run count and last-run time - note it misses command-line launches, which is exactly how CLI agents are started, so its ABSENCE means nothing here), and scheduled tasks at 'Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tasks' (+ \Tree) with the XML at C:\Windows\System32\Tasks\. Also worth pointing at: SRUM (C:\Windows\System32\sru\SRUDB.dat) for per-app network bytes - the single best way to show an agent exfiltrated volume; Security EID 4688 for full command lines; and Microsoft-Windows-TaskScheduler%4Operational.evtx.
+
+    Record structure: POINTERS, NOT THINGS AAFS PARSES - aafs should record presence/paths and hand these to the examiner's existing tooling (AmcacheParser, PECmd, AppCompatCacheParser, RECmd, SrumECmd). Literal strings from ForensicArtifacts: Amcache '%%environ_systemroot%%\AppCompat\Programs\Amcache.hve' (+ .LOG1/.LOG2); Prefetch '%%environ_systemroot%%\Prefetch\*.pf'; ShimCache under both 'Session Manager\AppCompatibility' and 'Session Manager\AppCompatCache' (value AppCompatCache); BAM 'HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\bam\UserSettings\*' and '...\bam\State\UserSettings\*'. What each proves for an agent: Amcache gives the binary's SHA-1 and publisher metadata (proves WHAT ran even after rename/delete); Prefetch gives first/last run, run count and the DLLs/files touched in the first ~10s; ShimCache proves the path was observed and preserves the pre-timestomp modification time; BAM gives a per-SID last-run FILETIME.
+  parser: null
+- id: crosscutting.hook_scripts
+  category: instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/claude/hooks/
+  - <project>/claude/settings.json
+  - <project>/claude/settings.local.json
+  - <project>/clinerules/hooks/
+  - ~/.claude/settings.json
+  - ~/Documents/Cline/Hooks/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/cline/cline/blob/main/.clinerules/hooks/README.md
+  source_kind: official
+  volatility: |-
+    Executable bits and mtimes matter as much as the content - record mode, owner and timestamps, not just the script text.
+  notes: |-
+    THE SHARPEST INJECTION SURFACE IN THIS WHOLE FAMILY, and the one most likely to be missed. A hook is arbitrary code that the agent runs automatically on tool use or prompt submission, and a workspace hook arrives with the repository - so cloning a hostile repo plus enabling hooks is remote code execution by design. Collect the script bodies verbatim (they are evidence, not secrets), plus mode/owner/mtime, and diff workspace hooks against the repo's git history to spot ones that were never committed. Cline's own docs even ship a PreToolUse guard example (docs/customization/clineignore.mdx) showing the copy-and-chmod workflow, which is what to grep shell history for.
+
+    Record structure: Cline hooks are EXECUTABLE FILES WITH NO EXTENSION named for the lifecycle event, e.g. .clinerules/hooks/PreToolUse, .clinerules/hooks/UserPromptSubmit (a .ps1 variant exists on Windows). Verbatim: "Cline hooks allow you to execute custom scripts at specific points in the agentic workflow. Hooks can be placed in either: Global hooks directory: ~/Documents/Cline/Hooks/ (applies to all workspaces); Workspace hooks directory: .clinerules/hooks/ (applies to the workspace the repo is part of). Hooks run automatically when enabled." Multi-root workspaces search each root's .clinerules/hooks, and a --hooks-dir flag can add a runtime directory; execution order between directories is explicitly not guaranteed. Claude Code hooks are configured as commands inside settings.json rather than as bare files in a hooks directory.
+  parser: null
+- id: crosscutting.mcp_config_files
+  category: mcp_config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HOME/.copilot/mcp-config.json
+  - '%APPDATA%\Claude\claude_desktop_config.json'
+  - '%USERPROFILE%\.mcp.json'
+  - <project>/cursor/mcp.json
+  - <project>/gemini/settings.json
+  - <project>/mcp.json
+  - <project>/vscode/mcp.json
+  - ~/.claude.json
+  - ~/.config/Claude/claude_desktop_config.json
+  - ~/.cursor/mcp.json
+  - ~/.gemini/settings.json
+  - ~/.vscode/mcp.json
+  - ~/Library/Application Support/Claude/claude_desktop_config.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://code.claude.com/docs/en/setup
+  source_kind: official
+  volatility: |-
+    Edited by hand and by `claude mcp add`-style commands; no history is kept, so only the file mtime dates a change. Collect early - these are small and cheap.
+  notes: |-
+    Claude Code's own paths are vendor-confirmed: the uninstall docs instruct `rm ~/.claude.json` and project-level `rm -f .mcp.json`. The remaining locations are corroborated consistently across many independent third-party integration docs (Cursor global ~/.cursor/mcp.json and project .cursor/mcp.json; Claude Desktop claude_desktop_config.json at ~/Library/Application Support/Claude on macOS, %APPDATA%\Claude on Windows, ~/.config/Claude on Linux; Gemini CLI ~/.gemini/settings.json, confirmed in the CLI's own README "Configure MCP servers in ~/.gemini/settings.json"; Copilot CLI $HOME/.copilot/mcp-config.json, confirmed in the fetched GitHub docs) - hence verified overall, though individual spellings are community-corroborated rather than each vendor-documented. TREAT AS A TOP-PRIORITY ARTIFACT: an MCP config is the clearest on-disk statement of what external capability an agent was granted, and inline env secrets mean the collector should record metadata plus hash for any value that looks like a credential while still copying the structure.
+
+    Record structure: Almost all share one schema: a top-level `mcpServers` object mapping a server name to {command, args, env} for stdio servers or {url} for remote ones. Exceptions: Visual Studio's .mcp.json uses `servers` instead of `mcpServers`. THE `command`/`args`/`env` FIELDS ARE THE PAYLOAD - they name an executable and its arguments that the agent will spawn with the user's privileges, and `env` frequently contains API keys and tokens inline. Per-server OAuth tokens may sit alongside (LM Studio's mcp.json takes an `auth` object).
+  parser: null
+- id: crosscutting.instructions_agents_md
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/**/AGENTS.md
+  - <project>/AGENTS.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/agentsmd/agents.md/main/README.md
+  source_kind: official
+  volatility: |-
+    Version-controlled in the repo, so git history gives you authorship and timing for free - `git log -p --follow AGENTS.md` is the single highest-value command for an injection question. Also check for uncommitted local modifications.
+  notes: |-
+    CONFIRMED AS THE EMERGING CROSS-VENDOR STANDARD, described by its own project as "A simple, open format for guiding coding agents" providing "a dedicated, predictable place to provide context and instructions to help AI coding agents work on your project". Independent corroboration of multi-vendor adoption: GitHub's official docs list `AGENTS.md` as a first-class instruction source for both Copilot coding agent and Copilot CLI ("In Git root and cwd") and describe it as "Cross-tool / agent-agnostic" and "Always-on rules shared across AI agents"; Cursor and Cline read it too. Canonical repo is agentsmd/agents.md (the agents.md site itself is egress-blocked here). PRIMARY INJECTION SURFACE: a repo-supplied AGENTS.md is untrusted input that every major agent loads automatically without the user seeing it.
+
+    Record structure: NESTED AND HIERARCHICAL - do not stop at the repo root. Verbatim from the agents.md site source: "Large monorepo? Use nested AGENTS.md files for subprojects... Place another AGENTS.md inside each package. Agents automatically read the nearest file in the directory tree, so the closest one takes precedence and every subproject can ship tailored instructions. For example, at time of writing the main OpenAI repo has 88 AGENTS.md files." So collect every AGENTS.md in the tree with its depth, and reconstruct precedence nearest-first.
+  parser: null
+- id: crosscutting.instructions_claude_md
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/**/CLAUDE.md
+  - <project>/CLAUDE.local.md
+  - <project>/CLAUDE.md
+  - <project>/claude/CLAUDE.md
+  - ~/.claude/CLAUDE.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-command-reference.md
+  source_kind: official
+  volatility: |-
+    Git-tracked in the project case; ~/.claude/CLAUDE.md is user-global and untracked, so it has no history and only its mtime.
+  notes: |-
+    CROSS-VENDOR READ - worth stressing. GitHub's own Copilot CLI reference table lists `CLAUDE.md` as an instruction source it loads "In Git root and cwd", and adds "Copilot CLI also uses .claude/CLAUDE.md"; Copilot's cloud agent lists `/CLAUDE.md` among its supported custom-instruction files; Cline reads .claude/skills/. So a CLAUDE.md is NOT evidence that Claude Code specifically was used - several agents consume it. Anthropic's own uninstall docs confirm the surrounding config: `rm -rf ~/.claude`, `rm ~/.claude.json`, project `rm -rf .claude` and `rm -f .mcp.json`, and note that "The VS Code extension, the JetBrains plugin, and the Desktop app also write to ~/.claude/".
+
+    Record structure: Two tiers: user-global ~/.claude/CLAUDE.md and per-project CLAUDE.md discovered up and down the tree, plus the .claude/CLAUDE.md spelling. Collect all of them with paths, and treat the union as the effective prompt.
+  parser: null
+- id: crosscutting.instructions_clinerules
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/claude/skills/
+  - <project>/cline/remote-config/
+  - <project>/cline/skills/
+  - <project>/clineignore
+  - <project>/clinerules
+  - <project>/clinerules/
+  - <project>/clinerules/*.md
+  - <project>/clinerules/skills/
+  - <project>/clinerules/workflows/
+  - ~/Documents/Cline/Rules/
+  - ~/Documents/Cline/Workflows/
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: verified
+  source: https://github.com/cline/cline/blob/main/docs/customization/cline-rules.mdx
+  source_kind: official
+  volatility: |-
+    When Cline converts a legacy single-file .clinerules into a directory it renames the original to `.clinerules.bak` as a backup - look for that file, it preserves the pre-migration instruction text.
+  notes: |-
+    Confirmed via GitHub code search content matches across cline/cline docs and source. THE REMOTE-CONFIG PATH IS THE STANDOUT FINDING: instructions, skills and workflows can be pushed to the workstation from a remote config server and land on disk under .cline/remote-config/ - that is a centrally-administered injection channel with no repo history to audit, and aafs should collect it and flag its provenance explicitly.
+
+    Record structure: TWO GENERATIONS: a legacy single .clinerules FILE, and the .clinerules/ DIRECTORY added in Cline 3.7.0 (changelog: "Add support for a .clinerules/ directory to load multiple files at once"). Cline's own code still handles both and treats ENOTDIR on .clinerules/workflows as "a legacy single-file ruleset". Rule files support YAML frontmatter for conditional application ("Add YAML frontmatter to the top of any rule file in your .clinerules/ directory"). Global tier is ~/Documents/Cline/Rules/ (multiroot docs: "use global rules (~/Documents/Cline/Rules/) which apply everywhere"); note .clinerules/ "only work in the primary workspace (the first folder in your workspace)" in multi-root setups. Skills are searched in .cline/skills/ (recommended), .clinerules/skills/ and .claude/skills/. Remote-config files materialize under <root>/.cline/remote-config/{workflows,skills,rules}.
+  parser: null
+- id: crosscutting.instructions_copilot_instructions
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HOME/.copilot/copilot-instructions.md
+  - $HOME/.copilot/instructions/**/*.instructions.md
+  - <project>/github/agents/*.md
+  - <project>/github/copilot-instructions.md
+  - <project>/github/copilot/settings.json
+  - <project>/github/copilot/settings.local.json
+  - <project>/github/instructions/**/*.instructions.md
+  - <project>/github/prompts/*.prompt.md
+  - <project>/github/skills/
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-command-reference.md
+  source_kind: official
+  notes: |-
+    THE ENV VAR MATTERS: COPILOT_CUSTOM_INSTRUCTIONS_DIRS can point at arbitrary directories outside the repo, so a purely repo-relative sweep can miss the instructions that actually shaped a run - read the environment. Copilot CLI's own state lives under $HOME/.copilot/ (settings.json, mcp-config.json, providers.json for BYOK providers/models, logs/ relocatable via COPILOT_LOG_DIR), with COPILOT_HOME overriding the whole directory. Repository-level settings: .github/copilot/settings.json and .github/copilot/settings.local.json. Custom agents can also be defined org-wide in a .github or .github-private repository at /agents/AGENT-NAME.md, i.e. instructions can arrive from outside the repo entirely.
+
+    Record structure: ALL SOURCES ARE MERGED SIMULTANEOUSLY, so the effective prompt is a union and the collector must capture every tier to reconstruct it. The official Copilot CLI table lists, all "In Git root and cwd": CLAUDE.md, GEMINI.md, AGENTS.md, .github/instructions/**/*.instructions.md, .github/copilot-instructions.md; plus user-level $HOME/.copilot/copilot-instructions.md and $HOME/.copilot/instructions/**/*.instructions.md; plus COPILOT_CUSTOM_INSTRUCTIONS_DIRS for "Additional directories via environment variable". Path-specific .instructions.md files activate automatically when changed files match their scope.
+  parser: null
+- id: crosscutting.instructions_cursor_rules
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/**/.cursor/rules/
+  - <project>/AGENTS.md
+  - <project>/cursor/rules/
+  - <project>/cursor/rules/*.mdc
+  - <project>/cursor/rules/*/RULE.md
+  - <project>/cursorrules
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/sanjeed5/awesome-cursor-rules-mdc/main/cursor-rules-reference.md
+  source_kind: community
+  notes: |-
+    MARKED UNVERIFIED DELIBERATELY: docs.cursor.com is egress-blocked from this environment, so I could not reach the vendor documentation and my only source is a community reference repo - recollection-adjacent, needs verification against docs.cursor.com. The RULE.md-vs-.mdc question in particular is unresolved and is the kind of layout change that is itself forensically interesting (it dates the install). What IS well corroborated across several independent sources: Cursor now also reads AGENTS.md from the project root and any subdirectory with more specific paths taking precedence. Note the alwaysApply and glob-triggered rule types mean a rule can enter the model's context with no user action at all - an injection vector.
+
+    Record structure: COLLECT BOTH SPELLINGS AND DO NOT ASSUME WHICH IS CURRENT. Legacy: a single .cursorrules file at the repo root (deprecated around Cursor 0.43 but still read). Then .cursor/rules/ with per-rule .mdc files carrying YAML frontmatter fields description, globs and alwaysApply. The community reference I fetched states the CURRENT shape is a folder per rule containing a RULE.md, with .mdc described as "legacy format with metadata" that is "functional but superseded". Rule application types: Always Apply, Apply Intelligently (agent decides from `description`), Apply to Specific Files (glob match), Apply Manually (@-mention). Stated precedence: Team Rules -> Project Rules -> User Rules. Nested .cursor/rules directories apply to their subtree. User and Team rules live in Cursor Settings / the Cursor dashboard, i.e. partly off-disk.
+  parser: null
+- id: crosscutting.instructions_gemini_md
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/**/GEMINI.md
+  - <project>/GEMINI.md
+  - <project>/gemini/settings.json
+  - ~/.gemini/GEMINI.md
+  - ~/.gemini/settings.json
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/gemini-md.md
+  source_kind: official
+  notes: |-
+    Confirmed via GitHub code search content match against google-gemini/gemini-cli docs. Also read by Copilot CLI ("GEMINI.md | In Git root and cwd"), so again not vendor-exclusive. Two high-value neighbours spotted in the same repo and worth flagging to the Gemini family owner: ~/.gemini/tmp/<project>/chats/ holds session transcripts (docs/cli/auto-memory.md: "The service indexes recent sessions from ~/.gemini/tmp/<project>/chats/"), and an Auto Memory feature can REWRITE ~/.gemini/GEMINI.md on its own - meaning the instruction file's contents may be machine-authored rather than user-authored, which matters for any injection finding. Plans dir: .gemini/plans.
+
+    Record structure: Documented tiers: "Global context file: Location: ~/.gemini/GEMINI.md (in your user home directory). Scope: Provides default instructions for all your projects", plus environment/workspace context files discovered in the tree. THE FILENAME IS CONFIGURABLE - docs/reference/configuration.md describes the global file as '~/.gemini/<configured-context-filename>' (for example ~/.gemini/GEMINI.md), and extensions can set "contextFileName": "GEMINI.md" - so read the settings before assuming the name. Hierarchical discovery is bounded by context.discoveryMaxDirs (200 directories by default).
+  parser: null
+- id: crosscutting.instructions_junie_guidelines
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/junie/
+  - <project>/junie/guidelines.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/JetBrains/Rplugin/master/.junie/guidelines.md
+  source_kind: community
+  notes: |-
+    Confirmed by fetching a real file in a JETBRAINS-OWNED repository, which is decent corroboration for a JetBrains product convention, plus GitHub code search showing 2,140 files at that exact path across repos including jodconverter/jodconverter, bytechefhq/bytechef and pestphp/pest-plugin-browser. Marked medium because I could not reach JetBrains' own documentation to confirm whether other files live under .junie/ (a user-global tier, MCP config, or per-directory guidelines) - that gap should be closed. Relevant to aafs because Junie runs inside the JetBrains IDEs and its on-disk footprint is otherwise poorly documented.
+
+    Record structure: Single markdown file of project guidelines at .junie/guidelines.md. The JetBrains/Rplugin copy I fetched opens "It is an IntelliJ plugin for support of R language and RMarkdown." followed by a Code structure section and coding-convention guidance - i.e. free-form prose, no frontmatter, no schema to key off.
+  parser: null
+- id: crosscutting.instructions_kiro_steering
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/kiro/specs/
+  - <project>/kiro/steering/
+  - <project>/kiro/steering/*.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://github.com/cremich/promptz/blob/main/.kiro/steering/product.md
+  source_kind: community
+  notes: |-
+    Confirmed EMPIRICALLY: GitHub code search returns 3,888 files matching path:.kiro/steering with extension md, including ossrs/srs, ironplc/ironplc, terraphim/terraphim-ai and fivexl/* repos. kiro.dev is egress-blocked from this environment, so the vendor-documented inclusion modes (the frontmatter that controls whether a steering file is always-on, conditional on a file glob, or manual) are NOT confirmed here and should be filled in from kiro.dev/docs/steering. That frontmatter is precisely what decides whether a steering file auto-enters context, so it matters for injection analysis.
+
+    Record structure: Directory of .md steering documents. The conventional trio product.md / tech.md / structure.md is clearly visible in the wild (e.g. cremich/promptz and joshuakatt/Bob-The-Builder each carry all three), but repos also add arbitrary names (glossary.md, doc-standards.md, adr-index.md, roadmap.md) and at least one ships .kiro/steering/AGENTS.md - so glob the directory, do not enumerate fixed filenames. Sibling .kiro/specs/ holds the spec-driven-development artifacts.
+  parser: null
+- id: crosscutting.instructions_windsurf_rules
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/windsurf/rules/
+  - <project>/windsurf/rules/*.md
+  - <project>/windsurfrules
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://github.com/Adyen/adyen-web/blob/main/.windsurf/rules/code-guide.md
+  source_kind: community
+  notes: |-
+    Confirmed EMPIRICALLY rather than from vendor docs: GitHub code search returns 3,232 files matching path:.windsurf/rules with extension md, across substantial repos including Adyen/adyen-web, dxos/dxos, aws/modern-data-architecture-accelerator and tmforum-oda/oda-canvas. docs.windsurf.com was not reachable from this environment, so the directory convention is verified by widespread real-world usage but the precedence rules, any frontmatter schema, and the global/user-level rules location are all unconfirmed. Marked medium; needs a vendor-doc pass.
+
+    Record structure: Two generations, same as Cursor: a legacy single .windsurfrules file at the repo root, superseded by a .windsurf/rules/ directory of .md files. Collect both.
+  parser: null
+- id: crosscutting.shell_bash_history
+  category: shell_history
+  root: user_profile
+  os:
+  - macos
+  - linux
+  paths:
+  - $HISTFILE
+  - ~/.bash_history
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/pexip/os-bash/c36eb24bedb80d6783fe1b1f7470acb97eb603a8/doc/bash.1
+  source_kind: source_code
+  volatility: |-
+    HISTFILESIZE truncates the file by removing the OLDEST entries whenever it is assigned. Default HISTSIZE is 500 after startup files are read. By default bash writes only at shell exit, so a killed terminal or a crashed box can lose the entire session.
+  notes: |-
+    HISTFILE default IS documented for bash, unlike zsh: "The name of the file in which command history is saved... The default value is ~/.bash_history. If unset, the command history is not saved when a shell exits." HISTCONTROL suppressions to account for: ignorespace ("lines which begin with a space character are not saved"), ignoredups, erasedups ("causes all previous lines matching the current line to be removed from the history list before that line is saved") - erasedups actively destroys earlier evidence of repeated agent invocations.
+
+    Record structure: TIMELINEABLE ONLY IF HISTTIMEFORMAT WAS SET AT THE TIME. Verbatim: "If this variable is set, time stamps are written to the history file so they may be preserved across shell sessions. This uses the history comment character to distinguish timestamps from other history lines." In practice that is a line `#<unix_epoch>` immediately preceding its command. Parse a `#`-prefixed all-digits line as the timestamp for the following command, and tolerate files that mix timestamped and untimestamped regions (the user turned it on partway through).
+  parser: null
+- id: crosscutting.shell_fish_history
+  category: shell_history
+  root: user_profile
+  os:
+  - macos
+  - linux
+  paths:
+  - $XDG_DATA_HOME/fish/${fish_history}_history
+  - $XDG_DATA_HOME/fish/fish_history
+  - ~/.local/share/fish/fish_history
+  format: yaml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/fish-shell/fish-shell/master/src/history/yaml_backend.rs
+  source_kind: source_code
+  volatility: Rewritten wholesale on save, so the previous generation is a good carving target.
+  notes: |-
+    The `paths` list is a gift no other shell gives: it ties an agent invocation to the specific files in play. Session/file name is controlled by the `fish_history` variable - docs: "The default value (when the variable is unset) is `fish` which corresponds to $XDG_DATA_HOME/fish/fish_history"; setting it to e.g. `fun` yields fun_history, and setting it to the empty string disables history entirely. Glob *_history in that directory rather than assuming one filename.
+
+    Record structure: BEST-IN-CLASS FOR TIMELINING - timestamps are unconditional, no opt-in needed. Verbatim source comment: "Our history format is nearly-valid YAML (but isn't quite). Here it is:\n\n  - cmd: ssh blah blah blah\n    when: 2348237\n    added_when: 2348238\n    paths:\n      - /path/to/something\n      - /path/to/something_else\n\nNewlines are replaced by \\n. Backslashes are replaced by \\\\." So: `when` = unix epoch seconds of last add, `added_when` = epoch of first add, and `paths` records file paths referenced by the command. DO NOT USE A STRICT YAML PARSER - the format is deliberately "nearly-valid"; write a line-oriented parser and unescape \\n and \\\\ yourself.
+  parser: null
+- id: crosscutting.shell_psreadline_history
+  category: shell_history
+  root: user_profile
+  os:
+  - windows
+  - macos
+  - linux
+  paths:
+  - $XDG_DATA_HOME/powershell/PSReadLine/*_history.txt
+  - '%APPDATA%\Microsoft\Windows\PowerShell\PSReadLine\*_history.txt'
+  - '%APPDATA%\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt'
+  - ~/.local/share/powershell/PSReadLine/ConsoleHost_history.txt
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/MicrosoftDocs/PowerShell-Docs/main/reference/7.7/PSReadLine/Set-PSReadLineOption.md
+  source_kind: official
+  volatility: |-
+    Default HistorySaveStyle is SaveIncrementally - "Save history after each command is executed and share across multiple instances of PowerShell" - which is good news: a crashed or killed console still leaves a record. SaveNothing disables the file. MaximumHistoryCount caps it and no default is documented.
+  notes: |-
+    KEY ADDITION the brief missed: the filename is per-HOST, not fixed. Verbatim: "The filename is stored in a variable `$($Host.Name)_history.txt`, for example `ConsoleHost_history.txt`." So the VS Code integrated terminal, the ISE and other embedders each write their OWN history file in the same directory. Glob *_history.txt - an agent driven from inside VS Code will be invisible if you only read ConsoleHost_history.txt. Documented defaults: Windows "$Env:APPDATA\Microsoft\Windows\PowerShell\PSReadLine\$($Host.Name)_history.txt"; non-Windows "$Env:XDG_DATA_HOME/powershell/PSReadLine/$($Host.Name)_history.txt" or "$HOME/.local/share/powershell/PSReadLine/$($Host.Name)_history.txt".
+
+    Record structure: NO TIMESTAMPS AT ALL. Plain UTF-8 text, one command per line, multi-line commands continued with a trailing backtick. This file CANNOT be timelined internally - you get ordering plus the file's own MACB times only. To date a PowerShell agent invocation you must corroborate with Prefetch/Amcache/UserAssist or the agent's own logs.
+  parser: null
+- id: crosscutting.shell_zsh_history
+  category: shell_history
+  root: user_profile
+  os:
+  - macos
+  - linux
+  paths:
+  - $HISTFILE
+  - ~/.zhistory
+  - ~/.zsh_history
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/zsh-users/zsh/master/Doc/Zsh/options.yo
+  source_kind: source_code
+  volatility: |-
+    SAVEHIST caps the file and oldest entries are dropped. HIST_EXPIRE_DUPS_FIRST and HIST_IGNORE_SPACE cause silent omissions - a leading space means the command was never recorded, which is NOT evidence of absence of the command.
+  notes: |-
+    IMPORTANT CORRECTION to the brief's framing: zsh itself has NO default HISTFILE. The manual says only "The file to save the history in when an interactive shell exits. If unset, the history is not saved" and gives no default. ~/.zsh_history is a convention supplied by the OS/distro rc files (macOS /etc/zshrc, oh-my-zsh, etc.), so the collector must read HISTFILE from the user's dotfiles and follow it rather than hardcoding the name. Likewise the history file is only written when SAVEHIST is non-zero. For aafs this file is the primary proof that a CLI agent was invoked at all (`claude`, `codex`, `gemini`, `ollama run`, `lms`, `aider`, `npx ...`).
+
+    Record structure: TIMELINEABLE ONLY IF EXTENDED_HISTORY IS SET. Verbatim from the zsh manual: EXTENDED_HISTORY "Save each command's beginning timestamp (in seconds since the epoch) and the duration (in seconds) to the history file", in the format `: <beginning time>:<elapsed seconds>;<command>`. Without it, lines are bare commands with no timestamps. Also verbatim: INC_APPEND_HISTORY appends "as soon as they are entered" (so a killed shell still leaves a record); APPEND_HISTORY only writes at shell exit; SHARE_HISTORY both imports and appends, interleaving commands from concurrent shells into one file so ORDER DOES NOT IMPLY ONE SESSION; HIST_IGNORE_SPACE removes lines whose first character is a space.
+  parser: null
+- id: crosscutting.npm_npx_cache
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%LOCALAPPDATA%\npm-cache\_npx\*\package.json'
+  - ~/.npm/_npx/*/node_modules/
+  - ~/.npm/_npx/*/package.json
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://github.com/npm/cli/blob/latest/workspaces/config/lib/definitions/definitions.js
+  source_kind: source_code
+  volatility: |-
+    Persists until `npm cache clean` or manual removal; survives package upgrades. Directory mtime dates the npx run.
+  notes: |-
+    MAJOR ADDITION beyond the brief's one-line mention. This is the cleanest proof available that a one-shot agent or MCP server was executed without ever being installed globally - exactly how most MCP servers are launched (`npx -y some-mcp-server`). Sibling cache dirs at the same level: _cacache (the content-addressable package cache, which contains the actual downloaded tarballs and registry metadata) and _tuf.
+
+    Record structure: EXCELLENT ARTIFACT, EASY TO PARSE. npxCache = join(cache, '_npx') (definitions.js flatten: flatOptions.npxCache = join(obj.cache, '_npx')). Each entry is _npx/<hash>/ containing a package.json that libnpmexec writes with a custom key: pkgJson.update({ _npx: { packages } }). So `jq ._npx.packages` on every _npx/*/package.json gives you the exact list of package@version specs the user ran via npx, per cache entry. npm's own `npm cache ls` prints these as "valid npx cache entry with key <hash> / packages: ...". Binaries are linked at _npx/<hash>/node_modules/.bin.
+  parser: null

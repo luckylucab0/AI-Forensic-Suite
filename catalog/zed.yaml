@@ -1,0 +1,160 @@
+# Zed artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: zed
+title: Zed
+vendor: Zed Industries
+references:
+- https://raw.githubusercontent.com/zed-industries/zed/main/crates/agent/src/db.rs
+- https://raw.githubusercontent.com/zed-industries/zed/main/crates/agent_ui/src/thread_metadata_store.rs
+- https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs
+- https://raw.githubusercontent.com/zed-industries/zed/main/docs/src/ai/mcp.md
+artifacts:
+- id: zed.threads_db
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_DATA_HOME/zed/threads/threads.db
+  - '%LOCALAPPDATA%\Zed\threads\threads.db'
+  - ~/.local/share/zed/threads/threads.db
+  - ~/Library/Application Support/Zed/threads/threads.db
+  format: sqlite
+  sensitivity: normal
+  collect_priority: live_only
+  status: verified
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/agent/src/db.rs
+  source_kind: source_code
+  volatility: |-
+    No automatic expiry. If ZED_STATELESS is set, an in-memory database is used and NOTHING is persisted. If the file DB cannot be opened Zed falls back to an in-memory DB, so absence of the file does not prove absence of use.
+  notes: |-
+    The single biggest collection trap in this family: because thread content is zstd-compressed inside a BLOB, keyword searching or strings-ing threads.db finds NOTHING. A collector must decompress the data column before any indexing or the entire Zed corpus reads as empty. parent_id gives subagent thread hierarchy.
+
+    Record structure: crates/agent/src/db.rs: threads_dir = paths::data_dir().join('threads'); sqlite_path = threads_dir.join('threads.db'). Schema: CREATE TABLE IF NOT EXISTS threads (id TEXT PRIMARY KEY, summary TEXT NOT NULL, updated_at TEXT NOT NULL, data_type TEXT NOT NULL, data BLOB NOT NULL), with migrations adding parent_id TEXT, folder_paths TEXT, folder_paths_order TEXT, created_at TEXT. THE CONVERSATION IS IN THE data BLOB: data_type 'zstd' means zstd-compressed JSON (compressed with zstd::encode_all at level 3), data_type 'json' means uncompressed legacy JSON. The JSON carries a version field. per-OS data_dir from crates/paths/src/paths.rs: macOS home_dir().join('Library/Application Support').join('Zed'); Linux/FreeBSD dirs::data_local_dir().join('zed') with FLATPAK_XDG_DATA_HOME override; Windows dirs::data_local_dir().join('Zed') i.e. %LOCALAPPDATA%\Zed.
+  parser: null
+- id: zed.extensions
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $ZED_DATA_DIR/debug_adapters/
+  - $ZED_DATA_DIR/extensions/
+  - $ZED_DATA_DIR/external_agents/
+  - $ZED_DATA_DIR/prompt_overrides/
+  - ~/.config/zed/prompts/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs
+  source_kind: source_code
+  volatility: Persistent until removed.
+  notes: |-
+    external_agents/ is the important one: it records ACP (Agent Client Protocol) agents installed into Zed. Those agents write their OWN transcripts elsewhere - e.g. a Claude-based ACP agent writes to ~/.claude/projects/<normalized-path>/*.jsonl - so this directory tells you which OTHER agent families to go and collect. prompt_overrides/ can silently replace Zed's built-in prompts.
+
+    Record structure: crates/paths/src/paths.rs defines extensions_dir() = 'extensions', external_agents_dir() = 'external_agents', debug_adapters_dir() = 'debug_adapters', languages_dir() = 'languages', copilot_dir() = 'copilot', and prompt_overrides_dir() = 'prompt_overrides' (or assets/prompts in dev builds). prompts_dir() is config_dir().join('prompts') on macOS and data_dir().join('prompts') elsewhere. All are relative to the per-OS data_dir unless noted. No ZED_* data/config env overrides exist in this file; only FLATPAK_XDG_* overrides.
+  parser: null
+- id: zed.logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_DATA_HOME/zed/logs/
+  - '%LOCALAPPDATA%\Zed\logs\'
+  - ~/Library/Logs/Zed/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs
+  source_kind: source_code
+  volatility: Rotation not established from the source reviewed; treat as volatile.
+  notes: |-
+    On macOS this is a THIRD top-level location (~/Library/Logs/Zed) separate from both the data and config dirs. Captures MCP/context-server startup and failures, which corroborates the settings.json inventory.
+
+    Record structure: crates/paths/src/paths.rs logs_dir(): macOS home_dir().join('Library/Logs').join('Zed'); all other platforms data_dir().join('logs'). Filenames not enumerated - list the directory.
+  parser: null
+- id: zed.settings
+  category: mcp_config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_CONFIG_HOME/zed/settings.json
+  - '%APPDATA%\Zed\settings.json'
+  - <project>/.zed/settings.json
+  - ~/.config/zed/settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/docs/src/ai/mcp.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    context_servers is the Zed MCP inventory with full command lines and env, including any inline secrets. The macOS config/data split is a frequent acquisition miss: imaging only ~/Library/Application Support/Zed gets the transcripts but not the MCP configuration.
+
+    Record structure: MCP servers live under the 'context_servers' key of settings.json, as {name: {command, args, env}}. NOTE the macOS anomaly: config_dir() is home_dir().join('.config').join('zed') on macOS too, NOT ~/Library/Application Support - so on macOS Zed's config and data live in two different trees. Windows config_dir is RoamingAppData (%APPDATA%\Zed) while data_dir is LocalAppData (%LOCALAPPDATA%\Zed). Project settings at .zed/settings.json take precedence for that project, and may also appear in subdirectories.
+  parser: null
+- id: zed.flatpak_legacy_threads
+  category: transcript
+  root: user_profile
+  os:
+  - linux
+  paths:
+  - ~/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: recollection
+  source_kind: community
+  volatility: Unknown.
+  notes: |-
+    recollection, needs verification. Still worth globbing for on Linux images: if present it is a pre-SQLite thread corpus that no current Zed code manages or deletes. Note the Flatpak sandbox relocates the whole Zed tree under ~/.var/app/dev.zed.Zed/, which also breaks every other Zed path in this catalogue.
+
+    Record structure: An LMDB (heed) store rather than SQLite, reported for the Flatpak build and/or older Zed versions. I saw this only in a WebSearch summary of a zed-industries GitHub discussion; I did not fetch the discussion itself and found no LMDB thread store in current main. Would require an LMDB reader, not sqlite3.
+  parser: null
+- id: zed.sidebar_threads
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite
+  - '%LOCALAPPDATA%\Zed\db\0-<release_channel>\db.sqlite'
+  - ~/Library/Application Support/Zed/db/0-stable/db.sqlite
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/agent_ui/src/thread_metadata_store.rs
+  source_kind: source_code
+  volatility: |-
+    Migration-populated. The migration only unarchives the 5 most recent threads per project and archives the rest; draft threads with no project are archived by default; threads with no project are excluded from migration entirely.
+  notes: |-
+    Newly discovered and NOT in the starting brief: Zed has moved thread metadata into a sidebar_threads store separate from threads.db. It is the only place agent_id, remote_connection and interacted_at live - i.e. WHICH agent (native or an external ACP agent) ran a thread, and whether it ran over a remote connection. It also carries an archived flag, so archived threads are hidden in the UI but fully present on disk. A known bug class is old threads remaining in threads.db but never reaching sidebar_threads, so the two stores must be reconciled rather than either being trusted alone.
+
+    Record structure: Current table definition in crates/agent_ui/src/thread_metadata_store.rs: CREATE TABLE IF NOT EXISTS sidebar_threads(thread_id BLOB PRIMARY KEY, session_id TEXT, agent_id TEXT, title TEXT NOT NULL, updated_at TEXT NOT NULL, created_at TEXT, folder_paths TEXT, folder_paths_order TEXT, archived INTEGER DEFAULT 0, main_worktree_paths TEXT, main_worktree_paths_order TEXT, remote_connection TEXT, interacted_at TEXT, title_override TEXT) STRICT. An earlier revision used session_id TEXT PRIMARY KEY, so the column set varies by version - read the actual schema. The FILE location is inferred, not stated: Zed's crates/db/src/db.rs defines DB_FILE_NAME = 'db.sqlite' and db_path() = db_dir.join(format!('0-{}', scope.scope_name())).join(DB_FILE_NAME), with db_dir = paths::database_dir() = data_dir().join('db'). Confirm by enumerating sqlite_master on the candidate file.
+  parser: null

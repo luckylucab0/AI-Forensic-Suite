@@ -1,0 +1,256 @@
+# ChatGPT Desktop artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: chatgpt_desktop
+title: ChatGPT Desktop
+vendor: OpenAI
+references:
+- https://github.com/garr3ttmjo/Digital-Forensic-Report-Writeups/blob/main/Blog/ChatGPT%20Desktop%20Forensics.md
+- https://github.com/reznikov/dotfiles/blob/master/bin/safehouse
+- https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt-classic.rb
+- https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb
+artifacts:
+- id: chatgpt_desktop.macos_httpstorages
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/HTTPStorages/ChatGPTHelper.binarycookies
+  - ~/Library/HTTPStorages/com.openai.chat/
+  - ~/Library/HTTPStorages/com.openai.codex/
+  - ~/Library/HTTPStorages/com.openai.sky.CUAService/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt-classic.rb
+  source_kind: community
+  volatility: NSURLSession cache; evicted under pressure and on cache clears.
+  notes: |-
+    Confirmed in both the chatgpt and chatgpt-classic casks. Useful for proving network activity to OpenAI endpoints and for dating first/last use per bundle id.
+
+    Record structure: HTTPStorages holds the per-bundle NSURLSession cache and cookie store. The directory itself yields cached HTTP responses and request metadata (hosts, timestamps) even when app-level content is encrypted.
+  parser: null
+- id: chatgpt_desktop.macos_app_pairing_extensions
+  category: config
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Application Support/com.openai.chat/app_pairing_extensions/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://github.com/reznikov/dotfiles/blob/master/bin/safehouse
+  source_kind: community
+  notes: |-
+    Confirmed via GitHub code search content match in a third-party sandbox profile, not vendor documentation - hence medium. This is almost certainly the state for ChatGPT's 'Work with Apps' IDE pairing (Xcode/VS Code/Terminal), which makes it direct evidence that the desktop app was wired into a code editor. Worth verifying against a live install and promoting.
+
+    Record structure: Appears as an explicitly allowlisted subpath in a public macOS sandbox profile alongside ~/.vscode and Microsoft DeveloperTools paths.
+  parser: null
+- id: chatgpt_desktop.macos_preferences
+  category: config
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Preferences/ChatGPTHelper.plist
+  - ~/Library/Preferences/com.openai.chat.*.plist
+  - ~/Library/Preferences/com.openai.chat.plist
+  - ~/Library/Preferences/com.openai.codex.plist
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb
+  source_kind: community
+  volatility: |-
+    Written through cfprefsd, so an on-disk plist can lag the live value; on a live box run `defaults read` or kill cfprefsd before imaging.
+  notes: |-
+    Feature-flag plists are an underrated dating artifact - they change as OpenAI rolls features out, so they help bound when the install was last online.
+
+    Record structure: Binary plist. The wildcard sibling files are real: an uninstaller in the wild explicitly removes ~/Library/Preferences/com.openai.chat.RemoteFeatureFlags.plist, i.e. server-pushed feature-flag state is cached locally and tells you which app capabilities (agent mode, connectors) were enabled for that user.
+  parser: null
+- id: chatgpt_desktop.macos_cookies
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/HTTPStorages/com.openai.chat.binarycookies
+  - ~/Library/HTTPStorages/com.openai.codex.binarycookies
+  - ~/Library/HTTPStorages/com.openai.sky.CUAService.binarycookies
+  format: binary
+  sensitivity: secret
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb
+  source_kind: community
+  notes: |-
+    Marked secret deliberately: these are live session tokens for the user's ChatGPT account, so the collector records metadata plus a hash and does NOT copy the file. This is the one ChatGPT-desktop artifact where the operational rule applies - everything else in this family is 'normal'. Consider a collector option to extract cookie names/domains/expiries only.
+
+    Record structure: Apple binarycookies format. Cookie NAMES, domains and expiry dates are the forensically useful part and can be recorded without the values.
+  parser: null
+- id: chatgpt_desktop.macos_computer_use_service
+  category: install_evidence
+  root: system
+  os:
+  - macos
+  paths:
+  - /Library/Application Support/CodexComputerUseAuthorizationPlugin/
+  - ~/Library/Caches/com.openai.sky.CUAService/
+  - ~/Library/Group Containers/*.com.openai.sky.CUAService/
+  - ~/Library/HTTPStorages/com.openai.sky.CUAService/
+  - ~/Library/Preferences/com.openai.sky.CUAService.cli.plist
+  - ~/Library/Preferences/com.openai.sky.CUAService.plist
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb
+  source_kind: community
+  notes: |-
+    MAJOR ADDITION - not in the brief. 'CUA' is computer-use agent: this is the component that drives the GUI on the user's behalf. The presence of the system-wide authorization plugin is strong evidence the user granted an AI agent screen-and-input control of the machine, which is exactly the kind of finding an examiner needs to flag. Pair it with the TCC database (Accessibility / Screen Recording grants for com.openai.codex) which is outside this family's scope but should be cross-referenced.
+
+    Record structure: A second bundle identifier, com.openai.sky.CUAService, ships inside the same app, with a system-level (not user-level) authorization plugin under /Library/Application Support/CodexComputerUseAuthorizationPlugin.
+  parser: null
+- id: chatgpt_desktop.macos_saved_state_and_logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Logs/com.openai.codex/
+  - ~/Library/Saved Application State/com.openai.chat.savedState/
+  - ~/Library/Saved Application State/com.openai.codex.savedState/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb
+  source_kind: community
+  volatility: Saved state is rewritten on every clean quit; it reflects only the LAST session.
+  notes: |-
+    ~/Library/Logs/com.openai.codex is new with the Codex-era app and is the natural place to look for local agent/tool-execution logging. I have not seen its contents; treat the format as unknown.
+
+    Record structure: savedState contains windows.plist plus a data.data blob. Window titles in saved state have historically leaked conversation titles for AppKit apps - worth carving even when message bodies are encrypted.
+  parser: null
+- id: chatgpt_desktop.macos_codex_app_support
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Application Support/Codex/
+  - ~/Library/Application Support/OpenAI/Codex/
+  - ~/Library/Application Support/com.openai.codex/
+  - ~/Library/Caches/Codex/
+  - ~/Library/Caches/com.openai.codex/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb
+  source_kind: community
+  volatility: |-
+    Chromium-style site data; Local Storage / IndexedDB LevelDB logs keep deleted records until compaction, so image the whole tree rather than cherry-picking .ldb files.
+  notes: |-
+    CORRECTS THE BRIEF. As of the current release the ChatGPT macOS app's bundle identifier is com.openai.codex, not com.openai.chat; the old native app is shipped separately as the `chatgpt-classic` cask (com.openai.chat, "OpenAI's previous ChatGPT desktop app"). A collector keyed only on com.openai.chat will silently miss every current install. The .sfl recent-documents list is a bonus: it records which files the user opened through the app.
+
+    Record structure: Cask `chatgpt` version 26.908.61612, app bundle ChatGPT.app, bundle identifiers com.openai.codex and com.openai.sky.CUAService. Full zap list also includes ~/Library/HTTPStorages/com.openai.codex(.binarycookies), ~/Library/Logs/com.openai.codex, ~/Library/Preferences/com.openai.codex.plist, ~/Library/Saved Application State/com.openai.codex.savedState, ~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.openai.codex.sfl*, and ~/.codex.
+  parser: null
+- id: chatgpt_desktop.macos_codex_home
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/.codex/
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb
+  source_kind: community
+  notes: |-
+    ANSWERS THE BRIEF'S OPEN QUESTION: yes, the Codex-in-ChatGPT-app local agent mode writes to disk, and it writes into the same ~/.codex home as the Codex CLI. Practical consequence for aafs: the Codex CLI collector and the ChatGPT-desktop collector target overlapping evidence, and a ~/.codex tree can no longer be taken as proof that the CLI specifically was used. Attribution between CLI, IDE extension and desktop app has to come from other signals (shell history, Amcache/Prefetch, bundle logs). OpenAI's own Codex app announcement states the app "picks up your session history and configuration from the Codex CLI and IDE extension" (openai.com/index/introducing-the-codex-app/ - domain blocked here, seen only in search snippets), which is consistent.
+
+    Record structure: ~/.codex is listed in the zap (uninstall) set of the ChatGPT desktop cask, which means the GUI app owns and writes that directory - it is not merely the CLI's directory that the app happens to read.
+  parser: null
+- id: chatgpt_desktop.macos_legacy_app_support
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Application Scripts/com.openai.chat.Widgets/
+  - ~/Library/Application Scripts/group.com.openai.chat/
+  - ~/Library/Application Support/ChatGPT/
+  - ~/Library/Application Support/com.openai.chat/
+  - ~/Library/Caches/com.openai.chat/
+  - ~/Library/Containers/com.openai.chat.Widgets/
+  - ~/Library/Group Containers/group.com.openai.chat/
+  - ~/Library/WebKit/com.openai.chat/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: unverified
+  source: https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt-classic.rb
+  source_kind: community
+  volatility: |-
+    Conversation payloads are encrypted in current builds; treat plaintext recovery as a bonus, not the plan. Envelope metadata (file names, counts, sizes, mtimes) survives regardless and is what supports a timeline.
+  notes: |-
+    This is the legacy app the brief describes. History: in July 2024 a researcher showed the app was unsandboxed and stored conversations in plaintext under ~/Library/Application Support/com.openai.chat/conversations-{uuid}/; OpenAI shipped encryption in response. So on an image, PRE-mid-2024 data may be plaintext and later data will not be. Realistic expectation for a modern image: directory structure, per-conversation file names/UUIDs, sizes and timestamps are recoverable; message bodies generally are not without the Keychain.
+
+    Record structure: Cask `chatgpt-classic` version 1.2026.184,1784145287, app bundle "ChatGPT Classic.app", bundle identifiers com.openai.chat, com.openai.chat-helper, com.openai.chat.Widgets, group.com.openai.chat.
+  parser: null
+- id: chatgpt_desktop.macos_legacy_conversations_dir
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Application Support/com.openai.chat/conversations-*/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: recollection
+  source_kind: recollection
+  notes: |-
+    recollection, needs verification. The exact subdirectory spelling `conversations-{uuid}` comes from the July 2024 disclosure by Pedro Jose Pereira Vieito; both the Mastodon and Threads originals are egress-blocked from this environment, so I saw it only in search snippets and could not fetch a page stating it. The PARENT directory is verified (see chatgpt_desktop.macos_legacy_app_support). Do not hardcode this glob until someone confirms it against a real install or an accessible primary source.
+  parser: null
+- id: chatgpt_desktop.windows_msix_localcache
+  category: transcript
+  root: user_profile
+  os:
+  - windows
+  paths:
+  - '%LOCALAPPDATA%\Packages\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\LocalCache\Roaming\ChatGPT\'
+  - |-
+    %LOCALAPPDATA%\Packages\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\LocalCache\Roaming\ChatGPT\IndexedDB\https_chatgpt.com_0.indexeddb.leveldb\
+  - '%LOCALAPPDATA%\Packages\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\LocalCache\Roaming\ChatGPT\Local Storage\leveldb\'
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://github.com/garr3ttmjo/Digital-Forensic-Report-Writeups/blob/main/Blog/ChatGPT%20Desktop%20Forensics.md
+  source_kind: community
+  volatility: |-
+    The writeup states the LevelDB store persists across app restarts but is REMOVED WHEN THE USER LOGS OUT. Collect before touching the app, and never log the account out on a live box.
+  notes: |-
+    Writeup dated 2025-01-23, Windows only. The `_2p2nqsd0c76g0` suffix is the MSIX package family publisher hash and should be treated as a glob (OpenAI.ChatGPT-Desktop_*) not a literal. IMPORTANT CAVEAT: this describes the MSIX-packaged Chromium-shell build. Given the macOS app's 2026 rebuild and rename to com.openai.codex, the current Windows layout may well have moved out of the Packages tree; see open questions. A peer-reviewed study also exists (arXiv 2505.23938, 'Digital Forensic Investigation of the ChatGPT Windows Application') but arxiv.org and its ar5iv mirror are both egress-blocked here, so I could not read it.
+
+    Record structure: Prompt/response history lives in the IndexedDB LevelDB set, with fresh records in the .log file before compaction into .ldb; session timing in Local Storage\leveldb. Standard LevelDB carving applies - read CURRENT/MANIFEST, then the .log for the newest unflushed records.
+  parser: null

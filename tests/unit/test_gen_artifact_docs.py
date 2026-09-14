@@ -72,11 +72,21 @@ def test_unverified_entries_are_marked_in_the_output() -> None:
 
 
 def test_priority_groups_are_ordered_most_volatile_first() -> None:
+    """Within each agent, the groups run from what vanishes first to what lasts.
+
+    The check is per agent rather than over the whole document: with many agents the
+    sections repeat, so a global index comparison would compare one agent's durable group
+    against a later agent's live_only group and fail for no reason.
+    """
     text = (DOCS / "ARTIFACTS.md").read_text(encoding="utf-8")
-    order = [
-        text.index("### live_only"),
-        text.index("### first"),
-        text.index("### normal"),
-        text.index("### durable"),
-    ]
-    assert order == sorted(order)
+    sections = text.split("\n## ")[1:]
+    assert sections, "the document should contain at least one agent section"
+    expected = ["live_only", "first", "normal", "durable"]
+    for section in sections:
+        agent = section.splitlines()[0]
+        seen = [
+            line[len("### ") :].strip()
+            for line in section.splitlines()
+            if line.startswith("### ") and line[len("### ") :].strip() in expected
+        ]
+        assert seen == [p for p in expected if p in seen], agent

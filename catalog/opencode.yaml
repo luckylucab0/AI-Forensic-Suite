@@ -1,0 +1,259 @@
+# OpenCode artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: opencode
+title: OpenCode
+vendor: OpenCode
+references:
+- https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/mcp/auth.ts
+- https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts
+- https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/session/sql.ts
+- https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx
+artifacts:
+- id: opencode.config
+  category: config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_CONFIG_HOME/opencode/opencode.json
+  - <project>/.opencode/
+  - <project>/opencode.json
+  - <project>/opencode.jsonc
+  - ~/.config/opencode/opencode.json
+  - ~/.config/opencode/opencode.jsonc
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    Two collection traps: (1) OPENCODE_CONFIG_CONTENT means live config may exist only in the process environment with no file on disk; (2) the remote .well-known/opencode source means part of the effective config was fetched from a server and is not on the endpoint at all. Note both in the report.
+
+    Record structure: Documented merge order (later overrides earlier): remote .well-known/opencode endpoint, global ~/.config/opencode/opencode.json, OPENCODE_CONFIG path, project opencode.json, .opencode/ subdirectories, OPENCODE_CONFIG_CONTENT inline env var, managed system config, macOS MDM managed preferences. OPENCODE_CONFIG_DIR relocates the config dir entirely. Configs are merged, not replaced. JSONC is accepted.
+  parser: null
+- id: opencode.managed_config
+  category: config
+  root: system
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%ProgramData%\opencode'
+  - /Library/Application Support/opencode/
+  - /etc/opencode/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx
+  source_kind: official
+  volatility: Admin-controlled; persistent.
+  notes: |-
+    Outside the user home directory, so routinely missed by home-directory-only acquisitions. Establishes organisation-imposed policy, which is what separates 'user went rogue' from 'the fleet was configured this way'.
+
+    Record structure: System-wide admin-controlled config, plus MDM-deployed .mobileconfig managed preferences on macOS.
+  parser: null
+- id: opencode.tui_config
+  category: config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/tui.json
+  - ~/.config/opencode/tui.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    Minor, but its mtime is another independent timestamp of interactive (as opposed to headless) use.
+
+    Record structure: TUI-only settings, global or project scoped.
+  parser: null
+- id: opencode.auth
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_DATA_HOME/opencode/auth.json
+  - '%LOCALAPPDATA%\opencode\auth.json'
+  - ~/.local/share/opencode/auth.json
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/janekbaraniewski/openusage/main/docs/site/docs/providers/opencode.md
+  source_kind: community
+  volatility: Persistent until logout.
+  notes: |-
+    Record metadata and hash only. The provider KEY NAMES (not values) are valuable: they enumerate which model providers the operator had credentials for.
+
+    Record structure: packages/opencode/src/auth/index.ts: const file = path.join(Global.Path.data, 'auth.json'). Keyed by provider with {type: 'api'|'oauth', ...}. Also documented in the first-party CLI docs ('stored in ~/.local/share/opencode/auth.json').
+  parser: null
+- id: opencode.mcp_auth
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_DATA_HOME/opencode/mcp-auth.json
+  - ~/.local/share/opencode/mcp-auth.json
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/mcp/auth.ts
+  source_kind: source_code
+  volatility: Persistent until the MCP OAuth grant is revoked.
+  notes: |-
+    Record metadata and hash only, but DO record the key names: they prove which third-party MCP services the agent held live OAuth tokens for, which bounds the blast radius of an incident.
+
+    Record structure: packages/opencode/src/mcp/auth.ts: const filepath = path.join(Global.Path.data, 'mcp-auth.json'), a Record<string, Entry>. Path string retrieved via GitHub code search content fragment.
+  parser: null
+- id: opencode.repos_cache
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_DATA_HOME/opencode/repos/
+  - ~/.local/share/opencode/repos/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts
+  source_kind: source_code
+  volatility: Unknown; not documented.
+  notes: |-
+    Likely holds cloned/checked-out repository content the agent worked against, which can preserve source code that has since been deleted or rewritten in the real working tree.
+
+    Record structure: global.ts defines repos = path.join(data, 'repos'). Contents not inspected - enumerate before assuming structure.
+  parser: null
+- id: opencode.agents_commands
+  category: instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.opencode/agents/
+  - <project>/.opencode/commands/
+  - <project>/AGENTS.md
+  - ~/.config/opencode/agents/
+  - ~/.config/opencode/commands/
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx
+  source_kind: official
+  volatility: Persistent; project-scoped copies are usually in git.
+  notes: |-
+    Custom agent definitions can carry their own system prompts and tool allowances - i.e. a user-authored privilege escalation. Diff against defaults.
+
+    Record structure: Custom agent definitions and slash commands, global and project scoped.
+  parser: null
+- id: opencode.log
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_DATA_HOME/opencode/log/
+  - '%LOCALAPPDATA%\opencode\log\'
+  - ~/.local/share/opencode/log/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts
+  source_kind: source_code
+  volatility: Rotation behaviour not documented in the source reviewed; treat as volatile and collect
+    early.
+  notes: |-
+    Two log roots (XDG data and Electron userData) - collect both for desktop installs.
+
+    Record structure: global.ts: log = path.join(data, 'log'). The Electron desktop app additionally looks in join(app.getPath('userData'), 'opencode', 'log') per packages/desktop/src/main/logging.ts.
+  parser: null
+- id: opencode.db
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_DATA_HOME/opencode/opencode.db
+  - '%LOCALAPPDATA%\opencode\opencode.db'
+  - ~/.local/share/opencode/opencode-*.db
+  - ~/.local/share/opencode/opencode.db
+  - ~/.local/share/opencode/opencode.db-shm
+  - ~/.local/share/opencode/opencode.db-wal
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/session/sql.ts
+  source_kind: source_code
+  volatility: |-
+    WAL mode with synchronous=NORMAL and a passive checkpoint at startup - the newest turns may exist ONLY in the -wal file. Capture opencode.db, -wal and -shm together or you lose the most recent activity. No automatic expiry.
+  notes: |-
+    IMPORTANT CORRECTION: the filename is not always opencode.db. database.ts computes: if Flag.OPENCODE_DB is set it wins (absolute path or a name under the data dir, or ':memory:'); otherwise the name is 'opencode.db' only for the latest/beta/prod channels or when OPENCODE_DISABLE_CHANNEL_DB=1, and is otherwise 'opencode-<InstallationChannel>.db'. Glob opencode*.db. Also note the DB now carries a 'credential' table, so the file can contain secrets even though it is collected as transcript evidence.
+
+    Record structure: Confirmed drizzle sqliteTable definitions: session (id, project_id, workspace_id, parent_id, slug, directory, path, title, version, share_url, summary_additions/deletions/files/diffs, metadata, cost, tokens_input/output/reasoning/cache_read/cache_write, revert, permission, agent, model, time_compacting, time_archived), message (id, session_id, data + timestamps), part (id, message_id, session_id, data + timestamps), project, credential, permission, account, session_share, workspace, event_sequence, data_migration. Conversation text lives in the JSON 'data' column of message and part - query part.data for tool calls and outputs. session.parent_id gives subagent lineage; session.directory/path gives the workspace.
+  parser: null
+- id: opencode.legacy_json_storage
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.local/share/opencode/storage/message/*/*.json
+  - ~/.local/share/opencode/storage/part/*/*.json
+  - ~/.local/share/opencode/storage/session/*/ses_*.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: unverified
+  source: https://raw.githubusercontent.com/jbdamask/john-claude-skills/main/.pass-along/2026-08-19-1157-PASS-ALONG.md
+  source_kind: community
+  volatility: |-
+    Left in place after the v1.2.0 SQLite migration and no longer managed by opencode, so it persists indefinitely. The maintainer's migration announcement explicitly said the original data is not yet deleted.
+  notes: |-
+    Same value as the Goose legacy JSONL: a frozen pre-migration record that modern in-app session deletion will not touch. Always collect the whole storage/ tree if it exists.
+
+    Record structure: Pre-1.2.0 layout: one JSON file per session under storage/session/<project>/ses_<id>.json plus per-message files under storage/message/<id>/. Observed on opencode 1.1.53. The part/ subtree is inferred from the session/message pattern and the modern schema - confirm by listing the storage/ tree rather than assuming.
+  parser: null

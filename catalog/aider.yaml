@@ -1,0 +1,216 @@
+# Aider artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: aider
+title: Aider
+vendor: Aider
+references:
+- https://github.com/Aider-AI/aider/blob/main/HISTORY.md
+- https://raw.githubusercontent.com/Aider-AI/aider/main/aider/analytics.py
+- https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py
+- https://raw.githubusercontent.com/Aider-AI/aider/main/aider/repomap.py
+artifacts:
+- id: aider.tags_cache
+  category: cache
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.aider.tags.cache.v3/
+  - <project>/.aider.tags.cache.v4/
+  format: sqlite
+  sensitivity: normal
+  collect_priority: live_only
+  status: verified
+  source: https://raw.githubusercontent.com/Aider-AI/aider/main/aider/repomap.py
+  source_kind: source_code
+  volatility: |-
+    Rebuilt on demand. If the on-disk cache cannot be opened aider silently falls back to an in-memory dict and writes nothing, so absence does not mean aider was not used.
+  notes: |-
+    Enumerates every source file aider parsed for its repo map, with mtimes - i.e. a list of files the agent had visibility into, even ones never edited. Only v3 and v4 exist; do not glob 'v*' expecting other versions.
+
+    Record structure: repomap.py: CACHE_VERSION = 3; if USING_TSL_PACK: CACHE_VERSION = 4; TAGS_CACHE_DIR = f'.aider.tags.cache.v{CACHE_VERSION}'. Backed by diskcache.Cache, which stores a SQLite file (cache.db) plus blob files inside the directory. v4 appears when the tree-sitter-language-pack build is in use.
+  parser: null
+- id: aider.caches
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.aider/caches/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/Aider-AI/aider/blob/main/HISTORY.md
+  source_kind: source_code
+  volatility: Expendable by design; refreshed from the network.
+  notes: |-
+    Timestamps on files here date aider runs even when the project directory (and its history files) is gone.
+
+    Record structure: HISTORY.md v0.42.0: 'New $HOME/.aider/caches dir for app-wide expendable caches.' Known contents include model_prices_and_context_window.json. Retrieved via GitHub code search content fragment.
+  parser: null
+- id: aider.config
+  category: config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.aider.conf.yml
+  - ~/.aider.conf.yml
+  format: yaml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/Aider-AI/aider/blob/main/HISTORY.md
+  source_kind: source_code
+  volatility: Persistent until edited.
+  notes: |-
+    Can relocate every other Aider artifact (history files, model settings). Always parse this BEFORE globbing for transcripts, or you will miss relocated histories. May contain inline api-key entries.
+
+    Record structure: HISTORY.md (v0.42.0 entry) states: 'All config/env/yml/json files now load from home, git root, cwd and named command line switch.' So three locations must all be collected; later ones override earlier. Keys mirror CLI flags (model, chat-history-file, input-history-file, auto-commits, weak-model, api-key, etc.). Path string retrieved via GitHub code search content fragment plus the HISTORY.md fragment, not a full page fetch.
+  parser: null
+- id: aider.model_metadata
+  category: config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.aider.model.metadata.json
+  - ~/.aider.model.metadata.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py
+  source_kind: source_code
+  volatility: Persistent until edited.
+  notes: |-
+    Presence of a custom entry for an unusual model name is a strong indicator of a non-default or proxied provider.
+
+    Record structure: Default became .aider.model.metadata.json in v0.42.0 per HISTORY.md; args.py confirms. Contains per-model context window and pricing overrides.
+  parser: null
+- id: aider.model_settings
+  category: config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.aider.model.settings.yml
+  - ~/.aider.model.settings.yml
+  format: yaml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py
+  source_kind: source_code
+  volatility: Persistent until edited.
+  notes: |-
+    Records custom/self-hosted model endpoints and edit formats - evidence of which model and which provider (possibly a proxy or local model) was actually driving the agent.
+
+    Record structure: Default filename changed to .aider.model.settings.yml in v0.42.0 (HISTORY.md); args.py confirms the default. Loaded from home, git root and cwd like the main config.
+  parser: null
+- id: aider.dotenv
+  category: credentials
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.env
+  - ~/.env
+  format: text
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py
+  source_kind: source_code
+  volatility: Persistent until edited.
+  notes: |-
+    Hash and record metadata only. Note that AIDER_CHAT_HISTORY_FILE / AIDER_INPUT_HISTORY_FILE set here will relocate the transcripts, so the KEY NAMES present matter forensically even though values must not be copied.
+
+    Record structure: args.py computes the default .env at git_root else cwd; HISTORY.md confirms env files also load from home. Holds AIDER_* settings and provider API keys (OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.).
+  parser: null
+- id: aider.analytics
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.aider/analytics.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/Aider-AI/aider/main/aider/analytics.py
+  source_kind: source_code
+  volatility: Written once at first run and then persists; not rotated.
+  notes: |-
+    Gives a stable per-install pseudonymous identifier that can tie one endpoint's aider usage to server-side PostHog records obtainable by legal process, and dates first use of aider on the host.
+
+    Record structure: analytics.py: Path.home() / '.aider' / 'analytics.json'. Single JSON object holding the stable install UUID, the opt-in flag, and a permanently-disabled flag. Telemetry backend is PostHog (a Mixpanel path exists but is commented out).
+  parser: null
+- id: aider.input_history
+  category: prompt_history
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.aider.input.history
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py
+  source_kind: source_code
+  volatility: Append-only readline-style history; survives across sessions and is not rotated.
+  notes: |-
+    Contains every line the operator typed at the aider prompt, including slash commands (/add, /run, /undo). Survives even when the chat history file has been deleted, so it is a good cross-check for tampering.
+
+    Record structure: args.py default_input_history_file = os.path.join(git_root, '.aider.input.history'). Override: --input-history-file / AIDER_INPUT_HISTORY_FILE / 'input-history-file:' key. prompt_toolkit FileHistory format: lines prefixed '+' grouped under '# <timestamp>' headers.
+  parser: null
+- id: aider.chat_history
+  category: transcript
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.aider.chat.history.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py
+  source_kind: source_code
+  volatility: |-
+    Append-only. Aider never rotates or truncates it, so it accumulates indefinitely and often covers the whole life of the repo checkout. Deleted only if the user deletes it or the working tree.
+  notes: |-
+    Highest-value Aider artifact: full prompt + response text including code the model emitted. Lives INSIDE the repo working tree, so it is frequently committed by accident and also frequently recoverable from git objects and from backups of the project dir rather than only a home directory.
+
+    Record structure: args.py: default_chat_history_file = os.path.join(git_root, '.aider.chat.history.md') if git_root else '.aider.chat.history.md'. Overridable with --chat-history-file or AIDER_CHAT_HISTORY_FILE, and via 'chat-history-file:' in .aider.conf.yml, so the file may be relocated anywhere. Markdown with '#### ' prefixes for user turns; assistant turns and diffs are plain markdown blocks.
+  parser: null

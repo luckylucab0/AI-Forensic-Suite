@@ -74,6 +74,473 @@ PRIORITY_ORDER = ("live_only", "first", "normal", "durable")
 EMBEDDED_CATALOGUE = {
     "agents": [
         {
+            "agent": "aider",
+            "artifacts": [
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "aider.analytics",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.aider/analytics.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "aider.caches",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.aider/caches/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "aider.chat_history",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.aider.chat.history.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "aider.config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.aider.conf.yml",
+                        "~/.aider.conf.yml"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "aider.dotenv",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.env",
+                        "~/.env"
+                    ],
+                    "root": "project",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "normal",
+                    "id": "aider.input_history",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.aider.input.history"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "aider.model_metadata",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.aider.model.metadata.json",
+                        "~/.aider.model.metadata.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "aider.model_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.aider.model.settings.yml",
+                        "~/.aider.model.settings.yml"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "live_only",
+                    "id": "aider.tags_cache",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.aider.tags.cache.v3/",
+                        "<project>/.aider.tags.cache.v4/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
+            "agent": "amp",
+            "artifacts": [
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "amp.continuations",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.local/share/amp/continuations/*.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "amp.ledger",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/amp/ledger.jsonl",
+                        "%APPDATA%\\amp\\ledger.jsonl",
+                        "~/.local/share/amp/ledger.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "amp.secrets",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\amp\\secrets.json",
+                        "~/.amp/oauth/",
+                        "~/.local/share/amp/secrets.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "amp.session_pointer",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.local/share/amp/session.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "amp.settings",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/amp/settings.json",
+                        "<project>/.amp/settings.json",
+                        "<project>/.amp/settings.jsonc",
+                        "~/.config/amp/settings.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "amp.thread_logs",
+                    "os": [
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cache/amp/logs/threads/*.log"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "amp.threads",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/amp/threads/T-*.json",
+                        "%APPDATA%\\amp\\threads\\T-*.json",
+                        "~/.local/share/amp/threads/T-*.json",
+                        "~/Library/Application Support/amp/threads/T-*.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                }
+            ]
+        },
+        {
+            "agent": "chatgpt_desktop",
+            "artifacts": [
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_app_pairing_extensions",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/com.openai.chat/app_pairing_extensions/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_codex_app_support",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/Codex/",
+                        "~/Library/Application Support/OpenAI/Codex/",
+                        "~/Library/Application Support/com.openai.codex/",
+                        "~/Library/Caches/Codex/",
+                        "~/Library/Caches/com.openai.codex/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_codex_home",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/.codex/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_computer_use_service",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "/Library/Application Support/CodexComputerUseAuthorizationPlugin/",
+                        "~/Library/Caches/com.openai.sky.CUAService/",
+                        "~/Library/Group Containers/*.com.openai.sky.CUAService/",
+                        "~/Library/HTTPStorages/com.openai.sky.CUAService/",
+                        "~/Library/Preferences/com.openai.sky.CUAService.cli.plist",
+                        "~/Library/Preferences/com.openai.sky.CUAService.plist"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_cookies",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/HTTPStorages/com.openai.chat.binarycookies",
+                        "~/Library/HTTPStorages/com.openai.codex.binarycookies",
+                        "~/Library/HTTPStorages/com.openai.sky.CUAService.binarycookies"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "unverified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_httpstorages",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/HTTPStorages/ChatGPTHelper.binarycookies",
+                        "~/Library/HTTPStorages/com.openai.chat/",
+                        "~/Library/HTTPStorages/com.openai.codex/",
+                        "~/Library/HTTPStorages/com.openai.sky.CUAService/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_legacy_app_support",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Scripts/com.openai.chat.Widgets/",
+                        "~/Library/Application Scripts/group.com.openai.chat/",
+                        "~/Library/Application Support/ChatGPT/",
+                        "~/Library/Application Support/com.openai.chat/",
+                        "~/Library/Caches/com.openai.chat/",
+                        "~/Library/Containers/com.openai.chat.Widgets/",
+                        "~/Library/Group Containers/group.com.openai.chat/",
+                        "~/Library/WebKit/com.openai.chat/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_legacy_conversations_dir",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/com.openai.chat/conversations-*/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_preferences",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Preferences/ChatGPTHelper.plist",
+                        "~/Library/Preferences/com.openai.chat.*.plist",
+                        "~/Library/Preferences/com.openai.chat.plist",
+                        "~/Library/Preferences/com.openai.codex.plist"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_saved_state_and_logs",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Logs/com.openai.codex/",
+                        "~/Library/Saved Application State/com.openai.chat.savedState/",
+                        "~/Library/Saved Application State/com.openai.codex.savedState/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.windows_msix_localcache",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Packages\\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\\LocalCache\\Roaming\\ChatGPT\\",
+                        "%LOCALAPPDATA%\\Packages\\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\\LocalCache\\Roaming\\ChatGPT\\IndexedDB\\https_chatgpt.com_0.indexeddb.leveldb\\",
+                        "%LOCALAPPDATA%\\Packages\\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\\LocalCache\\Roaming\\ChatGPT\\Local Storage\\leveldb\\"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                }
+            ]
+        },
+        {
             "agent": "claude_code",
             "artifacts": [
                 {
@@ -1453,9 +1920,1980 @@ EMBEDDED_CATALOGUE = {
                     "status": "verified"
                 }
             ]
+        },
+        {
+            "agent": "continue",
+            "artifacts": [
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "continue.agents",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.continue/agents/*.yaml",
+                        "<project>/.continue/assistants/*.yaml",
+                        "~/.continue/agents/*.yaml",
+                        "~/.continue/assistants/*.yaml"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "continue.aux_config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.continue/.configs/",
+                        "~/.continue/.continueignore",
+                        "~/.continue/.migrations/",
+                        "~/.continue/prompts/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "continue.config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.continuerc.json",
+                        "~/.continue/config.json",
+                        "~/.continue/config.ts",
+                        "~/.continue/config.yaml"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "continue.dev_data",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.continue/dev_data/",
+                        "~/.continue/logs/core.log"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "continue.devbox_env",
+                    "os": [
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.continue/devbox-env"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "normal",
+                    "id": "continue.diffs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.continue/.diffs/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "continue.index",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.continue/index/autocompleteCache.sqlite",
+                        "~/.continue/index/docs.sqlite",
+                        "~/.continue/index/index.sqlite",
+                        "~/.continue/index/lancedb/",
+                        "~/.continue/repo_map.txt"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "continue.sessions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/sessions/",
+                        "%USERPROFILE%\\.continue\\sessions\\*.json",
+                        "~/.continue/sessions/<session-id>.json",
+                        "~/.continue/sessions/sessions.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
+            "agent": "crosscutting",
+            "artifacts": [
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.homebrew_prefixes",
+                    "os": [
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "/home/linuxbrew/.linuxbrew/",
+                        "/home/linuxbrew/.linuxbrew/Cellar/",
+                        "/opt/homebrew/",
+                        "/opt/homebrew/Caskroom/",
+                        "/opt/homebrew/Cellar/",
+                        "/opt/homebrew/bin/",
+                        "/usr/local/",
+                        "/usr/local/Cellar/"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.hook_scripts",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/claude/hooks/",
+                        "<project>/claude/settings.json",
+                        "<project>/claude/settings.local.json",
+                        "<project>/clinerules/hooks/",
+                        "~/.claude/settings.json",
+                        "~/Documents/Cline/Hooks/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.instructions_agents_md",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/**/AGENTS.md",
+                        "<project>/AGENTS.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.instructions_claude_md",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/**/CLAUDE.md",
+                        "<project>/CLAUDE.local.md",
+                        "<project>/CLAUDE.md",
+                        "<project>/claude/CLAUDE.md",
+                        "~/.claude/CLAUDE.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.instructions_clinerules",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/claude/skills/",
+                        "<project>/cline/remote-config/",
+                        "<project>/cline/skills/",
+                        "<project>/clineignore",
+                        "<project>/clinerules",
+                        "<project>/clinerules/",
+                        "<project>/clinerules/*.md",
+                        "<project>/clinerules/skills/",
+                        "<project>/clinerules/workflows/",
+                        "~/Documents/Cline/Rules/",
+                        "~/Documents/Cline/Workflows/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.instructions_copilot_instructions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HOME/.copilot/copilot-instructions.md",
+                        "$HOME/.copilot/instructions/**/*.instructions.md",
+                        "<project>/github/agents/*.md",
+                        "<project>/github/copilot-instructions.md",
+                        "<project>/github/copilot/settings.json",
+                        "<project>/github/copilot/settings.local.json",
+                        "<project>/github/instructions/**/*.instructions.md",
+                        "<project>/github/prompts/*.prompt.md",
+                        "<project>/github/skills/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.instructions_cursor_rules",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/**/.cursor/rules/",
+                        "<project>/AGENTS.md",
+                        "<project>/cursor/rules/",
+                        "<project>/cursor/rules/*.mdc",
+                        "<project>/cursor/rules/*/RULE.md",
+                        "<project>/cursorrules"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.instructions_gemini_md",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/**/GEMINI.md",
+                        "<project>/GEMINI.md",
+                        "<project>/gemini/settings.json",
+                        "~/.gemini/GEMINI.md",
+                        "~/.gemini/settings.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.instructions_junie_guidelines",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/junie/",
+                        "<project>/junie/guidelines.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.instructions_kiro_steering",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/kiro/specs/",
+                        "<project>/kiro/steering/",
+                        "<project>/kiro/steering/*.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.instructions_windsurf_rules",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/windsurf/rules/",
+                        "<project>/windsurf/rules/*.md",
+                        "<project>/windsurfrules"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.mcp_config_files",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HOME/.copilot/mcp-config.json",
+                        "%APPDATA%\\Claude\\claude_desktop_config.json",
+                        "%USERPROFILE%\\.mcp.json",
+                        "<project>/cursor/mcp.json",
+                        "<project>/gemini/settings.json",
+                        "<project>/mcp.json",
+                        "<project>/vscode/mcp.json",
+                        "~/.claude.json",
+                        "~/.config/Claude/claude_desktop_config.json",
+                        "~/.cursor/mcp.json",
+                        "~/.gemini/settings.json",
+                        "~/.vscode/mcp.json",
+                        "~/Library/Application Support/Claude/claude_desktop_config.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "crosscutting.npm_debug_logs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\npm-cache\\_logs\\*-debug-*.log",
+                        "~/.npm/_logs/*-debug-*.log"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "first",
+                    "id": "crosscutting.npm_global_install_dirs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\npm\\",
+                        "%APPDATA%\\npm\\node_modules\\",
+                        "/opt/homebrew/lib/node_modules/",
+                        "/usr/local/bin/",
+                        "/usr/local/lib/node_modules/",
+                        "~/.nvm/versions/node/*/lib/node_modules/"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "durable",
+                    "id": "crosscutting.npm_npx_cache",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\npm-cache\\_npx\\*\\package.json",
+                        "~/.npm/_npx/*/node_modules/",
+                        "~/.npm/_npx/*/package.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.pipx_home_and_bin",
+                    "os": [
+                        "linux",
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\pipx\\pipx\\venvs\\*\\",
+                        "/opt/pipx/",
+                        "~/.local/bin/",
+                        "~/.local/pipx/",
+                        "~/.local/share/pipx/venvs/*/",
+                        "~/Library/Application Support/pipx/venvs/*/"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "shell_history",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.shell_bash_history",
+                    "os": [
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$HISTFILE",
+                        "~/.bash_history"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "shell_history",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.shell_fish_history",
+                    "os": [
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/fish/${fish_history}_history",
+                        "$XDG_DATA_HOME/fish/fish_history",
+                        "~/.local/share/fish/fish_history"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "shell_history",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.shell_psreadline_history",
+                    "os": [
+                        "windows",
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/powershell/PSReadLine/*_history.txt",
+                        "%APPDATA%\\Microsoft\\Windows\\PowerShell\\PSReadLine\\*_history.txt",
+                        "%APPDATA%\\Microsoft\\Windows\\PowerShell\\PSReadLine\\ConsoleHost_history.txt",
+                        "~/.local/share/powershell/PSReadLine/ConsoleHost_history.txt"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "shell_history",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.shell_zsh_history",
+                    "os": [
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$HISTFILE",
+                        "~/.zhistory",
+                        "~/.zsh_history"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.uv_tool_dir",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/uv/tools/*/",
+                        "%APPDATA%\\uv\\data\\tools\\*\\",
+                        "%LOCALAPPDATA%\\uv\\cache\\",
+                        "~/.cache/uv/",
+                        "~/.local/bin/",
+                        "~/.local/share/uv/python/",
+                        "~/.local/share/uv/tools/*/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.vscode_extension_dirs",
+                    "os": [
+                        "windows",
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.vscode\\extensions\\",
+                        "~/.cursor/extensions/",
+                        "~/.vscode-insiders/extensions/",
+                        "~/.vscode-server/extensions/",
+                        "~/.vscode/extensions/",
+                        "~/.windsurf/extensions/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.windows_appdata_program_dirs",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\",
+                        "%LOCALAPPDATA%\\Ollama\\",
+                        "%LOCALAPPDATA%\\Packages\\",
+                        "%LOCALAPPDATA%\\Programs\\",
+                        "%LOCALAPPDATA%\\Programs\\Ollama\\"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.windows_execution_artifacts",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "%SystemRoot%\\AppCompat\\Programs\\Amcache.hve",
+                        "%SystemRoot%\\AppCompat\\Programs\\Amcache.hve.LOG1",
+                        "%SystemRoot%\\AppCompat\\Programs\\Amcache.hve.LOG2",
+                        "%SystemRoot%\\Prefetch\\*.pf",
+                        "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                        "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+                        "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\AppCompatCache",
+                        "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\bam\\State\\UserSettings\\*",
+                        "HKEY_USERS\\%%users.sid%%\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                        "HKEY_USERS\\%%users.sid%%\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                }
+            ]
+        },
+        {
+            "agent": "factory_droid",
+            "artifacts": [
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "factory_droid.auth",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.factory/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "factory_droid.config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.factory/settings.json",
+                        "<project>/.factory/settings.local.json",
+                        "~/.factory/config.json",
+                        "~/.factory/settings.json",
+                        "~/.factory/settings.local.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "factory_droid.logs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.factory/bug-reports/",
+                        "~/.factory/logs/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "factory_droid.mcp_and_hooks",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.factory/mcp.json",
+                        "~/.factory/hooks.json",
+                        "~/.factory/mcp.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "factory_droid.sessions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.factory/sessions/",
+                        "~/.factory/sessions/**/settings.json",
+                        "~/.factory/sessions/*/*.jsonl",
+                        "~/.factory/sessions/<uuid>.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "factory_droid.skills_and_droids",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/AGENTS.md",
+                        "~/.factory/commands/",
+                        "~/.factory/droids/",
+                        "~/.factory/skills/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                }
+            ]
+        },
+        {
+            "agent": "goose",
+            "artifacts": [
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "goose.cli_logs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\data\\logs\\cli\\",
+                        "~/.local/state/goose/logs/cli/",
+                        "~/.local/state/goose/logs/cli/YYYY-MM-DD/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "goose.config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\config\\config.yaml",
+                        "~/.config/goose/config.yaml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "goose.desktop_log",
+                    "os": [
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\logs\\main.log",
+                        "~/Library/Application Support/Goose/logs/main.log"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "goose.hints",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.goosehints",
+                        "<project>/AGENTS.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "memory",
+                    "collect_priority": "normal",
+                    "id": "goose.memory",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.goose/memory/",
+                        "~/.config/goose/memory/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "goose.permissions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\config\\permission.yaml",
+                        "%APPDATA%\\Block\\goose\\config\\permissions\\tool_permissions.json",
+                        "~/.config/goose/permission.yaml",
+                        "~/.config/goose/permissions/tool_permissions.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "goose.prompts",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\config\\prompts\\",
+                        "~/.config/goose/prompts/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "goose.recipes",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/*.yaml"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "goose.secrets",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\config\\secrets.yaml",
+                        "~/.config/goose/secrets.yaml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "goose.server_logs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\data\\logs\\server\\",
+                        "~/.local/state/goose/logs/server/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "goose.sessions_db",
+                    "os": [
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.local/share/goose/sessions/sessions.db",
+                        "~/.local/share/goose/sessions/sessions.db-shm",
+                        "~/.local/share/goose/sessions/sessions.db-wal",
+                        "~/Library/Application Support/Block/goose/data/sessions/sessions.db"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "goose.sessions_db_windows",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\data\\sessions\\sessions.db"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "goose.sessions_jsonl_legacy",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\data\\sessions\\*.jsonl",
+                        "~/.local/share/goose/sessions/*.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
+            "agent": "hermes",
+            "artifacts": [
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "hermes.auth",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/auth.json",
+                        "~/.hermes/auth.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "hermes.config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/config.yaml",
+                        "~/.hermes/config.yaml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "hermes.cron",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/cron/",
+                        "~/.hermes/cron/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "hermes.env",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/.env",
+                        "~/.hermes/.env"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "hermes.logs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/logs/",
+                        "~/.hermes/logs/errors.log",
+                        "~/.hermes/logs/gateway.log"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "memory",
+                    "collect_priority": "normal",
+                    "id": "hermes.memories",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/memories/",
+                        "~/.hermes/memories/MEMORY.md",
+                        "~/.hermes/memories/USER.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "hermes.profiles",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.hermes/profiles/<name>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "normal",
+                    "id": "hermes.sandboxes",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/sandboxes/",
+                        "~/.hermes/sandboxes/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "hermes.sessions_dir",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/sessions/",
+                        "~/.hermes/sessions/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "hermes.skills",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/skills/",
+                        "~/.hermes/skills/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "hermes.soul",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/SOUL.md",
+                        "~/.hermes/SOUL.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "hermes.state_db",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/state.db",
+                        "~/.hermes/state.db",
+                        "~/.hermes/state.db-shm",
+                        "~/.hermes/state.db-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
+            "agent": "lmstudio",
+            "artifacts": [
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "lmstudio.cli_and_server",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.lmstudio\\bin\\lms.exe",
+                        "~/.lmstudio/bin/lms"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "lmstudio.conversations",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.lmstudio\\conversations\\",
+                        "~/.lmstudio/conversations/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "lmstudio.macos_app_support_and_logs",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/LM Studio/",
+                        "~/Library/Caches/ai.elementlabs.lmstudio/",
+                        "~/Library/HTTPStorages/ai.elementlabs.lmstudio/",
+                        "~/Library/Logs/LM Studio/",
+                        "~/Library/Preferences/ai.elementlabs.lmstudio.plist",
+                        "~/Library/Saved Application State/ai.elementlabs.lmstudio.savedState/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "lmstudio.mcp_config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.lmstudio\\mcp.json",
+                        "~/.lmstudio/mcp.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "lmstudio.models",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.lmstudio\\models\\*\\*\\*",
+                        "~/.lmstudio/models/*/*/*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "lmstudio.presets_and_hub",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.lmstudio\\config-presets\\",
+                        "%USERPROFILE%\\.lmstudio\\hub\\",
+                        "~/.lmstudio/config-presets/",
+                        "~/.lmstudio/hub/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
+            "agent": "ollama",
+            "artifacts": [
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "ollama.app_chat_database",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Ollama\\db.sqlite",
+                        "%LOCALAPPDATA%\\Ollama\\db.sqlite-wal",
+                        "~/.ollama/db.sqlite",
+                        "~/Library/Application Support/Ollama/db.sqlite",
+                        "~/Library/Application Support/Ollama/db.sqlite-shm",
+                        "~/Library/Application Support/Ollama/db.sqlite-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "ollama.app_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Ollama\\config.json",
+                        "~/.ollama/config.json",
+                        "~/Library/Application Support/Ollama/config.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "normal",
+                    "id": "ollama.backup_dir",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.ollama/backup/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "ollama.cli_config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.ollama/config.json",
+                        "~/.ollama/config/config.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "first",
+                    "id": "ollama.cli_prompt_history",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.ollama\\history",
+                        "~/.ollama/history"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "ollama.env_overrides",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "/etc/systemd/system/ollama.service",
+                        "/etc/systemd/system/ollama.service.d/override.conf",
+                        "HKEY_CURRENT_USER\\Environment",
+                        "~/.bashrc",
+                        "~/.zshrc"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "ollama.logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Ollama\\app.log",
+                        "%LOCALAPPDATA%\\Ollama\\server-*.log",
+                        "%LOCALAPPDATA%\\Ollama\\server.log",
+                        "%LOCALAPPDATA%\\Ollama\\upgrade.log",
+                        "~/.ollama/logs/app.log",
+                        "~/.ollama/logs/server.log"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "ollama.macos_app_container",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/Ollama/",
+                        "~/Library/Caches/com.electron.ollama/",
+                        "~/Library/Preferences/com.electron.ollama.plist",
+                        "~/Library/Saved Application State/com.electron.ollama.savedState/",
+                        "~/Library/Webkit/com.electron.ollama/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "ollama.model_blobs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$OLLAMA_MODELS/blobs/sha256-*",
+                        "%USERPROFILE%\\.ollama\\models\\blobs\\sha256-*",
+                        "/usr/share/ollama/.ollama/models/blobs/sha256-*",
+                        "~/.ollama/models/blobs/sha256-*"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "ollama.model_manifests",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$OLLAMA_MODELS/manifests/*/*/*/*",
+                        "%USERPROFILE%\\.ollama\\models\\manifests\\*\\*\\*\\*",
+                        "/usr/share/ollama/.ollama/models/manifests/*/*/*/*",
+                        "~/.ollama/models/manifests/*/*/*/*"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "ollama.private_key",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.ollama/id_ed25519",
+                        "~/.ollama/id_ed25519.pub"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
+            "agent": "opencode",
+            "artifacts": [
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "opencode.agents_commands",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.opencode/agents/",
+                        "<project>/.opencode/commands/",
+                        "<project>/AGENTS.md",
+                        "~/.config/opencode/agents/",
+                        "~/.config/opencode/commands/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "opencode.auth",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/opencode/auth.json",
+                        "%LOCALAPPDATA%\\opencode\\auth.json",
+                        "~/.local/share/opencode/auth.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "opencode.config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/opencode/opencode.json",
+                        "<project>/.opencode/",
+                        "<project>/opencode.json",
+                        "<project>/opencode.jsonc",
+                        "~/.config/opencode/opencode.json",
+                        "~/.config/opencode/opencode.jsonc"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "opencode.db",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/opencode/opencode.db",
+                        "%LOCALAPPDATA%\\opencode\\opencode.db",
+                        "~/.local/share/opencode/opencode-*.db",
+                        "~/.local/share/opencode/opencode.db",
+                        "~/.local/share/opencode/opencode.db-shm",
+                        "~/.local/share/opencode/opencode.db-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "opencode.legacy_json_storage",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.local/share/opencode/storage/message/*/*.json",
+                        "~/.local/share/opencode/storage/part/*/*.json",
+                        "~/.local/share/opencode/storage/session/*/ses_*.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "opencode.log",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/opencode/log/",
+                        "%LOCALAPPDATA%\\opencode\\log\\",
+                        "~/.local/share/opencode/log/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "opencode.managed_config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%ProgramData%\\opencode",
+                        "/Library/Application Support/opencode/",
+                        "/etc/opencode/"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "opencode.mcp_auth",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/opencode/mcp-auth.json",
+                        "~/.local/share/opencode/mcp-auth.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "normal",
+                    "id": "opencode.repos_cache",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/opencode/repos/",
+                        "~/.local/share/opencode/repos/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "opencode.tui_config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/tui.json",
+                        "~/.config/opencode/tui.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
+            "agent": "pi",
+            "artifacts": [
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "pi.auth",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.pi/agent/auth.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "pi.bin",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.pi/agent/bin/",
+                        "~/.pi/agent/themes/",
+                        "~/.pi/server/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "pi.debug_log",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.pi/agent/pi-debug.log"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "pi.extensions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.pi/agent/extensions/*.ts",
+                        "~/.pi/agent/tools/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "pi.models",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.pi/agent/models.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "pi.prompts",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.pi/agent/prompts/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "pi.sessions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$PI_CODING_AGENT_SESSION_DIR/**/*.jsonl",
+                        "~/.pi/agent/sessions/--<encoded-cwd>--/<iso-timestamp>_<session-id>.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "pi.settings",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.pi/",
+                        "~/.pi/agent/settings.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
+            "agent": "warp",
+            "artifacts": [
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "normal",
+                    "id": "warp.sqlite",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "${XDG_STATE_HOME:-~/.local/state}/warp-terminal/warp.sqlite",
+                        "%LOCALAPPDATA%\\warp\\Warp\\data\\warp.sqlite",
+                        "~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite",
+                        "~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm",
+                        "~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                }
+            ]
+        },
+        {
+            "agent": "zed",
+            "artifacts": [
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "zed.extensions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$ZED_DATA_DIR/debug_adapters/",
+                        "$ZED_DATA_DIR/extensions/",
+                        "$ZED_DATA_DIR/external_agents/",
+                        "$ZED_DATA_DIR/prompt_overrides/",
+                        "~/.config/zed/prompts/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "zed.flatpak_legacy_threads",
+                    "os": [
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "zed.logs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/zed/logs/",
+                        "%LOCALAPPDATA%\\Zed\\logs\\",
+                        "~/Library/Logs/Zed/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "zed.settings",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/zed/settings.json",
+                        "%APPDATA%\\Zed\\settings.json",
+                        "<project>/.zed/settings.json",
+                        "~/.config/zed/settings.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "zed.sidebar_threads",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite",
+                        "%LOCALAPPDATA%\\Zed\\db\\0-<release_channel>\\db.sqlite",
+                        "~/Library/Application Support/Zed/db/0-stable/db.sqlite"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "live_only",
+                    "id": "zed.threads_db",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/zed/threads/threads.db",
+                        "%LOCALAPPDATA%\\Zed\\threads\\threads.db",
+                        "~/.local/share/zed/threads/threads.db",
+                        "~/Library/Application Support/Zed/threads/threads.db"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
         }
     ],
-    "sha256": "e80e5356d1efe22fe0709fe6b105b73488be59fbcca8ba20a94e961f0b9ead9b"
+    "sha256": "d963a63299ebbe7dceeac1b371070a843ed521ad7394a51a1dc74ff2135c500d"
 }
 # --- END EMBEDDED CATALOGUE ---
 

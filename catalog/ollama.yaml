@@ -1,0 +1,283 @@
+# Ollama artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: ollama
+title: Ollama
+vendor: Ollama
+references:
+- https://github.com/ollama/ollama/blob/main/cmd/config/config.go
+- https://github.com/ollama/ollama/blob/main/manifest/layer.go
+- https://github.com/ollama/ollama/blob/main/manifest/paths.go
+- https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/o/ollama-app.rb
+artifacts:
+- id: ollama.cli_prompt_history
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.ollama\history'
+  - ~/.ollama/history
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/ollama/ollama/main/readline/history.go
+  source_kind: source_code
+  volatility: |-
+    Ring buffer, default Limit: 100 entries. Older prompts are compacted out and lost on every save. Written atomically via temp-file + rename, so the previous generation may be recoverable from unallocated space. Disabled entirely by OLLAMA_NOHISTORY.
+  notes: |-
+    Confirms the brief's assumption that this file exists and is plain text. The default limit of 100 is the key forensic limitation - a heavy user's early prompts are already gone.
+
+    Record structure: Path built as filepath.Join(home, ".ollama", "history"). One command per line, written with fmt.Fprintln(buf, line). NO timestamps and NO model responses - this is readline history of what the user typed at the `ollama run` prompt only. Cannot be timelined internally; only the file mtime bounds it.
+  parser: null
+- id: ollama.model_blobs
+  category: cache
+  root: system
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $OLLAMA_MODELS/blobs/sha256-*
+  - '%USERPROFILE%\.ollama\models\blobs\sha256-*'
+  - /usr/share/ollama/.ollama/models/blobs/sha256-*
+  - ~/.ollama/models/blobs/sha256-*
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/ollama/ollama/blob/main/manifest/layer.go
+  source_kind: source_code
+  volatility: |-
+    Pruned on server start unless OLLAMA_NOPRUNE=1. Individual blobs are GB-scale - hash and record metadata, do not copy by default.
+  notes: |-
+    Confirmed via GitHub code search content match. Practical guidance: parse the manifest first, then fetch only the small non-weight layers by digest.
+
+    Record structure: Blob filename is the digest with ':' replaced by '-' (see server/fixblobs.go: "replaces (\":\") to (\"-\") in the file prefix. (e.g. sha256:1234 -> sha256-1234)"). Small blobs are the template/params/license/system-prompt layers and ARE worth reading - a custom system prompt for a Modelfile lands here as a small text blob.
+  parser: null
+- id: ollama.app_config
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%LOCALAPPDATA%\Ollama\config.json'
+  - ~/.ollama/config.json
+  - ~/Library/Application Support/Ollama/config.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: verified
+  source: https://raw.githubusercontent.com/ollama/ollama/main/app/store/store.go
+  source_kind: source_code
+  volatility: |-
+    Legacy path; the app migrates its contents into db.sqlite and the file may be left behind after migration, which makes it a useful pre-migration snapshot.
+  notes: |-
+    Distinct from the CLI config (ollama.cli_config). Presence of BOTH a stale config.json and a db.sqlite dates the install across the GUI migration boundary.
+
+    Record structure: legacyConfigPath() uses the same three-way OS switch as defaultDBPath but with filename config.json. The app/store/migration.go path reads it once and marks the config migrated.
+  parser: null
+- id: ollama.cli_config
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.ollama/config.json
+  - ~/.ollama/config/config.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: verified
+  source: https://github.com/ollama/ollama/blob/main/cmd/config/config.go
+  source_kind: source_code
+  volatility: |-
+    migrateConfig() moves the legacy ~/.ollama/config/config.json to ~/.ollama/config.json; the legacy file may survive.
+  notes: |-
+    Confirmed via GitHub code search content match against cmd/config/config.go and cmd/config/config_test.go rather than a direct page fetch. The Integrations key is interesting: sibling files cmd/launch/claude_desktop_test.go and app/cmd/app/codex_app_darwin_test.go show Ollama now records that a user launched Claude Desktop / Codex Desktop integrations, i.e. Ollama's own store is cross-agent evidence.
+
+    Record structure: Code comment reads: "migrateConfig moves the config from the legacy path to ~/.ollama/config.json". Holds an `Integrations` object (cloud/agent integrations) plus unknown top-level fields that are preserved.
+  parser: null
+- id: ollama.env_overrides
+  category: config
+  root: system
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - /etc/systemd/system/ollama.service
+  - /etc/systemd/system/ollama.service.d/override.conf
+  - HKEY_CURRENT_USER\Environment
+  - ~/.bashrc
+  - ~/.zshrc
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/ollama/ollama/main/envconfig/config.go
+  source_kind: source_code
+  notes: |-
+    Read these BEFORE globbing ~/.ollama: a set OLLAMA_MODELS means the manifests are somewhere else entirely, and OLLAMA_NOHISTORY explains an absent history file without implying anti-forensics. OLLAMA_TMPDIR is NOT defined in current envconfig despite appearing in older third-party guides.
+
+    Record structure: Variables that relocate or suppress the artifacts above: OLLAMA_MODELS (default filepath.Join(home, ".ollama", "models")) moves manifests+blobs; OLLAMA_NOHISTORY (default false) suppresses ~/.ollama/history; OLLAMA_DEBUG raises log verbosity above INFO; OLLAMA_NOPRUNE (default false) keeps orphan blobs; OLLAMA_HOST (default http://127.0.0.1:11434) shows whether the server was exposed off-host; OLLAMA_ORIGINS lists allowed CORS origins and by default already includes app/file/tauri/vscode schemes; OLLAMA_REMOTES (default ollama.com) and OLLAMA_NO_CLOUD (default false) show whether cloud inference was reachable; also OLLAMA_KEEP_ALIVE, OLLAMA_LOAD_TIMEOUT, OLLAMA_NUM_PARALLEL, OLLAMA_MAX_LOADED_MODELS, OLLAMA_MAX_QUEUE, OLLAMA_MAX_TRANSFER_STREAMS, OLLAMA_SCHED_SPREAD, OLLAMA_FLASH_ATTENTION, OLLAMA_GO_TEMPLATE, OLLAMA_KV_CACHE_TYPE, OLLAMA_GPU_OVERHEAD, OLLAMA_CONTEXT_LENGTH, OLLAMA_VULKAN, OLLAMA_IGPU_ENABLE.
+  parser: null
+- id: ollama.macos_app_container
+  category: config
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Application Support/Ollama/
+  - ~/Library/Caches/com.electron.ollama/
+  - ~/Library/Preferences/com.electron.ollama.plist
+  - ~/Library/Saved Application State/com.electron.ollama.savedState/
+  - ~/Library/Webkit/com.electron.ollama/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/o/ollama-app.rb
+  source_kind: community
+  notes: |-
+    The com.electron.ollama identifier is itself a version marker: the current desktop app is Electron-based, so the usual Electron/Chromium site-data artefacts (Local Storage, IndexedDB, Cookies under Application Support) are worth sweeping even though the cask does not enumerate them.
+
+    Record structure: Cask ollama-app version 0.34.0, app bundle Ollama.app, bundle identifiers com.ollama.ollama and com.electron.ollama. Zap list: ~/.ollama, ~/Library/Application Support/Ollama, ~/Library/Caches/com.electron.ollama, ~/Library/Preferences/com.electron.ollama.plist, ~/Library/Saved Application State/com.electron.ollama.savedState, ~/Library/Webkit/com.electron.ollama.
+  parser: null
+- id: ollama.private_key
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.ollama/id_ed25519
+  - ~/.ollama/id_ed25519.pub
+  format: text
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/ollama/ollama/main/auth/auth.go
+  source_kind: source_code
+  volatility: |-
+    Created on first run and stable for the life of the install, which makes the public key a durable host/account identifier.
+  notes: |-
+    Collector must record metadata plus a hash only and NOT copy the key body. The .pub half is safe to copy and is the value that matters for attribution: it is the identity Ollama presents when pushing models to a registry or using cloud models (see OLLAMA_REMOTES / OLLAMA_NO_CLOUD).
+
+    Record structure: const defaultPrivateKey = "id_ed25519"; keyPath := filepath.Join(home, ".ollama", defaultPrivateKey), used by both GetPublicKey() and Sign(). OpenSSH-format Ed25519 private key.
+  parser: null
+- id: ollama.backup_dir
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.ollama/backup/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: recollection
+  source_kind: recollection
+  notes: |-
+    recollection, needs verification. A BackupDir() helper resolving to filepath.Join(home, ".ollama", "backup") appears in cmd/internal/fileutil/files_test.go, seen only as a code-search fragment; I did not confirm what writes there or what it contains. Worth checking on a live install before the collector globs it.
+  parser: null
+- id: ollama.model_manifests
+  category: install_evidence
+  root: system
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $OLLAMA_MODELS/manifests/*/*/*/*
+  - '%USERPROFILE%\.ollama\models\manifests\*\*\*\*'
+  - /usr/share/ollama/.ollama/models/manifests/*/*/*/*
+  - ~/.ollama/models/manifests/*/*/*/*
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/ollama/ollama/blob/main/manifest/paths.go
+  source_kind: source_code
+  volatility: Deleted by `ollama rm`. Directory mtimes date the pull; the file survives indefinitely
+    otherwise.
+  notes: |-
+    This is the single best proof of WHICH models a subject pulled, including private/uncensored or fine-tuned models, and the tag proves the exact variant. Confirmed via GitHub code search content match on manifest/paths.go plus the two route tests.
+
+    Record structure: manifest.Path() = filepath.Join(envconfig.Models(), "manifests"). The tree is manifests/<registry>/<namespace>/<model>/<tag>, e.g. manifests/registry.ollama.ai/library/test/latest (confirmed by server/routes_create_test.go and server/routes_delete_test.go, which glob manifests/*/*/*/*). Each leaf is an OCI-style JSON manifest whose layers carry media types application/vnd.ollama.image.model, .template, .params, .license, .json, .tensor.
+  parser: null
+- id: ollama.logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%LOCALAPPDATA%\Ollama\app.log'
+  - '%LOCALAPPDATA%\Ollama\server-*.log'
+  - '%LOCALAPPDATA%\Ollama\server.log'
+  - '%LOCALAPPDATA%\Ollama\upgrade.log'
+  - ~/.ollama/logs/app.log
+  - ~/.ollama/logs/server.log
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/ollama/ollama/main/docs/troubleshooting.mdx
+  source_kind: official
+  volatility: |-
+    Windows rotates: current activity in server.log, older generations in server-#.log. On Linux with the packaged systemd unit there is no file at all - logs go to the journal (journalctl -u ollama), so acquire /var/log/journal/*.
+  notes: |-
+    macOS app.log/server.log split confirmed separately in docs/macos.mdx ("app.log contains most recent logs from the GUI application / server.log contains the most recent server logs") and the Windows triple in docs/windows.mdx, both via GitHub code search content match. Linux systemd/journal guidance from the fetched docs/linux.mdx.
+
+    Record structure: Records model load/unload, request timing and GPU selection. Timestamped, so these are the best timeline source for WHEN a local model was actually run, complementing the untimestamped ~/.ollama/history. OLLAMA_DEBUG=1 raises verbosity above the INFO default.
+  parser: null
+- id: ollama.app_chat_database
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%LOCALAPPDATA%\Ollama\db.sqlite'
+  - '%LOCALAPPDATA%\Ollama\db.sqlite-wal'
+  - ~/.ollama/db.sqlite
+  - ~/Library/Application Support/Ollama/db.sqlite
+  - ~/Library/Application Support/Ollama/db.sqlite-shm
+  - ~/Library/Application Support/Ollama/db.sqlite-wal
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/ollama/ollama/main/app/store/store.go
+  source_kind: source_code
+  volatility: |-
+    Public issues report that chats deleted in the GUI remain readable in db.sqlite-wal. COLLECT THE -wal AND -shm SIDECARS BEFORE ANYTHING TOUCHES THE DB - a checkpoint on next app launch destroys them.
+  notes: |-
+    MAJOR ADDITION - not in the brief. The modern Ollama desktop GUI is a full chat client and stores conversation content in SQLite, so Ollama yields real transcripts and not only the 100-entry CLI prompt ring. Corroborated by ollama/ollama issue #12452 (opened 2025-09-30, v0.12.3, Windows) reporting plaintext chat retained in db.sqlite-wal after deletion.
+
+    Record structure: defaultDBPath() switches on runtime.GOOS: windows -> filepath.Join(os.Getenv("LOCALAPPDATA"), "Ollama", "db.sqlite"); darwin -> filepath.Join(HOME, "Library", "Application Support", "Ollama", "db.sqlite"); default (Linux) -> filepath.Join(HOME, ".ollama", "db.sqlite"). Go types visible in the store package include Chat, Message, User, Settings and Model. Exact table names and WAL pragma are set in the unexported `database` implementation, not visible in store.go.
+  parser: null

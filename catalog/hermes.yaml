@@ -1,0 +1,289 @@
+# Hermes artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: hermes
+title: Hermes
+vendor: Hermes
+references:
+- |-
+  https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/developer-guide/session-storage.md
+- https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+artifacts:
+- id: hermes.config
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/config.yaml
+  - ~/.hermes/config.yaml
+  format: yaml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    The terminal backend setting (Docker, Singularity, host) tells you how much of the agent's command execution happened inside a container versus directly on the endpoint - which decides where else to look for side effects.
+
+    Record structure: Model selection, terminal backend, compression settings, memory limits, context length, active MCP servers, and a skills.config namespace for skill-declared settings. Doubles as the MCP config.
+  parser: null
+- id: hermes.cron
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/cron/
+  - ~/.hermes/cron/
+  format: yaml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: Persistent until removed.
+  notes: |-
+    Critical for attribution: a scheduled job means agent activity that occurred with NO human at the keyboard. Any timeline that assumes interactive use will be wrong if this directory is populated.
+
+    Record structure: Scheduled jobs and automation tasks. File format not documented - enumerate.
+  parser: null
+- id: hermes.profiles
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.hermes/profiles/<name>/
+  format: yaml
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: Unknown.
+  notes: |-
+    recollection, needs verification - but check for this directory anyway: if profiles are in use, every other ~/.hermes artifact in this catalogue exists once PER PROFILE, and a single-path collector would capture only the default one.
+
+    Record structure: Named profiles are described as allowing multiple isolated concurrent Hermes instances, each bootstrapping its own memories, sessions, skills, skins, logs, plans, workspace, cron and home subdirectories. I saw this in a WebSearch summary of the configuration docs rather than in the page body I fetched, so treat the exact layout as unconfirmed.
+  parser: null
+- id: hermes.auth
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/auth.json
+  - ~/.hermes/auth.json
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: Persistent until the grant is revoked.
+  notes: |-
+    Record metadata and hash only.
+
+    Record structure: OAuth provider credentials for integrations such as Nous Portal.
+  parser: null
+- id: hermes.env
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/.env
+  - ~/.hermes/.env
+  format: text
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    Record metadata and hash only. Key names are still worth recording - they enumerate the providers and gateways the agent could authenticate to.
+
+    Record structure: API keys, tokens and passwords; takes precedence over config.yaml. 'hermes config set' automatically routes sensitive values here.
+  parser: null
+- id: hermes.sandboxes
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/sandboxes/
+  - ~/.hermes/sandboxes/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: Documented as temporary execution environments and cached data - expect churn and reuse.
+  notes: |-
+    May contain files the agent created or downloaded during tool use that exist nowhere else, including in-flight exfiltration staging. Worth a full content sweep despite being nominally temporary.
+
+    Record structure: Per-backend (Docker, Singularity, etc.) execution environments and caches.
+  parser: null
+- id: hermes.skills
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/skills/
+  - ~/.hermes/skills/
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: Persistent until removed.
+  notes: |-
+    These are AGENT-AUTHORED, not user-authored. A skill the agent wrote for itself is direct evidence of self-directed capability acquisition, with an mtime that dates it.
+
+    Record structure: Agent-created skills, managed via the skill_manage tool. Skills may declare config under the skills.config namespace in config.yaml.
+  parser: null
+- id: hermes.soul
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/SOUL.md
+  - ~/.hermes/SOUL.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    This is the top-priority system-prompt slot: whatever is here shaped every single session. Compare it against sessions.system_prompt in state.db to detect whether it was edited mid-history.
+
+    Record structure: Documented as 'Primary agent identity (slot #1 in system prompt)'.
+  parser: null
+- id: hermes.logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/logs/
+  - ~/.hermes/logs/errors.log
+  - ~/.hermes/logs/gateway.log
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: Rotation not documented.
+  notes: |-
+    gateway.log records remote-channel activity (Telegram/Discord), corroborating sessions.source. The documented redaction means these are comparatively safe to review, but it also means absence of a token here is not evidence one was not used.
+
+    Record structure: Documented as having 'secrets auto-redacted'.
+  parser: null
+- id: hermes.memories
+  category: memory
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/memories/
+  - ~/.hermes/memories/MEMORY.md
+  - ~/.hermes/memories/USER.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: Persists independently of sessions and of session pruning.
+  notes: |-
+    USER.md is often the single most personally identifying file in the whole Hermes tree, and it survives prune_sessions(). Where transcripts have been pruned, this is your best remaining summary of what the agent knew about the operator.
+
+    Record structure: MEMORY.md holds general facts; USER.md holds user-specific information.
+  parser: null
+- id: hermes.sessions_dir
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/sessions/
+  - ~/.hermes/sessions/
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: Legacy per-session JSONL files predating state.db are expected to remain on disk.
+  notes: |-
+    Collect the whole directory. As with Goose and OpenCode, the pre-SQLite files are the copy that in-app deletion and pruning do not reach.
+
+    Record structure: Documented as 'Gateway session data and conversation transcripts'. The session-storage doc says the SQLite database 'replaces the earlier per-session JSONL file approach' but does not detail the legacy layout - enumerate the directory rather than assuming a filename pattern.
+  parser: null
+- id: hermes.state_db
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/state.db
+  - ~/.hermes/state.db
+  - ~/.hermes/state.db-shm
+  - ~/.hermes/state.db-wal
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/developer-guide/session-storage.md
+  source_kind: official
+  volatility: |-
+    Journal mode is configurable (WAL or delete) - capture -wal and -shm. Compaction ARCHIVES old rows by setting active=0 rather than deleting them, so compacted history is still fully present. Real deletion only happens via explicit prune_sessions(older_than_days=N) (the docs example uses 90) or clear_messages().
+  notes: |-
+    Confirms the brief and adds a lot. Two standout fields: sessions.system_prompt preserves the exact instructions in force for each session, and messages.reasoning/reasoning_content can preserve chain-of-thought. sessions.source distinguishes CLI work from Telegram/Discord-driven work - i.e. remote operation of the agent. Always query WHERE active=0 too, or you will silently skip compacted history. The FTS tables are themselves a searchable shadow copy of message text and may retain content after a messages row is altered.
+
+    Record structure: Schema version 23. sessions: id, source (CLI/Telegram/Discord), user_id, model, model_config, system_prompt, parent_session_id, started_at, ended_at, end_reason, message_count, tool_call_count, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, reasoning_tokens, billing_provider, billing_base_url, billing_mode, estimated_cost_usd, actual_cost_usd, cost_status, cost_source, pricing_version, plus gateway/workspace metadata. messages: id, session_id, role, content, tool_call_id, tool_calls (JSON), tool_name, timestamp, token_count, finish_reason, reasoning, reasoning_content, reasoning_details, codex_reasoning_items, codex_message_items, platform_message_id, observed, active, compacted, api_content. FTS5 virtual tables: messages_fts, messages_fts_trigram, messages_fts_cjk. Supporting: session_model_usage, state_meta, gateway_routing, compression_locks, async_delegations, delivery_obligations, schema_version.
+  parser: null

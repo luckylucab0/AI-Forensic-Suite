@@ -6,9 +6,95 @@
 
 Erzeugt aus catalog/ durch scripts/gen_artifact_docs.py. Nicht von Hand bearbeiten: die CI erzeugt diese Datei neu und schlägt fehl, wenn sie abweicht.
 
-78 Artefakte über 1 Agent(en), davon 74 auf einer abgerufenen Herstellerquelle beruhend.
+210 Artefakte über 15 Agent(en), davon 167 auf einer abgerufenen Herstellerquelle beruhend.
 
 Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
+
+## Aider
+
+Vendor: Aider
+
+<https://github.com/Aider-AI/aider/blob/main/HISTORY.md>, <https://raw.githubusercontent.com/Aider-AI/aider/main/aider/analytics.py>, <https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py>, <https://raw.githubusercontent.com/Aider-AI/aider/main/aider/repomap.py>
+
+### live_only
+
+**Nur am laufenden System zu holen.** Diese Artefakte existieren nur, solange der Agent oder die Sitzung läuft, oder werden beim saubern Herunterfahren zerstört. Aus einem abgeschalteten Abbild sind sie nicht wiederherstellbar. Läuft das Endgerät noch, dann hier anfangen.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `aider.tags_cache` | tags cache | cache | macOS, Windows, Linux | `<project>/.aider.tags.cache.v3/`<br>`<project>/.aider.tags.cache.v4/` | sqlite | normal | [EN] Rebuilt on demand. If the on-disk cache cannot be opened aider silently falls back to an in-memory dict and writes nothing, so absence does not mean aider was not used. | bestätigt | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/repomap.py) |
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `aider.analytics` | analytics | install_evidence | macOS, Windows, Linux | `~/.aider/analytics.json` | json | normal | [EN] Written once at first run and then persists; not rotated. | bestätigt | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/analytics.py) |
+| `aider.caches` | caches | cache | macOS, Windows, Linux | `~/.aider/caches/` | json | normal | [EN] Expendable by design; refreshed from the network. | bestätigt | [source_code](https://github.com/Aider-AI/aider/blob/main/HISTORY.md) |
+| `aider.chat_history` | chat history | transcript | macOS, Windows, Linux | `<project>/.aider.chat.history.md` | markdown | normal | [EN] Append-only. Aider never rotates or truncates it, so it accumulates indefinitely and often covers the whole life of the repo checkout. Deleted only if the user deletes it or the working tree. | bestätigt | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py) |
+| `aider.config` | config | config | macOS, Windows, Linux | `<project>/.aider.conf.yml`<br>`~/.aider.conf.yml` | yaml | normal | [EN] Persistent until edited. | bestätigt | [source_code](https://github.com/Aider-AI/aider/blob/main/HISTORY.md) |
+| `aider.dotenv` | dotenv | credentials | macOS, Windows, Linux | `<project>/.env`<br>`~/.env` | text | secret | [EN] Persistent until edited. | bestätigt | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py) |
+| `aider.input_history` | input history | prompt_history | macOS, Windows, Linux | `<project>/.aider.input.history` | text | normal | [EN] Append-only readline-style history; survives across sessions and is not rotated. | bestätigt | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py) |
+| `aider.model_metadata` | model metadata | config | macOS, Windows, Linux | `<project>/.aider.model.metadata.json`<br>`~/.aider.model.metadata.json` | json | normal | [EN] Persistent until edited. | bestätigt | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py) |
+| `aider.model_settings` | model settings | config | macOS, Windows, Linux | `<project>/.aider.model.settings.yml`<br>`~/.aider.model.settings.yml` | yaml | normal | [EN] Persistent until edited. | bestätigt | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py) |
+
+## Amp
+
+Vendor: Sourcegraph
+
+<https://github.com/Eric-Song-Nop/agentstat/blob/main/AGENTS_MONITORING_SOLUTIONS.md>, <https://github.com/Untrivial-ai/agent-orchestrator/blob/main/backend/internal/adapters/agent/amp/auth.go>, <https://github.com/plurigrid/asi/blob/main/skills/amp-continue/SKILL.md>, <https://raw.githubusercontent.com/janekbaraniewski/openusage/main/docs/site/docs/providers/amp.md>
+
+### first
+
+**Zuerst sichern.** Rotieren oder verfallen aggressiv, nach Anzahl oder bei jedem Aufräumlauf statt nach einer bequemen Frist. Einige davon zerstört die Benutzerin schon dadurch, dass sie eine weitere Sitzung startet.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `amp.session_pointer` | session pointer | config | macOS, Linux, Windows | `~/.local/share/amp/session.json` | json | normal | [EN] Overwritten on each session; holds only the current/last state. | **unbestätigt** | [community](https://github.com/Eric-Song-Nop/agentstat/blob/main/AGENTS_MONITORING_SOLUTIONS.md) |
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `amp.continuations` | continuations | transcript | macOS, Linux, Windows | `~/.local/share/amp/continuations/*.json` | json | normal | [EN] Unknown. | **unbestätigt** | [community](https://github.com/plurigrid/asi/blob/main/skills/amp-continue/SKILL.md) |
+| `amp.ledger` | ledger | log | macOS, Linux, Windows | `$XDG_DATA_HOME/amp/ledger.jsonl`<br>`%APPDATA%\amp\ledger.jsonl`<br>`~/.local/share/amp/ledger.jsonl` | jsonl | normal | [EN] Append-only; no documented rotation. | **unbestätigt** | [community](https://raw.githubusercontent.com/janekbaraniewski/openusage/main/docs/site/docs/providers/amp.md) |
+| `amp.secrets` | secrets | credentials | macOS, Linux, Windows | `%APPDATA%\amp\secrets.json`<br>`~/.amp/oauth/`<br>`~/.local/share/amp/secrets.json` | json | secret | [EN] Persistent until logout. One reviewed source notes the schema has changed across CLI releases. | **unbestätigt** | [community](https://github.com/Untrivial-ai/agent-orchestrator/blob/main/backend/internal/adapters/agent/amp/auth.go) |
+| `amp.settings` | settings | config | macOS, Linux, Windows | `$XDG_CONFIG_HOME/amp/settings.json`<br>`<project>/.amp/settings.json`<br>`<project>/.amp/settings.jsonc`<br>`~/.config/amp/settings.json` | json | normal | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/sourcegraph/amp-examples-and-guides/main/guides/cli/README.md) |
+| `amp.thread_logs` | thread logs | log | macOS, Linux | `~/.cache/amp/logs/threads/*.log` | text | normal | [EN] Cache directory - expect OS and application cache eviction. Collect early. | **unbestätigt** | [community](https://raw.githubusercontent.com/jbdamask/john-claude-skills/main/.pass-along/2026-08-19-1157-PASS-ALONG.md) |
+| `amp.threads` | threads | transcript | macOS, Linux, Windows | `$XDG_DATA_HOME/amp/threads/T-*.json`<br>`%APPDATA%\amp\threads\T-*.json`<br>`~/.local/share/amp/threads/T-*.json`<br>`~/Library/Application Support/amp/threads/T-*.json` | json | normal | [EN] CAVEAT: the authoritative thread store is server-side. A fetched community playbook warns the local directory 'is only an offline fallback for that exact id, not a current inventory', so local files may be stale, partial, or absent for threads that certainly happened. | **unbestätigt** | [community](https://raw.githubusercontent.com/janekbaraniewski/openusage/main/docs/site/docs/providers/amp.md) |
+
+## ChatGPT Desktop
+
+Vendor: OpenAI
+
+<https://github.com/garr3ttmjo/Digital-Forensic-Report-Writeups/blob/main/Blog/ChatGPT%20Desktop%20Forensics.md>, <https://github.com/reznikov/dotfiles/blob/master/bin/safehouse>, <https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt-classic.rb>, <https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb>
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `chatgpt_desktop.macos_app_pairing_extensions` | macos app pairing extensions | config | macOS | `~/Library/Application Support/com.openai.chat/app_pairing_extensions/` | binary | normal |  | **unbestätigt** | [community](https://github.com/reznikov/dotfiles/blob/master/bin/safehouse) |
+| `chatgpt_desktop.macos_codex_app_support` | macos codex app support | transcript | macOS | `~/Library/Application Support/Codex/`<br>`~/Library/Application Support/OpenAI/Codex/`<br>`~/Library/Application Support/com.openai.codex/`<br>`~/Library/Caches/Codex/`<br>`~/Library/Caches/com.openai.codex/` | binary | normal | [EN] Chromium-style site data; Local Storage / IndexedDB LevelDB logs keep deleted records until compaction, so image the whole tree rather than cherry-picking .ldb files. | **unbestätigt** | [community](https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb) |
+| `chatgpt_desktop.macos_codex_home` | macos codex home | transcript | macOS | `~/.codex/` | jsonl | normal |  | **unbestätigt** | [community](https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb) |
+| `chatgpt_desktop.macos_computer_use_service` | macos computer use service | install_evidence | macOS | `/Library/Application Support/CodexComputerUseAuthorizationPlugin/`<br>`~/Library/Caches/com.openai.sky.CUAService/`<br>`~/Library/Group Containers/*.com.openai.sky.CUAService/`<br>`~/Library/HTTPStorages/com.openai.sky.CUAService/`<br>`~/Library/Preferences/com.openai.sky.CUAService.cli.plist`<br>`~/Library/Preferences/com.openai.sky.CUAService.plist` | binary | normal |  | **unbestätigt** | [community](https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb) |
+| `chatgpt_desktop.macos_cookies` | macos cookies | credentials | macOS | `~/Library/HTTPStorages/com.openai.chat.binarycookies`<br>`~/Library/HTTPStorages/com.openai.codex.binarycookies`<br>`~/Library/HTTPStorages/com.openai.sky.CUAService.binarycookies` | binary | secret |  | **unbestätigt** | [community](https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb) |
+| `chatgpt_desktop.macos_httpstorages` | macos httpstorages | cache | macOS | `~/Library/HTTPStorages/ChatGPTHelper.binarycookies`<br>`~/Library/HTTPStorages/com.openai.chat/`<br>`~/Library/HTTPStorages/com.openai.codex/`<br>`~/Library/HTTPStorages/com.openai.sky.CUAService/` | binary | normal | [EN] NSURLSession cache; evicted under pressure and on cache clears. | **unbestätigt** | [community](https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt-classic.rb) |
+| `chatgpt_desktop.macos_legacy_app_support` | macos legacy app support | transcript | macOS | `~/Library/Application Scripts/com.openai.chat.Widgets/`<br>`~/Library/Application Scripts/group.com.openai.chat/`<br>`~/Library/Application Support/ChatGPT/`<br>`~/Library/Application Support/com.openai.chat/`<br>`~/Library/Caches/com.openai.chat/`<br>`~/Library/Containers/com.openai.chat.Widgets/`<br>`~/Library/Group Containers/group.com.openai.chat/`<br>`~/Library/WebKit/com.openai.chat/` | binary | normal | [EN] Conversation payloads are encrypted in current builds; treat plaintext recovery as a bonus, not the plan. Envelope metadata (file names, counts, sizes, mtimes) survives regardless and is what supports a timeline. | **unbestätigt** | [community](https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt-classic.rb) |
+| `chatgpt_desktop.macos_legacy_conversations_dir` | macos legacy conversations dir | transcript | macOS | `~/Library/Application Support/com.openai.chat/conversations-*/` | binary | normal |  | **unbestätigt** | recollection |
+| `chatgpt_desktop.macos_preferences` | macos preferences | config | macOS | `~/Library/Preferences/ChatGPTHelper.plist`<br>`~/Library/Preferences/com.openai.chat.*.plist`<br>`~/Library/Preferences/com.openai.chat.plist`<br>`~/Library/Preferences/com.openai.codex.plist` | binary | normal | [EN] Written through cfprefsd, so an on-disk plist can lag the live value; on a live box run `defaults read` or kill cfprefsd before imaging. | **unbestätigt** | [community](https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb) |
+| `chatgpt_desktop.macos_saved_state_and_logs` | macos saved state and logs | log | macOS | `~/Library/Logs/com.openai.codex/`<br>`~/Library/Saved Application State/com.openai.chat.savedState/`<br>`~/Library/Saved Application State/com.openai.codex.savedState/` | binary | normal | [EN] Saved state is rewritten on every clean quit; it reflects only the LAST session. | **unbestätigt** | [community](https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt.rb) |
+| `chatgpt_desktop.windows_msix_localcache` | windows msix localcache | transcript | Windows | `%LOCALAPPDATA%\Packages\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\LocalCache\Roaming\ChatGPT\`<br>`%LOCALAPPDATA%\Packages\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\LocalCache\Roaming\ChatGPT\IndexedDB\https_chatgpt.com_0.indexeddb.leveldb\`<br>`%LOCALAPPDATA%\Packages\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\LocalCache\Roaming\ChatGPT\Local Storage\leveldb\` | binary | normal | [EN] The writeup states the LevelDB store persists across app restarts but is REMOVED WHEN THE USER LOGS OUT. Collect before touching the app, and never log the account out on a live box. | **unbestätigt** | [community](https://github.com/garr3ttmjo/Digital-Forensic-Report-Writeups/blob/main/Blog/ChatGPT%20Desktop%20Forensics.md) |
+
+### Veraltete Pfade
+
+Die folgenden Pfade werden von aktuellen Versionen nicht mehr geschrieben oder gelesen. Sie werden trotzdem gesammelt, weil sie eine ältere Installation belegen, dürfen aber nie als aktueller Zustand dargestellt werden.
+
+- `chatgpt_desktop.macos_legacy_app_support`: `~/Library/Application Scripts/com.openai.chat.Widgets/`, `~/Library/Application Scripts/group.com.openai.chat/`, `~/Library/Application Support/ChatGPT/`, `~/Library/Application Support/com.openai.chat/`, `~/Library/Caches/com.openai.chat/`, `~/Library/Containers/com.openai.chat.Widgets/`, `~/Library/Group Containers/group.com.openai.chat/`, `~/Library/WebKit/com.openai.chat/`
 
 ## Claude Code
 
@@ -134,3 +220,310 @@ Vendor: Anthropic
 Die folgenden Pfade werden von aktuellen Versionen nicht mehr geschrieben oder gelesen. Sie werden trotzdem gesammelt, weil sie eine ältere Installation belegen, dürfen aber nie als aktueller Zustand dargestellt werden.
 
 - `claude_code.legacy_state_dirs`: `~/.claude/todos/`, `~/.claude/statsig/`, `~/.claude/logs/`
+
+## Continue
+
+Vendor: Continue
+
+<https://github.com/continuedev/continue/blob/main/core/config/ConfigHandler.ts>, <https://github.com/continuedev/continue/blob/main/extensions/cli/src/commands/devbox-entrypoint.md>, <https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts>, <https://raw.githubusercontent.com/continuedev/continue/main/docs/customize/deep-dives/configuration.mdx>
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `continue.agents` | agents | config | macOS, Linux, Windows | `<project>/.continue/agents/*.yaml`<br>`<project>/.continue/assistants/*.yaml`<br>`~/.continue/agents/*.yaml`<br>`~/.continue/assistants/*.yaml` | yaml | normal | [EN] Persistent until removed. | bestätigt | [source_code](https://github.com/continuedev/continue/blob/main/core/config/ConfigHandler.ts) |
+| `continue.aux_config` | aux config | config | macOS, Linux, Windows | `~/.continue/.configs/`<br>`~/.continue/.continueignore`<br>`~/.continue/.migrations/`<br>`~/.continue/prompts/` | text | normal | [EN] Persistent. | bestätigt | [source_code](https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts) |
+| `continue.config` | config | config | macOS, Linux, Windows | `<project>/.continuerc.json`<br>`~/.continue/config.json`<br>`~/.continue/config.ts`<br>`~/.continue/config.yaml` | yaml | normal | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/continuedev/continue/main/docs/customize/deep-dives/configuration.mdx) |
+| `continue.dev_data` | dev data | log | macOS, Linux, Windows | `~/.continue/dev_data/`<br>`~/.continue/logs/core.log` | jsonl | normal | [EN] Append-only in the code reviewed; no rotation implemented. | bestätigt | [source_code](https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts) |
+| `continue.devbox_env` | devbox env | credentials | Linux | `~/.continue/devbox-env` | text | secret | [EN] Written at devbox start and sourced before 'cn serve'; persists so keys survive suspend/resume. | bestätigt | [source_code](https://github.com/continuedev/continue/blob/main/extensions/cli/src/commands/devbox-entrypoint.md) |
+| `continue.diffs` | diffs | file_snapshot | macOS, Linux, Windows | `~/.continue/.diffs/` | text | normal | [EN] Working scratch area for the diff/apply flow; expect files to be replaced or removed as edits are accepted or rejected. Collect early. | bestätigt | [source_code](https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts) |
+| `continue.index` | index | cache | macOS, Linux, Windows | `~/.continue/index/autocompleteCache.sqlite`<br>`~/.continue/index/docs.sqlite`<br>`~/.continue/index/index.sqlite`<br>`~/.continue/index/lancedb/`<br>`~/.continue/repo_map.txt` | sqlite | normal | [EN] Rebuildable caches; may be wiped by a reindex without affecting the agent's function. | bestätigt | [source_code](https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts) |
+| `continue.sessions` | sessions | transcript | macOS, Linux, Windows | `$CONTINUE_GLOBAL_DIR/sessions/`<br>`%USERPROFILE%\.continue\sessions\*.json`<br>`~/.continue/sessions/<session-id>.json`<br>`~/.continue/sessions/sessions.json` | json | normal | [EN] One file per session, retained indefinitely; no rotation in the code reviewed. | bestätigt | [source_code](https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts) |
+
+## Cross-cutting evidence
+
+[EN] Evidence that belongs to no single agent: shell history showing how an agent was invoked and with which flags, package manager traces proving it was installed, and the instruction-file conventions that several agents read, which are the surface through which injected instructions reach an agent.
+
+<https://code.claude.com/docs/en/setup>, <https://github.com/Adyen/adyen-web/blob/main/.windsurf/rules/code-guide.md>, <https://github.com/cline/cline/blob/main/.clinerules/hooks/README.md>, <https://github.com/cline/cline/blob/main/docs/customization/cline-rules.mdx>
+
+### first
+
+**Zuerst sichern.** Rotieren oder verfallen aggressiv, nach Anzahl oder bei jedem Aufräumlauf statt nach einer bequemen Frist. Einige davon zerstört die Benutzerin schon dadurch, dass sie eine weitere Sitzung startet.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `crosscutting.npm_debug_logs` | npm debug logs | log | macOS, Linux, Windows | `%LOCALAPPDATA%\npm-cache\_logs\*-debug-*.log`<br>`~/.npm/_logs/*-debug-*.log` | text | normal | [EN] PRUNED AGGRESSIVELY - COLLECT FIRST. Verbatim: "Log files will be removed from the logs-dir when the number of log files exceeds logs-max, with the oldest logs being deleted first." logs-max defaults to 10 (visible as `logs-max:10` in npm's own log-file test snapshot), so roughly the last ten npm invocations survive. On a busy dev box that can be hours. | bestätigt | [official](https://raw.githubusercontent.com/npm/cli/latest/docs/lib/content/using-npm/logging.md) |
+| `crosscutting.npm_global_install_dirs` | npm global install dirs | install_evidence | macOS, Linux, Windows | `%APPDATA%\npm\`<br>`%APPDATA%\npm\node_modules\`<br>`/opt/homebrew/lib/node_modules/`<br>`/usr/local/bin/`<br>`/usr/local/lib/node_modules/`<br>`~/.nvm/versions/node/*/lib/node_modules/` | json | normal | [EN] Overwritten in place on upgrade, so the installed version reflects only the CURRENT state; use ~/.npm/_logs for the install history. | bestätigt | [official](https://raw.githubusercontent.com/npm/cli/latest/docs/lib/content/configuring-npm/folders.md) |
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `crosscutting.homebrew_prefixes` | homebrew prefixes | install_evidence | macOS, Linux | `/home/linuxbrew/.linuxbrew/`<br>`/home/linuxbrew/.linuxbrew/Cellar/`<br>`/opt/homebrew/`<br>`/opt/homebrew/Caskroom/`<br>`/opt/homebrew/Cellar/`<br>`/opt/homebrew/bin/`<br>`/usr/local/`<br>`/usr/local/Cellar/` | text | normal | [EN] Verbatim from the docs: "Homebrew keeps old versions on disk after upgrades. Run `brew cleanup` periodically to reclaim disk space." That is good for us - the Cellar often holds a VERSION HISTORY of an agent, not just the current build. | bestätigt | [official](https://raw.githubusercontent.com/Homebrew/brew/main/docs/Installation.md) |
+| `crosscutting.hook_scripts` | hook scripts | instructions | macOS, Linux, Windows | `<project>/claude/hooks/`<br>`<project>/claude/settings.json`<br>`<project>/claude/settings.local.json`<br>`<project>/clinerules/hooks/`<br>`~/.claude/settings.json`<br>`~/Documents/Cline/Hooks/` | text | normal | [EN] Executable bits and mtimes matter as much as the content - record mode, owner and timestamps, not just the script text. | bestätigt | [official](https://github.com/cline/cline/blob/main/.clinerules/hooks/README.md) |
+| `crosscutting.instructions_agents_md` | instructions agents md | project_instructions | macOS, Linux, Windows | `<project>/**/AGENTS.md`<br>`<project>/AGENTS.md` | markdown | normal | [EN] Version-controlled in the repo, so git history gives you authorship and timing for free - `git log -p --follow AGENTS.md` is the single highest-value command for an injection question. Also check for uncommitted local modifications. | bestätigt | [official](https://raw.githubusercontent.com/agentsmd/agents.md/main/README.md) |
+| `crosscutting.instructions_claude_md` | instructions claude md | project_instructions | macOS, Linux, Windows | `<project>/**/CLAUDE.md`<br>`<project>/CLAUDE.local.md`<br>`<project>/CLAUDE.md`<br>`<project>/claude/CLAUDE.md`<br>`~/.claude/CLAUDE.md` | markdown | normal | [EN] Git-tracked in the project case; ~/.claude/CLAUDE.md is user-global and untracked, so it has no history and only its mtime. | bestätigt | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-command-reference.md) |
+| `crosscutting.instructions_clinerules` | instructions clinerules | project_instructions | macOS, Linux, Windows | `<project>/claude/skills/`<br>`<project>/cline/remote-config/`<br>`<project>/cline/skills/`<br>`<project>/clineignore`<br>`<project>/clinerules`<br>`<project>/clinerules/`<br>`<project>/clinerules/*.md`<br>`<project>/clinerules/skills/`<br>`<project>/clinerules/workflows/`<br>`~/Documents/Cline/Rules/`<br>`~/Documents/Cline/Workflows/` | markdown | normal | [EN] When Cline converts a legacy single-file .clinerules into a directory it renames the original to `.clinerules.bak` as a backup - look for that file, it preserves the pre-migration instruction text. | bestätigt | [official](https://github.com/cline/cline/blob/main/docs/customization/cline-rules.mdx) |
+| `crosscutting.instructions_copilot_instructions` | instructions copilot instructions | project_instructions | macOS, Linux, Windows | `$HOME/.copilot/copilot-instructions.md`<br>`$HOME/.copilot/instructions/**/*.instructions.md`<br>`<project>/github/agents/*.md`<br>`<project>/github/copilot-instructions.md`<br>`<project>/github/copilot/settings.json`<br>`<project>/github/copilot/settings.local.json`<br>`<project>/github/instructions/**/*.instructions.md`<br>`<project>/github/prompts/*.prompt.md`<br>`<project>/github/skills/` | markdown | normal |  | bestätigt | [official](https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-command-reference.md) |
+| `crosscutting.instructions_cursor_rules` | instructions cursor rules | project_instructions | macOS, Linux, Windows | `<project>/**/.cursor/rules/`<br>`<project>/AGENTS.md`<br>`<project>/cursor/rules/`<br>`<project>/cursor/rules/*.mdc`<br>`<project>/cursor/rules/*/RULE.md`<br>`<project>/cursorrules` | markdown | normal |  | **unbestätigt** | [community](https://raw.githubusercontent.com/sanjeed5/awesome-cursor-rules-mdc/main/cursor-rules-reference.md) |
+| `crosscutting.instructions_gemini_md` | instructions gemini md | project_instructions | macOS, Linux, Windows | `<project>/**/GEMINI.md`<br>`<project>/GEMINI.md`<br>`<project>/gemini/settings.json`<br>`~/.gemini/GEMINI.md`<br>`~/.gemini/settings.json` | markdown | normal |  | bestätigt | [official](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/gemini-md.md) |
+| `crosscutting.instructions_junie_guidelines` | instructions junie guidelines | project_instructions | macOS, Linux, Windows | `<project>/junie/`<br>`<project>/junie/guidelines.md` | markdown | normal |  | **unbestätigt** | [community](https://raw.githubusercontent.com/JetBrains/Rplugin/master/.junie/guidelines.md) |
+| `crosscutting.instructions_kiro_steering` | instructions kiro steering | project_instructions | macOS, Linux, Windows | `<project>/kiro/specs/`<br>`<project>/kiro/steering/`<br>`<project>/kiro/steering/*.md` | markdown | normal |  | **unbestätigt** | [community](https://github.com/cremich/promptz/blob/main/.kiro/steering/product.md) |
+| `crosscutting.instructions_windsurf_rules` | instructions windsurf rules | project_instructions | macOS, Linux, Windows | `<project>/windsurf/rules/`<br>`<project>/windsurf/rules/*.md`<br>`<project>/windsurfrules` | markdown | normal |  | **unbestätigt** | [community](https://github.com/Adyen/adyen-web/blob/main/.windsurf/rules/code-guide.md) |
+| `crosscutting.mcp_config_files` | mcp config files | mcp_config | macOS, Linux, Windows | `$HOME/.copilot/mcp-config.json`<br>`%APPDATA%\Claude\claude_desktop_config.json`<br>`%USERPROFILE%\.mcp.json`<br>`<project>/cursor/mcp.json`<br>`<project>/gemini/settings.json`<br>`<project>/mcp.json`<br>`<project>/vscode/mcp.json`<br>`~/.claude.json`<br>`~/.config/Claude/claude_desktop_config.json`<br>`~/.cursor/mcp.json`<br>`~/.gemini/settings.json`<br>`~/.vscode/mcp.json`<br>`~/Library/Application Support/Claude/claude_desktop_config.json` | json | normal | [EN] Edited by hand and by `claude mcp add`-style commands; no history is kept, so only the file mtime dates a change. Collect early - these are small and cheap. | bestätigt | [official](https://code.claude.com/docs/en/setup) |
+| `crosscutting.pipx_home_and_bin` | pipx home and bin | install_evidence | Linux, macOS, Windows | `%LOCALAPPDATA%\pipx\pipx\venvs\*\`<br>`/opt/pipx/`<br>`~/.local/bin/`<br>`~/.local/pipx/`<br>`~/.local/share/pipx/venvs/*/`<br>`~/Library/Application Support/pipx/venvs/*/` | json | normal |  | bestätigt | [official](https://raw.githubusercontent.com/pypa/pipx/main/docs/reference/environment-variables.rst) |
+| `crosscutting.shell_bash_history` | shell bash history | shell_history | macOS, Linux | `$HISTFILE`<br>`~/.bash_history` | text | normal | [EN] HISTFILESIZE truncates the file by removing the OLDEST entries whenever it is assigned. Default HISTSIZE is 500 after startup files are read. By default bash writes only at shell exit, so a killed terminal or a crashed box can lose the entire session. | bestätigt | [source_code](https://raw.githubusercontent.com/pexip/os-bash/c36eb24bedb80d6783fe1b1f7470acb97eb603a8/doc/bash.1) |
+| `crosscutting.shell_fish_history` | shell fish history | shell_history | macOS, Linux | `$XDG_DATA_HOME/fish/${fish_history}_history`<br>`$XDG_DATA_HOME/fish/fish_history`<br>`~/.local/share/fish/fish_history` | yaml | normal | [EN] Rewritten wholesale on save, so the previous generation is a good carving target. | bestätigt | [source_code](https://raw.githubusercontent.com/fish-shell/fish-shell/master/src/history/yaml_backend.rs) |
+| `crosscutting.shell_psreadline_history` | shell psreadline history | shell_history | Windows, macOS, Linux | `$XDG_DATA_HOME/powershell/PSReadLine/*_history.txt`<br>`%APPDATA%\Microsoft\Windows\PowerShell\PSReadLine\*_history.txt`<br>`%APPDATA%\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt`<br>`~/.local/share/powershell/PSReadLine/ConsoleHost_history.txt` | text | normal | [EN] Default HistorySaveStyle is SaveIncrementally - "Save history after each command is executed and share across multiple instances of PowerShell" - which is good news: a crashed or killed console still leaves a record. SaveNothing disables the file. MaximumHistoryCount caps it and no default is documented. | bestätigt | [official](https://raw.githubusercontent.com/MicrosoftDocs/PowerShell-Docs/main/reference/7.7/PSReadLine/Set-PSReadLineOption.md) |
+| `crosscutting.shell_zsh_history` | shell zsh history | shell_history | macOS, Linux | `$HISTFILE`<br>`~/.zhistory`<br>`~/.zsh_history` | text | normal | [EN] SAVEHIST caps the file and oldest entries are dropped. HIST_EXPIRE_DUPS_FIRST and HIST_IGNORE_SPACE cause silent omissions - a leading space means the command was never recorded, which is NOT evidence of absence of the command. | bestätigt | [source_code](https://raw.githubusercontent.com/zsh-users/zsh/master/Doc/Zsh/options.yo) |
+| `crosscutting.uv_tool_dir` | uv tool dir | install_evidence | macOS, Linux, Windows | `$XDG_DATA_HOME/uv/tools/*/`<br>`%APPDATA%\uv\data\tools\*\`<br>`%LOCALAPPDATA%\uv\cache\`<br>`~/.cache/uv/`<br>`~/.local/bin/`<br>`~/.local/share/uv/python/`<br>`~/.local/share/uv/tools/*/` | toml | normal | [EN] The cache is prunable (`uv cache clean`); tool installs persist. | bestätigt | [official](https://raw.githubusercontent.com/astral-sh/uv/main/docs/reference/storage.md) |
+| `crosscutting.vscode_extension_dirs` | vscode extension dirs | install_evidence | Windows, macOS, Linux | `%USERPROFILE%\.vscode\extensions\`<br>`~/.cursor/extensions/`<br>`~/.vscode-insiders/extensions/`<br>`~/.vscode-server/extensions/`<br>`~/.vscode/extensions/`<br>`~/.windsurf/extensions/` | json | normal | [EN] Old versions are removed on update, but extensions.json in the parent directory retains install/update bookkeeping. | bestätigt | [official](https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/configure/extensions/extension-marketplace.md) |
+| `crosscutting.windows_appdata_program_dirs` | windows appdata program dirs | install_evidence | Windows | `%APPDATA%\`<br>`%LOCALAPPDATA%\Ollama\`<br>`%LOCALAPPDATA%\Packages\`<br>`%LOCALAPPDATA%\Programs\`<br>`%LOCALAPPDATA%\Programs\Ollama\` | binary | normal |  | bestätigt | [official](https://raw.githubusercontent.com/ollama/ollama/main/docs/troubleshooting.mdx) |
+| `crosscutting.windows_execution_artifacts` | windows execution artifacts | install_evidence | Windows | `%SystemRoot%\AppCompat\Programs\Amcache.hve`<br>`%SystemRoot%\AppCompat\Programs\Amcache.hve.LOG1`<br>`%SystemRoot%\AppCompat\Programs\Amcache.hve.LOG2`<br>`%SystemRoot%\Prefetch\*.pf`<br>`HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run`<br>`HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce`<br>`HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\AppCompatCache`<br>`HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\bam\State\UserSettings\*`<br>`HKEY_USERS\%%users.sid%%\Software\Microsoft\Windows\CurrentVersion\Run`<br>`HKEY_USERS\%%users.sid%%\Software\Microsoft\Windows\CurrentVersion\RunOnce` | binary | normal | [EN] Prefetch is capped (1024 entries on modern Windows) and can be disabled on SSD-era builds; ShimCache is written to the registry mainly at shutdown so a live-acquired SYSTEM hive may lag; BAM entries are per-SID and get cleared with the profile. | **unbestätigt** | [community](https://raw.githubusercontent.com/ForensicArtifacts/artifacts/main/artifacts/data/windows.yaml) |
+
+### durable
+
+**Meist noch vorhanden.** Vom Aufräumlauf nicht erfasst und überleben damit regelmässig die Transkripte, die sie beschreiben. Sind die Transkripte schon weg, ist diese Gruppe das, was bleibt, und sie genügt oft, um zu belegen, dass ein Agent lief, was er durfte und was gefragt wurde.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `crosscutting.npm_npx_cache` | npm npx cache | install_evidence | macOS, Linux, Windows | `%LOCALAPPDATA%\npm-cache\_npx\*\package.json`<br>`~/.npm/_npx/*/node_modules/`<br>`~/.npm/_npx/*/package.json` | json | normal | [EN] Persists until `npm cache clean` or manual removal; survives package upgrades. Directory mtime dates the npx run. | bestätigt | [source_code](https://github.com/npm/cli/blob/latest/workspaces/config/lib/definitions/definitions.js) |
+
+### Veraltete Pfade
+
+Die folgenden Pfade werden von aktuellen Versionen nicht mehr geschrieben oder gelesen. Sie werden trotzdem gesammelt, weil sie eine ältere Installation belegen, dürfen aber nie als aktueller Zustand dargestellt werden.
+
+- `crosscutting.instructions_clinerules`: `<project>/claude/skills/`, `<project>/cline/remote-config/`, `<project>/cline/skills/`, `<project>/clineignore`, `<project>/clinerules`, `<project>/clinerules/`, `<project>/clinerules/*.md`, `<project>/clinerules/skills/`, `<project>/clinerules/workflows/`, `~/Documents/Cline/Rules/`, `~/Documents/Cline/Workflows/`
+
+## Factory Droid
+
+Vendor: Factory
+
+<https://github.com/code-yeongyu/oh-my-openagent/blob/main/packages/shared-skills/skills/coding-agent-sessions/references/all-platforms.md>, <https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift>
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `factory_droid.auth` | auth | credentials | macOS, Linux, Windows | `~/.factory/` | json | secret | [EN] Unknown. | **unbestätigt** | recollection |
+| `factory_droid.config` | config | config | macOS, Linux, Windows | `<project>/.factory/settings.json`<br>`<project>/.factory/settings.local.json`<br>`~/.factory/config.json`<br>`~/.factory/settings.json`<br>`~/.factory/settings.local.json` | json | normal | [EN] Persistent until edited. settings.json is created with defaults on first run of droid. | **unbestätigt** | [community](https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift) |
+| `factory_droid.logs` | logs | log | macOS, Linux, Windows | `~/.factory/bug-reports/`<br>`~/.factory/logs/` | text | normal | [EN] Unknown. | **unbestätigt** | recollection |
+| `factory_droid.mcp_and_hooks` | mcp and hooks | mcp_config | macOS, Linux, Windows | `<project>/.factory/mcp.json`<br>`~/.factory/hooks.json`<br>`~/.factory/mcp.json` | json | normal | [EN] Persistent until edited. | **unbestätigt** | [community](https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift) |
+| `factory_droid.sessions` | sessions | transcript | macOS, Linux, Windows | `<project>/.factory/sessions/`<br>`~/.factory/sessions/**/settings.json`<br>`~/.factory/sessions/*/*.jsonl`<br>`~/.factory/sessions/<uuid>.json` | jsonl | normal | [EN] No documented expiry. | **unbestätigt** | [community](https://github.com/code-yeongyu/oh-my-openagent/blob/main/packages/shared-skills/skills/coding-agent-sessions/references/all-platforms.md) |
+| `factory_droid.skills_and_droids` | skills and droids | instructions | macOS, Linux, Windows | `<project>/AGENTS.md`<br>`~/.factory/commands/`<br>`~/.factory/droids/`<br>`~/.factory/skills/` | markdown | normal | [EN] Persistent until removed. | **unbestätigt** | [community](https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift) |
+
+## Goose
+
+Vendor: Block
+
+<https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md>, <https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md>, <https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md>, <https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/recipes/session-recipes.md>
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `goose.cli_logs` | cli logs | log | macOS, Linux, Windows | `%APPDATA%\Block\goose\data\logs\cli\`<br>`~/.local/state/goose/logs/cli/`<br>`~/.local/state/goose/logs/cli/YYYY-MM-DD/` | text | normal | [EN] SELF-DELETING: organised into date-based subdirectories with automatic deletion of entries older than two weeks. Collect first. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md) |
+| `goose.config` | config | config | macOS, Linux, Windows | `%APPDATA%\Block\goose\config\config.yaml`<br>`~/.config/goose/config.yaml` | yaml | normal | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md) |
+| `goose.desktop_log` | desktop log | log | macOS, Windows | `%APPDATA%\Block\goose\logs\main.log`<br>`~/Library/Application Support/Goose/logs/main.log` | text | normal | [EN] Electron main-process log; rotation behaviour not documented. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md) |
+| `goose.hints` | hints | project_instructions | macOS, Linux, Windows | `<project>/.goosehints`<br>`<project>/AGENTS.md` | text | normal | [EN] Lives in the repo; recoverable from git history even when the working copy is clean. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md) |
+| `goose.memory` | memory | memory | macOS, Linux, Windows | `<project>/.goose/memory/`<br>`~/.config/goose/memory/` | text | normal | [EN] Persists independently of sessions; not covered by session deletion. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/mcp/memory-mcp.md) |
+| `goose.permissions` | permissions | permissions | macOS, Linux, Windows | `%APPDATA%\Block\goose\config\permission.yaml`<br>`%APPDATA%\Block\goose\config\permissions\tool_permissions.json`<br>`~/.config/goose/permission.yaml`<br>`~/.config/goose/permissions/tool_permissions.json` | yaml | normal | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md) |
+| `goose.prompts` | prompts | instructions | macOS, Linux, Windows | `%APPDATA%\Block\goose\config\prompts\`<br>`~/.config/goose/prompts/` | text | normal | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md) |
+| `goose.recipes` | recipes | config | macOS, Linux, Windows | `<project>/*.yaml` | yaml | normal | [EN] Unknown. | **unbestätigt** | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/recipes/session-recipes.md) |
+| `goose.secrets` | secrets | credentials | macOS, Linux, Windows | `%APPDATA%\Block\goose\config\secrets.yaml`<br>`~/.config/goose/secrets.yaml` | yaml | secret | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md) |
+| `goose.server_logs` | server logs | log | macOS, Linux, Windows | `%APPDATA%\Block\goose\data\logs\server\`<br>`~/.local/state/goose/logs/server/` | text | normal | [EN] SELF-DELETING: same two-week automatic cleanup as the CLI logs. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md) |
+| `goose.sessions_db` | sessions db | transcript | macOS, Linux | `~/.local/share/goose/sessions/sessions.db`<br>`~/.local/share/goose/sessions/sessions.db-shm`<br>`~/.local/share/goose/sessions/sessions.db-wal`<br>`~/Library/Application Support/Block/goose/data/sessions/sessions.db` | sqlite | normal | [EN] No automatic expiry documented. Deleting a session in Goose Desktop also removes it from the CLI and the docs state the action cannot be undone - i.e. a SQL delete, so carving the SQLite freelist and the -wal file may still recover it. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/sessions/session-management.md) |
+| `goose.sessions_db_windows` | sessions db windows | transcript | Windows | `%APPDATA%\Block\goose\data\sessions\sessions.db` | sqlite | normal | [EN] Same as the macOS/Linux database. | **unbestätigt** | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md) |
+| `goose.sessions_jsonl_legacy` | sessions jsonl legacy | transcript | macOS, Linux, Windows | `%APPDATA%\Block\goose\data\sessions\*.jsonl`<br>`~/.local/share/goose/sessions/*.jsonl` | jsonl | normal | [EN] Orphaned but NOT deleted. The doc states: 'Legacy .jsonl files remain on disk but are no longer managed by goose.' They therefore persist indefinitely and are never rotated, even after the SQLite import. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/sessions/session-management.md) |
+
+### Veraltete Pfade
+
+Die folgenden Pfade werden von aktuellen Versionen nicht mehr geschrieben oder gelesen. Sie werden trotzdem gesammelt, weil sie eine ältere Installation belegen, dürfen aber nie als aktueller Zustand dargestellt werden.
+
+- `goose.sessions_jsonl_legacy`: `%APPDATA%\Block\goose\data\sessions\*.jsonl`, `~/.local/share/goose/sessions/*.jsonl`
+
+## Hermes
+
+Vendor: Hermes
+
+<https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/developer-guide/session-storage.md>, <https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md>
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `hermes.auth` | auth | credentials | macOS, Linux, Windows | `$HERMES_HOME/auth.json`<br>`~/.hermes/auth.json` | json | secret | [EN] Persistent until the grant is revoked. | bestätigt | [official](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md) |
+| `hermes.config` | config | config | macOS, Linux, Windows | `$HERMES_HOME/config.yaml`<br>`~/.hermes/config.yaml` | yaml | normal | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md) |
+| `hermes.cron` | cron | config | macOS, Linux, Windows | `$HERMES_HOME/cron/`<br>`~/.hermes/cron/` | yaml | normal | [EN] Persistent until removed. | bestätigt | [official](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md) |
+| `hermes.env` | env | credentials | macOS, Linux, Windows | `$HERMES_HOME/.env`<br>`~/.hermes/.env` | text | secret | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md) |
+| `hermes.logs` | logs | log | macOS, Linux, Windows | `$HERMES_HOME/logs/`<br>`~/.hermes/logs/errors.log`<br>`~/.hermes/logs/gateway.log` | text | normal | [EN] Rotation not documented. | bestätigt | [official](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md) |
+| `hermes.memories` | memories | memory | macOS, Linux, Windows | `$HERMES_HOME/memories/`<br>`~/.hermes/memories/MEMORY.md`<br>`~/.hermes/memories/USER.md` | markdown | normal | [EN] Persists independently of sessions and of session pruning. | bestätigt | [official](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md) |
+| `hermes.profiles` | profiles | config | macOS, Linux, Windows | `~/.hermes/profiles/<name>/` | yaml | normal | [EN] Unknown. | **unbestätigt** | [official](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md) |
+| `hermes.sandboxes` | sandboxes | file_snapshot | macOS, Linux, Windows | `$HERMES_HOME/sandboxes/`<br>`~/.hermes/sandboxes/` | binary | normal | [EN] Documented as temporary execution environments and cached data - expect churn and reuse. | bestätigt | [official](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md) |
+| `hermes.sessions_dir` | sessions dir | transcript | macOS, Linux, Windows | `$HERMES_HOME/sessions/`<br>`~/.hermes/sessions/` | jsonl | normal | [EN] Legacy per-session JSONL files predating state.db are expected to remain on disk. | bestätigt | [official](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md) |
+| `hermes.skills` | skills | instructions | macOS, Linux, Windows | `$HERMES_HOME/skills/`<br>`~/.hermes/skills/` | markdown | normal | [EN] Persistent until removed. | bestätigt | [official](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md) |
+| `hermes.soul` | soul | instructions | macOS, Linux, Windows | `$HERMES_HOME/SOUL.md`<br>`~/.hermes/SOUL.md` | markdown | normal | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md) |
+| `hermes.state_db` | state db | transcript | macOS, Linux, Windows | `$HERMES_HOME/state.db`<br>`~/.hermes/state.db`<br>`~/.hermes/state.db-shm`<br>`~/.hermes/state.db-wal` | sqlite | normal | [EN] Journal mode is configurable (WAL or delete) - capture -wal and -shm. Compaction ARCHIVES old rows by setting active=0 rather than deleting them, so compacted history is still fully present. Real deletion only happens via explicit prune_sessions(older_than_days=N) (the docs example uses 90) or clear_messages(). | bestätigt | [official](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/developer-guide/session-storage.md) |
+
+### Veraltete Pfade
+
+Die folgenden Pfade werden von aktuellen Versionen nicht mehr geschrieben oder gelesen. Sie werden trotzdem gesammelt, weil sie eine ältere Installation belegen, dürfen aber nie als aktueller Zustand dargestellt werden.
+
+- `hermes.sessions_dir`: `$HERMES_HOME/sessions/`, `~/.hermes/sessions/`
+
+## LM Studio
+
+Vendor: Element Labs
+
+<https://github.com/lmstudio-ai/docs/blob/main/0_app/2_mcp/index.mdx>, <https://github.com/lmstudio-ai/docs/blob/main/0_app/5_advanced/import-model.md>, <https://github.com/lmstudio-ai/docs/blob/main/1_developer/0_core/headless_llmster.mdx>, <https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/l/lm-studio.rb>
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `lmstudio.cli_and_server` | cli and server | install_evidence | macOS, Linux, Windows | `%USERPROFILE%\.lmstudio\bin\lms.exe`<br>`~/.lmstudio/bin/lms` | binary | normal |  | bestätigt | [official](https://github.com/lmstudio-ai/docs/blob/main/1_developer/0_core/headless_llmster.mdx) |
+| `lmstudio.conversations` | conversations | transcript | macOS, Linux, Windows | `%USERPROFILE%\.lmstudio\conversations\`<br>`~/.lmstudio/conversations/` | json | normal | [EN] One file per conversation; deleting a chat in the UI deletes the file, so unallocated-space carving for JSON with LM Studio's role/content shape is worthwhile. | bestätigt | [official](https://raw.githubusercontent.com/lmstudio-ai/docs/main/0_app/1_basics/chat.md) |
+| `lmstudio.macos_app_support_and_logs` | macos app support and logs | log | macOS | `~/Library/Application Support/LM Studio/`<br>`~/Library/Caches/ai.elementlabs.lmstudio/`<br>`~/Library/HTTPStorages/ai.elementlabs.lmstudio/`<br>`~/Library/Logs/LM Studio/`<br>`~/Library/Preferences/ai.elementlabs.lmstudio.plist`<br>`~/Library/Saved Application State/ai.elementlabs.lmstudio.savedState/` | text | normal | [EN] Application logs typically rotate; capture the whole Logs directory. | **unbestätigt** | [community](https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/l/lm-studio.rb) |
+| `lmstudio.mcp_config` | mcp config | mcp_config | macOS, Linux, Windows | `%USERPROFILE%\.lmstudio\mcp.json`<br>`~/.lmstudio/mcp.json` | json | normal |  | **unbestätigt** | [official](https://github.com/lmstudio-ai/docs/blob/main/0_app/2_mcp/index.mdx) |
+| `lmstudio.models` | models | install_evidence | macOS, Linux, Windows | `%USERPROFILE%\.lmstudio\models\*\*\*`<br>`~/.lmstudio/models/*/*/*` | binary | normal |  | bestätigt | [official](https://github.com/lmstudio-ai/docs/blob/main/0_app/5_advanced/import-model.md) |
+| `lmstudio.presets_and_hub` | presets and hub | config | macOS, Linux, Windows | `%USERPROFILE%\.lmstudio\config-presets\`<br>`%USERPROFILE%\.lmstudio\hub\`<br>`~/.lmstudio/config-presets/`<br>`~/.lmstudio/hub/` | json | normal |  | bestätigt | [official](https://raw.githubusercontent.com/lmstudio-ai/docs/main/0_app/1_basics/chat.md) |
+
+## Ollama
+
+Vendor: Ollama
+
+<https://github.com/ollama/ollama/blob/main/cmd/config/config.go>, <https://github.com/ollama/ollama/blob/main/manifest/layer.go>, <https://github.com/ollama/ollama/blob/main/manifest/paths.go>, <https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/o/ollama-app.rb>
+
+### first
+
+**Zuerst sichern.** Rotieren oder verfallen aggressiv, nach Anzahl oder bei jedem Aufräumlauf statt nach einer bequemen Frist. Einige davon zerstört die Benutzerin schon dadurch, dass sie eine weitere Sitzung startet.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `ollama.cli_prompt_history` | cli prompt history | prompt_history | macOS, Linux, Windows | `%USERPROFILE%\.ollama\history`<br>`~/.ollama/history` | text | normal | [EN] Ring buffer, default Limit: 100 entries. Older prompts are compacted out and lost on every save. Written atomically via temp-file + rename, so the previous generation may be recoverable from unallocated space. Disabled entirely by OLLAMA_NOHISTORY. | bestätigt | [source_code](https://raw.githubusercontent.com/ollama/ollama/main/readline/history.go) |
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `ollama.app_chat_database` | app chat database | transcript | macOS, Windows, Linux | `%LOCALAPPDATA%\Ollama\db.sqlite`<br>`%LOCALAPPDATA%\Ollama\db.sqlite-wal`<br>`~/.ollama/db.sqlite`<br>`~/Library/Application Support/Ollama/db.sqlite`<br>`~/Library/Application Support/Ollama/db.sqlite-shm`<br>`~/Library/Application Support/Ollama/db.sqlite-wal` | sqlite | normal | [EN] Public issues report that chats deleted in the GUI remain readable in db.sqlite-wal. COLLECT THE -wal AND -shm SIDECARS BEFORE ANYTHING TOUCHES THE DB - a checkpoint on next app launch destroys them. | bestätigt | [source_code](https://raw.githubusercontent.com/ollama/ollama/main/app/store/store.go) |
+| `ollama.app_config` | app config | config | macOS, Windows, Linux | `%LOCALAPPDATA%\Ollama\config.json`<br>`~/.ollama/config.json`<br>`~/Library/Application Support/Ollama/config.json` | json | normal | [EN] Legacy path; the app migrates its contents into db.sqlite and the file may be left behind after migration, which makes it a useful pre-migration snapshot. | bestätigt | [source_code](https://raw.githubusercontent.com/ollama/ollama/main/app/store/store.go) |
+| `ollama.backup_dir` | backup dir | file_snapshot | macOS, Linux, Windows | `~/.ollama/backup/` | binary | normal |  | **unbestätigt** | recollection |
+| `ollama.cli_config` | cli config | config | macOS, Linux, Windows | `~/.ollama/config.json`<br>`~/.ollama/config/config.json` | json | normal | [EN] migrateConfig() moves the legacy ~/.ollama/config/config.json to ~/.ollama/config.json; the legacy file may survive. | bestätigt | [source_code](https://github.com/ollama/ollama/blob/main/cmd/config/config.go) |
+| `ollama.env_overrides` | env overrides | config | macOS, Linux, Windows | `/etc/systemd/system/ollama.service`<br>`/etc/systemd/system/ollama.service.d/override.conf`<br>`HKEY_CURRENT_USER\Environment`<br>`~/.bashrc`<br>`~/.zshrc` | text | normal |  | bestätigt | [source_code](https://raw.githubusercontent.com/ollama/ollama/main/envconfig/config.go) |
+| `ollama.logs` | logs | log | macOS, Windows, Linux | `%LOCALAPPDATA%\Ollama\app.log`<br>`%LOCALAPPDATA%\Ollama\server-*.log`<br>`%LOCALAPPDATA%\Ollama\server.log`<br>`%LOCALAPPDATA%\Ollama\upgrade.log`<br>`~/.ollama/logs/app.log`<br>`~/.ollama/logs/server.log` | text | normal | [EN] Windows rotates: current activity in server.log, older generations in server-#.log. On Linux with the packaged systemd unit there is no file at all - logs go to the journal (journalctl -u ollama), so acquire /var/log/journal/*. | bestätigt | [official](https://raw.githubusercontent.com/ollama/ollama/main/docs/troubleshooting.mdx) |
+| `ollama.macos_app_container` | macos app container | config | macOS | `~/Library/Application Support/Ollama/`<br>`~/Library/Caches/com.electron.ollama/`<br>`~/Library/Preferences/com.electron.ollama.plist`<br>`~/Library/Saved Application State/com.electron.ollama.savedState/`<br>`~/Library/Webkit/com.electron.ollama/` | binary | normal |  | **unbestätigt** | [community](https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/o/ollama-app.rb) |
+| `ollama.model_blobs` | model blobs | cache | macOS, Linux, Windows | `$OLLAMA_MODELS/blobs/sha256-*`<br>`%USERPROFILE%\.ollama\models\blobs\sha256-*`<br>`/usr/share/ollama/.ollama/models/blobs/sha256-*`<br>`~/.ollama/models/blobs/sha256-*` | binary | normal | [EN] Pruned on server start unless OLLAMA_NOPRUNE=1. Individual blobs are GB-scale - hash and record metadata, do not copy by default. | bestätigt | [source_code](https://github.com/ollama/ollama/blob/main/manifest/layer.go) |
+| `ollama.model_manifests` | model manifests | install_evidence | macOS, Linux, Windows | `$OLLAMA_MODELS/manifests/*/*/*/*`<br>`%USERPROFILE%\.ollama\models\manifests\*\*\*\*`<br>`/usr/share/ollama/.ollama/models/manifests/*/*/*/*`<br>`~/.ollama/models/manifests/*/*/*/*` | json | normal | [EN] Deleted by `ollama rm`. Directory mtimes date the pull; the file survives indefinitely otherwise. | bestätigt | [source_code](https://github.com/ollama/ollama/blob/main/manifest/paths.go) |
+| `ollama.private_key` | private key | credentials | macOS, Linux, Windows | `~/.ollama/id_ed25519`<br>`~/.ollama/id_ed25519.pub` | text | secret | [EN] Created on first run and stable for the life of the install, which makes the public key a durable host/account identifier. | bestätigt | [source_code](https://raw.githubusercontent.com/ollama/ollama/main/auth/auth.go) |
+
+### Veraltete Pfade
+
+Die folgenden Pfade werden von aktuellen Versionen nicht mehr geschrieben oder gelesen. Sie werden trotzdem gesammelt, weil sie eine ältere Installation belegen, dürfen aber nie als aktueller Zustand dargestellt werden.
+
+- `ollama.app_config`: `%LOCALAPPDATA%\Ollama\config.json`, `~/.ollama/config.json`, `~/Library/Application Support/Ollama/config.json`
+- `ollama.cli_config`: `~/.ollama/config.json`, `~/.ollama/config/config.json`
+
+## OpenCode
+
+Vendor: OpenCode
+
+<https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/mcp/auth.ts>, <https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts>, <https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/session/sql.ts>, <https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx>
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `opencode.agents_commands` | agents commands | instructions | macOS, Linux, Windows | `<project>/.opencode/agents/`<br>`<project>/.opencode/commands/`<br>`<project>/AGENTS.md`<br>`~/.config/opencode/agents/`<br>`~/.config/opencode/commands/` | markdown | normal | [EN] Persistent; project-scoped copies are usually in git. | bestätigt | [official](https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx) |
+| `opencode.auth` | auth | credentials | macOS, Linux, Windows | `$XDG_DATA_HOME/opencode/auth.json`<br>`%LOCALAPPDATA%\opencode\auth.json`<br>`~/.local/share/opencode/auth.json` | json | secret | [EN] Persistent until logout. | **unbestätigt** | [community](https://raw.githubusercontent.com/janekbaraniewski/openusage/main/docs/site/docs/providers/opencode.md) |
+| `opencode.config` | config | config | macOS, Linux, Windows | `$XDG_CONFIG_HOME/opencode/opencode.json`<br>`<project>/.opencode/`<br>`<project>/opencode.json`<br>`<project>/opencode.jsonc`<br>`~/.config/opencode/opencode.json`<br>`~/.config/opencode/opencode.jsonc` | json | normal | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx) |
+| `opencode.db` | db | transcript | macOS, Linux, Windows | `$XDG_DATA_HOME/opencode/opencode.db`<br>`%LOCALAPPDATA%\opencode\opencode.db`<br>`~/.local/share/opencode/opencode-*.db`<br>`~/.local/share/opencode/opencode.db`<br>`~/.local/share/opencode/opencode.db-shm`<br>`~/.local/share/opencode/opencode.db-wal` | sqlite | normal | [EN] WAL mode with synchronous=NORMAL and a passive checkpoint at startup - the newest turns may exist ONLY in the -wal file. Capture opencode.db, -wal and -shm together or you lose the most recent activity. No automatic expiry. | bestätigt | [source_code](https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/session/sql.ts) |
+| `opencode.legacy_json_storage` | legacy json storage | transcript | macOS, Linux, Windows | `~/.local/share/opencode/storage/message/*/*.json`<br>`~/.local/share/opencode/storage/part/*/*.json`<br>`~/.local/share/opencode/storage/session/*/ses_*.json` | json | normal | [EN] Left in place after the v1.2.0 SQLite migration and no longer managed by opencode, so it persists indefinitely. The maintainer's migration announcement explicitly said the original data is not yet deleted. | **unbestätigt** | [community](https://raw.githubusercontent.com/jbdamask/john-claude-skills/main/.pass-along/2026-08-19-1157-PASS-ALONG.md) |
+| `opencode.log` | log | log | macOS, Linux, Windows | `$XDG_DATA_HOME/opencode/log/`<br>`%LOCALAPPDATA%\opencode\log\`<br>`~/.local/share/opencode/log/` | text | normal | [EN] Rotation behaviour not documented in the source reviewed; treat as volatile and collect early. | bestätigt | [source_code](https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts) |
+| `opencode.managed_config` | managed config | config | macOS, Linux, Windows | `%ProgramData%\opencode`<br>`/Library/Application Support/opencode/`<br>`/etc/opencode/` | json | normal | [EN] Admin-controlled; persistent. | bestätigt | [official](https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx) |
+| `opencode.mcp_auth` | mcp auth | credentials | macOS, Linux, Windows | `$XDG_DATA_HOME/opencode/mcp-auth.json`<br>`~/.local/share/opencode/mcp-auth.json` | json | secret | [EN] Persistent until the MCP OAuth grant is revoked. | bestätigt | [source_code](https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/mcp/auth.ts) |
+| `opencode.repos_cache` | repos cache | file_snapshot | macOS, Linux, Windows | `$XDG_DATA_HOME/opencode/repos/`<br>`~/.local/share/opencode/repos/` | binary | normal | [EN] Unknown; not documented. | bestätigt | [source_code](https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts) |
+| `opencode.tui_config` | tui config | config | macOS, Linux, Windows | `<project>/tui.json`<br>`~/.config/opencode/tui.json` | json | normal | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx) |
+
+### Veraltete Pfade
+
+Die folgenden Pfade werden von aktuellen Versionen nicht mehr geschrieben oder gelesen. Sie werden trotzdem gesammelt, weil sie eine ältere Installation belegen, dürfen aber nie als aktueller Zustand dargestellt werden.
+
+- `opencode.legacy_json_storage`: `~/.local/share/opencode/storage/message/*/*.json`, `~/.local/share/opencode/storage/part/*/*.json`, `~/.local/share/opencode/storage/session/*/ses_*.json`
+
+## pi
+
+Vendor: pi
+
+<https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/session-format.md>, <https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts>
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `pi.auth` | auth | credentials | macOS, Linux, Windows | `~/.pi/agent/auth.json` | json | secret | [EN] Persistent until logout. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
+| `pi.bin` | bin | install_evidence | macOS, Linux, Windows | `~/.pi/agent/bin/`<br>`~/.pi/agent/themes/`<br>`~/.pi/server/` | binary | normal | [EN] Persistent until removed. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
+| `pi.debug_log` | debug log | log | macOS, Linux, Windows | `~/.pi/agent/pi-debug.log` | text | normal | [EN] Only written when debug logging is enabled; rotation not implemented in the code reviewed. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
+| `pi.extensions` | extensions | install_evidence | macOS, Linux, Windows | `~/.pi/agent/extensions/*.ts`<br>`~/.pi/agent/tools/` | text | normal | [EN] Persistent until removed. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
+| `pi.models` | models | config | macOS, Linux, Windows | `~/.pi/agent/models.json` | json | normal | [EN] Persistent until edited. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
+| `pi.prompts` | prompts | instructions | macOS, Linux, Windows | `~/.pi/agent/prompts/` | text | normal | [EN] Persistent until edited. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
+| `pi.sessions` | sessions | transcript | macOS, Linux, Windows | `$PI_CODING_AGENT_SESSION_DIR/**/*.jsonl`<br>`~/.pi/agent/sessions/--<encoded-cwd>--/<iso-timestamp>_<session-id>.jsonl` | jsonl | normal | [EN] Auto-saved and retained; no documented expiry. Nothing is written at all when --no-session is used. | bestätigt | [official](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/session-format.md) |
+| `pi.settings` | settings | config | macOS, Linux, Windows | `<project>/.pi/`<br>`~/.pi/agent/settings.json` | json | normal | [EN] Persistent until edited. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
+
+## Warp
+
+Vendor: Warp
+
+<https://raw.githubusercontent.com/marcus/sidecar/main/.claude/skills/create-adapter/references/warp-sqlite-schema.md>
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `warp.sqlite` | sqlite | prompt_history | macOS, Linux, Windows | `${XDG_STATE_HOME:-~/.local/state}/warp-terminal/warp.sqlite`<br>`%LOCALAPPDATA%\warp\Warp\data\warp.sqlite`<br>`~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite`<br>`~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm`<br>`~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal` | sqlite | normal | [EN] WAL mode - all three files (warp.sqlite, -wal, -shm) are required for a consistent read, and recent activity may live only in -wal. Deletion of a conversation in Warp is a SQL transaction against agent_tasks/ai_queries for that conversation id, not removal of the file, so freelist and WAL carving can recover deleted conversations. | **unbestätigt** | [community](https://raw.githubusercontent.com/marcus/sidecar/main/.claude/skills/create-adapter/references/warp-sqlite-schema.md) |
+
+## Zed
+
+Vendor: Zed Industries
+
+<https://raw.githubusercontent.com/zed-industries/zed/main/crates/agent/src/db.rs>, <https://raw.githubusercontent.com/zed-industries/zed/main/crates/agent_ui/src/thread_metadata_store.rs>, <https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs>, <https://raw.githubusercontent.com/zed-industries/zed/main/docs/src/ai/mcp.md>
+
+### live_only
+
+**Nur am laufenden System zu holen.** Diese Artefakte existieren nur, solange der Agent oder die Sitzung läuft, oder werden beim saubern Herunterfahren zerstört. Aus einem abgeschalteten Abbild sind sie nicht wiederherstellbar. Läuft das Endgerät noch, dann hier anfangen.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `zed.threads_db` | threads db | transcript | macOS, Linux, Windows | `$XDG_DATA_HOME/zed/threads/threads.db`<br>`%LOCALAPPDATA%\Zed\threads\threads.db`<br>`~/.local/share/zed/threads/threads.db`<br>`~/Library/Application Support/Zed/threads/threads.db` | sqlite | normal | [EN] No automatic expiry. If ZED_STATELESS is set, an in-memory database is used and NOTHING is persisted. If the file DB cannot be opened Zed falls back to an in-memory DB, so absence of the file does not prove absence of use. | bestätigt | [source_code](https://raw.githubusercontent.com/zed-industries/zed/main/crates/agent/src/db.rs) |
+
+### normal
+
+**Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `zed.extensions` | extensions | install_evidence | macOS, Linux, Windows | `$ZED_DATA_DIR/debug_adapters/`<br>`$ZED_DATA_DIR/extensions/`<br>`$ZED_DATA_DIR/external_agents/`<br>`$ZED_DATA_DIR/prompt_overrides/`<br>`~/.config/zed/prompts/` | binary | normal | [EN] Persistent until removed. | bestätigt | [source_code](https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs) |
+| `zed.flatpak_legacy_threads` | flatpak legacy threads | transcript | Linux | `~/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/` | binary | normal | [EN] Unknown. | **unbestätigt** | recollection |
+| `zed.logs` | logs | log | macOS, Linux, Windows | `$XDG_DATA_HOME/zed/logs/`<br>`%LOCALAPPDATA%\Zed\logs\`<br>`~/Library/Logs/Zed/` | text | normal | [EN] Rotation not established from the source reviewed; treat as volatile. | bestätigt | [source_code](https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs) |
+| `zed.settings` | settings | mcp_config | macOS, Linux, Windows | `$XDG_CONFIG_HOME/zed/settings.json`<br>`%APPDATA%\Zed\settings.json`<br>`<project>/.zed/settings.json`<br>`~/.config/zed/settings.json` | json | normal | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/zed-industries/zed/main/docs/src/ai/mcp.md) |
+| `zed.sidebar_threads` | sidebar threads | transcript | macOS, Linux, Windows | `$XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite`<br>`%LOCALAPPDATA%\Zed\db\0-<release_channel>\db.sqlite`<br>`~/Library/Application Support/Zed/db/0-stable/db.sqlite` | sqlite | normal | [EN] Migration-populated. The migration only unarchives the 5 most recent threads per project and archives the rest; draft threads with no project are archived by default; threads with no project are excluded from migration entirely. | bestätigt | [source_code](https://raw.githubusercontent.com/zed-industries/zed/main/crates/agent_ui/src/thread_metadata_store.rs) |

@@ -1,0 +1,311 @@
+# Goose artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: goose
+title: Goose
+vendor: Block
+references:
+- https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md
+- https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md
+- https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md
+- https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/recipes/session-recipes.md
+artifacts:
+- id: goose.config
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\config\config.yaml'
+  - ~/.config/goose/config.yaml
+  format: yaml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    The 'extensions' block is the MCP inventory: which external tools the agent could reach, with full command lines. Provider API keys are documented as NOT belonging here (keyring is preferred) but operators often put them here anyway.
+
+    Record structure: Holds provider selection, model, enabled extensions (including MCP servers and their commands/args), context strategy and memory limits. Doubles as the MCP config - there is no separate mcp.json.
+  parser: null
+- id: goose.recipes
+  category: config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/*.yaml
+  format: yaml
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/recipes/session-recipes.md
+  source_kind: official
+  volatility: Unknown.
+  notes: |-
+    recollection, needs verification - no default directory is documented. Recipes define reusable parameterised agent runs and are strong evidence of intent and repetition.
+
+    Variable location, not globbable: <directories listed in GOOSE_RECIPE_PATH>
+
+    Record structure: The recipes doc states recipes are found in 'the current directory or GOOSE_RECIPE_PATH directories' (colon-separated on Unix, semicolon-separated on Windows) but does NOT document a default recipe directory. Resolve GOOSE_RECIPE_PATH from the user's shell profile/environment rather than guessing a path.
+  parser: null
+- id: goose.secrets
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\config\secrets.yaml'
+  - ~/.config/goose/secrets.yaml
+  format: yaml
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    Record metadata and hash only. Presence of this file (rather than keyring use) is itself notable: it means GOOSE_DISABLE_KEYRING was set, often in headless/CI or deliberately non-standard deployments.
+
+    Record structure: Only present when file-based secret storage is in use, i.e. GOOSE_DISABLE_KEYRING is set. Otherwise secrets live in the OS keyring (macOS Keychain / Windows Credential Manager / libsecret) and are not in the filesystem at all.
+  parser: null
+- id: goose.prompts
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\config\prompts\'
+  - ~/.config/goose/prompts/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    Custom prompts are where jailbreak or policy-evasion instructions are usually planted; compare mtimes against session times.
+
+    Record structure: Custom prompt templates.
+  parser: null
+- id: goose.cli_logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\data\logs\cli\'
+  - ~/.local/state/goose/logs/cli/
+  - ~/.local/state/goose/logs/cli/YYYY-MM-DD/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md
+  source_kind: official
+  volatility: |-
+    SELF-DELETING: organised into date-based subdirectories with automatic deletion of entries older than two weeks. Collect first.
+  notes: |-
+    Highest-volatility artifact in the Goose family. If the endpoint has been powered on for more than two weeks after the incident these are already gone.
+
+    Record structure: Date-stamped subdirectories (e.g. cli/2025-11-13/). Note logs live under the XDG STATE dir (~/.local/state/goose) while sessions live under the DATA dir (~/.local/share/goose) - two different trees.
+  parser: null
+- id: goose.desktop_log
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\logs\main.log'
+  - ~/Library/Application Support/Goose/logs/main.log
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md
+  source_kind: official
+  volatility: Electron main-process log; rotation behaviour not documented.
+  notes: |-
+    Establishes Desktop app launch/quit times, which bracket session activity independently of the session store.
+
+    Record structure: Note the macOS Desktop log uses ~/Library/Application Support/Goose/ (capital G, no 'Block' segment) - a third macOS directory distinct from both ~/.config/goose and ~/Library/Application Support/Block/goose.
+  parser: null
+- id: goose.server_logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\data\logs\server\'
+  - ~/.local/state/goose/logs/server/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md
+  source_kind: official
+  volatility: 'SELF-DELETING: same two-week automatic cleanup as the CLI logs.'
+  notes: |-
+    The JSON-RPC capture is the best available record of actual MCP tool invocations and their arguments - often the only place the agent's side effects are logged verbatim. Two-week window: collect first.
+
+    Record structure: Captures goosed daemon activity, JSON-RPC traffic and extension (MCP) initialisation.
+  parser: null
+- id: goose.memory
+  category: memory
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.goose/memory/
+  - ~/.config/goose/memory/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/mcp/memory-mcp.md
+  source_kind: official
+  volatility: Persists independently of sessions; not covered by session deletion.
+  notes: |-
+    Survives session deletion. Facts the agent chose to remember often summarise work whose transcript has since been purged - a reliable secondary source when sessions are missing.
+
+    Record structure: Two scopes: global under the goose config dir, and local under .goose/memory/ in the working directory.
+  parser: null
+- id: goose.permissions
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\config\permission.yaml'
+  - '%APPDATA%\Block\goose\config\permissions\tool_permissions.json'
+  - ~/.config/goose/permission.yaml
+  - ~/.config/goose/permissions/tool_permissions.json
+  format: yaml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    Directly answers 'was the agent allowed to act without a human in the loop' - the central question in most agent-misuse investigations. A tool moved from 'ask' to 'always allow' with a recent mtime is a key finding.
+
+    Record structure: permission.yaml is YAML; permissions/tool_permissions.json is JSON. Records per-tool allow/deny/ask decisions.
+  parser: null
+- id: goose.hints
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.goosehints
+  - <project>/AGENTS.md
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md
+  source_kind: official
+  volatility: Lives in the repo; recoverable from git history even when the working copy is clean.
+  notes: |-
+    Project-scoped standing instructions to the agent. Because they are usually committed, git history gives an authenticated timeline of who changed the agent's marching orders and when.
+
+    Record structure: The CONTEXT_FILE_NAMES environment variable overrides the filename list; its documented default is [".goosehints", "AGENTS.md"]. A non-default value means hint files may have any name.
+  parser: null
+- id: goose.sessions_db
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  paths:
+  - ~/.local/share/goose/sessions/sessions.db
+  - ~/.local/share/goose/sessions/sessions.db-shm
+  - ~/.local/share/goose/sessions/sessions.db-wal
+  - ~/Library/Application Support/Block/goose/data/sessions/sessions.db
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/sessions/session-management.md
+  source_kind: official
+  volatility: |-
+    No automatic expiry documented. Deleting a session in Goose Desktop also removes it from the CLI and the docs state the action cannot be undone - i.e. a SQL delete, so carving the SQLite freelist and the -wal file may still recover it.
+  notes: |-
+    macOS is ambiguous and must be checked in BOTH places: the sessions doc gives ~/.local/share/goose/... for 'macOS and Linux', while the environment-variables doc gives ~/Library/Application Support/Block/goose/ as the macOS root. Goose picks an XDG-style or Apple-style strategy depending on version and on whether ~/.config/goose already exists. Collect both trees.
+
+    Record structure: Docs give working sqlite3 examples: SELECT id, description, working_dir, created_at FROM sessions. Table 'sessions' confirmed with columns id, description, working_dir, created_at. The message/turn table name is NOT stated in the docs - enumerate sqlite_master rather than assuming. SQLite format since goose 1.10.0.
+  parser: null
+- id: goose.sessions_db_windows
+  category: transcript
+  root: user_profile
+  os:
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\data\sessions\sessions.db'
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md
+  source_kind: official
+  volatility: Same as the macOS/Linux database.
+  notes: |-
+    recollection, needs verification
+
+    Record structure: Derived, not stated: the environment-variables doc gives the Windows root as %APPDATA%\Block\goose\ and says goose creates config/, data/ and state/ subdirectories under the root, and the logs doc confirms %APPDATA%\Block\goose\data\logs\. The sessions/sessions.db leaf is therefore inferred from the documented Linux layout. Verify on a live image before relying on it.
+  parser: null
+- id: goose.sessions_jsonl_legacy
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\data\sessions\*.jsonl'
+  - ~/.local/share/goose/sessions/*.jsonl
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  legacy: true
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/sessions/session-management.md
+  source_kind: official
+  volatility: |-
+    Orphaned but NOT deleted. The doc states: 'Legacy .jsonl files remain on disk but are no longer managed by goose.' They therefore persist indefinitely and are never rotated, even after the SQLite import.
+  notes: |-
+    Forensically excellent: because goose stopped managing these files, they are a frozen snapshot of pre-1.10.0 activity that a user deleting sessions through the modern UI will NOT remove. Always collect them even when sessions.db is present.
+
+    Record structure: One JSONL file per session, historically named with a short base-62 id (e.g. iNy1kNmS.jsonl). Pre-1.10.0 format. First line is session metadata, subsequent lines are messages.
+  parser: null
