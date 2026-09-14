@@ -213,6 +213,42 @@ def test_credential_content_is_not_copied_by_default(
         assert ".credentials.json" not in path.name
 
 
+def test_a_path_claimed_by_a_secret_artifact_is_withheld_whatever_else_claims_it(
+    bundle: Path, manifest: dict[str, Any]
+) -> None:
+    """Secret has to be a property of the path, not of whichever artifact matched first.
+
+    The catalogue routinely claims one path twice: a specific entry for a credential file
+    and a broad directory glob over the tree holding it. If the copy decision is taken as
+    each match is found, the outcome depends on iteration order, which means a password
+    database can end up in the bundle on one run and not on the next.
+    """
+    entries = [e for e in manifest["files"] if e["original_path"].endswith("secrets.json")]
+    assert entries, "the fixture should contain a doubly claimed credential file"
+    for entry in entries:
+        assert entry["collected"] is False
+        assert entry["reason"] == "secret_policy"
+        assert entry["bundle_path"] is None
+        assert len(entry["sha256"]) == 64
+    for path in (bundle / "files").rglob("secrets.json"):
+        raise AssertionError(f"credential content was copied to {path}")
+
+
+def test_a_doubly_claimed_path_records_every_artifact_that_matched(
+    manifest: dict[str, Any],
+) -> None:
+    """One entry per path, but no claim is dropped: never hide a record."""
+    multi = [e for e in manifest["files"] if e.get("artifact_ids")]
+    assert multi, "the fixture should produce at least one doubly claimed path"
+    for entry in multi:
+        ids = entry["artifact_ids"]
+        assert ids == sorted(ids), "artifact_ids has to be ordered for a stable diff"
+        assert len(ids) > 1, "the field is only written when there is more than one claim"
+        assert entry["artifact_id"] in ids, "the attributed claim must be among them"
+    paths = [e["original_path"] for e in manifest["files"]]
+    assert len(paths) == len(set(paths)), "a path must appear exactly once in the manifest"
+
+
 def test_a_symlink_out_of_the_profile_is_recorded_and_not_followed(
     manifest: dict[str, Any],
 ) -> None:

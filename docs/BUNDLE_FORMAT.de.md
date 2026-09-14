@@ -48,10 +48,17 @@ Fassungen nicht auseinanderlaufen. Die Felder, die nicht selbsterklärend sind:
   unklar ist, und nicht von einem bestätigten, was ein Befund wäre.
 - `reason` ist null, wenn `collected` wahr ist, sonst einer von `too_large`,
   `secret_policy`, `permission_denied`, `unreadable`, `not_a_file`, `skipped_symlink`.
-  `secret_policy` bedeutet, dass das Artefakt `sensitivity: secret` trägt und
-  `--include-secrets` nicht gesetzt war: der Eintrag führt weiterhin Grösse, Hash und
-  Zeitstempel, das Vorhandensein und die Identität sind also festgehalten, ohne dass
-  Zugangsdaten kopiert werden.
+  `secret_policy` bedeutet, dass den Pfad mindestens ein Artefakt mit
+  `sensitivity: secret` beansprucht hat und `--include-secrets` nicht gesetzt war: der
+  Eintrag führt weiterhin Grösse, Hash und Zeitstempel, das Vorhandensein und die
+  Identität sind also festgehalten, ohne dass Zugangsdaten kopiert werden. Ein einziger
+  solcher Anspruch genügt, eine Zugangsdatendatei, die zusätzlich ein weiter
+  Verzeichnis-Glob getroffen hat, wird also ebenfalls zurückgehalten.
+- `artifact_ids` steht nur dort, wo mehr als ein Artefakt denselben Pfad beansprucht hat,
+  und führt dann alle auf, sortiert. `artifact_id` bleibt einwertig und benennt den
+  spezifischsten Anspruch, eine Datei wird also dem Eintrag zugeordnet, der sie benennt,
+  und nicht einem Verzeichnis-Glob, der sie zufällig mit eingeschlossen hat, während
+  `artifact_ids` festhält, dass auch die anderen getroffen haben.
 - `changed_while_reading` wird gesetzt, wenn sich Grösse oder mtime zwischen dem Hashen
   und einem erneuten `stat` danach unterscheiden. Die Bytes im Bundle sind weiterhin
   genau die, die gehasht wurden; die Markierung sagt, dass die Quelle in Bewegung war.

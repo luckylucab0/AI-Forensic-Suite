@@ -106,9 +106,16 @@ Field notes that are not obvious:
   than from a verified one, which is evidence.
 - `reason` is null when `collected` is true, otherwise one of `too_large`,
   `secret_policy`, `permission_denied`, `unreadable`, `not_a_file`, `skipped_symlink`.
-  `secret_policy` means the artifact is `sensitivity: secret` and `--include-secrets` was
-  not given: the entry still carries its size, hash and timestamps, so its presence and
-  its identity are recorded without copying credential material.
+  `secret_policy` means the path was claimed by at least one artifact with
+  `sensitivity: secret` and `--include-secrets` was not given: the entry still carries its
+  size, hash and timestamps, so its presence and its identity are recorded without copying
+  credential material. Any claim is enough, so a credential file that a broad directory
+  glob also matched is still withheld.
+- `artifact_ids` is present only when more than one artifact claimed the same path, and
+  then lists all of them, sorted. `artifact_id` stays single-valued and names the most
+  specific claim, so a file is attributed to the entry that names it rather than to a
+  directory glob that happened to include it, while `artifact_ids` preserves the fact that
+  the others matched too.
 - `changed_while_reading` is set when the file's size or mtime differs between the hash
   and a re-stat afterwards. The bytes in the bundle are still exactly what was hashed;
   the flag says the source was live.

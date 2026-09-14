@@ -5825,6 +5825,31 @@ _XDG_DEFAULTS = {
     "XDG_STATE_HOME": ".local/state",
 }
 
+# The user directory of VS Code and of the forks that inherit its storage layout. A dozen
+# agentic extensions keep their conversations under it, so <vscode-user> in the catalogue
+# expands to all of these rather than to a wildcard: a wildcard would match one directory
+# level and find nothing, which is how an extension's entire history goes missing without
+# anyone being told.
+#
+# The product list is the part that will age. Adding a fork is a one-line change here and
+# in the same table in collect.ps1, and an unknown fork simply does not match.
+_VSCODE_PRODUCTS = (
+    "Code",
+    "Code - Insiders",
+    "VSCodium",
+    "Cursor",
+    "Windsurf",
+    "Kiro",
+    "Trae",
+    "Positron",
+)
+
+_VSCODE_USER_TEMPLATES = {
+    "macos": "Library/Application Support/{product}/User",
+    "linux": ".config/{product}/User",
+    "windows": "AppData/Roaming/{product}/User",
+}
+
 # Windows placeholders, expanded relative to a profile. Used when collecting a mounted
 # Windows profile from an analyst workstation with --root and --os windows.
 _WIN_PLACEHOLDERS = {
@@ -5832,6 +5857,19 @@ _WIN_PLACEHOLDERS = {
     "%APPDATA%": "AppData/Roaming",
     "%LOCALAPPDATA%": "AppData/Local",
 }
+
+
+def _expand_vscode_user(pattern: str, home: str, target_os: str) -> list[str]:
+    """Turn one <vscode-user> pattern into one pattern per known product."""
+    template = _VSCODE_USER_TEMPLATES.get(target_os)
+    if template is None:
+        return []
+    tail = pattern[len("<vscode-user>") :].lstrip("\\/")
+    out = []
+    for product in _VSCODE_PRODUCTS:
+        base = template.format(product=product)
+        out.append("/".join(x for x in (home.rstrip("/"), base, tail) if x))
+    return out
 
 
 def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> list[str]:
@@ -5842,6 +5880,12 @@ def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> l
     entry in the manifest, while treating it literally would collect nothing.
     """
     text = pattern
+    if text.startswith("<vscode-user>"):
+        results = []
+        for expanded in _expand_vscode_user(text, home, target_os):
+            results.extend(expand_paths(expanded, home, target_os, root))
+        return results
+
     if target_os == "windows":
         for placeholder, relative in _WIN_PLACEHOLDERS.items():
             if text.upper().startswith(placeholder):
@@ -6088,6 +6132,7 @@ def collect_file(
     used: dict,
     target_os: str,
     args: argparse.Namespace,
+    withhold: bool = False,
 ) -> dict:
     """Collect one file and return its manifest entry.
 
@@ -6157,7 +6202,9 @@ def collect_file(
         entry["reason"] = "dry_run"
         return entry
 
-    secret = artifact.get("sensitivity") == "secret" and not args.include_secrets
+    # Resolved by the caller across every artifact claiming this path, so a credential
+    # file caught by a broad directory glob is still withheld.
+    secret = withhold and not args.include_secrets
 
     try:
         digest, read_size = sha256_file(original, preserve_atime=True)
@@ -6248,6 +6295,9 @@ def run(args: argparse.Namespace) -> dict:
     errors: list = []
     project_roots: list = []
     used: dict = {}
+    # Paths already decided, so a second user's glob cannot re-collect a shared file and a
+    # scan over the growing entry list is not needed for every candidate.
+    seen_paths = set()
 
     for user in users:
         home = user["home"]
@@ -6261,6 +6311,17 @@ def run(args: argparse.Namespace) -> dict:
             if all(r["path"] != root["path"] for r in project_roots):
                 project_roots.append(root)
 
+        # Two passes, not one.
+        #
+        # A single file is often claimed by more than one artifact: a broad directory glob
+        # and a specific entry for one file inside it. Deciding as each match is found
+        # means whichever artifact the loop reaches first decides whether the bytes get
+        # copied, and that was a real protective failure rather than a theoretical one. A
+        # JetBrains directory glob marked normal matches the c.kdbx password database,
+        # which the catalogue marks secret, so the credential store would have been copied
+        # or withheld depending on iteration order. Resolving every claim on a path before
+        # deciding makes "secret wins" a property of the file instead.
+        matches = {}
         for artifact in artifacts:
             anchors = [home]
             if artifact.get("root") in ("project", "repo_root", "plugin"):
@@ -6290,28 +6351,43 @@ def run(args: argparse.Namespace) -> dict:
                                         }
                                     )
                             for target in targets:
-                                if any(e["original_path"] == target for e in entries):
-                                    continue
-                                entry = collect_file(
-                                    artifact,
-                                    target,
-                                    home,
-                                    user["name"],
-                                    files_dir,
-                                    used,
-                                    target_os,
-                                    args,
-                                )
-                                entries.append(entry)
-                                if entry["reason"] in ("permission_denied", "unreadable"):
-                                    errors.append(
-                                        {
-                                            "path": target,
-                                            "error": entry["reason"],
-                                            "detail": entry["artifact_id"],
-                                        }
-                                    )
+                                matches.setdefault(target, []).append(artifact)
 
+        for target in sorted(matches):
+            if target in seen_paths:
+                continue
+            seen_paths.add(target)
+            claimants = matches[target]
+            # Attributed to the most specific claim, which is the artifact with the fewest
+            # path patterns, so a file is reported under the entry that names it rather
+            # than under a directory glob that happened to include it.
+            primary = sorted(claimants, key=lambda a: (len(a["paths"]), a["id"]))[0]
+            withhold = any(a.get("sensitivity") == "secret" for a in claimants)
+            entry = collect_file(
+                primary,
+                target,
+                home,
+                user["name"],
+                files_dir,
+                used,
+                target_os,
+                args,
+                withhold,
+            )
+            # One artifact can claim the same path through two of its own patterns, which
+            # is not a second claim and must not produce a one-element list.
+            claimant_ids = sorted({a["id"] for a in claimants})
+            if len(claimant_ids) > 1:
+                entry["artifact_ids"] = claimant_ids
+            entries.append(entry)
+            if entry["reason"] in ("permission_denied", "unreadable"):
+                errors.append(
+                    {
+                        "path": target,
+                        "error": entry["reason"],
+                        "detail": entry["artifact_id"],
+                    }
+                )
     entries.sort(key=lambda e: (e["artifact_id"], e["original_path"]))
 
     offset = time.strftime("%z")

@@ -260,6 +260,19 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     )
     os.chmod(claude / ".credentials.json", 0o600)
 
+    # A credential file that a second, broader artifact also claims: the catalogue has
+    # cline.secrets_json as secret and cline.data_dir_root as a plain directory glob over
+    # the same tree. Deciding per artifact rather than per path meant whichever one the
+    # loop reached first decided whether the bytes were copied. The fixture carries the
+    # case so the conformance suite can prove the path is withheld either way.
+    cline_data = home / ".cline" / "data"
+    write(
+        cline_data / "secrets.json",
+        json.dumps({"apiKey": "example-not-a-real-key"}),
+    )
+    os.chmod(cline_data / "secrets.json", 0o600)
+    write(cline_data / "globalState.json", json.dumps({"mode": "act"}, sort_keys=True))
+
     write(claude / "CLAUDE.md", "# User instructions\n\nAlways run the linter.\n")
     write(claude / "shell-snapshots" / "snapshot-1.sh", "alias gs='git status'\n")
     write(claude / "plans" / "plan-1.md", "# Plan\n\n1. Read the log\n")
