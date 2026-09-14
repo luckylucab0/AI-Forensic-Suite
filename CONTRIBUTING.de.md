@@ -143,10 +143,13 @@ fehlschlägt, also den Generator ausführen, sobald sich seine Eingabe ändert:
 ```bash
 uv run python scripts/build_collectors.py    # catalog/ in beide Kollektoren einbetten
 uv run python scripts/gen_artifact_docs.py   # docs/ARTIFACTS{,.de}.md neu erzeugen
-uv run python scripts/gen_rule_docs.py       # docs/RULES{,.de}.md neu erzeugen
 uv run python scripts/check_translations.py  # deutsche Docs hinter dem englischen Stand
+uv run python scripts/check_viewer.py        # Viewer-Struktur und JavaScript-Syntax
 uv run python scripts/opsec_check.py --mode both
 ```
+
+Ein Generator für die Regeldokumentation kommt dazu, wenn die Regel-Engine in Phase 4
+entsteht.
 
 Das Kommandozeilenwerkzeug selbst heisst `agentforensics`, mit `afx` als Kurzform:
 
@@ -169,9 +172,10 @@ Konventionen, kurz gefasst.
 - Ein ADR pro Entscheidung, kurz, unter `docs/adr/`.
 - Frag nach, bevor du eine Abhängigkeit hinzufügst, ein Datenformat änderst oder etwas
   Sicherheitsrelevantes anfasst.
-- Generierte Dateien werden nie von Hand bearbeitet: `docs/ARTIFACTS.md`, `docs/RULES.md`,
-  alles unter `exporters/generated/`, und der eingebettete Katalogblock in jedem Kollektor.
-  Stattdessen `catalog/` oder `rules/` ändern und neu erzeugen. Die CI vergleicht.
+- Generierte Dateien werden nie von Hand bearbeitet: `docs/ARTIFACTS.md` und die deutsche
+  Fassung, alles, was künftig unter `exporters/generated/` liegt, und der eingebettete
+  Katalogblock in jedem Kollektor. Stattdessen `catalog/` ändern und neu erzeugen. Die CI
+  vergleicht.
 
 ## Ein Artefakt zum Katalog beitragen
 

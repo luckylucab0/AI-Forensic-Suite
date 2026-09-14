@@ -1,0 +1,138 @@
+# Collecting agent artifacts
+
+English | [Deutsch](COLLECTION.de.md)
+
+Read this before a collection, not after. The order matters more than the completeness:
+several of these artifacts are destroyed by ordinary use of the machine, and a few are gone
+the moment it shuts down cleanly.
+
+Using this requires proper authorization. See the README.
+
+## The one thing to get right
+
+Agents delete their own history. Claude Code sweeps transcripts older than
+`cleanupPeriodDays`, 30 days by default, and the sweep runs **at startup**, so the next
+time the user opens the agent they destroy the oldest evidence. Gemini CLI defaults to 30
+days as well. Some artifacts are worse: Claude Code's image cache drops the directories of
+every session but the current one on **every** sweep, whatever their age, so simply
+starting a new session can wipe every attached image in the tree.
+
+So the catalogue does not just record where things are. Every artifact carries a
+`collect_priority`, and the collectors work in that order rather than alphabetically. The
+generated reference [ARTIFACTS.md](ARTIFACTS.md) is grouped the same way.
+
+| Priority | What it means | What to do |
+| --- | --- | --- |
+| `live_only` | Exists only while the agent or the session is running, or is deleted on a clean shutdown | Collect from the running machine. A powered-off image will not have it, and no amount of disk forensics brings it back |
+| `first` | Rotated or swept aggressively, by count or on every sweep rather than after a comfortable interval | Collect before anything else that survives longer. Some of these the user destroys by starting another session |
+| `normal` | Subject to the agent's ordinary retention period | Collect in the normal course |
+| `durable` | Not covered by the retention sweep | Still collect it. This group routinely outlives the transcripts it describes, and when the transcripts are already gone it is often enough to establish that an agent ran, what it was allowed to do, and what the user asked |
+
+Two consequences worth stating plainly. First, if the endpoint is still running, a live
+collection is not a convenience, it is the only way to get the `live_only` group. Second, a
+collection that comes back with only `durable` artifacts is not a failed collection: it
+means the volatile evidence had already expired, which is itself a finding about how long
+the investigation took to start.
+
+## What the collectors do not do
+
+- They never modify, move, rename or delete anything on the target, and they never execute
+  an agent binary. Version information is read from files.
+- They write only into `--out`. No temporary files elsewhere, no logs, no configuration.
+- They do not copy the content of credential artifacts. Those are recorded as metadata plus
+  a SHA-256, so their presence and identity are in the manifest without the bundle becoming
+  a collection of live tokens. `--include-secrets` overrides that, and the choice is
+  recorded in the manifest.
+- They do not follow a symlink out of the profile being collected. Such a link is recorded
+  with its target and skipped.
+
+## Running a collection
+
+macOS and Linux, Python 3.8 or newer, standard library only:
+
+```bash
+# The current user, on this machine
+python3 collect.py --out /tmp/case-001
+
+# Every profile, which needs elevation. Whether the run was elevated is recorded either
+# way, so an unelevated --all-users produces an honest partial collection rather than a
+# silent one.
+sudo python3 collect.py --out /tmp/case-001 --all-users --zip
+
+# A mounted image or an exported profile, collected on an analyst workstation
+python3 collect.py --out ./bundle --root /mnt/evidence --os macos
+
+# See what would be collected, without reading or writing anything
+python3 collect.py --dry-run --json
+```
+
+Windows, PowerShell 5.1 or newer, no modules: `collect.ps1` takes the same options as
+parameters. It is not in this repository yet.
+
+Exit codes are part of the interface, because this gets driven from scripts and from
+live-response sessions where the exit code is the only signal:
+
+| Code | Meaning |
+| --- | --- |
+| 0 | Collected at least one artifact |
+| 1 | Ran, but at least one error is recorded in the manifest |
+| 2 | Could not run: bad arguments, output directory unusable |
+| 3 | Ran successfully and found nothing |
+
+Code 3 matters for a fleet sweep. "This host has no agent artifacts" is a useful answer,
+and a sweep that cannot tell it apart from a crash draws a wrong picture of where agents
+are in use.
+
+## Finding the tree when it has moved
+
+Several agents can be relocated by an environment variable. `CLAUDE_CONFIG_DIR` moves the
+whole Claude Code directory, taking transcripts, prompt history and plugins with it. A
+collection keyed on the default location then finds nothing, and nothing distinguishes that
+from the agent never having been installed.
+
+The collectors expand those variables from their own environment, which is right on a live
+machine and wrong on a mounted image, where the variable was set in a shell profile that is
+now just a file. So on an image, check the shell profiles and any process-environment
+evidence before concluding an agent was absent. [ARTIFACTS.md](ARTIFACTS.md) lists the
+relocating variables per agent.
+
+## Project files need to be found before they can be collected
+
+Instruction files (`CLAUDE.md`, `AGENTS.md`, `.cursorrules`, `.windsurfrules`,
+`.kiro/steering/` and the rest) live inside the user's repositories, not under the profile.
+They are also the surface through which injected instructions reach an agent, which makes
+them among the most interesting files in a collection.
+
+The collector cannot find them by expanding a profile, so it reads the agent's own state
+for a list of working copies: for Claude Code the `projects` key of `~/.claude.json` is
+authoritative, and the encoded directory names under `projects/` are a fallback hint. That
+encoding replaces every non-alphanumeric character with a dash and is not reversible, so a
+decoded name is only used when it happens to name a directory that exists.
+
+The consequence: a repository the user cloned and never opened with an agent will not be
+found, and a repository that has been deleted leaves only its encoded directory name
+behind. Both are worth noting in a report rather than treating the list as complete.
+
+## Verifying a bundle
+
+```bash
+agentforensics verify /tmp/case-001
+agentforensics verify /tmp/case-001 --json
+```
+
+Verification re-derives every hash from the bytes on disk and reports three different
+things, because they mean different things: a file the manifest lists and the bundle does
+not have, a file whose bytes no longer match, and a file present in the bundle that no
+manifest entry claims. It also checks the custody chain.
+
+The custody chain is **tamper-evident, not tamper-proof**. It sits in a writable directory
+and whoever can write it can rewrite the whole chain. What it buys is that a single record
+cannot be removed or edited quietly. See [BUNDLE_FORMAT.md](BUNDLE_FORMAT.md).
+
+## Deploying through other tooling
+
+Generated collection rules for Velociraptor, KAPE, Microsoft Defender live response,
+Advanced Hunting KQL and osquery are planned and will live under `exporters/generated/`,
+rendered from the same catalogue so they cannot drift from it. Until then, the collectors
+are single dependency-free files precisely so they can be pushed through whatever channel
+is available: a live-response `putfile` and `run`, a remote shell, or a USB stick.

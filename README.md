@@ -160,6 +160,10 @@ pseudonymization, and a shell fallback collector.
 ## Documentation
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), how the parts fit together
+- [docs/COLLECTION.md](docs/COLLECTION.md), what to collect first and why, and how to
+  run a collection
+- [docs/ARTIFACTS.md](docs/ARTIFACTS.md), the generated artifact reference, grouped by
+  how fast each artifact disappears
 - [docs/BUNDLE_FORMAT.md](docs/BUNDLE_FORMAT.md), the evidence bundle format
 - [docs/adr/](docs/adr/), one short record per architecture decision, with the reasoning
   and the cost each one accepts

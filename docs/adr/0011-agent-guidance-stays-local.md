@@ -30,7 +30,8 @@ Nothing a contributor needs may live only in those files. Specifically:
 - The full command reference, the conventions and the catalogue honesty rules are in
   `CONTRIBUTING.md`.
 - The architecture, the event model, the bundle rationale and the phase plan are in
-  `docs/ARCHITECTURE.md`, `docs/BUNDLE_FORMAT.md` and `docs/RULES.md`, written impersonally.
+  `docs/ARCHITECTURE.md`, `docs/BUNDLE_FORMAT.md` and `docs/COLLECTION.md`, written
+  impersonally, with the rules documentation to follow in phase 4.
 - Every decision, including the ones that supersede the brief, is an ADR here.
 
 ## Consequences

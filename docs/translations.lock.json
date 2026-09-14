@@ -1,10 +1,11 @@
 {
   "_comment": "sha256 of each English document whose German sibling was confirmed current. Refresh with scripts/check_translations.py --update after updating a translation, or after an English edit that needs none.",
   "english_hashes": {
-    "CONTRIBUTING.md": "8f0b0839c241ef2c18e4f1ad494f930f101ed0d393e4251a38e5191d42e84d49",
-    "README.md": "23a1a92d6c2c4c0d38a875b96330eab35af024eb2c9aed28c4e12659fa3251ba",
+    "CONTRIBUTING.md": "46a615c64f0fefbcf791607cbd940e5844a1ab6ed0738540fc95d9b46052a742",
+    "README.md": "efe233ad8f4af5022d0b36c6cf0e68ac9f8c8ee4d748216b38c8a957c037aaba",
     "SECURITY.md": "d762c856c43ffe27dab58d6f00918c2e0fb47f1f2dcea722e64c6259c2eb0041",
-    "docs/ARCHITECTURE.md": "114629e8ab2f30c2ee8492a1248310f0f8e13e46e9e7accf39444e88257c0516",
-    "docs/BUNDLE_FORMAT.md": "bca01524a77a5afb2ccce9bd8cec718e46547988451d3ddb8c91e386b8994015"
+    "docs/ARCHITECTURE.md": "8411fea74a41e7f9219bb4320b8d849bdcd3d53ecff68d2383c25a78ee23e4a9",
+    "docs/BUNDLE_FORMAT.md": "bca01524a77a5afb2ccce9bd8cec718e46547988451d3ddb8c91e386b8994015",
+    "docs/COLLECTION.md": "9ca2f9f6c95db4921bda06d8df013340ac5808b943755f5e260fb0be48ee3777"
   }
 }

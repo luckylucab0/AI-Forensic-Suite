@@ -127,10 +127,12 @@ run the generator whenever you change its input:
 ```bash
 uv run python scripts/build_collectors.py    # embed catalog/ into both collectors
 uv run python scripts/gen_artifact_docs.py   # regenerate docs/ARTIFACTS{,.de}.md
-uv run python scripts/gen_rule_docs.py       # regenerate docs/RULES{,.de}.md
 uv run python scripts/check_translations.py  # German docs lagging their English source
+uv run python scripts/check_viewer.py        # viewer structure and JavaScript parse
 uv run python scripts/opsec_check.py --mode both
 ```
+
+A rule documentation generator will join that list when the rule engine lands in phase 4.
 
 The CLI itself is `agentforensics`, with `afx` as a shorter alias:
 
@@ -150,9 +152,9 @@ Conventions, in short.
   comment with its reason, plus a source link when it comes from vendor documentation.
 - One ADR per decision, short, under `docs/adr/`.
 - Ask before adding a dependency, changing a data format, or anything security relevant.
-- Generated files are never hand-edited: `docs/ARTIFACTS.md`, `docs/RULES.md`, everything
-  under `exporters/generated/`, and the embedded catalogue block inside each collector.
-  Change `catalog/` or `rules/` and regenerate. CI compares.
+- Generated files are never hand-edited: `docs/ARTIFACTS.md` and its German version,
+  everything that will land under `exporters/generated/`, and the embedded catalogue block
+  inside each collector. Change `catalog/` and regenerate. CI compares.
 
 ## Contributing an artifact to the catalogue
 

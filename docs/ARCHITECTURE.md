@@ -166,7 +166,7 @@ own data. That is a different product, it would put internal domains and code na
 public repository, and it would pull the suite away from the question it exists to answer.
 The packs stay focused on agent behavior: secrets that reached a transcript, dangerous
 commands, sensitive paths, exfiltration indicators, permission bypass, anti-forensics,
-prompt injection, supply chain and third-party endpoints. See [RULES.md](RULES.md).
+prompt injection, supply chain and third-party endpoints. The engine and the packs are phase 4 work and `docs/RULES.md` does not exist yet.
 
 ### The viewer
 

@@ -180,8 +180,8 @@ Projektnamen in ein öffentliches Repository bringen, und es würde die Suite vo
 wegziehen, für die sie existiert. Die Pakete bleiben auf das Verhalten der Agenten
 fokussiert: Zugangsdaten, die in ein Transkript geraten sind, gefährliche Befehle,
 sensible Pfade, Exfiltrationshinweise, Umgehung von Berechtigungen, Anti-Forensik,
-Prompt-Injection, Lieferkette und Drittanbieter-Endpunkte. Siehe
-[RULES.de.md](RULES.de.md).
+Prompt-Injection, Lieferkette und Drittanbieter-Endpunkte. Engine und Pakete sind Arbeit
+aus Phase 4, `docs/RULES.de.md` existiert noch nicht.
 
 ### Der Viewer
 
