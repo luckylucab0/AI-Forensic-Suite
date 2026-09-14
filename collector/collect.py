@@ -71,7 +71,8 @@ PRIORITY_ORDER = ("live_only", "first", "normal", "durable")
 # --- BEGIN EMBEDDED CATALOGUE ---
 # Rendered from catalog/*.yaml by scripts/build_collectors.py. Do not edit by hand: CI
 # regenerates it and fails if this block is stale.
-EMBEDDED_CATALOGUE = {
+EMBEDDED_CATALOGUE_JSON = r"""
+{
     "agents": [
         {
             "agent": "aider",
@@ -3895,6 +3896,8 @@ EMBEDDED_CATALOGUE = {
     ],
     "sha256": "d963a63299ebbe7dceeac1b371070a843ed521ad7394a51a1dc74ff2135c500d"
 }
+"""
+EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)
 # --- END EMBEDDED CATALOGUE ---
 
 

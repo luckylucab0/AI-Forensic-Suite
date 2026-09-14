@@ -75,15 +75,54 @@ def catalogue_payload() -> dict:
     return payload
 
 
-def render_python(payload: dict) -> str:
+def render_json(payload: dict) -> str:
+    """The one JSON rendering both collectors embed, with the quoting hazards checked.
+
+    A Python raw triple-quoted string and a PowerShell here-string each have exactly one
+    sequence they cannot contain. Neither can occur in this data, but a catalogue entry is
+    the kind of thing that changes without anyone thinking about the quoting of a generated
+    file, and a broken collector is found at collection time, on someone's evidence.
+    """
     body = json.dumps(payload, sort_keys=True, indent=4, ensure_ascii=False)
-    # A Python dict literal and JSON agree on everything used here, so json.dumps output
-    # is valid Python. Verified by the byte-compile step in CI.
-    return "EMBEDDED_CATALOGUE = " + body
+    if '"""' in body:
+        raise SystemExit(
+            "build-collectors: the catalogue contains a triple quote, which would end the "
+            "embedded string in collect.py. Change the catalogue entry."
+        )
+    if "\n'@" in body:
+        raise SystemExit(
+            "build-collectors: the catalogue contains a line starting with '@, which would "
+            "end the here-string in collect.ps1. Change the catalogue entry."
+        )
+    if body.endswith("\\"):
+        raise SystemExit("build-collectors: the rendered JSON ends with a backslash")
+    return body
+
+
+def render_python(payload: dict) -> str:
+    body = render_json(payload)
+    # A raw triple-quoted string rather than a Python dict literal, for two reasons.
+    #
+    # The first is that both collectors then embed byte-identical data, so the differential
+    # test compares like with like and one hash describes both.
+    #
+    # The second is that a code formatter rewrites a dict literal and leaves a string
+    # alone. json.dumps output is valid Python, but ruff format collapses its one-item-per
+    # -line lists, and this script would then report the block as stale: two CI steps that
+    # cannot both pass, decided by whichever ran last. A string ends that.
+    #
+    # Raw, because catalogue paths contain Windows separators that JSON escapes as \\ and
+    # a non-raw string would turn back into a single backslash, breaking the JSON.
+    return (
+        'EMBEDDED_CATALOGUE_JSON = r"""\n'
+        + body
+        + '\n"""\n'
+        + "EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)"
+    )
 
 
 def render_powershell(payload: dict) -> str:
-    body = json.dumps(payload, sort_keys=True, indent=4, ensure_ascii=False)
+    body = render_json(payload)
     # A here-string keeps the JSON verbatim, so both collectors embed byte-identical data
     # and the differential test compares like with like. ConvertFrom-Json needs an
     # explicit -Depth on PowerShell 5.1, where the default would flatten the nesting.
