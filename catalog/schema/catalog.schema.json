@@ -1,0 +1,195 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/luckylucab0/AI-Forensic-Suite/catalog/schema/catalog.schema.json",
+  "title": "AI agent artifact catalogue",
+  "description": "One file per agent. This schema is the contract every consumer relies on: both collectors embed the catalogue, five collection-rule exporters render it, the parsers key off it, and docs/ARTIFACTS.md is generated from it. Draft-07 on purpose: the validator is pure Python with no dependencies of its own, which matters because an analyst workstation may be air-gapped.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["agent", "title", "artifacts"],
+  "properties": {
+    "agent": {
+      "description": "Stable key for the agent, used as the prefix of every artifact id and as the value of the --agents collector filter. Lowercase with underscores, so it is safe in a filename, a SQL identifier and a YAML key.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "title": {
+      "description": "The agent's name as a human writes it, for documentation and report output.",
+      "type": "string",
+      "minLength": 1
+    },
+    "vendor": { "type": "string" },
+    "description": { "$ref": "#/$defs/text" },
+    "references": {
+      "description": "Documentation entry points for the agent as a whole. Per-artifact evidence goes in the artifact's own source field.",
+      "type": "array",
+      "items": { "type": "string", "format": "uri" }
+    },
+    "env_overrides": {
+      "description": "Environment variables that relocate this agent's entire data tree. Without these the collector silently finds nothing on a host where the tree was moved, which is indistinguishable from the agent never having run.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/env_override" }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/artifact" }
+    }
+  },
+  "$defs": {
+    "text": {
+      "description": "Free text in one or both documentation languages. A plain string is treated as English, which lets a contributor add an entry without writing German; the generator then marks it visibly as untranslated rather than pretending it was translated.",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["en"],
+          "properties": {
+            "en": { "type": "string" },
+            "de": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "env_override": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "effect"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+        "effect": { "$ref": "#/$defs/text" },
+        "source": { "type": "string" }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "category",
+        "os",
+        "paths",
+        "format",
+        "sensitivity",
+        "status",
+        "source",
+        "source_kind"
+      ],
+      "properties": {
+        "id": {
+          "description": "Stable, globally unique, and referenced from findings and manifests, so renaming one breaks stored case data. Must begin with the file's agent key.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$"
+        },
+        "title": { "type": "string" },
+        "category": {
+          "description": "What kind of evidence this is. Drives report grouping and the personal-data warning: an analyst should be told when a bundle contains transcripts and prompt histories, which is a property of the category rather than of the sensitivity field.",
+          "enum": [
+            "transcript",
+            "prompt_history",
+            "config",
+            "permissions",
+            "instructions",
+            "project_instructions",
+            "mcp_config",
+            "credentials",
+            "memory",
+            "file_snapshot",
+            "cache",
+            "log",
+            "install_evidence",
+            "shell_history"
+          ]
+        },
+        "os": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["macos", "windows", "linux"] }
+        },
+        "paths": {
+          "description": "Glob patterns with placeholders the collectors expand: ~ for the user profile, %APPDATA% and %LOCALAPPDATA% and %USERPROFILE% and %PROGRAMFILES% and %PROGRAMDATA% on Windows, $XDG_DATA_HOME and $XDG_CONFIG_HOME and $XDG_CACHE_HOME on Linux with their documented defaults. Angle brackets mark a variable segment for a human reader and are not expanded; use a glob where the collector must actually match.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "format": {
+          "enum": [
+            "jsonl",
+            "json",
+            "sqlite",
+            "toml",
+            "yaml",
+            "markdown",
+            "text",
+            "binary",
+            "directory",
+            "plist",
+            "leveldb"
+          ]
+        },
+        "parser": {
+          "description": "Module under agentforensics.parsers that turns this artifact into events, or null when nothing parses it yet. An artifact with no parser is still collected and still produces artifact.fs timeline events, which is why null is a valid answer rather than a reason to omit the entry.",
+          "type": ["string", "null"]
+        },
+        "sensitivity": {
+          "description": "Operational, not descriptive. 'secret' means the collector records metadata and a SHA-256 only and does not copy the content unless --include-secrets is given, and that choice is recorded in the manifest. It is therefore reserved for credential stores: token files, OAuth credentials, private keys. Transcripts, prompt histories and configs are 'normal' however personal their content, because they are the evidence the tool exists to collect; marking a transcript 'secret' would make the collector skip the very thing the analyst needs.",
+          "enum": ["normal", "secret"]
+        },
+        "collect_priority": {
+          "description": "Collection order, derived from how fast the artifact disappears. 'live_only' exists only while the machine is running or is destroyed on a clean shutdown, so it is unrecoverable from a powered-off image. 'first' is swept or rotated aggressively. 'normal' survives until the retention sweep. 'durable' outlives the sweep and is where to look when transcripts are already gone. The collectors order their work by this field, because on a live endpoint the difference between collecting in this order and alphabetically is evidence.",
+          "enum": ["live_only", "first", "normal", "durable"],
+          "default": "normal"
+        },
+        "volatility": {
+          "description": "How and when this artifact disappears, in prose, including the setting or command that controls it. An empty value means unknown, which is different from 'never deleted' and must not be written as such.",
+          "$ref": "#/$defs/text"
+        },
+        "legacy": {
+          "description": "True when the path is no longer written or read by current versions. Such an artifact is still collected, because it is evidence of an older installation, but the analyzer must not present it as live state. A legacy managed-policy file misread as current policy would reverse the conclusion of an investigation.",
+          "type": "boolean",
+          "default": false
+        },
+        "status": {
+          "description": "'verified' requires that source is a URL somebody actually fetched and that the page states this path. Everything else is 'unverified'. Unverified artifacts are still collected by glob and are flagged as unverified in analyzer output, so a negative result reads as inconclusive rather than as proof the agent was never used. A plausible-looking invented path is the worst defect this catalogue can carry.",
+          "enum": ["verified", "unverified"]
+        },
+        "source": {
+          "description": "A URL for anything documented, or 'observed on <os> <version>' with no identifying detail for a first-hand observation.",
+          "type": "string",
+          "minLength": 1
+        },
+        "source_kind": {
+          "description": "Where the claim comes from. Separated from source so the honesty rule can be checked mechanically: only 'official' and 'source_code' may accompany status 'verified'.",
+          "enum": ["official", "source_code", "community", "observed", "recollection"]
+        },
+        "record_types": {
+          "description": "For a structured log, the record or event type values seen in it. Used by the parsers to detect a type they do not know yet, which must be preserved rather than dropped.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "tables": {
+          "description": "For a sqlite artifact, the tables that hold the interesting content.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "notes": { "$ref": "#/$defs/text" }
+      },
+      "allOf": [
+        {
+          "description": "A verified entry must rest on vendor documentation or on the agent's own published source. Community write-ups and first-hand observation are valuable and are kept, but they do not make an entry verified, because the failure they cause is an empty collection nobody questions.",
+          "if": { "properties": { "status": { "const": "verified" } }, "required": ["status"] },
+          "then": { "properties": { "source_kind": { "enum": ["official", "source_code"] } } }
+        },
+        {
+          "description": "Credential material is the one category where the default must be metadata only.",
+          "if": {
+            "properties": { "category": { "const": "credentials" } },
+            "required": ["category"]
+          },
+          "then": { "properties": { "sensitivity": { "const": "secret" } } }
+        }
+      ]
+    }
+  }
+}
