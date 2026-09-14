@@ -1,0 +1,17 @@
+# The collectors run on whatever interpreter an endpoint already has, which in a corporate
+# fleet means Python 3.8 is the realistic floor. Pinning the target here makes ruff reject
+# newer syntax at lint time instead of at collection time on someone's evidence.
+#
+# See docs/adr/0004-two-single-file-collectors.md.
+
+extend = "../pyproject.toml"
+target-version = "py38"
+
+[lint]
+# pyupgrade would rewrite 3.8-compatible code into syntax the target cannot run.
+ignore = ["UP", "E501"]
+
+[lint.per-file-ignores]
+# A collector is a command line tool whose output is its interface, it must walk paths the
+# operating system gives it, and it deliberately reads files that may be unreadable.
+"*.py" = ["T20", "S101", "PTH"]

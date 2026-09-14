@@ -1,0 +1,21 @@
+# These scripts run as pre-commit hooks with `language: system`, which means they execute
+# on whatever `python3` the contributor happens to have, not on the project's pinned 3.11
+# interpreter. A hook that crashes with a SyntaxError is a hook people disable, so the
+# target here is the same generous floor as the collectors use.
+#
+# The cost is that pyupgrade cannot suggest modern typing syntax in this directory. That is
+# the intended trade: `list[str]` as a runtime type alias fails on Python 3.8, and these
+# files are the ones most likely to be run outside the project's own environment.
+#
+# See docs/adr/0004-two-single-file-collectors.md for the same reasoning applied there.
+
+extend = "../pyproject.toml"
+target-version = "py38"
+
+[lint]
+ignore = ["UP", "E501"]
+
+[lint.per-file-ignores]
+# A development script is a command line tool: printing is its interface, and shelling out
+# to git is the job.
+"*.py" = ["T20", "S603", "S607"]

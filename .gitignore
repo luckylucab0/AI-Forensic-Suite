@@ -1,0 +1,48 @@
+# The OpSec denylist and its allowlist name the very things they protect, so they are
+# supplied by the operator and must never be committed. See CONTRIBUTING.
+.opsec-denylist
+.opsec-allowlist
+
+# Agent guidance is deliberately local, not published. Everything a contributor needs is
+# in CONTRIBUTING.md and docs/; these files exist so an agent session in this checkout has
+# the same context, without that context becoming part of the public record.
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+
+# The original project brief is a personal working document. Its substance lives in
+# docs/ARCHITECTURE.md, docs/BUNDLE_FORMAT.md, docs/RULES.md and the ADRs, written
+# impersonally and without reference to any operator.
+docs/BRIEF.md
+
+# Evidence and case data must never end up in the repository.
+*.aafsbundle/
+bundles/
+cases/
+*.case
+*.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
