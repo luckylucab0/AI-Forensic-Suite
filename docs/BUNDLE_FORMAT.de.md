@@ -64,6 +64,26 @@ Fassungen nicht auseinanderlaufen. Die Felder, die nicht selbsterklärend sind:
   genau die, die gehasht wurden; die Markierung sagt, dass die Quelle in Bewegung war.
 - `symlink` enthält das Ziel, wenn der Eintrag ein Symlink innerhalb des Profils war, und
   der Eintrag wird mit `skipped_symlink` übersprungen, wenn das Ziel ausserhalb liegt.
+- `refused_patterns` führt die Katalogmuster auf, die der Collector nicht durchsucht hat,
+  jeweils mit dem Muster wie geschrieben, dem Stand der Auflösung und einem der Gründe
+  `not_absolute`, `wildcard_too_broad`, `wildcard_only`, `malformed_variable` oder
+  `environment_unreadable_offline`. Das Feld gibt es, weil ein nicht durchsuchtes Muster
+  eine Lücke in der Abdeckung ist und ein Bundle, das darüber schweigt, genauso aussieht
+  wie ein Bundle von einem Host, auf dem das Artefakt gar nicht vorhanden war.
+
+  `environment_unreadable_offline` ist der Grund, den eine Analystin normalerweise sieht,
+  und er ist kein Defekt. Mehrere Agenten verschieben ihren gesamten Datenbaum über eine
+  eigene Umgebungsvariable, darunter `CLAUDE_CONFIG_DIR` und `CODEX_HOME`. Auf einem
+  laufenden Host liest der Collector die Variable und folgt ihr. Bei einem eingebundenen
+  Abbild mit `--root` gibt es keine solche Umgebung, und die eigene ist nicht die des
+  Endgeräts. Das Muster wird deshalb gemeldet statt geraten: Suchen Sie die Variable in
+  den Shell-Profilen des Abbilds und sammeln Sie gegebenenfalls in einem zweiten Durchgang
+  nach.
+
+  Ein Muster, das hier einfach nicht zutrifft, steht nicht in dieser Liste. Ein
+  Windows-Pfad auf einem Linux-Host, eine freedesktop-Variable unter Windows oder eine
+  Verschiebungsvariable, die tatsächlich nicht gesetzt ist, sind der Normalfall, und zu
+  jedem davon gibt es im selben Artefakt ein Geschwistermuster, das durchsucht wird.
 
 ## Pfadabbildung
 

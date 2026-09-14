@@ -9,8 +9,10 @@ wrong answer in an investigation, and no amount of unit testing the loader would
 
 from __future__ import annotations
 
+import importlib.util
 import re
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -41,6 +43,16 @@ def normalise_path(path: str) -> str:
 @pytest.fixture(scope="module")
 def catalogue() -> Catalogue:
     return load_catalogue(CATALOG_DIR)
+
+
+def _load_collector() -> Any:
+    """Import collect.py by path: it is a single standalone file, not a package module."""
+    path = Path(__file__).resolve().parent.parent.parent / "collector" / "collect.py"
+    spec = importlib.util.spec_from_file_location("collect_under_test", path)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def test_catalogue_loads_and_is_not_empty(catalogue: Catalogue) -> None:
@@ -203,6 +215,63 @@ def test_windows_paths_are_present_for_profile_anchored_windows_artifacts(
         if "<vscode-user>" in joined:
             continue
         assert re.search(r"%[A-Z]+%|^~|\s~|[A-Z]:\\|\\", joined), artifact.id
+
+
+def test_posix_paths_are_present_for_profile_anchored_posix_artifacts(
+    catalogue: Catalogue,
+) -> None:
+    """The mirror of the Windows check, and the same failure in the other direction.
+
+    An artifact that claims macOS or Linux but whose paths are all Windows placeholders
+    resolves to nothing on those hosts. The collector passes such a pattern through
+    unexpanded, it matches no file, and the bundle is clean: the agent looks unused on
+    every Mac and Linux endpoint in the fleet.
+    """
+    for artifact in catalogue.artifacts:
+        posix = {"macos", "linux"} & set(artifact.os)
+        if not posix or artifact.needs_project_roots or artifact.is_registry:
+            continue
+        joined = " ".join(artifact.paths)
+        if "<vscode-user>" in joined:
+            continue
+        # ~ for the profile, $XDG_* for the freedesktop directories, or an absolute path.
+        assert re.search(r"(^|\s)~|\$XDG_[A-Z_]+|(^|\s)/", joined), artifact.id
+
+
+def test_every_artifact_resolves_to_at_least_one_pattern_per_declared_os(
+    catalogue: Catalogue,
+) -> None:
+    """Run the collector's own expansion, rather than trusting a regex about it.
+
+    The two checks above look at the catalogue text. This one imports the collector and
+    asks it what it would actually search, which is the only thing that decides whether an
+    artifact can be found. A placeholder nobody taught the collector about expands to a
+    bare wildcard or to nothing, and either way the evidence is missing with no error.
+    """
+    collect = _load_collector()
+    homes = {"linux": "/home/alice", "macos": "/Users/alice", "windows": "C:/Users/alice"}
+    for agent in collect.EMBEDDED_CATALOGUE["agents"]:
+        for entry in agent["artifacts"]:
+            if entry.get("root") == "registry":
+                # A registry key is not a filesystem path. collect.ps1 reads these; the
+                # POSIX collector has nothing to expand and correctly resolves nothing.
+                continue
+            for target_os in entry["os"]:
+                home = homes[target_os]
+                resolved = []
+                for pattern in entry["paths"]:
+                    concrete = pattern
+                    if entry.get("root") in ("project", "repo_root", "plugin"):
+                        # The collection loop substitutes a discovered working copy for the
+                        # leading placeholder before expanding, so do the same here rather
+                        # than testing a path shape the collector never sees.
+                        anchor = "C:/src/app" if target_os == "windows" else "/src/app"
+                        concrete = re.sub(r"^<[^>]+>", anchor, pattern)
+                    resolved.extend(collect.expand_paths(concrete, home, target_os, None))
+                assert resolved, f"{entry['id']} resolves to nothing on {target_os}"
+    assert not collect.PATTERN_REFUSALS, (
+        f"the collector refused to search a catalogue pattern: {collect.PATTERN_REFUSALS}"
+    )
 
 
 def test_project_anchored_artifacts_are_labelled(catalogue: Catalogue) -> None:

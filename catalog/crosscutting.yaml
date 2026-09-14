@@ -171,9 +171,9 @@ artifacts:
 
     Record structure: POINTER-LEVEL. Per-user (non-admin) installs land in %LOCALAPPDATA%\Programs\<Vendor> and add themselves to the user PATH; MSIX/Store apps land in %LOCALAPPDATA%\Packages\<PackageFamilyName>\ with LocalCache/LocalState/RoamingState subtrees. Ollama's own docs give the concrete pattern: "explorer %LOCALAPPDATA%\Ollama" for logs and downloaded updates, "explorer %LOCALAPPDATA%\Programs\Ollama" for binaries ("The installer adds this to your user PATH"), "explorer %HOMEPATH%\.ollama" for models and configuration, and "explorer %TEMP%" for "temporary executable files in ollama* directories".
   parser: null
-- id: crosscutting.windows_execution_artifacts
+- id: crosscutting.windows_execution_evidence_files
   category: install_evidence
-  root: user_profile
+  root: system
   os:
   - windows
   paths:
@@ -181,12 +181,8 @@ artifacts:
   - '%SystemRoot%\AppCompat\Programs\Amcache.hve.LOG1'
   - '%SystemRoot%\AppCompat\Programs\Amcache.hve.LOG2'
   - '%SystemRoot%\Prefetch\*.pf'
-  - HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run
-  - HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce
-  - HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\AppCompatCache
-  - HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\bam\State\UserSettings\*
-  - HKEY_USERS\%%users.sid%%\Software\Microsoft\Windows\CurrentVersion\Run
-  - HKEY_USERS\%%users.sid%%\Software\Microsoft\Windows\CurrentVersion\RunOnce
+  - '%SystemRoot%\System32\Tasks\'
+  - '%SystemRoot%\System32\sru\SRUDB.dat'
   format: binary
   sensitivity: normal
   collect_priority: normal
@@ -194,11 +190,48 @@ artifacts:
   source: https://raw.githubusercontent.com/ForensicArtifacts/artifacts/main/artifacts/data/windows.yaml
   source_kind: community
   volatility: |-
-    Prefetch is capped (1024 entries on modern Windows) and can be disabled on SSD-era builds; ShimCache is written to the registry mainly at shutdown so a live-acquired SYSTEM hive may lag; BAM entries are per-SID and get cleared with the profile.
+    Prefetch is capped at 1024 entries on modern Windows and can be disabled entirely on SSD-era builds, so an absent .pf file is never evidence that a binary did not run. SRUDB.dat is written from memory periodically, so the most recent network usage may not be on disk yet.
   notes: |-
-    Deliberately scoped as pointers per the brief. Two more the ForensicArtifacts windows.yaml did NOT contain and which I sourced separately (Eric Zimmerman's RECmd batch files, EricZimmerman/RECmd BatchExamples/Kroll_Batch.reb) - treat as community, medium confidence: UserAssist at 'Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\*\Count' (ROT13-encoded GUI-launch history with run count and last-run time - note it misses command-line launches, which is exactly how CLI agents are started, so its ABSENCE means nothing here), and scheduled tasks at 'Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tasks' (+ \Tree) with the XML at C:\Windows\System32\Tasks\. Also worth pointing at: SRUM (C:\Windows\System32\sru\SRUDB.dat) for per-app network bytes - the single best way to show an agent exfiltrated volume; Security EID 4688 for full command lines; and Microsoft-Windows-TaskScheduler%4Operational.evtx.
+    Not agent artifacts, and not parsed here. They are the operating system's own record that a binary executed, which is what answers the question an agent's own files cannot: whether the agent ran at all on a host where its data directory has been deleted.
 
-    Record structure: POINTERS, NOT THINGS AAFS PARSES - aafs should record presence/paths and hand these to the examiner's existing tooling (AmcacheParser, PECmd, AppCompatCacheParser, RECmd, SrumECmd). Literal strings from ForensicArtifacts: Amcache '%%environ_systemroot%%\AppCompat\Programs\Amcache.hve' (+ .LOG1/.LOG2); Prefetch '%%environ_systemroot%%\Prefetch\*.pf'; ShimCache under both 'Session Manager\AppCompatibility' and 'Session Manager\AppCompatCache' (value AppCompatCache); BAM 'HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\bam\UserSettings\*' and '...\bam\State\UserSettings\*'. What each proves for an agent: Amcache gives the binary's SHA-1 and publisher metadata (proves WHAT ran even after rename/delete); Prefetch gives first/last run, run count and the DLLs/files touched in the first ~10s; ShimCache proves the path was observed and preserves the pre-timestomp modification time; BAM gives a per-SID last-run FILETIME.
+    Scope is deliberately pointers only. This tool records presence, paths, hashes and timestamps and hands the files to the examiner's existing tooling, because parsers for these formats exist and are better than anything this project would write: AmcacheParser, PECmd, AppCompatCacheParser, SrumECmd.
+
+    What each one proves about an agent. Amcache carries the binary's SHA-1 and publisher metadata, so it identifies what ran even after the file was renamed or deleted. Prefetch gives first run, last run, a run count and the files touched in the first ten seconds of execution. SRUDB.dat holds per-application network byte counts, which is the single best way to show how much data an agent sent. The Tasks directory holds the XML of scheduled tasks, which is where a persistent agent invocation would be defined.
+
+    Separated from the registry keys that used to sit in the same entry, because one artifact cannot be both a file and a registry key: the collector resolved neither and the whole entry was silently absent from every Windows bundle.
+  parser: null
+- id: crosscutting.windows_execution_evidence_registry
+  category: install_evidence
+  root: registry
+  os:
+  - windows
+  paths:
+  - HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run
+  - HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce
+  - HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tasks
+  - HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\AppCompatCache
+  - HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\AppCompatibility
+  - HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\bam\State\UserSettings\*
+  - HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\bam\UserSettings\*
+  - HKEY_USERS\<sid>\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\*\Count
+  - HKEY_USERS\<sid>\Software\Microsoft\Windows\CurrentVersion\Run
+  - HKEY_USERS\<sid>\Software\Microsoft\Windows\CurrentVersion\RunOnce
+  format: registry
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/ForensicArtifacts/artifacts/main/artifacts/data/windows.yaml
+  source_kind: community
+  volatility: |-
+    ShimCache is written to the registry mainly at shutdown, so a hive read from a live host can lag behind by the whole current uptime. BAM entries are per-SID and are removed with the profile.
+  notes: |-
+    Registry keys, so only the PowerShell collector can read them, and only on the host itself rather than from a mounted image.
+
+    ShimCache proves a path was observed by the system and preserves the modification time as it was before any later timestomping. BAM gives a per-SID last-run FILETIME.
+
+    UserAssist is listed with a warning attached: it records GUI launches with a run count and a last-run time, ROT13-encoded, and it does not record command-line launches. Command line is exactly how every agent in this catalogue is started, so an empty UserAssist means nothing here and must not be reported as absence of use.
+
+    Two of these came from Eric Zimmerman's RECmd batch files rather than from the ForensicArtifacts set, namely UserAssist and the scheduled-task TaskCache keys. Treat them as community sourced.
   parser: null
 - id: crosscutting.hook_scripts
   category: instructions

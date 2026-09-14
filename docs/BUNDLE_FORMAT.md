@@ -88,6 +88,11 @@ adapter shape reads all three, plus a mounted image and an exported profile.
   "counts": { "hit": 412, "collected": 402, "skipped": 10, "errors": 2 },
   "errors": [
     { "path": "C:\\Users\\bob\\.claude", "error": "permission_denied", "detail": "..." }
+  ],
+  "refused_patterns": [
+    { "pattern": "$CLAUDE_CONFIG_DIR/projects/*/*.jsonl",
+      "expanded": "$CLAUDE_CONFIG_DIR/projects/*/*.jsonl",
+      "reason": "environment_unreadable_offline" }
   ]
 }
 ```
@@ -121,6 +126,25 @@ Field notes that are not obvious:
   the flag says the source was live.
 - `symlink` holds the link target when the entry was a symlink inside the profile, and the
   entry is skipped with `skipped_symlink` when the target lies outside it.
+- `refused_patterns` lists the catalogue patterns the collector declined to search, with
+  the pattern as written, how far it got expanding it, and one of `not_absolute`,
+  `wildcard_too_broad`, `wildcard_only`, `malformed_variable` or
+  `environment_unreadable_offline`. It exists because a pattern nobody searched is a hole
+  in the coverage, and a bundle that is silent about it looks exactly like a bundle from a
+  host where the artifact was absent.
+
+  `environment_unreadable_offline` is the one an analyst will normally see, and it is not
+  a defect. Several agents relocate their whole data tree with an environment variable of
+  their own, `CLAUDE_CONFIG_DIR` and `CODEX_HOME` among them. On a live host the collector
+  reads the variable and follows it. Collecting a mounted image with `--root` there is no
+  such environment to read, and the analyst's own is not the endpoint's, so the pattern is
+  reported instead of guessed at: look for the variable in the image's shell profiles and
+  collect again with `--project-root` or a second pass if it was set.
+
+  A pattern that simply does not apply is not listed here. A Windows path on a Linux host,
+  a freedesktop variable on Windows, or a relocation variable that is genuinely unset are
+  all ordinary, and every one of them has a sibling pattern in the same artifact that is
+  being searched.
 
 ## Path mapping
 

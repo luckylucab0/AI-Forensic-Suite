@@ -1050,7 +1050,12 @@ artifacts:
   - windows
   paths:
   - ~/.claude/local/
-  - <node-prefix>/lib/node_modules/@anthropic-ai/claude-code
+  - /opt/homebrew/lib/node_modules/@anthropic-ai/claude-code
+  - /usr/lib/node_modules/@anthropic-ai/claude-code
+  - /usr/local/lib/node_modules/@anthropic-ai/claude-code
+  - '%APPDATA%\npm\node_modules\@anthropic-ai\claude-code'
+  - ~/.npm-global/lib/node_modules/@anthropic-ai/claude-code
+  - ~/.npm-packages/lib/node_modules/@anthropic-ai/claude-code
   - ~/.nvm/versions/node/<version>/lib/node_modules/@anthropic-ai/claude-code
   - ~/Library/Application Support/Claude/claude-code/<version>/
   format: binary
@@ -1063,6 +1068,8 @@ artifacts:
     Persist until manually removed (documented removal: rm -rf ~/.claude/local). Multiple installations commonly coexist.
   notes: |-
     Documentation explicitly describes THREE places a claude binary can come from and tells users to check all of them, so a collector must too: finding one install does not mean there is only one. Each has its own version and therefore its own behaviour. Marked unverified overall because the desktop sidecar path is community-sourced.
+
+    The npm global prefix is written out as the locations npm actually uses rather than as a placeholder. A placeholder here expanded to a single-level wildcard and the pattern was then searched relative to whatever directory the collector was started in, so the npm installs were never found on any host.
 
     Record structure: ~/.claude/local/ is a LEGACY local npm install created by older Claude Code versions - its presence alone dates the endpoint's first install to an older release, and is verified by the documented triage step `ls -la ~/.claude/local/`. The npm global paths under lib/node_modules/@anthropic-ai/claude-code are verified as the npm package name and location pattern from documented npm error output. The ~/Library/Application Support/Claude/claude-code/<version>/ desktop sidecar path is from a community GitHub issue, not Anthropic documentation - recollection, needs verification.
   parser: null

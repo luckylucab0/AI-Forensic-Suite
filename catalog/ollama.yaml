@@ -125,7 +125,6 @@ artifacts:
   paths:
   - /etc/systemd/system/ollama.service
   - /etc/systemd/system/ollama.service.d/override.conf
-  - HKEY_CURRENT_USER\Environment
   - ~/.bashrc
   - ~/.zshrc
   format: text
@@ -138,6 +137,26 @@ artifacts:
     Read these BEFORE globbing ~/.ollama: a set OLLAMA_MODELS means the manifests are somewhere else entirely, and OLLAMA_NOHISTORY explains an absent history file without implying anti-forensics. OLLAMA_TMPDIR is NOT defined in current envconfig despite appearing in older third-party guides.
 
     Record structure: Variables that relocate or suppress the artifacts above: OLLAMA_MODELS (default filepath.Join(home, ".ollama", "models")) moves manifests+blobs; OLLAMA_NOHISTORY (default false) suppresses ~/.ollama/history; OLLAMA_DEBUG raises log verbosity above INFO; OLLAMA_NOPRUNE (default false) keeps orphan blobs; OLLAMA_HOST (default http://127.0.0.1:11434) shows whether the server was exposed off-host; OLLAMA_ORIGINS lists allowed CORS origins and by default already includes app/file/tauri/vscode schemes; OLLAMA_REMOTES (default ollama.com) and OLLAMA_NO_CLOUD (default false) show whether cloud inference was reachable; also OLLAMA_KEEP_ALIVE, OLLAMA_LOAD_TIMEOUT, OLLAMA_NUM_PARALLEL, OLLAMA_MAX_LOADED_MODELS, OLLAMA_MAX_QUEUE, OLLAMA_MAX_TRANSFER_STREAMS, OLLAMA_SCHED_SPREAD, OLLAMA_FLASH_ATTENTION, OLLAMA_GO_TEMPLATE, OLLAMA_KV_CACHE_TYPE, OLLAMA_GPU_OVERHEAD, OLLAMA_CONTEXT_LENGTH, OLLAMA_VULKAN, OLLAMA_IGPU_ENABLE.
+  parser: null
+- id: ollama.env_overrides_registry
+  category: config
+  root: registry
+  os:
+  - windows
+  paths:
+  - HKEY_CURRENT_USER\Environment
+  format: registry
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://raw.githubusercontent.com/ollama/ollama/main/envconfig/config.go
+  source_kind: community
+  notes: |-
+    The Windows half of ollama.env_overrides, split out because one artifact cannot be both a file and a registry key: the collector resolved neither and the whole entry was absent from every bundle.
+
+    Unverified on purpose. Ollama's own source names the variables, which is what the sibling entry cites, but it does not say where Windows stores them. That this key holds a user's environment variables is a property of Windows rather than of ollama, so it is recorded as community knowledge instead of borrowing the vendor's confidence.
+
+    Read it before concluding anything from an absent artifact: OLLAMA_MODELS set here moves the manifests and blobs somewhere this catalogue does not name, and OLLAMA_NOHISTORY explains a missing history file without implying that anyone covered their tracks.
   parser: null
 - id: ollama.macos_app_container
   category: config

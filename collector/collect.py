@@ -901,7 +901,12 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "~/.claude/local/",
-                        "<node-prefix>/lib/node_modules/@anthropic-ai/claude-code",
+                        "/opt/homebrew/lib/node_modules/@anthropic-ai/claude-code",
+                        "/usr/lib/node_modules/@anthropic-ai/claude-code",
+                        "/usr/local/lib/node_modules/@anthropic-ai/claude-code",
+                        "%APPDATA%\\npm\\node_modules\\@anthropic-ai\\claude-code",
+                        "~/.npm-global/lib/node_modules/@anthropic-ai/claude-code",
+                        "~/.npm-packages/lib/node_modules/@anthropic-ai/claude-code",
                         "~/.nvm/versions/node/<version>/lib/node_modules/@anthropic-ai/claude-code",
                         "~/Library/Application Support/Claude/claude-code/<version>/"
                     ],
@@ -2905,7 +2910,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                 {
                     "category": "install_evidence",
                     "collect_priority": "normal",
-                    "id": "crosscutting.windows_execution_artifacts",
+                    "id": "crosscutting.windows_execution_evidence_files",
                     "os": [
                         "windows"
                     ],
@@ -2914,14 +2919,33 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "%SystemRoot%\\AppCompat\\Programs\\Amcache.hve.LOG1",
                         "%SystemRoot%\\AppCompat\\Programs\\Amcache.hve.LOG2",
                         "%SystemRoot%\\Prefetch\\*.pf",
+                        "%SystemRoot%\\System32\\Tasks\\",
+                        "%SystemRoot%\\System32\\sru\\SRUDB.dat"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.windows_execution_evidence_registry",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
                         "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
                         "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+                        "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Schedule\\TaskCache\\Tasks",
                         "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\AppCompatCache",
+                        "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\AppCompatibility",
                         "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\bam\\State\\UserSettings\\*",
-                        "HKEY_USERS\\%%users.sid%%\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-                        "HKEY_USERS\\%%users.sid%%\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce"
+                        "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\bam\\UserSettings\\*",
+                        "HKEY_USERS\\<sid>\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\*\\Count",
+                        "HKEY_USERS\\<sid>\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                        "HKEY_USERS\\<sid>\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce"
                     ],
-                    "root": "user_profile",
+                    "root": "registry",
                     "sensitivity": "normal",
                     "status": "unverified"
                 }
@@ -2959,7 +2983,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
-                        ".cursor/commands/*.md",
+                        "~/.cursor/commands/*.md",
                         "~/.cursor/agent-cli-state.json",
                         "~/.cursor/agents/",
                         "~/.cursor/browser-logs/",
@@ -4574,13 +4598,26 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "/etc/systemd/system/ollama.service",
                         "/etc/systemd/system/ollama.service.d/override.conf",
-                        "HKEY_CURRENT_USER\\Environment",
                         "~/.bashrc",
                         "~/.zshrc"
                     ],
                     "root": "system",
                     "sensitivity": "normal",
                     "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "ollama.env_overrides_registry",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "HKEY_CURRENT_USER\\Environment"
+                    ],
+                    "root": "registry",
+                    "sensitivity": "normal",
+                    "status": "unverified"
                 },
                 {
                     "category": "log",
@@ -5664,7 +5701,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "ab9dbf834a899204c81d2f5adc8eeb47699ce4aac8b87e9973fb6102bafd078f"
+    "sha256": "7ff23a5b8b355a141c29503896b1110b4a9daf8d108a4aecc6b0cec42426e07b"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)
@@ -5858,6 +5895,80 @@ _WIN_PLACEHOLDERS = {
     "%LOCALAPPDATA%": "AppData/Local",
 }
 
+# Windows placeholders that are machine-wide rather than relative to a profile. Kept apart
+# from _WIN_PLACEHOLDERS because they must not be joined to a user's home directory.
+#
+# The drive is assumed to be C: because the alternative is worse. On a live host the real
+# value could be read from the environment, but a mounted image collected with --root has
+# no environment to read, and the paths here are the ones that prove an agent binary
+# executed at all: Amcache and Prefetch. Getting them from the wrong drive letter costs an
+# empty result; not looking at all costs the execution evidence.
+_WIN_SYSTEM_PLACEHOLDERS = {
+    "%SYSTEMROOT%": "C:/Windows",
+    "%WINDIR%": "C:/Windows",
+    "%SYSTEMDRIVE%": "C:",
+    "%PROGRAMFILES(X86)%": "C:/Program Files (x86)",
+    "%PROGRAMFILES%": "C:/Program Files",
+    "%PROGRAMDATA%": "C:/ProgramData",
+    "%ALLUSERSPROFILE%": "C:/ProgramData",
+    "%PUBLIC%": "C:/Users/Public",
+}
+
+
+def resolve_env_prefix(text, home, root):
+    """Resolve a leading environment variable in a catalogue path.
+
+    Agents relocate their whole data tree with a variable of their own: CLAUDE_CONFIG_DIR,
+    CODEX_HOME, HERMES_HOME, OLLAMA_MODELS, ZED_DATA_DIR and a dozen more. The catalogue
+    records those spellings precisely so a relocated tree is still found, and leaving them
+    unexpanded defeated the point: the pattern was globbed against the process working
+    directory, matched nothing, and the bundle looked like a host where the agent had never
+    run. That is the one failure this tool must not have.
+
+    Returns (text, outcome). Three outcomes, because the three cases are genuinely
+    different and only one of them is a problem:
+
+    'ok'      the variable is set and the path was rewritten.
+    'unset'   the variable is not set on this host, so the pattern does not apply. Every
+              such entry has a default-location sibling in the same artifact, which is
+              already being searched, so this is the cross-platform case again and is not
+              worth reporting.
+    a reason  the variable could not be consulted at all, which happens when collecting a
+              mounted image: the analyst's own environment says nothing about the endpoint
+              and reading it would be worse than useless. Reported, so the analyst knows
+              to look for the variable in the image's shell profiles by hand.
+    """
+    # ${VAR:-default} is shell syntax and appears in the catalogue where vendor
+    # documentation used it. The default half is what the agent uses when the variable is
+    # unset, so it is a real path and not a fallback for our benefit.
+    braced = re.match(r"^\$\{([A-Za-z_][A-Za-z0-9_]*):-([^}]*)\}(.*)$", text)
+    if braced:
+        name, fallback, tail = braced.group(1), braced.group(2), braced.group(3)
+        value = None if root else os.environ.get(name)
+        base = value if value else fallback
+        if base.startswith("~"):
+            base = home + base[1:]
+        return base.rstrip("/") + tail, "ok"
+
+    plain = re.match(r"^\$([A-Za-z_][A-Za-z0-9_]*)(.*)$", text)
+    if not plain:
+        return text, "malformed_variable"
+    name, tail = plain.group(1), plain.group(2)
+
+    if name == "HOME":
+        return home.rstrip("/") + tail, "ok"
+    if name in _XDG_DEFAULTS:
+        base = (None if root else os.environ.get(name)) or os.path.join(home, _XDG_DEFAULTS[name])
+        return base.rstrip("/") + tail, "ok"
+
+    if root:
+        # A mounted image. The variable belongs to the endpoint, not to this workstation.
+        return text, "environment_unreadable_offline"
+    value = os.environ.get(name)
+    if not value:
+        return text, "unset"
+    return value.rstrip("/") + tail, "ok"
+
 
 def _expand_vscode_user(pattern: str, home: str, target_os: str) -> list[str]:
     """Turn one <vscode-user> pattern into one pattern per known product."""
@@ -5872,12 +5983,31 @@ def _expand_vscode_user(pattern: str, home: str, target_os: str) -> list[str]:
     return out
 
 
+# Patterns this run refused to search, with the reason. Module state rather than a return
+# value so every call site stays a plain list of patterns, and surfaced in the manifest
+# because a pattern the collector declined to follow is a hole in the evidence and has to
+# be visible as one. See docs/BUNDLE_FORMAT.md.
+PATTERN_REFUSALS = []
+
+
+def refuse_pattern(pattern, expanded, reason):
+    """Record a refusal once and return the empty result the caller expects."""
+    record = {"pattern": pattern, "expanded": expanded, "reason": reason}
+    if record not in PATTERN_REFUSALS:
+        PATTERN_REFUSALS.append(record)
+    return []
+
+
 def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> list[str]:
     """Turn one catalogue path pattern into concrete glob patterns on this filesystem.
 
     An angle-bracket segment is a human-readable placeholder in the catalogue. Here it
     becomes a single-level wildcard, which is always safe: a false match costs a skipped
     entry in the manifest, while treating it literally would collect nothing.
+
+    Anything this function declines to search is recorded in PATTERN_REFUSALS, never
+    dropped: a collector that quietly searches nothing produces a clean bundle from a
+    host it never looked at.
     """
     text = pattern
     if text.startswith("<vscode-user>"):
@@ -5886,29 +6016,45 @@ def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> l
             results.extend(expand_paths(expanded, home, target_os, root))
         return results
 
+    # A catalogue entry lists every operating system's spelling of the same artifact in one
+    # paths list, so on any given host most of them do not apply. That is expected and is
+    # not a refusal: dropping the other platform's spellings quietly is the whole point of
+    # having them in one entry. What must never be quiet is a pattern that applies here and
+    # still cannot be resolved, which is what the refusal at the end of this function is
+    # for.
     if target_os == "windows":
+        if text.startswith("$"):
+            return []  # a freedesktop variable, meaningless on Windows
         for placeholder, relative in _WIN_PLACEHOLDERS.items():
             if text.upper().startswith(placeholder):
                 tail = text[len(placeholder) :].lstrip("\\/")
                 text = "/".join(x for x in (home, relative, tail) if x)
                 break
         else:
-            if text.startswith("%PROGRAMFILES%"):
-                text = "C:/Program Files" + text[len("%PROGRAMFILES%") :]
-            elif text.startswith("%PROGRAMDATA%"):
-                text = "C:/ProgramData" + text[len("%PROGRAMDATA%") :]
+            upper = text.upper()
+            for placeholder, absolute in _WIN_SYSTEM_PLACEHOLDERS.items():
+                if upper.startswith(placeholder):
+                    text = absolute + text[len(placeholder) :]
+                    break
+            if text.startswith("~"):
+                # ~ is the catalogue's ordinary spelling for the user profile and many
+                # entries give no other. Leaving it unexpanded here meant the pattern was
+                # globbed against the process working directory, so on Windows those
+                # artifacts were never found and the manifest reported a clean host.
+                text = home.rstrip("/") + text[1:]
         text = text.replace("\\", "/")
     else:
-        for name, default in _XDG_DEFAULTS.items():
-            token = "$" + name
-            if text.startswith(token):
-                base = os.environ.get(name) or os.path.join(home, default)
-                text = base + text[len(token) :]
-                break
+        if re.match(r"^%[A-Za-z_]+%|^[A-Za-z]:\\|^HKEY_", text):
+            return []  # a Windows spelling or a registry key, meaningless here
+        if text.startswith("$"):
+            resolved, outcome = resolve_env_prefix(text, home, root)
+            if outcome == "unset":
+                return []
+            if outcome != "ok":
+                return refuse_pattern(pattern, text, outcome)
+            text = resolved
         if text.startswith("~"):
             text = home + text[1:]
-        # An environment-variable placeholder we do not know stays literal and simply
-        # will not match, which shows up as a skipped entry rather than as a wrong one.
 
     text = re.sub(r"<[^>]+>", "*", text)
 
@@ -5937,9 +6083,18 @@ def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> l
     # closed rather than hoover.
     stripped = text.rstrip("/")
     if stripped.endswith("/*") and stripped.count("/") <= 1:
-        return []
+        return refuse_pattern(pattern, text, "wildcard_too_broad")
     if re.sub(r"[*?/]", "", stripped) == "":
-        return []
+        return refuse_pattern(pattern, text, "wildcard_only")
+
+    # A relative pattern would be globbed against the process working directory, which on
+    # an analyst workstation is somewhere in the case folder and on an endpoint is wherever
+    # the responder happened to be. Both find the wrong thing or nothing, and neither says
+    # so. This happens when a placeholder at the start of a path is one the collector does
+    # not know: "<agent-home>/config.json" becomes "*/config.json", which is a valid glob
+    # and a search of entirely the wrong tree.
+    if not (text.startswith("/") or re.match(r"^[A-Za-z]:/", text)):
+        return refuse_pattern(pattern, text, "not_absolute")
 
     return [text if ("*" in text or "?" in text) else os.path.normpath(text)]
 
@@ -6425,8 +6580,12 @@ def run(args: argparse.Namespace) -> dict:
             "collected": sum(1 for e in entries if e["collected"]),
             "skipped": sum(1 for e in entries if not e["collected"]),
             "errors": len(errors),
+            "refused_patterns": len(PATTERN_REFUSALS),
         },
         "errors": sorted(errors, key=lambda e: (e["path"], e["error"])),
+        # A pattern the collector declined to search is a hole in the coverage, so it is
+        # reported next to the errors rather than left implicit in an absent file entry.
+        "refused_patterns": sorted(PATTERN_REFUSALS, key=lambda r: (r["pattern"], r["reason"])),
     }
     return manifest
 
@@ -6633,6 +6792,14 @@ def main(argv: list | None = None) -> int:
             bucket = summary["by_priority"].get(priority)
             if bucket:
                 sys.stderr.write("  %-10s %d/%d\n" % (priority, bucket["collected"], bucket["hit"]))
+        # Said on the terminal, not only in the manifest. An analyst who reads the summary
+        # line and nothing else would otherwise take a clean run as full coverage, when
+        # some of the catalogue could not be resolved on this host.
+        if counts.get("refused_patterns"):
+            sys.stderr.write(
+                "  %d pattern(s) not searched, see refused_patterns in the manifest\n"
+                % counts["refused_patterns"]
+            )
         if not args.dry_run:
             sys.stderr.write("  bundle: %s\n" % os.path.abspath(args.out))
 

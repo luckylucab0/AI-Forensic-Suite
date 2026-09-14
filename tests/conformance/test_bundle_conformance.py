@@ -249,6 +249,69 @@ def test_a_doubly_claimed_path_records_every_artifact_that_matched(
     assert len(paths) == len(set(paths)), "a path must appear exactly once in the manifest"
 
 
+def test_a_pattern_the_collector_would_not_search_is_reported(
+    manifest: dict[str, Any],
+) -> None:
+    """Coverage has to be auditable, not assumed.
+
+    A pattern nobody searched produces the same bundle as an artifact that was not there.
+    The manifest therefore carries every refusal, and on a normal run the list is empty:
+    if it is not, something in the catalogue cannot be resolved and the analyst is told
+    rather than left to infer it from a missing file.
+    """
+    assert "refused_patterns" in manifest, "the field is part of the format, always present"
+    assert manifest["counts"]["refused_patterns"] == len(manifest["refused_patterns"])
+    for refusal in manifest["refused_patterns"]:
+        assert refusal["pattern"]
+        assert refusal["reason"] in {
+            "not_absolute",
+            "wildcard_too_broad",
+            "wildcard_only",
+            "malformed_variable",
+            "environment_unreadable_offline",
+        }, refusal
+
+
+def test_a_relocation_variable_is_followed_rather_than_guessed_at(
+    synthetic_home: Path, tmp_path: Path
+) -> None:
+    """The case the catalogue records relocation variables for.
+
+    An agent that moved its data tree with an environment variable is the scenario where a
+    collection keyed on the default path returns nothing and reads as a clean host. The
+    collector has to follow the variable when it is set, and say so when it cannot.
+    """
+    relocated = synthetic_home / "elsewhere" / "claude-config"
+    (relocated / "projects" / "-src-app").mkdir(parents=True)
+    moved = relocated / "projects" / "-src-app" / "relocated-session.jsonl"
+    moved.write_text('{"type":"user","message":{"role":"user","content":"hi"}}\n')
+
+    # No --root, because the collector deliberately ignores the environment when reading a
+    # mounted image: the variable belongs to the endpoint, not to the workstation. HOME is
+    # overridden instead, which keeps the run inside the synthetic fixture. Without that
+    # this test would collect a contributor's own agent history into a temporary directory.
+    out = tmp_path / "relocated-bundle"
+    env = dict(
+        os.environ,
+        HOME=str(synthetic_home),
+        CLAUDE_CONFIG_DIR=str(relocated),
+    )
+    result = subprocess.run(
+        [sys.executable, str(COLLECT_PY), "--out", str(out), "--os", "linux"],
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+    assert result.returncode in (0, 1), result.stderr
+    manifest = json.loads((out / "manifest.json").read_text())
+    collected = [e["original_path"] for e in manifest["files"]]
+    assert str(moved) in collected, (
+        "a transcript in a relocated configuration directory was not collected; "
+        "the bundle would read as a host where Claude Code had never run"
+    )
+
+
 def test_a_symlink_out_of_the_profile_is_recorded_and_not_followed(
     manifest: dict[str, Any],
 ) -> None:

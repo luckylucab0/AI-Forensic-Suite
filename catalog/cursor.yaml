@@ -57,7 +57,7 @@ artifacts:
   - windows
   - linux
   paths:
-  - .cursor/commands/*.md
+  - ~/.cursor/commands/*.md
   - ~/.cursor/agent-cli-state.json
   - ~/.cursor/agents/
   - ~/.cursor/browser-logs/
