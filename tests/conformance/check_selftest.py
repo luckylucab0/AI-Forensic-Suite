@@ -36,7 +36,17 @@ def main(argv: list[str] | None = None) -> int:
         if result.returncode != 0:
             sys.stderr.write(result.stderr.decode("utf-8", errors="replace"))
             return 1
-        text = result.stdout.decode("utf-8")
+        try:
+            text = result.stdout.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            # Said precisely, because this is the failure the collector's output encoding
+            # exists to prevent and "could not decode" alone does not say which encoding
+            # it actually got.
+            sys.stderr.write(
+                f"check-selftest: the collector's output is not UTF-8: {exc}\n"
+                f"  first 32 bytes: {result.stdout[:32]!r}\n"
+            )
+            return 1
     elif len(args) == 1:
         text = Path(args[0]).read_text(encoding="utf-8")
     else:
@@ -49,7 +59,10 @@ def main(argv: list[str] | None = None) -> int:
     if problems:
         sys.stderr.write("check-selftest: the PowerShell serializer and json.dumps disagree\n")
         for problem in problems:
-            sys.stderr.write(f"  {problem}\n")
+            # ASCII only, so the message survives a console that is not UTF-8.
+            sys.stderr.write(
+                "  " + problem.encode("ascii", "backslashreplace").decode("ascii") + "\n"
+            )
         return 1
     sys.stderr.write("check-selftest: byte for byte identical\n")
     return 0

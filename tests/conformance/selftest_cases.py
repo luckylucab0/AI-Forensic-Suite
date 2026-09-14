@@ -57,6 +57,24 @@ def compare(text: str) -> list[str]:
         if case not in rendered:
             continue
         want = json.dumps(value, sort_keys=True, indent=2, ensure_ascii=False)
-        if rendered[case] != want:
-            problems.append(f"{case}: python {want!r}, powershell {rendered[case]!r}")
+        got = rendered[case]
+        if got != want:
+            # ascii() on both sides, and code points where they diverge. The first version
+            # of this message used %r, and a Windows console encodes stderr as cp1252 with
+            # backslashreplace: one side came out as replacement characters and the other
+            # as \uXXXX escapes, for strings that may or may not have differed. A
+            # diagnostic that cannot survive the log it is written to is not a diagnostic.
+            problems.append(f"{case}: python {want!a}, powershell {got!a}")
+            for index, (left, right) in enumerate(zip(want, got, strict=False)):
+                if left != right:
+                    problems.append(
+                        f"{case}: first difference at index {index}: "
+                        f"python U+{ord(left):04X}, powershell U+{ord(right):04X}"
+                    )
+                    break
+            else:
+                problems.append(
+                    f"{case}: same prefix, different length: "
+                    f"python {len(want)}, powershell {len(got)}"
+                )
     return problems
