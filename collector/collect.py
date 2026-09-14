@@ -6815,6 +6815,20 @@ def discover_project_roots(home: str) -> list:
     when it happens to name a directory that exists.
     """
     roots = []
+
+    def is_dir(path: str) -> bool:
+        """os.path.isdir that cannot raise.
+
+        On Windows a path whose syntax is invalid, and a drive colon in the middle of one
+        is, raises OSError rather than returning False. These paths come out of an agent's
+        own state file, so they are attacker-influenced in the sense that matters: one odd
+        entry must not end a collection that has not written its manifest yet.
+        """
+        try:
+            return os.path.isdir(path)
+        except (OSError, ValueError):
+            return False
+
     config = os.path.join(home, ".claude.json")
     if os.path.isfile(config):
         try:
@@ -6823,7 +6837,7 @@ def discover_project_roots(home: str) -> list:
             projects = data.get("projects")
             if isinstance(projects, dict):
                 for path in sorted(projects):
-                    if os.path.isdir(path):
+                    if is_dir(path):
                         roots.append({"path": path, "source": "claude_code.global_config"})
         except (OSError, ValueError):
             pass
@@ -6833,7 +6847,7 @@ def discover_project_roots(home: str) -> list:
         try:
             for name in sorted(os.listdir(projects_dir)):
                 guess = "/" + name.lstrip("-").replace("-", "/")
-                if os.path.isdir(guess) and all(r["path"] != guess for r in roots):
+                if is_dir(guess) and all(r["path"] != guess for r in roots):
                     roots.append({"path": guess, "source": "claude_code.projects_dir_name"})
         except OSError:
             pass

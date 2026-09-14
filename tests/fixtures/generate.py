@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -156,7 +157,11 @@ def transcript(session_id: str, cwd: str) -> str:
 def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     """Create the synthetic profile. Returns a summary for assertions."""
     project = home / "src" / "app"
-    encoded = "-" + str(project).lstrip("/").replace("/", "-").replace(".", "-")
+    # The real encoding, which is what makes this fixture worth having: Claude Code replaces
+    # every non-alphanumeric character in the working directory path with a single dash.
+    # Replacing only slashes and dots left the drive colon and the backslashes in place on
+    # Windows, and the fixture then tried to create a directory name Windows cannot hold.
+    encoded = re.sub(r"[^A-Za-z0-9]", "-", str(project))
 
     claude = home / ".claude"
     projects = claude / "projects" / encoded

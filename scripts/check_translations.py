@@ -61,11 +61,15 @@ def key(path: Path) -> str:
 
 
 def sha256_of(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(65536), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    """Hash a document's content, with line endings normalized to LF.
+
+    Not the raw bytes. A Windows checkout can convert LF to CRLF on the way to disk, which
+    changed every hash and failed this check for files nobody had edited. The lock is about
+    whether the English text moved, and a line ending is not the text moving.
+    """
+    text = path.read_text(encoding="utf-8", errors="replace")
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
 
 
 def tracked_markdown() -> set[str] | None:

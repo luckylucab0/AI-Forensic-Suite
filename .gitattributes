@@ -1,0 +1,13 @@
+# Line endings are normalized in the repository and checked out as LF everywhere.
+#
+# Two reasons beyond tidiness. The bundle format is compared byte for byte between the two
+# collectors, so a file that arrives with different line endings on one platform produces a
+# different hash for the same content. And the translation lock records a hash per document
+# to detect that the English text moved; a CRLF checkout changed every one of those hashes
+# and failed the check for files nobody had touched.
+* text=auto eol=lf
+
+# Binary, so git never rewrites them.
+*.png binary
+*.zip binary
+*.hve binary
