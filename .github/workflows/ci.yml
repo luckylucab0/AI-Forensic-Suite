@@ -125,6 +125,78 @@ jobs:
           # No denylist in CI by default, so this exercises the skip path.
           uv run --no-project --python 3.8 python scripts/opsec_check.py --mode tracked
 
+  windows-powershell-51:
+    name: PowerShell 5.1 compatibility
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+
+      - name: Install
+        run: uv sync --all-extras --dev
+
+      # powershell.exe, not pwsh. The runner has both, and only the first one is Windows
+      # PowerShell 5.1, which is what a corporate endpoint has and what collect.ps1 is
+      # written against. pwsh is PowerShell 7 and differs in ways that matter here: a
+      # `u{...} escape parses there and is a syntax error on 5.1, Set-Content defaults to a
+      # different encoding, and a .NET API added after 4.7 may be absent on the endpoint
+      # even though it is present on the runner.
+      - name: Report the interpreter under test
+        shell: powershell
+        run: |
+          $PSVersionTable | Out-String
+          if ($PSVersionTable.PSVersion.Major -ne 5) {
+            Write-Error "this job must run under Windows PowerShell 5.1, got $($PSVersionTable.PSVersion)"
+            exit 1
+          }
+
+      - name: Parse collect.ps1 under 5.1
+        shell: powershell
+        # Parsing is separate from running, because a syntax error newer than the target is
+        # the failure that would otherwise appear on an endpoint, mid-collection, on
+        # somebody's evidence.
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $errors = $null
+          $tokens = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            "collector/collect.ps1", [ref]$tokens, [ref]$errors) | Out-Null
+          if ($errors -and $errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Host $_.Message }
+            Write-Error "collect.ps1 does not parse under PowerShell $($PSVersionTable.PSVersion)"
+            exit 1
+          }
+          Write-Host "parsed clean, $($tokens.Count) tokens"
+
+      - name: Serializer parity under 5.1
+        shell: powershell
+        # The manifest is diffed between the two collectors, so the JSON has to be
+        # identical. -SelfTest prints fixed structures and Python checks them.
+        run: |
+          $ErrorActionPreference = 'Stop'
+          powershell -NoLogo -NoProfile -File collector/collect.ps1 -SelfTest > selftest-51.txt
+          if ($LASTEXITCODE -ne 0) { Write-Error "self test failed"; exit 1 }
+          uv run python tests/conformance/check_selftest.py selftest-51.txt
+
+      - name: Collect a synthetic profile under 5.1
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          uv run python tests/fixtures/generate.py --out synthetic-home
+          powershell -NoLogo -NoProfile -File collector/collect.ps1 -Out bundle-51 -Root synthetic-home -TargetOs windows
+          if ($LASTEXITCODE -gt 1) { Write-Error "collection failed with $LASTEXITCODE"; exit 1 }
+          uv run agentforensics verify bundle-51
+
+      - name: Conformance suite against collect.ps1 under 5.1
+        shell: powershell
+        # The same tests the POSIX collector passes, run against the PowerShell one on the
+        # platform it is written for. AFX_POWERSHELL pins the interpreter so the suite
+        # cannot quietly fall back to pwsh and report a pass for the wrong runtime.
+        env:
+          AFX_POWERSHELL: powershell.exe
+        run: uv run pytest tests/conformance -q
+
   opsec:
     name: OpSec guard
     runs-on: ubuntu-latest

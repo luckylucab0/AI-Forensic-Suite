@@ -1,77 +1,113 @@
-#!/usr/bin/env python3
-"""Collect AI coding agent artifacts from a macOS or Linux endpoint into an evidence bundle.
+<#
+.SYNOPSIS
+    Collect AI coding agent artifacts from a Windows endpoint into an evidence bundle.
 
-Single file, standard library only, Python 3.8 or newer. That is not minimalism: it is what
-lets this be pushed through EDR live response, a remote shell or a USB stick and run on a
-machine where nothing may be installed and nothing may be downloaded. Several agents delete
-their own history on a 30 day default schedule, so the difference between collecting today
-and scheduling it for next week is evidence.
+.DESCRIPTION
+    Single file, no modules, PowerShell 5.1 or newer. That is not minimalism: it is what
+    lets this be pushed through EDR live response or a remote session and run on a machine
+    where nothing may be installed and nothing may be downloaded. Several agents delete
+    their own history on a 30 day default schedule, so the difference between collecting
+    today and scheduling it for next week is evidence.
 
-The format it writes is specified in docs/BUNDLE_FORMAT.md and implemented twice, here and
-in collect.ps1 for Windows. Where this file and that document disagree, the document is
-right and this is a bug.
+    This is the Windows half of a format implemented twice. The other half is collect.py
+    for macOS and Linux, and the format both must produce is specified in
+    docs/BUNDLE_FORMAT.md. Where this file and that document disagree, the document is
+    right and this is a bug.
 
-Non-negotiable behaviors, each of which has a test:
+    Non-negotiable behaviors, each of which the conformance suite checks:
 
-  * Nothing outside --out is ever written. No temp files, no logs, no config.
-  * Nothing on the target is modified, moved, renamed or deleted, and no agent binary is
-    executed.
-  * Access times are preserved where the platform allows it, and recorded from before the
-    read where it does not, so the manifest never reports a time this tool caused.
-  * Artifacts marked sensitivity: secret are recorded as metadata and a hash only. Their
-    content is copied only with --include-secrets, and that choice goes in the manifest.
-  * Collection is ordered by how fast an artifact disappears, not alphabetically.
-  * Output is deterministic: two runs over an unchanged tree produce identical manifests
-    apart from the fields docs/BUNDLE_FORMAT.md lists as allowed to differ.
+      * Nothing outside -Out is ever written. No temp files, no logs, no config.
+      * Nothing on the target is modified, moved, renamed or deleted, and no agent binary
+        is executed.
+      * Artifacts marked sensitivity: secret are recorded as metadata and a hash only.
+        Their content is copied only with -IncludeSecrets, and that choice goes in the
+        manifest.
+      * Collection is ordered by how fast an artifact disappears, not alphabetically.
+      * Output is byte-identical to what collect.py writes for the same tree, apart from
+        the fields docs/BUNDLE_FORMAT.md lists as allowed to differ. That is why this file
+        carries its own JSON serializer: ConvertTo-Json does not produce the same bytes,
+        and a manifest that cannot be compared byte for byte cannot be diffed between the
+        two implementations.
 
-Usage:
-    python3 collect.py --out /tmp/case-001
-    python3 collect.py --out ./bundle --all-users --zip
-    python3 collect.py --out ./bundle --root /mnt/image --os macos
-    python3 collect.py --dry-run --json
-"""
+    PowerShell 5.1 specifics that would silently break parity, each handled explicitly:
 
-from __future__ import annotations
+      * Set-Content and Out-File default to UTF-16LE on 5.1. Every write here goes through
+        [System.IO.File]::WriteAllText with a UTF8 encoding that emits no byte order mark.
+      * Hashtable key order is not insertion order, so every ordered structure uses
+        [ordered]@{} and the serializer sorts keys anyway.
+      * Date formatting is culture dependent, so every timestamp uses InvariantCulture.
+      * MAX_PATH truncates long paths, so file access uses the \\?\ prefix where needed.
+      * A one-element array returned from a function is unwrapped to the element and an
+        empty one becomes $null, which would serialize a one-file manifest as an object and
+        a no-file manifest as null. Every array-valued field is a List[object] built in
+        place, and lists are built with ::new() rather than New-Object, because @() cannot
+        copy a List[object] that New-Object produced.
 
-import argparse
-import errno
-import fnmatch
-import getpass
-import hashlib
-import json
-import os
-import platform
-import re
-import socket
-import stat
-import sys
-import time
-import uuid
-import zipfile
-from datetime import datetime
+.EXAMPLE
+    powershell -ExecutionPolicy Bypass -File collect.ps1 -Out C:\case-001
 
-TOOL_NAME = "collect.py"
-TOOL_VERSION = "0.1.0"
-FORMAT_VERSION = 1
+.EXAMPLE
+    powershell -ExecutionPolicy Bypass -File collect.ps1 -Out C:\case-001 -AllUsers -Zip
 
-# Generous by default: a transcript of a long session runs to tens of megabytes, and a
-# skipped transcript is a hole in the evidence. Skipped files are still listed with a
-# reason, so the hole is never silent.
-DEFAULT_MAX_FILE_SIZE = 256 * 1024 * 1024
+.EXAMPLE
+    powershell -ExecutionPolicy Bypass -File collect.ps1 -DryRun -Json
+#>
 
-EXIT_OK = 0
-EXIT_ERRORS = 1
-EXIT_USAGE = 2
-EXIT_NOTHING_FOUND = 3
+[CmdletBinding()]
+param(
+    [string] $Out,
+    [switch] $Zip,
+    [string[]] $User,
+    [switch] $AllUsers,
+    [string[]] $Agents,
+    [switch] $IncludeSecrets,
+    [long] $MaxFileSize = 268435456,
+    [int] $MaxFilesPerArtifact = 20000,
+    [string] $Root,
+    [ValidateSet('macos', 'linux', 'windows')]
+    [string] $TargetOs,
+    [switch] $DryRun,
+    [switch] $Json,
+    [switch] $Version,
+    [switch] $SelfTest,
+    [switch] $Sourced
+)
+
+Set-StrictMode -Version 2.0
+$ErrorActionPreference = 'Stop'
+
+$script:ToolName = 'collect.ps1'
+$script:ToolVersion = '0.1.0'
+$script:FormatVersion = 1
+
+$script:ExitOk = 0
+$script:ExitErrors = 1
+$script:ExitUsage = 2
+$script:ExitNothingFound = 3
 
 # Collection order. live_only artifacts are destroyed by a clean shutdown and cannot be
 # recovered from a powered-off image, so they come first however small they are.
-PRIORITY_ORDER = ("live_only", "first", "normal", "durable")
+$script:PriorityOrder = @('live_only', 'first', 'normal', 'durable')
+
+# Recorded in the manifest so a bundle says how it was collected. $MyInvocation.Line would
+# carry the whole command including the interpreter and the path to this file, which on a
+# live-response console can hold a case number or an operator's name, so only the bound
+# arguments are kept.
+$script:RawArguments = [System.Collections.Generic.List[string]]::new()
+foreach ($name in ($PSBoundParameters.Keys | Sort-Object -CaseSensitive)) {
+    $value = $PSBoundParameters[$name]
+    if ($value -is [switch]) {
+        if ([bool]$value) { $script:RawArguments.Add('-' + $name) }
+        continue
+    }
+    $script:RawArguments.Add('-' + $name)
+    foreach ($item in @($value)) { $script:RawArguments.Add([string]$item) }
+}
 
 # --- BEGIN EMBEDDED CATALOGUE ---
 # Rendered from catalog/*.yaml by scripts/build_collectors.py. Do not edit by hand: CI
 # regenerates it and fails if this block is stale.
-EMBEDDED_CATALOGUE_JSON = r"""
+$EmbeddedCatalogueJson = @'
 {
     "agents": [
         {
@@ -6289,1118 +6325,2069 @@ EMBEDDED_CATALOGUE_JSON = r"""
     ],
     "sha256": "ab6057d1481144a027fc692b2574336bc7a589be2e24b103ccb833267442d896"
 }
-"""
-EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)
+'@
+$script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json
 # --- END EMBEDDED CATALOGUE ---
 
 
-# ---------------------------------------------------------------------------- utilities
+# ============================================================================ utilities
+
+function Write-Utf8NoBom {
+    <#
+    .SYNOPSIS
+        Write text as UTF-8 without a byte order mark.
+    .DESCRIPTION
+        Set-Content and Out-File default to UTF-16LE on PowerShell 5.1, and even the UTF8
+        option there emits a byte order mark. Either would make this collector's output
+        differ from collect.py's for the same input, which is exactly what the differential
+        test exists to catch.
+    #>
+    param([string] $Path, [string] $Text)
+    $encoding = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($Path, $Text, $encoding)
+}
+
+function Get-UtcString {
+    <#
+    .SYNOPSIS
+        Format a time as the bundle's one timestamp format, or $null.
+    .DESCRIPTION
+        Microseconds are always present and the zone is always UTC, because a manifest
+        that sometimes carries them and sometimes not cannot be compared byte for byte.
+        InvariantCulture because the format is culture dependent otherwise, and a machine
+        set to a different locale would produce a different manifest for the same tree.
+
+        A time the platform cannot supply is $null, never zero and never the epoch: the
+        epoch is a real instant and would read as a genuine 1970 timestamp in a timeline.
+    #>
+    param([Nullable[DateTime]] $Value)
+    if ($null -eq $Value) { return $null }
+    $utc = ([DateTime]$Value).ToUniversalTime()
+    # Python writes exactly six fractional digits. .NET's "ffffff" matches that.
+    return $utc.ToString('yyyy-MM-ddTHH:mm:ss.ffffff', [System.Globalization.CultureInfo]::InvariantCulture) + 'Z'
+}
+
+function Get-Sha256OfFile {
+    param([string] $Path)
+    $stream = $null
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $stream = [System.IO.File]::Open($Path, [System.IO.FileMode]::Open,
+            [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+        $bytes = $sha.ComputeHash($stream)
+    } finally {
+        if ($null -ne $stream) { $stream.Dispose() }
+        $sha.Dispose()
+    }
+    return ([System.BitConverter]::ToString($bytes) -replace '-', '').ToLowerInvariant()
+}
+
+function Get-Sha256OfString {
+    param([string] $Text)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $bytes = $sha.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($Text))
+    } finally {
+        $sha.Dispose()
+    }
+    return ([System.BitConverter]::ToString($bytes) -replace '-', '').ToLowerInvariant()
+}
+
+function ConvertTo-CanonicalJson {
+    <#
+    .SYNOPSIS
+        Serialize to the exact bytes Python's json.dumps(sort_keys=True, indent=2,
+        ensure_ascii=False) produces.
+    .DESCRIPTION
+        The reason this exists rather than ConvertTo-Json: the two implementations of this
+        format have to produce manifests that can be diffed byte for byte, and
+        ConvertTo-Json differs from Python in key order, in indentation, in how it escapes
+        non-ASCII and in how it renders numbers. It also defaults to -Depth 2 on 5.1, which
+        silently flattens anything deeper into type names.
+
+        Writing a serializer by hand is unusual and is the right call here: the output
+        format is part of the specification, and a specification that says "whatever this
+        version of this cmdlet happens to emit" is not one.
+
+        Arrays must be passed as a generic List, not as a PowerShell array. PowerShell
+        unwraps an array of one element and turns an empty one into $null when either
+        crosses a function boundary, which would serialize a one-file manifest as an object
+        instead of an array and a no-file manifest as null. Every array-valued field in
+        this collector is therefore a List[object] built in place.
+    #>
+    param(
+        [Parameter(Mandatory = $true)] [AllowNull()] $Value,
+        [int] $Indent = 0
+    )
+
+    $pad = ' ' * $Indent
+    $padInner = ' ' * ($Indent + 2)
+
+    if ($null -eq $Value) { return 'null' }
+
+    if ($Value -is [bool]) { if ($Value) { return 'true' } else { return 'false' } }
+
+    if ($Value -is [string]) { return (ConvertTo-JsonString $Value) }
+
+    if ($Value -is [int] -or $Value -is [long] -or $Value -is [int16] -or $Value -is [byte]) {
+        return $Value.ToString([System.Globalization.CultureInfo]::InvariantCulture)
+    }
+
+    if ($Value -is [double] -or $Value -is [decimal] -or $Value -is [float]) {
+        # Nothing in the manifest is a float. Emitting one would be a bug worth seeing
+        # rather than a rounding difference worth hiding.
+        throw ("ConvertTo-CanonicalJson: refusing to serialize the floating point value " +
+               "$Value. The manifest format has no float fields; see docs/BUNDLE_FORMAT.md.")
+    }
+
+    if ($Value -is [System.Collections.IDictionary]) {
+        if ($Value.Count -eq 0) { return '{}' }
+        $parts = [System.Collections.Generic.List[string]]::new()
+        # Entries are enumerated rather than looked up by key. An OrderedDictionary exposes
+        # both an [object] and an [int] indexer, and Sort-Object hands keys back wrapped in
+        # PSObject, so $Value[$key] cannot resolve the overload and throws "Argument types
+        # do not match" at runtime. Enumerating sidesteps the indexer entirely.
+        #
+        # -CaseSensitive gives an ordinal sort, matching Python's sort by code point. A
+        # culture-aware sort would order keys differently on a machine with another locale,
+        # and the manifest would stop being comparable between two collections.
+        $entries = @($Value.GetEnumerator()) | Sort-Object -Property Key -CaseSensitive
+        foreach ($entry in $entries) {
+            $rendered = ConvertTo-CanonicalJson -Value $entry.Value -Indent ($Indent + 2)
+            $parts.Add($padInner + (ConvertTo-JsonString ([string]$entry.Key)) + ': ' + [string]$rendered)
+        }
+        return "{`n" + [string]::Join(",`n", $parts) + "`n" + $pad + '}'
+    }
+
+    if ($Value -is [System.Collections.IEnumerable]) {
+        # Enumerated with foreach rather than collected with @($Value), and the difference
+        # is not style. @() on a List[object] built by New-Object throws "Argument types
+        # do not match": it copies through ICollection.CopyTo and the overload cannot be
+        # resolved for that particular combination, while the identical type built with
+        # ::new() copies fine and a List[string] copies fine either way. The failure is in
+        # the collection step, not in this function, so it would move around as calling
+        # code changed. foreach uses the enumerator and has none of that.
+        $parts = [System.Collections.Generic.List[string]]::new()
+        foreach ($item in $Value) {
+            $parts.Add($padInner + [string](ConvertTo-CanonicalJson -Value $item -Indent ($Indent + 2)))
+        }
+        if ($parts.Count -eq 0) { return '[]' }
+        return "[`n" + [string]::Join(",`n", $parts) + "`n" + $pad + ']'
+    }
+
+    throw "ConvertTo-CanonicalJson: unsupported type $($Value.GetType().FullName)"
+}
+
+function ConvertTo-JsonString {
+    <#
+    .SYNOPSIS
+        Escape a string the way Python's json module does with ensure_ascii=False.
+    .DESCRIPTION
+        Only the characters the JSON grammar requires are escaped, plus the short forms
+        Python uses. Everything else, including every non-ASCII character, is written
+        through as UTF-8. Escaping non-ASCII as \uXXXX would also be valid JSON and would
+        not match collect.py byte for byte.
+    #>
+    param([string] $Text)
+    $builder = New-Object System.Text.StringBuilder
+    [void]$builder.Append('"')
+    foreach ($char in $Text.ToCharArray()) {
+        $code = [int]$char
+        switch ($char) {
+            '"'  { [void]$builder.Append('\"'); continue }
+            '\'  { [void]$builder.Append('\\'); continue }
+            "`n" { [void]$builder.Append('\n'); continue }
+            "`r" { [void]$builder.Append('\r'); continue }
+            "`t" { [void]$builder.Append('\t'); continue }
+            "`b" { [void]$builder.Append('\b'); continue }
+            "`f" { [void]$builder.Append('\f'); continue }
+            default {
+                if ($code -lt 0x20) {
+                    [void]$builder.Append(('\u{0:x4}' -f $code))
+                } else {
+                    [void]$builder.Append($char)
+                }
+            }
+        }
+    }
+    [void]$builder.Append('"')
+    return $builder.ToString()
+}
 
 
-def utc(seconds: float | None) -> str | None:
-    """Format a POSIX timestamp as the bundle's one timestamp format.
+# ======================================================================== path mapping
 
-    Microseconds are always present and the zone is always UTC, because a manifest that
-    sometimes carries them and sometimes not cannot be compared byte for byte. A time the
-    platform cannot supply is None, never zero and never the epoch: the epoch is a real
-    instant and would read as a genuine 1970 timestamp in a timeline.
-    """
-    if seconds is None:
-        return None
-    return datetime.utcfromtimestamp(seconds).strftime("%Y-%m-%dT%H:%M:%S.%f") + "Z"
+# Characters that cannot appear in a path component on at least one supported platform,
+# plus the separator itself. See docs/BUNDLE_FORMAT.md, "Path mapping".
+$script:ReservedChars = [System.Collections.Generic.HashSet[char]]::new(
+    [char[]]('<', '>', ':', '"', '|', '?', '*', '\', '/'))
+
+$script:ReservedNames = [System.Collections.Generic.HashSet[string]]::new(
+    [string[]]@('CON', 'PRN', 'AUX', 'NUL',
+        'COM0', 'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9',
+        'LPT0', 'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9'),
+    [System.StringComparer]::OrdinalIgnoreCase)
+
+function Get-PercentEncoded {
+    <#
+    .SYNOPSIS
+        Percent-encode one character as its UTF-8 bytes, upper-case hex.
+    .DESCRIPTION
+        Matches collect.py's _pct. A .NET string is UTF-16, so a character outside the
+        basic multilingual plane arrives as a surrogate pair and is encoded by the caller
+        as a unit; a lone surrogate encodes to the replacement character's bytes, which is
+        lossy in the bundle path and is exactly why original_path is mandatory.
+    #>
+    param([string] $Character)
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($Character)
+    $builder = [System.Text.StringBuilder]::new()
+    foreach ($byte in $bytes) { [void]$builder.Append(('%{0:X2}' -f $byte)) }
+    return $builder.ToString()
+}
+
+function ConvertTo-EncodedSegment {
+    <#
+    .SYNOPSIS
+        Make one path component safe on every supported filesystem, reversibly.
+    .DESCRIPTION
+        Mirrors collect.py's encode_segment step for step, and the order of the steps is
+        part of the format: '%' is encoded first, or nothing below it could be decoded
+        unambiguously. Steps five and six are not reversible, which docs/BUNDLE_FORMAT.md
+        states and which is why every manifest entry carries original_path.
+    #>
+    param([string] $Segment)
+
+    $builder = [System.Text.StringBuilder]::new()
+    foreach ($char in $Segment.ToCharArray()) {
+        $code = [int]$char
+        if ($char -eq '%') {
+            [void]$builder.Append('%25')
+        } elseif ($script:ReservedChars.Contains($char) -or $code -lt 0x20 -or
+                  ($code -ge 0xD800 -and $code -le 0xDFFF)) {
+            [void]$builder.Append((Get-PercentEncoded ([string]$char)))
+        } else {
+            [void]$builder.Append($char)
+        }
+    }
+    $encoded = $builder.ToString()
+
+    # Windows silently strips a trailing dot or space from a file name, which would change
+    # the name and could collide with a sibling that differs only by it.
+    if ($encoded.Length -gt 0) {
+        $last = $encoded[$encoded.Length - 1]
+        if ($last -eq '.' -or $last -eq ' ') {
+            $encoded = $encoded.Substring(0, $encoded.Length - 1) + (Get-PercentEncoded ([string]$last))
+        }
+    }
+
+    # A reserved device name cannot be a file name on Windows at all, whatever extension
+    # follows it, so the first character is encoded and CON.txt becomes %43ON.txt.
+    if ($encoded.Length -gt 0) {
+        $stem = $encoded.Split('.')[0]
+        if ($script:ReservedNames.Contains($stem)) {
+            $encoded = (Get-PercentEncoded ([string]$encoded[0])) + $encoded.Substring(1)
+        }
+    }
+
+    # Over-long components, measured in bytes rather than characters because that is what
+    # the filesystem limits.
+    $raw = [System.Text.Encoding]::UTF8.GetBytes($encoded)
+    if ($raw.Length -gt 200) {
+        $cut = 190
+        # Do not split a multi-byte character: back up off any continuation byte.
+        while ($cut -gt 0 -and (($raw[$cut] -band 0xC0) -eq 0x80)) { $cut -= 1 }
+        $head = [System.Text.Encoding]::UTF8.GetString($raw, 0, $cut)
+        $tag = (Get-Sha256OfString $Segment).Substring(0, 10)
+        $encoded = $head + '~' + $tag
+    }
+    return $encoded
+}
+
+function Get-NormalizedPath {
+    <#
+    .SYNOPSIS
+        Collapse a path the way Python's os.path.normpath does, without touching the disk.
+    .DESCRIPTION
+        Not [System.IO.Path]::GetFullPath, for two reasons: it resolves against the current
+        directory, which a forensic tool must never let influence where it looks, and on
+        Linux it would mangle a Windows-shaped path such as C:/Users/alice while collecting
+        a mounted image.
+    #>
+    param([string] $Path)
+    $isAbsolute = $Path.StartsWith('/')
+    $drive = ''
+    $rest = $Path
+    $driveMatch = [regex]::Match($Path, '^([A-Za-z]:)/')
+    if ($driveMatch.Success) {
+        $drive = $driveMatch.Groups[1].Value
+        $rest = $Path.Substring($drive.Length + 1)
+    }
+    $out = [System.Collections.Generic.List[string]]::new()
+    foreach ($segment in $rest.Split('/')) {
+        if ($segment -ceq '' -or $segment -ceq '.') { continue }
+        if ($segment -ceq '..') {
+            if ($out.Count -gt 0 -and $out[$out.Count - 1] -cne '..') {
+                $out.RemoveAt($out.Count - 1)
+                continue
+            }
+            if ($isAbsolute -or $drive) { continue }
+        }
+        $out.Add($segment)
+    }
+    $joined = [string]::Join('/', $out)
+    if ($drive) { return $drive + '/' + $joined }
+    if ($isAbsolute) { return '/' + $joined }
+    if ($joined -ceq '') { return '.' }
+    return $joined
+}
+
+function ConvertTo-BundlePath {
+    <#
+    .SYNOPSIS
+        Map an original absolute path to its path inside the bundle.
+    .DESCRIPTION
+        $Used maps a case-folded bundle path to the original it came from. Without that
+        check, a case-sensitive source written to a case-insensitive destination silently
+        loses one of two files whose names differ only in case, and the bundle would be
+        internally consistent while missing evidence.
+    #>
+    param(
+        [string] $Original,
+        [System.Collections.IDictionary] $Used,
+        [string] $TargetOs
+    )
+
+    $segments = [System.Collections.Generic.List[string]]::new()
+    if ($TargetOs -eq 'windows') {
+        $norm = $Original.Replace('\', '/')
+        if ($norm.StartsWith('//')) {
+            # A UNC path. The share is evidence of where the file came from, so it is kept
+            # as path segments rather than flattened away.
+            $segments.Add('UNC')
+            foreach ($part in $norm.Substring(2).Split('/')) {
+                if ($part) { $segments.Add($part) }
+            }
+        } elseif ($norm -match '^[A-Za-z]:/') {
+            $segments.Add($norm.Substring(0, 1).ToUpperInvariant())
+            foreach ($part in $norm.Substring(3).Split('/')) {
+                if ($part) { $segments.Add($part) }
+            }
+        } else {
+            foreach ($part in $norm.Split('/')) {
+                if ($part) { $segments.Add($part) }
+            }
+        }
+    } else {
+        foreach ($part in $Original.Split('/')) {
+            if ($part) { $segments.Add($part) }
+        }
+    }
+
+    $encoded = [System.Collections.Generic.List[string]]::new()
+    foreach ($segment in $segments) { $encoded.Add((ConvertTo-EncodedSegment $segment)) }
+
+    $candidate = [string]::Join('/', $encoded)
+    $folded = $candidate.ToLowerInvariant()
+    # -cne, not -ne. PowerShell's string comparison operators are case-insensitive by
+    # default, which in the one check whose whole purpose is detecting a case collision
+    # made the two paths compare equal and the suffix was never appended: Settings.json
+    # and settings.json then mapped to the same bundle path and one overwrote the other.
+    if ($Used.Contains($folded) -and [string]$Used[$folded] -cne $Original) {
+        $suffix = '~' + (Get-Sha256OfString $Original).Substring(0, 10)
+        $encoded[$encoded.Count - 1] = $encoded[$encoded.Count - 1] + $suffix
+        $candidate = [string]::Join('/', $encoded)
+        $folded = $candidate.ToLowerInvariant()
+    }
+    $Used[$folded] = $Original
+    return $candidate
+}
 
 
-def sha256_file(path: str, preserve_atime: bool) -> tuple[str, int]:
-    """Hash a file's bytes, trying not to disturb its access time.
+# ============================================================== placeholder expansion
 
-    O_NOATIME only works for a file we own or as root, and only on Linux, so the caller
-    also captures atime beforehand and writes that value into the manifest. Between the
-    two, the manifest never reports an access time this tool caused.
-    """
-    flags = os.O_RDONLY
-    if preserve_atime:
-        flags |= getattr(os, "O_NOATIME", 0)
-    digest = hashlib.sha256()
-    size = 0
-    try:
-        fd = os.open(path, flags)
-    except OSError as exc:
-        if preserve_atime and exc.errno in (errno.EPERM, errno.EACCES):
-            fd = os.open(path, os.O_RDONLY)
-        else:
-            raise
-    try:
-        while True:
-            chunk = os.read(fd, 1024 * 1024)
-            if not chunk:
-                break
-            digest.update(chunk)
-            size += len(chunk)
-    finally:
-        os.close(fd)
-    return digest.hexdigest(), size
+# Windows placeholders expanded relative to the profile being collected.
+$script:WinPlaceholders = [ordered]@{
+    '%USERPROFILE%'   = ''
+    '%APPDATA%'       = 'AppData/Roaming'
+    '%LOCALAPPDATA%'  = 'AppData/Local'
+}
 
+# Windows placeholders that are machine-wide rather than relative to a profile, kept
+# apart from the table above because they must not be joined to a user's home directory.
+# The drive is assumed to be C: for the reason collect.py gives: a mounted image has no
+# environment to read, and these are the paths that prove a binary executed at all.
+$script:WinSystemPlaceholders = [ordered]@{
+    '%SYSTEMROOT%'        = 'C:/Windows'
+    '%WINDIR%'            = 'C:/Windows'
+    '%SYSTEMDRIVE%'       = 'C:'
+    '%PROGRAMFILES(X86)%' = 'C:/Program Files (x86)'
+    '%PROGRAMFILES%'      = 'C:/Program Files'
+    '%PROGRAMDATA%'       = 'C:/ProgramData'
+    '%ALLUSERSPROFILE%'   = 'C:/ProgramData'
+    '%PUBLIC%'            = 'C:/Users/Public'
+}
 
-def sha256_bytes(data: bytes) -> str:
-    return hashlib.sha256(data).hexdigest()
-
-
-def canonical_json(obj: object) -> str:
-    """Serialize deterministically, so two runs can be compared by hash."""
-    return json.dumps(obj, sort_keys=True, indent=2, ensure_ascii=False) + "\n"
-
-
-# ------------------------------------------------------------------------ path mapping
-
-# Bytes that cannot appear in a path component on at least one supported platform, plus
-# the separator itself. See docs/BUNDLE_FORMAT.md, "Path mapping".
-_RESERVED_CHARS = set('<>:"|?*\\/')
-_RESERVED_NAMES = (
-    {"CON", "PRN", "AUX", "NUL"}
-    | {"COM%d" % i for i in range(10)}
-    | {"LPT%d" % i for i in range(10)}
-)
-
-
-def _pct(char: str) -> str:
-    """Percent-encode one character, including one that is not valid UTF-8.
-
-    A filename on Linux is a byte string, so it can hold bytes that are not valid UTF-8.
-    Python surfaces those as lone surrogates, and str.encode("utf-8") raises on a
-    surrogate. Using surrogateescape here means one oddly named file cannot abort a whole
-    collection, which on a compromised endpoint is exactly the file worth having.
-    """
-    return "".join("%%%02X" % b for b in char.encode("utf-8", "surrogateescape"))
-
-
-def encode_segment(segment: str) -> str:
-    """Make one path component safe on every supported filesystem, reversibly."""
-    # '%' first, or the encoding of anything else below would be ambiguous.
-    out = []
-    for char in segment.replace("%", "\x00"):
-        if char == "\x00":
-            out.append("%25")
-        elif char in _RESERVED_CHARS or ord(char) < 0x20 or 0xD800 <= ord(char) <= 0xDFFF:
-            out.append(_pct(char))
-        else:
-            out.append(char)
-    encoded = "".join(out)
-
-    # Windows strips a trailing dot or space from a file name, which would silently change
-    # the name and could collide with a sibling.
-    if encoded and encoded[-1] in ". ":
-        encoded = encoded[:-1] + _pct(encoded[-1])
-
-    # A reserved device name cannot be a file name on Windows at all.
-    stem = encoded.split(".", 1)[0].upper()
-    if stem in _RESERVED_NAMES:
-        encoded = _pct(encoded[0]) + encoded[1:]
-
-    # Over-long components. Not reversible, which is why original_path is mandatory.
-    raw = encoded.encode("utf-8", "surrogateescape")
-    if len(raw) > 200:
-        cut = raw[:190]
-        # Do not split a multi-byte character.
-        while cut and (cut[-1] & 0xC0) == 0x80:
-            cut = cut[:-1]
-        tag = sha256_bytes(segment.encode("utf-8", "surrogateescape"))[:10]
-        encoded = cut.decode("utf-8", "ignore") + "~" + tag
-    return encoded
-
-
-def bundle_path_for(original: str, used: dict, target_os: str) -> str:
-    """Map an original absolute path to its path inside the bundle.
-
-    `used` maps a case-folded bundle path to the original it came from, so a collision
-    between two paths that differ only in case can be detected and broken. Without that, a
-    case-sensitive source written to a case-insensitive destination silently loses one of
-    them.
-    """
-    if target_os == "windows":
-        norm = original.replace("\\", "/")
-        if norm.startswith("//"):
-            segments = ["UNC"] + [s for s in norm[2:].split("/") if s]
-        elif re.match(r"^[A-Za-z]:/", norm):
-            segments = [norm[0].upper()] + [s for s in norm[3:].split("/") if s]
-        else:
-            segments = [s for s in norm.split("/") if s]
-    else:
-        segments = [s for s in original.split("/") if s]
-
-    encoded = [encode_segment(s) for s in segments]
-    candidate = "/".join(encoded)
-    folded = candidate.lower()
-    if folded in used and used[folded] != original:
-        suffix = "~" + sha256_bytes(original.encode("utf-8", "surrogateescape"))[:10]
-        encoded[-1] = encoded[-1] + suffix
-        candidate = "/".join(encoded)
-        folded = candidate.lower()
-    used[folded] = original
-    return candidate
-
-
-# ------------------------------------------------------------- placeholder expansion
-
-_XDG_DEFAULTS = {
-    "XDG_DATA_HOME": ".local/share",
-    "XDG_CONFIG_HOME": ".config",
-    "XDG_CACHE_HOME": ".cache",
-    "XDG_STATE_HOME": ".local/state",
+$script:XdgDefaults = [ordered]@{
+    'XDG_DATA_HOME'   = '.local/share'
+    'XDG_CONFIG_HOME' = '.config'
+    'XDG_CACHE_HOME'  = '.cache'
+    'XDG_STATE_HOME'  = '.local/state'
 }
 
 # The user directory of VS Code and of the forks that inherit its storage layout. A dozen
-# agentic extensions keep their conversations under it, so <vscode-user> in the catalogue
-# expands to all of these rather than to a wildcard: a wildcard would match one directory
-# level and find nothing, which is how an extension's entire history goes missing without
-# anyone being told.
+# agentic extensions keep their conversations under it, so <vscode-user> expands to all of
+# these rather than to a wildcard: a wildcard matches one directory level and finds
+# nothing, which is how an extension's entire history goes missing with nobody told.
 #
-# The product list is the part that will age. Adding a fork is a one-line change here and
-# in the same table in collect.ps1, and an unknown fork simply does not match.
-_VSCODE_PRODUCTS = (
-    "Code",
-    "Code - Insiders",
-    "VSCodium",
-    "Cursor",
-    "Windsurf",
-    "Kiro",
-    "Trae",
-    "Positron",
-)
+# Kept in step with the same table in collect.py by the conformance suite.
+$script:VsCodeProducts = @('Code', 'Code - Insiders', 'VSCodium', 'Cursor', 'Windsurf',
+    'Kiro', 'Trae', 'Positron')
 
-_VSCODE_USER_TEMPLATES = {
-    "macos": "Library/Application Support/{product}/User",
-    "linux": ".config/{product}/User",
-    "windows": "AppData/Roaming/{product}/User",
+$script:VsCodeUserTemplates = [ordered]@{
+    'macos'   = 'Library/Application Support/{0}/User'
+    'linux'   = '.config/{0}/User'
+    'windows' = 'AppData/Roaming/{0}/User'
 }
 
-# Windows placeholders, expanded relative to a profile. Used when collecting a mounted
-# Windows profile from an analyst workstation with --root and --os windows.
-_WIN_PLACEHOLDERS = {
-    "%USERPROFILE%": "",
-    "%APPDATA%": "AppData/Roaming",
-    "%LOCALAPPDATA%": "AppData/Local",
-}
-
-# Windows placeholders that are machine-wide rather than relative to a profile. Kept apart
-# from _WIN_PLACEHOLDERS because they must not be joined to a user's home directory.
-#
-# The drive is assumed to be C: because the alternative is worse. On a live host the real
-# value could be read from the environment, but a mounted image collected with --root has
-# no environment to read, and the paths here are the ones that prove an agent binary
-# executed at all: Amcache and Prefetch. Getting them from the wrong drive letter costs an
-# empty result; not looking at all costs the execution evidence.
-_WIN_SYSTEM_PLACEHOLDERS = {
-    "%SYSTEMROOT%": "C:/Windows",
-    "%WINDIR%": "C:/Windows",
-    "%SYSTEMDRIVE%": "C:",
-    "%PROGRAMFILES(X86)%": "C:/Program Files (x86)",
-    "%PROGRAMFILES%": "C:/Program Files",
-    "%PROGRAMDATA%": "C:/ProgramData",
-    "%ALLUSERSPROFILE%": "C:/ProgramData",
-    "%PUBLIC%": "C:/Users/Public",
-}
-
-
-def resolve_env_prefix(text, home, root):
-    """Resolve a leading environment variable in a catalogue path.
-
-    Agents relocate their whole data tree with a variable of their own: CLAUDE_CONFIG_DIR,
-    CODEX_HOME, HERMES_HOME, OLLAMA_MODELS, ZED_DATA_DIR and a dozen more. The catalogue
-    records those spellings precisely so a relocated tree is still found, and leaving them
-    unexpanded defeated the point: the pattern was globbed against the process working
-    directory, matched nothing, and the bundle looked like a host where the agent had never
-    run. That is the one failure this tool must not have.
-
-    Returns (text, outcome). Three outcomes, because the three cases are genuinely
-    different and only one of them is a problem:
-
-    'ok'      the variable is set and the path was rewritten.
-    'unset'   the variable is not set on this host, so the pattern does not apply. Every
-              such entry has a default-location sibling in the same artifact, which is
-              already being searched, so this is the cross-platform case again and is not
-              worth reporting.
-    a reason  the variable could not be consulted at all, which happens when collecting a
-              mounted image: the analyst's own environment says nothing about the endpoint
-              and reading it would be worse than useless. Reported, so the analyst knows
-              to look for the variable in the image's shell profiles by hand.
-    """
-    # ${VAR:-default} is shell syntax and appears in the catalogue where vendor
-    # documentation used it. The default half is what the agent uses when the variable is
-    # unset, so it is a real path and not a fallback for our benefit.
-    braced = re.match(r"^\$\{([A-Za-z_][A-Za-z0-9_]*):-([^}]*)\}(.*)$", text)
-    if braced:
-        name, fallback, tail = braced.group(1), braced.group(2), braced.group(3)
-        value = None if root else os.environ.get(name)
-        base = value if value else fallback
-        if base.startswith("~"):
-            base = home + base[1:]
-        return base.rstrip("/") + tail, "ok"
-
-    plain = re.match(r"^\$([A-Za-z_][A-Za-z0-9_]*)(.*)$", text)
-    if not plain:
-        return text, "malformed_variable"
-    name, tail = plain.group(1), plain.group(2)
-
-    if name == "HOME":
-        return home.rstrip("/") + tail, "ok"
-    if name in _XDG_DEFAULTS:
-        base = (None if root else os.environ.get(name)) or os.path.join(home, _XDG_DEFAULTS[name])
-        return base.rstrip("/") + tail, "ok"
-
-    if root:
-        # A mounted image. The variable belongs to the endpoint, not to this workstation.
-        return text, "environment_unreadable_offline"
-    value = os.environ.get(name)
-    if not value:
-        return text, "unset"
-    return value.rstrip("/") + tail, "ok"
-
-
-def _expand_vscode_user(pattern: str, home: str, target_os: str) -> list[str]:
-    """Turn one <vscode-user> pattern into one pattern per known product."""
-    template = _VSCODE_USER_TEMPLATES.get(target_os)
-    if template is None:
-        return []
-    tail = pattern[len("<vscode-user>") :].lstrip("\\/")
-    out = []
-    for product in _VSCODE_PRODUCTS:
-        base = template.format(product=product)
-        out.append("/".join(x for x in (home.rstrip("/"), base, tail) if x))
-    return out
-
-
-# Patterns this run refused to search, with the reason. Module state rather than a return
+# Patterns this run refused to search, with the reason. Script state rather than a return
 # value so every call site stays a plain list of patterns, and surfaced in the manifest
 # because a pattern the collector declined to follow is a hole in the evidence and has to
 # be visible as one. See docs/BUNDLE_FORMAT.md.
-PATTERN_REFUSALS = []
+$script:PatternRefusals = [System.Collections.Generic.List[object]]::new()
 
+function Add-PatternRefusal {
+    <#
+    .SYNOPSIS
+        Record a refusal once and return nothing, which is what the caller expects.
+    #>
+    param([string] $Pattern, [string] $Expanded, [string] $Reason)
+    foreach ($existingItem in $script:PatternRefusals) {
+        [System.Collections.IDictionary] $existing = $existingItem
+        if ([string]$existing['pattern'] -ceq $Pattern -and
+            [string]$existing['reason'] -ceq $Reason) { return }
+    }
+    $record = [ordered]@{}
+    $record['expanded'] = $Expanded
+    $record['pattern'] = $Pattern
+    $record['reason'] = $Reason
+    [void]$script:PatternRefusals.Add($record)
+}
 
-def refuse_pattern(pattern, expanded, reason):
-    """Record a refusal once and return the empty result the caller expects."""
-    record = {"pattern": pattern, "expanded": expanded, "reason": reason}
-    if record not in PATTERN_REFUSALS:
-        PATTERN_REFUSALS.append(record)
-    return []
+function Resolve-EnvPrefix {
+    <#
+    .SYNOPSIS
+        Resolve a leading environment variable in a catalogue path.
+    .DESCRIPTION
+        Mirrors collect.py's resolve_env_prefix, including which of the three outcomes is
+        worth reporting. Agents relocate their whole data tree with a variable of their own
+        (CLAUDE_CONFIG_DIR, CODEX_HOME, HERMES_HOME and a dozen more) and the catalogue
+        carries those spellings so a relocated tree is still found.
 
+        Returns an ordered dictionary with 'text' and 'outcome'. 'ok' means rewritten,
+        'unset' means the variable is not set here so the pattern does not apply and its
+        default-location sibling covers it, and anything else is a reason to report:
+        collecting a mounted image, the endpoint's environment cannot be read from the
+        analyst's workstation and guessing would be worse than saying so.
+    #>
+    param([string] $Text, [string] $ProfileHome, [string] $Root)
 
-def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> list[str]:
-    """Turn one catalogue path pattern into concrete glob patterns on this filesystem.
+    $result = [ordered]@{}
 
-    An angle-bracket segment is a human-readable placeholder in the catalogue. Here it
-    becomes a single-level wildcard, which is always safe: a false match costs a skipped
-    entry in the manifest, while treating it literally would collect nothing.
+    # ${VAR:-default} is shell syntax and appears where vendor documentation used it. The
+    # default half is the path the agent uses when the variable is unset, so it is real.
+    $braced = [regex]::Match($Text, '^\$\{([A-Za-z_][A-Za-z0-9_]*):-([^}]*)\}(.*)$')
+    if ($braced.Success) {
+        $name = $braced.Groups[1].Value
+        $fallback = $braced.Groups[2].Value
+        $tail = $braced.Groups[3].Value
+        $value = $null
+        if (-not $Root) { $value = [System.Environment]::GetEnvironmentVariable($name) }
+        $base = $fallback
+        if ($value) { $base = $value }
+        if ($base.StartsWith('~')) { $base = $ProfileHome + $base.Substring(1) }
+        $result['text'] = $base.TrimEnd('/') + $tail
+        $result['outcome'] = 'ok'
+        return $result
+    }
 
-    Anything this function declines to search is recorded in PATTERN_REFUSALS, never
-    dropped: a collector that quietly searches nothing produces a clean bundle from a
-    host it never looked at.
-    """
-    text = pattern
-    if text.startswith("<vscode-user>"):
-        results = []
-        for expanded in _expand_vscode_user(text, home, target_os):
-            results.extend(expand_paths(expanded, home, target_os, root))
-        return results
+    $plain = [regex]::Match($Text, '^\$([A-Za-z_][A-Za-z0-9_]*)(.*)$')
+    if (-not $plain.Success) {
+        $result['text'] = $Text
+        $result['outcome'] = 'malformed_variable'
+        return $result
+    }
+    $name = $plain.Groups[1].Value
+    $tail = $plain.Groups[2].Value
+
+    if ($name -ceq 'HOME') {
+        $result['text'] = $ProfileHome.TrimEnd('/') + $tail
+        $result['outcome'] = 'ok'
+        return $result
+    }
+    if ($script:XdgDefaults.Contains($name)) {
+        $value = $null
+        if (-not $Root) { $value = [System.Environment]::GetEnvironmentVariable($name) }
+        if (-not $value) {
+            $value = $ProfileHome.TrimEnd('/') + '/' + [string]$script:XdgDefaults[$name]
+        }
+        $result['text'] = $value.TrimEnd('/') + $tail
+        $result['outcome'] = 'ok'
+        return $result
+    }
+
+    if ($Root) {
+        $result['text'] = $Text
+        $result['outcome'] = 'environment_unreadable_offline'
+        return $result
+    }
+    $value = [System.Environment]::GetEnvironmentVariable($name)
+    if (-not $value) {
+        $result['text'] = $Text
+        $result['outcome'] = 'unset'
+        return $result
+    }
+    $result['text'] = $value.TrimEnd('/') + $tail
+    $result['outcome'] = 'ok'
+    return $result
+}
+
+function Expand-VsCodeUser {
+    <#
+    .SYNOPSIS
+        Turn one <vscode-user> pattern into one pattern per known product.
+    #>
+    param([string] $Pattern, [string] $ProfileHome, [string] $TargetOs)
+    $out = [System.Collections.Generic.List[string]]::new()
+    if (-not $script:VsCodeUserTemplates.Contains($TargetOs)) { return $out }
+    $template = [string]$script:VsCodeUserTemplates[$TargetOs]
+    $tail = $Pattern.Substring('<vscode-user>'.Length).TrimStart('\', '/')
+    foreach ($product in $script:VsCodeProducts) {
+        $base = [string]::Format($template, $product)
+        $parts = [System.Collections.Generic.List[string]]::new()
+        foreach ($piece in @($ProfileHome.TrimEnd('/'), $base, $tail)) {
+            if ($piece) { $parts.Add($piece) }
+        }
+        $out.Add([string]::Join('/', $parts))
+    }
+    return ,$out
+}
+
+function Expand-CataloguePath {
+    <#
+    .SYNOPSIS
+        Turn one catalogue path pattern into concrete glob patterns on this filesystem.
+    .DESCRIPTION
+        Mirrors collect.py's expand_paths. An angle-bracket segment is a human-readable
+        placeholder and becomes a single-level wildcard, which is safe: a false match costs
+        a skipped manifest entry, while treating it literally would collect nothing.
+
+        Anything this function declines to search is recorded in $script:PatternRefusals,
+        never dropped. A collector that quietly searches nothing produces a clean bundle
+        from a host it never looked at, which is the one failure this tool must not have.
+    #>
+    param([string] $Pattern, [string] $ProfileHome, [string] $TargetOs, [string] $Root)
+
+    $results = [System.Collections.Generic.List[string]]::new()
+    $text = $Pattern
+
+    if ($text.StartsWith('<vscode-user>')) {
+        foreach ($expanded in (Expand-VsCodeUser -Pattern $text -ProfileHome $ProfileHome -TargetOs $TargetOs)) {
+            foreach ($final in (Expand-CataloguePath -Pattern $expanded -ProfileHome $ProfileHome -TargetOs $TargetOs -Root $Root)) {
+                $results.Add($final)
+            }
+        }
+        return ,$results
+    }
 
     # A catalogue entry lists every operating system's spelling of the same artifact in one
     # paths list, so on any given host most of them do not apply. That is expected and is
-    # not a refusal: dropping the other platform's spellings quietly is the whole point of
-    # having them in one entry. What must never be quiet is a pattern that applies here and
-    # still cannot be resolved, which is what the refusal at the end of this function is
-    # for.
-    if target_os == "windows":
-        if text.startswith("$"):
-            return []  # a freedesktop variable, meaningless on Windows
-        for placeholder, relative in _WIN_PLACEHOLDERS.items():
-            if text.upper().startswith(placeholder):
-                tail = text[len(placeholder) :].lstrip("\\/")
-                text = "/".join(x for x in (home, relative, tail) if x)
+    # not a refusal. What must never be quiet is a pattern that applies here and still
+    # cannot be resolved, which is what the refusals at the end are for.
+    if ($TargetOs -eq 'windows') {
+        if ($text.StartsWith('$')) { return $results }  # freedesktop variable
+        $upper = $text.ToUpperInvariant()
+        $matched = $false
+        foreach ($key in $script:WinPlaceholders.Keys) {
+            if ($upper.StartsWith($key)) {
+                $tail = $text.Substring(([string]$key).Length).TrimStart('\', '/')
+                $parts = [System.Collections.Generic.List[string]]::new()
+                foreach ($piece in @($ProfileHome, [string]$script:WinPlaceholders[$key], $tail)) {
+                    if ($piece) { $parts.Add($piece) }
+                }
+                $text = [string]::Join('/', $parts)
+                $matched = $true
                 break
-        else:
-            upper = text.upper()
-            for placeholder, absolute in _WIN_SYSTEM_PLACEHOLDERS.items():
-                if upper.startswith(placeholder):
-                    text = absolute + text[len(placeholder) :]
+            }
+        }
+        if (-not $matched) {
+            foreach ($key in $script:WinSystemPlaceholders.Keys) {
+                if ($upper.StartsWith($key)) {
+                    $text = [string]$script:WinSystemPlaceholders[$key] + $text.Substring(([string]$key).Length)
+                    $matched = $true
                     break
-            if text.startswith("~"):
+                }
+            }
+            if (-not $matched -and $text.StartsWith('~')) {
                 # ~ is the catalogue's ordinary spelling for the user profile and many
-                # entries give no other. Leaving it unexpanded here meant the pattern was
-                # globbed against the process working directory, so on Windows those
-                # artifacts were never found and the manifest reported a clean host.
-                text = home.rstrip("/") + text[1:]
-        text = text.replace("\\", "/")
-    else:
-        if re.match(r"^%[A-Za-z_]+%|^[A-Za-z]:\\|^HKEY_", text):
-            return []  # a Windows spelling or a registry key, meaningless here
-        if text.startswith("$"):
-            resolved, outcome = resolve_env_prefix(text, home, root)
-            if outcome == "unset":
-                return []
-            if outcome != "ok":
-                return refuse_pattern(pattern, text, outcome)
-            text = resolved
-        if text.startswith("~"):
-            text = home + text[1:]
+                # entries give no other. Leaving it unexpanded meant the pattern was
+                # searched relative to the working directory, so on Windows those
+                # artifacts were never found and the manifest reported a clean profile.
+                $text = $ProfileHome.TrimEnd('/') + $text.Substring(1)
+            }
+        }
+        $text = $text.Replace('\', '/')
+    } else {
+        if ($text -match '^%[A-Za-z_]+%' -or $text -match '^[A-Za-z]:\\' -or $text.StartsWith('HKEY_')) {
+            return $results  # a Windows spelling or a registry key, meaningless here
+        }
+        if ($text.StartsWith('$')) {
+            $resolved = Resolve-EnvPrefix -Text $text -ProfileHome $ProfileHome -Root $Root
+            $outcome = [string]$resolved['outcome']
+            if ($outcome -ceq 'unset') { return $results }
+            if ($outcome -cne 'ok') {
+                Add-PatternRefusal -Pattern $Pattern -Expanded $text -Reason $outcome
+                return ,$results
+            }
+            $text = [string]$resolved['text']
+        }
+        if ($text.StartsWith('~')) { $text = $ProfileHome + $text.Substring(1) }
+    }
 
-    text = re.sub(r"<[^>]+>", "*", text)
+    $text = [regex]::Replace($text, '<[^>]+>', '*')
 
-    if root and not text.startswith(root.rstrip("/") + "/") and text != root.rstrip("/"):
+    if ($Root -and -not $text.StartsWith($Root.TrimEnd('/') + '/') -and $text -cne $Root.TrimEnd('/')) {
         # Re-anchor under the mounted root, but only when it is not already anchored there.
-        #
-        # Three kinds of path reach this point and one prefix test handles all of them. A
-        # profile-relative path already carries the root, because `home` was discovered
-        # inside it. An absolute system path does not. And a project root read out of the
-        # agent's own state carries the ORIGINAL machine's absolute path, which also does
-        # not exist under the root. Re-anchoring unconditionally double-prefixed the first
-        # kind, which made every profile artifact silently fail to match: the collection
-        # came back empty and looked like a host with no agents on it.
-        #
-        # lstrip() takes a character set rather than a prefix, so the drive letter is
-        # removed with an explicit match: lstrip("C:/") would also eat a leading 'C' from
-        # a directory name.
-        relative = re.sub(r"^[A-Za-z]:/", "", text).lstrip("/")
-        text = os.path.join(root, relative)
+        # A profile-relative path already carries the root because $ProfileHome was discovered
+        # inside it; an absolute system path and a project root read out of an agent's own
+        # state do not. Re-anchoring unconditionally double-prefixed the first kind, and
+        # every profile artifact then silently failed to match.
+        $relative = [regex]::Replace($text, '^[A-Za-z]:/', '').TrimStart('/')
+        $text = $Root.TrimEnd('/') + '/' + $relative
+    }
 
     # A pattern that reduces to a bare wildcard near the top of the tree would collect the
     # whole filesystem under one artifact id. That is not hypothetical: a catalogue entry
-    # carried prose in angle brackets, this function turned it into a wildcard, and one
-    # artifact swallowed an entire home directory. The schema now rejects such an entry,
-    # and this is the second line of defence, because a collector in the field has to fail
-    # closed rather than hoover.
-    stripped = text.rstrip("/")
-    if stripped.endswith("/*") and stripped.count("/") <= 1:
-        return refuse_pattern(pattern, text, "wildcard_too_broad")
-    if re.sub(r"[*?/]", "", stripped) == "":
-        return refuse_pattern(pattern, text, "wildcard_only")
+    # once carried prose in angle brackets, expansion turned it into a wildcard, and one
+    # artifact swallowed a home directory. The schema rejects such an entry now, and this
+    # is the second line of defence, because a collector in the field fails closed.
+    $stripped = $text.TrimEnd('/')
+    if ($stripped.EndsWith('/*') -and (($stripped.ToCharArray() | Where-Object { $_ -eq '/' }).Count -le 1)) {
+        Add-PatternRefusal -Pattern $Pattern -Expanded $text -Reason 'wildcard_too_broad'
+        return ,$results
+    }
+    if ([regex]::Replace($stripped, '[*?/]', '') -ceq '') {
+        Add-PatternRefusal -Pattern $Pattern -Expanded $text -Reason 'wildcard_only'
+        return ,$results
+    }
 
-    # A relative pattern would be globbed against the process working directory, which on
+    # A relative pattern would be searched against the process working directory, which on
     # an analyst workstation is somewhere in the case folder and on an endpoint is wherever
     # the responder happened to be. Both find the wrong thing or nothing, and neither says
-    # so. This happens when a placeholder at the start of a path is one the collector does
-    # not know: "<agent-home>/config.json" becomes "*/config.json", which is a valid glob
-    # and a search of entirely the wrong tree.
-    if not (text.startswith("/") or re.match(r"^[A-Za-z]:/", text)):
-        return refuse_pattern(pattern, text, "not_absolute")
+    # so.
+    if (-not ($text.StartsWith('/') -or $text -match '^[A-Za-z]:/')) {
+        Add-PatternRefusal -Pattern $Pattern -Expanded $text -Reason 'not_absolute'
+        return ,$results
+    }
 
-    return [text if ("*" in text or "?" in text) else os.path.normpath(text)]
+    # A literal path is normalized, a glob is not. This mirrors collect.py, which ends with
+    # os.path.normpath for a pattern with no wildcard: without it a catalogue entry written
+    # with a trailing slash produces a different manifest path in each collector for the
+    # same file, and the differential test between the two would fail on 769 entries that
+    # are in fact identical.
+    if ($text.Contains('*') -or $text.Contains('?')) {
+        $results.Add($text)
+    } else {
+        $results.Add((Get-NormalizedPath $text))
+    }
+    return ,$results
+}
 
 
-# --------------------------------------------------------------------- discovery
+# ========================================================================== discovery
 
+function Test-PathExists {
+    <#
+    .SYNOPSIS
+        Does this path exist, without following a symbolic link.
+    .DESCRIPTION
+        Test-Path -Path follows links, so a dangling link reads as absent and the fact that
+        an agent left a link behind would be lost. Existence is therefore asked of the
+        filesystem entry itself.
+    #>
+    param([string] $Path)
+    try {
+        $info = [System.IO.FileInfo]::new($Path)
+        if ($info.Exists) { return $true }
+        return [System.IO.Directory]::Exists($Path)
+    } catch {
+        return $false
+    }
+}
 
-def iter_matches(pattern: str) -> list[str]:
-    """Expand a glob without following symlinks into directories outside the tree.
+function Test-IsSymlink {
+    param([string] $Path)
+    try {
+        $attrs = [System.IO.File]::GetAttributes($Path)
+        return (($attrs -band [System.IO.FileAttributes]::ReparsePoint) -ne 0)
+    } catch {
+        return $false
+    }
+}
 
-    glob.glob would work, but it has surprising behavior with '**' across versions, and
-    this needs to be identical in the PowerShell implementation, so the walk is explicit.
-    """
-    if "*" not in pattern and "?" not in pattern:
-        return [pattern] if os.path.lexists(pattern) else []
+function Get-GlobMatches {
+    <#
+    .SYNOPSIS
+        Expand a glob without descending into symlinked directories.
+    .DESCRIPTION
+        Mirrors collect.py's iter_matches, walk for walk, rather than using
+        Get-ChildItem -Recurse: the two implementations have to agree on what a pattern
+        matches, and a cmdlet's own interpretation of ** and of link following is not
+        something this format can depend on.
 
-    parts = pattern.split("/")
-    # An absolute pattern starts with an empty first part.
-    bases = ["/"] if pattern.startswith("/") else ["."]
-    if parts and parts[0] == "":
-        parts = parts[1:]
-    elif re.match(r"^[A-Za-z]:$", parts[0] if parts else ""):
-        bases = [parts[0] + "/"]
-        parts = parts[1:]
+        -clike rather than -like, because PowerShell's wildcard operators are
+        case-insensitive by default and Python's fnmatch on a POSIX host is not. The
+        difference is invisible on Windows, where the filesystem is case-insensitive
+        anyway, and it is what lets the differential test run both collectors over one
+        tree and compare.
+    #>
+    param([string] $Pattern, [int] $Limit = 100000)
 
-    for index, part in enumerate(parts):
-        nxt = []
-        if part == "**":
-            for base in bases:
-                for dirpath, dirnames, _files in os.walk(base):
-                    # Do not descend into symlinked directories: a link out of the profile
-                    # would take the collection with it.
-                    dirnames[:] = [
-                        d for d in dirnames if not os.path.islink(os.path.join(dirpath, d))
-                    ]
-                    nxt.append(dirpath)
-        elif "*" in part or "?" in part:
-            for base in bases:
-                try:
-                    entries = sorted(os.listdir(base))
-                except OSError:
+    if (-not ($Pattern.Contains('*') -or $Pattern.Contains('?'))) {
+        $out = [System.Collections.Generic.List[string]]::new()
+        if (Test-PathExists $Pattern) { $out.Add($Pattern) }
+        return ,$out
+    }
+
+    $parts = [System.Collections.Generic.List[string]]::new()
+    foreach ($piece in $Pattern.Split('/')) { $parts.Add($piece) }
+
+    $bases = [System.Collections.Generic.List[string]]::new()
+    if ($Pattern.StartsWith('/')) {
+        $bases.Add('/')
+        $parts.RemoveAt(0)
+    } elseif ($parts.Count -gt 0 -and $parts[0] -match '^[A-Za-z]:$') {
+        $bases.Add($parts[0] + '/')
+        $parts.RemoveAt(0)
+    } else {
+        $bases.Add('.')
+    }
+
+    for ($index = 0; $index -lt $parts.Count; $index++) {
+        $part = $parts[$index]
+        $next = [System.Collections.Generic.List[string]]::new()
+
+        if ($part -ceq '**') {
+            foreach ($base in $bases) {
+                foreach ($dir in (Get-DirectoryTree $base $Limit)) { $next.Add($dir) }
+            }
+        } elseif ($part.Contains('*') -or $part.Contains('?')) {
+            foreach ($base in $bases) {
+                $names = [System.Collections.Generic.List[string]]::new()
+                try {
+                    foreach ($child in [System.IO.Directory]::GetFileSystemEntries($base)) {
+                        $names.Add([System.IO.Path]::GetFileName($child))
+                    }
+                } catch {
                     continue
-                for name in entries:
-                    if fnmatch.fnmatch(name, part):
-                        nxt.append(os.path.join(base, name))
-        else:
-            for base in bases:
-                candidate = os.path.join(base, part)
-                if os.path.lexists(candidate):
-                    nxt.append(candidate)
-        bases = nxt
-        if not bases:
-            return []
-        is_last = index == len(parts) - 1
-        if not is_last:
-            bases = [b for b in bases if os.path.isdir(b)]
-    return sorted(set(bases))
+                }
+                foreach ($name in (Sort-Ordinal $names)) {
+                    if ($name -clike $part) { $next.Add((Join-BundlePath $base $name)) }
+                }
+            }
+        } else {
+            foreach ($base in $bases) {
+                $candidate = Join-BundlePath $base $part
+                if (Test-PathExists $candidate) { $next.Add($candidate) }
+            }
+        }
 
+        $bases = $next
+        if ($bases.Count -eq 0) { return ,$bases }
+        if ($index -lt ($parts.Count - 1)) {
+            $kept = [System.Collections.Generic.List[string]]::new()
+            foreach ($base in $bases) {
+                if ([System.IO.Directory]::Exists($base)) { $kept.Add($base) }
+            }
+            $bases = $kept
+            if ($bases.Count -eq 0) { return ,$bases }
+        }
+    }
 
-def discover_users(root: str | None, all_users: bool, named: list) -> list:
-    """Return [{'name', 'home'}] for the profiles to scan."""
-    if root:
+    $unique = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::Ordinal)
+    foreach ($base in $bases) { [void]$unique.Add($base) }
+    $out = [System.Collections.Generic.List[string]]::new()
+    foreach ($item in $unique) { $out.Add($item) }
+    return ,$out
+}
+
+function Join-BundlePath {
+    <#
+    .SYNOPSIS
+        Join two path pieces with a forward slash, exactly once.
+    .DESCRIPTION
+        Join-Path would use the platform separator and would produce backslashes on
+        Windows, and every path inside this collector is held with forward slashes so that
+        the two implementations produce the same manifest for the same tree.
+    #>
+    param([string] $Base, [string] $Leaf)
+    if ($Base -ceq '/') { return '/' + $Leaf }
+    return $Base.TrimEnd('/') + '/' + $Leaf
+}
+
+function Get-DirectoryTree {
+    <#
+    .SYNOPSIS
+        Every directory at or under a base, without following symbolic links.
+    #>
+    param([string] $Base, [int] $Limit = 100000)
+    $found = [System.Collections.Generic.List[string]]::new()
+    if (-not [System.IO.Directory]::Exists($Base)) { return $found }
+    $stack = [System.Collections.Generic.Stack[string]]::new()
+    $stack.Push($Base)
+    while ($stack.Count -gt 0) {
+        $current = $stack.Pop()
+        $found.Add($current)
+        if ($found.Count -ge $Limit) { return $found }
+        $children = [System.Collections.Generic.List[string]]::new()
+        try {
+            foreach ($dir in [System.IO.Directory]::GetDirectories($current)) { $children.Add($dir) }
+        } catch {
+            continue
+        }
+        foreach ($dir in ($children | Sort-Object -CaseSensitive -Descending)) {
+            $normalized = ([string]$dir).Replace('\', '/')
+            # A link out of the profile would take the collection with it.
+            if (-not (Test-IsSymlink $normalized)) { $stack.Push($normalized) }
+        }
+    }
+    return ,$found
+}
+
+function Get-RegularFilesUnder {
+    <#
+    .SYNOPSIS
+        List regular files under a directory, without following symlinked directories.
+    .DESCRIPTION
+        Returns an ordered dictionary with 'files' and 'truncated'. Hitting the cap is
+        recorded as an error rather than passing silently, because a truncated artifact
+        looks exactly like a small one in the manifest.
+    #>
+    param([string] $Base, [int] $Limit)
+    $files = [System.Collections.Generic.List[string]]::new()
+    $truncated = $false
+    foreach ($dir in (Get-DirectoryTree $Base)) {
+        $names = [System.Collections.Generic.List[string]]::new()
+        try {
+            foreach ($file in [System.IO.Directory]::GetFiles($dir)) { $names.Add(([string]$file).Replace('\', '/')) }
+        } catch {
+            continue
+        }
+        foreach ($name in (Sort-Ordinal $names)) {
+            $files.Add([string]$name)
+            if ($files.Count -ge $Limit) { $truncated = $true; break }
+        }
+        if ($truncated) { break }
+    }
+    $result = [ordered]@{}
+    $result['files'] = $files
+    $result['truncated'] = $truncated
+    return $result
+}
+
+function Get-ProfilesToScan {
+    <#
+    .SYNOPSIS
+        The user profiles to scan, as a list of ordered dictionaries with name and home.
+    #>
+    param([string] $Root, [bool] $AllUsers, [string[]] $Named)
+
+    $found = [System.Collections.Generic.List[object]]::new()
+
+    if ($Root) {
         # A mounted image or an exported profile. Look for the usual profile parents, and
-        # fall back to treating the root itself as one profile.
-        found = []
-        for parent in ("Users", "home", "root"):
-            base = os.path.join(root, parent)
-            if not os.path.isdir(base):
+        # fall back to treating the root itself as one profile, because an exported single
+        # profile is a common shape and finding nothing in it would read as a clean host.
+        foreach ($parent in @('Users', 'home', 'root')) {
+            $base = Join-BundlePath $Root $parent
+            if (-not [System.IO.Directory]::Exists($base)) { continue }
+            if ($parent -ceq 'root') {
+                $entry = [ordered]@{}; $entry['home'] = $base; $entry['name'] = 'root'
+                [void]$found.Add($entry)
                 continue
-            if parent == "root":
-                found.append({"name": "root", "home": base})
+            }
+            $names = [System.Collections.Generic.List[string]]::new()
+            try {
+                foreach ($dir in [System.IO.Directory]::GetDirectories($base)) {
+                    $names.Add([System.IO.Path]::GetFileName(([string]$dir).TrimEnd('/', '\')))
+                }
+            } catch {
                 continue
-            try:
-                for name in sorted(os.listdir(base)):
-                    home = os.path.join(base, name)
-                    if os.path.isdir(home):
-                        found.append({"name": name, "home": home})
-            except OSError:
+            }
+            foreach ($name in ($names | Sort-Object -CaseSensitive)) {
+                $entry = [ordered]@{}
+                $entry['home'] = (Join-BundlePath $base $name)
+                $entry['name'] = $name
+                [void]$found.Add($entry)
+            }
+        }
+        if ($found.Count -eq 0) {
+            $leaf = [System.IO.Path]::GetFileName($Root.TrimEnd('/', '\'))
+            if (-not $leaf) { $leaf = 'root' }
+            $entry = [ordered]@{}; $entry['home'] = $Root; $entry['name'] = $leaf
+            [void]$found.Add($entry)
+        }
+    } elseif ($AllUsers) {
+        foreach ($parent in @('C:/Users', '/Users', '/home')) {
+            if (-not [System.IO.Directory]::Exists($parent)) { continue }
+            $names = [System.Collections.Generic.List[string]]::new()
+            try {
+                foreach ($dir in [System.IO.Directory]::GetDirectories($parent)) {
+                    $names.Add([System.IO.Path]::GetFileName(([string]$dir).TrimEnd('/', '\')))
+                }
+            } catch {
                 continue
-        if not found:
-            found = [{"name": os.path.basename(root.rstrip("/")) or "root", "home": root}]
-        if named:
-            found = [u for u in found if u["name"] in named]
-        return found
-
-    if all_users:
-        found = []
-        for parent in ("/Users", "/home"):
-            if not os.path.isdir(parent):
-                continue
-            try:
-                for name in sorted(os.listdir(parent)):
-                    home = os.path.join(parent, name)
-                    if os.path.isdir(home) and not os.path.islink(home):
-                        found.append({"name": name, "home": home})
-            except OSError:
-                continue
-        if os.path.isdir("/var/root"):
-            found.append({"name": "root", "home": "/var/root"})
-        elif os.path.isdir("/root"):
-            found.append({"name": "root", "home": "/root"})
-        if named:
-            found = [u for u in found if u["name"] in named]
-        return found
-
-    if named:
-        out = []
-        for name in named:
-            for parent in ("/Users", "/home"):
-                home = os.path.join(parent, name)
-                if os.path.isdir(home):
-                    out.append({"name": name, "home": home})
-                    break
-        return out
-
-    try:
-        who = getpass.getuser()
-    except Exception:
-        who = os.environ.get("USER") or "unknown"
-    return [{"name": who, "home": os.path.expanduser("~")}]
-
-
-def discover_project_roots(home: str) -> list:
-    """Find the working copies whose project-anchored artifacts we should collect.
-
-    Project instruction files (CLAUDE.md, .claude/rules and the rest) live inside a user's
-    repositories, not under the profile, and they are the prompt-injection surface. They
-    cannot be found by expanding a profile, so the agent's own state is read for the list:
-    the projects key of ~/.claude.json is authoritative, and the encoded directory names
-    under projects/ are a fallback hint. The encoding replaces every non-alphanumeric
-    character with a dash and is therefore not reversible, so a decoded name is only used
-    when it happens to name a directory that exists.
-    """
-    roots = []
-    config = os.path.join(home, ".claude.json")
-    if os.path.isfile(config):
-        try:
-            with open(config, "rb") as handle:
-                data = json.loads(handle.read().decode("utf-8", "replace"))
-            projects = data.get("projects")
-            if isinstance(projects, dict):
-                for path in sorted(projects):
-                    if os.path.isdir(path):
-                        roots.append({"path": path, "source": "claude_code.global_config"})
-        except (OSError, ValueError):
-            pass
-
-    projects_dir = os.path.join(home, ".claude", "projects")
-    if os.path.isdir(projects_dir):
-        try:
-            for name in sorted(os.listdir(projects_dir)):
-                guess = "/" + name.lstrip("-").replace("-", "/")
-                if os.path.isdir(guess) and all(r["path"] != guess for r in roots):
-                    roots.append({"path": guess, "source": "claude_code.projects_dir_name"})
-        except OSError:
-            pass
-    return roots
-
-
-# ------------------------------------------------------------------------- collection
-
-# A single glob can match an unbounded number of files, for example a project directory
-# with tens of thousands of transcripts. The cap keeps one artifact from consuming a whole
-# collection window, and hitting it is recorded as an error rather than passing silently.
-DEFAULT_MAX_FILES_PER_ARTIFACT = 20000
-
-
-def _stat_times(st: os.stat_result) -> dict:
-    """Read every timestamp the platform offers, and say null for the ones it does not.
-
-    st_birthtime exists on macOS and on some BSDs, and does not exist on Linux. st_ctime
-    means inode change time on Unix and creation time on Windows: the same field name with
-    two meanings, which docs/BUNDLE_FORMAT.md documents rather than tries to reconcile.
-    """
-    birth = getattr(st, "st_birthtime", None)
-    return {
-        "mtime_utc": utc(st.st_mtime),
-        "ctime_utc": utc(st.st_ctime),
-        "atime_utc": utc(st.st_atime),
-        "birthtime_utc": utc(birth) if birth else None,
+            }
+            foreach ($name in ($names | Sort-Object -CaseSensitive)) {
+                # $profilePath, because $home is the automatic $HOME. Assigning it inside a
+                # function is legal and creates a local, which makes it a trap rather than
+                # an error for whoever edits this next.
+                $profilePath = Join-BundlePath $parent $name
+                if (Test-IsSymlink $profilePath) { continue }
+                $entry = [ordered]@{}; $entry['home'] = $profilePath; $entry['name'] = $name
+                [void]$found.Add($entry)
+            }
+        }
+    } else {
+        $profilePath = [System.Environment]::GetEnvironmentVariable('USERPROFILE')
+        if (-not $profilePath) { $profilePath = [System.Environment]::GetEnvironmentVariable('HOME') }
+        if (-not $profilePath) { $profilePath = $HOME }
+        $entry = [ordered]@{}
+        $entry['home'] = ([string]$profilePath).Replace('\', '/')
+        $entry['name'] = (Get-CollectorUser)
+        [void]$found.Add($entry)
     }
 
+    if ($Named -and $Named.Count -gt 0) {
+        $kept = [System.Collections.Generic.List[object]]::new()
+        foreach ($entry in $found) {
+            if ($Named -ccontains [string]$entry['name']) { [void]$kept.Add($entry) }
+        }
+        return ,$kept
+    }
+    return ,$found
+}
 
-def collect_file(
-    artifact: dict,
-    original: str,
-    profile_home: str,
-    user_name: str,
-    files_dir: str | None,
-    used: dict,
-    target_os: str,
-    args: argparse.Namespace,
-    withhold: bool = False,
-) -> dict:
-    """Collect one file and return its manifest entry.
+function Get-CollectorUser {
+    try {
+        $name = [System.Environment]::UserName
+        if ($name) { return $name }
+    } catch {
+        # Fall through: a user name is context, not evidence, and must not stop a run.
+    }
+    $fallback = [System.Environment]::GetEnvironmentVariable('USERNAME')
+    if (-not $fallback) { $fallback = [System.Environment]::GetEnvironmentVariable('USER') }
+    if (-not $fallback) { $fallback = 'unknown' }
+    return $fallback
+}
 
-    Every path out of this function produces an entry. A file that could not be read is
-    still described, with a reason, because a collection that silently omits what it could
-    not open leaves the analyst unable to tell "absent" from "unreadable".
-    """
-    entry = {
-        "artifact_id": artifact["id"],
-        "agent": artifact["id"].split(".", 1)[0],
-        "category": artifact["category"],
-        "status": artifact.get("status", "unverified"),
-        "user": user_name,
-        "original_path": original,
-        "bundle_path": None,
-        "size": None,
-        "sha256": None,
-        "collected": False,
-        "reason": None,
-        "symlink": None,
-        "reparse_point": False,
-        "changed_while_reading": False,
-        "mtime_utc": None,
-        "ctime_utc": None,
-        "atime_utc": None,
-        "birthtime_utc": None,
+
+# ========================================================================= collection
+
+function Get-ProjectRoots {
+    <#
+    .SYNOPSIS
+        The working copies whose project-anchored artifacts should be collected.
+    .DESCRIPTION
+        Project instruction files (CLAUDE.md, AGENTS.md, .cursorrules and the rest) live
+        inside a user's repositories rather than under the profile, and they are the
+        prompt-injection surface. They cannot be found by expanding a profile, so the
+        agent's own state is read for the list: the projects key of ~/.claude.json is
+        authoritative, and the encoded directory names under projects/ are a fallback.
+
+        The encoding replaces every non-alphanumeric character with a dash and is not
+        reversible, so a decoded name is used only when it happens to name a real
+        directory. Mirrors collect.py's discover_project_roots.
+    #>
+    param([string] $ProfileHome)
+
+    $roots = [System.Collections.Generic.List[object]]::new()
+    $seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+
+    function Add-Root {
+        param([string] $Path, [string] $Source)
+        $normalized = ([string]$Path).Replace('\', '/').TrimEnd('/')
+        if (-not $normalized) { return }
+        if (-not $seen.Add($normalized)) { return }
+        if (-not [System.IO.Directory]::Exists($normalized)) { return }
+        $entry = [ordered]@{}
+        $entry['path'] = $normalized
+        $entry['source'] = $Source
+        [void]$roots.Add($entry)
     }
 
-    try:
-        st = os.lstat(original)
-    except OSError as exc:
-        entry["reason"] = "permission_denied" if exc.errno == errno.EACCES else "unreadable"
-        return entry
+    $configPath = Join-BundlePath $ProfileHome '.claude.json'
+    if (Test-PathExists $configPath) {
+        try {
+            $raw = [System.IO.File]::ReadAllText($configPath)
+            $parsed = $raw | ConvertFrom-Json
+            if ($parsed.PSObject.Properties.Name -ccontains 'projects') {
+                foreach ($property in $parsed.projects.PSObject.Properties) {
+                    Add-Root -Path $property.Name -Source 'claude_code.global_config'
+                }
+            }
+        } catch {
+            # A config we cannot parse is not a reason to collect nothing. The projects
+            # directory below is a second, independent source for the same list.
+        }
+    }
 
-    if stat.S_ISLNK(st.st_mode):
-        try:
-            target = os.readlink(original)
-        except OSError:
-            target = None
-        entry["symlink"] = target
-        # A symbolic link is a reparse point on Windows, which is the platform this field
-        # is named for. Set here so the value means something and so both collectors agree.
-        entry["reparse_point"] = True
-        resolved = os.path.realpath(original)
+    $projectsDir = Join-BundlePath $ProfileHome '.claude/projects'
+    if ([System.IO.Directory]::Exists($projectsDir)) {
+        $names = [System.Collections.Generic.List[string]]::new()
+        try {
+            foreach ($dir in [System.IO.Directory]::GetDirectories($projectsDir)) {
+                $names.Add([System.IO.Path]::GetFileName(([string]$dir).TrimEnd('/', '\')))
+            }
+        } catch {
+            $names.Clear()
+        }
+        foreach ($name in ($names | Sort-Object -CaseSensitive)) {
+            $candidate = '/' + ([string]$name).TrimStart('-').Replace('-', '/')
+            Add-Root -Path $candidate -Source 'claude_code.projects_dir_name'
+        }
+    }
+
+    return ,$roots
+}
+
+function Get-FileTimes {
+    <#
+    .SYNOPSIS
+        Every timestamp the platform offers, as the bundle's timestamp format or null.
+    .DESCRIPTION
+        On Windows CreationTime is a real creation time, which is what birthtime_utc means
+        on macOS, so it is reported there rather than left null. ctime_utc carries
+        CreationTime as well, because docs/BUNDLE_FORMAT.md documents that this field means
+        inode change time on Unix and creation time on Windows rather than pretending the
+        two are the same thing.
+    #>
+    param([System.IO.FileSystemInfo] $Info)
+    $times = [ordered]@{}
+    $times['atime_utc'] = (Get-UtcString $Info.LastAccessTimeUtc)
+    $times['birthtime_utc'] = (Get-UtcString $Info.CreationTimeUtc)
+    $times['ctime_utc'] = (Get-UtcString $Info.CreationTimeUtc)
+    $times['mtime_utc'] = (Get-UtcString $Info.LastWriteTimeUtc)
+    return $times
+}
+
+function Copy-ArtifactFile {
+    <#
+    .SYNOPSIS
+        Collect one file and return its manifest entry.
+    .DESCRIPTION
+        Every path out of this function produces an entry. A file that could not be read is
+        still described, with a reason, because a collection that silently omits what it
+        could not open leaves an analyst unable to tell absent from unreadable.
+
+        $Withhold is decided by the caller across every artifact claiming this path, so a
+        credential file caught by a broad directory glob is withheld too. See ADR 0014.
+    #>
+    param(
+        $Artifact,
+        [string] $Original,
+        [string] $ProfileHome,
+        [string] $UserName,
+        [string] $FilesDir,
+        [System.Collections.IDictionary] $Used,
+        [string] $TargetOs,
+        [bool] $Withhold,
+        [bool] $IncludeSecrets,
+        [long] $MaxFileSize,
+        [bool] $DryRun
+    )
+
+    $entry = [ordered]@{}
+    $entry['agent'] = ([string]$Artifact.id).Split('.')[0]
+    $entry['artifact_id'] = [string]$Artifact.id
+    $entry['atime_utc'] = $null
+    $entry['birthtime_utc'] = $null
+    $entry['bundle_path'] = $null
+    $entry['category'] = [string]$Artifact.category
+    $entry['changed_while_reading'] = $false
+    $entry['collected'] = $false
+    $entry['ctime_utc'] = $null
+    $entry['mtime_utc'] = $null
+    $entry['original_path'] = $Original
+    $entry['reason'] = $null
+    $entry['reparse_point'] = $false
+    $entry['sha256'] = $null
+    $entry['size'] = $null
+    $entry['status'] = [string]$Artifact.status
+    $entry['symlink'] = $null
+    $entry['user'] = $UserName
+
+    # What gets read, as opposed to what gets reported. They differ for a symbolic link
+    # inside the profile: the bytes come from the target, and original_path plus the bundle
+    # path stay on the link, because that is how the file was found.
+    $readPath = $Original
+
+    $isDirectory = $false
+    try {
+        $isDirectory = [System.IO.Directory]::Exists($Original)
+        if (-not $isDirectory -and -not [System.IO.File]::Exists($Original)) {
+            # Neither, which on a live host usually means a link whose target is gone or a
+            # path we are not allowed to stat. Either way it is recorded, never dropped.
+            if (Test-PathExists $Original) {
+                $entry['reason'] = 'not_a_file'
+            } else {
+                $entry['reason'] = 'unreadable'
+            }
+            return $entry
+        }
+    } catch [System.UnauthorizedAccessException] {
+        $entry['reason'] = 'permission_denied'
+        return $entry
+    } catch {
+        $entry['reason'] = 'unreadable'
+        return $entry
+    }
+
+    if (Test-IsSymlink $Original) {
+        $entry['reparse_point'] = $true
+        $target = $null
+        try {
+            $info = [System.IO.FileInfo]::new($Original)
+            if ($info.PSObject.Properties.Name -ccontains 'LinkTarget') { $target = $info.LinkTarget }
+        } catch {
+            $target = $null
+        }
+        $entry['symlink'] = $target
+        $resolved = $null
+        try {
+            $resolved = ([string]([System.IO.Path]::GetFullPath($Original))).Replace('\', '/')
+            if ($target) {
+                if ($target -match '^([A-Za-z]:|/)') {
+                    $resolved = ([string]$target).Replace('\', '/')
+                } else {
+                    $parent = [System.IO.Path]::GetDirectoryName($Original)
+                    $resolved = (Get-NormalizedPath ((([string]$parent).Replace('\', '/')).TrimEnd('/') + '/' + ([string]$target).Replace('\', '/')))
+                }
+            }
+        } catch {
+            $resolved = $null
+        }
+        $homeNormalized = (Get-NormalizedPath $ProfileHome)
         # A link out of the profile would take the collection somewhere it was never
         # authorized to read. Recorded, not followed.
-        if not resolved.startswith(os.path.realpath(profile_home) + os.sep):
-            entry["reason"] = "skipped_symlink"
-            return entry
-        try:
-            st = os.stat(original)
-        except OSError:
-            entry["reason"] = "unreadable"
-            return entry
+        if (-not $resolved -or -not $resolved.StartsWith($homeNormalized.TrimEnd('/') + '/')) {
+            $entry['reason'] = 'skipped_symlink'
+            return $entry
+        }
+        # Inside the profile, so the link is followed and the rest of this function
+        # describes the target: its size, its hash and its timestamps are what the bundle
+        # will hold. original_path still records the link, which is how it was found.
+        if ([System.IO.File]::Exists($resolved)) {
+            $readPath = $resolved
+        } elseif ([System.IO.Directory]::Exists($resolved)) {
+            $entry['reason'] = 'not_a_file'
+            return $entry
+        } else {
+            $entry['reason'] = 'unreadable'
+            return $entry
+        }
+    }
 
-    if not stat.S_ISREG(st.st_mode):
-        entry["reason"] = "not_a_file"
-        return entry
+    if ($isDirectory) {
+        $entry['reason'] = 'not_a_file'
+        return $entry
+    }
 
-    entry.update(_stat_times(st))
-    entry["size"] = st.st_size
+    $info = $null
+    try {
+        $info = [System.IO.FileInfo]::new($readPath)
+        $times = Get-FileTimes $info
+        foreach ($key in $times.Keys) { $entry[[string]$key] = $times[[string]$key] }
+        $entry['size'] = [long]$info.Length
+    } catch [System.UnauthorizedAccessException] {
+        $entry['reason'] = 'permission_denied'
+        return $entry
+    } catch {
+        $entry['reason'] = 'unreadable'
+        return $entry
+    }
 
-    if st.st_size > args.max_file_size:
-        entry["reason"] = "too_large"
-        return entry
+    if ([long]$entry['size'] -gt $MaxFileSize) {
+        $entry['reason'] = 'too_large'
+        return $entry
+    }
 
-    if args.dry_run:
+    if ($DryRun) {
         # No read at all: hashing would touch access times and cost the time a dry run
         # exists to save. The entry says what would have happened.
-        entry["reason"] = "dry_run"
-        return entry
+        $entry['reason'] = 'dry_run'
+        return $entry
+    }
 
-    # Resolved by the caller across every artifact claiming this path, so a credential
-    # file caught by a broad directory glob is still withheld.
-    secret = withhold and not args.include_secrets
+    $secret = ($Withhold -and -not $IncludeSecrets)
 
-    try:
-        digest, read_size = sha256_file(original, preserve_atime=True)
-    except OSError as exc:
-        entry["reason"] = "permission_denied" if exc.errno == errno.EACCES else "unreadable"
-        return entry
+    try {
+        $entry['sha256'] = Get-Sha256OfFile $readPath
+    } catch [System.UnauthorizedAccessException] {
+        $entry['reason'] = 'permission_denied'
+        return $entry
+    } catch {
+        $entry['reason'] = 'unreadable'
+        return $entry
+    }
 
-    entry["sha256"] = digest
-    entry["size"] = read_size
+    try {
+        $after = [System.IO.FileInfo]::new($readPath)
+        if ($after.Length -ne [long]$entry['size'] -or
+            (Get-UtcString $after.LastWriteTimeUtc) -cne [string]$entry['mtime_utc']) {
+            $entry['changed_while_reading'] = $true
+        }
+    } catch {
+        # A file that vanished between the hash and the re-stat is still described by the
+        # entry we already built, which is the point of building it first.
+    }
 
-    try:
-        after = os.stat(original)
-        if after.st_mtime != st.st_mtime or after.st_size != st.st_size:
-            entry["changed_while_reading"] = True
-    except OSError:
-        pass
-
-    if secret:
+    if ($secret) {
         # Presence, identity and timestamps are recorded; the bytes are not copied. See
         # SECURITY.md: the tool locates credential material, and copying it by default
         # would make every bundle a liability of its own.
-        entry["reason"] = "secret_policy"
-        return entry
+        $entry['reason'] = 'secret_policy'
+        return $entry
+    }
 
-    if files_dir is None:
-        entry["collected"] = True
-        return entry
+    if (-not $FilesDir) {
+        $entry['collected'] = $true
+        return $entry
+    }
 
-    relative = bundle_path_for(original, used, target_os)
-    destination = os.path.join(files_dir, *relative.split("/"))
-    try:
-        os.makedirs(os.path.dirname(destination), exist_ok=True)
-        with open(original, "rb") as src, open(destination, "wb") as dst:
-            while True:
-                chunk = src.read(1024 * 1024)
-                if not chunk:
-                    break
-                dst.write(chunk)
-        # Carry the original mtime onto the copy, so a bundle extracted on another machine
-        # still shows when the evidence was last written.
-        os.utime(destination, (st.st_atime, st.st_mtime))
-    except OSError as exc:
-        entry["reason"] = "permission_denied" if exc.errno == errno.EACCES else "unreadable"
-        return entry
+    $relative = ConvertTo-BundlePath -Original $Original -Used $Used -TargetOs $TargetOs
+    $destination = (Join-BundlePath $FilesDir $relative)
+    try {
+        $parent = [System.IO.Path]::GetDirectoryName($destination)
+        if ($parent) { [void][System.IO.Directory]::CreateDirectory($parent) }
+        [System.IO.File]::Copy($readPath, $destination, $true)
+        # Carry the original timestamps onto the copy, so a bundle extracted on another
+        # machine still shows when the evidence was last written.
+        [System.IO.File]::SetLastWriteTimeUtc($destination, $info.LastWriteTimeUtc)
+        [System.IO.File]::SetLastAccessTimeUtc($destination, $info.LastAccessTimeUtc)
+    } catch [System.UnauthorizedAccessException] {
+        $entry['reason'] = 'permission_denied'
+        return $entry
+    } catch {
+        $entry['reason'] = 'unreadable'
+        return $entry
+    }
 
-    entry["bundle_path"] = "files/" + relative
-    entry["collected"] = True
-    return entry
-
-
-def walk_regular_files(base: str, limit: int) -> tuple[list, bool]:
-    """List regular files under a directory without following symlinked directories."""
-    found = []
-    truncated = False
-    for dirpath, dirnames, filenames in os.walk(base):
-        dirnames[:] = sorted(d for d in dirnames if not os.path.islink(os.path.join(dirpath, d)))
-        for name in sorted(filenames):
-            found.append(os.path.join(dirpath, name))
-            if len(found) >= limit:
-                return found, True
-    return found, truncated
+    $entry['bundle_path'] = 'files/' + $relative
+    $entry['collected'] = $true
+    return $entry
+}
 
 
-def run(args: argparse.Namespace) -> dict:
-    """Collect everything the catalogue describes for this platform."""
-    started = time.time()
-    target_os = args.os or {"Darwin": "macos", "Linux": "linux"}.get(platform.system(), "linux")
+# ===================================================================== the collection
 
-    artifacts = []
-    for agent in EMBEDDED_CATALOGUE.get("agents", []):
-        if args.agents and agent["agent"] not in args.agents:
-            continue
-        for artifact in agent.get("artifacts", []):
-            if target_os in artifact.get("os", []):
-                artifacts.append(artifact)
-    # Most volatile first, then by id so two runs queue the same work in the same order.
-    artifacts.sort(
-        key=lambda a: (PRIORITY_ORDER.index(a.get("collect_priority", "normal")), a["id"])
+function Sort-Ordinal {
+    <#
+    .SYNOPSIS
+        Sort strings by code point, the way Python's sorted() does.
+    .DESCRIPTION
+        Sort-Object -CaseSensitive is culture-aware and orders "mixed.md" before "Mixed.md";
+        an ordinal sort orders them the other way, which is what Python does. The order
+        decides which of two files whose names differ only in case keeps the plain bundle
+        path and which gets the collision suffix, so the two collectors disagreeing here
+        makes their manifests differ over a pair of files that are both collected.
+    #>
+    param([System.Collections.Generic.List[string]] $Items)
+    $array = [string[]]$Items.ToArray()
+    [System.Array]::Sort($array, [System.StringComparer]::Ordinal)
+    $out = [System.Collections.Generic.List[string]]::new()
+    foreach ($item in $array) { $out.Add($item) }
+    return ,$out
+}
+
+function Sort-DictionaryList {
+    <#
+    .SYNOPSIS
+        Sort a list of ordered dictionaries by one or more string fields, ordinally.
+    .DESCRIPTION
+        Not Sort-Object, and the reason is a real failure rather than a preference.
+        Sort-Object hands each item back wrapped in a PSObject, and an OrderedDictionary
+        exposes both an [object] and an [int] indexer, so $entry['collected'] on a wrapped
+        dictionary cannot resolve the overload: PowerShell picks the [int] one and the run
+        dies with "Cannot convert value collected to type System.Int32". Sorting the keys
+        and keeping the dictionaries untouched avoids the wrapper entirely.
+
+        Ordinal comparison, because Python sorts by code point and a culture-aware sort
+        would order two manifests differently on two machines for the same tree.
+    #>
+    param(
+        [System.Collections.Generic.List[object]] $Items,
+        [string[]] $Fields
+    )
+    $keys = [System.Collections.Generic.List[string]]::new()
+    for ($index = 0; $index -lt $Items.Count; $index++) {
+        $dictionary = [System.Collections.IDictionary]$Items[$index]
+        $parts = [System.Collections.Generic.List[string]]::new()
+        foreach ($field in $Fields) {
+            $value = ''
+            if ($dictionary.Contains($field)) { $value = [string]$dictionary[$field] }
+            $parts.Add($value)
+        }
+        # The index is the last component, so the sort is stable and two records with equal
+        # fields keep the order they were collected in.
+        $parts.Add($index.ToString('D8', [System.Globalization.CultureInfo]::InvariantCulture))
+        # [char]0x0001 rather than the `u{0001} escape, which is PowerShell 6 syntax and
+        # a parse error on 5.1. A parse error means this file does not load at all on the
+        # platform it exists for.
+        $keys.Add([string]::Join([string][char]0x0001, $parts))
+    }
+    $sortedKeys = [string[]]$keys.ToArray()
+    [System.Array]::Sort($sortedKeys, [System.StringComparer]::Ordinal)
+
+    $out = [System.Collections.Generic.List[object]]::new()
+    foreach ($key in $sortedKeys) {
+        $pieces = $key.Split([char]0x0001)
+        $index = [int]::Parse($pieces[$pieces.Length - 1], [System.Globalization.CultureInfo]::InvariantCulture)
+        [void]$out.Add($Items[$index])
+    }
+    return ,$out
+}
+
+function Invoke-Collection {
+    <#
+    .SYNOPSIS
+        Collect everything the catalogue describes for this platform, and return the
+        manifest as an ordered dictionary ready to serialize.
+    #>
+    param(
+        [string] $Out,
+        [string] $Root,
+        [string] $TargetOs,
+        [string[]] $Agents,
+        [string[]] $User,
+        [bool] $AllUsers,
+        [bool] $IncludeSecrets,
+        [long] $MaxFileSize,
+        [int] $MaxFilesPerArtifact,
+        [bool] $DryRun,
+        [string[]] $Argv
     )
 
-    users = discover_users(args.root, args.all_users, args.user or [])
-    files_dir = None
-    if not args.dry_run:
-        files_dir = os.path.join(args.out, "files")
-        os.makedirs(files_dir, exist_ok=True)
+    $started = [DateTime]::UtcNow
 
-    entries: list = []
-    errors: list = []
-    project_roots: list = []
-    used: dict = {}
-    # Paths already decided, so a second user's glob cannot re-collect a shared file and a
-    # scan over the growing entry list is not needed for every candidate.
-    seen_paths = set()
+    $artifacts = [System.Collections.Generic.List[object]]::new()
+    foreach ($agent in $script:EmbeddedCatalogue.agents) {
+        if ($Agents -and $Agents.Count -gt 0 -and -not ($Agents -ccontains [string]$agent.agent)) { continue }
+        foreach ($artifact in $agent.artifacts) {
+            if ($artifact.os -ccontains $TargetOs) { [void]$artifacts.Add($artifact) }
+        }
+    }
+    # Most volatile first, then by id so two runs queue the same work in the same order.
+    $ordered = $artifacts | Sort-Object -Property `
+        @{ Expression = { $script:PriorityOrder.IndexOf([string]$_.collect_priority) } }, `
+        @{ Expression = { [string]$_.id }; Descending = $false }
 
-    for user in users:
-        home = user["home"]
-        if not os.path.isdir(home):
-            user["collected"] = False
-            user["reason"] = "unreadable"
+    $users = Get-ProfilesToScan -Root $Root -AllUsers $AllUsers -Named $User
+
+    $filesDir = $null
+    if (-not $DryRun) {
+        $filesDir = (Join-BundlePath $Out 'files')
+        [void][System.IO.Directory]::CreateDirectory($filesDir)
+    }
+
+    $entries = [System.Collections.Generic.List[object]]::new()
+    $errors = [System.Collections.Generic.List[object]]::new()
+    $projectRoots = [System.Collections.Generic.List[object]]::new()
+    $projectRootPaths = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    # Ordinal, not [ordered]@{}. A PowerShell ordered dictionary compares keys
+    # case-insensitively, so Mixed.md and mixed.md were one entry and one of two real files
+    # was silently dropped: exactly the case collision the bundle path mapping exists to
+    # preserve.
+    $used = [System.Collections.Specialized.OrderedDictionary]::new([System.StringComparer]::Ordinal)
+    # Paths already decided, so a second user's glob cannot re-collect a shared file.
+    $seenPaths = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+
+    # Typed, not just named. A variable whose static type is object cannot be indexed by
+    # key on an OrderedDictionary: PowerShell resolves the [int] indexer and assigning
+    # $user['collected'] fails with "Cannot convert value collected to type System.Int32".
+    # Items coming out of a List[object] are object-typed, so every dictionary taken from
+    # one is declared before it is used.
+    foreach ($userItem in $users) {
+        [System.Collections.IDictionary] $scanned = $userItem
+        $profileHome = [string]$scanned['home']
+        if (-not [System.IO.Directory]::Exists($profileHome)) {
+            $scanned['collected'] = $false
+            $scanned['reason'] = 'unreadable'
             continue
-        user["collected"] = True
-        roots = discover_project_roots(home)
-        for root in roots:
-            if all(r["path"] != root["path"] for r in project_roots):
-                project_roots.append(root)
+        }
+        $scanned['collected'] = $true
 
-        # Two passes, not one.
-        #
-        # A single file is often claimed by more than one artifact: a broad directory glob
-        # and a specific entry for one file inside it. Deciding as each match is found
-        # means whichever artifact the loop reaches first decides whether the bytes get
-        # copied, and that was a real protective failure rather than a theoretical one. A
-        # JetBrains directory glob marked normal matches the c.kdbx password database,
-        # which the catalogue marks secret, so the credential store would have been copied
-        # or withheld depending on iteration order. Resolving every claim on a path before
-        # deciding makes "secret wins" a property of the file instead.
-        matches = {}
-        for artifact in artifacts:
-            anchors = [home]
-            if artifact.get("root") in ("project", "repo_root", "plugin"):
-                anchors = [r["path"] for r in roots]
-                if not anchors:
-                    continue
-            for anchor in anchors:
-                for pattern in artifact["paths"]:
-                    concrete = pattern
-                    if artifact.get("root") in ("project", "repo_root", "plugin"):
-                        concrete = re.sub(r"^<[^>]+>", anchor.rstrip("/"), pattern)
-                    for expanded in expand_paths(concrete, home, target_os, args.root):
-                        for match in iter_matches(expanded):
-                            targets = [match]
-                            if os.path.isdir(match) and not os.path.islink(match):
-                                targets, truncated = walk_regular_files(
-                                    match, args.max_files_per_artifact
-                                )
-                                if truncated:
-                                    errors.append(
-                                        {
-                                            "path": match,
-                                            "error": "too_many_files",
-                                            "detail": "stopped after %d files; raise "
-                                            "--max-files-per-artifact"
-                                            % args.max_files_per_artifact,
-                                        }
-                                    )
-                            for target in targets:
-                                matches.setdefault(target, []).append(artifact)
+        # Named $discoveredRoot, not $root. PowerShell variable names are case-insensitive,
+        # so a loop variable called $root IS the $Root parameter: it replaced the mounted
+        # root path with a dictionary, every later pattern expanded against nothing, and the
+        # collection reported 0 hits and 917 unresolvable patterns on a tree full of
+        # evidence. Nothing warned, because assigning to a parameter is legal.
+        $roots = Get-ProjectRoots -ProfileHome $profileHome
+        foreach ($rootItem in $roots) {
+            [System.Collections.IDictionary] $discoveredRoot = $rootItem
+            if ($projectRootPaths.Add([string]$discoveredRoot['path'])) {
+                [void]$projectRoots.Add($discoveredRoot)
+            }
+        }
 
-        for target in sorted(matches):
-            if target in seen_paths:
-                continue
-            seen_paths.add(target)
-            claimants = matches[target]
-            # Attributed to the most specific claim, which is the artifact with the fewest
-            # path patterns, so a file is reported under the entry that names it rather
-            # than under a directory glob that happened to include it.
-            primary = sorted(claimants, key=lambda a: (len(a["paths"]), a["id"]))[0]
-            withhold = any(a.get("sensitivity") == "secret" for a in claimants)
-            entry = collect_file(
-                primary,
-                target,
-                home,
-                user["name"],
-                files_dir,
-                used,
-                target_os,
-                args,
-                withhold,
-            )
+        # Two passes, not one. A single file is often claimed by more than one artifact: a
+        # broad directory glob and a specific entry for one file inside it. Deciding as
+        # each match is found lets iteration order decide whether credential bytes get
+        # copied, which was a real protective failure and not a theoretical one. Resolving
+        # every claim on a path before deciding makes "secret wins" a property of the file.
+        # See ADR 0014.
+        $matches = [System.Collections.Specialized.OrderedDictionary]::new([System.StringComparer]::Ordinal)
+        foreach ($artifact in $ordered) {
+            $anchors = [System.Collections.Generic.List[string]]::new()
+            if (@('project', 'repo_root', 'plugin') -ccontains [string]$artifact.root) {
+                foreach ($anchorItem in $projectRoots) {
+                    $anchors.Add([string]([System.Collections.IDictionary]$anchorItem)['path'])
+                }
+                if ($anchors.Count -eq 0) { continue }
+            } else {
+                $anchors.Add($profileHome)
+            }
+            foreach ($anchor in $anchors) {
+                foreach ($pattern in $artifact.paths) {
+                    $concrete = [string]$pattern
+                    if (@('project', 'repo_root', 'plugin') -ccontains [string]$artifact.root) {
+                        $concrete = [regex]::Replace($concrete, '^<[^>]+>', $anchor.TrimEnd('/'))
+                    }
+                    foreach ($expanded in (Expand-CataloguePath -Pattern $concrete -ProfileHome $profileHome -TargetOs $TargetOs -Root $Root)) {
+                        foreach ($match in (Get-GlobMatches $expanded)) {
+                            $targets = [System.Collections.Generic.List[string]]::new()
+                            if ([System.IO.Directory]::Exists($match) -and -not (Test-IsSymlink $match)) {
+                                $walked = Get-RegularFilesUnder -Base $match -Limit $MaxFilesPerArtifact
+                                foreach ($file in $walked['files']) { $targets.Add([string]$file) }
+                                if ([bool]$walked['truncated']) {
+                                    $problem = [ordered]@{}
+                                    $problem['detail'] = ('stopped after {0} files; raise -MaxFilesPerArtifact' -f $MaxFilesPerArtifact)
+                                    $problem['error'] = 'too_many_files'
+                                    $problem['path'] = $match
+                                    [void]$errors.Add($problem)
+                                }
+                            } else {
+                                $targets.Add($match)
+                            }
+                            foreach ($target in $targets) {
+                                if (-not $matches.Contains($target)) {
+                                    $matches[$target] = [System.Collections.Generic.List[object]]::new()
+                                }
+                                [void]([System.Collections.Generic.List[object]]$matches[$target]).Add($artifact)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $targetsSorted = [System.Collections.Generic.List[string]]::new()
+        foreach ($key in $matches.Keys) { $targetsSorted.Add([string]$key) }
+        foreach ($target in (Sort-Ordinal $targetsSorted)) {
+            if (-not $seenPaths.Add([string]$target)) { continue }
+            $claimants = [System.Collections.Generic.List[object]]$matches[[string]$target]
+
+            # Attributed to the most specific claim, the artifact with the fewest path
+            # patterns, so a file is reported under the entry that names it rather than
+            # under a directory glob that happened to include it.
+            $primary = ($claimants | Sort-Object -Property `
+                @{ Expression = { @($_.paths).Count } }, `
+                @{ Expression = { [string]$_.id } })[0]
+
+            $withhold = $false
+            $claimantIds = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::Ordinal)
+            foreach ($claimant in $claimants) {
+                if ([string]$claimant.sensitivity -ceq 'secret') { $withhold = $true }
+                [void]$claimantIds.Add([string]$claimant.id)
+            }
+
+            $entry = Copy-ArtifactFile -Artifact $primary -Original ([string]$target) `
+                -ProfileHome $profileHome -UserName ([string]$scanned['name']) -FilesDir $filesDir `
+                -Used $used -TargetOs $TargetOs -Withhold $withhold `
+                -IncludeSecrets $IncludeSecrets -MaxFileSize $MaxFileSize -DryRun $DryRun
+
             # One artifact can claim the same path through two of its own patterns, which
             # is not a second claim and must not produce a one-element list.
-            claimant_ids = sorted({a["id"] for a in claimants})
-            if len(claimant_ids) > 1:
-                entry["artifact_ids"] = claimant_ids
-            entries.append(entry)
-            if entry["reason"] in ("permission_denied", "unreadable"):
-                errors.append(
-                    {
-                        "path": target,
-                        "error": entry["reason"],
-                        "detail": entry["artifact_id"],
-                    }
-                )
-    entries.sort(key=lambda e: (e["artifact_id"], e["original_path"]))
+            if ($claimantIds.Count -gt 1) {
+                $ids = [System.Collections.Generic.List[object]]::new()
+                foreach ($id in $claimantIds) { [void]$ids.Add($id) }
+                $entry['artifact_ids'] = $ids
+            }
+            [void]$entries.Add($entry)
 
-    offset = time.strftime("%z")
-    manifest = {
-        "format_version": FORMAT_VERSION,
-        "tool": {
-            "name": TOOL_NAME,
-            "version": TOOL_VERSION,
-            "sha256": tool_sha256(),
-            "catalogue_version": EMBEDDED_CATALOGUE.get("sha256", ""),
-        },
-        "collection": {
-            "uuid": str(uuid.uuid4()),
-            "started_utc": utc(started),
-            "finished_utc": utc(time.time()),
-            "local_timezone": (offset[:3] + ":" + offset[3:]) if offset else None,
-            "local_timezone_name": time.tzname[time.daylight and time.localtime().tm_isdst > 0],
-            "hostname": socket.gethostname(),
-            "os": target_os,
-            "os_version": platform.release(),
-            "architecture": platform.machine(),
-            "collector_user": _current_user(),
-            "elevated": hasattr(os, "geteuid") and os.geteuid() == 0,
-            "argv": [os.path.basename(sys.argv[0]), *sys.argv[1:]],
-            "include_secrets": bool(args.include_secrets),
-            "max_file_size": args.max_file_size,
-            "root": args.root,
-            "agents_filter": sorted(args.agents) if args.agents else None,
-        },
-        "users": users,
-        "project_roots": sorted(project_roots, key=lambda r: r["path"]),
-        "files": entries,
-        "counts": {
-            "hit": len(entries),
-            "collected": sum(1 for e in entries if e["collected"]),
-            "skipped": sum(1 for e in entries if not e["collected"]),
-            "errors": len(errors),
-            "refused_patterns": len(PATTERN_REFUSALS),
-        },
-        "errors": sorted(errors, key=lambda e: (e["path"], e["error"])),
-        # A pattern the collector declined to search is a hole in the coverage, so it is
-        # reported next to the errors rather than left implicit in an absent file entry.
-        "refused_patterns": sorted(PATTERN_REFUSALS, key=lambda r: (r["pattern"], r["reason"])),
+            if (@('permission_denied', 'unreadable') -ccontains [string]$entry['reason']) {
+                $problem = [ordered]@{}
+                $problem['detail'] = [string]$entry['artifact_id']
+                $problem['error'] = [string]$entry['reason']
+                $problem['path'] = [string]$target
+                [void]$errors.Add($problem)
+            }
+        }
     }
-    return manifest
 
+    $sortedEntries = Sort-DictionaryList -Items $entries -Fields @('artifact_id', 'original_path')
 
-def _current_user() -> str:
-    try:
-        return getpass.getuser()
-    except Exception:
-        return os.environ.get("USER") or "unknown"
-
-
-def tool_sha256() -> str:
-    """Hash this file as it ran, so a bundle can be tied to the exact collector build."""
-    try:
-        with open(os.path.abspath(__file__), "rb") as handle:
-            return sha256_bytes(handle.read())
-    except OSError:
-        return ""
-
-
-# --------------------------------------------------------------------- bundle writing
-
-
-def custody_record(seq: int, event: str, manifest_sha: str, prev_sha: str | None, **extra) -> dict:
-    """Build one hash-chained custody record.
-
-    Each record commits to the previous one, so removing or editing a single record breaks
-    the chain at a detectable point. This is tamper-evident, not tamper-proof: anyone who
-    can write the file can rewrite the whole chain. See docs/BUNDLE_FORMAT.md.
-    """
-    record = {
-        "seq": seq,
-        "event": event,
-        "time_utc": utc(time.time()),
-        "actor": _current_user(),
-        "host": socket.gethostname(),
-        "tool": "%s %s" % (TOOL_NAME, TOOL_VERSION),
-        "manifest_sha256": manifest_sha,
-        "prev_sha256": prev_sha,
+    $collected = 0
+    foreach ($entryItem in $sortedEntries) {
+        [System.Collections.IDictionary] $entry = $entryItem
+        if ([bool]$entry['collected']) { $collected += 1 }
     }
-    record.update(extra)
-    record["sha256"] = sha256_bytes(
-        json.dumps(record, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    )
-    return record
 
+    $sortedErrors = Sort-DictionaryList -Items $errors -Fields @('path', 'error')
 
-def write_bundle(out: str, manifest: dict) -> str:
-    manifest_text = canonical_json(manifest)
-    manifest_sha = sha256_bytes(manifest_text.encode("utf-8"))
-    with open(os.path.join(out, "manifest.json"), "w") as handle:
-        handle.write(manifest_text)
-    record = custody_record(0, "collected", manifest_sha, None)
-    with open(os.path.join(out, "chain_of_custody.jsonl"), "w") as handle:
-        handle.write(json.dumps(record, sort_keys=True) + "\n")
-    return manifest_sha
+    $sortedRefusals = Sort-DictionaryList -Items $script:PatternRefusals -Fields @('pattern', 'reason')
 
+    $sortedRoots = Sort-DictionaryList -Items $projectRoots -Fields @('path')
 
-# Fixed timestamp for the two metadata files inside the zip. The zip format cannot store
-# anything before 1980, and using the collection time would make two zips over an
-# unchanged tree differ in more places than their content.
-ZIP_METADATA_TIME = (1980, 1, 1, 0, 0, 0)
+    $userList = [System.Collections.Generic.List[object]]::new()
+    foreach ($userItem in $users) { [void]$userList.Add($userItem) }
 
-
-def write_zip(out: str, manifest: dict) -> str:
-    """Pack the bundle, in manifest order, and write a .sha256 sidecar beside it."""
-    archive = out.rstrip(os.sep) + ".zip"
-    base = os.path.basename(out.rstrip(os.sep))
-    with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as zf:
-        for name in ("manifest.json", "chain_of_custody.jsonl"):
-            info = zipfile.ZipInfo(base + "/" + name, ZIP_METADATA_TIME)
-            info.compress_type = zipfile.ZIP_DEFLATED
-            with open(os.path.join(out, name), "rb") as handle:
-                zf.writestr(info, handle.read())
-        for entry in manifest["files"]:
-            if not entry.get("bundle_path"):
-                continue
-            source = os.path.join(out, *entry["bundle_path"].split("/"))
-            if not os.path.isfile(source):
-                continue
-            st = os.stat(source)
-            info = zipfile.ZipInfo(
-                base + "/" + entry["bundle_path"], time.localtime(st.st_mtime)[:6]
-            )
-            info.compress_type = zipfile.ZIP_DEFLATED
-            with open(source, "rb") as handle:
-                zf.writestr(info, handle.read())
-    with open(archive, "rb") as handle:
-        digest = sha256_bytes(handle.read())
-    with open(archive + ".sha256", "w") as handle:
-        handle.write("%s  %s\n" % (digest, os.path.basename(archive)))
-    return archive
-
-
-# ------------------------------------------------------------------------------- CLI
-
-
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        prog=TOOL_NAME,
-        description=__doc__.strip().splitlines()[0],
-        epilog="Use requires proper authorization. Exit codes: 0 collected, 1 collected "
-        "with errors, 2 could not run, 3 nothing found.",
-    )
-    parser.add_argument("--out", help="bundle directory to create. Required unless --dry-run")
-    parser.add_argument("--zip", action="store_true", help="also write <out>.zip and a .sha256")
-    parser.add_argument("--user", action="append", metavar="NAME", help="repeatable")
-    parser.add_argument(
-        "--all-users",
-        action="store_true",
-        help="scan every profile. Needs elevation, which is recorded in the manifest",
-    )
-    parser.add_argument("--agents", action="append", metavar="KEY", help="repeatable")
-    parser.add_argument(
-        "--include-secrets",
-        action="store_true",
-        help="copy the content of credential artifacts too. Off by default: their "
-        "presence, hash and timestamps are recorded without copying the material",
-    )
-    parser.add_argument("--max-file-size", type=int, default=DEFAULT_MAX_FILE_SIZE)
-    parser.add_argument(
-        "--max-files-per-artifact", type=int, default=DEFAULT_MAX_FILES_PER_ARTIFACT
-    )
-    parser.add_argument(
-        "--root", metavar="PATH", help="collect from a mounted image or an exported profile"
-    )
-    parser.add_argument(
-        "--os",
-        choices=("macos", "linux", "windows"),
-        help="target platform, for use with --root when it differs from this machine",
-    )
-    parser.add_argument("--dry-run", action="store_true", help="list what would be collected")
-    parser.add_argument("--json", action="store_true", help="machine-readable summary on stdout")
-    parser.add_argument("--version", action="version", version="%s %s" % (TOOL_NAME, TOOL_VERSION))
-    return parser
-
-
-def main(argv: list | None = None) -> int:
-    parser = build_parser()
-    args = parser.parse_args(argv)
-
-    if not EMBEDDED_CATALOGUE.get("agents"):
-        sys.stderr.write(
-            "%s: the embedded catalogue is empty. This file was not built by "
-            "scripts/build_collectors.py.\n" % TOOL_NAME
-        )
-        return EXIT_USAGE
-
-    if not args.dry_run:
-        if not args.out:
-            parser.error("--out is required unless --dry-run is given")
-        try:
-            os.makedirs(args.out, exist_ok=True)
-        except OSError as exc:
-            sys.stderr.write("%s: cannot create %s: %s\n" % (TOOL_NAME, args.out, exc))
-            return EXIT_USAGE
-        if os.listdir(args.out):
-            sys.stderr.write(
-                "%s: %s is not empty. Refusing to write into an existing bundle, because "
-                "mixing two collections makes both unusable as evidence.\n" % (TOOL_NAME, args.out)
-            )
-            return EXIT_USAGE
-
-    if args.all_users and hasattr(os, "geteuid") and os.geteuid() != 0:
-        sys.stderr.write(
-            "%s: --all-users without elevation will miss other users' profiles. "
-            "Continuing, and recording that this run was not elevated.\n" % TOOL_NAME
-        )
-
-    manifest = run(args)
-
-    if not args.dry_run:
-        write_bundle(args.out, manifest)
-        if args.zip:
-            write_zip(args.out, manifest)
-
-    summary = {
-        "bundle": None if args.dry_run else os.path.abspath(args.out),
-        "dry_run": bool(args.dry_run),
-        "users": [u["name"] for u in manifest["users"]],
-        "project_roots": [r["path"] for r in manifest["project_roots"]],
-        "counts": manifest["counts"],
-        "by_priority": {},
+    $agentsFilter = $null
+    if ($Agents -and $Agents.Count -gt 0) {
+        $agentsFilter = [System.Collections.Generic.List[object]]::new()
+        foreach ($name in ($Agents | Sort-Object -CaseSensitive)) { [void]$agentsFilter.Add([string]$name) }
     }
-    priorities = {}
-    for agent in EMBEDDED_CATALOGUE.get("agents", []):
-        for artifact in agent.get("artifacts", []):
-            priorities[artifact["id"]] = artifact.get("collect_priority", "normal")
-    for entry in manifest["files"]:
-        key = priorities.get(entry["artifact_id"], "normal")
-        bucket = summary["by_priority"].setdefault(key, {"hit": 0, "collected": 0})
-        bucket["hit"] += 1
-        bucket["collected"] += 1 if entry["collected"] else 0
 
-    if args.json:
-        sys.stdout.write(json.dumps(summary, sort_keys=True, indent=2) + "\n")
-    else:
-        counts = manifest["counts"]
-        sys.stderr.write(
-            "%s: %d hit, %d collected, %d skipped, %d error(s)\n"
-            % (TOOL_NAME, counts["hit"], counts["collected"], counts["skipped"], counts["errors"])
-        )
-        for priority in PRIORITY_ORDER:
-            bucket = summary["by_priority"].get(priority)
-            if bucket:
-                sys.stderr.write("  %-10s %d/%d\n" % (priority, bucket["collected"], bucket["hit"]))
+    $argvList = [System.Collections.Generic.List[object]]::new()
+    foreach ($item in $Argv) { [void]$argvList.Add([string]$item) }
+
+    $offset = [DateTimeOffset]::Now.Offset
+    $offsetText = ('{0}{1:00}:{2:00}' -f $(if ($offset.Ticks -lt 0) { '-' } else { '+' }),
+        [Math]::Abs($offset.Hours), [Math]::Abs($offset.Minutes))
+
+    $counts = [ordered]@{}
+    $counts['collected'] = $collected
+    $counts['errors'] = $sortedErrors.Count
+    $counts['hit'] = $sortedEntries.Count
+    $counts['refused_patterns'] = $sortedRefusals.Count
+    $counts['skipped'] = $sortedEntries.Count - $collected
+
+    $collection = [ordered]@{}
+    $collection['agents_filter'] = $agentsFilter
+    $collection['architecture'] = (Get-Architecture)
+    $collection['argv'] = $argvList
+    $collection['collector_user'] = (Get-CollectorUser)
+    $collection['elevated'] = (Test-Elevated)
+    $collection['finished_utc'] = (Get-UtcString ([DateTime]::UtcNow))
+    $collection['hostname'] = [System.Net.Dns]::GetHostName()
+    $collection['include_secrets'] = [bool]$IncludeSecrets
+    $collection['local_timezone'] = $offsetText
+    $collection['local_timezone_name'] = [System.TimeZoneInfo]::Local.StandardName
+    $collection['max_file_size'] = [long]$MaxFileSize
+    $collection['os'] = $TargetOs
+    $collection['os_version'] = [string][System.Environment]::OSVersion.Version
+    $collection['root'] = $(if ($Root) { $Root } else { $null })
+    $collection['started_utc'] = (Get-UtcString $started)
+    $collection['uuid'] = [string]([Guid]::NewGuid())
+
+    $tool = [ordered]@{}
+    $tool['catalogue_version'] = [string]$script:EmbeddedCatalogue.sha256
+    $tool['name'] = $script:ToolName
+    $tool['sha256'] = (Get-ToolSha256)
+    $tool['version'] = $script:ToolVersion
+
+    $manifest = [ordered]@{}
+    $manifest['collection'] = $collection
+    $manifest['counts'] = $counts
+    $manifest['errors'] = $sortedErrors
+    $manifest['files'] = $sortedEntries
+    $manifest['format_version'] = $script:FormatVersion
+    $manifest['project_roots'] = $sortedRoots
+    # A pattern the collector declined to search is a hole in the coverage, so it is
+    # reported next to the errors rather than left implicit in an absent file entry.
+    $manifest['refused_patterns'] = $sortedRefusals
+    $manifest['tool'] = $tool
+    $manifest['users'] = $userList
+    return $manifest
+}
+
+function Get-Architecture {
+    <#
+    .SYNOPSIS
+        The machine architecture, without depending on a recent .NET.
+    .DESCRIPTION
+        RuntimeInformation.OSArchitecture arrived in .NET Framework 4.7.1, and an endpoint
+        still on an older 4.x is exactly the kind of machine this collector is pushed to.
+        PROCESSOR_ARCHITECTURE has been there since forever and is what the manifest needs:
+        context for reading the rest, not a precise runtime fact.
+    #>
+    try {
+        return [string][System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+    } catch {
+        $value = [System.Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITEW6432')
+        if (-not $value) { $value = [System.Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE') }
+        if (-not $value) { $value = 'unknown' }
+        return [string]$value
+    }
+}
+
+function Resolve-RelativePath {
+    <#
+    .SYNOPSIS
+        Make a path absolute against PowerShell's location, not .NET's.
+    .DESCRIPTION
+        The two differ whenever the session has changed directory, because Set-Location does
+        not touch [System.Environment]::CurrentDirectory. Every write in this file uses
+        System.IO, so without this a relative -Out lands somewhere the operator did not
+        choose, and on a live-response console that is somebody else's directory.
+    #>
+    param([string] $Path)
+    if ([System.IO.Path]::IsPathRooted($Path)) { return $Path }
+    $location = (Get-Location).ProviderPath
+    return (Join-BundlePath ([string]$location).Replace('\', '/') $Path)
+}
+
+function Test-Elevated {
+    <#
+    .SYNOPSIS
+        Is this process running with administrative rights.
+    .DESCRIPTION
+        Recorded in the manifest because it decides what the collection could see: a
+        non-elevated run cannot read another user's profile, and an empty result from one
+        is not the same finding as an empty result from an elevated run.
+    #>
+    try {
+        $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+        $principal = [System.Security.Principal.WindowsPrincipal]::new($identity)
+        return $principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
+    } catch {
+        # Not Windows, or an identity the platform will not describe. Reported as false
+        # rather than null, because the manifest field means "known to be elevated".
+        return $false
+    }
+}
+
+function Get-ToolSha256 {
+    <#
+    .SYNOPSIS
+        Hash this file as it ran, so a bundle can be tied to the exact collector build.
+    #>
+    try {
+        return (Get-Sha256OfFile $PSCommandPath)
+    } catch {
+        return ''
+    }
+}
+
+
+# ==================================================================== bundle writing
+
+function New-CustodyRecord {
+    <#
+    .SYNOPSIS
+        Build one hash-chained custody record.
+    .DESCRIPTION
+        Each record commits to the previous one, so removing or editing a single record
+        breaks the chain at a detectable point. Tamper-evident, not tamper-proof: anyone
+        who can write the file can rewrite the whole chain. See docs/BUNDLE_FORMAT.md.
+    #>
+    param([int] $Seq, [string] $EventName, [string] $ManifestSha, [string] $PrevSha)
+    $record = [ordered]@{}
+    $record['actor'] = (Get-CollectorUser)
+    $record['event'] = $EventName
+    $record['host'] = [System.Net.Dns]::GetHostName()
+    $record['manifest_sha256'] = $ManifestSha
+    $record['prev_sha256'] = $(if ($PrevSha) { $PrevSha } else { $null })
+    $record['seq'] = $Seq
+    $record['time_utc'] = (Get-UtcString ([DateTime]::UtcNow))
+    $record['tool'] = ('{0} {1}' -f $script:ToolName, $script:ToolVersion)
+    # The chain hash covers the record without its own hash field, serialized with the
+    # compact separators collect.py uses, so the two implementations chain identically.
+    $record['sha256'] = (Get-Sha256OfString (ConvertTo-CompactJson $record))
+    return $record
+}
+
+function ConvertTo-CompactJson {
+    <#
+    .SYNOPSIS
+        Serialize with no whitespace, matching Python's separators=(',', ':').
+    .DESCRIPTION
+        Used only for the custody chain hash, where the bytes being hashed have to be
+        identical in both collectors or the chains cannot be compared. The pretty form is
+        what gets written to disk.
+    #>
+    param([Parameter(Mandatory = $true)] [AllowNull()] $Value)
+    if ($null -eq $Value) { return 'null' }
+    if ($Value -is [bool]) { if ($Value) { return 'true' } else { return 'false' } }
+    if ($Value -is [string]) { return (ConvertTo-JsonString $Value) }
+    if ($Value -is [int] -or $Value -is [long] -or $Value -is [int16] -or $Value -is [byte]) {
+        return $Value.ToString([System.Globalization.CultureInfo]::InvariantCulture)
+    }
+    if ($Value -is [System.Collections.IDictionary]) {
+        $parts = [System.Collections.Generic.List[string]]::new()
+        foreach ($entry in (@($Value.GetEnumerator()) | Sort-Object -Property Key -CaseSensitive)) {
+            $parts.Add((ConvertTo-JsonString ([string]$entry.Key)) + ':' + [string](ConvertTo-CompactJson $entry.Value))
+        }
+        return '{' + [string]::Join(',', $parts) + '}'
+    }
+    if ($Value -is [System.Collections.IEnumerable]) {
+        $parts = [System.Collections.Generic.List[string]]::new()
+        foreach ($item in $Value) { $parts.Add([string](ConvertTo-CompactJson $item)) }
+        return '[' + [string]::Join(',', $parts) + ']'
+    }
+    throw "ConvertTo-CompactJson: unsupported type $($Value.GetType().FullName)"
+}
+
+function Write-Bundle {
+    <#
+    .SYNOPSIS
+        Write manifest.json and the first custody record, and return the manifest hash.
+    #>
+    param([string] $Out, [System.Collections.IDictionary] $Manifest)
+    $text = ConvertTo-CanonicalJson -Value $Manifest -Indent 0
+    $sha = Get-Sha256OfString $text
+    Write-Utf8NoBom -Path (Join-BundlePath $Out 'manifest.json') -Text $text
+    $record = New-CustodyRecord -Seq 0 -EventName 'collected' -ManifestSha $sha -PrevSha $null
+    # One record per line, because the file is JSONL and a pretty-printed record would
+    # make it unparseable line by line, which is how the verifier reads the chain.
+    Write-Utf8NoBom -Path (Join-BundlePath $Out 'chain_of_custody.jsonl') `
+        -Text ((ConvertTo-LineJson $record) + "`n")
+    return $sha
+}
+
+function ConvertTo-LineJson {
+    <#
+    .SYNOPSIS
+        Serialize onto one line, matching Python's json.dumps(sort_keys=True) defaults.
+    .DESCRIPTION
+        A third form, and each of the three has one caller. The pretty form is manifest
+        .json, the compact form is what the custody hash covers, and this one is what a
+        line of chain_of_custody.jsonl looks like. Python's default separators are ', '
+        and ': ', with the spaces, so they are here too: the file is compared between the
+        two collectors byte for byte.
+    #>
+    param([Parameter(Mandatory = $true)] [AllowNull()] $Value)
+    if ($null -eq $Value) { return 'null' }
+    if ($Value -is [bool]) { if ($Value) { return 'true' } else { return 'false' } }
+    if ($Value -is [string]) { return (ConvertTo-JsonString $Value) }
+    if ($Value -is [int] -or $Value -is [long] -or $Value -is [int16] -or $Value -is [byte]) {
+        return $Value.ToString([System.Globalization.CultureInfo]::InvariantCulture)
+    }
+    if ($Value -is [System.Collections.IDictionary]) {
+        $parts = [System.Collections.Generic.List[string]]::new()
+        foreach ($entry in (@($Value.GetEnumerator()) | Sort-Object -Property Key -CaseSensitive)) {
+            $parts.Add((ConvertTo-JsonString ([string]$entry.Key)) + ': ' + [string](ConvertTo-LineJson $entry.Value))
+        }
+        return '{' + [string]::Join(', ', $parts) + '}'
+    }
+    if ($Value -is [System.Collections.IEnumerable]) {
+        $parts = [System.Collections.Generic.List[string]]::new()
+        foreach ($item in $Value) { $parts.Add([string](ConvertTo-LineJson $item)) }
+        return '[' + [string]::Join(', ', $parts) + ']'
+    }
+    throw "ConvertTo-LineJson: unsupported type $($Value.GetType().FullName)"
+}
+
+function Write-BundleZip {
+    <#
+    .SYNOPSIS
+        Pack the bundle in manifest order and write a .sha256 sidecar beside it.
+    .DESCRIPTION
+        Entries are added in manifest order rather than in directory order so that two
+        collections of an unchanged tree produce the same archive. The two metadata files
+        get a fixed 1980 timestamp, which is the earliest the zip format can store and
+        avoids the collection time making otherwise identical archives differ.
+    #>
+    param([string] $Out, [System.Collections.IDictionary] $Manifest)
+
+    Add-Type -AssemblyName System.IO.Compression -ErrorAction SilentlyContinue
+    Add-Type -AssemblyName System.IO.Compression.FileSystem -ErrorAction SilentlyContinue
+
+    $archive = $Out.TrimEnd('/', '\') + '.zip'
+    $base = [System.IO.Path]::GetFileName($Out.TrimEnd('/', '\'))
+    $metadataTime = [DateTimeOffset]::new(1980, 1, 1, 0, 0, 0, [TimeSpan]::Zero)
+
+    if ([System.IO.File]::Exists($archive)) { [System.IO.File]::Delete($archive) }
+    $stream = [System.IO.File]::Open($archive, [System.IO.FileMode]::CreateNew)
+    $zip = $null
+    try {
+        $zip = [System.IO.Compression.ZipArchive]::new($stream, [System.IO.Compression.ZipArchiveMode]::Create)
+
+        foreach ($name in @('manifest.json', 'chain_of_custody.jsonl')) {
+            $source = Join-BundlePath $Out $name
+            $item = $zip.CreateEntry($base + '/' + $name, [System.IO.Compression.CompressionLevel]::Optimal)
+            $item.LastWriteTime = $metadataTime
+            $writer = $item.Open()
+            try {
+                $bytes = [System.IO.File]::ReadAllBytes($source)
+                $writer.Write($bytes, 0, $bytes.Length)
+            } finally {
+                $writer.Dispose()
+            }
+        }
+
+        foreach ($entryItem in $Manifest['files']) {
+            [System.Collections.IDictionary] $entry = $entryItem
+            $bundlePath = [string]$entry['bundle_path']
+            if (-not $bundlePath) { continue }
+            $source = Join-BundlePath $Out $bundlePath
+            if (-not [System.IO.File]::Exists($source)) { continue }
+            $item = $zip.CreateEntry($base + '/' + $bundlePath, [System.IO.Compression.CompressionLevel]::Optimal)
+            $item.LastWriteTime = [DateTimeOffset]::new([System.IO.File]::GetLastWriteTime($source))
+            $writer = $item.Open()
+            try {
+                $bytes = [System.IO.File]::ReadAllBytes($source)
+                $writer.Write($bytes, 0, $bytes.Length)
+            } finally {
+                $writer.Dispose()
+            }
+        }
+    } finally {
+        if ($null -ne $zip) { $zip.Dispose() }
+        $stream.Dispose()
+    }
+
+    $digest = Get-Sha256OfFile $archive
+    Write-Utf8NoBom -Path ($archive + '.sha256') `
+        -Text ('{0}  {1}{2}' -f $digest, [System.IO.Path]::GetFileName($archive), "`n")
+    return $archive
+}
+
+
+# ========================================================================== self test
+
+function Invoke-SelfTest {
+    <#
+    .SYNOPSIS
+        Serialize a fixed set of structures and print them, for comparison with Python.
+    .DESCRIPTION
+        The parity between this file's serializer and Python's json.dumps is part of the
+        bundle format, so the check belongs in the repository rather than in somebody's
+        scratch directory. tests/conformance runs this and compares each block against
+        json.dumps(sort_keys=True, indent=2, ensure_ascii=False).
+
+        The cases are the ones that have actually gone wrong: an empty array and a
+        one-element array, because PowerShell unwraps those across a function boundary; a
+        string with a backslash, because catalogue paths are full of them; non-ASCII,
+        because ensure_ascii=False must be matched rather than escaped; and control
+        characters, because Python uses short escapes for some and \uXXXX for the rest.
+    #>
+    $cases = [ordered]@{}
+
+    $mixed = [ordered]@{}
+    $mixed['b'] = 1
+    $mixed['a'] = 'two'
+    $mixed['c'] = $true
+    $mixed['d'] = $null
+    $cases['dict_mixed'] = $mixed
+
+    $cases['empty_dict'] = [ordered]@{}
+    $cases['empty_list'] = [System.Collections.Generic.List[object]]::new()
+
+    $one = [System.Collections.Generic.List[object]]::new()
+    [void]$one.Add('only')
+    $cases['one_element_list'] = $one
+
+    $innerNumbers = [System.Collections.Generic.List[object]]::new()
+    [void]$innerNumbers.Add(1)
+    [void]$innerNumbers.Add(2)
+    $innerStrings = [System.Collections.Generic.List[object]]::new()
+    [void]$innerStrings.Add('x')
+    $innerDict = [ordered]@{}
+    $innerDict['k'] = $innerStrings
+    $nested = [System.Collections.Generic.List[object]]::new()
+    [void]$nested.Add($innerNumbers)
+    [void]$nested.Add($innerDict)
+    $cases['nested'] = $nested
+
+    $cases['unicode'] = 'Grüezi ünd ãçcents 日本語 emoji'
+    $cases['control'] = "tab`there`nnewline`r`bback`fform"
+    $cases['quotes'] = 'he said "hi" and C:\path\to'
+
+    $numbers = [System.Collections.Generic.List[object]]::new()
+    foreach ($n in @(0, 1, -1, 268435456)) { [void]$numbers.Add([int]$n) }
+    [void]$numbers.Add([long]9007199254740991)
+    $cases['numbers'] = $numbers
+
+    $bools = [System.Collections.Generic.List[object]]::new()
+    [void]$bools.Add($true)
+    [void]$bools.Add($false)
+    $cases['bools'] = $bools
+
+    $nulls = [System.Collections.Generic.List[object]]::new()
+    [void]$nulls.Add($null)
+    [void]$nulls.Add('x')
+    [void]$nulls.Add($null)
+    $cases['nulls_in_list'] = $nulls
+
+    # Written to the console rather than to the output stream. A function that both emits
+    # with Write-Output and returns a value returns all of it as one collection, and the
+    # caller then passes that array to exit, which printed nothing and exited 0.
+    foreach ($entry in $cases.GetEnumerator()) {
+        [Console]::Out.Write('===' + [string]$entry.Key + "`n")
+        [Console]::Out.Write([string](ConvertTo-CanonicalJson -Value $entry.Value -Indent 0) + "`n")
+    }
+    return $script:ExitOk
+}
+
+
+# =============================================================================== main
+
+function Invoke-Main {
+    if ($Version) {
+        [Console]::Out.Write(('{0} {1}{2}' -f $script:ToolName, $script:ToolVersion, "`n"))
+        return $script:ExitOk
+    }
+
+    if ($SelfTest) { return (Invoke-SelfTest) }
+
+    if ($script:EmbeddedCatalogue.agents.Count -eq 0) {
+        # A collector with no catalogue would report a clean host for every machine it ran
+        # on, which is the worst possible failure, so it refuses to run at all.
+        [Console]::Error.Write(("{0}: the embedded catalogue is empty or failed to parse. " -f $script:ToolName) +
+            "Rebuild with scripts/build_collectors.py.`n")
+        return $script:ExitUsage
+    }
+
+    $targetOs = $TargetOs
+    if (-not $targetOs) {
+        $targetOs = 'windows'
+        if ([System.Environment]::OSVersion.Platform -ceq 'Unix') {
+            # Running this file on a POSIX host happens in the differential test and
+            # nowhere else, but guessing 'windows' there would search paths that cannot
+            # exist and report a clean host.
+            $targetOs = 'linux'
+            if ([System.IO.Directory]::Exists('/System/Library')) { $targetOs = 'macos' }
+        }
+    }
+
+    if (-not $DryRun) {
+        if (-not $Out) {
+            [Console]::Error.Write(("{0}: -Out is required unless -DryRun is given.`n" -f $script:ToolName))
+            return $script:ExitUsage
+        }
+        if ([System.IO.Directory]::Exists($Out)) {
+            $existing = @([System.IO.Directory]::GetFileSystemEntries($Out))
+            if ($existing.Count -gt 0) {
+                # Never write into a directory that already holds something. Merging two
+                # collections into one bundle would produce a manifest that describes
+                # neither, and the hashes would still verify.
+                [Console]::Error.Write(("{0}: {1} is not empty. Give an empty or new " -f $script:ToolName, $Out) +
+                    "directory so one bundle is one collection.`n")
+                return $script:ExitUsage
+            }
+        } else {
+            [void][System.IO.Directory]::CreateDirectory($Out)
+        }
+    }
+
+    # Resolved to absolute before anything is written. PowerShell's current location and
+    # .NET's current directory are two different things, and every write in this file goes
+    # through System.IO, so a relative -Out would put the manifest in one place and the
+    # collected files in another.
+    $normalizedOut = ''
+    if ($Out) {
+        $normalizedOut = ([string]([System.IO.Path]::GetFullPath((Resolve-RelativePath $Out)))).Replace('\', '/').TrimEnd('/')
+    }
+    $normalizedRoot = ''
+    if ($Root) {
+        $normalizedRoot = ([string]([System.IO.Path]::GetFullPath((Resolve-RelativePath $Root)))).Replace('\', '/').TrimEnd('/')
+    }
+
+    $argv = [System.Collections.Generic.List[string]]::new()
+    $argv.Add($script:ToolName)
+    foreach ($arg in $script:RawArguments) { $argv.Add([string]$arg) }
+
+    $manifest = Invoke-Collection -Out $normalizedOut -Root $normalizedRoot -TargetOs $targetOs `
+        -Agents $Agents -User $User -AllUsers ([bool]$AllUsers) `
+        -IncludeSecrets ([bool]$IncludeSecrets) -MaxFileSize $MaxFileSize `
+        -MaxFilesPerArtifact $MaxFilesPerArtifact -DryRun ([bool]$DryRun) -Argv $argv
+
+    $archive = $null
+    if (-not $DryRun) {
+        [void](Write-Bundle -Out $normalizedOut -Manifest $manifest)
+        if ($Zip) { $archive = Write-BundleZip -Out $normalizedOut -Manifest $manifest }
+    }
+
+    $counts = $manifest['counts']
+
+    # The same summary collect.py prints, field for field, because a fleet sweep that
+    # pipes -Json into something else must not have to know which collector ran.
+    $priorities = [System.Collections.Specialized.OrderedDictionary]::new([System.StringComparer]::Ordinal)
+    foreach ($agent in $script:EmbeddedCatalogue.agents) {
+        foreach ($artifact in $agent.artifacts) {
+            $priorities[[string]$artifact.id] = [string]$artifact.collect_priority
+        }
+    }
+    $byPriority = [System.Collections.Specialized.OrderedDictionary]::new([System.StringComparer]::Ordinal)
+    foreach ($entryItem in $manifest['files']) {
+        [System.Collections.IDictionary] $entry = $entryItem
+        $key = 'normal'
+        if ($priorities.Contains([string]$entry['artifact_id'])) {
+            $key = [string]$priorities[[string]$entry['artifact_id']]
+        }
+        if (-not $byPriority.Contains($key)) {
+            $bucket = [ordered]@{}
+            $bucket['collected'] = 0
+            $bucket['hit'] = 0
+            $byPriority[$key] = $bucket
+        }
+        [System.Collections.IDictionary] $bucket = $byPriority[$key]
+        $bucket['hit'] = [int]$bucket['hit'] + 1
+        if ([bool]$entry['collected']) { $bucket['collected'] = [int]$bucket['collected'] + 1 }
+    }
+
+    $userNames = [System.Collections.Generic.List[object]]::new()
+    foreach ($entryItem in $manifest['users']) {
+        [void]$userNames.Add([string]([System.Collections.IDictionary]$entryItem)['name'])
+    }
+    $rootPaths = [System.Collections.Generic.List[object]]::new()
+    foreach ($entryItem in $manifest['project_roots']) {
+        [void]$rootPaths.Add([string]([System.Collections.IDictionary]$entryItem)['path'])
+    }
+
+    if ($Json) {
+        $summary = [ordered]@{}
+        $summary['bundle'] = $(if ($DryRun) { $null } else { $normalizedOut })
+        $summary['by_priority'] = $byPriority
+        $summary['counts'] = $counts
+        $summary['dry_run'] = [bool]$DryRun
+        $summary['project_roots'] = $rootPaths
+        $summary['users'] = $userNames
+        [Console]::Out.Write((ConvertTo-CanonicalJson -Value $summary -Indent 0) + "`n")
+    } else {
+        [Console]::Error.Write(('{0}: {1} hit, {2} collected, {3} skipped, {4} error(s){5}' -f
+            $script:ToolName, $counts['hit'], $counts['collected'], $counts['skipped'],
+            $counts['errors'], "`n"))
         # Said on the terminal, not only in the manifest. An analyst who reads the summary
-        # line and nothing else would otherwise take a clean run as full coverage, when
-        # some of the catalogue could not be resolved on this host.
-        if counts.get("refused_patterns"):
-            sys.stderr.write(
-                "  %d pattern(s) not searched, see refused_patterns in the manifest\n"
-                % counts["refused_patterns"]
-            )
-        if not args.dry_run:
-            sys.stderr.write("  bundle: %s\n" % os.path.abspath(args.out))
+        # line and nothing else would otherwise take a clean run as full coverage.
+        foreach ($priority in $script:PriorityOrder) {
+            if (-not $byPriority.Contains($priority)) { continue }
+            [System.Collections.IDictionary] $bucket = $byPriority[$priority]
+            [Console]::Error.Write(('  {0,-10} {1}/{2}{3}' -f $priority,
+                $bucket['collected'], $bucket['hit'], "`n"))
+        }
+        if ([int]$counts['refused_patterns'] -gt 0) {
+            [Console]::Error.Write(('  {0} pattern(s) not searched, see refused_patterns in the manifest{1}' -f
+                $counts['refused_patterns'], "`n"))
+        }
+        if (-not $DryRun) {
+            [Console]::Error.Write(('  bundle: {0}{1}' -f $normalizedOut, "`n"))
+        }
+    }
 
-    if manifest["counts"]["hit"] == 0:
+    if ([int]$counts['hit'] -eq 0) {
         # Distinct from failure on purpose: a host with no agent artifacts is a valid and
         # useful result, and a fleet sweep that cannot tell the two apart draws a wrong
         # picture of where agents are in use.
-        return EXIT_NOTHING_FOUND
-    if manifest["counts"]["errors"]:
-        return EXIT_ERRORS
-    return EXIT_OK
+        return $script:ExitNothingFound
+    }
+    if ([int]$counts['errors'] -gt 0) { return $script:ExitErrors }
+    return $script:ExitOk
+}
 
-
-if __name__ == "__main__":
-    sys.exit(main())
+# Dot-sourcing this file defines its functions without running a collection, which is what
+# the differential test and the parity check do. $PSCommandPath is set either way, so the
+# guard is on the invocation name instead.
+if ($MyInvocation.InvocationName -cne '.' -and -not $script:Sourced) {
+    exit (Invoke-Main)
+}

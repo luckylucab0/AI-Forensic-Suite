@@ -67,7 +67,29 @@ python3 collect.py --dry-run --json
 ```
 
 Windows, PowerShell 5.1 or newer, no modules: `collect.ps1` takes the same options as
-parameters. It is not in this repository yet.
+PowerShell parameters, so `--out` is `-Out`, `--all-users` is `-AllUsers`, `--dry-run` is
+`-DryRun` and `--os` is `-TargetOs`.
+
+```powershell
+# The usual case: the profile of the logged-on user
+powershell -ExecutionPolicy Bypass -File collect.ps1 -Out C:\case-001
+
+# Every profile on the machine. Needs an elevated session, which the manifest records
+powershell -ExecutionPolicy Bypass -File collect.ps1 -Out C:\case-001 -AllUsers -Zip
+
+# A mounted image, collected on an analyst workstation
+powershell -ExecutionPolicy Bypass -File collect.ps1 -Out .\bundle -Root E:\ -TargetOs windows
+
+# See what would be collected, without reading or writing anything
+powershell -ExecutionPolicy Bypass -File collect.ps1 -DryRun -Json
+```
+
+The two collectors produce the same bundle format, and CI proves it rather than asserting
+it: both run over one synthetic profile and their manifests are compared field by field,
+with only the fields under "Fields allowed to differ" in `docs/BUNDLE_FORMAT.md`
+normalized away. `collect.ps1 -SelfTest` prints a fixed set of structures through its JSON
+serializer, and CI checks those against Python's `json.dumps` byte for byte on real
+Windows PowerShell 5.1.
 
 Exit codes are part of the interface, because this gets driven from scripts and from
 live-response sessions where the exit code is the only signal:

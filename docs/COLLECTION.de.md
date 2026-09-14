@@ -69,7 +69,30 @@ python3 collect.py --dry-run --json
 ```
 
 Windows, PowerShell 5.1 oder neuer, ohne Module: `collect.ps1` bietet dieselben Optionen
-als Parameter. Sie liegt noch nicht in diesem Repository.
+als PowerShell-Parameter, aus `--out` wird also `-Out`, aus `--all-users` `-AllUsers`, aus
+`--dry-run` `-DryRun` und aus `--os` `-TargetOs`.
+
+```powershell
+# Der Normalfall: das Profil der angemeldeten Person
+powershell -ExecutionPolicy Bypass -File collect.ps1 -Out C:\case-001
+
+# Alle Profile der Maschine. Braucht eine erhöhte Sitzung, was das Manifest festhält
+powershell -ExecutionPolicy Bypass -File collect.ps1 -Out C:\case-001 -AllUsers -Zip
+
+# Ein eingebundenes Abbild, auf einer Analyse-Workstation gesammelt
+powershell -ExecutionPolicy Bypass -File collect.ps1 -Out .\bundle -Root E:\ -TargetOs windows
+
+# Anzeigen, was gesammelt würde, ohne zu lesen und ohne zu schreiben
+powershell -ExecutionPolicy Bypass -File collect.ps1 -DryRun -Json
+```
+
+Beide Collectors erzeugen dasselbe Bundle-Format, und die CI weist das nach statt es zu
+behaupten: beide laufen über ein synthetisches Profil, und ihre Manifeste werden Feld für
+Feld verglichen, wobei nur die Felder unter "Felder, die zwischen den beiden Collectors
+abweichen dürfen" in `docs/BUNDLE_FORMAT.de.md` normalisiert werden. `collect.ps1
+-SelfTest` gibt einen festen Satz Strukturen durch den eigenen JSON-Serialisierer aus, und
+die CI vergleicht die auf echtem Windows PowerShell 5.1 Byte für Byte mit dem Ergebnis von
+Pythons `json.dumps`.
 
 Die Rückgabewerte sind Teil der Schnittstelle, denn das wird aus Skripten und aus
 Live-Response-Sitzungen aufgerufen, wo der Rückgabewert das einzige Signal ist:

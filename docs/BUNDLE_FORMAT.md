@@ -248,6 +248,8 @@ these and nothing else.
 | `original_path` separators | As the platform reports them, so `\` on Windows |
 | Path case | A case-insensitive source reports the case the filesystem stores, which need not match the case a glob used |
 | `users[].home` | Different layouts per platform |
+| `collection.elevated` | Administrator on Windows, uid 0 on Unix. Only the collector running on the platform can answer it, so a cross-platform comparison of this field compares two different questions |
+| `collection.local_timezone_name` | The operating system's own name for the zone. `UTC` on Unix and `Coordinated Universal Time` on Windows for the same zone; `collection.local_timezone`, the offset, is the field to reconcile timestamps with |
 
 ## Exit codes
 

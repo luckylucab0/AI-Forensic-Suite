@@ -185,6 +185,8 @@ normalisiert genau diese und nichts sonst.
 | Trenner in `original_path` | So, wie die Plattform sie meldet, unter Windows also `\` |
 | Gross- und Kleinschreibung in Pfaden | Eine Quelle ohne Unterscheidung meldet die Schreibweise, die das Dateisystem gespeichert hat, und die muss nicht der Schreibweise des Globs entsprechen |
 | `users[].home` | Je Plattform anderer Aufbau |
+| `collection.elevated` | Administrator unter Windows, uid 0 unter Unix. Nur der Collector, der auf der jeweiligen Plattform läuft, kann das beantworten, ein plattformübergreifender Vergleich dieses Feldes vergleicht also zwei verschiedene Fragen |
+| `collection.local_timezone_name` | Der Name, den das Betriebssystem der Zone gibt. Für dieselbe Zone `UTC` unter Unix und `Coordinated Universal Time` unter Windows; zum Abgleich von Zeitstempeln dient `collection.local_timezone`, der Offset |
 
 ## Rückgabewerte
 

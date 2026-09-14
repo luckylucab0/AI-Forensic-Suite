@@ -28,10 +28,57 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "tests" / "fixtures"))
 
 from generate import build_home  # noqa: E402
+from selftest_cases import compare  # noqa: E402
 
 from agentforensics.bundle import verify_bundle  # noqa: E402
 
 COLLECT_PY = REPO_ROOT / "collector" / "collect.py"
+COLLECT_PS1 = REPO_ROOT / "collector" / "collect.ps1"
+
+# The interpreter to run collect.ps1 with. powershell.exe first, because that is Windows
+# PowerShell 5.1 and the only thing that proves the collector runs where it is meant to:
+# pwsh is PowerShell 7 and differs in ways this file documents. pwsh is still worth using,
+# since it catches logic errors on any platform, and the CI matrix runs the 5.1 job.
+POWERSHELL_CANDIDATES = ("powershell.exe", "powershell", "pwsh", "/opt/pwsh/pwsh")
+
+
+def find_powershell() -> str | None:
+    # AFX_POWERSHELL pins the interpreter, which the Windows CI job uses so the suite
+    # cannot quietly fall back to pwsh and report a pass for the wrong runtime.
+    pinned = os.environ.get("AFX_POWERSHELL")
+    if pinned:
+        found = shutil.which(pinned)
+        return str(found) if found else pinned
+    for candidate in POWERSHELL_CANDIDATES:
+        found = shutil.which(candidate) if "/" not in candidate else candidate
+        if found and Path(found).exists():
+            return str(found)
+        if found and shutil.which(found):
+            return str(found)
+    return None
+
+
+POWERSHELL = find_powershell()
+
+# collect.ps1 takes PowerShell parameters, collect.py takes POSIX options. One translation
+# table here keeps every test written once, against the format rather than against a
+# command line.
+PS1_OPTIONS = {
+    "--out": "-Out",
+    "--root": "-Root",
+    "--os": "-TargetOs",
+    "--zip": "-Zip",
+    "--dry-run": "-DryRun",
+    "--json": "-Json",
+    "--all-users": "-AllUsers",
+    "--include-secrets": "-IncludeSecrets",
+    "--user": "-User",
+    "--agents": "-Agents",
+    "--max-file-size": "-MaxFileSize",
+    "--max-files-per-artifact": "-MaxFilesPerArtifact",
+    "--version": "-Version",
+    "--selftest": "-SelfTest",
+}
 
 # Fields that are allowed to differ between two runs, or between the two collectors. This
 # list is part of the specification: see docs/BUNDLE_FORMAT.md, "Fields allowed to differ".
@@ -58,9 +105,26 @@ def run_collect_py(args: list[str]) -> subprocess.CompletedProcess[str]:
     )
 
 
-# Each entry is (name, runner). One today, two once the PowerShell collector lands.
+def run_collect_ps1(args: list[str]) -> subprocess.CompletedProcess[str]:
+    """Run collect.ps1 with the same arguments the Python collector takes."""
+    if POWERSHELL is None:
+        raise RuntimeError("no PowerShell interpreter available")
+    translated: list[str] = []
+    for arg in args:
+        translated.append(PS1_OPTIONS.get(arg, arg))
+    return subprocess.run(
+        [POWERSHELL, "-NoLogo", "-NoProfile", "-File", str(COLLECT_PS1), *translated],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
+
+
+# Each entry is (name, runner). Every test written against this list runs against both
+# implementations, so the format is what is tested rather than either collector.
 COLLECTORS: list[tuple[str, Callable[[list[str]], subprocess.CompletedProcess[str]]]] = [
     ("collect.py", run_collect_py),
+    ("collect.ps1", run_collect_ps1),
 ]
 
 
@@ -444,11 +508,93 @@ def test_collector_produces_a_verifiable_bundle(
     Parameterised so the PowerShell collector joins the suite by being added to
     COLLECTORS, rather than by getting a second set of assertions that can drift.
     """
+    if name.endswith(".ps1") and POWERSHELL is None:
+        pytest.skip("no PowerShell interpreter available")
     out = tmp_path / ("bundle-" + name.replace(".", "-"))
     result = runner(["--out", str(out), "--root", str(synthetic_home), "--os", "linux"])
     assert result.returncode == 0, result.stderr
     report = verify_bundle(out)
     assert report.ok, report.summary()
+
+
+def test_the_two_collectors_agree_on_the_same_tree(synthetic_home: Path, tmp_path: Path) -> None:
+    """The differential test, and the reason the bundle format is written down.
+
+    Two implementations of one format drift silently: each is self-consistent, each
+    verifies, and an analyst comparing a Windows bundle with a macOS one sees differences
+    that are artefacts of the collector rather than facts about the endpoints. So the two
+    are run over the same tree and their manifests compared field by field, with only the
+    fields docs/BUNDLE_FORMAT.md lists as allowed to differ normalized away.
+
+    Every real bug this found was of that kind: a culture-aware sort putting a
+    case-collision suffix on the other file of a pair, a case-insensitive dictionary losing
+    one of two names differing only in case, and a symlink described by its own metadata
+    instead of its target's.
+    """
+    if POWERSHELL is None:
+        pytest.skip("no PowerShell interpreter available")
+
+    py_out = tmp_path / "differential-py"
+    ps_out = tmp_path / "differential-ps1"
+    for runner, out in ((run_collect_py, py_out), (run_collect_ps1, ps_out)):
+        result = runner(["--out", str(out), "--root", str(synthetic_home), "--os", "linux"])
+        assert result.returncode == 0, result.stderr
+
+    py_manifest = json.loads((py_out / "manifest.json").read_text(encoding="utf-8"))
+    ps_manifest = json.loads((ps_out / "manifest.json").read_text(encoding="utf-8"))
+
+    # Per-file: everything except the three timestamps the platforms genuinely disagree on.
+    per_file_allowed = {"birthtime_utc", "ctime_utc", "atime_utc"}
+    py_files = {e["original_path"]: e for e in py_manifest["files"]}
+    ps_files = {e["original_path"]: e for e in ps_manifest["files"]}
+    assert set(py_files) == set(ps_files), (
+        "the collectors found different files: "
+        f"only python={sorted(set(py_files) - set(ps_files))} "
+        f"only powershell={sorted(set(ps_files) - set(py_files))}"
+    )
+    for path in sorted(py_files):
+        left = {k: v for k, v in py_files[path].items() if k not in per_file_allowed}
+        right = {k: v for k, v in ps_files[path].items() if k not in per_file_allowed}
+        assert left == right, f"{path} differs between the collectors"
+
+    # Everything else that is not a platform fact or a per-run value.
+    for section in ("counts", "errors", "refused_patterns", "project_roots", "users"):
+        assert py_manifest[section] == ps_manifest[section], section
+    assert py_manifest["format_version"] == ps_manifest["format_version"]
+
+    allowed_collection = VOLATILE_COLLECTION_FIELDS | {"os", "local_timezone_name"}
+    left = {k: v for k, v in py_manifest["collection"].items() if k not in allowed_collection}
+    right = {k: v for k, v in ps_manifest["collection"].items() if k not in allowed_collection}
+    assert left == right
+
+    # The catalogue hash has to be the same, or the two were built from different data and
+    # nothing above proves anything.
+    assert py_manifest["tool"]["catalogue_version"] == ps_manifest["tool"]["catalogue_version"]
+
+    # And both bundles verify with the one verifier.
+    for out in (py_out, ps_out):
+        report = verify_bundle(out)
+        assert report.ok, report.summary()
+
+
+def test_the_powershell_serializer_matches_python_byte_for_byte() -> None:
+    """The manifest is compared between the collectors, so the JSON has to agree exactly.
+
+    collect.ps1 carries a hand-written serializer because ConvertTo-Json differs from
+    Python in key order, indentation, non-ASCII escaping and number rendering, and defaults
+    to -Depth 2 on PowerShell 5.1, which silently flattens nested structures into type
+    names. -SelfTest prints a fixed set of structures so that claim is checked rather than
+    taken on trust.
+
+    The expectations live in selftest_cases.py because the Windows CI job checks the same
+    output from real 5.1 through check_selftest.py, and two copies would drift.
+    """
+    if POWERSHELL is None:
+        pytest.skip("no PowerShell interpreter available")
+    result = run_collect_ps1(["--selftest"])
+    assert result.returncode == 0, result.stderr
+    problems = compare(result.stdout)
+    assert not problems, "\n".join(problems)
 
 
 def test_collector_runs_on_python_38(synthetic_home: Path, tmp_path: Path) -> None:
