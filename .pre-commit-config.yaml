@@ -29,10 +29,15 @@ repos:
         exclude: '\.md$'
       - id: detect-private-key
 
+  # Pinned to the ruff version in uv.lock, which is what CI runs. The two formatters
+  # disagreeing is not a cosmetic problem: the hook rewrites a file, CI rejects what the
+  # hook wrote, and whichever ran last decides what is committed.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
+    rev: v0.16.7
     hooks:
-      - id: ruff
+      # ruff-check, not the ruff alias: the alias still works but is deprecated, and a
+      # hook that warns today is a hook that fails on a later bump.
+      - id: ruff-check
         args: ["--fix"]
       - id: ruff-format
 
@@ -68,6 +73,13 @@ repos:
         language: system
         pass_filenames: false
         files: '^(catalog/|docs/locales/|scripts/gen_artifact_docs\.py)'
+
+      - id: embedded-catalogue
+        name: embedded catalogue current in both collectors
+        entry: uv run python scripts/build_collectors.py --check
+        language: system
+        pass_filenames: false
+        files: '^(catalog/|collector/|scripts/build_collectors\.py)'
 
       - id: catalogue-schema
         name: catalogue validates against its schema

@@ -84,6 +84,12 @@ jobs:
       - name: Generated artifact documentation current with the catalogue
         run: uv run python scripts/gen_artifact_docs.py --check
 
+      # The check that decides whether a collection looks for artifacts where they are or
+      # where they used to be. A stale embedded catalogue produces a bundle that is missing
+      # evidence without anything in it saying so.
+      - name: Embedded catalogue current in both collectors
+        run: uv run python scripts/build_collectors.py --check
+
   legacy-interpreter:
     name: Python 3.8 compatibility
     runs-on: ubuntu-latest
