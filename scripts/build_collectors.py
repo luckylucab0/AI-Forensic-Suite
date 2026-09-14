@@ -83,7 +83,18 @@ def render_json(payload: dict) -> str:
     the kind of thing that changes without anyone thinking about the quoting of a generated
     file, and a broken collector is found at collection time, on someone's evidence.
     """
-    body = json.dumps(payload, sort_keys=True, indent=4, ensure_ascii=False)
+    # ensure_ascii=True, which is not about the manifest. The manifest is written at
+    # collection time and stays UTF-8; this is the literal embedded in a collector's own
+    # source. Windows PowerShell 5.1 reads a script with no byte order mark as the ANSI
+    # code page, so one catalogue path with a non-ASCII character in it would be parsed as
+    # something else and the collector would search a path that does not exist, on the
+    # platform most endpoints run, with nothing saying so. Escapes cost readability in a
+    # generated block and remove the failure mode.
+    #
+    # The catalogue hash is unaffected: it is computed over the payload with fixed
+    # separators in catalogue_payload, not over this rendering, so both collectors still
+    # report the same catalogue_version and still embed the same data.
+    body = json.dumps(payload, sort_keys=True, indent=4, ensure_ascii=True)
     if '"""' in body:
         raise SystemExit(
             "build-collectors: the catalogue contains a triple quote, which would end the "

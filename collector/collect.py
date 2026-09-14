@@ -6751,6 +6751,23 @@ def refuse_pattern(pattern, expanded, reason):
     return []
 
 
+def substitute_anchor(pattern: str, anchor: str) -> str:
+    """Replace a leading <placeholder> with a discovered working copy, literally.
+
+    Not re.sub. A replacement string in re.sub interprets backslash escapes, and a project
+    root on Windows is "C:\\Users\\alice\\src\\app": the \\U is not a valid escape and
+    re.sub raises. The collection then died the moment any project root was discovered, on
+    the platform most endpoints run, before the manifest had been written.
+
+    Matching and slicing has no such interpretation and cannot fail on the content of a
+    path.
+    """
+    match = re.match(r"^<[^>]+>", pattern)
+    if not match:
+        return pattern
+    return anchor.rstrip("/\\") + pattern[match.end() :]
+
+
 def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> list[str]:
     """Turn one catalogue path pattern into concrete glob patterns on this filesystem.
 
@@ -7248,16 +7265,15 @@ def run(args: argparse.Namespace) -> dict:
         # deciding makes "secret wins" a property of the file instead.
         matches = {}
         for artifact in artifacts:
+            is_project = artifact.get("root") in ("project", "repo_root", "plugin")
             anchors = [home]
-            if artifact.get("root") in ("project", "repo_root", "plugin"):
+            if is_project:
                 anchors = [r["path"] for r in roots]
                 if not anchors:
                     continue
             for anchor in anchors:
                 for pattern in artifact["paths"]:
-                    concrete = pattern
-                    if artifact.get("root") in ("project", "repo_root", "plugin"):
-                        concrete = re.sub(r"^<[^>]+>", anchor.rstrip("/"), pattern)
+                    concrete = substitute_anchor(pattern, anchor) if is_project else pattern
                     for expanded in expand_paths(concrete, home, target_os, args.root):
                         for match in iter_matches(expanded):
                             targets = [match]

@@ -59,3 +59,26 @@ def test_the_project_directory_name_uses_the_documented_encoding(tmp_path: Path)
     assert expected in names, f"expected the encoding of the working copy path, got {names}"
     for name in names:
         assert re.fullmatch(r"[A-Za-z0-9-]+", name), name
+
+
+def test_both_collectors_are_pure_ascii() -> None:
+    """A collector with a byte above 127 in it is misparsed on Windows PowerShell 5.1.
+
+    5.1 reads a script file with no byte order mark as the machine's ANSI code page rather
+    than as UTF-8, so one non-ASCII character becomes two. That broke the serializer parity
+    check with U+00C3 where U+00FC belonged, and it would equally corrupt a catalogue path
+    that happened to contain a non-ASCII character: the collector would search somewhere
+    that does not exist and report a clean host.
+
+    A byte order mark would also fix it and is worse. These files get pasted into
+    live-response consoles and piped through EDR tooling, and a tool that misparses its own
+    source when a BOM is lost in transit is a hazard. ASCII has no such dependency.
+    """
+    for name in ("collector/collect.py", "collector/collect.ps1"):
+        raw = (REPO_ROOT / name).read_bytes()
+        offending = [(index, byte) for index, byte in enumerate(raw) if byte > 127]
+        assert not offending, (
+            f"{name} has {len(offending)} byte(s) above 127, first at offset "
+            f"{offending[0][0] if offending else 0}"
+        )
+        assert not raw.startswith(b"\xef\xbb\xbf"), f"{name} has a UTF-8 byte order mark"

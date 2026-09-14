@@ -37,6 +37,9 @@
         [ordered]@{} and the serializer sorts keys anyway.
       * Date formatting is culture dependent, so every timestamp uses InvariantCulture.
       * MAX_PATH truncates long paths, so file access uses the \\?\ prefix where needed.
+      * A script file with no byte order mark is read as the machine's ANSI code page, not
+        as UTF-8, so a non-ASCII character in this file would be parsed as two. This file
+        therefore contains no byte above 127 at all, and a test enforces that.
       * A one-element array returned from a function is unwrapped to the element and an
         empty one becomes $null, which would serialize a one-file manifest as an object and
         a no-file manifest as null. Every array-valued field is a List[object] built in
@@ -7943,7 +7946,15 @@ function Invoke-Collection {
                 foreach ($pattern in $artifact.paths) {
                     $concrete = [string]$pattern
                     if (@('project', 'repo_root', 'plugin') -ccontains [string]$artifact.root) {
-                        $concrete = [regex]::Replace($concrete, '^<[^>]+>', $anchor.TrimEnd('/'))
+                        # Matched and sliced rather than passed to Replace. A .NET
+                        # replacement string interprets $ as a group reference, and a
+                        # directory name may contain one; the Python side had the same
+                        # shape and re.sub interprets backslashes, which killed the whole
+                        # collection on the first Windows project root it found.
+                        $anchorMatch = [regex]::Match($concrete, '^<[^>]+>')
+                        if ($anchorMatch.Success) {
+                            $concrete = $anchor.TrimEnd('/', '\') + $concrete.Substring($anchorMatch.Length)
+                        }
                     }
                     foreach ($expanded in (Expand-CataloguePath -Pattern $concrete -ProfileHome $profileHome -TargetOs $TargetOs -Root $Root)) {
                         foreach ($match in (Get-GlobMatches $expanded)) {
@@ -8382,7 +8393,22 @@ function Invoke-SelfTest {
     [void]$nested.Add($innerDict)
     $cases['nested'] = $nested
 
-    $cases['unicode'] = 'Grüezi ünd ãçcents 日本語 emoji'
+    # Built from code points rather than written as literal characters, so that this file
+    # contains no byte above 127 anywhere.
+    #
+    # Windows PowerShell 5.1 reads a script file with no byte order mark as the machine's
+    # ANSI code page, not as UTF-8. A literal 'Gruezi' with an umlaut was therefore parsed
+    # as two characters, the serializer faithfully emitted both, and the parity check
+    # failed against Python with U+00C3 where U+00FC belonged. A byte order mark would also
+    # fix it, and is worse: this collector is pasted into live-response consoles and piped
+    # through EDR tooling, and a tool that misparses its own source when a BOM is lost in
+    # transit is a hazard. ASCII has no such dependency.
+    $unicodeCase = -join @(
+        'Gr', [char]0x00FC, 'ezi ', [char]0x00FC, 'nd ',
+        [char]0x00E3, [char]0x00E7, 'cents ',
+        [char]0x65E5, [char]0x672C, [char]0x8A9E, ' emoji'
+    )
+    $cases['unicode'] = $unicodeCase
     $cases['control'] = "tab`there`nnewline`r`bback`fform"
     $cases['quotes'] = 'he said "hi" and C:\path\to'
 

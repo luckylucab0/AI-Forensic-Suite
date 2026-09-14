@@ -262,16 +262,44 @@ def test_every_artifact_resolves_to_at_least_one_pattern_per_declared_os(
                 for pattern in entry["paths"]:
                     concrete = pattern
                     if entry.get("root") in ("project", "repo_root", "plugin"):
-                        # The collection loop substitutes a discovered working copy for the
-                        # leading placeholder before expanding, so do the same here rather
-                        # than testing a path shape the collector never sees.
-                        anchor = "C:/src/app" if target_os == "windows" else "/src/app"
-                        concrete = re.sub(r"^<[^>]+>", anchor, pattern)
+                        # The collector's own substitution, not a copy of it. A copy kept
+                        # passing while the real one crashed: re.sub interprets backslash
+                        # escapes in its replacement, and a Windows project root is full of
+                        # them.
+                        anchor = (
+                            "C:\\Users\\alice\\src\\app" if target_os == "windows" else "/src/app"
+                        )
+                        concrete = collect.substitute_anchor(pattern, anchor)
                     resolved.extend(collect.expand_paths(concrete, home, target_os, None))
                 assert resolved, f"{entry['id']} resolves to nothing on {target_os}"
     assert not collect.PATTERN_REFUSALS, (
         f"the collector refused to search a catalogue pattern: {collect.PATTERN_REFUSALS}"
     )
+
+
+def test_a_windows_project_root_can_be_substituted_into_a_pattern() -> None:
+    """The replacement is literal text, not a regular expression replacement.
+
+    re.sub interprets backslash escapes in its replacement string, and a project root on
+    Windows is "C:\\Users\\alice\\src\\app": \\U is not a valid escape, so re.sub raised
+    and the collection died the moment any project root was discovered. It died before
+    writing the manifest, on the platform most endpoints run, while the Linux and macOS
+    jobs stayed green.
+    """
+    collect = _load_collector()
+    cases = [
+        ("<project>/.claude/CLAUDE.md", "C:\\Users\\alice\\src\\app"),
+        ("<repo-root>/AGENTS.md", "C:\\a\\U\\b"),
+        ("<project>/.cursorrules", "C:\\x\\name with $1 and backref"),
+        ("<project>/x", "/src/app"),
+    ]
+    for pattern, anchor in cases:
+        result = collect.substitute_anchor(pattern, anchor)
+        assert result.startswith(anchor.rstrip("/\\")), (pattern, anchor, result)
+        assert "<" not in result, result
+
+    # A pattern with no placeholder is returned untouched.
+    assert collect.substitute_anchor("~/.claude/x", "/src/app") == "~/.claude/x"
 
 
 def test_project_anchored_artifacts_are_labelled(catalogue: Catalogue) -> None:
