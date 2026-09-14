@@ -42,6 +42,7 @@ env_overrides:
 artifacts:
 - id: claude_code.sessions_dir
   category: log
+  root: user_profile
   os:
   - linux
   - macos
@@ -71,6 +72,7 @@ artifacts:
   parser: null
 - id: claude_code.shell_snapshots
   category: shell_history
+  root: user_profile
   os:
   - linux
   - macos
@@ -101,6 +103,7 @@ artifacts:
   parser: null
 - id: claude_code.image_cache
   category: cache
+  root: user_profile
   os:
   - macos
   - windows
@@ -124,6 +127,7 @@ artifacts:
   parser: null
 - id: claude_code.config_backups
   category: config
+  root: user_profile
   os:
   - linux
   - macos
@@ -154,6 +158,7 @@ artifacts:
   parser: null
 - id: claude_code.policy_limits
   category: config
+  root: user_profile
   os:
   - macos
   - windows
@@ -174,6 +179,7 @@ artifacts:
   parser: null
 - id: claude_code.credentials
   category: credentials
+  root: user_profile
   os:
   - linux
   - macos
@@ -203,6 +209,7 @@ artifacts:
   parser: null
 - id: claude_code.macos_keychain_credentials
   category: credentials
+  root: user_profile
   os:
   - macos
   paths:
@@ -222,6 +229,7 @@ artifacts:
   parser: null
 - id: claude_code.file_history_snapshots
   category: file_snapshot
+  root: user_profile
   os:
   - macos
   - windows
@@ -245,6 +253,7 @@ artifacts:
   parser: null
 - id: claude_code.feedback_drafts
   category: log
+  root: user_profile
   os:
   - macos
   - windows
@@ -268,6 +277,7 @@ artifacts:
   parser: null
 - id: claude_code.feedback_bundles
   category: transcript
+  root: user_profile
   os:
   - linux
   - macos
@@ -298,6 +308,7 @@ artifacts:
   parser: null
 - id: claude_code.subagent_transcripts
   category: transcript
+  root: user_profile
   os:
   - macos
   - windows
@@ -322,6 +333,7 @@ artifacts:
   parser: null
 - id: claude_code.tool_result_spills
   category: transcript
+  root: user_profile
   os:
   - macos
   - windows
@@ -345,6 +357,7 @@ artifacts:
   parser: null
 - id: claude_code.transcripts
   category: transcript
+  root: user_profile
   os:
   - macos
   - windows
@@ -369,6 +382,7 @@ artifacts:
   parser: null
 - id: claude_code.transcripts_set_aside
   category: transcript
+  root: user_profile
   os:
   - macos
   - windows
@@ -393,6 +407,7 @@ artifacts:
   parser: null
 - id: claude_code.workflow_runs
   category: transcript
+  root: user_profile
   os:
   - macos
   - windows
@@ -418,6 +433,7 @@ artifacts:
   parser: null
 - id: claude_code.legacy_state_dirs
   category: cache
+  root: user_profile
   os:
   - macos
   - windows
@@ -442,6 +458,7 @@ artifacts:
   parser: null
 - id: claude_code.paste_cache
   category: cache
+  root: user_profile
   os:
   - macos
   - windows
@@ -465,6 +482,7 @@ artifacts:
   parser: null
 - id: claude_code.plugin_cache
   category: cache
+  root: user_profile
   os:
   - macos
   - windows
@@ -486,6 +504,7 @@ artifacts:
   parser: null
 - id: claude_code.plugin_data
   category: cache
+  root: user_profile
   os:
   - macos
   - windows
@@ -506,6 +525,7 @@ artifacts:
   parser: null
 - id: claude_code.stats_cache
   category: cache
+  root: user_profile
   os:
   - linux
   - macos
@@ -534,6 +554,7 @@ artifacts:
   parser: null
 - id: claude_code.uploads
   category: cache
+  root: user_profile
   os:
   - macos
   - windows
@@ -556,6 +577,7 @@ artifacts:
   parser: null
 - id: claude_code.agents
   category: config
+  root: project
   os:
   - macos
   - windows
@@ -577,6 +599,7 @@ artifacts:
   parser: null
 - id: claude_code.anthropic_active_config
   category: config
+  root: user_profile
   os:
   - macos
   - linux
@@ -599,6 +622,7 @@ artifacts:
   parser: null
 - id: claude_code.anthropic_profile_configs
   category: config
+  root: user_profile
   os:
   - macos
   - linux
@@ -622,6 +646,7 @@ artifacts:
   parser: null
 - id: claude_code.global_config
   category: config
+  root: user_profile
   os:
   - linux
   - macos
@@ -651,6 +676,7 @@ artifacts:
   parser: null
 - id: claude_code.keybindings
   category: config
+  root: user_profile
   os:
   - macos
   - windows
@@ -671,6 +697,7 @@ artifacts:
   parser: null
 - id: claude_code.known_marketplaces
   category: config
+  root: user_profile
   os:
   - macos
   - windows
@@ -693,6 +720,7 @@ artifacts:
   parser: null
 - id: claude_code.org_policy_cache
   category: config
+  root: user_profile
   os:
   - linux
   - macos
@@ -723,6 +751,7 @@ artifacts:
   parser: null
 - id: claude_code.plugin_manifests
   category: config
+  root: plugin
   os:
   - macos
   - windows
@@ -748,6 +777,7 @@ artifacts:
   parser: null
 - id: claude_code.project_settings
   category: config
+  root: project
   os:
   - macos
   - windows
@@ -769,6 +799,7 @@ artifacts:
   parser: null
 - id: claude_code.session_env
   category: config
+  root: user_profile
   os:
   - linux
   - macos
@@ -798,6 +829,7 @@ artifacts:
   parser: null
 - id: claude_code.settings_referenced_executables
   category: config
+  root: project
   os:
   - macos
   - windows
@@ -820,6 +852,7 @@ artifacts:
   parser: null
 - id: claude_code.themes
   category: config
+  root: user_profile
   os:
   - macos
   - windows
@@ -840,6 +873,7 @@ artifacts:
   parser: null
 - id: claude_code.user_settings
   category: config
+  root: user_profile
   os:
   - macos
   - windows
@@ -862,6 +896,7 @@ artifacts:
   parser: null
 - id: claude_code.workflows
   category: config
+  root: project
   os:
   - macos
   - windows
@@ -883,6 +918,7 @@ artifacts:
   parser: null
 - id: claude_code.worktreeinclude
   category: config
+  root: project
   os:
   - macos
   - windows
@@ -903,6 +939,7 @@ artifacts:
   parser: null
 - id: claude_code.anthropic_profile_credentials
   category: credentials
+  root: user_profile
   os:
   - macos
   - linux
@@ -926,6 +963,7 @@ artifacts:
   parser: null
 - id: claude_code.worktrees
   category: file_snapshot
+  root: project
   os:
   - linux
   - macos
@@ -954,6 +992,7 @@ artifacts:
   parser: null
 - id: claude_code.changelog_cache
   category: install_evidence
+  root: user_profile
   os:
   - linux
   - macos
@@ -982,6 +1021,7 @@ artifacts:
   parser: null
 - id: claude_code.git_global_excludes
   category: install_evidence
+  root: user_profile
   os:
   - macos
   - windows
@@ -1005,6 +1045,7 @@ artifacts:
   parser: null
 - id: claude_code.install_legacy_and_npm
   category: install_evidence
+  root: user_profile
   os:
   - macos
   - linux
@@ -1029,6 +1070,7 @@ artifacts:
   parser: null
 - id: claude_code.install_native
   category: install_evidence
+  root: user_profile
   os:
   - macos
   - linux
@@ -1052,6 +1094,7 @@ artifacts:
   parser: null
 - id: claude_code.plugin_marketplaces_clones
   category: install_evidence
+  root: user_profile
   os:
   - macos
   - windows
@@ -1073,6 +1116,7 @@ artifacts:
   parser: null
 - id: claude_code.plugins_root
   category: install_evidence
+  root: user_profile
   os:
   - macos
   - windows
@@ -1095,6 +1139,7 @@ artifacts:
   parser: null
 - id: claude_code.plugins_synced
   category: install_evidence
+  root: user_profile
   os:
   - macos
   - windows
@@ -1116,6 +1161,7 @@ artifacts:
   parser: null
 - id: claude_code.shell_profile_evidence
   category: install_evidence
+  root: user_profile
   os:
   - macos
   - linux
@@ -1141,6 +1187,7 @@ artifacts:
   parser: null
 - id: claude_code.commands
   category: instructions
+  root: project
   os:
   - macos
   - windows
@@ -1162,6 +1209,7 @@ artifacts:
   parser: null
 - id: claude_code.loop_instructions
   category: instructions
+  root: project
   os:
   - macos
   - windows
@@ -1183,6 +1231,7 @@ artifacts:
   parser: null
 - id: claude_code.managed_claude_md
   category: instructions
+  root: system
   os:
   - macos
   - windows
@@ -1205,6 +1254,7 @@ artifacts:
   parser: null
 - id: claude_code.output_styles
   category: instructions
+  root: project
   os:
   - macos
   - windows
@@ -1226,6 +1276,7 @@ artifacts:
   parser: null
 - id: claude_code.plans
   category: instructions
+  root: user_profile
   os:
   - macos
   - windows
@@ -1247,6 +1298,7 @@ artifacts:
   parser: null
 - id: claude_code.skills
   category: instructions
+  root: project
   os:
   - macos
   - windows
@@ -1271,6 +1323,7 @@ artifacts:
   parser: null
 - id: claude_code.skills_trash
   category: instructions
+  root: user_profile
   os:
   - macos
   - windows
@@ -1292,6 +1345,7 @@ artifacts:
   parser: null
 - id: claude_code.synced_skills
   category: instructions
+  root: user_profile
   os:
   - macos
   - windows
@@ -1313,6 +1367,7 @@ artifacts:
   parser: null
 - id: claude_code.user_claude_md
   category: instructions
+  root: user_profile
   os:
   - macos
   - windows
@@ -1333,6 +1388,7 @@ artifacts:
   parser: null
 - id: claude_code.user_rules
   category: instructions
+  root: user_profile
   os:
   - macos
   - windows
@@ -1353,6 +1409,7 @@ artifacts:
   parser: null
 - id: claude_code.daemon_state
   category: log
+  root: user_profile
   os:
   - linux
   - macos
@@ -1384,6 +1441,7 @@ artifacts:
   parser: null
 - id: claude_code.debug_logs
   category: log
+  root: user_profile
   os:
   - linux
   - macos
@@ -1414,6 +1472,7 @@ artifacts:
   parser: null
 - id: claude_code.jobs
   category: log
+  root: user_profile
   os:
   - linux
   - macos
@@ -1445,6 +1504,7 @@ artifacts:
   parser: null
 - id: claude_code.legacy_dirs
   category: log
+  root: user_profile
   os:
   - macos
   - windows
@@ -1471,6 +1531,7 @@ artifacts:
   parser: null
 - id: claude_code.mcp_logs
   category: log
+  root: user_profile
   os:
   - macos
   - windows
@@ -1495,6 +1556,7 @@ artifacts:
   parser: null
 - id: claude_code.usage_data
   category: log
+  root: user_profile
   os:
   - macos
   - windows
@@ -1516,6 +1578,7 @@ artifacts:
   parser: null
 - id: claude_code.usage_reports
   category: log
+  root: user_profile
   os:
   - macos
   - windows
@@ -1538,6 +1601,7 @@ artifacts:
   parser: null
 - id: claude_code.managed_mcp_json
   category: mcp_config
+  root: system
   os:
   - macos
   - linux
@@ -1560,6 +1624,7 @@ artifacts:
   parser: null
 - id: claude_code.project_mcp_json
   category: mcp_config
+  root: project
   os:
   - macos
   - windows
@@ -1580,6 +1645,7 @@ artifacts:
   parser: null
 - id: claude_code.agent_memory
   category: memory
+  root: project
   os:
   - linux
   - macos
@@ -1612,6 +1678,7 @@ artifacts:
   parser: null
 - id: claude_code.auto_memory
   category: memory
+  root: user_profile
   os:
   - linux
   - macos
@@ -1641,6 +1708,7 @@ artifacts:
   parser: null
 - id: claude_code.task_lists
   category: memory
+  root: user_profile
   os:
   - macos
   - windows
@@ -1664,6 +1732,7 @@ artifacts:
   parser: null
 - id: claude_code.managed_settings_dropins
   category: permissions
+  root: system
   os:
   - macos
   - windows
@@ -1686,6 +1755,7 @@ artifacts:
   parser: null
 - id: claude_code.managed_settings_file
   category: permissions
+  root: system
   os:
   - macos
   - windows
@@ -1710,6 +1780,7 @@ artifacts:
   parser: null
 - id: claude_code.managed_settings_macos_profile
   category: permissions
+  root: system
   os:
   - macos
   paths:
@@ -1729,6 +1800,7 @@ artifacts:
   parser: null
 - id: claude_code.managed_settings_registry
   category: permissions
+  root: user_profile
   os:
   - windows
   paths:
@@ -1749,6 +1821,7 @@ artifacts:
   parser: null
 - id: claude_code.project_settings_local
   category: permissions
+  root: project
   os:
   - macos
   - windows
@@ -1769,6 +1842,7 @@ artifacts:
   parser: null
 - id: claude_code.user_settings_local
   category: permissions
+  root: user_profile
   os:
   - macos
   - windows
@@ -1789,6 +1863,7 @@ artifacts:
   parser: null
 - id: claude_code.project_claude_local_md
   category: project_instructions
+  root: project
   os:
   - macos
   - windows
@@ -1811,6 +1886,7 @@ artifacts:
   parser: null
 - id: claude_code.project_claude_md
   category: project_instructions
+  root: project
   os:
   - macos
   - windows
@@ -1833,6 +1909,7 @@ artifacts:
   parser: null
 - id: claude_code.project_rules
   category: project_instructions
+  root: project
   os:
   - macos
   - windows
@@ -1853,6 +1930,7 @@ artifacts:
   parser: null
 - id: claude_code.history_jsonl
   category: prompt_history
+  root: user_profile
   os:
   - linux
   - macos

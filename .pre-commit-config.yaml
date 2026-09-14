@@ -62,6 +62,20 @@ repos:
         pass_filenames: false
         files: '\.md$'
 
+      - id: generated-artifact-docs
+        name: docs/ARTIFACTS.md current with the catalogue
+        entry: uv run python scripts/gen_artifact_docs.py --check
+        language: system
+        pass_filenames: false
+        files: '^(catalog/|docs/locales/|scripts/gen_artifact_docs\.py)'
+
+      - id: catalogue-schema
+        name: catalogue validates against its schema
+        entry: uv run python -c "from pathlib import Path; from agentforensics.catalog import load_catalogue; print(len(load_catalogue(Path('catalog')).artifacts), 'artifacts validated')"
+        language: system
+        pass_filenames: false
+        files: '^catalog/'
+
       - id: viewer-syntax
         name: viewer JavaScript parses
         entry: python3 scripts/check_viewer.py

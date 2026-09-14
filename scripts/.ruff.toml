@@ -7,6 +7,12 @@
 # the intended trade: `list[str]` as a runtime type alias fails on Python 3.8, and these
 # files are the ones most likely to be run outside the project's own environment.
 #
+# The generators in this directory (build_collectors.py, gen_artifact_docs.py) import the
+# analyzer package and therefore need Python 3.11 to RUN. Their own syntax is still kept
+# inside this target, because one ruff target per directory is simpler than splitting the
+# directory, and because a contributor should not have to remember which script in here can
+# use which syntax.
+#
 # See docs/adr/0004-two-single-file-collectors.md for the same reasoning applied there.
 
 extend = "../pyproject.toml"

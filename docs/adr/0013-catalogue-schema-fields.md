@@ -1,4 +1,4 @@
-# ADR 0013: Four fields added to the artifact entry beyond the original list
+# ADR 0013: Five fields added to the artifact entry beyond the original list
 
 - **Status:** accepted
 - **Date:** 2026-09-14
@@ -29,13 +29,22 @@ explicitly does not read the older `C:\ProgramData\ClaudeCode\managed-settings.j
 are worth collecting. Presenting the second as effective policy would invert the conclusion
 of an investigation.
 
+**Not every path is anchored to the user profile.** `<project>/CLAUDE.md`,
+`<project>/.claude/settings.local.json`, `<project>/.claude/rules/` and the rest of the
+project tier sit inside a user's working copy. Expanding them against the profile finds
+nothing, and these are exactly the files that carry injected instructions, so losing them
+silently defeats one of the questions the suite exists to answer. The collector needs to
+know that it must first discover where the working copies are, which for Claude Code means
+reading the `projects` key of `~/.claude.json` and the encoded directory names under
+`projects/`.
+
 **`source` conflated two things.** It was specified as "URL, or observed on <os> <version>",
 which makes the honesty rule unenforceable: no check can tell whether a `verified` entry
 rests on vendor documentation or on somebody's recollection.
 
 ## Decision
 
-Four fields, plus one file-level addition:
+Five fields, plus one file-level addition:
 
 - `collect_priority`: `live_only`, `first`, `normal` or `durable`. The collectors order
   their work by it, and `docs/COLLECTION.md` groups its guidance by it. `live_only` means
@@ -46,6 +55,9 @@ Four fields, plus one file-level addition:
   `source_code`, so the honesty rule is mechanical rather than a matter of discipline.
 - `title`: a human-readable name, because the generated documentation needs one and the
   id is not it.
+- `root`: `user_profile`, `system`, `project`, `repo_root` or `plugin`. What the paths are
+  anchored to, and therefore whether the collector can resolve them by expanding a profile
+  or has to discover a list of working copies first.
 - At file level, `env_overrides`: the environment variables that relocate the agent's tree,
   each with its effect and its source.
 
@@ -67,7 +79,7 @@ Buys: a collector that can find a relocated tree, collection ordered by what dis
 first, legacy paths that cannot be mistaken for policy, and a verification rule a schema
 can enforce.
 
-Costs: five more fields to fill in per agent, and `collect_priority` is a judgement that
+Costs: six more fields to fill in per agent, and `collect_priority` is a judgement that
 has to be made per artifact from its retention behavior. It was tempting to derive it
 mechanically from the volatility text; doing so produced confidently wrong answers,
 including marking transcripts `durable` because the text mentioned that desktop sessions
@@ -77,6 +89,11 @@ are kept at any age. The values are therefore set deliberately, and the ones tha
 `sensitivity` remains a binary, which means a transcript full of personal data and a
 public README are both `normal`. That is correct for the question the field answers, which
 is whether to copy the bytes, and the personal-data question is answered by `category`.
+
+The `root` field also has a test behind it rather than only a convention: a path written
+as `<project>/...` must be labelled `project`, and a profile-anchored Windows artifact must
+carry a path the collector can actually expand on Windows. The second of those failed on
+first writing, which is how the whole distinction was found.
 
 ## Alternatives considered
 

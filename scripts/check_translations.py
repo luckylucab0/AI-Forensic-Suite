@@ -35,6 +35,15 @@ SEARCH_DIRS = [Path(), Path("docs")]
 ENGLISH_ONLY_DIRS = [Path("docs") / "adr"]
 ENGLISH_ONLY_FILES: list[str] = []
 
+# Documents whose German version is produced by a generator rather than written by hand.
+# They are skipped entirely: there is nothing for a human to confirm, and a lock entry
+# would demand a pointless refresh every time the catalogue changes. Their own generator
+# has a --check mode, which is what CI uses to catch drift for these.
+GENERATED_PAIRS = [
+    Path("docs") / "ARTIFACTS.md",
+    Path("docs") / "RULES.md",
+]
+
 EXIT_OK = 0
 EXIT_DRIFT = 1
 EXIT_ERROR = 2
@@ -88,6 +97,8 @@ def candidates(tracked: set[str] | None) -> list[tuple[Path, Path]]:
                 continue
             english = Path(*entry.parts)
             if key(english) in ENGLISH_ONLY_FILES:
+                continue
+            if english in GENERATED_PAIRS:
                 continue
             if any(parent in ENGLISH_ONLY_DIRS for parent in english.parents):
                 continue

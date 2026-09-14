@@ -78,6 +78,12 @@ jobs:
       - name: German docs current with their English source
         run: uv run python scripts/check_translations.py --check
 
+      - name: Catalogue validates against its schema
+        run: uv run python -c "from pathlib import Path; from agentforensics.catalog import load_catalogue; c = load_catalogue(Path('catalog')); print(len(c.artifacts), 'artifacts in', len(c), 'agent catalogue(s)')"
+
+      - name: Generated artifact documentation current with the catalogue
+        run: uv run python scripts/gen_artifact_docs.py --check
+
   legacy-interpreter:
     name: Python 3.8 compatibility
     runs-on: ubuntu-latest

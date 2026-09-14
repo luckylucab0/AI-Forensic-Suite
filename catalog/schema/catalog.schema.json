@@ -107,6 +107,11 @@
           "uniqueItems": true,
           "items": { "enum": ["macos", "windows", "linux"] }
         },
+        "root": {
+          "description": "What the paths are anchored to, which decides whether the collector can resolve them at all. 'user_profile' is expanded from the profile being collected. 'system' paths are absolute and machine-wide. 'project' and 'repo_root' paths sit inside a user's working copy, so they cannot be found without a list of project roots: the collector derives that list from the agent's own state (for Claude Code, the projects key of ~/.claude.json and the project directory names under projects/) and from --project-root. 'plugin' paths sit inside an installed plugin or a cloned marketplace. Getting this wrong is not cosmetic: treating a project path as profile-relative means the project instruction files, which are the prompt-injection surface, are never collected.",
+          "enum": ["user_profile", "system", "project", "repo_root", "plugin"],
+          "default": "user_profile"
+        },
         "paths": {
           "description": "Glob patterns with placeholders the collectors expand: ~ for the user profile, %APPDATA% and %LOCALAPPDATA% and %USERPROFILE% and %PROGRAMFILES% and %PROGRAMDATA% on Windows, $XDG_DATA_HOME and $XDG_CONFIG_HOME and $XDG_CACHE_HOME on Linux with their documented defaults. Angle brackets mark a variable segment for a human reader and are not expanded; use a glob where the collector must actually match.",
           "type": "array",
