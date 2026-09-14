@@ -1,0 +1,70 @@
+# Hooks that run before a commit can exist. Install both hook types, not just the default:
+#
+#   uv run pre-commit install --hook-type pre-commit --hook-type commit-msg
+#
+# The commit-msg hook matters as much as the pre-commit one here, because a commit message
+# enters history just as permanently as a file does, and it is the easier place to leak an
+# internal name by accident.
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        # Evidence does not belong in the repository. This is a backstop for the .gitignore
+        # rules, not a substitute for them.
+        args: ["--maxkb=512"]
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+        # The catalogue and the rule files are plain YAML; nothing here uses multi-document
+        # streams or custom tags.
+        args: ["--allow-multiple-documents"]
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: trailing-whitespace
+        exclude: '\.md$'
+      - id: detect-private-key
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      # The OpSec guard runs twice, over different things: the staged content, and the
+      # commit message. See docs/adr/0008-opsec-guard-and-fresh-history.md.
+      - id: opsec-check-staged
+        name: opsec check (staged content)
+        entry: python3 scripts/opsec_check.py --mode both
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: opsec-check-commit-msg
+        name: opsec check (commit message)
+        entry: python3 scripts/opsec_check.py --mode tracked --commit-msg
+        language: system
+        stages: [commit-msg]
+        pass_filenames: true
+        always_run: true
+
+      - id: check-translations
+        name: German docs current with their English source
+        entry: python3 scripts/check_translations.py --check
+        language: system
+        pass_filenames: false
+        files: '\.md$'
+
+      - id: viewer-syntax
+        name: viewer JavaScript parses
+        entry: python3 scripts/check_viewer.py
+        language: system
+        pass_filenames: false
+        files: '^viewer/'

@@ -1,0 +1,147 @@
+# Continuous integration.
+#
+# Three properties this pipeline is built to protect, in order of how badly a regression
+# would hurt:
+#
+#   1. The collectors and the pre-commit scripts must run on interpreters much older than
+#      the analyzer's, because they execute on endpoints and on contributors' machines.
+#      That is checked against a real old interpreter, not by inspection.
+#   2. Generated artifacts must never drift from the catalogue and rules they come from.
+#      Each generator has a --check mode, and CI runs it.
+#   3. Nothing organization-specific may enter the repository. The guard runs here too, so
+#      it also covers a commit pushed without local hooks installed.
+#
+# Actions are pinned by commit SHA rather than by tag. A tag can be moved to point at
+# different code; for a security tool whose CI has write access to nothing but is read by
+# people deciding whether to trust it, the pin is cheap insurance. The comment after each
+# SHA records which tag it was, so updates stay reviewable.
+
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+# A new push to the same ref makes the previous run irrelevant.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Nothing in this pipeline writes to the repository or to any package registry.
+permissions:
+  contents: read
+
+env:
+  # Reproducible resolution: the lock file decides, and a drifted lock fails rather than
+  # being silently updated.
+  UV_FROZEN: "1"
+
+jobs:
+  checks:
+    name: ${{ matrix.os }} / lint, types, tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The OpSec job needs history to be able to look past the tip. The default of a
+          # single commit would make that check meaningless.
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --all-extras --dev
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Formatting
+        run: uv run ruff format --check .
+
+      - name: Types
+        run: uv run mypy src
+
+      - name: Tests
+        run: uv run pytest --cov --cov-report=term-missing
+
+      - name: Viewer structure and JavaScript parse
+        run: uv run python scripts/check_viewer.py
+
+      - name: German docs current with their English source
+        run: uv run python scripts/check_translations.py --check
+
+  legacy-interpreter:
+    name: Python 3.8 compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+
+      - name: Provide Python 3.8
+        # 3.8 is long past end of life, which is exactly why this job exists: corporate
+        # fleets still run it, and the collector has to work there. uv fetches a
+        # standalone build, so this does not depend on the runner image still shipping it.
+        run: uv python install 3.8
+
+      - name: Compile under 3.8
+        # Catches syntax newer than the target, which is the failure that would otherwise
+        # only appear on an endpoint, mid-collection, on somebody's evidence.
+        run: |
+          set -euo pipefail
+          files=$(git ls-files 'collector/*.py' 'scripts/*.py')
+          if [ -z "$files" ]; then echo "nothing to compile"; exit 0; fi
+          echo "$files"
+          # shellcheck disable=SC2086
+          uv run --no-project --python 3.8 python -m py_compile $files
+
+      - name: Run the pre-commit scripts under 3.8
+        # Compiling proves the syntax parses. Running proves the standard library calls
+        # exist in that version, which py_compile cannot tell us.
+        run: |
+          set -euo pipefail
+          uv run --no-project --python 3.8 python scripts/check_viewer.py
+          uv run --no-project --python 3.8 python scripts/check_translations.py --check
+          # No denylist in CI by default, so this exercises the skip path.
+          uv run --no-project --python 3.8 python scripts/opsec_check.py --mode tracked
+
+  opsec:
+    name: OpSec guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Scan tracked content and history
+        env:
+          OPSEC_DENYLIST: ${{ secrets.OPSEC_DENYLIST }}
+        run: |
+          set -euo pipefail
+          if [ -z "${OPSEC_DENYLIST:-}" ]; then
+            echo "No OPSEC_DENYLIST secret is configured."
+            echo "Running the guard anyway, which exercises its skip path, so a fork and"
+            echo "an outside contributor are never blocked by a secret they cannot have."
+            python3 scripts/opsec_check.py --mode tracked
+            exit 0
+          fi
+          # Written to the gitignored path the tool expects, removed immediately after.
+          # Never echoed: GitHub masks known secrets in logs, but relying on that to hide
+          # the thing this repository exists to keep hidden would be careless.
+          printf '%s\n' "$OPSEC_DENYLIST" > .opsec-denylist
+          trap 'rm -f .opsec-denylist' EXIT
+          python3 scripts/opsec_check.py --mode tracked --require-denylist
+          # The working tree is only the present. History is what actually gets published.
+          if git log -p --all | grep -i -q -f .opsec-denylist; then
+            echo "::error::A denied string appears in git history. See CONTRIBUTING."
+            exit 1
+          fi
+          echo "History is clean against the denylist."
