@@ -175,9 +175,10 @@ jobs:
         # identical. -SelfTest prints fixed structures and Python checks them.
         run: |
           $ErrorActionPreference = 'Stop'
-          powershell -NoLogo -NoProfile -File collector/collect.ps1 -SelfTest > selftest-51.txt
-          if ($LASTEXITCODE -ne 0) { Write-Error "self test failed"; exit 1 }
-          uv run python tests/conformance/check_selftest.py selftest-51.txt
+          # No shell redirection: PowerShell 5.1's `>` writes UTF-16LE, so the file could
+          # not be read back as UTF-8. The checker runs the collector itself and decodes
+          # one pipe with one stated encoding.
+          uv run python tests/conformance/check_selftest.py --powershell powershell.exe
 
       - name: Collect a synthetic profile under 5.1
         shell: powershell

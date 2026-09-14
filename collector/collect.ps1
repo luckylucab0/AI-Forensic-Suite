@@ -76,6 +76,22 @@ param(
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = 'Stop'
 
+# Everything this script writes to standard output is UTF-8 without a byte order mark,
+# whether it goes to a console or into a pipe.
+#
+# Not cosmetic. On PowerShell 5.1 a redirected [Console]::Out inherits the console's output
+# encoding, which is an OEM code page, so the -Json summary came out mangled the moment a
+# path contained a non-ASCII character, and `>` in 5.1 writes UTF-16LE, which anything
+# reading the output as UTF-8 rejects at the first byte. A fleet script that pipes this
+# collector into something else has to get the same bytes on every host.
+try {
+    [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false)
+} catch {
+    # A host without a real console, such as some remote-execution agents, refuses to have
+    # this set. The bundle on disk is written through System.IO with an explicit encoding
+    # and is unaffected; only the summary on stdout is.
+}
+
 $script:ToolName = 'collect.ps1'
 $script:ToolVersion = '0.1.0'
 $script:FormatVersion = 1
