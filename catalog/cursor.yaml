@@ -25,6 +25,8 @@ vendor_sources:
 - https://cursor.com/
 - https://docs.cursor.com/
 - https://www.cursor.com/
+description: |-
+  A closed-source editor derived from VS Code, whose agent keeps its data in two trees: the editor's own user data directory, which follows the layout it inherited, and a per-user agent directory under the home directory. The vendor documents the second tree's configuration files thoroughly and documents nothing at all about where conversations are stored, which is why the transcript entries here rest on independent research and are marked unverified. Two negative findings from the vendor's own pages are worth knowing before an acquisition. There is no first-party statement that privacy mode changes what is written to local disk: it is documented as a control over cloud training and retention, so a privacy-mode user's conversations should still be expected on the endpoint. And there is no documented way to export or delete local conversation history, with account deletion explicitly leaving local data in place, so material can outlive the account it belongs to.
 references:
 - |-
   https://github.com/AltimateAI/vscode-dbt-power-user/blob/5fc912ee821cf1e42feb826ad48f9a01e2e98a80/documentation/docs/setup/cursor_installation_workaround.md
@@ -34,7 +36,67 @@ references:
   https://raw.githubusercontent.com/OpenAgentsInc/openagents/a2de475d2ee3a2f00865944c79c15600c1ada45c/docs/teardowns/2026-07-11-cursor-product-teardown.md
 - |-
   https://raw.githubusercontent.com/VasiHemanth/tokentelemetry/0d691ae343ed31991e504a738bb1b288eea3b2ee/docs/research/harness-survey/harness-cursor-vscode.md
+env_overrides:
+- name: CURSOR_CONFIG_DIR
+  effect: |-
+    Relocates the agent configuration directory that the command line interface reads, which the vendor otherwise resolves to .cursor under the home directory or, on Linux and BSD, to a cursor directory under the base configuration directory. A collection keyed on the default finds nothing on such a host.
+  source: https://cursor.com/docs/cli/reference/configuration
+- name: CURSOR_TRANSCRIPT_PATH
+  effect: |-
+    Not a relocation the user sets but a value the agent passes to a hook script, holding the path of the conversation transcript for that run. It is the only documented way to learn where a transcript actually is, because the vendor states no path for one. The vendor also says it is present only when transcripts are enabled, so its absence means the feature was off rather than that the run had no conversation.
+  source: https://cursor.com/docs/hooks
 artifacts:
+- id: cursor.hooks
+  title: Hook scripts and configuration
+  category: config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - /Library/Application Support/Cursor/hooks.json
+  - /etc/cursor/hooks.json
+  - C:\ProgramData\Cursor\hooks.json
+  - <project>/.cursor/hooks.json
+  - <project>/.cursor/hooks/
+  - ~/.cursor/hooks.json
+  - ~/.cursor/hooks/
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://cursor.com/docs/hooks
+  source_kind: official
+  volatility: |-
+    Persists until edited. The script directory holds whatever the configuration points at, and nothing sweeps it.
+  notes: |-
+    Added by the vendor verification pass. Three scopes, and the machine-wide one is the reason to collect this even when the user's own directories look complete: an administrator can place a hook there that the user cannot see or remove, and a blocking hook explains an action the analyst expected to find attempted and did not.
+
+    The scripts matter more than the configuration. A hook is an executable the agent runs at a lifecycle point, so the script directory is where a persistence mechanism or an exfiltration step would live, and it is content this catalogue cannot predict: collect the directory whole rather than a list of filenames. The hook interface is also how a collector learns where a conversation transcript is, since the vendor states no path for one and passes it to the script instead.
+  parser: null
+- id: cursor.worktrees
+  title: Agent-created git worktrees
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.cursor\worktrees\*'
+  - ~/.cursor/worktrees/*
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://cursor.com/docs/cli/using
+  source_kind: official
+  volatility: |-
+    The vendor documents cleanup settings and a limit for these, so agent-written code here is removed on a schedule rather than kept.
+  notes: |-
+    Added by the vendor verification pass. The agent creates git worktrees under the home directory, organized by repository name, so the code it wrote is not in the checkout an analyst is looking at. A diff of the user's repository can show nothing while the agent wrote a great deal, and this is where the difference is.
+  parser: null
 - id: cursor.retrieval_index
   category: cache
   root: user_profile
@@ -413,7 +475,9 @@ artifacts:
   notes: |-
     Per-session prompt log. Survives independently of the blob store, so it can recover user intent even when store.db is corrupt or truncated.
 
-    Provenance: no vendor source states this path. The product is closed source and its documentation does not describe its on-disk layout, so the location rests on independent research. It is collected all the same, and reported as unverified, so an empty result reads as inconclusive rather than as proof the agent was never used.
+    Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The result is stronger than an absent source. The vendor documents around twenty paths under the same agent directory, among them the agent, skill, subagent, command and worktree directories and the configuration, hook and authentication files, and a chats directory is not one of them. Nothing in two hundred and fifty documentation pages, three changelogs, the data-use and security pages or the vendor's code hosting organization mentions this layout: no hit for the database filename, for the prompt history filename, for a chats directory, or for an md5 keyed directory level. Control searches against the same sources returned hundreds of results, so the absence is real rather than a failed search.
+
+    There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and the slug one is the better supported of the two. Collect the whole agent directory rather than either path list, and expect the layout that is actually on the endpoint to settle which is right.
   parser: null
 - id: cursor.global_prompt_history
   category: prompt_history
@@ -465,7 +529,7 @@ artifacts:
   notes: |-
     STRUCTURALLY SEPARATE third Cursor CLI store, used when cursor-agent runs in ACP mode (`cursor-agent acp`, IDE/third-party harness integrations). Keyed by ACP session id, not by workspace hash — there is no md5(cwd) directory level. Rich tool-call arguments persist here that are absent from the legacy chats layout. Relocatable via CURSOR_CONFIG_DIR.
 
-    Provenance: no vendor source states this path. The product is closed source and its documentation does not describe its on-disk layout, so the location rests on independent research. It is collected all the same, and reported as unverified, so an empty result reads as inconclusive rather than as proof the agent was never used.
+    Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The vendor's dedicated page for this protocol was read in full and names one path, the server configuration file, and nothing about a session store. The directory name does not occur anywhere in the vendor's documentation or repositories. It stays in the catalogue because it costs a glob and because an agent session store is exactly what an investigation needs, but treat a hit under it as a finding that needs its own explanation and a miss as telling you nothing.
   parser: null
 - id: cursor.agent_transcripts_jsonl
   category: transcript
@@ -515,7 +579,9 @@ artifacts:
   notes: |-
     Sidecar beside store.db. This is the cheap session index for triage: title plus timestamps without opening the SQLite store. Do not confuse with the store.db `meta` TABLE, which is hex-encoded.
 
-    Provenance: no vendor source states this path. The product is closed source and its documentation does not describe its on-disk layout, so the location rests on independent research. It is collected all the same, and reported as unverified, so an empty result reads as inconclusive rather than as proof the agent was never used.
+    Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The result is stronger than an absent source. The vendor documents around twenty paths under the same agent directory, among them the agent, skill, subagent, command and worktree directories and the configuration, hook and authentication files, and a chats directory is not one of them. Nothing in two hundred and fifty documentation pages, three changelogs, the data-use and security pages or the vendor's code hosting organization mentions this layout: no hit for the database filename, for the prompt history filename, for a chats directory, or for an md5 keyed directory level. Control searches against the same sources returned hundreds of results, so the absence is real rather than a failed search.
+
+    There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and the slug one is the better supported of the two. Collect the whole agent directory rather than either path list, and expect the layout that is actually on the endpoint to settle which is right.
   parser: null
 - id: cursor.chat_store_db
   category: transcript
@@ -542,7 +608,9 @@ artifacts:
   notes: |-
     Cursor CLI (cursor-agent) interactive/print-mode store; distinct from the IDE's state.vscdb and from acp-sessions. Workspace bucket = lowercase hex MD5 of the absolute workspace path, empirically char-for-char matched against real data by one source. Relocatable via CURSOR_CONFIG_DIR. Image/pasted attachments live here as blobs and are NOT in the JSONL transcript.
 
-    Provenance: no vendor source states this path. The product is closed source and its documentation does not describe its on-disk layout, so the location rests on independent research. It is collected all the same, and reported as unverified, so an empty result reads as inconclusive rather than as proof the agent was never used.
+    Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The result is stronger than an absent source. The vendor documents around twenty paths under the same agent directory, among them the agent, skill, subagent, command and worktree directories and the configuration, hook and authentication files, and a chats directory is not one of them. Nothing in two hundred and fifty documentation pages, three changelogs, the data-use and security pages or the vendor's code hosting organization mentions this layout: no hit for the database filename, for the prompt history filename, for a chats directory, or for an md5 keyed directory level. Control searches against the same sources returned hundreds of results, so the absence is real rather than a failed search.
+
+    There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and the slug one is the better supported of the two. Collect the whole agent directory rather than either path list, and expect the layout that is actually on the endpoint to settle which is right.
   parser: null
 - id: cursor.conversation_search_db
   category: transcript
@@ -628,7 +696,9 @@ artifacts:
   notes: |-
     SINGLE SOURCE, retrieved as a code-search snippet from a Go doc comment, not a full fetch. High analytical value if real (pasted credentials/log excerpts land here rather than in the transcript) so worth globbing, but do not assert the field layout.
 
-    Provenance: no vendor source states this path. The product is closed source and its documentation does not describe its on-disk layout, so the location rests on independent research. It is collected all the same, and reported as unverified, so an empty result reads as inconclusive rather than as proof the agent was never used.
+    Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The result is stronger than an absent source. The vendor documents around twenty paths under the same agent directory, among them the agent, skill, subagent, command and worktree directories and the configuration, hook and authentication files, and a chats directory is not one of them. Nothing in two hundred and fifty documentation pages, three changelogs, the data-use and security pages or the vendor's code hosting organization mentions this layout: no hit for the database filename, for the prompt history filename, for a chats directory, or for an md5 keyed directory level. Control searches against the same sources returned hundreds of results, so the absence is real rather than a failed search.
+
+    There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and the slug one is the better supported of the two. Collect the whole agent directory rather than either path list, and expect the layout that is actually on the endpoint to settle which is right.
   parser: null
 - id: cursor.workspace_state_vscdb
   category: transcript

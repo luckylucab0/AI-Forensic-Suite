@@ -3894,6 +3894,28 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "unverified"
                 },
                 {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "cursor.hooks",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "/Library/Application Support/Cursor/hooks.json",
+                        "/etc/cursor/hooks.json",
+                        "C:\\ProgramData\\Cursor\\hooks.json",
+                        "<project>/.cursor/hooks.json",
+                        "<project>/.cursor/hooks/",
+                        "~/.cursor/hooks.json",
+                        "~/.cursor/hooks/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "install_evidence",
                     "collect_priority": "normal",
                     "id": "cursor.install_and_machine_identity",
@@ -4064,6 +4086,23 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "unverified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "first",
+                    "id": "cursor.worktrees",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.cursor\\worktrees\\*",
+                        "~/.cursor/worktrees/*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 }
             ]
         },
@@ -6167,6 +6206,24 @@ EMBEDDED_CATALOGUE_JSON = r"""
             "agent": "windsurf",
             "artifacts": [
                 {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "windsurf.acp_registry",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.windsurf\\acp\\registry.json",
+                        "~/.windsurf-next/acp/registry.json",
+                        "~/.windsurf/acp/registry.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "credentials",
                     "collect_priority": "normal",
                     "id": "windsurf.auth_credentials",
@@ -6195,14 +6252,34 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
-                        "$WINDSURF_CONFIG_DIR/cascade/<cascade-id>.pb",
-                        "%USERPROFILE%\\.codeium\\windsurf\\cascade\\<cascade-id>.pb",
-                        "~/.codeium/windsurf/cascade/<cascade-id-uuid>.pb",
-                        "~/.codeium/windsurf/cascade/<cascade-id-uuid>.pb.archived"
+                        "%USERPROFILE%\\.codeium\\windsurf\\cascade\\*",
+                        "~/.codeium/windsurf-insiders/cascade/*",
+                        "~/.codeium/windsurf-next/cascade/*",
+                        "~/.codeium/windsurf/cascade/*",
+                        "~/.codeium/windsurf/cascade/*.pb",
+                        "~/.codeium/windsurf/cascade/*.pb.archived"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "windsurf.cascade_transcripts",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.windsurf\\transcripts\\*.jsonl",
+                        "~/.devin/transcripts/*.jsonl",
+                        "~/.windsurf/transcripts/*.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 },
                 {
                     "category": "config",
@@ -6214,13 +6291,15 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
+                        "%USERPROFILE%\\.codeium\\user_settings.pb",
+                        "~/.codeium/user_settings.pb",
                         "~/.codeium/windsurf/code_tracker/",
                         "~/.codeium/windsurf/installation_id",
                         "~/.codeium/windsurf/user_settings.pb"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "cache",
@@ -6269,14 +6348,14 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
-                        "%APPDATA%\\Codeium\\windsurf\\global_rules.md",
                         "%USERPROFILE%\\.codeium\\windsurf\\memories\\global_rules.md",
-                        "~/.codeium/windsurf/global_rules.md",
+                        "~/.codeium/windsurf-insiders/memories/global_rules.md",
+                        "~/.codeium/windsurf-next/memories/global_rules.md",
                         "~/.codeium/windsurf/memories/global_rules.md"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "config",
@@ -6288,13 +6367,15 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
+                        "%USERPROFILE%\\.codeium\\hooks.json",
                         "%USERPROFILE%\\.codeium\\windsurf\\hooks.json",
                         "<project>/.windsurf/hooks.json",
+                        "~/.codeium/hooks.json",
                         "~/.codeium/windsurf/hooks.json"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "config",
@@ -6325,6 +6406,32 @@ EMBEDDED_CATALOGUE_JSON = r"""
                 {
                     "category": "config",
                     "collect_priority": "normal",
+                    "id": "windsurf.ide_user_data",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Devin\\User\\settings.json",
+                        "%APPDATA%\\Windsurf\\User\\keybindings.json",
+                        "%APPDATA%\\Windsurf\\User\\settings.json",
+                        "%APPDATA%\\Windsurf\\argv.json",
+                        "~/.config/Windsurf/User/settings.json",
+                        "~/Library/Application Support/Devin/User/settings.json",
+                        "~/Library/Application Support/Windsurf/User/keybindings.json",
+                        "~/Library/Application Support/Windsurf/User/settings.json",
+                        "~/Library/Application Support/Windsurf/User/snippets/",
+                        "~/Library/Application Support/Windsurf/Workspaces/",
+                        "~/Library/Application Support/Windsurf/argv.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
                     "id": "windsurf.ide_workspace_state_vscdb",
                     "os": [
                         "macos",
@@ -6340,6 +6447,26 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "windsurf.ignore_files",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codeium\\.codeiumignore",
+                        "<project>/.codeiumignore",
+                        "<project>/.devinignore",
+                        "<project>/.windsurfignore",
+                        "~/.codeium/.codeiumignore"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 },
                 {
                     "category": "transcript",
@@ -6409,12 +6536,53 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
-                        "%USERPROFILE%\\.codeium\\windsurf\\memories\\*.pb",
+                        "%USERPROFILE%\\.codeium\\windsurf\\memories\\*",
+                        "~/.codeium/windsurf-insiders/memories/*",
+                        "~/.codeium/windsurf-next/memories/*",
+                        "~/.codeium/windsurf/memories/*",
                         "~/.codeium/windsurf/memories/*.pb"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "windsurf.plans",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.windsurf\\plans\\",
+                        "<project>/.devin/plans/",
+                        "<project>/.windsurf/plans/",
+                        "~/.devin/plans/plan-*.md",
+                        "~/.devin/plans/",
+                        "~/.windsurf/plans/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "windsurf.plugin_log",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codeium\\codeium.log",
+                        "~/.codeium/codeium.log"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 },
                 {
                     "category": "project_instructions",
@@ -6426,6 +6594,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
+                        "<project>/.windsurf/global_rules.md",
                         "<project>/.windsurf/rules/*.md",
                         "<project>/.windsurf/settings.json",
                         "<project>/.windsurfrules",
@@ -6433,7 +6602,34 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "project",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "windsurf.system_config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "/Library/Application Support/Windsurf/hooks.json",
+                        "/Library/Application Support/Windsurf/rules/*.md",
+                        "/Library/Application Support/Windsurf/skills/",
+                        "/Library/Application Support/Windsurf/workflows/",
+                        "/etc/windsurf/hooks.json",
+                        "/etc/windsurf/rules/*.md",
+                        "/etc/windsurf/skills/",
+                        "/etc/windsurf/workflows/",
+                        "C:\\ProgramData\\Windsurf\\hooks.json",
+                        "C:\\ProgramData\\Windsurf\\rules\\*.md",
+                        "C:\\ProgramData\\Windsurf\\skills\\",
+                        "C:\\ProgramData\\Windsurf\\workflows\\"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 },
                 {
                     "category": "instructions",
@@ -6452,7 +6648,25 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "project",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "first",
+                    "id": "windsurf.worktrees",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.windsurf\\worktrees\\*",
+                        "~/.devin/worktrees/*",
+                        "~/.windsurf/worktrees/*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 }
             ]
         },
@@ -6578,7 +6792,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "db4c351c4edb19d81ffe3d18270127333a7f2e587a88b1c76ae9f86829af50ad"
+    "sha256": "6ded654026cf1394d574f018531e8353ca13975c327baa83d7328faeb4ea39cc"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)
