@@ -848,18 +848,23 @@ artifacts:
   - linux
   paths:
   - <project>/.claude/hooks/*
+  - <project>/.claude/hooks/**/*
   - ~/.claude/hooks/*
+  - ~/.claude/hooks/**/*
   format: text
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://code.claude.com/docs/en/hooks
   source_kind: official
+  unsourced_paths:
+  - <project>/.claude/hooks/**/*
+  - ~/.claude/hooks/**/*
   volatility: Follows whatever file the operator pointed at; not managed or swept by Claude Code.
   notes: |-
     The highest-value execution artifacts in this family are files Claude Code never names: hook scripts and credential helpers. A catalogue of settings files alone misses the payload. CLAUDE_ENV_FILE is a particularly clean persistence primitive - it executes on every single Bash command.
 
-    Re-sourced by the verification pass: the settings reference names a hook script only inside one example under the user directory, with no project-level hooks directory. The hooks page documents both.
+    The vendor's example script sits directly in the hooks directory, so the one-level glob is what is sourced. The recursive glob is here because a settings file can point at any path and a script one directory deeper would be walked past by the flat glob, which would mean not collecting an executable the agent runs on every command.
   parser: null
 - id: claude_code.themes
   category: config

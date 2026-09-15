@@ -1541,7 +1541,9 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "<project>/.claude/hooks/*",
-                        "~/.claude/hooks/*"
+                        "<project>/.claude/hooks/**/*",
+                        "~/.claude/hooks/*",
+                        "~/.claude/hooks/**/*"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -3166,11 +3168,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
-                        "<project>/.claude/hooks/",
-                        "<project>/.claude/settings.json",
-                        "<project>/.claude/settings.local.json",
                         "<project>/.clinerules/hooks/",
-                        "~/.claude/settings.json",
                         "~/Documents/Cline/Hooks/"
                     ],
                     "root": "project",
@@ -6580,7 +6578,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "d75f83120048e66506962698a6852a3f1fab2addf700b8cc9b57f88e3d254a05"
+    "sha256": "db4c351c4edb19d81ffe3d18270127333a7f2e587a88b1c76ae9f86829af50ad"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

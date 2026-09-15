@@ -296,11 +296,7 @@ artifacts:
   - linux
   - windows
   paths:
-  - <project>/.claude/hooks/
-  - <project>/.claude/settings.json
-  - <project>/.claude/settings.local.json
   - <project>/.clinerules/hooks/
-  - ~/.claude/settings.json
   - ~/Documents/Cline/Hooks/
   format: text
   sensitivity: normal
@@ -308,17 +304,10 @@ artifacts:
   status: verified
   source: https://github.com/cline/cline/blob/main/.clinerules/hooks/README.md
   source_kind: official
-  unsourced_paths:
-  - <project>/.claude/hooks/
-  - <project>/.claude/settings.json
-  - <project>/.claude/settings.local.json
-  - ~/.claude/settings.json
   volatility: |-
     Executable bits and mtimes matter as much as the content - record mode, owner and timestamps, not just the script text.
   notes: |-
     THE SHARPEST INJECTION SURFACE IN THIS WHOLE FAMILY, and the one most likely to be missed. A hook is arbitrary code that the agent runs automatically on tool use or prompt submission, and a workspace hook arrives with the repository - so cloning a hostile repo plus enabling hooks is remote code execution by design. Collect the script bodies verbatim (they are evidence, not secrets), plus mode/owner/mtime, and diff workspace hooks against the repo's git history to spot ones that were never committed. Cline's own docs even ship a PreToolUse guard example (docs/customization/clineignore.mdx) showing the copy-and-chmod workflow, which is what to grep shell history for.
-
-    The verification pass found the cited page confirms only the paths of the agent whose repository it is. The four paths of the other agent are documented on that vendor's own settings and hooks pages, which is where a split of this entry should point them.
   parser: null
 - id: crosscutting.mcp_config_files
   category: mcp_config
