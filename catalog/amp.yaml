@@ -58,23 +58,30 @@ artifacts:
   - windows
   paths:
   - $XDG_CONFIG_HOME/amp/settings.json
+  - $XDG_CONFIG_HOME/amp/settings.jsonc
+  - /Library/Application Support/ampcode/managed-settings.json
+  - /etc/ampcode/managed-settings.json
+  - '%PROGRAMDATA%\ampcode\managed-settings.json'
+  - '%USERPROFILE%\.config\amp\settings.json'
+  - '%USERPROFILE%\.config\amp\settings.jsonc'
   - <project>/.amp/settings.json
   - <project>/.amp/settings.jsonc
   - ~/.config/amp/settings.json
+  - ~/.config/amp/settings.jsonc
   format: json
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/sourcegraph/amp-examples-and-guides/main/guides/cli/README.md
+  source: https://ampcode.com/manual/configuration.md
   source_kind: official
   unsourced_paths:
-  - <project>/.amp/settings.json
-  - <project>/.amp/settings.jsonc
+  - $XDG_CONFIG_HOME/amp/settings.json
+  - $XDG_CONFIG_HOME/amp/settings.jsonc
   volatility: Persistent until edited.
   notes: |-
     Carries the MCP inventory and, critically, amp.url - which can point the CLI at a self-hosted or proxied Amp server instead of ampcode.com. A non-default amp.url materially changes where the transcripts actually live.
 
-    The cited guide states the user-level settings file only. A project-level .amp/settings.json is described on a vendor manual page that was not reachable from the environment the verification pass ran in, so the two project paths are marked unsourced rather than dropped.
+    Re-sourced by the verification pass. The guide cited before states the user settings file only, and the vendor's own manual states the whole stack: the user file in both spellings and on both platforms, the nearest project file searched upward from the working directory to the repository root, and a machine-wide managed settings file per platform. The managed file is the one to read first in a policy question, because it is what an administrator uses to constrain the agent and it was missing from this catalogue entirely. The base directory variable spelling is how the collector reaches a relocated configuration directory and is not what the manual states, so it is marked unsourced.
   parser: null
 - id: amp.secrets
   category: credentials
@@ -162,6 +169,32 @@ artifacts:
     recollection, needs verification
 
     Record structure: Seen in a single community skill definition alongside the threads path. Path string retrieved via GitHub code search content fragment. Not corroborated elsewhere.
+  parser: null
+- id: amp.skills
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.agents/skills/
+  - <project>/.claude/skills/
+  - ~/.agents/skills/
+  - ~/.claude/plugins/cache/
+  - ~/.claude/skills/
+  - ~/.config/agents/skills/
+  - ~/.config/amp/skills/
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://ampcode.com/manual/configuration.md
+  source_kind: official
+  volatility: |-
+    Version-controlled in the project case, so git history gives authorship and timing. The user-level and plugin cache directories are untracked and carry only their mtimes.
+  notes: |-
+    Found by the source verification pass while re-sourcing the settings entry, and missing from this catalogue until then. This agent reads skills out of another vendor's directories as well as its own, including that vendor's plugin cache, which makes those directories an injection surface for this agent too. Two consequences for an investigation: a skill file under another agent's directory is not evidence that the other agent ran, and a finding about this agent's behaviour may have its cause in a directory nobody would think to attribute to it.
   parser: null
 - id: amp.threads
   category: transcript

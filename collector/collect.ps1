@@ -365,9 +365,38 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$XDG_CONFIG_HOME/amp/settings.json",
+                        "$XDG_CONFIG_HOME/amp/settings.jsonc",
+                        "/Library/Application Support/ampcode/managed-settings.json",
+                        "/etc/ampcode/managed-settings.json",
+                        "%PROGRAMDATA%\\ampcode\\managed-settings.json",
+                        "%USERPROFILE%\\.config\\amp\\settings.json",
+                        "%USERPROFILE%\\.config\\amp\\settings.jsonc",
                         "<project>/.amp/settings.json",
                         "<project>/.amp/settings.jsonc",
-                        "~/.config/amp/settings.json"
+                        "~/.config/amp/settings.json",
+                        "~/.config/amp/settings.jsonc"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "amp.skills",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.agents/skills/",
+                        "<project>/.claude/skills/",
+                        "~/.agents/skills/",
+                        "~/.claude/plugins/cache/",
+                        "~/.claude/skills/",
+                        "~/.config/agents/skills/",
+                        "~/.config/amp/skills/"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -1986,6 +2015,22 @@ $EmbeddedCatalogueJson = @'
             "agent": "cline",
             "artifacts": [
                 {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "cline.agent_schedules",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.cline/schedules/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "cache",
                     "collect_priority": "normal",
                     "id": "cline.cache_and_remote_config",
@@ -1998,6 +2043,22 @@ $EmbeddedCatalogueJson = @'
                         "<vscode-user>/globalStorage/saoudrizwan.claude-dev/cache/",
                         "<vscode-user>/globalStorage/saoudrizwan.claude-dev/cache/remote_config_<orgId>.json",
                         "<vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/cline_recommended_models.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "first",
+                    "id": "cline.chat_workspace",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.cline/data/workspaces/chat/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -2308,6 +2369,22 @@ $EmbeddedCatalogueJson = @'
                         "~/.cline/data/db/connectors.db",
                         "~/.cline/data/db/cron.db",
                         "~/.cline/data/db/tasks.db"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "cline.team_data",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.cline/data/teams/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -3461,7 +3538,7 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "shell_history",
@@ -3554,7 +3631,7 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "install_evidence",
@@ -6526,7 +6603,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "9cf521fca60e52f47ac42e0a77227d28f84a104eeadc3c7ebc6aaffe32b30822"
+    "sha256": "6f2bbd56b3fb9e7cf99ee19d54aa7b015d3f5260d0fe8c53831a67bd4c5d3eef"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

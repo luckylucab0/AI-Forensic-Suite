@@ -214,13 +214,17 @@ artifacts:
   format: binary
   sensitivity: normal
   collect_priority: normal
-  status: unverified
-  source: https://raw.githubusercontent.com/ollama/ollama/main/docs/troubleshooting.mdx
-  source_kind: community
+  status: verified
+  source: https://learn.microsoft.com/en-us/windows/win32/shell/knownfolderid
+  source_kind: official
+  unsourced_paths:
+  - '%LOCALAPPDATA%\Ollama\'
+  - '%LOCALAPPDATA%\Packages\'
+  - '%LOCALAPPDATA%\Programs\Ollama\'
   notes: |-
     The %LOCALAPPDATA%\Programs pattern is why AI tooling so often installs without admin rights and without appearing in Add/Remove Programs - enumerate it directly rather than trusting the uninstall registry. %TEMP%\ollama* is a reminder to sweep %TEMP% for agent-extracted runners generally.
 
-    Provenance: these are Windows known folders, and the page cited is one application's troubleshooting guide, which names only its own two directories under %LOCALAPPDATA%. %APPDATA% and %LOCALAPPDATA%\Packages are not defined anywhere on it. Promote to verified against the platform vendor's KNOWNFOLDERID reference, which was not reachable from the environment this was verified in.
+    Re-sourced by the verification pass, which flagged a generic platform layout resting on one application's troubleshooting guide. The platform vendor's known folder reference gives the roaming folder as %USERPROFILE%\AppData\Roaming and the local folder as %USERPROFILE%\AppData\Local, which is what these two roots are. The packaged-application container under the local folder is not on that page, and neither are the two directories of the one application the previous source covered, so those three stay marked unsourced. The Programs directory under the local folder is the one that matters for this entry and is a known folder in its own right.
   parser: null
 - id: crosscutting.windows_execution_evidence_files
   category: install_evidence
@@ -624,15 +628,13 @@ artifacts:
   format: text
   sensitivity: normal
   collect_priority: normal
-  status: unverified
-  source: https://raw.githubusercontent.com/pexip/os-bash/c36eb24bedb80d6783fe1b1f7470acb97eb603a8/doc/bash.1
-  source_kind: community
+  status: verified
+  source: https://git.savannah.gnu.org/git/bash.git
+  source_kind: source_code
   volatility: |-
     HISTFILESIZE truncates the file by removing the OLDEST entries whenever it is assigned. Default HISTSIZE is 500 after startup files are read. By default bash writes only at shell exit, so a killed terminal or a crashed box can lose the entire session.
   notes: |-
     HISTFILE default IS documented for bash, unlike zsh: "The name of the file in which command history is saved... The default value is ~/.bash_history. If unset, the command history is not saved when a shell exits." HISTCONTROL suppressions to account for: ignorespace ("lines which begin with a space character are not saved"), ignoredups, erasedups ("causes all previous lines matching the current line to be removed from the history list before that line is saved") - erasedups actively destroys earlier evidence of repeated agent invocations.
-
-    Provenance: the text behind this entry is bash's own manual page, which states that the default value of HISTFILE is ~/.bash_history, but the copy that was fetched is a distribution's packaging repository at a pinned commit rather than the canonical manual at gnu.org, which was not reachable from the environment this was verified in. Promote to verified after fetching https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html.
   parser: null
 - id: crosscutting.shell_fish_history
   category: shell_history

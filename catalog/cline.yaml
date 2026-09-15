@@ -27,6 +27,76 @@ references:
 - https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts
 - https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/shared/storage/storage-context.ts
 - https://raw.githubusercontent.com/cline/cline/main/docs/enterprise-solutions/monitoring/prompt-storage.mdx
+env_overrides:
+# Every one of these is read by the path resolver in the vendor's own shared storage
+# module. They were found by the source verification pass, which noticed that a file
+# cited for four artifacts also resolved thirteen relocations that nothing in this
+# catalogue mentioned.
+- name: CLINE_DIR
+  effect: |-
+    Relocates the agent's entire home directory, which the resolver otherwise builds as .cline under the home directory. Everything else on this list hangs off it, so a collection keyed on ~/.cline finds nothing on such a host and cannot tell that apart from the agent never having run. The directory can also be set programmatically by the embedding application, in which case no environment variable records it.
+  source: |-
+    https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+- name: CLINE_DATA_DIR
+  effect: |-
+    Relocates the data directory, which holds the session transcripts, the task store, the databases, the secrets file and the settings. Set independently of the home directory, so a host can have the configuration tree in the default place and the evidence somewhere else entirely.
+  source: |-
+    https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+- name: CLINE_SESSION_DATA_DIR
+  effect: |-
+    Relocates the session store on its own. This is the conversation record, so it is the single most consequential variable on this list for an investigation.
+  source: |-
+    https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+- name: CLINE_TEAM_DATA_DIR
+  effect: |-
+    Relocates the shared team configuration tree.
+  source: |-
+    https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+- name: CLINE_CONNECTOR_DATA_DIR
+  effect: |-
+    Relocates the connector tree, which holds the connector settings and the per-channel logs of what the agent sent outward.
+  source: |-
+    https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+- name: CLINE_CONNECTOR_SETTINGS_PATH
+  effect: |-
+    Moves the connector settings file on its own, independently of the connector tree.
+  source: |-
+    https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+- name: CLINE_DB_DATA_DIR
+  effect: |-
+    Relocates the database directory that holds the task, cron and connector databases.
+  source: |-
+    https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+- name: CLINE_TASKS_DB_PATH
+  effect: |-
+    Moves the task database, one of the two transcript stores, on its own.
+  source: |-
+    https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+- name: CLINE_CRON_DB_PATH
+  effect: |-
+    Moves the cron database on its own. That database is the record of scheduled autonomous runs, so losing it loses the explanation for a session nobody started by hand.
+  source: |-
+    https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+- name: CLINE_CONNECTORS_DB_PATH
+  effect: |-
+    Moves the connector database on its own.
+  source: |-
+    https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+- name: CLINE_GLOBAL_SETTINGS_PATH
+  effect: |-
+    Moves the global settings file, which is where an approval or a permission relaxation would be recorded.
+  source: |-
+    https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+- name: CLINE_MCP_SETTINGS_PATH
+  effect: |-
+    Moves the MCP server inventory, which is the list of external tools the agent could reach and often carries their credentials inline.
+  source: |-
+    https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+- name: CLINE_PROVIDER_SETTINGS_PATH
+  effect: |-
+    Moves the provider settings file, which records which model endpoint the agent was talking to.
+  source: |-
+    https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
 artifacts:
 - id: cline.cache_and_remote_config
   category: cache
@@ -432,6 +502,65 @@ artifacts:
 
     Record structure: S3 object key shape observed in sdk/packages/shared/src/vcr.ts: /tasks/<userId>/<taskId>/api_conversation_history.json
   parser: null
+- id: cline.agent_schedules
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.cline/schedules/
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+  source_kind: source_code
+  volatility: |-
+    A schedule the agent created for itself, so it persists until something removes it. Removing the schedule removes the only record of why a run happened, while the run's own transcript stays in the session store, which is the pairing to look for.
+  notes: |-
+    Found by the source verification pass while re-sourcing the rules and MCP entries, and missing from this catalogue until then. The resolver's own comment calls these agent-created schedules and user-level routines, which is the forensically interesting part: this is the agent arranging to run itself later, with no user present at the time of the run. Read it together with the cron database and the cron specification directories, and treat a run in the session store with no matching interactive prompt as expected rather than anomalous when a schedule exists.
+  parser: null
+- id: cline.team_data
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.cline/data/teams/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+  source_kind: source_code
+  volatility: Persists until the shared configuration is removed.
+  notes: |-
+    Found by the source verification pass, and missing from this catalogue until then. A separate tree under the data directory for shared rather than personal configuration, with its own relocation variable. Worth reading before concluding that a rule or a server the agent used came from the user.
+  parser: null
+- id: cline.chat_workspace
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.cline/data/workspaces/chat/
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+  source_kind: source_code
+  volatility: |-
+    The resolver's comment says this lives under the data directory rather than the operating system temporary directory precisely so that temp reapers never delete it, which means work here survives a reboot and is not cleaned up on its own.
+  notes: |-
+    Found by the source verification pass, and missing from this catalogue until then. Every session the user started without a working directory writes its files here instead of into a project. That makes this the place to look for agent-written files that belong to no repository and would therefore appear in no git history, which is the hardest class of agent output to account for otherwise.
+  parser: null
 - id: cline.sqlite_dbs
   category: transcript
   root: user_profile
@@ -453,7 +582,7 @@ artifacts:
   notes: |-
     resolveDbDataDir() = join(resolveClineDataDir(), "db"); resolveTasksDbPath/resolveConnectorsDbPath/resolveCronDbPath resolve tasks.db, connectors.db, cron.db inside it. tasks.db is the session/task index that the VS Code history view and `cline` CLI read; cron.db holds scheduled/recurring agent runs (a persistence-mechanism artifact in its own right). Overridable via $CLINE_DB_DATA_DIR.
 
-    Record structure: Schema not documented in the sources read - enumerate tables on the acquired copy rather than assuming.
+    One gap the verification pass surfaced here: the resolver file describes two of these databases as living alongside a sessions.db, twice, and contains no resolver for that file. So a fourth database is referenced by the vendor's own code and its location is stated nowhere. Glob the database directory rather than the three filenames, and expect a file this catalogue does not name.
   parser: null
 - id: cline.vscode_task_transcripts
   category: transcript

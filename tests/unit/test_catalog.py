@@ -82,6 +82,11 @@ def test_verified_entries_cite_a_fetchable_source(catalogue: Catalogue) -> None:
         if artifact.is_verified:
             assert artifact.source_kind in ("official", "source_code"), artifact.id
             assert artifact.source.startswith("http"), artifact.id
+            # The generated reference renders the source as a Markdown link, and a space
+            # or a bracket inside the URL breaks it silently, leaving the analyst with a
+            # citation they cannot follow. Qualifiers such as a file name and a commit
+            # belong in notes.
+            assert not re.search(r"[\s()<>\[\]]", artifact.source), artifact.id
 
 
 def test_verified_entries_rest_on_their_own_vendor(catalogue: Catalogue) -> None:
