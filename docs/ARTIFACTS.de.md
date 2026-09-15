@@ -6,7 +6,7 @@
 
 Erzeugt aus catalog/ durch scripts/gen_artifact_docs.py. Nicht von Hand bearbeiten: die CI erzeugt diese Datei neu und schlägt fehl, wenn sie abweicht.
 
-347 Artefakte über 27 Agent(en), davon 249 auf einer abgerufenen Herstellerquelle beruhend.
+349 Artefakte über 27 Agent(en), davon 251 auf einer abgerufenen Herstellerquelle beruhend.
 
 Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
 
@@ -777,10 +777,11 @@ Vendor: Element Labs
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `lmstudio.cli_and_server` | cli and server | install_evidence | macOS, Linux, Windows | `%USERPROFILE%\.lmstudio\bin\lms.exe`<br>`~/.lmstudio/bin/lms` | binary | normal |  | bestätigt | [official](https://github.com/lmstudio-ai/docs/blob/main/1_developer/0_core/headless_llmster.mdx) |
 | `lmstudio.conversations` | conversations | transcript | macOS, Linux, Windows | `%USERPROFILE%\.lmstudio\conversations\`<br>`~/.lmstudio/conversations/` | json | normal | [EN] One file per conversation; deleting a chat in the UI deletes the file, so unallocated-space carving for JSON with LM Studio's role/content shape is worthwhile. | bestätigt | [official](https://raw.githubusercontent.com/lmstudio-ai/docs/main/0_app/1_basics/chat.md) |
+| `lmstudio.hub_downloads` | Presets downloaded from the hub | instructions | macOS, Linux, Windows | `%USERPROFILE%\.lmstudio\hub\`<br>`~/.lmstudio/hub/` | json | normal | [EN] Persists until the user deletes the downloaded preset. | bestätigt | [official](https://raw.githubusercontent.com/lmstudio-ai/docs/main/0_app/3_presets/import.md) |
 | `lmstudio.macos_app_support_and_logs` | macos app support and logs | log | macOS | `~/Library/Application Support/LM Studio/`<br>`~/Library/Caches/ai.elementlabs.lmstudio/`<br>`~/Library/HTTPStorages/ai.elementlabs.lmstudio/`<br>`~/Library/Logs/LM Studio/`<br>`~/Library/Preferences/ai.elementlabs.lmstudio.plist`<br>`~/Library/Saved Application State/ai.elementlabs.lmstudio.savedState/` | text | normal | [EN] Application logs typically rotate; capture the whole Logs directory. | **unbestätigt** | [community](https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/l/lm-studio.rb) |
 | `lmstudio.mcp_config` | mcp config | mcp_config | macOS, Linux, Windows | `%USERPROFILE%\.lmstudio\mcp.json`<br>`~/.lmstudio/mcp.json` | json | normal |  | **unbestätigt** | [official](https://github.com/lmstudio-ai/docs/blob/main/0_app/2_mcp/index.mdx) |
 | `lmstudio.models` | models | install_evidence | macOS, Linux, Windows | `%USERPROFILE%\.lmstudio\models\*\*\*`<br>`~/.lmstudio/models/*/*/*` | binary | normal |  | bestätigt | [official](https://github.com/lmstudio-ai/docs/blob/main/0_app/5_advanced/import-model.md) |
-| `lmstudio.presets_and_hub` | presets and hub | config | macOS, Linux, Windows | `%USERPROFILE%\.lmstudio\config-presets\`<br>`%USERPROFILE%\.lmstudio\hub\` [unbelegt]<br>`~/.lmstudio/config-presets/`<br>`~/.lmstudio/hub/` [unbelegt] | json | normal |  | bestätigt | [official](https://raw.githubusercontent.com/lmstudio-ai/docs/main/0_app/3_presets/index.md) |
+| `lmstudio.presets` | Configuration presets | instructions | macOS, Linux, Windows | `%USERPROFILE%\.lmstudio\config-presets\`<br>`~/.lmstudio/config-presets/` | json | normal | [EN] Persists until the user deletes the preset. | bestätigt | [official](https://raw.githubusercontent.com/lmstudio-ai/docs/main/0_app/3_presets/index.md) |
 
 ## Ollama
 
@@ -928,6 +929,7 @@ Vendor: Microsoft
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `vscode.extension_dirs` | extension dirs | install_evidence | Windows, macOS, Linux | `%USERPROFILE%\.vscode\extensions\`<br>`~/.cursor/extensions/`<br>`~/.vscode-insiders/extensions/`<br>`~/.vscode-server/extensions/`<br>`~/.vscode/extensions/`<br>`~/.windsurf/extensions/` | json | normal | [EN] Old versions are removed on update, but extensions.json in the parent directory retains install/update bookkeeping. | bestätigt | [official](https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/configure/extensions/extension-marketplace.md) |
 | `vscode.extension_install_evidence` | extension install evidence | install_evidence | macOS, Windows, Linux | `%USERPROFILE%\.vscode\extensions\`<br>`~/.vscode-server/extensions/`<br>`~/.vscode/extensions/extensions.json`<br>`~/.vscode/extensions/kilocode.kilo-code-*/`<br>`~/.vscode/extensions/rooveterinaryinc.roo-cline-*/`<br>`~/.vscode/extensions/saoudrizwan.claude-dev-*/` | json | normal | [EN] Removed on uninstall, but extensions.json often retains stale entries and the versioned directory name preserves the exact version that ran. | **unbestätigt** | recollection |
+| `vscode.mcp_config` | MCP server configuration | mcp_config | macOS, Linux, Windows | `<project>/.vscode/mcp.json`<br>`<vscode-user>/mcp.json` | json | normal | [EN] Persistent until edited. The workspace file is usually version-controlled, so git history gives authorship and timing for it. | bestätigt | [official](https://code.visualstudio.com/docs/copilot/customization/mcp-servers) |
 | `vscode.state_vscdb` | state vscdb | config | macOS, Windows, Linux | `%APPDATA%\Code\User\globalStorage\state.vscdb`<br>`~/.config/Code/User/globalStorage/state.vscdb`<br>`~/Library/Application Support/Code/User/globalStorage/state.vscdb`<br>`~/Library/Application Support/Code/User/globalStorage/state.vscdb.backup` | sqlite | normal | [EN] Rewritten continuously while the editor runs; SQLite may carry -wal/-shm siblings. Cleared by 'reset user data'. | bestätigt | [official](https://github.com/microsoft/vscode-discussions/discussions/748) |
 
 ### durable

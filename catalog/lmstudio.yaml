@@ -27,8 +27,9 @@ references:
 - https://github.com/lmstudio-ai/docs/blob/main/1_developer/0_core/headless_llmster.mdx
 - https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/l/lm-studio.rb
 artifacts:
-- id: lmstudio.presets_and_hub
-  category: config
+- id: lmstudio.presets
+  title: Configuration presets
+  category: instructions
   root: user_profile
   os:
   - macos
@@ -36,22 +37,39 @@ artifacts:
   - windows
   paths:
   - '%USERPROFILE%\.lmstudio\config-presets\'
-  - '%USERPROFILE%\.lmstudio\hub\'
   - ~/.lmstudio/config-presets/
-  - ~/.lmstudio/hub/
   format: json
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://raw.githubusercontent.com/lmstudio-ai/docs/main/0_app/3_presets/index.md
   source_kind: official
-  unsourced_paths:
+  volatility: Persists until the user deletes the preset.
+  notes: |-
+    A preset IS an instruction file by another name, because it carries the system prompt. Split out of a combined presets-and-hub entry by the source verification pass, which found that no single vendor page states both directories.
+  parser: null
+- id: lmstudio.hub_downloads
+  title: Presets downloaded from the hub
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
   - '%USERPROFILE%\.lmstudio\hub\'
   - ~/.lmstudio/hub/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/lmstudio-ai/docs/main/0_app/3_presets/import.md
+  source_kind: official
+  volatility: Persists until the user deletes the downloaded preset.
   notes: |-
-    A preset IS an instruction file by another name - it carries the system prompt. Anything downloaded into hub/ came from a remote source and is therefore part of the prompt-injection surface, same class of evidence as a CLAUDE.md pulled from a repo. Sibling paths confirmed via GitHub code search content match in lmstudio-ai/docs.
+    The vendor's own import page says presets downloaded from the hub or shared by the user are stored here. That provenance is the point: anything in this directory carries a system prompt that came from a remote source, which makes it the same class of evidence as an instruction file pulled out of a repository, and part of the prompt-injection surface rather than a record of what the user wrote.
 
-    Re-sourced by the verification pass: the page cited before covers threads and folders and mentions neither directory. The presets page states the presets directory in both spellings. The hub directory is stated on a third page, which means no single page covers this entry, so the two hub paths are marked unsourced until the entry is split.
+    Split out of a combined presets-and-hub entry by the source verification pass, which found the presets directory and the hub directory stated on two different vendor pages.
   parser: null
 - id: lmstudio.cli_and_server
   category: install_evidence

@@ -5260,6 +5260,23 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "lmstudio.hub_downloads",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.lmstudio\\hub\\",
+                        "~/.lmstudio/hub/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "log",
                     "collect_priority": "normal",
                     "id": "lmstudio.macos_app_support_and_logs",
@@ -5313,9 +5330,9 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
-                    "category": "config",
+                    "category": "instructions",
                     "collect_priority": "normal",
-                    "id": "lmstudio.presets_and_hub",
+                    "id": "lmstudio.presets",
                     "os": [
                         "macos",
                         "linux",
@@ -5323,9 +5340,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "%USERPROFILE%\\.lmstudio\\config-presets\\",
-                        "%USERPROFILE%\\.lmstudio\\hub\\",
-                        "~/.lmstudio/config-presets/",
-                        "~/.lmstudio/hub/"
+                        "~/.lmstudio/config-presets/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6067,6 +6082,23 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "unverified"
                 },
                 {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "vscode.mcp_config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.vscode/mcp.json",
+                        "<vscode-user>/mcp.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "config",
                     "collect_priority": "normal",
                     "id": "vscode.state_vscdb",
@@ -6548,7 +6580,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "6f2bbd56b3fb9e7cf99ee19d54aa7b015d3f5260d0fe8c53831a67bd4c5d3eef"
+    "sha256": "d75f83120048e66506962698a6852a3f1fab2addf700b8cc9b57f88e3d254a05"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

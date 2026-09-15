@@ -116,6 +116,29 @@ artifacts:
   notes: |-
     recollection, needs verification - I did not fetch a source that states the VS Code extensions-directory layout, so the exact paths here must be confirmed against Microsoft's documentation before they go in the catalogue as verified. Forensic value if confirmed is high and cheap: the versioned directory name pins WHICH version of Cline/Roo/Kilo ran, which is what lets us decide between the mutually exclusive layouts above (Cline 3.x shadow-git vs 4.x workspace refs; Kilo legacy tasks vs kilo.db; Roo pre/post customStoragePath).
   parser: null
+- id: vscode.mcp_config
+  title: MCP server configuration
+  category: mcp_config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.vscode/mcp.json
+  - <vscode-user>/mcp.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://code.visualstudio.com/docs/copilot/customization/mcp-servers
+  source_kind: official
+  volatility: Persistent until edited. The workspace file is usually version-controlled, so git history gives authorship and timing for it.
+  notes: |-
+    The inventory of external tools the editor's agent mode could reach, with their command lines and environment, which is where an inline secret ends up. Two scopes: the vendor states the workspace file as .vscode/mcp.json, shared through source control, and a user-level mcp.json in the user profile folder, which it reaches through a command rather than by naming the path. Enumerate the user-level file under every product variant, the same set as the user data roots entry.
+
+    Added by the source verification pass, which found these two paths claimed by a cross-cutting entry that rested on a different vendor's documentation. One correction came out of it: a user-level file directly under ~/.vscode is not what the vendor describes, and that spelling has been dropped.
+  parser: null
 - id: vscode.user_data_roots
   category: config
   root: user_profile
