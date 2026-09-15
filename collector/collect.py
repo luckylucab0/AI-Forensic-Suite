@@ -7485,14 +7485,33 @@ def custody_record(seq: int, event: str, manifest_sha: str, prev_sha: str | None
     return record
 
 
+def write_text_file(path: str, text: str) -> None:
+    """Write text as UTF-8 with no newline translation, on every platform.
+
+    open(path, "w") uses the platform's default encoding and translates "\n" to the
+    platform's line ending. Both are wrong here and the second is worse than wrong: the
+    custody record commits to the SHA-256 of the manifest, that hash is computed over the
+    text, and on Windows the file on disk then had different bytes than the ones hashed.
+    Every bundle written on Windows failed its own verification with "the chain describes a
+    different manifest than the one in this bundle", which is what tampering looks like.
+
+    collect.ps1 has always written through WriteAllText with an explicit encoding, which is
+    why the differential test caught this: two implementations of one format disagreeing is
+    the signal the second implementation exists to give.
+    """
+    with open(path, "w", encoding="utf-8", newline="") as handle:
+        handle.write(text)
+
+
 def write_bundle(out: str, manifest: dict) -> str:
     manifest_text = canonical_json(manifest)
     manifest_sha = sha256_bytes(manifest_text.encode("utf-8"))
-    with open(os.path.join(out, "manifest.json"), "w") as handle:
-        handle.write(manifest_text)
+    write_text_file(os.path.join(out, "manifest.json"), manifest_text)
     record = custody_record(0, "collected", manifest_sha, None)
-    with open(os.path.join(out, "chain_of_custody.jsonl"), "w") as handle:
-        handle.write(json.dumps(record, sort_keys=True) + "\n")
+    write_text_file(
+        os.path.join(out, "chain_of_custody.jsonl"),
+        json.dumps(record, sort_keys=True) + "\n",
+    )
     return manifest_sha
 
 
@@ -7527,8 +7546,7 @@ def write_zip(out: str, manifest: dict) -> str:
                 zf.writestr(info, handle.read())
     with open(archive, "rb") as handle:
         digest = sha256_bytes(handle.read())
-    with open(archive + ".sha256", "w") as handle:
-        handle.write("%s  %s\n" % (digest, os.path.basename(archive)))
+    write_text_file(archive + ".sha256", "%s  %s\n" % (digest, os.path.basename(archive)))
     return archive
 
 
