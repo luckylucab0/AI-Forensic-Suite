@@ -100,6 +100,8 @@ artifacts:
   status: verified
   source: https://code.claude.com/docs/en/claude-directory
   source_kind: official
+  unsourced_paths:
+  - /tmp/claude-shell-snapshot*
   volatility: |-
     Removed on CLEAN EXIT - a snapshot surviving on disk generally means that session crashed or was killed. The sweep clears whatever is left after a crash (brought under cleanupPeriodDays in v2.1.117). Explicitly NOT project-scoped and explicitly left alone by `claude project purge`, which even warns about it - so this directory survives the main anti-forensic command.
 
@@ -107,11 +109,7 @@ artifacts:
   notes: |-
     Effectively a copy of the analyst-relevant parts of the user's shell environment (.bashrc/.zshrc-derived aliases and functions), captured at a known time, including any function that wraps credentials or internal hostnames. IMPORTANT version note: v1.0.48 'Moved shell snapshots from /tmp to ~/.claude' - on evidence from before that, look in the system temp directory instead, and v1.0.51 fixed handling of home directories containing spaces.
 
-    Presence of files here is itself an indicator of an unclean exit or a live session. Content is a snapshot of the user's real shell environment - functions and aliases frequently embed tokens, internal hostnames and credential-fetch helpers, hence secret sensitivity. Capture it in live triage; it will usually be gone from a cleanly shut-down image.
-
-    Record structure: Shell script text: the user's aliases, functions and shell options captured at startup and re-applied by the Bash tool to each command. Changelog v2.1.147 ('shell snapshot dropping user functions whose names start with a single underscore') confirms it serializes user-defined functions. v1.0.54 switched to an in-memory snapshot for some paths, and v2.1.51 lets the Bash tool skip the login shell when a snapshot is available - so presence/absence varies by version.
-
-    Aliases, shell functions and shell options captured from the user's shell at startup and re-applied by the Bash tool to each command.
+    The verification pass could not find this temporary-directory spelling anywhere in the vendor's documentation, which states only the directory under ~/.claude. Kept and marked unsourced rather than dropped, because an extra glob costs nothing while a removed path that turns out to be real costs evidence, but treat a hit under it as needing its own explanation.
   parser: null
 - id: claude_code.image_cache
   category: cache
@@ -153,7 +151,7 @@ artifacts:
   sensitivity: normal
   collect_priority: first
   status: verified
-  source: https://code.claude.com/docs/en/claude-directory
+  source: https://code.claude.com/docs/en/settings
   source_kind: official
   volatility: |-
     Only the FIVE newest copies are kept, plus a copy of any version Claude Code could not parse - so this rotates by count, not by age, and a busy machine loses history fast. Brought under the cleanupPeriodDays sweep in v2.1.117. Explicitly left alone by `claude project purge`, which warns that 'backups/ may still contain this project entry in old .claude.json snapshots'.
@@ -162,11 +160,7 @@ artifacts:
   notes: |-
     Historical DIFFS of global state: which projects existed, which were trusted, which MCP servers were configured, and per-project history - including projects that have since been purged. Because `claude project purge` does not touch this directory, a purged project's entry often survives here. Directly useful for proving that a project or MCP server existed on a machine after the user tried to remove the evidence.
 
-    Record structure: Each file is an earlier full copy of ~/.claude.json, copied whenever Claude Code rewrites it. Same schema as ~/.claude.json.
-
-    Excellent short-window timeline source: five prior states of the trust list, MCP server set and OAuth session. Rolls over fast on an active endpoint - collect early. The .corrupted.<timestamp> copy can survive longer than the rotation.
-
-    Record structure: Earlier versions of ~/.claude.json, copied each time Claude Code rewrites the file. Same key structure as the live file.
+    Re-sourced by the verification pass: the corrupted-config backup is documented on the settings page rather than on the directory page cited before.
   parser: null
 - id: claude_code.policy_limits
   category: config
@@ -303,7 +297,7 @@ artifacts:
   sensitivity: normal
   collect_priority: first
   status: verified
-  source: https://code.claude.com/docs/en/data-usage.md
+  source: https://code.claude.com/docs/en/tools-reference
   source_kind: official
   volatility: |-
     Swept under cleanupPeriodDays (default 30 days).
@@ -312,11 +306,7 @@ artifacts:
   notes: |-
     A self-contained, portable copy of a whole session including subagents, written when `/feedback` runs on a third-party provider (Bedrock, Vertex, Foundry, gateway) or with no first-party credentials configured. It can therefore contain a session whose original transcript has already aged out or been purged. Its existence also tells you the user intended to send a transcript off the machine.
 
-    Redacted transcript archives are still transcript material and may survive as a bundle after the original .jsonl is gone. Note the redaction: content here is deliberately scrubbed, so absence of a secret in a bundle is not evidence it was absent from the session.
-
-    Record structure: Archive files containing a redacted transcript bundle. Vendor states the payload is the conversation transcript, ANY SUBAGENT TRANSCRIPTS, and the raw session log file from disk, with known API key and token patterns redacted but source code and file contents included as-is. Since v2.1.224 the consented share may also include the last request's model settings - the SYSTEM PROMPT, which embeds the user's CLAUDE.md instructions, plus tool definitions. Container format not documented - needs verification.
-
-    feedback-bundles/ holds REDACTED transcript archives written by /feedback on third-party providers or when no Anthropic credentials are configured. feedback/drafts/ holds queued Claude-drafted feedback awaiting review in /feedback; gated by the `feedbackDrafts` setting.
+    Re-sourced by the verification pass: the page cited before names the feedback-bundles directory and not the drafts directory under it.
   parser: null
 - id: claude_code.subagent_transcripts
   category: transcript
@@ -336,12 +326,14 @@ artifacts:
   status: verified
   source: https://code.claude.com/docs/en/sub-agents.md
   source_kind: official
+  unsourced_paths:
+  - ~/.claude/projects/<project>/<session-id>/subagents/agent-<agentId>.meta.json
   volatility: |-
     Removed with the parent session transcript when it ages out under cleanupPeriodDays (default 30 days). Unaffected by main-conversation compaction - they live in separate files, so a subagent transcript can survive content that was compacted out of the trunk.
   notes: |-
     Note the shape change: <session-id> is BOTH a .jsonl file and a sibling DIRECTORY under the same project folder. Hook payloads expose the path as `agent_transcript_path`. The subagent's own work - its prompts, its tool calls, its file reads - is only here, not in the parent transcript, so skipping this directory loses most of the agentic activity in a delegation-heavy session. The `.meta.json` sidecar naming and contents come from a third-party parser's source, not from vendor docs.
 
-    Record structure: Same line format as the trunk transcript, but every line has `isSidechain: true` and carries `agentId` (membership). Trunk lines link to a subagent via `toolUseResult.agentId` or, per a third-party parser, via the `toolUseId` inside the `agent-<id>.meta.json` sidecar; the sidecar also carries `agentType` (e.g. "workflow-subagent") and, for the teammates feature, a `name`. Nested agent->agent spawns are linkable through these. Some subagent files (e.g. prompt-suggestion helpers) are never referenced from the trunk at all - enumerate the directory, do not walk only from trunk references. Teammate traffic appears in trunk user entries as <\teammate-message> blocks (teammates feature, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1).
+    The verification pass confirmed the transcript naming and could not find the sidecar metadata filename anywhere in the vendor's documentation, so that one path is marked unsourced.
   parser: null
 - id: claude_code.tool_result_spills
   category: transcript
@@ -671,7 +663,7 @@ artifacts:
   sensitivity: normal
   collect_priority: durable
   status: verified
-  source: https://code.claude.com/docs/en/claude-directory.md
+  source: https://code.claude.com/docs/en/mcp-quickstart
   source_kind: official
   volatility: |-
     Not swept. Rewritten by Claude Code whenever /config options change or trust prompts are accepted; earlier versions are copied into ~/.claude/backups/ (five newest kept).
@@ -680,11 +672,7 @@ artifacts:
   notes: |-
     CORRECTION TO BRIEF: the docs describe the `projects` key as per-project trust and last-session metrics and do not document per-project prompt history here; prompt history is ~/.claude/history.jsonl. Older Claude Code versions did keep a per-project `history` array in this file - treat that as unverified for current versions but still worth parsing on older images, since it would be an independent prompt-history source. Sensitivity secret: it carries the OAuth session and MCP server definitions that may embed tokens.
 
-    The key that makes the rest of the tree interpretable: because the projects map holds real absolute paths, you can map each encoded ~/.claude/projects/<project> directory back to its true cwd without brute-forcing the encoding, and resolve collisions. Also records per-directory workspace TRUST decisions (who approved running hooks and project settings) and user-scope MCP server definitions, which may embed endpoints and token references. Vendor explicitly warns not to delete it.
-
-    Record structure: Holds app state that does not belong in settings.json: theme, the OAuth session, per-project trust decisions, the user's personal MCP servers, and UI toggles. The `projects` key tracks per-project state such as trust-dialog acceptance and last-session metrics - this is the per-project inventory of every directory Claude Code was run in. `mcpServers` here holds BOTH user-scope servers (all projects) and local-scope servers (per project, stored under that project's path); team-shared servers live in <project>/.mcp.json instead. Documented global-config-only keys (ignored anywhere else): `autoConnectIde`, `autoInstallIdeExtension`, `copyOnSelect`, `diffTool`, `externalEditorContext`, `permissionExplainerEnabled`, `teammateDefaultModel`. `claude project purge <path>` deletes that project's entry from this file. NOTE: permission rules approved in-session go to .claude/settings.local.json, NOT here.
-
-    App state, OAuth state, UI toggles and personal (user-scope) MCP servers. Contains a `projects` map keyed by ABSOLUTE working-directory path - the purge dry-run output prints `config: projects["/home/alice/work/my-repo"]` described as 'project entry in ~/.claude.json (trust, history, MCP servers)'. So this single file enumerates every directory Claude Code was ever run in, in un-encoded form, which is the ground truth for reversing the lossy <project> directory encoding.
+    Re-sourced by the verification pass: the configuration directory page redirects every path under ~/.claude when the config directory variable is set, and this file sits beside that directory rather than inside it, so that page did not cover the relocated spelling.
   parser: null
 - id: claude_code.keybindings
   category: config
@@ -721,14 +709,14 @@ artifacts:
   sensitivity: normal
   collect_priority: durable
   status: verified
-  source: https://code.claude.com/docs/en/plugin-marketplaces.md
+  source: https://code.claude.com/docs/en/env-vars
   source_kind: official
   volatility: |-
     Written by /plugin marketplace add and the claude plugin commands; not swept. Marketplace state is stored once per user, not per project.
   notes: |-
     VERIFIED - this half of the brief's community claim is correct. This is the provenance record for third-party code on the endpoint: every marketplace URL here is a supply-chain entry point worth attributing.
 
-    Record structure: Registry of marketplaces the user has added. Marketplace sources can be a GitHub owner/repo shorthand, a git URL, an npm package, a local `directory` or `file` path, or a `command` source; relative local paths resolve against the repository's MAIN checkout even from a worktree. At startup Claude Code also registers marketplaces found in a seed directory's known_marketplaces.json. Constrained by the `strictKnownMarketplaces`, `blockedMarketplaces` and `extraKnownMarketplaces` settings.
+    Re-sourced by the verification pass. The directory page's tree that contains this file is labelled with the plugin seed directory, not the plugin cache directory, so the previous citation supported the wrong parent.
   parser: null
 - id: claude_code.org_policy_cache
   category: config
@@ -779,13 +767,13 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://code.claude.com/docs/en/plugins-reference.md
+  source: https://code.claude.com/docs/en/plugin-marketplaces
   source_kind: official
   volatility: Ship with the plugin; versioned inside the plugin cache.
   notes: |-
     That last rule is a quiet persistence mechanism: dropping a .claude-plugin/plugin.json into ~/.claude/skills/<anything>/ registers a plugin - complete with hooks and MCP servers - with no install command and no marketplace record. Worth a dedicated detection rule.
 
-    Record structure: plugin.json holds plugin metadata including `name`, `version`, `defaultEnabled` (false ships a plugin installed but off), `userConfig`, and inline component declarations; hooks, MCP servers, LSP config and monitors may each be a separate file at the plugin root OR inline in plugin.json, so parse both shapes. `experimental.monitors` may be an array or a relative path string. A folder under any skills directory that contains .claude-plugin/plugin.json is loaded as a plugin named <name>@skills-dir on the next session, discovered in place with no marketplace and no install step.
+    Re-sourced by the verification pass: the reference cited before gives the bare filename, the marketplace page gives it inside its directory.
   parser: null
 - id: claude_code.project_settings
   category: config
@@ -853,13 +841,13 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://code.claude.com/docs/en/settings-reference.md
+  source: https://code.claude.com/docs/en/hooks
   source_kind: official
   volatility: Follows whatever file the operator pointed at; not managed or swept by Claude Code.
   notes: |-
     The highest-value execution artifacts in this family are files Claude Code never names: hook scripts and credential helpers. A catalogue of settings files alone misses the payload. CLAUDE_ENV_FILE is a particularly clean persistence primitive - it executes on every single Bash command.
 
-    Record structure: Not a fixed path - this entry exists so the collector follows every settings key whose VALUE is a command line or script path, and acquires the target. Keys to resolve (exact names): `apiKeyHelper`, `policyHelper.path`, `otelHeadersHelper`, `awsAuthRefresh`, `awsCredentialExport`, `gcpAuthRefresh`, `statusLine`, `subagentStatusLine`, `fileSuggestion`, `processWrapper`, `defaultShell`, and every `hooks.<Event>[].hooks[].command`. Also resolve `CLAUDE_ENV_FILE`, a shell script whose contents are run before EVERY Bash command in the same shell process, and which SessionStart, Setup, CwdChanged and FileChanged hooks populate dynamically. Claude Code runs apiKeyHelper through /bin/sh on macOS and Linux and cmd on Windows. .claude/hooks/ and ~/.claude/hooks/ are documentation conventions for hook scripts, not auto-loaded directories.
+    Re-sourced by the verification pass: the settings reference names a hook script only inside one example under the user directory, with no project-level hooks directory. The hooks page documents both.
   parser: null
 - id: claude_code.themes
   category: config
@@ -1145,14 +1133,14 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://code.claude.com/docs/en/claude-directory.md
+  source: https://code.claude.com/docs/en/env-vars
   source_kind: official
   volatility: Documented as a directory NOT to delete. Orphaned plugin versions are cleaned up over
     time.
   notes: |-
     CORRECTION TO BRIEF: there is no installed_plugins.json. Plugin enablement lives in the `enabledPlugins` key of settings.json files; marketplace registration lives in known_marketplaces.json.
 
-    Record structure: Root for cloned marketplaces, installed plugin versions and per-plugin data, managed by the `claude plugin` commands. Layout: known_marketplaces.json, marketplaces/<name>/..., cache/<marketplace>/<plugin>/<version>/..., data/<id>/, synced/. Relocated by CLAUDE_CODE_PLUGIN_CACHE_DIR (which sets the PARENT directory, not the cache itself) and pre-seeded from CLAUDE_CODE_PLUGIN_SEED_DIR (colon-separated on Unix, semicolon on Windows).
+    Re-sourced by the verification pass: the plugin cache override is documented on the environment variable reference, which also states the default under ~/.claude/plugins. The directory page cited before never mentions the variable.
   parser: null
 - id: claude_code.plugins_synced
   category: install_evidence
@@ -1464,7 +1452,7 @@ artifacts:
   - macos
   - windows
   paths:
-  - $CLAUDE_CODE_DEBUG_LOGS_DIR/
+  - $CLAUDE_CODE_DEBUG_LOGS_DIR
   - '%USERPROFILE%\.claude\debug\*.txt'
   - ~/.claude/debug/*.txt
   - ~/.claude/debug/<session-id>.txt
@@ -1481,11 +1469,7 @@ artifacts:
   notes: |-
     Present only when the session was started with `--debug` or the user ran `/debug`, so its existence is itself evidence of troubleshooting activity. Because it logs hook execution, it is the best place to see hook-based automation (including hooks that exfiltrate or filter data) actually firing. Vendor docs elsewhere refer to 'the raw session log file from disk' being uploaded with a consented transcript share - likely this file.
 
-    The authoritative source for WHICH credential and WHICH managed-settings source a session actually used - facts no config file states. Filename gives you the session ID for joining to transcripts. Reported to grow very large.
-
-    Record structure: Plain text, one file per session named by session ID, so it joins directly to the transcript. Content documented by vendor: hook execution details (which hook ran, how it exited, its stderr) and, during a checkpoint restore, the name of each path the restore skipped. `claude --debug-file <path>` redirects it to an arbitrary location, so the debug directory can be empty even though debug logging ran - check settings and shell history for the flag.
-
-    Per-session debug logs, written while debug logging is on (--debug, --debug=mcp, or /debug). Contains MCP server stderr, the `Using Anthropic profile auth` line naming the credential source, warnings about env vars dropped from project/local settings, and `Remote settings: Settings validation failed - no fields could be salvaged` on a rejected server-managed payload. Relocated by CLAUDE_CODE_DEBUG_LOGS_DIR; verbosity set by CLAUDE_CODE_DEBUG_LOG_LEVEL.
+    Shape correction from the source verification pass: the vendor's environment variable reference says of this variable, despite the name, that it is a file path and not a directory. This entry had it with a trailing slash.
   parser: null
 - id: claude_code.jobs
   category: log
@@ -1788,12 +1772,14 @@ artifacts:
   status: verified
   source: https://code.claude.com/docs/en/managed-settings.md
   source_kind: official
+  unsourced_paths:
+  - 'C:\ProgramData\ClaudeCode\managed-settings.json'
   volatility: |-
     Deployed by MDM/config management; read at startup and reloaded when the file changes. Not swept by Claude Code.
   notes: |-
     CORRECTION TO BRIEF: the Windows path is C:\Program Files\ClaudeCode\managed-settings.json. The docs state explicitly that Claude Code does NOT read the legacy C:\ProgramData\ClaudeCode\managed-settings.json. Collect the ProgramData path anyway as historical evidence (older deployments and stale policy), but do not treat it as live policy.
 
-    Record structure: Same JSON shape as settings.json. Highest-precedence settings FILE tier; only a few security-sensitive keys can be loosened below it. Key enforcement keys: `allowManagedPermissionRulesOnly`, `allowManagedHooksOnly`, `allowManagedMcpServersOnly`, `disableAllHooks`, `permissions.disableBypassPermissionsMode`, `strictPluginOnlyCustomization.{skills,agents,hooks,mcp}`, `strictKnownMarketplaces`, `forceRemoteSettingsRefresh`, `managedSourcesBehavior` ("first-wins" default, or "merge", v2.1.242+), `parentSettingsBehavior`, `policyHelper` (object with `path`, `timeoutMs`, `refreshIntervalMs`), `wslInheritsWindowsSettings`, `requiredMinimumVersion`/`requiredMaximumVersion`/`minimumVersion`, `disableSideloadFlags`.
+    The verification pass found the ProgramData spelling absent from the managed settings page, which names only the Program Files location, and the vendor's changelog records the removal of a deprecated Windows managed settings fallback. Still worth collecting on an endpoint that has not been updated, so it stays in the list, marked unsourced.
   parser: null
 - id: claude_code.managed_settings_macos_profile
   category: permissions

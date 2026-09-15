@@ -56,14 +56,14 @@ artifacts:
   collect_priority: normal
   status: verified
   source: |-
-    https://raw.githubusercontent.com/JetBrains/intellij-community/master/native/repair-utility/helpers/global_variables.go
+    https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/util/src/com/intellij/openapi/application/PathManager.java
   source_kind: source_code
   volatility: |-
     A product-version upgrade creates a NEW <Product><Version> tree and JetBrains prompts to import from the old one; the old tree usually survives on disk, so multiple versions' worth of AI history coexist. Deleting a version directory destroys its AI history.
   notes: |-
     CANONICAL, from JetBrains' own repair-utility source (www.jetbrains.com and junie.jetbrains.com are unreachable from this environment, so this is the authoritative substitute). Four maps verified verbatim: defaultConfigDirLocation {darwin: ${HOME}/Library/Application Support/JetBrains/{dataDirectoryName}/, linux: ${HOME}/.config/JetBrains/{dataDirectoryName}/, windows: %APPDATA%/JetBrains/{dataDirectoryName}/}; defaultSystemDirLocation {darwin: ${HOME}/Library/Caches/JetBrains/..., linux: ${HOME}/.cache/JetBrains/..., windows: %LOCALAPPDATA%/JetBrains/...}; defaultLogsDirLocation {darwin: $HOME/Library/Logs/JetBrains/..., linux: $HOME/.cache/JetBrains/{dataDirectoryName}/log/, windows: %LOCALAPPDATA%/JetBrains/{dataDirectoryName}/log/}. The plugins row is from the corroborating community research doc (tinesoft/aikill, direct macOS inspection). Overrides: idea.config.path / idea.system.path / idea.log.path / idea.plugins.path in idea.properties, which global_variables.go looks for at defaultSystemDir/idea.properties, $HOME/idea.properties, {ideaPackage}/bin/idea.properties, and via the $<IDE>_PROPERTIES env var - check these before trusting the defaults. Also note $HOME/.local/share/JetBrains/Toolbox/apps/ for Toolbox-managed installs.
 
-    Record structure: <dataDirectoryName> is the concatenated product + version, e.g. IntelliJIdea2026.2, PhpStorm2026.1, PyCharm2025.3. Enumerate every sibling directory - do not assume one.
+    Re-sourced by the verification pass: the file cited before states the config, cache and log trees but its only plugins entry is inside the installation directory, and its only .local/share strings are unrelated. The path manager builds the per-platform plugin directory, which is also why the Linux spelling correctly has no plugins suffix.
   parser: null
 - id: jetbrains_ai.password_safe
   category: credentials
@@ -86,14 +86,16 @@ artifacts:
   legacy: true
   status: verified
   source: |-
-    https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/credential-store-impl/src/credentialStore/keePass/KeePassCredentialStore.kt
+    https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/credential-store-impl/src/credentialStore/keePass/mainKey.kt
   source_kind: source_code
+  unsourced_paths:
+  - ~/Library/Application Support/JetBrains/<Product><Version>/options/security.xml
   volatility: |-
     A kdbx moved to another machine WITHOUT its main-key file causes the platform to silently generate a new main password and WIPE the KeePass contents - so never let an acquired copy be opened by a live IDE.
   notes: |-
     ANSWERS THE BRIEF'S QUESTION ON RECOVERABILITY. Verified from JetBrains source: `const val DB_FILE_NAME: String = "c.kdbx"`, `fun getDefaultDbFile(): Path = PathManager.getOriginalConfigDir().resolve(DB_FILE_NAME)` and `fun getDefaultMainPasswordFile(): Path = PathManager.getOriginalConfigDir().resolve(MAIN_KEY_FILE_NAME)`, with `internal const val MAIN_KEY_FILE_NAME = "c.pwd"` and `private const val OLD_MAIN_PASSWORD_FILE_NAME = "pdb.pwd"` in credentialStore/keePass/mainKey.kt. So both files sit directly in the IDE CONFIG dir (NOT in options/), current names c.kdbx + c.pwd, legacy main-key name pdb.pwd - glob for all three. WHAT THIS MEANS OPERATIONALLY: (1) The DEFAULT provider is ProviderType.KEYCHAIN - the native OS store (macOS Keychain, Windows Credential Manager/DPAPI, Linux libsecret/KWallet) - in which case NO c.kdbx exists at all and the AI Assistant / JetBrains Account tokens are NOT recoverable from the filesystem alone; you need the keychain. (2) KeePass (ProviderType.KEEPASS) is an opt-in alternative, in which case c.kdbx is a standard KDBX database. If the user set no main password, c.pwd holds the (obfuscated, base64) key next to the db and the store is effectively recoverable; if they set one, or chose EncryptionType.PGP_KEY, it is not. (3) The db path is user-overridable: PasswordSafeConfigurable.kt writes `settings.keepassDb = newDbFile.toString()` for any file ending in .kdbx. ALWAYS read options/security.xml first - PasswordSafeSettings is @State(name="PasswordSafe", storages=[Storage("security.xml", roamingType=DISABLED)]) - to learn which provider, which db path and which encryption type are in force. Metadata + hash only; record the provider verdict in the report.
 
-    Record structure: security.xml holds the PasswordSafe component (provider type, keepassDb path, pgpKeyId). c.kdbx is KDBX (gzipped XML inner payload; JetBrains' reader lives in platform/credential-store-impl/src/credentialStore/kdbx/). Entry Times/CreationTime and Times/LastModificationTime give per-credential timestamps - useful even when values cannot be decrypted.
+    Re-sourced by the verification pass: the store cited before really does build the database file against the configuration directory, but the main key filename is only imported there and is defined in this file. The settings file that records which storage backend is in use is declared in a third file, so it is marked unsourced here.
   parser: null
 - id: jetbrains_ai.ide_logs
   category: log
@@ -113,14 +115,16 @@ artifacts:
   collect_priority: normal
   status: verified
   source: |-
-    https://raw.githubusercontent.com/JetBrains/intellij-community/master/native/repair-utility/helpers/global_variables.go
+    https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/platform-impl/src/com/intellij/idea/LoggerFactory.java
   source_kind: source_code
+  unsourced_paths:
+  - ~/Library/Logs/JetBrains/<Product><Version>/acp.log
   volatility: |-
     Rotated (idea.log.1, .2, ...) and capped - the oldest AI activity is lost first. Collect the whole log directory, not just idea.log.
   notes: |-
     The per-OS log roots are verified from JetBrains' own defaultLogsDirLocation map. The AI-specific value is verified by the aikill researcher grepping a live idea.log and finding Junie plugin-load lines plus internal matterhorn-namespaced module diagnostics (org.jetbrains.junie_$implicit) - i.e. idea.log dates AI-plugin activation and load even when the transcript stores are gone. acp.log is named by the junie-export README, which injects 'matching excerpts from the relevant idea*.log files and acp.log' into its debug output - ACP is the Agent Client Protocol layer that fronts Junie (agentId 'acp.registry.junie'), so acp.log is the agent-transport log. I did not confirm acp.log's exact directory; glob for it across the log root. Product-agnostic caveat: the executable-named log file is idea.log even in non-IntelliJ products in most versions, but confirm per product.
 
-    Record structure: Grep for: junie, matterhorn, com.intellij.ml.llm, acp.registry, AUI_EVENTS, ChatSession.
+    Re-sourced by the verification pass: neither log filename appears in the file cited before. The logger factory resolves the main log file against the log directory. The agent protocol log has no source the pass could find, so it is marked unsourced.
   parser: null
 - id: jetbrains_ai.log_data
   category: log

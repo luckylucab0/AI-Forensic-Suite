@@ -64,24 +64,27 @@ artifacts:
   - windows
   - linux
   paths:
-  - '%USERPROFILE%\.gemini\chats\'
   - '%USERPROFILE%\.gemini\sessions\'
-  - ~/.gemini/chats/
+  - '%USERPROFILE%\.gemini\tmp\*\chats\'
+  - ~/.cache/.gemini/tmp/*/chats/
   - ~/.gemini/sessions/
+  - ~/.gemini/tmp/*/chats/
   format: json
   sensitivity: normal
   collect_priority: first
-  status: unverified
-  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
-  source_kind: official
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
+  source_kind: source_code
+  unsourced_paths:
+  - '%USERPROFILE%\.gemini\sessions\'
+  - ~/.gemini/sessions/
   volatility: |-
     Deleted on a timer by default, which is unusual and is the most important fact about this agent. general.sessionRetention has enabled default true, maxAge default "30d" described as "Automatically delete chats older than this time period", an optional maxCount as the "Maximum number of sessions to keep", and minRetention default "1d" as a "Minimum retention period (safety limit)".
   notes: |-
     The primary evidence, and the entry whose status matters most. Google documents the retention policy for chats precisely and does not say where the chats are written, so the path here is a plausible reading of the setting's name and nothing more. It is marked unverified for that reason and collected anyway.
 
-    What follows for a report. An absent conversation older than thirty days is the documented default behaviour, not a sign of anti-forensics, and saying otherwise would invert the finding. The settings file is where to check whether the default was in force, whether retention was disabled, and whether maxCount was set lower.
-
-    Verify this path before relying on it. If it is wrong, the directory glob in gemini_cli.home_tree still collects the content and the manifest will attribute it there instead.
+    Path correction and promotion from the source verification pass, which was asked to find a source for this entry and found the constructing code instead. Saved chats go into a chats directory under the per-project temporary directory, which is the global runtime directory joined with tmp and then with a per-project identifier. This entry previously claimed a chats directory directly under the agent's home directory, where nothing is written. The vendor's command reference corroborates the parent, stating the per-project temporary directory for the chat save command in both spellings, without naming the chats directory inside it. The cache-rooted spelling is the same directory under the macOS Seatbelt sandbox, where the runtime directory diverts into ~/.cache. A sessions directory is named in no source the pass could find, so it stays marked unsourced.
   parser: null
 - id: gemini_cli.home_tree
   category: config
@@ -97,14 +100,15 @@ artifacts:
   sensitivity: normal
   collect_priority: first
   status: verified
-  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/utils/paths.ts
+  source: |-
+    https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
   source_kind: source_code
   volatility: |-
     Mixed. Some of what is in here is deleted on a timer, see gemini_cli.chats, and the rest persists until edited.
   notes: |-
     GEMINI_DIR = '.gemini' in packages/core/src/utils/paths.ts. Claimed as a whole tree on purpose: the vendor documents the directory and several files in it, and not everything that lands here is documented anywhere. A glob over the tree means an undocumented file is still collected and still appears in the manifest, rather than being absent because nobody had written it down.
 
-    The named entries in this catalogue give attribution; this one gives coverage. A file claimed by both appears once, attributed to the specific entry, with artifact_ids recording that this glob matched it too. See ADR 0014.
+    Re-sourced by the verification pass: the file cited before declares the directory name as a constant and never joins it to a home directory. The storage module does. Forensically important and newly established by the pass: the runtime directory diverts to ~/.cache/.gemini when the sandbox variable is set to the macOS Seatbelt backend, so under that sandbox the account file, the trusted folder list, the temporary directory and the saved chats live there instead. The settings file and the cached credentials do not move.
   parser: null
 - id: gemini_cli.shell_history
   category: shell_history
@@ -195,11 +199,14 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/utils/paths.ts
+  source: |-
+    https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
   source_kind: source_code
   volatility: Rewritten on sign-in.
   notes: |-
     GOOGLE_ACCOUNTS_FILENAME = 'google_accounts.json'. Which account the agent ran as, which is the attribution question: a transcript says what was asked, this says whose credentials answered it, and on a shared or handed-over machine those are different people.
+
+    Re-sourced by the verification pass, same cause as the home tree entry. This file is under the runtime directory, so it is one of the files that moves to ~/.cache/.gemini under the macOS Seatbelt sandbox.
   parser: null
 - id: gemini_cli.trusted_folders
   category: permissions
@@ -215,13 +222,14 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/utils/paths.ts
+  source: |-
+    https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
   source_kind: source_code
   volatility: Appended to as the user trusts directories; nothing observed that expires an entry.
   notes: |-
     TRUSTED_FOLDERS_FILENAME = 'trustedFolders.json'. The directories the user allowed the agent to operate in, which is both the permission record and a list of working copies to collect project-anchored artifacts from.
 
-    GEMINI_CLI_TRUSTED_FOLDERS_PATH moves it, so check the environment before reading an empty result as a cautious user.
+    Re-sourced by the verification pass, same cause as the home tree entry. Also under the runtime directory, so it moves under the macOS Seatbelt sandbox.
   parser: null
 - id: gemini_cli.credentials
   category: credentials
@@ -236,14 +244,15 @@ artifacts:
   format: json
   sensitivity: secret
   collect_priority: normal
-  status: unverified
-  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
-  source_kind: official
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
+  source_kind: source_code
   volatility: Rewritten on sign-in and on token refresh.
   notes: |-
     Metadata and a hash only. The configuration reference describes OAuth as an authentication method and the paths module names the directory, but no page read here names the credential file itself, so the filename is unverified.
 
-    Collected anyway, because its existence and its timestamps date the sign-in, which is the forensic question. If the name is wrong the file is still collected by gemini_cli.home_tree, and that is the one case where this catalogue's redundancy costs something: it would be collected as evidence rather than withheld as a credential. Verify this entry.
+    Promoted by the source verification pass, which was asked to find a source for this path: the storage module declares the filename and joins it onto the global agent directory. No prose documentation states it. This file uses the agent directory directly rather than the runtime directory, so unlike the account file and the saved chats it does not move under the macOS Seatbelt sandbox.
   parser: null
 - id: gemini_cli.project_config
   category: project_instructions

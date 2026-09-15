@@ -755,7 +755,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
-                        "$CLAUDE_CODE_DEBUG_LOGS_DIR/",
+                        "$CLAUDE_CODE_DEBUG_LOGS_DIR",
                         "%USERPROFILE%\\.claude\\debug\\*.txt",
                         "~/.claude/debug/*.txt",
                         "~/.claude/debug/<session-id>.txt"
@@ -1941,8 +1941,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "<vscode-user>/globalStorage/saoudrizwan.claude-dev/cache/",
-                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/cline_recommended_models.json",
-                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/remote_config_<orgId>.json"
+                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/cache/remote_config_<orgId>.json",
+                        "<vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/cline_recommended_models.json"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -2467,10 +2467,12 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
-                        "%USERPROFILE%\\.codex\\sessions\\**\\rollout-*.jsonl.tmp",
+                        "%USERPROFILE%\\.codex\\sessions\\**\\rollout-*.jsonl.*.tmp",
                         "%USERPROFILE%\\.codex\\sessions\\**\\rollout-*.jsonl.zst",
-                        "~/.codex/sessions/**/rollout-*.jsonl.tmp",
-                        "~/.codex/sessions/**/rollout-*.jsonl.zst"
+                        "%USERPROFILE%\\.codex\\sessions\\**\\rollout-compress-*.tmp",
+                        "~/.codex/sessions/**/rollout-*.jsonl.*.tmp",
+                        "~/.codex/sessions/**/rollout-*.jsonl.zst",
+                        "~/.codex/sessions/**/rollout-compress-*.tmp"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -2660,11 +2662,11 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
+                        "~/.continue/.utils/repo_map.txt",
                         "~/.continue/index/autocompleteCache.sqlite",
                         "~/.continue/index/docs.sqlite",
                         "~/.continue/index/index.sqlite",
-                        "~/.continue/index/lancedb/",
-                        "~/.continue/repo_map.txt"
+                        "~/.continue/index/lancedb/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -2978,7 +2980,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "transcript",
@@ -4161,14 +4163,15 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
-                        "%USERPROFILE%\\.gemini\\chats\\",
                         "%USERPROFILE%\\.gemini\\sessions\\",
-                        "~/.gemini/chats/",
-                        "~/.gemini/sessions/"
+                        "%USERPROFILE%\\.gemini\\tmp\\*\\chats\\",
+                        "~/.cache/.gemini/tmp/*/chats/",
+                        "~/.gemini/sessions/",
+                        "~/.gemini/tmp/*/chats/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "credentials",
@@ -4185,7 +4188,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "secret",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "config",
@@ -5547,7 +5550,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "$XDG_DATA_HOME/opencode/opencode.db",
-                        "%LOCALAPPDATA%\\opencode\\opencode.db",
+                        "%USERPROFILE%\\.local\\share\\opencode\\opencode.db",
                         "~/.local/share/opencode/opencode-*.db",
                         "~/.local/share/opencode/opencode.db",
                         "~/.local/share/opencode/opencode.db-shm",
@@ -5586,7 +5589,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "$XDG_DATA_HOME/opencode/log/",
-                        "%LOCALAPPDATA%\\opencode\\log\\",
+                        "%USERPROFILE%\\.local\\share\\opencode\\log\\",
                         "~/.local/share/opencode/log/"
                     ],
                     "root": "user_profile",
@@ -6359,11 +6362,19 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
-                        "$ZED_DATA_DIR/debug_adapters/",
-                        "$ZED_DATA_DIR/extensions/",
-                        "$ZED_DATA_DIR/external_agents/",
-                        "$ZED_DATA_DIR/prompt_overrides/",
-                        "~/.config/zed/prompts/"
+                        "$XDG_DATA_HOME/zed/debug_adapters/",
+                        "$XDG_DATA_HOME/zed/extensions/",
+                        "$XDG_DATA_HOME/zed/external_agents/",
+                        "$XDG_DATA_HOME/zed/prompt_overrides/",
+                        "%LOCALAPPDATA%\\Zed\\debug_adapters\\",
+                        "%LOCALAPPDATA%\\Zed\\extensions\\",
+                        "%LOCALAPPDATA%\\Zed\\external_agents\\",
+                        "%LOCALAPPDATA%\\Zed\\prompt_overrides\\",
+                        "~/.config/zed/prompts/",
+                        "~/Library/Application Support/Zed/debug_adapters/",
+                        "~/Library/Application Support/Zed/extensions/",
+                        "~/Library/Application Support/Zed/external_agents/",
+                        "~/Library/Application Support/Zed/prompt_overrides/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6460,7 +6471,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "acd5261a04bca250de3dbe1d5d551950bdcfb0f869c32e544b949331b953cb79"
+    "sha256": "9cf521fca60e52f47ac42e0a77227d28f84a104eeadc3c7ebc6aaffe32b30822"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

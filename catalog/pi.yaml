@@ -61,11 +61,13 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts
   source_kind: source_code
+  unsourced_paths:
+  - <project>/.pi/
   volatility: Persistent until edited.
   notes: |-
     Read this and the env overrides BEFORE globbing for sessions: the session directory is independently relocatable, so ~/.pi/agent/sessions being empty does not mean no sessions exist.
 
-    Record structure: config.ts getSettingsPath() = join(getAgentDir(), 'settings.json'); CONFIG_DIR_NAME = '.pi' is also used for a project-level directory (SettingsManager.create(projectDir, agentDir)). The agent dir itself is overridable via the PI_CODING_AGENT_DIR environment variable, and the session dir via PI_CODING_AGENT_SESSION_DIR.
+    The verification pass found no project-local lookup in the cited configuration module; the settings manager is what implements it.
   parser: null
 - id: pi.auth
   category: credentials
@@ -105,11 +107,13 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts
   source_kind: source_code
+  unsourced_paths:
+  - ~/.pi/server/
   volatility: Persistent until removed.
   notes: |-
     bin/ dates the install and proves the agent had bundled fast file-search tooling (fd, rg) available regardless of what was installed system-wide. The existence of ~/.pi/server indicates the experimental server mode was used, i.e. potentially remote-driven sessions.
 
-    Record structure: config.ts getBinDir() = join(getAgentDir(), 'bin') and is documented as holding managed binaries (fd, rg); getCustomThemesDir() = join(getAgentDir(), 'themes'). Separately, packages/coding-agent/src/experimental/server.ts resolves a server directory to join(homedir(), '.pi', 'server') unless overridden by its env var.
+    The verification pass found the word server absent from the cited configuration module. The experimental server module joins the home directory with .pi and server, so the path is real but not stated where this entry points.
   parser: null
 - id: pi.extensions
   category: install_evidence
@@ -127,11 +131,13 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts
   source_kind: source_code
+  unsourced_paths:
+  - ~/.pi/agent/extensions/*.ts
   volatility: Persistent until removed.
   notes: |-
     These are executable TypeScript loaded into the agent. Treat as user-supplied code: a modified edit.ts or a bespoke tool is both a capability grant and, potentially, the malicious component itself. Collect content, not just filenames.
 
-    Record structure: config.ts getToolsDir() = join(getAgentDir(), 'tools'); the extensions directory is referenced in the repo's own scripts as ~/.pi/agent/extensions/ (e.g. extensions/edit.ts).
+    The verification pass found the word extension absent from the cited configuration module; the extension loader is what builds this directory.
   parser: null
 - id: pi.prompts
   category: instructions
@@ -191,10 +197,12 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/session-format.md
   source_kind: official
+  unsourced_paths:
+  - $PI_CODING_AGENT_SESSION_DIR/**/*.jsonl
   volatility: Auto-saved and retained; no documented expiry. Nothing is written at all when --no-session
     is used.
   notes: |-
     The tree structure is the forensic headline: abandoned branches remain in the file. A naive line-by-line reader will present discarded or retracted turns as if they were the real conversation, and will miss that the operator branched away from something. Reconstruct via id/parentId and identify the active leaf. model_change and thinking_level_change entries give a timeline of capability changes mid-session.
 
-    Record structure: Documented layout: ~/.pi/agent/sessions/--<path>--/<timestamp>_<session-id>.jsonl. The subdirectory is the working directory path with any leading separator removed and '/', '\\' and ':' each replaced by '-'. Filename is an ISO timestamp, underscore, then the session id (usually a UUID, settable via --session-id or the SDK). CRITICAL: a session is a TREE, not a flat list - line 1 is a SessionHeader (type 'session', no tree ids), and every later entry has id (usually an 8-char hex string, sometimes a full UUID) and parentId, with the current view being the active leaf. Entry types: message, compaction, branch_summary, custom, custom_message, label, model_change, thinking_level_change, session_info. Message entries embed an AgentMessage with role and content arrays.
+    The verification pass confirmed the default session directory and found no environment variable on the cited page: the module defines the variable's name but the documentation page does not state it, so the relocated spelling is marked unsourced.
   parser: null

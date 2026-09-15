@@ -43,12 +43,15 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/lmstudio-ai/docs/main/0_app/1_basics/chat.md
+  source: https://raw.githubusercontent.com/lmstudio-ai/docs/main/0_app/3_presets/index.md
   source_kind: official
+  unsourced_paths:
+  - '%USERPROFILE%\.lmstudio\hub\'
+  - ~/.lmstudio/hub/
   notes: |-
     A preset IS an instruction file by another name - it carries the system prompt. Anything downloaded into hub/ came from a remote source and is therefore part of the prompt-injection surface, same class of evidence as a CLAUDE.md pulled from a repo. Sibling paths confirmed via GitHub code search content match in lmstudio-ai/docs.
 
-    Record structure: config-presets holds bundled system prompt + sampling parameters. Docs state Hub presets (shared or downloaded) are saved in ~/.lmstudio/hub on macOS and Linux, or %USERPROFILE%\.lmstudio\hub on Windows (docs/0_app/3_presets/import.md); the config-presets path is in docs/0_app/3_presets/index.md.
+    Re-sourced by the verification pass: the page cited before covers threads and folders and mentions neither directory. The presets page states the presets directory in both spellings. The hub directory is stated on a third page, which means no single page covers this entry, so the two hub paths are marked unsourced until the entry is split.
   parser: null
 - id: lmstudio.cli_and_server
   category: install_evidence

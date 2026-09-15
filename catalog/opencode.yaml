@@ -49,11 +49,13 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx
   source_kind: official
+  unsourced_paths:
+  - $XDG_CONFIG_HOME/opencode/opencode.json
   volatility: Persistent until edited.
   notes: |-
     Two collection traps: (1) OPENCODE_CONFIG_CONTENT means live config may exist only in the process environment with no file on disk; (2) the remote .well-known/opencode source means part of the effective config was fetched from a server and is not on the endpoint at all. Note both in the report.
 
-    Record structure: Documented merge order (later overrides earlier): remote .well-known/opencode endpoint, global ~/.config/opencode/opencode.json, OPENCODE_CONFIG path, project opencode.json, .opencode/ subdirectories, OPENCODE_CONFIG_CONTENT inline env var, managed system config, macOS MDM managed preferences. OPENCODE_CONFIG_DIR relocates the config dir entirely. Configs are merged, not replaced. JSONC is accepted.
+    The verification pass confirmed the documented locations and found no mention of the base directory variable on that page. The variable-rooted spelling is correct, it is built by the global path module, but it is not what the cited page states, so it is marked unsourced.
   parser: null
 - id: opencode.managed_config
   category: config
@@ -186,11 +188,13 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx
   source_kind: official
+  unsourced_paths:
+  - <project>/AGENTS.md
   volatility: Persistent; project-scoped copies are usually in git.
   notes: |-
     Custom agent definitions can carry their own system prompts and tool allowances - i.e. a user-authored privilege escalation. Diff against defaults.
 
-    Record structure: Custom agent definitions and slash commands, global and project scoped.
+    The verification pass confirmed everything except the cross-vendor instruction file, which the vendor states on its rules page rather than on the configuration page cited here.
   parser: null
 - id: opencode.log
   category: log
@@ -201,7 +205,7 @@ artifacts:
   - windows
   paths:
   - $XDG_DATA_HOME/opencode/log/
-  - '%LOCALAPPDATA%\opencode\log\'
+  - '%USERPROFILE%\.local\share\opencode\log\'
   - ~/.local/share/opencode/log/
   format: text
   sensitivity: normal
@@ -214,7 +218,7 @@ artifacts:
   notes: |-
     Two log roots (XDG data and Electron userData) - collect both for desktop installs.
 
-    Record structure: global.ts: log = path.join(data, 'log'). The Electron desktop app additionally looks in join(app.getPath('userData'), 'opencode', 'log') per packages/desktop/src/main/logging.ts.
+    Windows path correction from the source verification pass: the data directory comes from an XDG base directory helper whose data path is $XDG_DATA_HOME or else the home directory joined with .local/share, on every platform and with no branch for LOCALAPPDATA. This entry claimed a path under %LOCALAPPDATA%, where a collector would have found nothing.
   parser: null
 - id: opencode.db
   category: transcript
@@ -225,7 +229,7 @@ artifacts:
   - windows
   paths:
   - $XDG_DATA_HOME/opencode/opencode.db
-  - '%LOCALAPPDATA%\opencode\opencode.db'
+  - '%USERPROFILE%\.local\share\opencode\opencode.db'
   - ~/.local/share/opencode/opencode-*.db
   - ~/.local/share/opencode/opencode.db
   - ~/.local/share/opencode/opencode.db-shm
@@ -234,14 +238,18 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/session/sql.ts
+  source: |-
+    https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/database/database.ts
   source_kind: source_code
+  unsourced_paths:
+  - ~/.local/share/opencode/opencode.db-shm
+  - ~/.local/share/opencode/opencode.db-wal
   volatility: |-
     WAL mode with synchronous=NORMAL and a passive checkpoint at startup - the newest turns may exist ONLY in the -wal file. Capture opencode.db, -wal and -shm together or you lose the most recent activity. No automatic expiry.
   notes: |-
     IMPORTANT CORRECTION: the filename is not always opencode.db. database.ts computes: if Flag.OPENCODE_DB is set it wins (absolute path or a name under the data dir, or ':memory:'); otherwise the name is 'opencode.db' only for the latest/beta/prod channels or when OPENCODE_DISABLE_CHANNEL_DB=1, and is otherwise 'opencode-<InstallationChannel>.db'. Glob opencode*.db. Also note the DB now carries a 'credential' table, so the file can contain secrets even though it is collected as transcript evidence.
 
-    Record structure: Confirmed drizzle sqliteTable definitions: session (id, project_id, workspace_id, parent_id, slug, directory, path, title, version, share_url, summary_additions/deletions/files/diffs, metadata, cost, tokens_input/output/reasoning/cache_read/cache_write, revert, permission, agent, model, time_compacting, time_archived), message (id, session_id, data + timestamps), part (id, message_id, session_id, data + timestamps), project, credential, permission, account, session_share, workspace, event_sequence, data_migration. Conversation text lives in the JSON 'data' column of message and part - query part.data for tool calls and outputs. session.parent_id gives subagent lineage; session.directory/path gives the workspace.
+    Windows path correction from the source verification pass, same cause as the log entry: the data directory has no LOCALAPPDATA branch, so the database sits under the profile's .local/share on Windows too. Re-sourced at the same time: the page previously cited holds only the table definitions and constructs no path, while the database module joins the data directory with opencode.db and with the channel-suffixed spelling. The -wal and -shm sidecars are named in no vendor source and follow from the journal mode, so they are marked unsourced.
   parser: null
 - id: opencode.legacy_json_storage
   category: transcript

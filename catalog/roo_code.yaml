@@ -46,8 +46,13 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/package.json
   source_kind: source_code
+  unsourced_paths:
+  - <project>/.vscode/settings.json
+  - <vscode-user>/settings.json
   notes: |-
     COLLECTION-CRITICAL. package.json contributes the setting `roo-cline.customStoragePath` (string, default ""): 'a custom location for storing extension data'. src/utils/storage.ts reads it via vscode.workspace.getConfiguration(Package.name), validates that the path is absolute, and falls back to the default global storage path only if it is inaccessible. So the ENTIRE tasks/settings/cache/checkpoints tree can legitimately live anywhere on the volume (or a network share). Always parse the VS Code settings.json for roo-cline.customStoragePath and roo-cline.autoImportSettingsPath before reporting 'no Roo Code data'. autoImportSettingsPath is a second lead: it names a settings file Roo imports on startup, which may point at an exported config containing provider profiles.
+
+    The verification pass confirmed that the extension declares the setting and found no statement of where a setting value is stored: that is the editor's layout, and the page the pass would have cited for it was not reachable. Both paths are marked unsourced. The setting matters more than the file: it relocates the whole task store, so an endpoint where it is set has its transcripts somewhere this catalogue cannot predict.
   parser: null
 - id: roo_code.extension_id
   category: install_evidence
@@ -86,8 +91,12 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/services/roo-config/index.ts
   source_kind: source_code
+  unsourced_paths:
+  - ~/.roo/rules-<mode>/
   notes: |-
     getGlobalRooDirectory() = path.join(os.homedir(), ".roo") with the doc comment giving the per-OS examples verbatim ('macOS/Linux: ~/.roo/ ... Windows: %USERPROFILE%\.roo\'). getProjectRooDirectoryForCwd(cwd) = path.join(cwd, ".roo"). The same file also resolves a global '.agents' directory (the emerging cross-agent convention). Global rules apply to every project and are therefore the best single source for 'what standing instructions did this user give their agent'.
+
+    The verification pass found the only per-mode rules example on the cited page sitting under a project subfolder rather than under the user's global directory.
   parser: null
 - id: roo_code.settings
   category: mcp_config
@@ -106,8 +115,13 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/utils/storage.ts
   source_kind: source_code
+  unsourced_paths:
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/settings/custom_modes.yaml
+  - <vscode-user>/globalStorage/rooveterinaryinc.roo-cline/settings/mcp_settings.json
   notes: |-
     CORRECTION TO THE BRIEF'S IMPLICIT ASSUMPTION: Roo's MCP file is mcp_settings.json, NOT cline_mcp_settings.json - do not reuse the Cline filename for the fork. storage.ts builds `path.join(basePath, "settings")` and `path.join(basePath, "cache")`. custom_modes.yaml defines custom agent personas including their tool/file-access restrictions, i.e. it is effectively a permissions artifact as well as config.
+
+    The verification pass confirmed the settings directory itself and neither filename inside it: the storage utility constructs the directory, the filename map states the names, and no page states the two together.
   parser: null
 - id: roo_code.rules
   category: project_instructions
@@ -134,8 +148,12 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/core/prompts/sections/custom-instructions.ts
   source_kind: source_code
+  unsourced_paths:
+  - <project>/.rooignore
   notes: |-
     Precedence verified from custom-instructions.ts: it first checks '.roo/rules/ directories in order (global, project-local, and optionally subfolders)' and returns them under the header 'Rules from .roo directories'; only if none are found does it 'Fall back to existing behavior for legacy .roorules/.clinerules files' with `const ruleFiles = [".roorules", ".clinerules"]`. Mode-specific equivalents: `.roo/rules-${mode}/` then `.roorules-${mode}` then `.clinerules-${mode}`. Separately it loads agent rules files with `const filenames = ["AGENTS.md", "AGENT.md"]` plus "AGENTS.local.md" for 'personal overrides (not checked in to version control)' - AGENTS.local.md is therefore a high-value uncommitted artifact that will NOT be in git history. .rooignore appears as options.rooIgnoreInstructions (a user-authored file-access boundary). In a monorepo, .roo dirs in SUBDIRECTORIES are also discovered - glob recursively, not just at the repo root.
+
+    The verification pass found only a pre-rendered instruction string on the cited page. The ignore controller builds the project-relative pattern, so the path is real but unsourced where this entry points.
   parser: null
 - id: roo_code.tasks
   category: transcript
@@ -154,14 +172,14 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/shared/globalFileNames.ts
+  source: https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/src/utils/storage.ts
   source_kind: source_code
   volatility: |-
     Roo Code's tasks directory is notorious for unbounded growth (issue #4174, 'Excessive Disk Space Consumption in tasks Directory Leading to Full Home Directory') - users are advised to delete it, so absence is not evidence of non-use.
   notes: |-
     File names verified verbatim from GlobalFileNames: apiConversationHistory="api_conversation_history.json", uiMessages="ui_messages.json", mcpSettings="mcp_settings.json", customModes="custom_modes.yaml", taskMetadata="task_metadata.json", historyItem="history_item.json", historyIndex="_index.json". Directory layout verified from src/utils/storage.ts: `const taskDir = path.join(basePath, "tasks", taskId)`. TWO EXTRA FILES the brief does not mention: history_item.json (per-task history record, so unlike Cline <=3.x the task index is on disk, not only in state.vscdb) and _index.json (history index).
 
-    Record structure: Cline-family shape: api_conversation_history.json is Anthropic-shaped; ui_messages.json is the say/ask stream where say/api_req_started carries token+cost. I could not confirm from source whether _index.json sits directly under tasks/ or under settings/ - glob for it under the extension root.
+    Re-sourced by the verification pass: the file cited before is a bare map of filenames with no directory and no path join, so the tasks layout rested on nothing. The storage utility builds it. This is the transcript store, which makes it the worst of the mis-citations the pass found for this agent.
   parser: null
 - id: roo_code.checkpoints
   category: file_snapshot

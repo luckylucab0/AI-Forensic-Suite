@@ -36,11 +36,11 @@ artifacts:
   - linux
   - windows
   paths:
+  - ~/.continue/.utils/repo_map.txt
   - ~/.continue/index/autocompleteCache.sqlite
   - ~/.continue/index/docs.sqlite
   - ~/.continue/index/index.sqlite
   - ~/.continue/index/lancedb/
-  - ~/.continue/repo_map.txt
   format: sqlite
   sensitivity: normal
   collect_priority: normal
@@ -51,7 +51,7 @@ artifacts:
   notes: |-
     index.sqlite enumerates every file and chunk Continue ingested - a list of source files the agent had visibility into, including files since deleted. autocompleteCache.sqlite can retain completion text (i.e. model output) that never appeared in any session transcript because it was inline autocomplete rather than chat. docs.sqlite and lancedb record which external documentation sites were ingested.
 
-    Record structure: paths.ts: index folder = join(getContinueGlobalPath(), 'index'); index.sqlite, autocompleteCache.sqlite and docs.sqlite are its named databases; lancedb is the vector store directory; getRepoMapFilePath() returns repo_map.txt.
+    Path correction from the source verification pass: the repository map is built as path.join(getContinueUtilsPath(), "repo_map.txt") where getContinueUtilsPath() joins ".utils" onto the global directory, so the file is at ~/.continue/.utils/repo_map.txt. This entry previously claimed ~/.continue/repo_map.txt, one level too high, which would have collected nothing.
   parser: null
 - id: continue.agents
   category: config
@@ -69,13 +69,13 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://github.com/continuedev/continue/blob/main/core/config/ConfigHandler.ts
+  source: https://raw.githubusercontent.com/continuedev/continue/main/core/config/loadLocalAssistants.ts
   source_kind: source_code
   volatility: Persistent until removed.
   notes: |-
     CORRECTION to the starting brief: the current folder name is agents/, and assistants/ is the PREVIOUS name. Glob both - an old assistants/ directory left behind is exactly the kind of stale configuration evidence that survives a user tidying up the current one. These files commonly embed apiKey values and declare capabilities such as tool_use.
 
-    Record structure: core/config/ConfigHandler.ts comment: 'Users can define as many local agents as they want in a `.continue/agents` (or previous .continue/assistants) folder'. Retrieved via GitHub code search content fragment. Each file is a local agent definition with name, version, schema, models, roles, capabilities, defaultCompletionOptions.
+    Re-sourced by the verification pass: the handler cited before constructs these directories only in its workspace branch, so the two user-level paths rested on nothing. The loader builds both the workspace and the global spelling.
   parser: null
 - id: continue.aux_config
   category: config

@@ -37,17 +37,21 @@ artifacts:
   - linux
   paths:
   - <vscode-user>/globalStorage/saoudrizwan.claude-dev/cache/
+  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/cache/remote_config_<orgId>.json
   - <vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/cline_recommended_models.json
-  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/remote_config_<orgId>.json
   format: json
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts
   source_kind: source_code
+  unsourced_paths:
+  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/cline_recommended_models.json
   volatility: Cache is regenerable.
   notes: |-
     ensureCacheDirectoryExists() = getGlobalStorageDir("cache"). GlobalFileNames.clineRecommendedModels = "cline_recommended_models.json" and remoteConfig = (orgId) => `remote_config_${orgId}.json`. The remote_config_<orgId>.json filename LEAKS THE ENTERPRISE ORG ID - useful for attribution, and a reason to sanitise before publishing sample data.
+
+    Path correction from the source verification pass: remote config is built as path.join(await ensureCacheDirectoryExists(), remoteConfig(organizationId)), and that helper returns the cache directory, so the file sits under cache/ and not under settings/ as this entry previously claimed. The recommended-models file is declared only as a filename constant with no directory join anywhere, so its placement under settings/ is unsourced.
   parser: null
 - id: cline.data_dir_root
   category: config
@@ -204,12 +208,15 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/core/src/hooks/checkpoint-hooks.ts
   source_kind: source_code
+  unsourced_paths:
+  - <project>/.git/logs/refs/cline/checkpoints/
+  - <project>/.git/packed-refs
   volatility: |-
     Deleted by deleteCheckpointRefs() when the session/task is deleted. Stash objects become unreachable and GC-able once the ref is gone - but may survive in .git/objects until `git gc`.
   notes: |-
     CLINE 4.x MECHANISM CHANGE - this is the single biggest correction to the brief's checkpoint model. There is no longer a shadow repo in globalStorage. Cline runs `git stash create` in the USER'S OWN workspace and then `git update-ref refs/cline/checkpoints/<sessionId>/<runCount> <sha>` in that same repo. The source comment states the intent: 'Store the stash commit under a private ref namespace so it is invisible to the user's normal git stash list workflow. refs/stash is what populates that list; writing to any other ref path keeps the object reachable (GC-safe) without surfacing it to the user.' Consequences for us: (a) per-tool-use workspace snapshots live inside the evidence repo itself, so a repo-only acquisition already contains them; (b) `git stash list` will NOT show them - you must enumerate refs/cline/**; (c) untracked-at-snapshot files are captured as a THIRD PARENT of the stash commit (createUntrackedParentCommit / createWorktreeStashCommit), so a naive two-parent stash read misses them; (d) checkpoints only exist if the workspace is a git repo - SdkController.ts surfaces 'Checkpoints require the workspace to be a git repository.'
 
-    Record structure: Stash message marker constant CHECKPOINT_STASH_MESSAGE_PREFIX = 'cline checkpoint session=' - grep .git/logs and commit messages for it. Checkpoint kinds are "stash" | "commit"; telemetry outcomes are stash / head_clean / head_fallback / skipped.
+    The verification pass confirmed the private ref namespace the extension writes and found nothing in the cited source about the repository layout the refs land in: packed-refs and the reflog are properties of the version control system, so those two paths are marked unsourced here.
   parser: null
 - id: cline.checkpoint_scratch
   category: file_snapshot
@@ -271,8 +278,12 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/package.json
   source_kind: source_code
+  unsourced_paths:
+  - <vscode-user>/globalStorage/saoudrizwan.claude-dev/
   notes: |-
     Confirmed exact: package.json name="claude-dev", publisher="saoudrizwan", displayName="Cline", version 4.1.17 on main as of 2026-09-14. The extension id is therefore saoudrizwan.claude-dev and is already all-lowercase, so the globalStorage folder needs no case folding.
+
+    The verification pass confirmed the publisher and name that compose the identifier, and found no statement of the storage location on that page: the globalStorage layout is the editor's, not the extension's. The editor vendor's own environment service states it, and the editor entry in this catalogue carries that citation.
   parser: null
 - id: cline.rules_global
   category: instructions
@@ -291,10 +302,12 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
   source_kind: source_code
   notes: |-
     disk.ts helper functions resolve 'Cline/Rules', 'Cline/Workflows', 'Cline/MCP' and 'Cline/Hooks' inside the user's Documents folder - an unusual choice that a home-directory-dotfile-only collector will miss entirely. docs/customization/cline-rules.mdx adds: 'Linux/WSL users: If you don't find global rules in ~/Documents/Cline/Rules, check ~/Cline/Rules.' The CHANGELOG 4.1.16 entry explains why: the VS Code Rules tab resolves Documents with `xdg-user-dir DOCUMENTS`, which prints bare $HOME on WSL and headless installs. Collect BOTH. On macOS/Windows also account for a redirected/iCloud Documents folder.
+
+    Re-sourced by the verification pass: the documents-directory rules path is absent from the disk module cited before and present in the path resolver.
   parser: null
 - id: cline.connector_settings_and_logs
   category: log
@@ -332,12 +345,12 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
   source_kind: source_code
   notes: |-
     Two live locations. disk.ts: GlobalFileNames.mcpSettings = "cline_mcp_settings.json" and getMcpSettingsFilePath() resolves it inside ensureSettingsDirectoryExists() = getGlobalStorageDir("settings"); ensureMcpServersDirectoryExists() points at "Cline/MCP" under Documents (installed MCP server code). paths.ts: CLINE_MCP_SETTINGS_FILE_NAME = "cline_mcp_settings.json", resolveMcpSettingsPath() = join(resolveClineDataDir(), "settings", <that>). The brief's path is correct but incomplete - the ~/.cline copy must be collected too. Treat as normal sensitivity but expect embedded env vars / bearer tokens for remote MCP servers; flag for review.
 
-    Record structure: Standard mcpServers object. Remote SSE/streamable-HTTP servers get a 10s connect budget (CHANGELOG 4.1.x), and an OAuth prompt on 401 - so OAuth material for MCP servers may exist separately.
+    Re-sourced by the verification pass, same cause as the global rules entry.
   parser: null
 - id: cline.rules_project
   category: project_instructions
@@ -388,11 +401,16 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
   source_kind: source_code
+  unsourced_paths:
+  - ~/.cline/data/sessions/<session-id>/<session-id>.hooks.jsonl
+  - ~/.cline/data/sessions/<session-id>/<session-id>.json
+  - ~/.cline/data/sessions/<session-id>/<session-id>.messages.json
+  - ~/.cline/data/sessions/<session-id>/subagents/
   volatility: No automatic pruning found in the sources read.
   notes: |-
     resolveSessionDataDir() = join(resolveClineDataDir(), "sessions"). File naming verified three ways: sdk/packages/core/docs/messages-contract-v1.md states the canonical path '~/.cline/data/sessions/<sessionId>/<sessionId>.messages.json'; sdk/packages/core/src/runtime/host/local-runtime-host.ts builds join(sessionDir, `${sessionId}.messages.json`) and join(sessionDir, `${sessionId}.json`); apps/examples/desktop-app/README.md names `<sessionId>.hooks.jsonl` as observability telemetry. Child/teammate sessions use a compound id of the form <rootSessionId>__teamtask__<agent>__<hash> (see sdk/packages/core/src/runtime/host/history.test.ts), which is how sub-agent transcripts are correlated to their parent.
 
-    Record structure: <sessionId>.messages.json is the 'messages contract v1' replay artifact: ordered messages plus assistant modelInfo and metrics (incl. cache token fields). <sessionId>.json is the session manifest. <sessionId>.hooks.jsonl is newline-delimited hook telemetry.
+    The verification pass confirmed the sessions directory and none of the file layout inside it: the resolver states the directory, and the three filenames and the subagents directory appear nowhere on that page. This is a transcript artifact, so treat a session directory that contains none of these filenames as a layout this catalogue has wrong rather than as an empty session, and collect the directory whole.
   parser: null
 - id: cline.data_tasks
   category: transcript

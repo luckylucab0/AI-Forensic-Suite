@@ -78,12 +78,15 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/npm/cli/latest/docs/lib/content/configuring-npm/folders.md
   source_kind: official
+  unsourced_paths:
+  - /opt/homebrew/lib/node_modules/
+  - ~/.nvm/versions/node/*/lib/node_modules/
   volatility: |-
     Overwritten in place on upgrade, so the installed version reflects only the CURRENT state; use ~/.npm/_logs for the install history.
   notes: |-
     The prefix is NOT fixed - it follows the node install, so nvm/fnm/volta/asdf and Homebrew node all relocate it. Resolve it from `npm prefix -g` on a live box, or on an image enumerate candidate node installs. Agent packages to look for: @anthropic-ai/claude-code (plus its per-platform optional deps such as @anthropic-ai/claude-code-darwin-arm64), @openai/codex, @google/gemini-cli, @github/copilot.
 
-    Record structure: Verbatim: "The prefix config defaults to the location where node is installed. On most systems, this is /usr/local. On Windows, it's %AppData%\npm." "Global installs on Unix systems go to {prefix}/lib/node_modules. Global installs on Windows go to {prefix}/node_modules (that is, no lib folder.)" "When in global mode, executables are linked into {prefix}/bin on Unix, or directly into {prefix} on Windows." Read each package's package.json for name + version; that is the install evidence. Scoped packages sit under node_modules/@scope/name.
+    The verification pass confirmed the prefix-relative locations and the two documented default prefixes, and found the package manager and version manager paths absent from the page. They are the same prefix-relative layout under a prefix a third party chose, which is exactly the kind of path worth collecting and not worth calling vendor-stated.
   parser: null
 - id: crosscutting.npm_debug_logs
   category: log
@@ -101,12 +104,15 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/npm/cli/latest/docs/lib/content/using-npm/logging.md
   source_kind: official
+  unsourced_paths:
+  - '%LOCALAPPDATA%\npm-cache\_logs\*-debug-*.log'
+  - ~/.npm/_logs/*-debug-*.log
   volatility: |-
     PRUNED AGGRESSIVELY - COLLECT FIRST. Verbatim: "Log files will be removed from the logs-dir when the number of log files exceeds logs-max, with the oldest logs being deleted first." logs-max defaults to 10 (visible as `logs-max:10` in npm's own log-file test snapshot), so roughly the last ten npm invocations survive. On a busy dev box that can be hours.
   notes: |-
     HIGH-VALUE and HIGHLY PERISHABLE. Directory is `_logs` inside the npm cache (verbatim: "The default location of the logs directory is a directory named _logs inside the npm cache"), and the cache is "~/.npm on Posix, or %LocalAppData%/npm-cache on Windows". Relocatable via the logs-dir config; --logs-max=0 turns logging off.
 
-    Record structure: Filename is `${ISO-ish timestamp}-debug-${n}.log` (log-file.js: `${this.#path}debug-${count}.log`, with the date prefix forming #path; tests show e.g. 2024-01-01T00_00_00_000Z-debug-0.log). The filename timestamp alone dates an npm invocation. Body records the full argv, the resolved registry, the packages added/removed and the cwd - so a single log can prove `npm install -g @anthropic-ai/claude-code` happened, at what time, by which user.
+    The verification pass found the cited page states only that logs go in a directory named with an underscore prefix inside the cache, with neither the cache path nor the filename pattern. Both spellings of the glob are marked unsourced; the directory itself is what the page supports.
   parser: null
 - id: crosscutting.homebrew_prefixes
   category: install_evidence
@@ -129,12 +135,18 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/Homebrew/brew/main/docs/Installation.md
   source_kind: official
+  unsourced_paths:
+  - /home/linuxbrew/.linuxbrew/Cellar/
+  - /opt/homebrew/Caskroom/
+  - /opt/homebrew/Cellar/
+  - /opt/homebrew/bin/
+  - /usr/local/Cellar/
   volatility: |-
     Verbatim from the docs: "Homebrew keeps old versions on disk after upgrades. Run `brew cleanup` periodically to reclaim disk space." That is good for us - the Cellar often holds a VERSION HISTORY of an agent, not just the current build.
   notes: |-
     CHECK BOTH PREFIXES ON APPLE SILICON. Homebrew's own Common-Issues.md notes that "Migration Assistant or an x86_64 terminal on Apple Silicon can leave both /usr/local and /opt/homebrew installations active" - so two independent sets of agent installs can coexist on one Mac, at different versions. Custom prefixes are supported (Support-Tiers.md), so do not treat the three defaults as exhaustive; prefer resolving `brew --prefix`. Relevant casks: claude-code, claude-code@latest, chatgpt, chatgpt-classic, ollama-app, lm-studio.
 
-    Record structure: Verbatim default prefixes: "/opt/homebrew for Apple Silicon, /usr/local for macOS Intel and /home/linuxbrew/.linuxbrew for Linux". Enumerate {prefix}/Cellar/<formula>/<version>/ and {prefix}/Caskroom/<cask>/<version>/ - the directory names ARE the install evidence, with mtimes dating each install. Also read {prefix}/var/homebrew/locks and the git logs in {prefix}/Library/Taps/*/.git for tap history.
+    The verification pass confirmed the three prefixes and found that the cited page names neither the formula nor the cask directory under them, and shows the binary directory only as a template inside one example.
   parser: null
 - id: crosscutting.pipx_home_and_bin
   category: install_evidence
@@ -292,12 +304,17 @@ artifacts:
   status: verified
   source: https://github.com/cline/cline/blob/main/.clinerules/hooks/README.md
   source_kind: official
+  unsourced_paths:
+  - <project>/.claude/hooks/
+  - <project>/.claude/settings.json
+  - <project>/.claude/settings.local.json
+  - ~/.claude/settings.json
   volatility: |-
     Executable bits and mtimes matter as much as the content - record mode, owner and timestamps, not just the script text.
   notes: |-
     THE SHARPEST INJECTION SURFACE IN THIS WHOLE FAMILY, and the one most likely to be missed. A hook is arbitrary code that the agent runs automatically on tool use or prompt submission, and a workspace hook arrives with the repository - so cloning a hostile repo plus enabling hooks is remote code execution by design. Collect the script bodies verbatim (they are evidence, not secrets), plus mode/owner/mtime, and diff workspace hooks against the repo's git history to spot ones that were never committed. Cline's own docs even ship a PreToolUse guard example (docs/customization/clineignore.mdx) showing the copy-and-chmod workflow, which is what to grep shell history for.
 
-    Record structure: Cline hooks are EXECUTABLE FILES WITH NO EXTENSION named for the lifecycle event, e.g. .clinerules/hooks/PreToolUse, .clinerules/hooks/UserPromptSubmit (a .ps1 variant exists on Windows). Verbatim: "Cline hooks allow you to execute custom scripts at specific points in the agentic workflow. Hooks can be placed in either: Global hooks directory: ~/Documents/Cline/Hooks/ (applies to all workspaces); Workspace hooks directory: .clinerules/hooks/ (applies to the workspace the repo is part of). Hooks run automatically when enabled." Multi-root workspaces search each root's .clinerules/hooks, and a --hooks-dir flag can add a runtime directory; execution order between directories is explicitly not guaranteed. Claude Code hooks are configured as commands inside settings.json rather than as bare files in a hooks directory.
+    The verification pass found the cited page confirms only the paths of the agent whose repository it is. The four paths of the other agent are documented on that vendor's own settings and hooks pages, which is where a split of this entry should point them.
   parser: null
 - id: crosscutting.mcp_config_files
   category: mcp_config
@@ -326,12 +343,24 @@ artifacts:
   status: verified
   source: https://code.claude.com/docs/en/setup
   source_kind: official
+  unsourced_paths:
+  - $HOME/.copilot/mcp-config.json
+  - '%APPDATA%\Claude\claude_desktop_config.json'
+  - '%USERPROFILE%\.mcp.json'
+  - <project>/.cursor/mcp.json
+  - <project>/.gemini/settings.json
+  - <project>/.vscode/mcp.json
+  - ~/.config/Claude/claude_desktop_config.json
+  - ~/.cursor/mcp.json
+  - ~/.gemini/settings.json
+  - ~/.vscode/mcp.json
+  - ~/Library/Application Support/Claude/claude_desktop_config.json
   volatility: |-
     Edited by hand and by `claude mcp add`-style commands; no history is kept, so only the file mtime dates a change. Collect early - these are small and cheap.
   notes: |-
     Claude Code's own paths are vendor-confirmed: the uninstall docs instruct `rm ~/.claude.json` and project-level `rm -f .mcp.json`. The remaining locations are corroborated consistently across many independent third-party integration docs (Cursor global ~/.cursor/mcp.json and project .cursor/mcp.json; Claude Desktop claude_desktop_config.json at ~/Library/Application Support/Claude on macOS, %APPDATA%\Claude on Windows, ~/.config/Claude on Linux; Gemini CLI ~/.gemini/settings.json, confirmed in the CLI's own README "Configure MCP servers in ~/.gemini/settings.json"; Copilot CLI $HOME/.copilot/mcp-config.json, confirmed in the fetched GitHub docs) - hence verified overall, though individual spellings are community-corroborated rather than each vendor-documented. TREAT AS A TOP-PRIORITY ARTIFACT: an MCP config is the clearest on-disk statement of what external capability an agent was granted, and inline env secrets mean the collector should record metadata plus hash for any value that looks like a credential while still copying the structure.
 
-    Record structure: Almost all share one schema: a top-level `mcpServers` object mapping a server name to {command, args, env} for stdio servers or {url} for remote ones. Exceptions: Visual Studio's .mcp.json uses `servers` instead of `mcpServers`. THE `command`/`args`/`env` FIELDS ARE THE PAYLOAD - they name an executable and its arguments that the agent will spawn with the user's privileges, and `env` frequently contains API keys and tokens inline. Per-server OAuth tokens may sit alongside (LM Studio's mcp.json takes an `auth` object).
+    The verification pass found that the cited page states two of the thirteen paths, the user configuration file and the project server file for the one agent whose documentation it is, and nothing about the other vendors' locations. Its Windows example is that agent's user configuration file, not a project file. The other eleven paths are marked unsourced here; the per-vendor entries in this catalogue carry the citations for most of them, and the three desktop application paths have no vendor-sourced entry anywhere yet. The right end state is one entry per vendor with its own source, which is a split this entry is waiting for.
   parser: null
 - id: crosscutting.instructions_agents_md
   category: project_instructions
@@ -415,12 +444,20 @@ artifacts:
   status: verified
   source: https://github.com/cline/cline/blob/main/docs/customization/cline-rules.mdx
   source_kind: official
+  unsourced_paths:
+  - <project>/.claude/skills/
+  - <project>/.cline/remote-config/
+  - <project>/.cline/skills/
+  - <project>/.clineignore
+  - <project>/.clinerules/skills/
+  - <project>/.clinerules/workflows/
+  - ~/Documents/Cline/Workflows/
   volatility: |-
     When Cline converts a legacy single-file .clinerules into a directory it renames the original to `.clinerules.bak` as a backup - look for that file, it preserves the pre-migration instruction text.
   notes: |-
     Confirmed via GitHub code search content matches across cline/cline docs and source. THE REMOTE-CONFIG PATH IS THE STANDOUT FINDING: instructions, skills and workflows can be pushed to the workstation from a remote config server and land on disk under .cline/remote-config/ - that is a centrally-administered injection channel with no repo history to audit, and aafs should collect it and flag its provenance explicitly.
 
-    Record structure: TWO GENERATIONS: a legacy single .clinerules FILE, and the .clinerules/ DIRECTORY added in Cline 3.7.0 (changelog: "Add support for a .clinerules/ directory to load multiple files at once"). Cline's own code still handles both and treats ENOTDIR on .clinerules/workflows as "a legacy single-file ruleset". Rule files support YAML frontmatter for conditional application ("Add YAML frontmatter to the top of any rule file in your .clinerules/ directory"). Global tier is ~/Documents/Cline/Rules/ (multiroot docs: "use global rules (~/Documents/Cline/Rules/) which apply everywhere"); note .clinerules/ "only work in the primary workspace (the first folder in your workspace)" in multi-root setups. Skills are searched in .cline/skills/ (recommended), .clinerules/skills/ and .claude/skills/. Remote-config files materialize under <root>/.cline/remote-config/{workflows,skills,rules}.
+    The verification pass confirmed the rule file and rule directory on the cited pages and none of the seven paths above, which cover skills, workflows, remote configuration and the ignore file. The agent's own catalogue file carries sourced entries for several of them.
   parser: null
 - id: crosscutting.instructions_copilot_instructions
   category: project_instructions
@@ -446,10 +483,17 @@ artifacts:
   source: |-
     https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-command-reference.md
   source_kind: official
+  unsourced_paths:
+  - <project>/.github/agents/*.md
+  - <project>/.github/copilot/settings.json
+  - <project>/.github/copilot/settings.local.json
+  - <project>/.github/instructions/**/*.instructions.md
+  - <project>/.github/prompts/*.prompt.md
+  - <project>/.github/skills/
   notes: |-
     THE ENV VAR MATTERS: COPILOT_CUSTOM_INSTRUCTIONS_DIRS can point at arbitrary directories outside the repo, so a purely repo-relative sweep can miss the instructions that actually shaped a run - read the environment. Copilot CLI's own state lives under $HOME/.copilot/ (settings.json, mcp-config.json, providers.json for BYOK providers/models, logs/ relocatable via COPILOT_LOG_DIR), with COPILOT_HOME overriding the whole directory. Repository-level settings: .github/copilot/settings.json and .github/copilot/settings.local.json. Custom agents can also be defined org-wide in a .github or .github-private repository at /agents/AGENT-NAME.md, i.e. instructions can arrive from outside the repo entirely.
 
-    Record structure: ALL SOURCES ARE MERGED SIMULTANEOUSLY, so the effective prompt is a union and the collector must capture every tier to reconstruct it. The official Copilot CLI table lists, all "In Git root and cwd": CLAUDE.md, GEMINI.md, AGENTS.md, .github/instructions/**/*.instructions.md, .github/copilot-instructions.md; plus user-level $HOME/.copilot/copilot-instructions.md and $HOME/.copilot/instructions/**/*.instructions.md; plus COPILOT_CUSTOM_INSTRUCTIONS_DIRS for "Additional directories via environment variable". Path-specific .instructions.md files activate automatically when changed files match their scope.
+    The verification pass confirmed the repository and user instruction files and the instructions glob for both scopes, and found the prompt, agent and skill directories and the two settings files absent from the cited page.
   parser: null
 - id: crosscutting.instructions_cursor_rules
   category: project_instructions
@@ -495,10 +539,13 @@ artifacts:
   status: verified
   source: https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/gemini-md.md
   source_kind: official
+  unsourced_paths:
+  - <project>/.gemini/settings.json
+  - ~/.gemini/settings.json
   notes: |-
     Confirmed via GitHub code search content match against google-gemini/gemini-cli docs. Also read by Copilot CLI ("GEMINI.md | In Git root and cwd"), so again not vendor-exclusive. Two high-value neighbours spotted in the same repo and worth flagging to the Gemini family owner: ~/.gemini/tmp/<project>/chats/ holds session transcripts (docs/cli/auto-memory.md: "The service indexes recent sessions from ~/.gemini/tmp/<project>/chats/"), and an Auto Memory feature can REWRITE ~/.gemini/GEMINI.md on its own - meaning the instruction file's contents may be machine-authored rather than user-authored, which matters for any injection finding. Plans dir: .gemini/plans.
 
-    Record structure: Documented tiers: "Global context file: Location: ~/.gemini/GEMINI.md (in your user home directory). Scope: Provides default instructions for all your projects", plus environment/workspace context files discovered in the tree. THE FILENAME IS CONFIGURABLE - docs/reference/configuration.md describes the global file as '~/.gemini/<configured-context-filename>' (for example ~/.gemini/GEMINI.md), and extensions can set "contextFileName": "GEMINI.md" - so read the settings before assuming the name. Hierarchical discovery is bounded by context.discoveryMaxDirs (200 directories by default).
+    The verification pass confirmed the instruction file locations and found that the cited page states nothing about the settings file, which has its own sourced entry in that agent's catalogue file.
   parser: null
 - id: crosscutting.instructions_junie_guidelines
   category: project_instructions
@@ -677,10 +724,14 @@ artifacts:
   status: verified
   source: https://github.com/npm/cli/blob/latest/workspaces/config/lib/definitions/definitions.js
   source_kind: source_code
+  unsourced_paths:
+  - '%LOCALAPPDATA%\npm-cache\_npx\*\package.json'
+  - ~/.npm/_npx/*/node_modules/
+  - ~/.npm/_npx/*/package.json
   volatility: |-
     Persists until `npm cache clean` or manual removal; survives package upgrades. Directory mtime dates the npx run.
   notes: |-
     MAJOR ADDITION beyond the brief's one-line mention. This is the cleanest proof available that a one-shot agent or MCP server was executed without ever being installed globally - exactly how most MCP servers are launched (`npx -y some-mcp-server`). Sibling cache dirs at the same level: _cacache (the content-addressable package cache, which contains the actual downloaded tarballs and registry metadata) and _tuf.
 
-    Record structure: EXCELLENT ARTIFACT, EASY TO PARSE. npxCache = join(cache, '_npx') (definitions.js flatten: flatOptions.npxCache = join(obj.cache, '_npx')). Each entry is _npx/<hash>/ containing a package.json that libnpmexec writes with a custom key: pkgJson.update({ _npx: { packages } }). So `jq ._npx.packages` on every _npx/*/package.json gives you the exact list of package@version specs the user ran via npx, per cache entry. npm's own `npm cache ls` prints these as "valid npx cache entry with key <hash> / packages: ...". Binaries are linked at _npx/<hash>/node_modules/.bin.
+    The verification pass confirmed the cache roots, which the tool builds by joining its cache directory with an underscore-prefixed directory name, and found nothing about the layout inside one of those directories. The manifest and module directory are npm's own package layout rather than anything this page states.
   parser: null

@@ -107,13 +107,14 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py
+  source: |-
+    https://raw.githubusercontent.com/Aider-AI/aider/main/aider/website/docs/config/adv-model-settings.md
   source_kind: source_code
   volatility: Persistent until edited.
   notes: |-
     Presence of a custom entry for an unusual model name is a strong indicator of a non-default or proxied provider.
 
-    Record structure: Default became .aider.model.metadata.json in v0.42.0 per HISTORY.md; args.py confirms. Contains per-model context window and pricing overrides.
+    Re-sourced by the verification pass: the argument parser cited before carries the bare filename as a default and never expands a home directory. The advanced model settings page lists the three locations the file is looked for in.
   parser: null
 - id: aider.model_settings
   category: config
@@ -129,13 +130,14 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py
+  source: |-
+    https://raw.githubusercontent.com/Aider-AI/aider/main/aider/website/docs/config/adv-model-settings.md
   source_kind: source_code
   volatility: Persistent until edited.
   notes: |-
     Records custom/self-hosted model endpoints and edit formats - evidence of which model and which provider (possibly a proxy or local model) was actually driving the agent.
 
-    Record structure: Default filename changed to .aider.model.settings.yml in v0.42.0 (HISTORY.md); args.py confirms the default. Loaded from home, git root and cwd like the main config.
+    Re-sourced by the verification pass, same cause as the metadata entry: the argument parser states a bare filename, the documentation states the locations.
   parser: null
 - id: aider.dotenv
   category: credentials
@@ -151,13 +153,13 @@ artifacts:
   sensitivity: secret
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py
+  source: https://raw.githubusercontent.com/Aider-AI/aider/main/aider/website/docs/config/dotenv.md
   source_kind: source_code
   volatility: Persistent until edited.
   notes: |-
     Hash and record metadata only. Note that AIDER_CHAT_HISTORY_FILE / AIDER_INPUT_HISTORY_FILE set here will relocate the transcripts, so the KEY NAMES present matter forensically even though values must not be copied.
 
-    Record structure: args.py computes the default .env at git_root else cwd; HISTORY.md confirms env files also load from home. Holds AIDER_* settings and provider API keys (OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.).
+    Re-sourced by the verification pass: the code cited before joins the git root only, while the documentation lists the home directory as one of the locations.
   parser: null
 - id: aider.analytics
   category: install_evidence

@@ -67,11 +67,14 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/sourcegraph/amp-examples-and-guides/main/guides/cli/README.md
   source_kind: official
+  unsourced_paths:
+  - <project>/.amp/settings.json
+  - <project>/.amp/settings.jsonc
   volatility: Persistent until edited.
   notes: |-
     Carries the MCP inventory and, critically, amp.url - which can point the CLI at a self-hosted or proxied Amp server instead of ampcode.com. A non-default amp.url materially changes where the transcripts actually live.
 
-    Record structure: Same property set as the Amp VS Code extension, including MCP server configuration. AMP_SETTINGS_FILE relocates it entirely (and a --settings-file flag exists). Workspace settings are searched upward from cwd to the repository root.
+    The cited guide states the user-level settings file only. A project-level .amp/settings.json is described on a vendor manual page that was not reachable from the environment the verification pass ran in, so the two project paths are marked unsourced rather than dropped.
   parser: null
 - id: amp.secrets
   category: credentials

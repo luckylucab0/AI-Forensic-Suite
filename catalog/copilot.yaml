@@ -150,15 +150,17 @@ artifacts:
   format: jsonl
   sensitivity: normal
   collect_priority: first
-  status: unverified
+  status: verified
   source: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-config-dir-reference.md
   source_kind: official
+  unsourced_paths:
+  - ~/.copilot/session-state/<session-id>/workspace.yaml
   volatility: |-
     As copilot.session_state, inside which these live.
   notes: |-
     The filenames inside a session directory, split out from copilot.session_state and left unverified on purpose. The vendor documents that each session directory holds "an event log and workspace artifacts" but does not name events.jsonl or workspace.yaml, and this catalogue does not mark a path verified on the strength of a filename nobody published.
 
-    Coverage does not depend on getting the names right: copilot.session_state collects the whole tree. What this entry buys is attribution, so a report can say which file a finding came from, and a warning if the names turn out to be wrong.
+    Settled by the source verification pass: the vendor's configuration directory reference does name the event log, saying that each session directory stores an event log (events.jsonl) and workspace artifacts (plans, checkpoints, tracked files). The workspace filename appears nowhere on that page and nowhere else the pass could reach, so it stays in the list marked unsourced. Coverage still does not depend on either name, because the session state entry collects the tree.
   parser: null
 - id: copilot.command_history
   category: prompt_history

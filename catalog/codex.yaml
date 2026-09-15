@@ -64,12 +64,17 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/state/src/sqlite.rs
   source_kind: source_code
+  unsourced_paths:
+  - '%USERPROFILE%\.codex\*.sqlite-shm'
+  - '%USERPROFILE%\.codex\*.sqlite-wal'
+  - ~/.codex/*.sqlite-shm
+  - ~/.codex/*.sqlite-wal
   volatility: |-
     Destroyed by a clean shutdown. Every Codex database is opened with journal_mode(SqliteJournalMode::Wal), so the newest writes live in the -wal sidecar until a checkpoint folds them into the main file. Collect the sidecars together with the database or lose the most recent activity, which is usually the activity under investigation.
   notes: |-
     Not an artifact in its own right so much as the missing half of every other .sqlite entry here. A bundle holding state_5.sqlite without state_5.sqlite-wal can be internally consistent and still be missing the last session, and nothing in the database says so.
 
-    Collect all three parts of each database, always: the .sqlite, the -wal and the -shm. Analysis must open a copy, never the original, and must not let SQLite checkpoint the evidence.
+    The verification pass confirmed that the databases are opened in write-ahead logging mode and found no mention of the sidecar filenames. They follow from the journal mode rather than from anything the vendor published, so they are marked unsourced. Collect them regardless: uncommitted transcript records live in the write-ahead log and are lost if only the main database file is taken.
   parser: null
 - id: codex.rollouts
   category: transcript
@@ -105,10 +110,12 @@ artifacts:
   - windows
   - linux
   paths:
-  - '%USERPROFILE%\.codex\sessions\**\rollout-*.jsonl.tmp'
+  - '%USERPROFILE%\.codex\sessions\**\rollout-*.jsonl.*.tmp'
   - '%USERPROFILE%\.codex\sessions\**\rollout-*.jsonl.zst'
-  - ~/.codex/sessions/**/rollout-*.jsonl.tmp
+  - '%USERPROFILE%\.codex\sessions\**\rollout-compress-*.tmp'
+  - ~/.codex/sessions/**/rollout-*.jsonl.*.tmp
   - ~/.codex/sessions/**/rollout-*.jsonl.zst
+  - ~/.codex/sessions/**/rollout-compress-*.tmp
   format: binary
   sensitivity: normal
   collect_priority: first
@@ -120,7 +127,7 @@ artifacts:
   notes: |-
     The single most likely way to miss almost everything. A collection or a viewer that globs rollout-*.jsonl finds the last seven days and silently reports nothing older, on a host where a year of conversations is sitting right next to it under a different extension. Constants: COMPRESSED_SUFFIX = ".zst", TEMP_SUFFIX = ".tmp".
 
-    A .tmp file present at collection time means the worker was interrupted mid-compression, so both the archive and the original may exist, or neither may be complete. Collect it and say so rather than choosing.
+    Glob correction from the source verification pass: an interrupted compression leaves either a tempfile named with the prefix rollout-compress- and the suffix .tmp, or a file named <name>.jsonl.<operation>.<pid>.<counter>.tmp. Neither ends in .jsonl.tmp, which is what this entry globbed for, so a partially compressed transcript was unreachable.
   parser: null
 - id: codex.archived_sessions
   category: transcript
@@ -136,12 +143,14 @@ artifacts:
   sensitivity: normal
   collect_priority: first
   status: verified
-  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/lib.rs
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/compression.rs
   source_kind: source_code
   volatility: |-
     Where a rollout goes when the user archives a thread rather than where it goes when it ages. Nothing in the sources read deletes this tree on a timer.
   notes: |-
     ARCHIVED_SESSIONS_SUBDIR = "archived_sessions", a sibling of sessions/ and not a subdirectory of it, so a collection rooted at sessions/ misses every archived conversation. Archiving is a user action, which makes a populated tree here more interesting than the same content under sessions/: somebody chose to take these out of the list they see.
+
+    Re-sourced by the verification pass: the module cited before declares the two directory names as peer constants but never joins either to a root, while the compression module joins both to the same parent side by side, which is what makes this directory a sibling of the sessions directory rather than a child.
   parser: null
 - id: codex.prompt_history
   category: prompt_history
@@ -307,9 +316,16 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/config/mod.rs
   source_kind: source_code
+  unsourced_paths:
+  - '%USERPROFILE%\.codex\permissions.toml'
+  - '%USERPROFILE%\.codex\requirements.toml'
+  - ~/.codex/permissions.toml
+  - ~/.codex/requirements.toml
   volatility: Persistent until edited.
   notes: |-
     The two files that decide what the agent was allowed to do without asking. allow_managed_hooks_only is honoured only in requirements.toml and is ignored in config.toml, so a control that looks configured can have no effect: check which file a restriction is written in before reporting that it was in force.
+
+    The verification pass found neither filename resolved to a location in the cited source. The permissions spelling occurs there only as part of a module path, which is the likely origin of the filename, and the requirements file appears in prose and error strings with no directory ever given, described as a layer an administrator sets rather than a per-user file. All four paths are marked unsourced, and the placement under the user's configuration directory is the part to distrust most.
   parser: null
 - id: codex.auth
   category: credentials
