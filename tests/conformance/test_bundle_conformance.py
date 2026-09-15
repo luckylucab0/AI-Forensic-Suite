@@ -110,6 +110,24 @@ def run_collect_py(args: list[str]) -> subprocess.CompletedProcess[str]:
     )
 
 
+def describe_run(out: Path, result: subprocess.CompletedProcess[str]) -> str:
+    """Everything a failing collector run knows, for an assertion message.
+
+    An exit code and a count of errors is not a diagnosis, and the platform where these
+    tests fail is not the one they can be debugged on interactively.
+    """
+    lines = [f"exit {result.returncode}", result.stderr.strip()]
+    manifest_path = out / "manifest.json"
+    if manifest_path.is_file():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        lines.append(f"counts: {manifest['counts']}")
+        for problem in manifest["errors"]:
+            lines.append(f"  error: {problem}")
+        for refusal in manifest["refused_patterns"][:5]:
+            lines.append(f"  refused: {refusal}")
+    return "\n".join(lines)
+
+
 def run_collect_ps1(args: list[str]) -> subprocess.CompletedProcess[str]:
     """Run collect.ps1 with the same arguments the Python collector takes."""
     if POWERSHELL is None:
@@ -517,7 +535,7 @@ def test_collector_produces_a_verifiable_bundle(
         pytest.skip("no PowerShell interpreter available")
     out = tmp_path / ("bundle-" + name.replace(".", "-"))
     result = runner(["--out", str(out), "--root", str(synthetic_home), "--os", "linux"])
-    assert result.returncode == 0, result.stderr
+    assert result.returncode == 0, describe_run(out, result)
     report = verify_bundle(out)
     assert report.ok, report.summary()
 
@@ -543,7 +561,7 @@ def test_the_two_collectors_agree_on_the_same_tree(synthetic_home: Path, tmp_pat
     ps_out = tmp_path / "differential-ps1"
     for runner, out in ((run_collect_py, py_out), (run_collect_ps1, ps_out)):
         result = runner(["--out", str(out), "--root", str(synthetic_home), "--os", "linux"])
-        assert result.returncode == 0, result.stderr
+        assert result.returncode == 0, describe_run(out, result)
 
     py_manifest = json.loads((py_out / "manifest.json").read_text(encoding="utf-8"))
     ps_manifest = json.loads((ps_out / "manifest.json").read_text(encoding="utf-8"))

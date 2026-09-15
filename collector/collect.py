@@ -6885,7 +6885,7 @@ def iter_matches(pattern: str) -> list[str]:
     this needs to be identical in the PowerShell implementation, so the walk is explicit.
     """
     if "*" not in pattern and "?" not in pattern:
-        return [pattern] if os.path.lexists(pattern) else []
+        return [as_posix(pattern)] if os.path.lexists(pattern) else []
 
     parts = pattern.split("/")
     # An absolute pattern starts with an empty first part.
@@ -6906,7 +6906,7 @@ def iter_matches(pattern: str) -> list[str]:
                     dirnames[:] = [
                         d for d in dirnames if not os.path.islink(os.path.join(dirpath, d))
                     ]
-                    nxt.append(dirpath)
+                    nxt.append(as_posix(dirpath))
         elif "*" in part or "?" in part:
             for base in bases:
                 try:
@@ -6915,10 +6915,10 @@ def iter_matches(pattern: str) -> list[str]:
                     continue
                 for name in entries:
                     if fnmatch.fnmatch(name, part):
-                        nxt.append(os.path.join(base, name))
+                        nxt.append(as_posix(os.path.join(base, name)))
         else:
             for base in bases:
-                candidate = os.path.join(base, part)
+                candidate = as_posix(os.path.join(base, part))
                 if os.path.lexists(candidate):
                     nxt.append(candidate)
         bases = nxt
@@ -7199,6 +7199,8 @@ def collect_file(
 
     relative = bundle_path_for(original, used, target_os)
     destination = os.path.join(files_dir, *relative.split("/"))
+    # os.path.join is right here: this one is a real path on the collecting machine rather
+    # than a value that goes into the manifest.
     try:
         os.makedirs(os.path.dirname(destination), exist_ok=True)
         with open(original, "rb") as src, open(destination, "wb") as dst:
@@ -7226,7 +7228,7 @@ def walk_regular_files(base: str, limit: int) -> tuple[list, bool]:
     for dirpath, dirnames, filenames in os.walk(base):
         dirnames[:] = sorted(d for d in dirnames if not os.path.islink(os.path.join(dirpath, d)))
         for name in sorted(filenames):
-            found.append(os.path.join(dirpath, name))
+            found.append(as_posix(os.path.join(dirpath, name)))
             if len(found) >= limit:
                 return found, True
     return found, truncated

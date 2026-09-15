@@ -7210,6 +7210,48 @@ function Test-PathExists {
     }
 }
 
+function Get-LinkTarget {
+    <#
+    .SYNOPSIS
+        Where a symbolic link or junction points, or $null.
+    .DESCRIPTION
+        Two ways, because the one that reads well is not available where this runs.
+        FileInfo.LinkTarget arrived in .NET 6, so it exists under PowerShell 7 and not
+        under Windows PowerShell 5.1. Get-Item exposes a Target property on 5.1 for a
+        reparse point and is the fallback.
+
+        Without a target the collector cannot tell whether a link leaves the profile, and
+        it then treats the entry as skipped_symlink rather than following it: on 5.1 the
+        first version of this returned nothing, the link was reported as unreadable, and an
+        unreadable file is an error while a link out of the profile is a deliberate
+        decision. The two must not look alike in a manifest.
+    #>
+    param([string] $Path)
+    try {
+        $info = [System.IO.FileInfo]::new($Path)
+        if ($info.PSObject.Properties.Name -ccontains 'LinkTarget' -and $info.LinkTarget) {
+            return [string]$info.LinkTarget
+        }
+    } catch {
+        # Fall through to Get-Item.
+    }
+    try {
+        $item = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+        if ($item.PSObject.Properties.Name -ccontains 'Target') {
+            $value = $item.Target
+            if ($value) {
+                # 5.1 returns a collection for a reparse point with several targets.
+                foreach ($entry in @($value)) {
+                    if ($entry) { return [string]$entry }
+                }
+            }
+        }
+    } catch {
+        # A link the platform will not describe. The caller records skipped_symlink.
+    }
+    return $null
+}
+
 function Test-IsSymlink {
     param([string] $Path)
     try {
@@ -7640,13 +7682,7 @@ function Copy-ArtifactFile {
 
     if (Test-IsSymlink $Original) {
         $entry['reparse_point'] = $true
-        $target = $null
-        try {
-            $info = [System.IO.FileInfo]::new($Original)
-            if ($info.PSObject.Properties.Name -ccontains 'LinkTarget') { $target = $info.LinkTarget }
-        } catch {
-            $target = $null
-        }
+        $target = Get-LinkTarget $Original
         $entry['symlink'] = $target
         $resolved = $null
         try {
@@ -7664,7 +7700,9 @@ function Copy-ArtifactFile {
         }
         $homeNormalized = (Get-NormalizedPath $ProfileHome)
         # A link out of the profile would take the collection somewhere it was never
-        # authorized to read. Recorded, not followed.
+        # authorized to read. Recorded, not followed. A link whose target cannot be
+        # determined at all is treated the same way, because following it blind is the one
+        # thing that must not happen.
         if (-not $resolved -or -not $resolved.StartsWith($homeNormalized.TrimEnd('/') + '/')) {
             $entry['reason'] = 'skipped_symlink'
             return $entry
