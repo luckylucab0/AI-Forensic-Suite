@@ -6863,10 +6863,16 @@ def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> l
     # so. This happens when a placeholder at the start of a path is one the collector does
     # not know: "<agent-home>/config.json" becomes "*/config.json", which is a valid glob
     # and a search of entirely the wrong tree.
-    if not (text.startswith("/") or re.match(r"^[A-Za-z]:/", text)):
+    if not (text.startswith("/") or re.match(r"^[A-Za-z]:[/\\]", text)):
         return refuse_pattern(pattern, text, "not_absolute")
 
-    return [text if ("*" in text or "?" in text) else os.path.normpath(text)]
+    # as_posix after normpath, because normpath returns backslashes on Windows and every
+    # consumer of this list splits on "/": iter_matches walks the pattern segment by
+    # segment and bundle_path_for maps a path to its place in the bundle the same way. A
+    # backslash path would become one enormous percent-encoded segment.
+    if "*" in text or "?" in text:
+        return [text]
+    return [as_posix(os.path.normpath(text))]
 
 
 # --------------------------------------------------------------------- discovery
@@ -6922,6 +6928,22 @@ def iter_matches(pattern: str) -> list[str]:
         if not is_last:
             bases = [b for b in bases if os.path.isdir(b)]
     return sorted(set(bases))
+
+
+def as_posix(path: str) -> str:
+    """One separator convention inside the collector, whatever the platform gave us.
+
+    Every path this collector holds uses forward slashes: patterns are split on "/", the
+    bundle path mapping splits on "/", and the absoluteness check below looks for "/". A
+    Windows-shaped home or --root arrives with backslashes, and mixing the two meant every
+    pattern was refused as not absolute: the run reported 638 unsearched patterns and zero
+    hits against a tree full of evidence.
+
+    collect.py is the POSIX collector and collect.ps1 is the Windows one, but a POSIX-style
+    path can still be Windows-shaped: an analyst pointing --root at a mounted image from a
+    Windows workstation is the case the conformance suite exercises.
+    """
+    return path.replace("\\", "/")
 
 
 def discover_users(root: str | None, all_users: bool, named: list) -> list:
@@ -7228,10 +7250,14 @@ def run(args: argparse.Namespace) -> dict:
     )
 
     users = discover_users(args.root, args.all_users, args.user or [])
+    for user in users:
+        user["home"] = as_posix(user["home"])
     files_dir = None
     if not args.dry_run:
         files_dir = os.path.join(args.out, "files")
         os.makedirs(files_dir, exist_ok=True)
+
+    root_prefix = as_posix(args.root) if args.root else None
 
     entries: list = []
     errors: list = []
@@ -7274,7 +7300,7 @@ def run(args: argparse.Namespace) -> dict:
             for anchor in anchors:
                 for pattern in artifact["paths"]:
                     concrete = substitute_anchor(pattern, anchor) if is_project else pattern
-                    for expanded in expand_paths(concrete, home, target_os, args.root):
+                    for expanded in expand_paths(concrete, home, target_os, root_prefix):
                         for match in iter_matches(expanded):
                             targets = [match]
                             if os.path.isdir(match) and not os.path.islink(match):

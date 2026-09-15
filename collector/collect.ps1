@@ -7170,7 +7170,7 @@ function Expand-CataloguePath {
     # an analyst workstation is somewhere in the case folder and on an endpoint is wherever
     # the responder happened to be. Both find the wrong thing or nothing, and neither says
     # so.
-    if (-not ($text.StartsWith('/') -or $text -match '^[A-Za-z]:/')) {
+    if (-not ($text.StartsWith('/') -or $text -match '^[A-Za-z]:[/\\]')) {
         Add-PatternRefusal -Pattern $Pattern -Expanded $text -Reason 'not_absolute'
         return ,$results
     }

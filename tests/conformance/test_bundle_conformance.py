@@ -35,6 +35,11 @@ from agentforensics.bundle import verify_bundle  # noqa: E402
 COLLECT_PY = REPO_ROOT / "collector" / "collect.py"
 COLLECT_PS1 = REPO_ROOT / "collector" / "collect.ps1"
 
+# text=True alone decodes with the locale encoding, which on a Windows runner is cp1252.
+# Both collectors write UTF-8 on purpose, so that turned the serializer parity check into a
+# comparison against mojibake and blamed the collector for the harness's own decoding.
+DECODE_AS_UTF8 = {"text": True, "encoding": "utf-8", "errors": "replace"}
+
 # The interpreter to run collect.ps1 with. powershell.exe first, because that is Windows
 # PowerShell 5.1 and the only thing that proves the collector runs where it is meant to:
 # pwsh is PowerShell 7 and differs in ways this file documents. pwsh is still worth using,
@@ -101,7 +106,7 @@ def run_collect_py(args: list[str]) -> subprocess.CompletedProcess[str]:
         [sys.executable, str(COLLECT_PY), *args],
         cwd=REPO_ROOT,
         capture_output=True,
-        text=True,
+        **DECODE_AS_UTF8,
     )
 
 
@@ -116,7 +121,7 @@ def run_collect_ps1(args: list[str]) -> subprocess.CompletedProcess[str]:
         [POWERSHELL, "-NoLogo", "-NoProfile", "-File", str(COLLECT_PS1), *translated],
         cwd=REPO_ROOT,
         capture_output=True,
-        text=True,
+        **DECODE_AS_UTF8,
     )
 
 
