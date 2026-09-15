@@ -22,3 +22,4 @@ Add one with the next free number, using [0000-template.md](0000-template.md).
 | [0012](0012-runtime-dependencies.md) | Two runtime dependencies, both pure Python |
 | [0013](0013-catalogue-schema-fields.md) | Five fields added to the artifact entry beyond the original list |
 | [0014](0014-one-path-one-manifest-entry.md) | One path is one manifest entry, and the strictest claim on it wins |
+| [0015](0015-verified-means-the-vendor-said-so.md) | verified means the vendor said so, not that somebody wrote it down |

@@ -11,6 +11,45 @@
 
 agent: crosscutting
 title: Cross-cutting evidence
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/npm/
+- https://raw.githubusercontent.com/npm/
+- https://github.com/Homebrew/
+- https://raw.githubusercontent.com/Homebrew/
+- https://github.com/pypa/
+- https://raw.githubusercontent.com/pypa/
+- https://github.com/astral-sh/
+- https://raw.githubusercontent.com/astral-sh/
+- https://github.com/ollama/
+- https://raw.githubusercontent.com/ollama/
+- https://github.com/agentsmd/
+- https://raw.githubusercontent.com/agentsmd/
+- https://github.com/google-gemini/
+- https://raw.githubusercontent.com/google-gemini/
+- https://github.com/fish-shell/
+- https://raw.githubusercontent.com/fish-shell/
+- https://github.com/zsh-users/
+- https://raw.githubusercontent.com/zsh-users/
+- https://github.com/MicrosoftDocs/
+- https://raw.githubusercontent.com/MicrosoftDocs/
+- https://github.com/github/
+- https://raw.githubusercontent.com/github/
+- https://github.com/cline/
+- https://raw.githubusercontent.com/cline/
+- https://github.com/JetBrains/
+- https://raw.githubusercontent.com/JetBrains/
+- https://code.claude.com/
+- https://www.gnu.org/
+- https://git.savannah.gnu.org/
+- https://learn.microsoft.com/
+- https://docs.npmjs.com/
+- https://docs.brew.sh/
+- https://agents.md/
 description: |-
   Evidence that belongs to no single agent: shell history showing how an agent was invoked and with which flags, package manager traces proving it was installed, and the instruction-file conventions that several agents read, which are the surface through which injected instructions reach an agent.
 references:
@@ -163,13 +202,13 @@ artifacts:
   format: binary
   sensitivity: normal
   collect_priority: normal
-  status: verified
+  status: unverified
   source: https://raw.githubusercontent.com/ollama/ollama/main/docs/troubleshooting.mdx
-  source_kind: official
+  source_kind: community
   notes: |-
     The %LOCALAPPDATA%\Programs pattern is why AI tooling so often installs without admin rights and without appearing in Add/Remove Programs - enumerate it directly rather than trusting the uninstall registry. %TEMP%\ollama* is a reminder to sweep %TEMP% for agent-extracted runners generally.
 
-    Record structure: POINTER-LEVEL. Per-user (non-admin) installs land in %LOCALAPPDATA%\Programs\<Vendor> and add themselves to the user PATH; MSIX/Store apps land in %LOCALAPPDATA%\Packages\<PackageFamilyName>\ with LocalCache/LocalState/RoamingState subtrees. Ollama's own docs give the concrete pattern: "explorer %LOCALAPPDATA%\Ollama" for logs and downloaded updates, "explorer %LOCALAPPDATA%\Programs\Ollama" for binaries ("The installer adds this to your user PATH"), "explorer %HOMEPATH%\.ollama" for models and configuration, and "explorer %TEMP%" for "temporary executable files in ollama* directories".
+    Provenance: these are Windows known folders, and the page cited is one application's troubleshooting guide, which names only its own two directories under %LOCALAPPDATA%. %APPDATA% and %LOCALAPPDATA%\Packages are not defined anywhere on it. Promote to verified against the platform vendor's KNOWNFOLDERID reference, which was not reachable from the environment this was verified in.
   parser: null
 - id: crosscutting.windows_execution_evidence_files
   category: install_evidence
@@ -241,10 +280,10 @@ artifacts:
   - linux
   - windows
   paths:
-  - <project>/claude/hooks/
-  - <project>/claude/settings.json
-  - <project>/claude/settings.local.json
-  - <project>/clinerules/hooks/
+  - <project>/.claude/hooks/
+  - <project>/.claude/settings.json
+  - <project>/.claude/settings.local.json
+  - <project>/.clinerules/hooks/
   - ~/.claude/settings.json
   - ~/Documents/Cline/Hooks/
   format: text
@@ -271,10 +310,10 @@ artifacts:
   - $HOME/.copilot/mcp-config.json
   - '%APPDATA%\Claude\claude_desktop_config.json'
   - '%USERPROFILE%\.mcp.json'
-  - <project>/cursor/mcp.json
-  - <project>/gemini/settings.json
-  - <project>/mcp.json
-  - <project>/vscode/mcp.json
+  - <project>/.cursor/mcp.json
+  - <project>/.gemini/settings.json
+  - <project>/.mcp.json
+  - <project>/.vscode/mcp.json
   - ~/.claude.json
   - ~/.config/Claude/claude_desktop_config.json
   - ~/.cursor/mcp.json
@@ -308,8 +347,9 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/agentsmd/agents.md/main/README.md
-  source_kind: official
+  source: |-
+    https://raw.githubusercontent.com/agentsmd/agents.md/main/components/HowToUseSection.tsx
+  source_kind: source_code
   volatility: |-
     Version-controlled in the repo, so git history gives you authorship and timing for free - `git log -p --follow AGENTS.md` is the single highest-value command for an injection question. Also check for uncommitted local modifications.
   notes: |-
@@ -325,17 +365,22 @@ artifacts:
   - linux
   - windows
   paths:
+  - /Library/Application Support/ClaudeCode/CLAUDE.md
+  - /etc/claude-code/CLAUDE.md
+  - <project>/**/CLAUDE.local.md
   - <project>/**/CLAUDE.md
+  - <project>/.claude/CLAUDE.md
+  - <project>/.claude/rules/**/*.md
   - <project>/CLAUDE.local.md
   - <project>/CLAUDE.md
-  - <project>/claude/CLAUDE.md
+  - C:\Program Files\ClaudeCode\CLAUDE.md
   - ~/.claude/CLAUDE.md
+  - ~/.claude/rules/**/*.md
   format: markdown
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: |-
-    https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-command-reference.md
+  source: https://code.claude.com/docs/en/memory
   source_kind: official
   volatility: |-
     Git-tracked in the project case; ~/.claude/CLAUDE.md is user-global and untracked, so it has no history and only its mtime.
@@ -352,15 +397,15 @@ artifacts:
   - linux
   - windows
   paths:
-  - <project>/claude/skills/
-  - <project>/cline/remote-config/
-  - <project>/cline/skills/
-  - <project>/clineignore
-  - <project>/clinerules
-  - <project>/clinerules/
-  - <project>/clinerules/*.md
-  - <project>/clinerules/skills/
-  - <project>/clinerules/workflows/
+  - <project>/.claude/skills/
+  - <project>/.cline/remote-config/
+  - <project>/.cline/skills/
+  - <project>/.clineignore
+  - <project>/.clinerules
+  - <project>/.clinerules/
+  - <project>/.clinerules/*.md
+  - <project>/.clinerules/skills/
+  - <project>/.clinerules/workflows/
   - ~/Documents/Cline/Rules/
   - ~/Documents/Cline/Workflows/
   format: markdown
@@ -387,13 +432,13 @@ artifacts:
   paths:
   - $HOME/.copilot/copilot-instructions.md
   - $HOME/.copilot/instructions/**/*.instructions.md
-  - <project>/github/agents/*.md
-  - <project>/github/copilot-instructions.md
-  - <project>/github/copilot/settings.json
-  - <project>/github/copilot/settings.local.json
-  - <project>/github/instructions/**/*.instructions.md
-  - <project>/github/prompts/*.prompt.md
-  - <project>/github/skills/
+  - <project>/.github/agents/*.md
+  - <project>/.github/copilot-instructions.md
+  - <project>/.github/copilot/settings.json
+  - <project>/.github/copilot/settings.local.json
+  - <project>/.github/instructions/**/*.instructions.md
+  - <project>/.github/prompts/*.prompt.md
+  - <project>/.github/skills/
   format: markdown
   sensitivity: normal
   collect_priority: normal
@@ -416,10 +461,10 @@ artifacts:
   paths:
   - <project>/**/.cursor/rules/
   - <project>/AGENTS.md
-  - <project>/cursor/rules/
-  - <project>/cursor/rules/*.mdc
-  - <project>/cursor/rules/*/RULE.md
-  - <project>/cursorrules
+  - <project>/.cursor/rules/
+  - <project>/.cursor/rules/*.mdc
+  - <project>/.cursor/rules/*/RULE.md
+  - <project>/.cursorrules
   format: markdown
   sensitivity: normal
   collect_priority: normal
@@ -441,7 +486,7 @@ artifacts:
   paths:
   - <project>/**/GEMINI.md
   - <project>/GEMINI.md
-  - <project>/gemini/settings.json
+  - <project>/.gemini/settings.json
   - ~/.gemini/GEMINI.md
   - ~/.gemini/settings.json
   format: markdown
@@ -463,8 +508,8 @@ artifacts:
   - linux
   - windows
   paths:
-  - <project>/junie/
-  - <project>/junie/guidelines.md
+  - <project>/.junie/
+  - <project>/.junie/guidelines.md
   format: markdown
   sensitivity: normal
   collect_priority: normal
@@ -484,9 +529,9 @@ artifacts:
   - linux
   - windows
   paths:
-  - <project>/kiro/specs/
-  - <project>/kiro/steering/
-  - <project>/kiro/steering/*.md
+  - <project>/.kiro/specs/
+  - <project>/.kiro/steering/
+  - <project>/.kiro/steering/*.md
   format: markdown
   sensitivity: normal
   collect_priority: normal
@@ -506,9 +551,9 @@ artifacts:
   - linux
   - windows
   paths:
-  - <project>/windsurf/rules/
-  - <project>/windsurf/rules/*.md
-  - <project>/windsurfrules
+  - <project>/.windsurf/rules/
+  - <project>/.windsurf/rules/*.md
+  - <project>/.windsurfrules
   format: markdown
   sensitivity: normal
   collect_priority: normal
@@ -532,15 +577,15 @@ artifacts:
   format: text
   sensitivity: normal
   collect_priority: normal
-  status: verified
+  status: unverified
   source: https://raw.githubusercontent.com/pexip/os-bash/c36eb24bedb80d6783fe1b1f7470acb97eb603a8/doc/bash.1
-  source_kind: source_code
+  source_kind: community
   volatility: |-
     HISTFILESIZE truncates the file by removing the OLDEST entries whenever it is assigned. Default HISTSIZE is 500 after startup files are read. By default bash writes only at shell exit, so a killed terminal or a crashed box can lose the entire session.
   notes: |-
     HISTFILE default IS documented for bash, unlike zsh: "The name of the file in which command history is saved... The default value is ~/.bash_history. If unset, the command history is not saved when a shell exits." HISTCONTROL suppressions to account for: ignorespace ("lines which begin with a space character are not saved"), ignoredups, erasedups ("causes all previous lines matching the current line to be removed from the history list before that line is saved") - erasedups actively destroys earlier evidence of repeated agent invocations.
 
-    Record structure: TIMELINEABLE ONLY IF HISTTIMEFORMAT WAS SET AT THE TIME. Verbatim: "If this variable is set, time stamps are written to the history file so they may be preserved across shell sessions. This uses the history comment character to distinguish timestamps from other history lines." In practice that is a line `#<unix_epoch>` immediately preceding its command. Parse a `#`-prefixed all-digits line as the timestamp for the following command, and tolerate files that mix timestamped and untimestamped regions (the user turned it on partway through).
+    Provenance: the text behind this entry is bash's own manual page, which states that the default value of HISTFILE is ~/.bash_history, but the copy that was fetched is a distribution's packaging repository at a pinned commit rather than the canonical manual at gnu.org, which was not reachable from the environment this was verified in. Promote to verified after fetching https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html.
   parser: null
 - id: crosscutting.shell_fish_history
   category: shell_history
@@ -556,8 +601,9 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/fish-shell/fish-shell/master/src/history/yaml_backend.rs
-  source_kind: source_code
+  source: |-
+    https://raw.githubusercontent.com/fish-shell/fish-shell/master/doc_src/cmds/history.rst
+  source_kind: official
   volatility: Rewritten wholesale on save, so the previous generation is a good carving target.
   notes: |-
     The `paths` list is a gift no other shell gives: it ties an agent invocation to the specific files in play. Session/file name is controlled by the `fish_history` variable - docs: "The default value (when the variable is unset) is `fish` which corresponds to $XDG_DATA_HOME/fish/fish_history"; setting it to e.g. `fun` yields fun_history, and setting it to the empty string disables history entirely. Glob *_history in that directory rather than assuming one filename.
@@ -603,15 +649,16 @@ artifacts:
   format: text
   sensitivity: normal
   collect_priority: normal
-  status: verified
-  source: https://raw.githubusercontent.com/zsh-users/zsh/master/Doc/Zsh/options.yo
-  source_kind: source_code
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/zsh-users/zsh/master/Doc/Zsh/params.yo
+  source_kind: official
   volatility: |-
     SAVEHIST caps the file and oldest entries are dropped. HIST_EXPIRE_DUPS_FIRST and HIST_IGNORE_SPACE cause silent omissions - a leading space means the command was never recorded, which is NOT evidence of absence of the command.
   notes: |-
     IMPORTANT CORRECTION to the brief's framing: zsh itself has NO default HISTFILE. The manual says only "The file to save the history in when an interactive shell exits. If unset, the history is not saved" and gives no default. ~/.zsh_history is a convention supplied by the OS/distro rc files (macOS /etc/zshrc, oh-my-zsh, etc.), so the collector must read HISTFILE from the user's dotfiles and follow it rather than hardcoding the name. Likewise the history file is only written when SAVEHIST is non-zero. For aafs this file is the primary proof that a CLI agent was invoked at all (`claude`, `codex`, `gemini`, `ollama run`, `lms`, `aider`, `npx ...`).
 
-    Record structure: TIMELINEABLE ONLY IF EXTENDED_HISTORY IS SET. Verbatim from the zsh manual: EXTENDED_HISTORY "Save each command's beginning timestamp (in seconds since the epoch) and the duration (in seconds) to the history file", in the format `: <beginning time>:<elapsed seconds>;<command>`. Without it, lines are bare commands with no timestamps. Also verbatim: INC_APPEND_HISTORY appends "as soon as they are entered" (so a killed shell still leaves a record); APPEND_HISTORY only writes at shell exit; SHARE_HISTORY both imports and appends, interleaving commands from concurrent shells into one file so ORDER DOES NOT IMPLY ONE SESSION; HIST_IGNORE_SPACE removes lines whose first character is a space.
+    Provenance: zsh documents the HISTFILE parameter as "the file to save the history in when an interactive shell exits" and states no default for it. If HISTFILE is unset the history is not saved at all. The two filenames an analyst actually finds, ~/.zsh_history and ~/.zhistory, are set by distribution and framework startup files rather than by the shell, so they are convention and not a vendor-stated location. Read HISTFILE out of the collected startup files before concluding anything from an absent history file.
   parser: null
 - id: crosscutting.npm_npx_cache
   category: install_evidence

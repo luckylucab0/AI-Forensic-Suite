@@ -12,6 +12,16 @@
 agent: factory_droid
 title: Factory Droid
 vendor: Factory
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/Factory-AI/
+- https://raw.githubusercontent.com/Factory-AI/
+- https://docs.factory.ai/
+- https://factory.ai/
 references:
 - |-
   https://github.com/code-yeongyu/oh-my-openagent/blob/main/packages/shared-skills/skills/coding-agent-sessions/references/all-platforms.md

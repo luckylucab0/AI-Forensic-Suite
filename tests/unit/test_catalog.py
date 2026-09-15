@@ -84,6 +84,54 @@ def test_verified_entries_cite_a_fetchable_source(catalogue: Catalogue) -> None:
             assert artifact.source.startswith("http"), artifact.id
 
 
+def test_verified_entries_rest_on_their_own_vendor(catalogue: Catalogue) -> None:
+    """The other half of the honesty rule: whose page is it.
+
+    A third party who reverse-engineered a path writes it down with exactly the same
+    confidence as the vendor does, and nothing in the path itself tells an analyst which
+    of the two they are reading. Community research belongs in the catalogue, it just
+    belongs there as source_kind: community with status: unverified, which the analyzer
+    surfaces so an empty result reads as inconclusive. Each agent file lists the prefixes
+    that count as first party in vendor_sources.
+    """
+    overclaimed = [
+        (artifact.id, artifact.source)
+        for agent in catalogue
+        for artifact in agent.artifacts
+        if artifact.is_verified and not agent.is_vendor_source(artifact.source)
+    ]
+    assert not overclaimed, (
+        "verified entries whose source is not first party. Either re-source them to the "
+        f"vendor or set status: unverified with source_kind: community: {overclaimed}"
+    )
+
+
+def test_every_agent_declares_who_its_vendor_is(catalogue: Catalogue) -> None:
+    """Without the list the check above silently passes for a whole agent."""
+    for agent in catalogue:
+        assert agent.vendor_sources, agent.agent
+
+
+def test_an_unsourced_path_is_one_of_the_artifacts_own_paths(catalogue: Catalogue) -> None:
+    """A typo here would silently mark nothing, which is the failure mode of the field."""
+    for artifact in catalogue.artifacts:
+        stray = sorted(set(artifact.unsourced_paths) - set(artifact.paths))
+        assert not stray, f"{artifact.id}: unsourced_paths not in paths: {stray}"
+
+
+def test_an_unverified_artifact_does_not_also_list_unsourced_paths(
+    catalogue: Catalogue,
+) -> None:
+    """Every path of an unverified artifact is unsourced already.
+
+    Listing a few would read as if the others were confirmed, which is the opposite of
+    what the status says.
+    """
+    for artifact in catalogue.artifacts:
+        if not artifact.is_verified:
+            assert not artifact.unsourced_paths, artifact.id
+
+
 def test_unverified_entries_are_still_collectable(catalogue: Catalogue) -> None:
     """Unverified does not mean excluded. It means flagged."""
     for artifact in catalogue.artifacts:
@@ -151,6 +199,39 @@ def test_a_container_of_credentials_is_still_collected(catalogue: Catalogue) -> 
         assert artifact.sensitivity == "normal", artifact.id
         assert artifact.content_collected_by_default, artifact.id
         assert artifact.category != "credentials", artifact.id
+
+
+def test_no_path_lost_a_leading_dot(catalogue: Catalogue) -> None:
+    """A dot-directory spelled without its dot collects nothing and says nothing failed.
+
+    Found in the real catalogue: 38 project-anchored paths in the cross-cutting file had
+    lost the dot in front of the first segment, so the instruction-file entries pointed at
+    <project>/github/ and <project>/clinerules/ rather than the directories that exist.
+    The collector would have found nothing under any of them and reported no error, and an
+    analyst would have read that as no injected instruction file present.
+
+    The check compares against the catalogue itself: a first segment that appears with a
+    dot somewhere must never appear without one, since no project convention uses both
+    spellings for the same directory.
+    """
+    roots = ("<project>/", "<repo_root>/", "~/", "%USERPROFILE%/")
+    first_segments: dict[str, set[str]] = {}
+    for artifact in catalogue.artifacts:
+        for path in artifact.paths:
+            text = path.replace("\\", "/")
+            for root in roots:
+                if text.startswith(root):
+                    segment = text[len(root) :].split("/")[0]
+                    first_segments.setdefault(segment, set()).add(artifact.id)
+    dotless = {
+        segment: sorted(ids)
+        for segment, ids in first_segments.items()
+        if not segment.startswith(".") and ("." + segment) in first_segments
+    }
+    assert not dotless, (
+        "these first path segments appear both with and without a leading dot, so one "
+        f"spelling is wrong and collects nothing: {dotless}"
+    )
 
 
 def test_paths_are_paths_and_not_prose(catalogue: Catalogue) -> None:

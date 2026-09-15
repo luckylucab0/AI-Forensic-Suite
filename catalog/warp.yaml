@@ -12,6 +12,16 @@
 agent: warp
 title: Warp
 vendor: Warp
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/warpdotdev/
+- https://raw.githubusercontent.com/warpdotdev/
+- https://docs.warp.dev/
+- https://www.warp.dev/
 references:
 - |-
   https://raw.githubusercontent.com/marcus/sidecar/main/.claude/skills/create-adapter/references/warp-sqlite-schema.md

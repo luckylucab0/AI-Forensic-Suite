@@ -35,6 +35,11 @@ artifacts:
     hat der Katalog noch nicht hinter sich. Eine bestätigte Zeile ist also belegt, aber
     nicht unabhängig geprüft. Folgen Sie dem Link, wenn eine Schlussfolgerung am Pfad
     hängt.
+  unsourced_marker: "[unbelegt]"
+  unsourced_warning: >-
+    Ein mit [unbelegt] markierter Pfad gehört zu einem bestätigten Eintrag, dessen Quelle genau
+    diesen Pfad nicht nennt. Er wird wie jeder andere Pfad gesammelt, und ein Fehlschlag unter
+    ihm ist genauso unklar wie bei einem unbestätigten Eintrag.
   untranslated_marker: "[EN]"
 
 rules:

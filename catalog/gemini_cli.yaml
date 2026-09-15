@@ -12,6 +12,20 @@
 agent: gemini_cli
 title: Gemini CLI
 vendor: Google
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/google-gemini/
+- https://raw.githubusercontent.com/google-gemini/
+- https://github.com/google/
+- https://raw.githubusercontent.com/google/
+- https://github.com/googleapis/
+- https://raw.githubusercontent.com/googleapis/
+- https://cloud.google.com/
+- https://developers.google.com/
 description: |-
   Google's command line agent. The one agent in this catalogue that documents an automatic
   deletion policy for its own conversations, which changes what a collection means: the

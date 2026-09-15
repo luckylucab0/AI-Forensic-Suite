@@ -18,6 +18,12 @@
       "minLength": 1
     },
     "vendor": { "type": "string" },
+    "vendor_sources": {
+      "description": "URL prefixes that count as this agent's own vendor for the honesty rule. An artifact may only be status 'verified' if its source URL starts with one of these, because 'verified' has to mean the vendor states the path and not that a third party reverse-engineered it. Third-party research is welcome in the catalogue, it just carries source_kind 'community' and status 'unverified', which the analyzer surfaces. Enforced by tests/unit/test_catalog.py, not by this schema, so the failure message can name the entry and its URL.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
     "description": { "$ref": "#/$defs/text" },
     "references": {
       "description": "Documentation entry points for the agent as a whole. Per-artifact evidence goes in the artifact's own source field.",
@@ -173,6 +179,11 @@
           "description": "A URL for anything documented, or 'observed on <os> <version>' with no identifying detail for a first-hand observation.",
           "type": "string",
           "minLength": 1
+        },
+        "unsourced_paths": {
+          "description": "Paths of this artifact that the cited source does NOT state. An artifact is one logical thing, and a source often documents its main location while saying nothing about a sibling leaf under it. Marking the whole entry unverified for that would throw away a confirmed location, and marking it verified would quietly extend the vendor's claim to paths the vendor never made. Every path listed here must also appear in paths, is collected exactly like the others, and is shown as unsourced in generated documentation and in analyzer output, so a miss under one of them reads as inconclusive.",
+          "type": "array",
+          "items": { "type": "string" }
         },
         "source_kind": {
           "description": "Where the claim comes from. Separated from source so the honesty rule can be checked mechanically: only 'official' and 'source_code' may accompany status 'verified'.",

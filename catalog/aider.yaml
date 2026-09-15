@@ -12,6 +12,15 @@
 agent: aider
 title: Aider
 vendor: Aider
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/Aider-AI/
+- https://raw.githubusercontent.com/Aider-AI/
+- https://aider.chat/
 references:
 - https://github.com/Aider-AI/aider/blob/main/HISTORY.md
 - https://raw.githubusercontent.com/Aider-AI/aider/main/aider/analytics.py

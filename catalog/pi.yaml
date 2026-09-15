@@ -12,6 +12,14 @@
 agent: pi
 title: pi
 vendor: pi
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/earendil-works/
+- https://raw.githubusercontent.com/earendil-works/
 references:
 - https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/session-format.md
 - https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts

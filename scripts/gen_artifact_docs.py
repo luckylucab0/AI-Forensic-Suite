@@ -112,6 +112,22 @@ def code_list(values: tuple[str, ...]) -> str:
     return "<br>".join("`%s`" % esc(v) for v in values) if values else ""
 
 
+def path_list(artifact: Artifact, loc: dict[str, str]) -> str:
+    """The paths, with the ones the cited source does not state marked as such.
+
+    A verified artifact can still carry a leaf path its source says nothing about. Showing
+    the marker per path rather than per entry is the only way an analyst can tell which of
+    the two an empty result belongs to.
+    """
+    marked = []
+    for value in artifact.paths:
+        cell = "`%s`" % esc(value)
+        if value in artifact.unsourced_paths:
+            cell += " %s" % loc["unsourced_marker"]
+        marked.append(cell)
+    return "<br>".join(marked)
+
+
 def artifact_row(artifact: Artifact, loc: dict[str, str], lang: str) -> str:
     name = artifact.title or artifact.id.split(".", 1)[1].replace("_", " ")
     status = loc["status_verified"] if artifact.is_verified else loc["status_unverified"]
@@ -129,7 +145,7 @@ def artifact_row(artifact: Artifact, loc: dict[str, str], lang: str) -> str:
         esc(name),
         artifact.category,
         ", ".join(OS_LABELS.get(o, o) for o in artifact.os),
-        code_list(artifact.paths),
+        path_list(artifact, loc),
         artifact.format,
         artifact.sensitivity,
         esc(volatility),
@@ -245,6 +261,8 @@ def render(catalogue: Catalogue, lang: str) -> str:
         ),
         "",
         loc["unverified_warning"],
+        "",
+        loc["unsourced_warning"],
         "",
         # Said in the generated reference rather than only in an ADR, because this is the
         # file an analyst reads while deciding whether a missing artifact means anything.

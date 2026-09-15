@@ -12,6 +12,19 @@
 agent: cursor
 title: Cursor
 vendor: Anysphere
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/cursor/
+- https://raw.githubusercontent.com/cursor/
+- https://github.com/getcursor/
+- https://raw.githubusercontent.com/getcursor/
+- https://cursor.com/
+- https://docs.cursor.com/
+- https://www.cursor.com/
 references:
 - |-
   https://github.com/AltimateAI/vscode-dbt-power-user/blob/5fc912ee821cf1e42feb826ad48f9a01e2e98a80/documentation/docs/setup/cursor_installation_workaround.md
@@ -393,14 +406,14 @@ artifacts:
   format: json
   sensitivity: normal
   collect_priority: normal
-  status: verified
+  status: unverified
   source: |-
     https://raw.githubusercontent.com/skillsynchq/txcript/c545075461a45edf609a252b8be932ad3a6c5052/docs/formats/cursor.md
-  source_kind: source_code
+  source_kind: community
   notes: |-
     Per-session prompt log. Survives independently of the blob store, so it can recover user intent even when store.db is corrupt or truncated.
 
-    Record structure: Array of raw user prompt strings, in order. No timestamps, no assistant text.
+    Provenance: no vendor source states this path. The product is closed source and its documentation does not describe its on-disk layout, so the location rests on independent research. It is collected all the same, and reported as unverified, so an empty result reads as inconclusive rather than as proof the agent was never used.
   parser: null
 - id: cursor.global_prompt_history
   category: prompt_history
@@ -443,16 +456,16 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   legacy: true
-  status: verified
+  status: unverified
   source: |-
     https://raw.githubusercontent.com/xintaofei/codeg/18046ea4ecc11a68f8f7bac9e54c99b28658dfe6/src-tauri/src/parsers/cursor.rs
-  source_kind: source_code
+  source_kind: community
   volatility: |-
     WAL/SHM present for live and recent stores. One teardown counted 74 session directories but only 71 store.db files — some sessions leave a directory with meta.json and no database.
   notes: |-
     STRUCTURALLY SEPARATE third Cursor CLI store, used when cursor-agent runs in ACP mode (`cursor-agent acp`, IDE/third-party harness integrations). Keyed by ACP session id, not by workspace hash — there is no md5(cwd) directory level. Rich tool-call arguments persist here that are absent from the legacy chats layout. Relocatable via CURSOR_CONFIG_DIR.
 
-    Record structure: Same schema as the chats store: blobs(id TEXT PRIMARY KEY, data BLOB) + meta(key TEXT PRIMARY KEY, value TEXT). meta.json here is plain JSON with schemaVersion, cwd, title — cwd is the only reliable workspace attribution for ACP sessions, because ACP-only sessions never produce an agent-transcripts entry.
+    Provenance: no vendor source states this path. The product is closed source and its documentation does not describe its on-disk layout, so the location rests on independent research. It is collected all the same, and reported as unverified, so an empty result reads as inconclusive rather than as proof the agent was never used.
   parser: null
 - id: cursor.agent_transcripts_jsonl
   category: transcript
@@ -494,15 +507,15 @@ artifacts:
   format: json
   sensitivity: normal
   collect_priority: normal
-  status: verified
+  status: unverified
   source: |-
     https://raw.githubusercontent.com/skillsynchq/txcript/c545075461a45edf609a252b8be932ad3a6c5052/docs/formats/cursor.md
-  source_kind: source_code
+  source_kind: community
   volatility: Rewritten on each session update; updatedAtMs is the last-touch timestamp.
   notes: |-
     Sidecar beside store.db. This is the cheap session index for triage: title plus timestamps without opening the SQLite store. Do not confuse with the store.db `meta` TABLE, which is hex-encoded.
 
-    Record structure: Plain (not hex-encoded) JSON: title, createdAtMs, updatedAtMs, schemaVersion, hasConversation.
+    Provenance: no vendor source states this path. The product is closed source and its documentation does not describe its on-disk layout, so the location rests on independent research. It is collected all the same, and reported as unverified, so an empty result reads as inconclusive rather than as proof the agent was never used.
   parser: null
 - id: cursor.chat_store_db
   category: transcript
@@ -520,16 +533,16 @@ artifacts:
   format: sqlite
   sensitivity: normal
   collect_priority: normal
-  status: verified
+  status: unverified
   source: |-
     https://raw.githubusercontent.com/skillsynchq/txcript/c545075461a45edf609a252b8be932ad3a6c5052/docs/formats/cursor.md
-  source_kind: source_code
+  source_kind: community
   volatility: |-
     No rotation or pruning observed; transcripts described as unbounded. SQLite is WAL-mode and the file descriptor is held open for the whole session, so -wal and -shm must be acquired with the main file or the newest turns are lost.
   notes: |-
     Cursor CLI (cursor-agent) interactive/print-mode store; distinct from the IDE's state.vscdb and from acp-sessions. Workspace bucket = lowercase hex MD5 of the absolute workspace path, empirically char-for-char matched against real data by one source. Relocatable via CURSOR_CONFIG_DIR. Image/pasted attachments live here as blobs and are NOT in the JSONL transcript.
 
-    Record structure: Two tables. blobs(id TEXT PRIMARY KEY, data BLOB) is content-addressed: id = lowercase-hex sha256(data) (64 hex chars). meta(key TEXT PRIMARY KEY, value TEXT) holds a SINGLE row whose key is the literal string "0" and whose value is HEX-ENCODED UTF-8 JSON (hex-decode before JSON parse) carrying agentId, latestRootBlobId, name, createdAt (unix ms), mode (e.g. "auto-run"/"manual"), lastUsedModel, and in newer builds isRunEverything, approvalMode, subagentInfo. Blob payloads are MIXED encodings: message blobs are plain JSON objects starting with the byte 0x7B '{' ({role, content, id, createdAt, providerOptions.cursor.modelName}); linking/tree blobs are protobuf-framed lists of child references, each frame 0x0A 0x20 followed by a 32-byte raw sha256, repeated, with optional trailing embedded JSON. Walk from meta.latestRootBlobId to reconstruct the turn DAG. One independent source instead describes the blobs as protobuf agent.v1.* messages — treat the encoding as per-blob sniffed, not fixed.
+    Provenance: no vendor source states this path. The product is closed source and its documentation does not describe its on-disk layout, so the location rests on independent research. It is collected all the same, and reported as unverified, so an empty result reads as inconclusive rather than as proof the agent was never used.
   parser: null
 - id: cursor.conversation_search_db
   category: transcript
@@ -608,14 +621,14 @@ artifacts:
   format: json
   sensitivity: normal
   collect_priority: normal
-  status: verified
+  status: unverified
   source: |-
     https://github.com/pradipta/wallfacer/blob/94a58b79a47c4e815e60ffe6bfc5fb604351d2c3/internal/agent/cursor/cursor.go
-  source_kind: source_code
+  source_kind: community
   notes: |-
     SINGLE SOURCE, retrieved as a code-search snippet from a Go doc comment, not a full fetch. High analytical value if real (pasted credentials/log excerpts land here rather than in the transcript) so worth globbing, but do not assert the field layout.
 
-    Record structure: Described only as "pasted buffers" in a doc comment enumerating the per-session directory contents. Structure unknown.
+    Provenance: no vendor source states this path. The product is closed source and its documentation does not describe its on-disk layout, so the location rests on independent research. It is collected all the same, and reported as unverified, so an empty result reads as inconclusive rather than as proof the agent was never used.
   parser: null
 - id: cursor.workspace_state_vscdb
   category: transcript

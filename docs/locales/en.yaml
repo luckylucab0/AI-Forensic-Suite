@@ -33,6 +33,11 @@ artifacts:
     which is a pass this catalogue has not been through yet. Read a verified row as
     sourced rather than as independently confirmed, and follow the link when a conclusion
     depends on the path.
+  unsourced_marker: "[unsourced]"
+  unsourced_warning: >-
+    A path marked [unsourced] belongs to a verified entry whose source does not state that
+    particular path. It is collected like every other path, and a miss under it is inconclusive
+    in the same way an unverified entry is.
   untranslated_marker: "[EN]"
 
 rules:

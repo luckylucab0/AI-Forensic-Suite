@@ -12,6 +12,15 @@
 agent: lmstudio
 title: LM Studio
 vendor: Element Labs
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/lmstudio-ai/
+- https://raw.githubusercontent.com/lmstudio-ai/
+- https://lmstudio.ai/
 references:
 - https://github.com/lmstudio-ai/docs/blob/main/0_app/2_mcp/index.mdx
 - https://github.com/lmstudio-ai/docs/blob/main/0_app/5_advanced/import-model.md

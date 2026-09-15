@@ -12,11 +12,24 @@
 agent: vscode
 title: Visual Studio Code host storage
 vendor: Microsoft
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/microsoft/
+- https://raw.githubusercontent.com/microsoft/
+- https://github.com/MicrosoftDocs/
+- https://raw.githubusercontent.com/MicrosoftDocs/
+- https://code.visualstudio.com/
+- https://learn.microsoft.com/
 description: |-
   Visual Studio Code and its forks, as a storage host rather than as an agent. A dozen agentic extensions keep their conversations under workspaceStorage and globalStorage or inside state.vscdb, so these paths are worth collecting even when it is not yet known which extension was installed.
 references:
 - https://github.com/microsoft/vscode-discussions/discussions/748
-- https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-modes.md
+- |-
+  https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/configure/settings.md
 - |-
   https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/configure/extensions/extension-marketplace.md
 artifacts:
@@ -121,12 +134,14 @@ artifacts:
   sensitivity: normal
   collect_priority: durable
   status: verified
-  source: https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-modes.md
-  source_kind: official
+  source: https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts
+  source_kind: source_code
   volatility: Persists until the editor variant's user-data dir is deleted; survives extension uninstall
     in most cases.
   notes: |-
-    The `<vscode-user>` root is NOT one path - enumerate every editor variant present on the image: Code, 'Code - Insiders', VSCodium, 'Cursor', 'Windsurf', plus remote roots ~/.vscode-server/data/User and ~/.vscode-remote/data/User (the codeburn and tokscale collectors enumerate exactly this set). The Kilo official docs give the macOS/Linux/Windows triple for the Code variant verbatim.
+    The editor's own environment service joins the user data path with `User` and then with `globalStorage`, which is what fixes this layout. The per-platform user data path itself is given by the vendor's settings documentation as %APPDATA%\Code\User on Windows, $HOME/Library/Application Support/Code/User on macOS and $HOME/.config/Code/User on Linux.
 
-    Record structure: Every Cline-family extension hangs its tree off <vscode-user>/globalStorage/<publisher.extension-lowercased>/.
+    This root is NOT one path. Enumerate every editor variant present on the image: Code, 'Code - Insiders', VSCodium, Cursor, Windsurf, plus the remote roots ~/.vscode-server/data/User and ~/.vscode-remote/data/User. Only the Code variant is vendor-stated; the others are the same relative layout under a differently named product directory and were not separately confirmed, so a miss under one of them is inconclusive rather than proof the variant was unused.
+
+    Record structure: every Cline-family extension hangs its tree off <vscode-user>/globalStorage/<publisher.extension-lowercased>/.
   parser: null

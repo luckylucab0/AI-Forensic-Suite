@@ -23,6 +23,18 @@
 agent: claude_code
 title: Claude Code
 vendor: Anthropic
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/anthropics/
+- https://raw.githubusercontent.com/anthropics/
+- https://code.claude.com/
+- https://platform.claude.com/
+- https://docs.claude.com/
+- https://www.anthropic.com/
 description: |-
   Anthropic's terminal coding agent, also reachable from the desktop app, VS Code, JetBrains IDEs, the Agent SDK and CI. It keeps by far the richest on-disk record of any agent covered here: full transcripts, every prompt typed, pre-edit file snapshots, subagent activity, permission decisions and effective policy.
 references:

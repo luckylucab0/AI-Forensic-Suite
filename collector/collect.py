@@ -3087,10 +3087,10 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
-                        "<project>/claude/hooks/",
-                        "<project>/claude/settings.json",
-                        "<project>/claude/settings.local.json",
-                        "<project>/clinerules/hooks/",
+                        "<project>/.claude/hooks/",
+                        "<project>/.claude/settings.json",
+                        "<project>/.claude/settings.local.json",
+                        "<project>/.clinerules/hooks/",
                         "~/.claude/settings.json",
                         "~/Documents/Cline/Hooks/"
                     ],
@@ -3125,11 +3125,17 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
+                        "/Library/Application Support/ClaudeCode/CLAUDE.md",
+                        "/etc/claude-code/CLAUDE.md",
+                        "<project>/**/CLAUDE.local.md",
                         "<project>/**/CLAUDE.md",
+                        "<project>/.claude/CLAUDE.md",
+                        "<project>/.claude/rules/**/*.md",
                         "<project>/CLAUDE.local.md",
                         "<project>/CLAUDE.md",
-                        "<project>/claude/CLAUDE.md",
-                        "~/.claude/CLAUDE.md"
+                        "C:\\Program Files\\ClaudeCode\\CLAUDE.md",
+                        "~/.claude/CLAUDE.md",
+                        "~/.claude/rules/**/*.md"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -3145,15 +3151,15 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
-                        "<project>/claude/skills/",
-                        "<project>/cline/remote-config/",
-                        "<project>/cline/skills/",
-                        "<project>/clineignore",
-                        "<project>/clinerules",
-                        "<project>/clinerules/",
-                        "<project>/clinerules/*.md",
-                        "<project>/clinerules/skills/",
-                        "<project>/clinerules/workflows/",
+                        "<project>/.claude/skills/",
+                        "<project>/.cline/remote-config/",
+                        "<project>/.cline/skills/",
+                        "<project>/.clineignore",
+                        "<project>/.clinerules",
+                        "<project>/.clinerules/",
+                        "<project>/.clinerules/*.md",
+                        "<project>/.clinerules/skills/",
+                        "<project>/.clinerules/workflows/",
                         "~/Documents/Cline/Rules/",
                         "~/Documents/Cline/Workflows/"
                     ],
@@ -3173,13 +3179,13 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "$HOME/.copilot/copilot-instructions.md",
                         "$HOME/.copilot/instructions/**/*.instructions.md",
-                        "<project>/github/agents/*.md",
-                        "<project>/github/copilot-instructions.md",
-                        "<project>/github/copilot/settings.json",
-                        "<project>/github/copilot/settings.local.json",
-                        "<project>/github/instructions/**/*.instructions.md",
-                        "<project>/github/prompts/*.prompt.md",
-                        "<project>/github/skills/"
+                        "<project>/.github/agents/*.md",
+                        "<project>/.github/copilot-instructions.md",
+                        "<project>/.github/copilot/settings.json",
+                        "<project>/.github/copilot/settings.local.json",
+                        "<project>/.github/instructions/**/*.instructions.md",
+                        "<project>/.github/prompts/*.prompt.md",
+                        "<project>/.github/skills/"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -3197,10 +3203,10 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "<project>/**/.cursor/rules/",
                         "<project>/AGENTS.md",
-                        "<project>/cursor/rules/",
-                        "<project>/cursor/rules/*.mdc",
-                        "<project>/cursor/rules/*/RULE.md",
-                        "<project>/cursorrules"
+                        "<project>/.cursor/rules/",
+                        "<project>/.cursor/rules/*.mdc",
+                        "<project>/.cursor/rules/*/RULE.md",
+                        "<project>/.cursorrules"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -3218,7 +3224,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "<project>/**/GEMINI.md",
                         "<project>/GEMINI.md",
-                        "<project>/gemini/settings.json",
+                        "<project>/.gemini/settings.json",
                         "~/.gemini/GEMINI.md",
                         "~/.gemini/settings.json"
                     ],
@@ -3236,8 +3242,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
-                        "<project>/junie/",
-                        "<project>/junie/guidelines.md"
+                        "<project>/.junie/",
+                        "<project>/.junie/guidelines.md"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -3253,9 +3259,9 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
-                        "<project>/kiro/specs/",
-                        "<project>/kiro/steering/",
-                        "<project>/kiro/steering/*.md"
+                        "<project>/.kiro/specs/",
+                        "<project>/.kiro/steering/",
+                        "<project>/.kiro/steering/*.md"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -3271,9 +3277,9 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
-                        "<project>/windsurf/rules/",
-                        "<project>/windsurf/rules/*.md",
-                        "<project>/windsurfrules"
+                        "<project>/.windsurf/rules/",
+                        "<project>/.windsurf/rules/*.md",
+                        "<project>/.windsurfrules"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -3292,10 +3298,10 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "$HOME/.copilot/mcp-config.json",
                         "%APPDATA%\\Claude\\claude_desktop_config.json",
                         "%USERPROFILE%\\.mcp.json",
-                        "<project>/cursor/mcp.json",
-                        "<project>/gemini/settings.json",
-                        "<project>/mcp.json",
-                        "<project>/vscode/mcp.json",
+                        "<project>/.cursor/mcp.json",
+                        "<project>/.gemini/settings.json",
+                        "<project>/.mcp.json",
+                        "<project>/.vscode/mcp.json",
                         "~/.claude.json",
                         "~/.config/Claude/claude_desktop_config.json",
                         "~/.cursor/mcp.json",
@@ -3398,7 +3404,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "shell_history",
@@ -3451,7 +3457,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "install_evidence",
@@ -3491,7 +3497,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "install_evidence",
@@ -3557,7 +3563,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "config",
@@ -3656,7 +3662,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "prompt_history",
@@ -3672,7 +3678,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "transcript",
@@ -3692,7 +3698,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "permissions",
@@ -3902,7 +3908,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "project_instructions",
@@ -6086,7 +6092,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "config",
@@ -6104,7 +6110,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "cache",
@@ -6160,7 +6166,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "config",
@@ -6178,7 +6184,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "project",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "config",
@@ -6298,7 +6304,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "project_instructions",
@@ -6317,7 +6323,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "project",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 },
                 {
                     "category": "instructions",
@@ -6336,7 +6342,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "project",
                     "sensitivity": "normal",
-                    "status": "verified"
+                    "status": "unverified"
                 }
             ]
         },
@@ -6454,7 +6460,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "bafae099c57de0f22475a58f09bdc8ed6ce948e3003d3bed34da0f38b79c906b"
+    "sha256": "acd5261a04bca250de3dbe1d5d551950bdcfb0f869c32e544b949331b953cb79"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

@@ -74,6 +74,7 @@ class Artifact:
     parser: str | None = None
     collect_priority: CollectPriority = "normal"
     legacy: bool = False
+    unsourced_paths: tuple[str, ...] = ()
     record_types: tuple[str, ...] = ()
     tables: tuple[str, ...] = ()
     contains_credentials: tuple[str, ...] = ()
@@ -88,6 +89,15 @@ class Artifact:
     @property
     def is_verified(self) -> bool:
         return self.status == "verified"
+
+    def path_is_sourced(self, path: str) -> bool:
+        """Whether the cited source states this particular path.
+
+        False for a verified artifact's unsourced leaf as well as for every path of an
+        unverified one, because an analyst needs the same warning in both cases: an empty
+        result here is inconclusive rather than proof of absence.
+        """
+        return self.is_verified and path not in self.unsourced_paths
 
     @property
     def content_collected_by_default(self) -> bool:
@@ -133,12 +143,24 @@ class AgentCatalog:
     title: str
     artifacts: tuple[Artifact, ...]
     vendor: str | None = None
+    vendor_sources: tuple[str, ...] = ()
     description: Text | None = None
     references: tuple[str, ...] = ()
     env_overrides: tuple[EnvOverride, ...] = ()
 
     def for_os(self, os_name: str) -> tuple[Artifact, ...]:
         return tuple(a for a in self.artifacts if a.applies_to(os_name))
+
+    def is_vendor_source(self, url: str) -> bool:
+        """Whether this URL is the agent's own vendor speaking about its own product.
+
+        The honesty rule needs this because a third party who reverse-engineered a path
+        writes it down just as confidently as the vendor does, and an analyst reading the
+        catalogue cannot tell the two apart from the path alone. Matching is a plain
+        prefix test on purpose: a host test alone would accept any repository on a code
+        hosting site, which is where most of the third-party research lives.
+        """
+        return any(url.startswith(prefix) for prefix in self.vendor_sources)
 
 
 @dataclass(frozen=True, slots=True)
@@ -238,6 +260,7 @@ def _artifact(data: Mapping[str, Any]) -> Artifact:
         parser=data.get("parser"),
         collect_priority=cast(CollectPriority, data.get("collect_priority", "normal")),
         legacy=bool(data.get("legacy", False)),
+        unsourced_paths=_tuple(data.get("unsourced_paths")),
         record_types=_tuple(data.get("record_types")),
         tables=_tuple(data.get("tables")),
         contains_credentials=_tuple(data.get("contains_credentials")),
@@ -284,6 +307,7 @@ def load_file(path: Path, schema_path: Path | None = None) -> AgentCatalog:
         title=data["title"],
         artifacts=tuple(artifacts),
         vendor=data.get("vendor"),
+        vendor_sources=_tuple(data.get("vendor_sources")),
         description=data.get("description"),
         references=_tuple(data.get("references")),
         env_overrides=tuple(

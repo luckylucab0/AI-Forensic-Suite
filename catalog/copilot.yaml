@@ -12,6 +12,18 @@
 agent: copilot
 title: GitHub Copilot CLI
 vendor: GitHub
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/github/
+- https://raw.githubusercontent.com/github/
+- https://github.com/JetBrains/
+- https://raw.githubusercontent.com/JetBrains/
+- https://docs.github.com/
+- https://github.blog/
 description: |-
   The Copilot command line agent. GitHub documents the whole configuration directory file
   by file, including which files hold credentials and what is lost by deleting each one,

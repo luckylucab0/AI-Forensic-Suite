@@ -12,6 +12,16 @@
 agent: continue
 title: Continue
 vendor: Continue
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/continuedev/
+- https://raw.githubusercontent.com/continuedev/
+- https://docs.continue.dev/
+- https://continue.dev/
 references:
 - https://github.com/continuedev/continue/blob/main/core/config/ConfigHandler.ts
 - https://github.com/continuedev/continue/blob/main/extensions/cli/src/commands/devbox-entrypoint.md

@@ -12,6 +12,17 @@
 agent: opencode
 title: OpenCode
 vendor: OpenCode
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/anomalyco/
+- https://raw.githubusercontent.com/anomalyco/
+- https://github.com/sst/
+- https://raw.githubusercontent.com/sst/
+- https://opencode.ai/
 references:
 - https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/mcp/auth.ts
 - https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts
