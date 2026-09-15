@@ -6940,6 +6940,21 @@ def iter_matches(pattern: str) -> list[str]:
     return sorted(set(bases))
 
 
+def format_link_target(target: str) -> str:
+    """A link target as the manifest records it: no extended-length prefix, one separator.
+
+    Windows hands back \\\\?\\C:\\... for a link created through the extended-length API,
+    which is a Win32 calling convention rather than a fact about where the link points, and
+    the two collectors' manifests are compared field by field.
+    """
+    text = target
+    if text.startswith("\\\\?\\UNC\\"):
+        text = "\\\\" + text[len("\\\\?\\UNC\\") :]
+    elif text.startswith("\\\\?\\"):
+        text = text[len("\\\\?\\") :]
+    return as_posix(text)
+
+
 def as_posix(path: str) -> str:
     """One separator convention inside the collector, whatever the platform gave us.
 
@@ -7155,7 +7170,7 @@ def collect_file(
             target = os.readlink(original)
         except OSError:
             target = None
-        entry["symlink"] = target
+        entry["symlink"] = format_link_target(target) if target else target
         # A symbolic link is a reparse point on Windows, which is the platform this field
         # is named for. Set here so the value means something and so both collectors agree.
         entry["reparse_point"] = True

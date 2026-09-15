@@ -7215,6 +7215,27 @@ function Test-PathExists {
     }
 }
 
+function Format-LinkTarget {
+    <#
+    .SYNOPSIS
+        A link target as the manifest records it: no extended-length prefix, one separator.
+    .DESCRIPTION
+        Windows hands back \\?\C:\... for a link created through the extended-length API,
+        which is a Win32 calling convention rather than a fact about where the link points.
+        The other collector reports the plain path, and the manifests are compared field by
+        field, so the prefix has to go. Forward slashes for the same reason every other
+        path in this collector uses them.
+    #>
+    param([string] $Target)
+    $text = $Target
+    if ($text.StartsWith('\\?\UNC\')) {
+        $text = '\\' + $text.Substring('\\?\UNC\'.Length)
+    } elseif ($text.StartsWith('\\?\')) {
+        $text = $text.Substring('\\?\'.Length)
+    }
+    return $text.Replace('\', '/')
+}
+
 function Get-LinkTarget {
     <#
     .SYNOPSIS
@@ -7235,7 +7256,7 @@ function Get-LinkTarget {
     try {
         $info = [System.IO.FileInfo]::new($Path)
         if ($info.PSObject.Properties.Name -ccontains 'LinkTarget' -and $info.LinkTarget) {
-            return [string]$info.LinkTarget
+            return (Format-LinkTarget ([string]$info.LinkTarget))
         }
     } catch {
         # Fall through to Get-Item.
@@ -7247,7 +7268,7 @@ function Get-LinkTarget {
             if ($value) {
                 # 5.1 returns a collection for a reparse point with several targets.
                 foreach ($entry in @($value)) {
-                    if ($entry) { return [string]$entry }
+                    if ($entry) { return (Format-LinkTarget ([string]$entry)) }
                 }
             }
         }
