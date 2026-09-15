@@ -25,6 +25,12 @@ references:
 - |-
   https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/developer-guide/session-storage.md
 - https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+env_overrides:
+- name: HERMES_HOME
+  effect: |-
+    Relocates the agent's entire directory: configuration, credentials, memories, skills, scheduled jobs, session transcripts and logs all hang off it. Every path in this file has a spelling rooted at this variable for that reason.
+  source: |-
+    https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
 artifacts:
 - id: hermes.config
   category: config

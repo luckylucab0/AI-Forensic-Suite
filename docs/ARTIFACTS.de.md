@@ -110,6 +110,9 @@ Vendor: Anthropic
 
 ### Verschiebende Variablen
 
+- `ANTHROPIC_CONFIG_DIR`: [EN] Relocates the shared credential and profile directory that Claude Code and the agent SDK both read. The vendor's reference gives the resolution order as this variable first, then ~/.config/anthropic on Linux and macOS, then the Anthropic directory under %APPDATA% on Windows. A collection that reads only the default two reports no federated identity on a host that has one.
+- `CLAUDE_CODE_DEBUG_LOGS_DIR`: [EN] Moves the debug log. Despite the name it is a file path and not a directory, and the vendor states the default as ~/.claude/debug/<session-id>.txt. Debug logging also has to be enabled separately, so an absent log is the normal state rather than a sign of anything.
+- `CLAUDE_CODE_PLUGIN_CACHE_DIR`: [EN] Moves the plugins root. Despite the name it sets the parent directory, with the marketplace registry and the plugin cache in subdirectories under it, and the vendor states the default as ~/.claude/plugins. Plugins are executable code the agent loads, so a relocated root is a hole in exactly the evidence that answers what the agent was made to do.
 - `CLAUDE_CONFIG_DIR`: [EN] Moves the whole configuration directory away from ~/.claude, taking settings, transcripts, prompt history and plugins with it. A collection keyed on ~/.claude alone finds nothing on such a host, which is indistinguishable from the agent never having run. Read the variable from the shell profile and from process environment evidence before concluding an agent was absent.
 - `CLAUDE_CODE_SKIP_PROMPT_HISTORY`: [EN] Suppresses writing to history.jsonl. Its presence in a shell profile is itself a finding, since prompt history normally outlives the transcripts.
 
@@ -320,6 +323,10 @@ after Claude Code.
 Vendor: Continue
 
 <https://github.com/continuedev/continue/blob/main/core/config/ConfigHandler.ts>, <https://github.com/continuedev/continue/blob/main/extensions/cli/src/commands/devbox-entrypoint.md>, <https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts>, <https://raw.githubusercontent.com/continuedev/continue/main/docs/customize/deep-dives/configuration.mdx>
+
+### Verschiebende Variablen
+
+- `CONTINUE_GLOBAL_DIR`: [EN] Relocates the whole global directory, which holds the session transcripts. A collection keyed on ~/.continue finds nothing on such a host and cannot tell that apart from the agent never having run.
 
 ### normal
 
@@ -622,6 +629,10 @@ Vendor: Hermes
 
 <https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/developer-guide/session-storage.md>, <https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md>
 
+### Verschiebende Variablen
+
+- `HERMES_HOME`: [EN] Relocates the agent's entire directory: configuration, credentials, memories, skills, scheduled jobs, session transcripts and logs all hang off it. Every path in this file has a spelling rooted at this variable for that reason.
+
 ### normal
 
 **Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
@@ -750,6 +761,10 @@ Vendor: Ollama
 
 <https://github.com/ollama/ollama/blob/main/cmd/config/config.go>, <https://github.com/ollama/ollama/blob/main/manifest/layer.go>, <https://github.com/ollama/ollama/blob/main/manifest/paths.go>, <https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/o/ollama-app.rb>
 
+### Verschiebende Variablen
+
+- `OLLAMA_MODELS`: [EN] Relocates the model store, which holds the manifests and the content-addressed blobs. Those are the record of which models were pulled and when, so a relocated store makes an endpoint look as though no model was ever downloaded. The vendor documents the default as the models directory under the agent's home directory.
+
 ### first
 
 **Zuerst sichern.** Rotieren oder verfallen aggressiv, nach Anzahl oder bei jedem Aufräumlauf statt nach einer bequemen Frist. Einige davon zerstört die Benutzerin schon dadurch, dass sie eine weitere Sitzung startet.
@@ -817,6 +832,10 @@ Die folgenden Pfade werden von aktuellen Versionen nicht mehr geschrieben oder g
 Vendor: pi
 
 <https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/session-format.md>, <https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts>
+
+### Verschiebende Variablen
+
+- `PI_CODING_AGENT_SESSION_DIR`: [EN] Relocates the session transcripts. The variable's name is defined in the agent's configuration module; the documentation page that describes the session format does not state it, which is why the path rooted at it is marked unsourced.
 
 ### normal
 
@@ -917,6 +936,10 @@ Vendor: Warp
 Vendor: Codeium
 
 <https://github.com/depalmar/ai-dfir-toolkit/blob/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/docs/RESEARCH-2026-08-14.md>, <https://raw.githubusercontent.com/LayerNorm/overlay-web/6cf2cbfe09e0f25ebabf9986f1566183f477a48b/docs/develop/traversing-agent-conversations.md>, <https://raw.githubusercontent.com/dayearleo/windsurf-local-user-data-decryption/0e9e057aa9962284517db9c4963c5275eff7df00/SKILL.md>, <https://raw.githubusercontent.com/depalmar/ai-dfir-toolkit/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/catalog/codeium-windsurf.yml>
+
+### Verschiebende Variablen
+
+- `WINDSURF_CONFIG_DIR`: [EN] Relocates the configuration directory, inside which the conversation trajectories live. Like the rest of this agent's entries the variable comes from independent research rather than from a vendor source, so treat it as a lead and read the value off the endpoint rather than assuming the default.
 
 ### first
 

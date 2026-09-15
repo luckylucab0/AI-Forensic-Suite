@@ -201,6 +201,41 @@ def test_a_container_of_credentials_is_still_collected(catalogue: Catalogue) -> 
         assert artifact.category != "credentials", artifact.id
 
 
+def test_a_relocation_variable_in_a_path_is_declared(catalogue: Catalogue) -> None:
+    """A variable the agent does not read is a pattern that resolves to nothing, forever.
+
+    Found in the real catalogue: four of one editor's five install-evidence paths were
+    rooted at a data directory variable the editor never reads, because its only override
+    is a function call inside the process. The variable is unset on every host, so the
+    collector skipped all four patterns on every platform without reporting an error.
+
+    Declaring an agent-specific variable in env_overrides is what makes somebody check it
+    exists and write down what it moves. The shell and base directory variables below are
+    the operating system's, not an agent's, and the collector resolves them itself.
+    """
+    system_variables = {
+        "HOME",
+        "HISTFILE",
+        "ZDOTDIR",
+        "XDG_CACHE_HOME",
+        "XDG_CONFIG_HOME",
+        "XDG_DATA_HOME",
+        "XDG_STATE_HOME",
+    }
+    undeclared: dict[str, list[str]] = {}
+    for agent in catalogue:
+        declared = {override.name for override in agent.env_overrides} | system_variables
+        for artifact in agent.artifacts:
+            for path in artifact.paths:
+                for name in re.findall(r"\$\{?([A-Z][A-Z0-9_]*)", path):
+                    if name not in declared:
+                        undeclared.setdefault(f"{name} in {artifact.id}", []).append(path)
+    assert not undeclared, (
+        "these paths are rooted at a variable the agent's env_overrides does not declare, "
+        f"so nobody has checked the agent reads it: {sorted(undeclared)}"
+    )
+
+
 def test_no_path_lost_a_leading_dot(catalogue: Catalogue) -> None:
     """A dot-directory spelled without its dot collects nothing and says nothing failed.
 

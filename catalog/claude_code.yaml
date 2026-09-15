@@ -43,6 +43,18 @@ references:
 - https://code.claude.com/docs/en/sessions
 - https://code.claude.com/docs/en/iam
 env_overrides:
+- name: ANTHROPIC_CONFIG_DIR
+  effect: |-
+    Relocates the shared credential and profile directory that Claude Code and the agent SDK both read. The vendor's reference gives the resolution order as this variable first, then ~/.config/anthropic on Linux and macOS, then the Anthropic directory under %APPDATA% on Windows. A collection that reads only the default two reports no federated identity on a host that has one.
+  source: https://platform.claude.com/docs/en/manage-claude/wif-reference
+- name: CLAUDE_CODE_DEBUG_LOGS_DIR
+  effect: |-
+    Moves the debug log. Despite the name it is a file path and not a directory, and the vendor states the default as ~/.claude/debug/<session-id>.txt. Debug logging also has to be enabled separately, so an absent log is the normal state rather than a sign of anything.
+  source: https://code.claude.com/docs/en/env-vars
+- name: CLAUDE_CODE_PLUGIN_CACHE_DIR
+  effect: |-
+    Moves the plugins root. Despite the name it sets the parent directory, with the marketplace registry and the plugin cache in subdirectories under it, and the vendor states the default as ~/.claude/plugins. Plugins are executable code the agent loads, so a relocated root is a hole in exactly the evidence that answers what the agent was made to do.
+  source: https://code.claude.com/docs/en/env-vars
 - name: CLAUDE_CONFIG_DIR
   effect: |-
     Moves the whole configuration directory away from ~/.claude, taking settings, transcripts, prompt history and plugins with it. A collection keyed on ~/.claude alone finds nothing on such a host, which is indistinguishable from the agent never having run. Read the variable from the shell profile and from process environment evidence before concluding an agent was absent.

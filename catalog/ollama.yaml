@@ -26,6 +26,11 @@ references:
 - https://github.com/ollama/ollama/blob/main/manifest/layer.go
 - https://github.com/ollama/ollama/blob/main/manifest/paths.go
 - https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/o/ollama-app.rb
+env_overrides:
+- name: OLLAMA_MODELS
+  effect: |-
+    Relocates the model store, which holds the manifests and the content-addressed blobs. Those are the record of which models were pulled and when, so a relocated store makes an endpoint look as though no model was ever downloaded. The vendor documents the default as the models directory under the agent's home directory.
+  source: https://raw.githubusercontent.com/ollama/ollama/main/envconfig/config.go
 artifacts:
 - id: ollama.cli_prompt_history
   category: prompt_history

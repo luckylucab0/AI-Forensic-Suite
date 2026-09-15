@@ -23,6 +23,11 @@ vendor_sources:
 references:
 - https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/session-format.md
 - https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts
+env_overrides:
+- name: PI_CODING_AGENT_SESSION_DIR
+  effect: |-
+    Relocates the session transcripts. The variable's name is defined in the agent's configuration module; the documentation page that describes the session format does not state it, which is why the path rooted at it is marked unsourced.
+  source: https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts
 artifacts:
 - id: pi.models
   category: config

@@ -34,6 +34,10 @@ references:
   https://raw.githubusercontent.com/dayearleo/windsurf-local-user-data-decryption/0e9e057aa9962284517db9c4963c5275eff7df00/SKILL.md
 - |-
   https://raw.githubusercontent.com/depalmar/ai-dfir-toolkit/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/catalog/codeium-windsurf.yml
+env_overrides:
+- name: WINDSURF_CONFIG_DIR
+  effect: |-
+    Relocates the configuration directory, inside which the conversation trajectories live. Like the rest of this agent's entries the variable comes from independent research rather than from a vendor source, so treat it as a lead and read the value off the endpoint rather than assuming the default.
 artifacts:
 - id: windsurf.global_rules
   category: instructions

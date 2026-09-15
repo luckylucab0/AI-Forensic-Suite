@@ -27,6 +27,11 @@ references:
 - https://github.com/continuedev/continue/blob/main/extensions/cli/src/commands/devbox-entrypoint.md
 - https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts
 - https://raw.githubusercontent.com/continuedev/continue/main/docs/customize/deep-dives/configuration.mdx
+env_overrides:
+- name: CONTINUE_GLOBAL_DIR
+  effect: |-
+    Relocates the whole global directory, which holds the session transcripts. A collection keyed on ~/.continue finds nothing on such a host and cannot tell that apart from the agent never having run.
+  source: https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts
 artifacts:
 - id: continue.index
   category: cache
