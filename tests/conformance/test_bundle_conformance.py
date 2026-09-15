@@ -121,6 +121,8 @@ def describe_run(out: Path, result: subprocess.CompletedProcess[str]) -> str:
     if manifest_path.is_file():
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         lines.append(f"counts: {manifest['counts']}")
+        lines.append(f"users: {manifest['users']}")
+        lines.append(f"project_roots: {manifest['project_roots']}")
         for problem in manifest["errors"]:
             lines.append(f"  error: {problem}")
         for refusal in manifest["refused_patterns"][:5]:
@@ -571,9 +573,16 @@ def test_the_two_collectors_agree_on_the_same_tree(synthetic_home: Path, tmp_pat
     py_files = {e["original_path"]: e for e in py_manifest["files"]}
     ps_files = {e["original_path"]: e for e in ps_manifest["files"]}
     assert set(py_files) == set(ps_files), (
-        "the collectors found different files: "
-        f"only python={sorted(set(py_files) - set(ps_files))} "
-        f"only powershell={sorted(set(ps_files) - set(py_files))}"
+        "the collectors found different files.\n"
+        f"only python={sorted(set(py_files) - set(ps_files))}\n"
+        f"only powershell={sorted(set(ps_files) - set(py_files))}\n"
+        # Project-anchored artifacts live inside a working copy that each collector
+        # discovers for itself out of the agent's own state, so a disagreement about the
+        # files usually starts as a disagreement about the roots.
+        f"python project_roots={py_manifest['project_roots']}\n"
+        f"powershell project_roots={ps_manifest['project_roots']}\n"
+        f"python users={py_manifest['users']}\n"
+        f"powershell users={ps_manifest['users']}"
     )
     for path in sorted(py_files):
         left = {k: v for k, v in py_files[path].items() if k not in per_file_allowed}

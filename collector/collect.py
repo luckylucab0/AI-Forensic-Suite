@@ -6742,6 +6742,11 @@ def _expand_vscode_user(pattern: str, home: str, target_os: str) -> list[str]:
 # be visible as one. See docs/BUNDLE_FORMAT.md.
 PATTERN_REFUSALS = []
 
+# Failures to read an agent's own state file, which is where the list of working copies
+# comes from. Surfaced in the manifest's errors for the reason ADR 0009 gives: a record
+# that is dropped reads as a record that never existed.
+STATE_READ_PROBLEMS = []
+
 
 def refuse_pattern(pattern, expanded, reason):
     """Record a refusal once and return the empty result the caller expects."""
@@ -7044,9 +7049,21 @@ def discover_project_roots(home: str) -> list:
             if isinstance(projects, dict):
                 for path in sorted(projects):
                     if is_dir(path):
-                        roots.append({"path": path, "source": "claude_code.global_config"})
-        except (OSError, ValueError):
-            pass
+                        roots.append(
+                            {"path": as_posix(path), "source": "claude_code.global_config"}
+                        )
+        except (OSError, ValueError) as exc:
+            # Recorded, not swallowed. This file is the authoritative list of the working
+            # copies an agent was used in, and the project-anchored artifacts are the
+            # prompt-injection surface. Failing to read it silently means the whole of
+            # that surface is absent from the bundle with nothing saying why.
+            STATE_READ_PROBLEMS.append(
+                {
+                    "path": as_posix(config),
+                    "error": "unparsable_agent_state",
+                    "detail": type(exc).__name__ + ": " + str(exc)[:200],
+                }
+            )
 
     projects_dir = os.path.join(home, ".claude", "projects")
     if os.path.isdir(projects_dir):
@@ -7357,6 +7374,7 @@ def run(args: argparse.Namespace) -> dict:
                         "detail": entry["artifact_id"],
                     }
                 )
+    errors.extend(STATE_READ_PROBLEMS)
     entries.sort(key=lambda e: (e["artifact_id"], e["original_path"]))
 
     offset = time.strftime("%z")

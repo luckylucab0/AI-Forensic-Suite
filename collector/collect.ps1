@@ -6941,6 +6941,11 @@ $script:VsCodeUserTemplates = [ordered]@{
 # be visible as one. See docs/BUNDLE_FORMAT.md.
 $script:PatternRefusals = [System.Collections.Generic.List[object]]::new()
 
+# Failures to read an agent's own state file, which is where the list of working copies
+# comes from. Surfaced in the manifest's errors, for the reason ADR 0009 gives: a record
+# that is dropped reads as a record that never existed.
+$script:StateReadProblems = [System.Collections.Generic.List[object]]::new()
+
 function Add-PatternRefusal {
     <#
     .SYNOPSIS
@@ -7564,8 +7569,17 @@ function Get-ProjectRoots {
                 }
             }
         } catch {
-            # A config we cannot parse is not a reason to collect nothing. The projects
-            # directory below is a second, independent source for the same list.
+            # Recorded, not swallowed. This file is the authoritative list of the working
+            # copies an agent was used in, and the project-anchored artifacts are the
+            # prompt-injection surface: failing to read it silently means the whole of
+            # that surface is absent from the bundle with nothing saying why. The projects
+            # directory below is a second, independent source for the same list, and it is
+            # lossy, so it is a fallback rather than a replacement.
+            $problem = [ordered]@{}
+            $problem['detail'] = [string]$_.Exception.Message
+            $problem['error'] = 'unparsable_agent_state'
+            $problem['path'] = $configPath
+            [void]$script:StateReadProblems.Add($problem)
         }
     }
 
@@ -8074,6 +8088,7 @@ function Invoke-Collection {
         if ([bool]$entry['collected']) { $collected += 1 }
     }
 
+    foreach ($problem in $script:StateReadProblems) { [void]$errors.Add($problem) }
     $sortedErrors = Sort-DictionaryList -Items $errors -Fields @('path', 'error')
 
     $sortedRefusals = Sort-DictionaryList -Items $script:PatternRefusals -Fields @('pattern', 'reason')
