@@ -1,0 +1,617 @@
+# Amazon Q Developer (CLI and IDE extension) artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: amazonq
+title: Amazon Q Developer (CLI and IDE extension)
+vendor: Amazon
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+# The command line interface of this product was renamed and continues under the newer
+# product's name, and the vendor documents the migration and the paths this product still
+# reads on that product's site, so it counts as first party here as well.
+- https://kiro.dev/
+- https://aws.amazon.com/q/developer/
+- https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/
+- https://github.com/aws/amazon-q-developer-cli
+- https://github.com/aws/aws-toolkit-vscode
+- https://github.com/awslabs/
+description: |-
+  Amazon's coding agent, in a command line form and an IDE extension form. The command line form has been renamed and continues under the vendor's newer product name, but the vendor states that product still reads these directories, so these paths remain live evidence. This is the better documented of the two because the command line source is public and the paths can be read out of the code that builds them. The richest artifact is not a transcript: each conversation gets its own bare git repository under the home directory holding tagged snapshots of the user's working tree, so the content of files the agent created, changed or deleted is recoverable long after the working copy is gone, and it joins to the conversation record by identifier. Two traps that make an analyst conclude nothing happened. The authentication keys are spelled odic rather than oidc, so the obvious search finds nothing and the user looks unauthenticated. And the logs are deleted rather than rotated when they reach their size limit, with no predecessor file left behind.
+env_overrides:
+- name: Q_CLI_DATA_DIR
+  effect: |-
+    Overrides the local data directory that holds data.sqlite3 and settings.json. If set, every conversation, the shell command history table and the stored auth tokens move somewhere the catalogue cannot predict, and a collection of the documented locations returns an empty result that looks exactly like 'the CLI was never used'. Read it from the live environment and from shell profiles. Trap: only the newer agent crate honours it. The chat-cli crate computes the same paths from dirs::data_local_dir() directly and ignores the variable, so depending on the installed version the override may apply to one component and not the other.
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/agent/src/agent/util/consts.rs
+- name: XDG_DATA_HOME
+  effect: |-
+    On Linux the data directory is computed from dirs::data_local_dir(), which honours XDG_DATA_HOME. If it is set, data.sqlite3 and settings.json are under $XDG_DATA_HOME/amazon-q rather than ~/.local/share/amazon-q. This is a stock XDG variable that is often set by distributions and dotfile frameworks, so it is a realistic miss rather than a theoretical one.
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/util/paths.rs
+- name: XDG_RUNTIME_DIR
+  effect: |-
+    On Unix the log directory is runtime_dir()/qlog, where runtime_dir() prefers dirs::runtime_dir() (XDG_RUNTIME_DIR). Normally a tmpfs under /run/user/<uid>, so the logs do not survive logout and cannot be recovered from a disk image.
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/util/paths.rs
+- name: TMPDIR
+  effect: |-
+    Falls back to TMPDIR when XDG_RUNTIME_DIR is unset, and on macOS then to the Darwin per-user temp directory from confstr(_CS_DARWIN_USER_TEMP_DIR), which is a /var/folders/... path that differs per user and per boot. The log directory therefore cannot be reconstructed offline with confidence and must be resolved live.
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/util/paths.rs
+- name: Q_LOG_LEVEL
+  effect: |-
+    Sets log verbosity. The vendor documentation states logs are always written to files regardless of verbosity flags, but the level still governs how much detail lands there, and the vendor's own MCP troubleshooting text tells users to re-run with Q_LOG_LEVEL=trace, which produces logs with far more prompt and tool detail.
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/util/consts.rs
+- name: Q_LOG_STDOUT
+  effect: |-
+    Redirects logging to stdout. Combined with a shell redirection this can put a full log wherever the operator chose, outside any catalogued path.
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/util/consts.rs
+- name: Q_DISABLE_TELEMETRY
+  effect: |-
+    Disables telemetry collection. Does not move any artifact, but it explains an absence: no telemetry-cognito-credentials entry in the state table and no telemetry traffic is consistent with this being set rather than with the tool being unused.
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/util/consts.rs
+- name: Q_ZDOTDIR
+  effect: |-
+    Overrides ZDOTDIR for the CLI's shell integration. Changes which zsh dotfile directory the integration reads and writes, so shell-integration evidence and any injected hooks may sit outside the user's normal ~/.zshrc and friends.
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/util/consts.rs
+- name: HOME
+  effect: |-
+    Everything under ~/.aws/amazonq (prompt history, prompts, agents, legacy MCP config, checkpoints, knowledge bases, IDE chat history) and ~/.aws/sso/cache is resolved from the home directory. A service account, a container, a sudo invocation or an SSH session with a different HOME puts a complete second copy of the agent's history in a place nobody is looking. Enumerate all home directories on the endpoint, not just the interactive user's.
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/util/paths.rs
+- name: USERPROFILE
+  effect: |-
+    Everything under ~/.aws/amazonq (prompt history, prompts, agents, legacy MCP config, checkpoints, knowledge bases, IDE chat history) and ~/.aws/sso/cache is resolved from the home directory. A service account, a container, a sudo invocation or an SSH session with a different HOME puts a complete second copy of the agent's history in a place nobody is looking. Enumerate all home directories on the endpoint, not just the interactive user's.
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/util/paths.rs
+artifacts:
+- id: amazonq.cli_state_database
+  title: Amazon Q Developer CLI state and conversation database
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $Q_CLI_DATA_DIR/data.sqlite3
+  - $XDG_DATA_HOME/amazon-q/data.sqlite3
+  - '%LOCALAPPDATA%\amazon-q\data.sqlite3'
+  - ~/.local/share/amazon-q/data.sqlite3
+  - ~/Library/Application Support/amazon-q/data.sqlite3
+  format: sqlite
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/util/paths.rs
+  source_kind: source_code
+  contains_credentials:
+  - auth_kv.codewhisperer:odic:device-registration
+  - auth_kv.codewhisperer:odic:token
+  - state.telemetry-cognito-credentials
+  record_types:
+  - 'auth_kv: key/value secrets'
+  - 'conversations: key = absolute directory path, value = ConversationState JSON (conversation_id, history of user and assistant turns with tool uses, human-readable transcript, tools by origin, context_manager, latest_summary from /compact, file_line_tracker mapping file path to agent-versus-user line attribution, model and model_info, checkpoint_manager)'
+  - 'history: shell command rows'
+  - 'state: key/BLOB application state'
+  tables:
+  - auth_kv
+  - conversations
+  - history
+  - migrations
+  - state
+  volatility: |-
+    Written continuously. The file is chmod 0600 on Unix and the code resets the mode on every open, so an unexpected mode is itself notable. Conversations are keyed by absolute directory path, so starting a new conversation in the same directory overwrites the previous value for that key: prior conversations for a directory are NOT retained as separate rows. Recovering them means SQLite freelist and WAL carving.
+  notes: |-
+    The single highest-value Amazon Q CLI artifact. Path construction is quoted verbatim in the source: Ok(dirs::data_local_dir().ok_or(DirectoryError::NoHomeDirectory)?.join("amazon-q").join("data.sqlite3")), and the newer agent crate builds the same from data_dir()?.join("data.sqlite3") with DATA_DIR_NAME = "amazon-q". The per-OS prefixes above are the dirs crate's documented data_local_dir contract (macOS ~/Library/Application Support, Linux $XDG_DATA_HOME or ~/.local/share, Windows %LOCALAPPDATA%); the Rust source itself states only the amazon-q/data.sqlite3 suffix, and a third-party viewer independently hardcodes exactly these prefixes. Four things an analyst gets here that exist nowhere else. The conversations table is keyed by the working directory, which maps activity to projects without needing the project to still exist. ConversationState.file_line_tracker attributes file line changes to the agent versus the user, which is direct evidence of what the agent wrote. ConversationState.transcript is a human-readable rendering with user turns prefixed '> ', including errors posted in the chat, so it survives even when the structured history is trimmed to valid_history_range. And the history table is a shell command log with command, shell, pid, session_id, cwd, start_time, end_time, duration, hostname and exit_code, which is a command-execution record independent of the shell's own history file. TRAP on the credential key names: they are spelled 'codewhisperer:odic:token' and 'codewhisperer:odic:device-registration' with odic, not oidc. A grep for oidc finds nothing and an analyst concludes the user was never authenticated. Redact the values but record that they were present and their expiry.
+  parser: null
+- id: amazonq.cli_prompt_history
+  title: Amazon Q Developer CLI chat prompt history
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.aws\amazonq\.cli_bash_history'
+  - ~/.aws/amazonq/.cli_bash_history
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/util/paths.rs
+  source_kind: source_code
+  record_types:
+  - rustyline FileHistory lines
+  volatility: |-
+    Appended, not rewritten: the code calls rl.append_history(&history_path) from InputSource::save_history, which runs on Drop of the input source, so entries survive even when the conversation itself is deleted from the database. Entries are only added when should_append_history returns true, which drops empty lines and the bare answers y, n and t; rustyline is configured with history_ignore_space(true), so a prompt typed with a leading space is never recorded.
+  notes: |-
+    This is the arrow-up recall file for q chat and it is the best answer to 'what did the user actually ask'. It is a plain rustyline history file, so it is trivially parseable and readable even when the SQLite conversation for that directory has been overwritten. The path is built from the constant CLI_BASH_HISTORY = ".aws/amazonq/.cli_bash_history" joined to the home directory in GlobalPaths::cli_bash_history(), and is used as the rustyline history path in the chat prompt setup. TWO TRAPS. The name says bash_history, which invites an analyst to dismiss it as an ordinary shell history or to skip it as duplicate of ~/.bash_history: it is neither, it is the Amazon Q chat prompt history. And it is a dotfile inside a dotdirectory, so a collector that does not glob hidden files inside ~/.aws/amazonq will silently miss it. Because the file is append-only while conversations are keyed by directory and overwritten, the history file frequently contains prompts whose conversations no longer exist, which makes it the right place to start when a transcript looks suspiciously short.
+  parser: null
+- id: amazonq.cli_checkpoints
+  title: Amazon Q Developer CLI checkpoint shadow repositories
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.aws\amazonq\cli-checkouts\<conversation-id>\**'
+  - ~/.aws/amazonq/cli-checkouts/<conversation-id>/**
+  format: binary
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/cli/chat/checkpoint.rs
+  source_kind: source_code
+  record_types:
+  - 'bare git repository: objects, refs, tags per checkpoint'
+  volatility: |-
+    Only created when checkpoints are enabled for a session (/checkpoint init, or automatically depending on version). Once written, git objects are immutable and are not garbage collected by Kiro or Q, so content survives even after the working tree is changed or deleted. Removing the directory is the only cleanup.
+  notes: |-
+    Probably the most under-appreciated artifact in this product. The code builds the path with PathResolver::new(os).global().shadow_repo_dir()?.join(session.conversation.conversation_id()) from the constant SHADOW_REPO_DIR = ".aws/amazonq/cli-checkouts", then runs run_git(path, None, &["init", "--bare", ...]) and later resets or checks out against a --work-tree. So each conversation gets a bare git repository under the user's home holding committed snapshots, tagged per checkpoint, of the user's working tree at each turn. For an analyst this means the content of files the agent created, modified or deleted is recoverable from git objects even when the files are gone from the working copy and even when the project directory no longer exists, and the commit and tag sequence gives an ordered timeline that ties to the conversation id in the conversations table. It also means source code left the project directory and now sits in a second location under the home directory, which matters for data-at-rest and scoping questions. Collect the whole directory; do not run git commands against the original, copy it first.
+  parser: null
+- id: amazonq.ide_chat_history
+  title: Amazon Q Developer IDE chat history database
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.aws\amazonq\history\*.json'
+  - ~/.aws/amazonq/history/*.json
+  - ~/.aws/amazonq/history/chat-history-<hash>.json
+  - ~/.aws/amazonq/history/chat-history-no-workspace.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/aws/aws-toolkit-vscode/blob/master/packages/core/src/shared/db/chatDb/chatDb.ts
+  source_kind: source_code
+  record_types:
+  - 'Conversation: conversationId, clientType (IDE-VSCode, IDE_JetBrains, CLI), messages[]'
+  - 'Message: body, type, codeReference, relatedContent, messageId, userIntent, origin, userInputMessageContext, toolUses[]'
+  - 'Tab: historyId, isOpen, updatedAt, tabType, title, conversations[]'
+  - tabs collection
+  tables:
+  - tabs
+  volatility: |-
+    LokiJS with autosave every 1000 ms and persistenceMethod 'fs', so the whole JSON file is rewritten roughly every second while a chat is open. Deleting a conversation in the UI calls findAndRemove on the tabs collection and the record is gone from the next rewrite. There is no age-based expiry in the code, so undeleted history accumulates indefinitely; conversely deleted tabs are only recoverable from unallocated space or from backups, and the constant rewriting works against that.
+  notes: |-
+    Verbatim construction: this.dbDirectory = path.join(fs.getUserHomeDir(), '.aws/amazonq/history') and const dbName = `chat-history-${workspaceId}.json`. The <hash> is NOT random, which is the key insight for an analyst: getWorkspaceIdentifier() returns the md5 hex digest of the .code-workspace file path for a saved workspace, or of the single workspace folder path, or of all multi-root folder paths sorted and joined with '|', and falls back to the literal string 'no-workspace' when no folder is open. So you can map a file name back to a workspace by computing md5 over candidate paths, and chat-history-no-workspace.json specifically holds conversations held with no project open. The record model reaches into what the agent did, not just what was said: Message.toolUses records tool invocations and Message.codeReference records code-attribution references. Conversation.clientType distinguishes IDE-VSCode, IDE_JetBrains and CLI, which means this same store is shared with the JetBrains plugin, so one file can cover several IDEs. The vendor's user guide corroborates the location loosely, stating only that 'Amazon Q stores your conversations on your local computer, in your home directory' and that conversations are saved per workspace.
+  parser: null
+- id: amazonq.sso_token_cache
+  title: AWS SSO and Builder ID token cache
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.aws\sso\cache\*.json'
+  - ~/.aws/sso/cache/<hash>.json
+  - ~/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
+  format: json
+  sensitivity: secret
+  collect_priority: first
+  status: verified
+  source: https://github.com/aws/aws-toolkit-vscode/blob/master/packages/core/src/auth/sso/cache.ts
+  source_kind: source_code
+  record_types:
+  - StoredRegistration
+  - StoredToken
+  volatility: |-
+    Rewritten on every token refresh, deleted on sign-out. The directory is watched with a file system watcher over '*.json', so the toolkit reacts to external changes. Token files expire and are replaced, so the present content reflects only the most recent session.
+  notes: |-
+    Verbatim: const defaultCacheDir = () => path.join(fs.getUserHomeDir(), '.aws/sso/cache'), with getTokenCacheFile returning path.join(ssoCacheDir, `${hashedKey}.json`) where hashedKey is a SHA1 hex digest, and getRegistrationCacheFile returning path.join(ssoCacheDir, `aws-toolkit-vscode-client-id-${suffix}.json`). This is the shared AWS SSO cache directory, so it also holds tokens written by the AWS CLI and other AWS tooling: do not attribute a file here to Amazon Q without checking its contents and the client-id file naming. Treat as secret and do not copy token values into any report; record the file, its hash name, the start URL or issuer if present, and the expiry. Two collection notes. The file name is a SHA1 of an internal cache key rather than always of the start URL, so you cannot reliably compute the expected name; enumerate the directory. And the cache directory is itself overridable through the toolkit's ssoCacheDirectory developer setting, so an empty ~/.aws/sso/cache does not prove the user was signed out. The Amazon Q CLI stores its own tokens separately, in the auth_kv table of data.sqlite3, and the CLI's MCP OAuth code points at this same ~/.aws/sso/cache directory.
+  parser: null
+- id: amazonq.cli_mcp_config
+  title: Amazon Q Developer CLI MCP server configuration
+  category: mcp_config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.aws\amazonq\mcp.json'
+  - <project>/.amazonq/mcp.json
+  - ~/.aws/amazonq/mcp.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/docs/agent-format.md
+  source_kind: official
+  contains_credentials:
+  - mcpServers.*.env
+  - mcpServers.*.headers
+  record_types:
+  - args
+  - env
+  - mcpServers.<name>.command
+  - type
+  - url
+  volatility: |-
+    Rewritten by q mcp add / q mcp remove / q mcp import and by hand.
+  notes: |-
+    The vendor's own repository documentation states: 'the legacy MCP configuration files (~/.aws/amazonq/mcp.json for global and cwd/.amazonq/mcp.json for workspace)', and the source constructs the same two paths in legacy_global_mcp_config_path() (home_dir()?.join(".aws").join(AWS_DIR_NAME).join("mcp.json")) and legacy_workspace_mcp_config_path() (current_dir()?.join(format!(".{}", AWS_DIR_NAME)).join("mcp.json")), with AWS_DIR_NAME = "amazonq". 'Legacy' is a trap word here: whether these files are honoured depends on the agent's useLegacyMcpJson field, which the vendor documents as defaulting to true, so a legacy file is normally live. The vendor also notes these same files may be used by the IDE, so one file can explain MCP activity in two products. Remote servers appear as type http with a url. Inline env and headers values are the usual place MCP credentials sit, so treat as secret.
+  parser: null
+- id: amazonq.cli_agents
+  title: Amazon Q Developer CLI agent configurations
+  category: permissions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.aws\amazonq\cli-agents\*.json'
+  - <project>/.amazonq/cli-agents/*.json
+  - ~/.aws/amazonq/cli-agents/*.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/docs/agent-file-locations.md
+  source_kind: official
+  contains_credentials:
+  - mcpServers.*.env
+  - mcpServers.*.headers
+  record_types:
+  - allowedTools
+  - description
+  - hooks
+  - mcpServers
+  - name
+  - resources
+  - tools
+  - toolsSettings
+  - useLegacyMcpJson
+  volatility: |-
+    The vendor states Q CLI creates the global agents directory automatically but the local one must be created by hand, so the presence of a project .amazonq/cli-agents directory is itself a deliberate act. Legacy profiles under ~/.aws/amazonq/profiles are auto-migrated into cli-agents on first startup, which rewrites this directory without user action.
+  notes: |-
+    This is the autonomy and auto-approve record for the Amazon Q CLI, and the reason it is categorised as permissions rather than config. The vendor documents allowedTools as 'Tools that can be used without prompting the user for permission', supporting glob-style wildcards with * and ?, plus server-level MCP permissions and a toolsSettings block that can constrain allowable patterns but is overridden if the same tool also appears in allowedTools. An entry there is a standing pre-authorisation: any matching tool call in a transcript ran with no prompt, which is the difference between an approved action and a silent one. Resolution is local first (.amazonq/cli-agents/ in the working directory) then global fallback (~/.aws/amazonq/cli-agents/), so collect both and note which would have won for the directory in question. The file can also embed its own mcpServers, so it is a second place MCP credentials and egress destinations hide. Default agent resources include file://.amazonq/rules/**/*.md, file://AmazonQ.md, file://AGENTS.md and file://README.md.
+  parser: null
+- id: amazonq.ide_agent_config
+  title: Amazon Q Developer IDE agent and MCP configuration
+  category: mcp_config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.aws\amazonq\default.json'
+  - <project>/.amazonq/default.json
+  - ~/.aws/amazonq/agents/default.json
+  - ~/.aws/amazonq/default.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/mcp-ide.html
+  source_kind: official
+  unsourced_paths:
+  - ~/.aws/amazonq/agents/default.json
+  contains_credentials:
+  - mcpServers.*.env
+  - mcpServers.*.headers
+  record_types:
+  - allowedTools
+  - mcpServers
+  - toolsSettings
+  - useLegacyMcpJson
+  volatility: |-
+    Rewritten whenever a server is added, enabled, disabled or deleted through the IDE MCP panel, and when tool permissions are adjusted.
+  notes: |-
+    The vendor states: 'When you use the GUI to add an MCP server to Q Developer in the IDE, the configuration is stored in one of two files: At the global scope: ~/.aws/amazonq/default.json, or at the local scope: .amazonq/default.json', and that workspace-level configuration takes precedence. It also states support for the legacy mcp.json files is controlled by useLegacyMcpJson in the global default.json and is true by default. IMPORTANT DISCREPANCY, which is exactly the kind of thing that makes a collection come back empty: a user-filed issue on the vendor's VS Code repository reports that the extension actually writes global MCP configuration to ~/.aws/amazonq/agents/default.json, one directory deeper than the documentation says, and no maintainer has confirmed which is correct. That fourth path is listed here and flagged as not stated by the cited source. Collect the whole ~/.aws/amazonq tree rather than named files. Credentials can sit inline: the vendor's add-server walkthrough has the user type environment variable values and HTTP headers into the GUI, and those land in this file even though the UI subsequently hides the values.
+  parser: null
+- id: amazonq.project_rules
+  title: Amazon Q Developer project rules
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.amazonq/rules/**/*.md
+  - <project>/AGENTS.md
+  - <project>/AmazonQ.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/context-project-rules.html
+  source_kind: official
+  record_types:
+  - markdown rule body
+  volatility: |-
+    Ordinary project files, normally under version control, so superseded content is usually recoverable from git.
+  notes: |-
+    The vendor states project rules are Markdown files in {{project-root}}/.amazonq/rules and that Amazon Q 'will automatically use them as context whenever a developer chats with Amazon Q within your project'. Subdirectories are supported. The vendor's default agent configuration lists file://.amazonq/rules/**/*.md alongside file://AmazonQ.md, file://AGENTS.md and file://README.md as default resources, which is why those root files are included here. Forensically this is the main injected-instruction surface for the IDE and the CLI: anything a contributor can commit under .amazonq/rules becomes standing instructions for every developer on the project. Note the rules can be toggled per chat session through the Rules button in the IDE, so a rule file being present does not prove it was active for a given conversation; the transcript is the arbiter.
+  parser: null
+- id: amazonq.memory_bank
+  title: Amazon Q Developer memory bank
+  category: memory
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.amazonq/rules/memory-bank/guidelines.md
+  - <project>/.amazonq/rules/memory-bank/product.md
+  - <project>/.amazonq/rules/memory-bank/structure.md
+  - <project>/.amazonq/rules/memory-bank/tech.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/context-memory-bank.html
+  source_kind: official
+  volatility: |-
+    Regenerated wholesale by the Regenerate Memory Bank action, which overwrites the previous analysis with no history kept.
+  notes: |-
+    Agent-authored summaries of the project that are automatically used as context. The vendor states Amazon Q creates a memory-bank subfolder under .amazonq/rules containing product.md, structure.md, tech.md and guidelines.md. Two forensic uses. They are a dated, agent-written description of the codebase as it existed when they were generated, which is useful when the codebase has since changed or been removed. And because they sit under .amazonq/rules, they are loaded as rules, so anything written into them becomes standing instructions: a memory bank that was hand-edited after generation is an injection vector wearing a generated-file disguise. Compare against the repository history to spot that.
+  parser: null
+- id: amazonq.cli_user_rules
+  title: Amazon Q Developer CLI user-level rules
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.aws\amazonq\rules\*'
+  - ~/.aws/amazonq/rules/*
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://kiro.dev/docs/upgrade-guides/migrating-from-q.md
+  source_kind: official
+  volatility: |-
+    User-edited. Content was copied (not moved) into ~/.kiro/steering by the Kiro CLI install migration, so both copies commonly exist.
+  notes: |-
+    The user-scope equivalent of project rules, which the product's own documentation barely mentions. Sourced from the vendor's Kiro migration page, whose configuration table maps 'Rules / Steering, User' to ~/.aws/amazonq/rules on the Q Developer CLI side and ~/.kiro/steering on the Kiro side, and whose migration steps state 'Files from rules folder in ~/.aws/amazonq folder are copied to ~/.kiro/steering folder with the same names'. These are per-user standing instructions that apply across every project, which makes them a higher-impact injection target than any single project's rules and an easy thing to miss because the main Amazon Q user guide documents only the project-level .amazonq/rules folder.
+  parser: null
+- id: amazonq.prompt_library
+  title: Amazon Q Developer saved prompt library
+  category: instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.aws\amazonq\prompts\*.md'
+  - <project>/.amazonq/prompts/*
+  - ~/.aws/amazonq/prompts/*.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/context-prompt-library.html
+  source_kind: official
+  volatility: |-
+    User-managed. Copied into ~/.kiro/prompts by the Kiro CLI install migration.
+  notes: |-
+    The vendor states 'Prompts are saved in the ~/.aws/amazonq/prompts folder' and that creating a prompt named for example Create_sequence_diagram produces Create_sequence_diagram.md there; prompt names cannot contain spaces. Saved prompts are invoked in chat with @<name>, so a transcript line containing @something is a pointer into this directory, and resolving it is often necessary to know what was actually sent to the model. The source constructs the same paths from the constants PROMPTS_DIR = ".aws/amazonq/prompts" (global) and ".amazonq/prompts" (workspace).
+  parser: null
+- id: amazonq.cli_todo_lists
+  title: Amazon Q Developer CLI todo lists
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.amazonq/cli-todo-lists/*.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/docs/todo-lists.md
+  source_kind: official
+  record_types:
+  - context updates from completed tasks
+  - list description
+  - modified file paths
+  - task descriptions and completion status
+  - timestamp-based list id
+  volatility: |-
+    Updated in place as tasks complete, so intermediate states are lost. Persist in the project directory and can be resumed across sessions.
+  notes: |-
+    The vendor documentation states these are stored in .amazonq/cli-todo-lists/ in the current working directory, one JSON file per list, and explicitly lists 'Modified file paths' among the recorded fields. That makes them a compact, independent record of which files an agent task touched, tied to a timestamp-based id, which is valuable when the conversation for that directory has since been overwritten in the database. Also confirmed by the built-in tools reference.
+  parser: null
+- id: amazonq.cli_subagent_executions
+  title: Amazon Q Developer CLI sub-agent execution records
+  category: log
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.amazonq/.subagents/**
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/docs/experiments.md
+  source_kind: official
+  volatility: |-
+    The vendor states plainly: 'Files persist until the same agent runs a new task.' So each run of a given sub-agent destroys the previous run's record. This is the shortest-lived durable artifact in the product and the first thing to collect.
+  notes: |-
+    Task execution details for delegated sub-agent work, stored in .amazonq/.subagents/ in the current working directory, and constructed in the source as current_dir()?.join(SUBAGENTS_DIR) with SUBAGENTS_DIR = ".amazonq/.subagents". Forensically important out of proportion to its size: work a sub-agent did may not appear in the parent conversation at all, so without this directory an analyst can under-report what the agent executed. Because it is overwritten on the next run of the same sub-agent, treat it as collect-first even though it lives on disk. Note it is a hidden directory inside a hidden directory, so hidden-file globbing is required.
+  parser: null
+- id: amazonq.knowledge_bases
+  title: Amazon Q Developer CLI knowledge bases
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.aws\amazonq\knowledge_bases\**'
+  - ~/.aws/amazonq/knowledge_bases/*/*/bm25_data.json
+  - ~/.aws/amazonq/knowledge_bases/*/*/data.json
+  - ~/.aws/amazonq/knowledge_bases/*/contexts.json
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/docs/knowledge-management.md
+  source_kind: official
+  record_types:
+  - bm25_data.json BM25 index
+  - contexts.json context metadata
+  - data.json semantic search data
+  volatility: |-
+    Persist until the user removes a context. Indexed content is a snapshot of the source material at index time and does not follow later changes to the source.
+  notes: |-
+    The vendor documents the layout verbatim as ~/.aws/amazonq/knowledge_bases/<agent-name>[_<alphanumeric-code>]/ containing contexts.json plus one directory per context holding data.json and, for the fast index, bm25_data.json; the source builds it as knowledge_bases_dir()?.join(unique_id). This is a durable copy of indexed content outside its original location, so it can preserve text from files or directories that have since been deleted, and contexts.json records what was indexed and when. Per-agent isolation means the directory name tells you which agent had access to which corpus. Experimental feature, so it is absent on most endpoints; when present it is high value for a data-movement question.
+  parser: null
+- id: amazonq.cli_logs
+  title: Amazon Q Developer CLI logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $TMPDIR/qlog/chat.log
+  - $TMPDIR/qlog/mcp.log
+  - $TMPDIR/qlog/qchat.log
+  - $TMPDIR/qlog/translate.log
+  - $XDG_RUNTIME_DIR/qlog/*.log
+  - '%TEMP%\amazon-q\logs\*.log'
+  - '%TEMP%\qlog\*.log'
+  - /tmp/qlog/*.log
+  format: text
+  sensitivity: normal
+  collect_priority: live_only
+  status: verified
+  source: https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/troubleshooting-q-logs.html
+  source_kind: official
+  volatility: |-
+    Two independent destructive behaviours. The code deletes the log file outright when it exceeds MAX_FILE_SIZE = 10 MiB (std::fs::remove_file, not a rename or a rotation, so there is no .1 predecessor), and the same applies to mcp.log. And the containing directory is the platform temp or XDG runtime directory, which is cleaned at logout or reboot. Assume the log covers only recent activity and that a long engagement has already lost its early part.
+  notes: |-
+    The vendor documentation gives the locations as $TMPDIR/qlog/ on macOS (typically a /var/folders/.../qlog path), $XDG_RUNTIME_DIR/qlog/ or $TMPDIR/qlog/ or /tmp/qlog/ on Linux and WSL, and %TEMP%\qlog\ on Windows, with four files: chat.log (CLI wrapper, AWS SDK calls, authentication flows, HTTP and TLS connections, endpoint resolution, telemetry and socket operations), qchat.log (chat application, MCP server lifecycle and connection errors, state processing, user interruptions), mcp.log (MCP server logs) and translate.log (natural-language-to-shell translation). It also states logs are always written regardless of verbosity flags. DISCREPANCY worth carrying: the source's logs_dir() returns runtime_dir()?.join("qlog") on Unix but std::env::temp_dir().join("amazon-q").join("logs") on Windows, which does not match the documented %TEMP%\qlog\; both Windows paths are therefore listed. chat.log is the closest thing to a network-destination record in this product, since it logs endpoint resolution and connections, and mcp.log is the record of MCP server process lifecycle. The vendor warns logs may contain conversation content, file paths, code snippets, command outputs, account ids and resource names, hence the secret marking.
+  parser: null
+- id: amazonq.cli_settings
+  title: Amazon Q Developer CLI settings
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $Q_CLI_DATA_DIR/settings.json
+  - $XDG_DATA_HOME/amazon-q/settings.json
+  - '%LOCALAPPDATA%\amazon-q\settings.json'
+  - ~/.local/share/amazon-q/settings.json
+  - ~/Library/Application Support/amazon-q/settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/util/paths.rs
+  source_kind: source_code
+  record_types:
+  - chat.defaultModel
+  - chat.enableHistoryHints
+  - experiment flags
+  volatility: |-
+    Last-write-wins, no history.
+  notes: |-
+    Constructed verbatim as Ok(dirs::data_local_dir().ok_or(DirectoryError::NoHomeDirectory)?.join("amazon-q").join("settings.json")), sitting beside data.sqlite3 in the same data directory, and as data_dir()?.join("settings.json") in the newer agent crate. Useful mainly for establishing which experimental features were enabled, since several of them (knowledge bases, sub-agent delegation, todo lists) decide whether the corresponding artifacts exist at all. The per-OS prefixes are the dirs crate data_local_dir contract, as for the database.
+  parser: null
+- id: amazonq.legacy_profiles_and_context
+  title: Amazon Q Developer CLI legacy profiles and global context
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.aws\amazonq\global_context.json'
+  - '%USERPROFILE%\.aws\amazonq\profiles\**'
+  - ~/.aws/amazonq/global_context.json
+  - ~/.aws/amazonq/profiles/**
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://github.com/aws/amazon-q-developer-cli/blob/main/docs/legacy-profile-to-agent-migration.md
+  source_kind: official
+  volatility: |-
+    Left in place, not deleted, when superseded. The vendor states global profiles support automatic migration into ~/.aws/amazonq/cli-agents on initial startup, and that global context under ~/.aws/amazonq/global_context.json 'is no longer supported'.
+  notes: |-
+    Dead-but-present configuration, which is often the most informative kind. Because the migration copies rather than removes, these files can preserve the user's context and profile configuration from before the agents model, giving an analyst a view of an earlier period that the current configuration has erased. global_context.json specifically held the user's global context file list. The source declares both paths as constants PROFILES_DIR = ".aws/amazonq/profiles" and GLOBAL_CONTEXT = ".aws/amazonq/global_context.json" and joins them to the home directory in GlobalPaths::profiles_dir() and GlobalPaths::global_context(). Do not read the presence of global_context.json as evidence it was in effect at the time of the incident.
+  parser: null
+- id: amazonq.ide_chat_export
+  title: Amazon Q Developer IDE exported conversations
+  category: transcript
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/q-dev-chat-*.html
+  - <project>/q-dev-chat-*.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/ide-chat-conversation.html
+  source_kind: official
+  volatility: |-
+    Static once written. A user-initiated export, so it survives deletion of the conversation from the history database and is a common way a transcript escapes to a shared drive, a ticket or a chat message.
+  notes: |-
+    The vendor states that on export 'By default, Amazon Q names the file q-dev-chat-{{yyyy}}-{{mm}}-{{dd}}.{{md|html}} and saves it in the root of your project.' Two reasons to look for these. They are frequently the only surviving copy of a conversation the user later deleted from the IDE history. And because the default location is the project root, they get committed to repositories by accident, so the same file may also exist in git history and on any remote. The date in the file name is the export date, not the conversation date, so do not use it as a conversation timestamp. The user can choose another location, so also search outside the project.
+  parser: null
+- id: amazonq.ide_extension_install
+  title: Amazon Q Developer IDE extension install evidence
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.vscode\extensions\amazonwebservices.amazon-q-vscode-*\**'
+  - ~/.vscode/extensions/amazonwebservices.amazon-q-vscode-*/**
+  - ~/.vscode/extensions/amazonwebservices.aws-toolkit-vscode-*/**
+  - ~/.vscode/extensions/extensions.json
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://github.com/aws/aws-toolkit-vscode/blob/master/packages/core/src/shared/extensionIds.ts
+  source_kind: source_code
+  volatility: |-
+    Replaced on extension update; the previous version directory is normally removed, so only the current version is present.
+  notes: |-
+    What is actually verified here is the extension identifiers, declared in the vendor's source as awstoolkit: 'amazonwebservices.aws-toolkit-vscode' and amazonq: 'amazonwebservices.amazon-q-vscode'. The extension directory layout (~/.vscode/extensions/<publisher>.<name>-<version>/ and the extensions.json index) is standard VS Code behaviour that the vendor does not state, which is why every path is flagged unsourced and the entry is unverified. Match on the identifier prefix, not on a full path, and expect variants for VS Code Insiders, Cursor, code-server and other VS Code derivatives, each with its own extensions root. The JetBrains plugin is a separate install whose location is not covered here, but note from the shared history schema that it writes conversations into the same ~/.aws/amazonq/history store with clientType IDE_JetBrains, so IDE chat history can exist with no VS Code extension installed at all.
+  parser: null

@@ -317,43 +317,22 @@ artifacts:
   - linux
   - windows
   paths:
-  - $HOME/.copilot/mcp-config.json
-  - '%APPDATA%\Claude\claude_desktop_config.json'
-  - '%USERPROFILE%\.mcp.json'
-  - <project>/.cursor/mcp.json
-  - <project>/.gemini/settings.json
   - <project>/.mcp.json
-  - <project>/.vscode/mcp.json
   - ~/.claude.json
-  - ~/.config/Claude/claude_desktop_config.json
-  - ~/.cursor/mcp.json
-  - ~/.gemini/settings.json
-  - ~/.vscode/mcp.json
-  - ~/Library/Application Support/Claude/claude_desktop_config.json
   format: json
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://code.claude.com/docs/en/setup
   source_kind: official
-  unsourced_paths:
-  - $HOME/.copilot/mcp-config.json
-  - '%APPDATA%\Claude\claude_desktop_config.json'
-  - '%USERPROFILE%\.mcp.json'
-  - <project>/.cursor/mcp.json
-  - <project>/.gemini/settings.json
-  - <project>/.vscode/mcp.json
-  - ~/.config/Claude/claude_desktop_config.json
-  - ~/.cursor/mcp.json
-  - ~/.gemini/settings.json
-  - ~/.vscode/mcp.json
-  - ~/Library/Application Support/Claude/claude_desktop_config.json
   volatility: |-
     Edited by hand and by `claude mcp add`-style commands; no history is kept, so only the file mtime dates a change. Collect early - these are small and cheap.
   notes: |-
     Claude Code's own paths are vendor-confirmed: the uninstall docs instruct `rm ~/.claude.json` and project-level `rm -f .mcp.json`. The remaining locations are corroborated consistently across many independent third-party integration docs (Cursor global ~/.cursor/mcp.json and project .cursor/mcp.json; Claude Desktop claude_desktop_config.json at ~/Library/Application Support/Claude on macOS, %APPDATA%\Claude on Windows, ~/.config/Claude on Linux; Gemini CLI ~/.gemini/settings.json, confirmed in the CLI's own README "Configure MCP servers in ~/.gemini/settings.json"; Copilot CLI $HOME/.copilot/mcp-config.json, confirmed in the fetched GitHub docs) - hence verified overall, though individual spellings are community-corroborated rather than each vendor-documented. TREAT AS A TOP-PRIORITY ARTIFACT: an MCP config is the clearest on-disk statement of what external capability an agent was granted, and inline env secrets mean the collector should record metadata plus hash for any value that looks like a credential while still copying the structure.
 
-    The verification pass found that the cited page states two of the thirteen paths, the user configuration file and the project server file for the one agent whose documentation it is, and nothing about the other vendors' locations. Its Windows example is that agent's user configuration file, not a project file. The other eleven paths are marked unsourced here; the per-vendor entries in this catalogue carry the citations for most of them, and the three desktop application paths have no vendor-sourced entry anywhere yet. The right end state is one entry per vendor with its own source, which is a split this entry is waiting for.
+    Narrowed to what its source states. The verification pass found this entry claiming thirteen paths across six vendors on one vendor's documentation page, which states two of them. Every other path now sits with the vendor that owns it: the editor, the two closed-source editors, the command line agent of one vendor, and the desktop application, which has its own file in this catalogue since the research pass that added it. Two spellings were dropped rather than moved, because reading the real pages showed they do not exist: a user-level project server file directly under the profile, where the vendor's Windows example is actually its user configuration file, and a user-level editor server file directly under a dot-directory in the home directory, where the vendor puts it in the editor's user profile folder instead.
+
+    What is left is the genuinely cross-cutting part: the convention that a project carries a server inventory at its root, which more than one agent reads, and the user-level file of the agent whose page this is. Read it together with the per-vendor entries rather than instead of them.
   parser: null
 - id: crosscutting.instructions_agents_md
   category: project_instructions

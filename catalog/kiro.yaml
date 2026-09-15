@@ -1,0 +1,684 @@
+# Kiro artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: kiro
+title: Kiro
+vendor: Amazon
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://kiro.dev/
+- https://kiro.dev/docs/
+- https://kiro.dev/changelog/
+- https://app.kiro.dev/
+- https://cli.kiro.dev/
+description: |-
+  Amazon's agentic development environment, in an editor form and a command line form. The command line form is the Amazon Q Developer CLI renamed, and the vendor states it still reads the older product's configuration directories, so an Amazon Q path is live evidence in an engagement that only mentions this product and the reverse is also true: collect both trees. The split between the two matters for what can be relied on. The older product is open source and its paths can be read out of its own code, while this one is closed source since the rename, so most of what is written here rests on documentation prose. Three consequences worth knowing before an acquisition. The session database is documented only as a database somewhere in the agent's home directory, with no filename, so both candidate trees have to be swept and files matched on their SQLite header rather than on a name. The pre-approved permissions for a project live outside the project, so they outlive a working copy that has been deleted. And the wire recording variable writes a complete second transcript to a path the operator chooses, which no directory walk will find: read the variable off the endpoint.
+env_overrides:
+- name: KIRO_HOME
+  effect: |-
+    Redirects the whole global ~/.kiro tree. The vendor states that agents, prompts, skills, steering, settings and sessions all resolve against it. If it is set, a collection that only walks ~/.kiro finds nothing at all: no transcripts, no permissions, no MCP config. Read it from the process environment, the user shell profiles and any service unit or wrapper script before concluding the agent was unused.
+  source: https://kiro.dev/docs/configuration.md
+- name: KIRO_CHAT_LOG_FILE
+  effect: |-
+    Relocates the CLI chat log file to an arbitrary path, out of the platform temp directory. A collection that only sweeps $TMPDIR/kiro-log, $XDG_RUNTIME_DIR/kiro-log or %TEMP%\kiro-log misses it entirely, and the analyst sees no log activity.
+  source: https://kiro.dev/docs/cli/setup.md
+- name: KIRO_LOG_LEVEL
+  effect: |-
+    Log verbosity, default error. At the default the chat log holds almost nothing, so an empty or tiny kiro-chat.log is NOT evidence that the CLI was unused. Conversely a value of debug or trace means the log may hold prompts, file paths, code snippets and command output.
+  source: https://kiro.dev/docs/reference/cli-commands.md
+- name: KIRO_ACP_RECORD_PATH
+  effect: |-
+    Path to a JSONL file recording the TUI ACP wire traffic. When set, that file is a full second copy of the conversation at an operator-chosen location that no catalogue path will predict. Treat any value seen in shell history or a wrapper script as a transcript artifact in its own right.
+  source: https://kiro.dev/docs/reference/settings.md
+- name: KIRO_API_KEY
+  effect: |-
+    Long-lived API key credential (values are prefixed ksk_) used for non-interactive runs. It is passed through the environment, so copies commonly land in shell history, CI definitions and wrapper scripts rather than in any Kiro-owned file. Also explains sessions with no interactive sign-in.
+  source: https://kiro.dev/docs/getting-started/authentication.md
+- name: TMPDIR
+  effect: |-
+    On macOS the CLI log directory is $TMPDIR/kiro-log/, which on a default macOS install resolves under a per-user /var/folders/... path. The value must be captured live: the resolved directory cannot be reconstructed from a dead disk with certainty.
+  source: https://kiro.dev/docs/cli/setup.md
+- name: XDG_RUNTIME_DIR
+  effect: |-
+    On Linux the CLI log directory is $XDG_RUNTIME_DIR/kiro-log/. Typically a tmpfs under /run/user/<uid> that does not survive logout or reboot, so the logs are live-response only. The vendor also documents /tmp/kiro-log/ as a fallback.
+  source: https://kiro.dev/docs/reference/cli-commands.md
+- name: KIRO_LOG_NO_COLOR
+  effect: |-
+    Only disables ANSI colour in log output (v1.26.0+). It does not move anything, but its presence in an environment or profile is a weak indicator that someone was collecting or post-processing Kiro logs.
+  source: https://kiro.dev/docs/reference/cli-commands.md
+artifacts:
+- id: kiro.cli_session_database
+  title: Kiro CLI session database
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_HOME/*.sqlite3
+  - '%USERPROFILE%\.kiro\*.sqlite3'
+  - ~/.kiro/*.sqlite3
+  format: sqlite
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: https://kiro.dev/docs/cli/chat/session-management.md
+  source_kind: official
+  volatility: |-
+    Auto-saved after every conversation turn, so the file is rewritten constantly. Sessions are deletable by the user: kiro-cli chat --delete-session <ID>, Ctrl+D in the /sessions dashboard, and /sessions clean --yes which bulk-deletes empty local sessions and 'cannot be undone'. No vendor-stated age-based expiry.
+  notes: |-
+    The vendor states twice, under 'Auto-save' and 'Technical details', that Kiro CLI sessions are stored in a local SQLite database in ~/.kiro/, keyed by directory path, with a UUID session id, saved on every turn. What the vendor does NOT state is the database file name, which is why this entry is unverified: collect every *.sqlite3 (and any extensionless SQLite header match) in the ~/.kiro tree rather than guessing a name. The predecessor product used data.sqlite3 and a third-party viewer looks for ~/Library/Application Support/kiro-cli/data.sqlite3 and ~/.local/share/kiro-cli/data.sqlite3, i.e. a data_local_dir location and NOT ~/.kiro, so the two candidate locations disagree and both must be swept. Cloud sessions (--cloud) are stored server side and leave no local transcript, so a session id present in --list-sessions output may have no on-disk body. There is also a local content search index over V2 and V3 transcripts (prompts, optionally agent responses, never tool output), controlled by chat.sessionDashboard.indexResponses.
+  parser: null
+- id: kiro.cli_session_files
+  title: Kiro CLI flat-file session store
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_HOME/sessions/cli/*
+  - ~/.kiro/sessions/cli/*.lock
+  - ~/.kiro/sessions/cli/<session-id>.json
+  - ~/.kiro/sessions/cli/<session-id>.jsonl
+  format: jsonl
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: https://github.com/pajaydev/kiro-history/blob/main/server/cli-v2.ts
+  source_kind: community
+  record_types:
+  - assistant
+  - tool_call
+  - tool_result
+  - turn_end
+  - turn_start
+  - usage_summary
+  - user
+  volatility: |-
+    Written per turn. A .lock file marks a session held open by a live process. Deleted by the same /sessions cleanup commands as the database sessions.
+  notes: |-
+    Third-party viewer only, not a vendor statement. That tool resolves join(homedir(), '.kiro', 'sessions', 'cli') and, for each <id>.json metadata file that is not a .lock, reads the sibling <id>.jsonl for the messages. The metadata object carries session_id, cwd, updated_at and session_state.conversation_metadata.user_turn_metadatas (per-turn model name, request count and metering usage), which gives an analyst a per-turn model and cost trail even when the message bodies are gone. The vendor's own 'Export sessions' page documents exactly this session.json + messages.jsonl + sub-executions/*.jsonl shape for exported sessions, which corroborates the record layout while saying nothing about the directory.
+  parser: null
+- id: kiro.ide_session_files
+  title: Kiro IDE session transcripts
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_HOME/sessions/<workspace-hash>/<session-id>/*
+  - ~/.kiro/sessions/<workspace-hash>/<session-id>/messages.jsonl
+  - ~/.kiro/sessions/<workspace-hash>/<session-id>/session.json
+  - ~/.kiro/sessions/<workspace-hash>/<session-id>/sub-executions/*.jsonl
+  format: jsonl
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: https://github.com/pajaydev/kiro-history/blob/main/server/ide-v1.ts
+  source_kind: community
+  record_types:
+  - assistant
+  - tool_call
+  - tool_result
+  - turn_end
+  - turn_start
+  - usage_summary
+  - user
+  volatility: |-
+    Appended per message. Deleting a chat in the IDE removes the session directory. Because messages.jsonl is append-only, a partially deleted session may leave the JSONL behind after the index or session.json is gone, and vice versa.
+  notes: |-
+    Location is third-party: the viewer resolves join(homedir(), '.kiro', 'sessions') and treats every child directory except 'cli' as a workspace-hash directory holding <session-id>/session.json plus <session-id>/messages.jsonl. The FILE LAYOUT is separately confirmed by the vendor's 'Export sessions' page, which says an exported session is a directory named for the session id containing session.json (agent name, model, timestamps), messages.jsonl (one message per line: prompts, responses, code blocks, tool calls) and sub-executions/*.jsonl (sub-agent runs). Treat the sub-executions files as first-class: a sub-agent can run tools that never appear in the parent transcript. The <workspace-hash> mapping back to a real workspace path is not documented; recover it from session.json rather than trying to invert the hash. Vendor also states that IDE 'Agent Artifacts' (generated documents, diagrams, PDFs, Office files, up to 12 MB each) are stored per session 'in its global application storage, outside your project .kiro directory', with no path given: sweep the whole ~/.kiro tree for them.
+  parser: null
+- id: kiro.ide_legacy_global_storage
+  title: Kiro IDE legacy chat storage (pre-1.0 global storage)
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Kiro\User\globalStorage\kiro.kiroagent\**'
+  - ~/.config/Kiro/User/globalStorage/kiro.kiroagent/**
+  - ~/Library/Application Support/Kiro/User/globalStorage/kiro.kiroagent/**
+  - ~/Library/Application Support/kiro/User/globalStorage/kiro.kiroagent/**
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: unverified
+  source: https://github.com/pajaydev/kiro-history/blob/main/server/ide.ts
+  source_kind: community
+  record_types:
+  - '*.chat conversation files'
+  - execution index file
+  - execution log files
+  - per-workspace 32-hex-character directories
+  - workspace-sessions/<base64url-workspace-path>/<session-id>.json session body
+  - workspace-sessions/<base64url-workspace-path>/sessions.json session index
+  volatility: |-
+    No vendor-provided cleanup. A user-filed issue reports this tree growing past 13 GB over months with no built-in way to manage it, which means old conversations tend to survive here long after the user believes they are gone. Manual file deletion is the only stated remedy, so absence of a directory can be an anti-forensic act rather than non-use.
+  notes: |-
+    Kiro IDE is a VS Code derivative, so this is the standard <user-data-dir>/User/globalStorage/<extension-id> location for extension kiro.kiroagent. Third-party only, on two independent community sources. Two traps. First, the directory case differs between reports (Kiro vs kiro): macOS is case-insensitive by default so both spellings appear in write-ups and a case-sensitive collector must try both. Second, the interesting file names inside are opaque 32-hex-character strings rather than readable names: the community viewer hardcodes one such name as the per-workspace execution index and another as the execution log directory, and identifies workspace directories only by the 32-hex-character pattern. Do not filter by extension or by name here, collect the whole subtree. The workspace-sessions child directories are base64url of the workspace path (with _ and - substituted for = and +), so the workspace path is directly recoverable by decoding the directory name. Execution logs are the record of what the agent actually did (tool calls, commands, file operations) and are keyed by executionId inside the first bytes of each file.
+  parser: null
+- id: kiro.cli_settings
+  title: Kiro CLI settings
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_HOME/settings/cli.json
+  - '%USERPROFILE%\.kiro\settings\cli.json'
+  - ~/.kiro/settings/cli.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://kiro.dev/docs/reference/settings.md
+  source_kind: official
+  record_types:
+  - chat.agentEngine
+  - chat.allowAsciiArt
+  - chat.enableHistoryHints
+  - chat.historyMode
+  - chat.modelDefaults
+  - chat.sessionDashboard.indexResponses
+  volatility: |-
+    Rewritten by /settings, kiro-cli settings and by /model and /effort selections, which now persist automatically. Last-write-wins, no history kept.
+  notes: |-
+    Single global settings file, no project scope. Forensically it dates and explains behaviour rather than holding content: chat.agentEngine pins the harness version (v1/v2/v3) which decides which of the competing session stores is in use; chat.historyMode is 'session' or 'global' and therefore tells you whether arrow-up prompt recall was shared across all sessions or isolated per session; chat.sessionDashboard.indexResponses says whether the local search index covers agent responses as well as prompts; chat.modelDefaults records per-model reasoning effort. The vendor explicitly documents editing this file directly with kiro-cli settings open, so an unexpected mtime here can indicate hand-editing.
+  parser: null
+- id: kiro.permissions_user
+  title: Kiro user permission rules
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_HOME/settings/permissions.yaml
+  - '%USERPROFILE%\.kiro\settings\permissions.yaml'
+  - ~/.kiro/settings/permissions.yaml
+  format: yaml
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://kiro.dev/docs/permissions.md
+  source_kind: official
+  record_types:
+  - effect
+  - exclude
+  - match
+  - 'rule: capability'
+  volatility: |-
+    Edited by the user or written when an approval prompt is answered with a persistent choice. No versioning.
+  notes: |-
+    This is the central autonomy artifact for Kiro. Capability-based rules over filesystem read and write, shell commands, web requests, MCP servers, subagents, skills, powers and diagnostics, each with effect deny, ask or allow, matched by glob, with deny overriding ask overriding allow across all scopes. An entry such as shell: allow with match 'git *' or 'npm *', or a filesystem write allow over 'src/**', is a pre-authorisation that lets the agent act with no prompt, and is exactly what an analyst needs to distinguish 'the user approved this action' from 'the action ran silently under a standing rule'. Note the vendor-stated hardcoded denials (~/.kiro/settings/, .kiro/settings/, ~/.kiro/workspace-roots/) and always-ask paths (.git/**, .kiro/agents/**, .kiro/hooks/**, .kiroignore): a write to any of those implies an explicit user approval, so it is a strong indicator of deliberate action rather than drift.
+  parser: null
+- id: kiro.permissions_workspace
+  title: Kiro per-workspace permission rules
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_HOME/workspace-roots/<hash>/permissions.yaml
+  - '%USERPROFILE%\.kiro\workspace-roots\<hash>\permissions.yaml'
+  - ~/.kiro/workspace-roots/<hash>/permissions.yaml
+  format: yaml
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://kiro.dev/docs/configuration.md
+  source_kind: official
+  record_types:
+  - effect
+  - exclude
+  - match
+  - 'rule: capability'
+  volatility: |-
+    Same as the user rules. Survives deletion of the project itself, because it lives under the home directory and not in the repository.
+  notes: |-
+    The project-scope permission file is deliberately NOT in the repository: the vendor describes it as 'per-user, outside the repo'. That makes it the single most useful record of what a particular user pre-approved for a particular working copy, and it outlives the working copy. The <hash> keys the workspace root; how it is derived is not documented, so enumerate the directories and correlate them with session metadata rather than trying to compute the hash from a candidate path. Collect the whole ~/.kiro/workspace-roots tree, including directories whose workspace no longer exists on the endpoint, since those are evidence of projects that were worked on and then removed.
+  parser: null
+- id: kiro.managed_settings
+  title: Kiro enterprise managed permission policy
+  category: permissions
+  root: system
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - /Library/Application Support/Kiro/managed-settings.json
+  - /etc/kiro/managed-settings.json
+  - 'C:\ProgramData\Kiro\managed-settings.json'
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://kiro.dev/docs/enterprise/governance/permissions.md
+  source_kind: official
+  record_types:
+  - effect
+  - match
+  - 'rules[]: capability'
+  volatility: |-
+    Deployed and replaced by MDM, Group Policy or SCCM, so it can change without any user action and without a local trace of the previous content.
+  notes: |-
+    Machine-wide policy that uses the same rule schema as the user permission file and is deployed by administrators. It is the baseline an analyst needs before judging a user's own rules: a deny here cannot be overridden by the user, so an action that happened despite an apparent policy means either the policy postdates the action or the deny did not match. Requires a Kiro restart to take effect, so its mtime is only an upper bound on when it became effective. Collect from all three locations: the macOS path is under the system /Library, not the user one.
+  parser: null
+- id: kiro.mcp_config_user
+  title: Kiro user MCP server configuration
+  category: mcp_config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_HOME/settings/mcp.json
+  - '%USERPROFILE%\.kiro\settings\mcp.json'
+  - ~/.kiro/settings/mcp.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://kiro.dev/docs/configuration.md
+  source_kind: official
+  contains_credentials:
+  - env
+  - headers
+  - oauth.clientSecret
+  record_types:
+  - args
+  - env
+  - headers
+  - mcpServers.<name>.command
+  - oauth.clientId
+  - oauth.clientMetadataUrl
+  - oauth.clientSecret
+  - oauth.redirectUri
+  - oauthScopes
+  - timeout
+  - type
+  - url
+  volatility: |-
+    Rewritten whenever a server is added, edited, enabled or disabled through the UI or the command palette. No history.
+  notes: |-
+    The primary record of which external tools and network destinations the agent could reach. Treat it as secret: the vendor's own examples put literal values in env (for example an API key variable) and in headers (Authorization: Bearer ...), and the oauth object documents a clientSecret field with a literal example value, so inline credentials are expected rather than exceptional. The IDE UI hides those values from the user while the file on disk holds them, which is exactly the gap a forensic collection closes. Remote servers appear as type http with a url, which gives an analyst the egress destination even when no traffic capture exists. Note that the CLI supports confidential OAuth clients (clientId plus clientSecret) while the IDE supports public PKCE clients only, so a clientSecret present in this file points to CLI use.
+  parser: null
+- id: kiro.mcp_config_project
+  title: Kiro project MCP server configuration
+  category: mcp_config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.kiro/settings/mcp.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://kiro.dev/docs/configuration.md
+  source_kind: official
+  contains_credentials:
+  - env
+  - headers
+  - oauth.clientSecret
+  record_types:
+  - args
+  - env
+  - headers
+  - mcpServers.<name>.command
+  - oauth.*
+  - timeout
+  - type
+  - url
+  volatility: |-
+    Lives inside the working copy, so it is also subject to git history, branch switches and checkouts. Prior versions may be recoverable from the repository even when the working-tree file was changed or removed.
+  notes: |-
+    Project scope beats global scope for MCP resolution (agent scope beats both), so this file, not the user one, usually decides what actually ran. Because it is committed, it is a supply-chain vector: an MCP server added by someone else in a pull request will run for every developer who opens the repository. Check the repository history as well as the working tree. Kiro Web and Mobile read only repository-committed configuration, never ~/.kiro, so for cloud sessions this file is the whole story.
+  parser: null
+- id: kiro.steering_user
+  title: Kiro global steering files
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_HOME/steering/*.md
+  - '%USERPROFILE%\.kiro\steering\*.md'
+  - ~/.kiro/steering/*.md
+  - ~/.kiro/steering/AGENTS.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://kiro.dev/docs/steering.md
+  source_kind: official
+  record_types:
+  - fileMatch pattern
+  - front matter inclusion mode
+  - markdown body
+  volatility: |-
+    User-edited plain files. Nothing rotates them.
+  notes: |-
+    Steering files are markdown instructions applied to every session. Global ones live here and workspace ones override them on conflict; all scopes are merged rather than replaced. Forensically these are injected-instruction candidates: whoever can write this directory can steer every session the user runs in every project. The vendor also supports the AGENTS.md standard here, which is always included and does not support inclusion modes, so an AGENTS.md is unconditional context. Collect the file content verbatim including front matter, since the inclusion mode (always, fileMatch with a glob, or manual) decides whether the text actually reached the model for a given turn.
+  parser: null
+- id: kiro.steering_project
+  title: Kiro project steering and AGENTS.md
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/**/AGENTS.md
+  - <project>/.kiro/steering/*.md
+  - <project>/AGENTS.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://kiro.dev/docs/steering.md
+  source_kind: official
+  record_types:
+  - fileMatch pattern
+  - front matter inclusion mode
+  - markdown body
+  volatility: |-
+    Tracked in version control in most projects, so superseded content is usually recoverable from git even after the working-tree file changes.
+  notes: |-
+    The highest-value prompt-injection surface in a Kiro engagement. The vendor states AGENTS.md files are discovered in subdirectories throughout the workspace, not just at the root, and are always included with no inclusion-mode control. That means a single AGENTS.md dropped deep in a dependency directory or a vendored subtree silently becomes agent instructions for anyone who opens the project. Enumerate every AGENTS.md at every depth and diff it against the repository history, then correlate its mtime with session timestamps. The vendor's suggested foundation files are product.md, tech.md and structure.md under .kiro/steering/.
+  parser: null
+- id: kiro.specs
+  title: Kiro specs
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.kiro/specs/**
+  - <project>/.kiro/specs/*/bugfix.md
+  - <project>/.kiro/specs/*/design.md
+  - <project>/.kiro/specs/*/requirements.md
+  - <project>/.kiro/specs/*/tasks.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://kiro.dev/docs/configuration.md
+  source_kind: official
+  record_types:
+  - bugfix.md current/expected/unchanged behaviour
+  - design.md architecture and sequence diagrams
+  - requirements.md user stories and acceptance criteria
+  - tasks.md task list with status tracking
+  volatility: |-
+    Rewritten by the agent as work progresses; tasks.md in particular carries live status that is updated in place, so intermediate states are lost unless the repository has them.
+  notes: |-
+    Specs are the plan the agent worked from and are project-scope only, with no global equivalent. The directory is stated by the vendor's configuration-scopes table (.kiro/specs/) and the three-or-four file names by the specs page. Because tasks.md tracks status in real time, an abandoned spec with half-completed tasks is a good pointer at which session to read next. Treat the content as agent-authored narrative, not ground truth, but it is the cheapest way to recover intent for a long engagement.
+  parser: null
+- id: kiro.agents
+  title: Kiro custom agent definitions
+  category: config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_HOME/agents/*
+  - '%USERPROFILE%\.kiro\agents\*'
+  - <project>/.kiro/agents/*
+  - ~/.kiro/agents/*
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://kiro.dev/docs/configuration.md
+  source_kind: official
+  contains_credentials:
+  - mcpServers
+  record_types:
+  - hooks field
+  - includeMcpJson field
+  - includePowers field
+  - mcpServers field
+  - permissions field
+  - resources field
+  volatility: |-
+    User or agent edited. Writes to .kiro/agents/** are vendor-stated always-ask, so a modification here implies an explicit approval at the time.
+  notes: |-
+    Agent scope is the highest-priority configuration scope, so an agent file can carry its own mcpServers, its own permissions block and its own resources (steering and skills) that beat both project and global settings. That makes it the place a bypass is most likely to hide: a permissive permissions field inside a custom agent silently overrides a careful user-level policy. The vendor documents both YAML (.kiro/agents/code-review.yaml appears in their examples) and JSON spellings, so match on the directory rather than the extension. Collect both scopes; project wins on a name collision with a warning.
+  parser: null
+- id: kiro.hooks
+  title: Kiro agent hooks
+  category: config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_HOME/hooks/*.json
+  - '%USERPROFILE%\.kiro\hooks\*.json'
+  - <project>/.kiro/hooks/*.json
+  - <project>/.kiro/hooks/<id>.json
+  - ~/.kiro/hooks/*.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://kiro.dev/docs/hooks.md
+  source_kind: official
+  record_types:
+  - action
+  - trigger type
+  volatility: |-
+    User or agent edited. Writes to .kiro/hooks/** are vendor-stated always-ask.
+  notes: |-
+    Hooks fire on agent file changes, tool use or task completion and can run scripts or inject context. They are therefore both an execution mechanism (commands that ran with no user prompt at the moment of execution) and an injection mechanism (context added to every session). All scopes are merged rather than overridden, so a global hook and a project hook both run. Kiro Web also reads project hooks, so a committed hook executes in the cloud sandbox too. Read every hook body before concluding which commands in a transcript were user-initiated.
+  parser: null
+- id: kiro.skills_powers
+  title: Kiro skills and powers
+  category: instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_HOME/powers/**
+  - $KIRO_HOME/skills/**
+  - <project>/.kiro/skills/**
+  - <project>/.kiro/skills/*/SKILL.md
+  - ~/.kiro/powers/**
+  - ~/.kiro/skills/**
+  - ~/.kiro/skills/*/SKILL.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://kiro.dev/docs/skills.md
+  source_kind: official
+  record_types:
+  - SKILL.md
+  volatility: |-
+    Installed and updated as packages; powers are installed from a marketplace or from GitHub repositories, so content can change under the user without an explicit edit.
+  notes: |-
+    Skills are reusable instruction packages loaded as SKILL.md; powers are packaged MCP servers plus documentation that activate on demand and are global-scope only (no project powers). Both are merged across scopes. Because powers are installed from a marketplace or straight from a GitHub repository, they are a third-party code and instruction supply chain: enumerate what is installed and where it came from. A skill or power directory can also carry executable payloads beyond the SKILL.md, so collect the whole subtree, not just the markdown.
+  parser: null
+- id: kiro.prompt_library
+  title: Kiro saved prompt library
+  category: instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_HOME/prompts/*
+  - '%USERPROFILE%\.kiro\prompts\*'
+  - <project>/.kiro/prompts/*
+  - ~/.kiro/prompts/*
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://kiro.dev/docs/upgrade-guides/migrating-from-q.md
+  source_kind: official
+  volatility: |-
+    User-managed files. The vendor states that new project-level prompts are written to .kiro and not to the legacy .amazonq folder.
+  notes: |-
+    Reusable prompts the user saved deliberately, user scope and workspace scope. This is NOT the arrow-up recall history: it is a library of prompts the user chose to keep, which makes it good evidence of intent and of repeated workflows. The same vendor page states these were copied out of ~/.aws/amazonq/prompts during the one-time Amazon Q Developer CLI to Kiro CLI migration, so matching content in both trees dates the migration rather than indicating two separate activities.
+  parser: null
+- id: kiro.kiroignore
+  title: Kiroignore files
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/**/.kiroignore
+  - <project>/.kiroignore
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://kiro.dev/docs/kiroignore.md
+  source_kind: official
+  record_types:
+  - gitignore-syntax patterns
+  volatility: |-
+    Writes to .kiroignore are vendor-stated always-ask and the file is also a vendor-stated protected path in the IDE, so any modification implies an explicit approval.
+  notes: |-
+    Gitignore-syntax patterns that stop Kiro reading matching files, placeable in the project root or any subdirectory with subdirectory patterns taking precedence. Two forensic uses. It tells you what the agent could not see, which bounds what it could have exfiltrated. And it is an anti-forensic and evasion indicator: patterns added shortly before or during an engagement, or patterns covering exactly the material under investigation, are worth flagging. Note the coverage is uneven by surface, which the vendor states plainly: the IDE enforces it across supported agent tools, CLI V3 enforces it only when filtering content-search and filename-search results, and Web does not enforce it at all. So a .kiroignore is not proof a file was unreadable, and in Web it is no protection whatsoever. The IDE also reads the ignore filename list from the kiroAgent.agentIgnoreFiles setting, so other ignore file names may be in force.
+  parser: null
+- id: kiro.cli_log
+  title: Kiro CLI chat log
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_CHAT_LOG_FILE
+  - $TMPDIR/kiro-log/kiro-chat.log
+  - $XDG_RUNTIME_DIR/kiro-log/kiro-chat.log
+  - '%TEMP%\kiro-log\logs\kiro-chat.log'
+  - /tmp/kiro-log/*.log
+  format: text
+  sensitivity: normal
+  collect_priority: live_only
+  status: verified
+  source: https://kiro.dev/docs/cli/setup.md
+  source_kind: official
+  volatility: |-
+    Lives in the platform temp or runtime directory. On Linux $XDG_RUNTIME_DIR is normally a tmpfs under /run/user/<uid> destroyed at logout; on macOS $TMPDIR is a per-user /var/folders path subject to periodic cleanup; on Windows %TEMP% is cleaned by disk maintenance. Default verbosity is error, so the file is usually near-empty unless KIRO_LOG_LEVEL was raised.
+  notes: |-
+    Must be collected live: on a dead disk the resolved directory may not exist and on Linux a tmpfs leaves nothing at all. The vendor explicitly warns the log 'may contain sensitive information including file paths, code snippets, and command outputs', which is why it is marked secret and why it is worth having despite the default error level. Note the three per-platform spellings differ in shape, not just in prefix: the Windows path has an extra logs segment (%TEMP%\kiro-log\logs\kiro-chat.log). Always resolve $KIRO_CHAT_LOG_FILE from the live environment first; if it is set, the documented paths are empty and mean nothing.
+  parser: null
+- id: kiro.acp_wire_record
+  title: Kiro CLI ACP wire recording
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $KIRO_ACP_RECORD_PATH
+  format: jsonl
+  sensitivity: normal
+  collect_priority: live_only
+  status: verified
+  source: https://kiro.dev/docs/reference/settings.md
+  source_kind: official
+  record_types:
+  - ACP wire messages
+  volatility: |-
+    Only exists while the environment variable is set. Path and lifetime are entirely operator-chosen.
+  notes: |-
+    The vendor documents KIRO_ACP_RECORD_PATH as the path to a JSONL file for recording TUI ACP wire traffic. There is no default location, so it is invisible to any path-based collection: it has to be discovered from the live environment, from shell profiles, from wrapper scripts or from shell history. When present it is a complete protocol-level transcript of a session, including tool calls, which is frequently richer than the saved session store. Worth an explicit check in every Kiro engagement precisely because nobody expects it.
+  parser: null
+- id: kiro.legacy_amazonq_config
+  title: Amazon Q Developer configuration still read by Kiro
+  category: config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.amazonq/**
+  - ~/.aws/amazonq/**
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://kiro.dev/docs/upgrade-guides/migrating-from-q.md
+  source_kind: official
+  contains_credentials:
+  - mcp.json env
+  - mcp.json headers
+  volatility: |-
+    The vendor states Kiro CLI will NOT modify existing .amazonq folders, so this tree is unusually stable and can preserve configuration that predates Kiro by months.
+  notes: |-
+    Collect this even in a Kiro-only engagement. The vendor states that Kiro CLI continues to read the project .amazonq folder so existing rules, agents and MCP settings keep working, and that the default agent is named kiro_default and 'includes paths for both Amazon Q and Kiro'. So an MCP server or a rules file that only exists under .amazonq was still live under Kiro. Two traps follow. First, if a project has both .kiro and .amazonq, configuration loads from .kiro, so the presence of a .amazonq file does not prove it was in effect at project scope. Second, the one-time install migration copied prompts and agents from ~/.aws/amazonq into ~/.kiro, mcp.json into ~/.kiro/settings/mcp.json and the rules folder into ~/.kiro/steering, skipping conflicting MCP servers: duplicate content across the two trees is a migration artifact, and an MCP server present only in the old tree is one the migration deliberately skipped. See the amazon_q agent entries for the full layout of these paths.
+  parser: null
+- id: kiro.cli_install
+  title: Kiro CLI install evidence
+  category: install_evidence
+  root: user_profile
+  os:
+  - linux
+  - macos
+  paths:
+  - ~/.local/bin/kiro-cli
+  - ~/.local/bin/kirocli
+  - ~/.local/bin/q
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://kiro.dev/docs/getting-started/installation.md
+  source_kind: official
+  volatility: |-
+    Replaced in place by kiro-cli update, which the vendor documents with a staged-rollout option. The mtime therefore reflects the last update, not the install.
+  notes: |-
+    The vendor states only 'Files install to ~/.local/bin by default' for the Linux zip install, without naming the binaries, which is why the individual file paths are flagged unsourced: collect the directory listing rather than testing for a name. Install is a one-line curl to https://cli.kiro.dev/install (bash) or https://cli.kiro.dev/install.ps1 (PowerShell), and release artifacts come from a desktop-release host under amazonaws.com, so shell history and package-manager or download logs are often better install evidence than the filesystem. Do not read version information by executing the binary; on a target that would be an evidence-modifying act and is forbidden. macOS and Windows install locations are not documented.
+  parser: null

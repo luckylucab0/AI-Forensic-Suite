@@ -229,6 +229,378 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         },
         {
+            "agent": "amazonq",
+            "artifacts": [
+                {
+                    "category": "permissions",
+                    "collect_priority": "first",
+                    "id": "amazonq.cli_agents",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.aws\\amazonq\\cli-agents\\*.json",
+                        "<project>/.amazonq/cli-agents/*.json",
+                        "~/.aws/amazonq/cli-agents/*.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "durable",
+                    "id": "amazonq.cli_checkpoints",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.aws\\amazonq\\cli-checkouts\\<conversation-id>\\**",
+                        "~/.aws/amazonq/cli-checkouts/<conversation-id>/**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "live_only",
+                    "id": "amazonq.cli_logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$TMPDIR/qlog/chat.log",
+                        "$TMPDIR/qlog/mcp.log",
+                        "$TMPDIR/qlog/qchat.log",
+                        "$TMPDIR/qlog/translate.log",
+                        "$XDG_RUNTIME_DIR/qlog/*.log",
+                        "%TEMP%\\amazon-q\\logs\\*.log",
+                        "%TEMP%\\qlog\\*.log",
+                        "/tmp/qlog/*.log"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "first",
+                    "id": "amazonq.cli_mcp_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.aws\\amazonq\\mcp.json",
+                        "<project>/.amazonq/mcp.json",
+                        "~/.aws/amazonq/mcp.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "first",
+                    "id": "amazonq.cli_prompt_history",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.aws\\amazonq\\.cli_bash_history",
+                        "~/.aws/amazonq/.cli_bash_history"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "amazonq.cli_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$Q_CLI_DATA_DIR/settings.json",
+                        "$XDG_DATA_HOME/amazon-q/settings.json",
+                        "%LOCALAPPDATA%\\amazon-q\\settings.json",
+                        "~/.local/share/amazon-q/settings.json",
+                        "~/Library/Application Support/amazon-q/settings.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "amazonq.cli_state_database",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$Q_CLI_DATA_DIR/data.sqlite3",
+                        "$XDG_DATA_HOME/amazon-q/data.sqlite3",
+                        "%LOCALAPPDATA%\\amazon-q\\data.sqlite3",
+                        "~/.local/share/amazon-q/data.sqlite3",
+                        "~/Library/Application Support/amazon-q/data.sqlite3"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "amazonq.cli_subagent_executions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.amazonq/.subagents/**"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "amazonq.cli_todo_lists",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.amazonq/cli-todo-lists/*.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "amazonq.cli_user_rules",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.aws\\amazonq\\rules\\*",
+                        "~/.aws/amazonq/rules/*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "first",
+                    "id": "amazonq.ide_agent_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.aws\\amazonq\\default.json",
+                        "<project>/.amazonq/default.json",
+                        "~/.aws/amazonq/agents/default.json",
+                        "~/.aws/amazonq/default.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "amazonq.ide_chat_export",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/q-dev-chat-*.html",
+                        "<project>/q-dev-chat-*.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "amazonq.ide_chat_history",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.aws\\amazonq\\history\\*.json",
+                        "~/.aws/amazonq/history/*.json",
+                        "~/.aws/amazonq/history/chat-history-<hash>.json",
+                        "~/.aws/amazonq/history/chat-history-no-workspace.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "amazonq.ide_extension_install",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.vscode\\extensions\\amazonwebservices.amazon-q-vscode-*\\**",
+                        "~/.vscode/extensions/amazonwebservices.amazon-q-vscode-*/**",
+                        "~/.vscode/extensions/amazonwebservices.aws-toolkit-vscode-*/**",
+                        "~/.vscode/extensions/extensions.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "durable",
+                    "id": "amazonq.knowledge_bases",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.aws\\amazonq\\knowledge_bases\\**",
+                        "~/.aws/amazonq/knowledge_bases/*/*/bm25_data.json",
+                        "~/.aws/amazonq/knowledge_bases/*/*/data.json",
+                        "~/.aws/amazonq/knowledge_bases/*/contexts.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "amazonq.legacy_profiles_and_context",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.aws\\amazonq\\global_context.json",
+                        "%USERPROFILE%\\.aws\\amazonq\\profiles\\**",
+                        "~/.aws/amazonq/global_context.json",
+                        "~/.aws/amazonq/profiles/**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "memory",
+                    "collect_priority": "normal",
+                    "id": "amazonq.memory_bank",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.amazonq/rules/memory-bank/guidelines.md",
+                        "<project>/.amazonq/rules/memory-bank/product.md",
+                        "<project>/.amazonq/rules/memory-bank/structure.md",
+                        "<project>/.amazonq/rules/memory-bank/tech.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "amazonq.project_rules",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.amazonq/rules/**/*.md",
+                        "<project>/AGENTS.md",
+                        "<project>/AmazonQ.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "amazonq.prompt_library",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.aws\\amazonq\\prompts\\*.md",
+                        "<project>/.amazonq/prompts/*",
+                        "~/.aws/amazonq/prompts/*.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "first",
+                    "id": "amazonq.sso_token_cache",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.aws\\sso\\cache\\*.json",
+                        "~/.aws/sso/cache/<hash>.json",
+                        "~/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
             "agent": "amp",
             "artifacts": [
                 {
@@ -1959,6 +2331,553 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         },
         {
+            "agent": "claude_desktop",
+            "artifacts": [
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "claude_desktop.app_logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\logs\\main.log",
+                        "%LOCALAPPDATA%\\Claude-3p\\logs\\main.log",
+                        "%LOCALAPPDATA%\\Claude\\Logs\\main.log",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\logs\\",
+                        "~/.config/Claude-3p/logs/main.log",
+                        "~/.config/Claude/logs/main.log",
+                        "~/Library/Logs/Claude-3p/main.log",
+                        "~/Library/Logs/Claude/claude.ai-web.log",
+                        "~/Library/Logs/Claude/cowork_vm_node.log",
+                        "~/Library/Logs/Claude/main.log",
+                        "~/Library/Logs/Claude/mcp-server-<name>.log",
+                        "~/Library/Logs/Claude/mcp.log"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "claude_desktop.code_launch_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.claude/launch.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "claude_desktop.code_session_index",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\claude-code-sessions\\<uuid>\\<uuid>\\local_<session-id>.json",
+                        "%LOCALAPPDATA%\\Claude-3p\\claude-code-sessions\\",
+                        "%LOCALAPPDATA%\\Claude\\claude-code-sessions\\<uuid>\\<uuid>\\local_<session-id>.json",
+                        "~/Library/Application Support/Claude-3p/claude-code-sessions/",
+                        "~/Library/Application Support/Claude/claude-code-sessions/<uuid>/<uuid>/local_<session-id>.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "claude_desktop.cowork_account_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\local-agent-mode-sessions\\*\\*\\cowork_account_settings.json",
+                        "%LOCALAPPDATA%\\Claude-3p\\local-agent-mode-sessions\\*\\*\\cowork_account_settings.json",
+                        "~/Library/Application Support/Claude-3p/local-agent-mode-sessions/*/*/cowork_account_settings.json",
+                        "~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/cowork_account_settings.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "live_only",
+                    "id": "claude_desktop.cowork_audit_key",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\<session-id>\\.audit-key",
+                        "%LOCALAPPDATA%\\Claude-3p\\local-agent-mode-sessions\\<uuid>\\<uuid>\\<session-id>\\.audit-key",
+                        "~/Library/Application Support/Claude-3p/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/.audit-key",
+                        "~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/.audit-key"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "claude_desktop.cowork_audit_log",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\<session-id>\\audit.jsonl",
+                        "%LOCALAPPDATA%\\Claude-3p\\local-agent-mode-sessions\\<uuid>\\<uuid>\\<session-id>\\audit.jsonl",
+                        "~/Library/Application Support/Claude-3p/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/audit.jsonl",
+                        "~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/audit.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "memory",
+                    "collect_priority": "first",
+                    "id": "claude_desktop.cowork_memory",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\local-agent-mode-sessions\\*\\*\\memory\\memory\\*.md",
+                        "%LOCALAPPDATA%\\Claude-3p\\local-agent-mode-sessions\\*\\*\\memory\\memory\\*.md",
+                        "~/Library/Application Support/Claude-3p/local-agent-mode-sessions/*/*/memory/memory/*.md",
+                        "~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/memory/CLAUDE.md",
+                        "~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/memory/memory/*.md",
+                        "~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/spaces/<uuid>/memory/*.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "first",
+                    "id": "claude_desktop.cowork_session_files",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\local_<uuid>\\outputs\\",
+                        "%APPDATA%\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\local_<uuid>\\uploads\\",
+                        "~/Library/Application Support/Claude-3p/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/outputs/",
+                        "~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/outputs/",
+                        "~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/uploads/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "claude_desktop.cowork_session_store",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\local_<uuid>\\",
+                        "%LOCALAPPDATA%\\Claude-3p\\local-agent-mode-sessions\\<uuid>\\<uuid>\\local_<uuid>\\",
+                        "%LOCALAPPDATA%\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\local_<uuid>\\",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\local_<uuid>\\",
+                        "~/.config/Claude-3p/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/",
+                        "~/.config/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/",
+                        "~/Library/Application Support/Claude-3p/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/",
+                        "~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>.json",
+                        "~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "durable",
+                    "id": "claude_desktop.cowork_vm_bundle",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\vm_bundles\\claudevm.bundle\\",
+                        "%LOCALAPPDATA%\\Claude-3p\\vm_bundles\\",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\vm_bundles\\claudevm.bundle\\sessiondata.vhdx",
+                        "~/Library/Application Support/Claude-3p/vm_bundles/",
+                        "~/Library/Application Support/Claude/vm_bundles/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "claude_desktop.coworkd_service_log",
+                    "os": [
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "C:\\ProgramData\\Claude\\Logs\\coworkd\\user-<sid>.log",
+                        "~/Library/Logs/Claude/coworkd.log"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "claude_desktop.device_identifier",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Claude-3p\\ant-did",
+                        "~/.config/Claude-3p/ant-did",
+                        "~/Library/Application Support/Claude-3p/ant-did"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "claude_desktop.embedded_claude_code",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\claude-code\\<version>\\claude.exe",
+                        "%LOCALAPPDATA%\\Claude-3p\\claude-code\\<version>\\",
+                        "~/Library/Application Support/Claude-3p/claude-code/<version>/claude.app/Contents/MacOS/claude",
+                        "~/Library/Application Support/Claude/claude-code-vm/",
+                        "~/Library/Application Support/Claude/claude-code/<version>/claude.app/Contents/MacOS/claude"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "claude_desktop.install_evidence_linux",
+                    "os": [
+                        "linux"
+                    ],
+                    "paths": [
+                        "/etc/apt/sources.list.d/claude-desktop.list",
+                        "/etc/default/claude-desktop",
+                        "/usr/share/keyrings/claude-desktop-archive-keyring.asc",
+                        "/var/lib/dpkg/info/claude-desktop.*"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "claude_desktop.install_evidence_macos",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "/Applications/Claude.app",
+                        "~/Applications/Claude.app"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "claude_desktop.install_evidence_windows",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\",
+                        "C:\\Program Files\\WindowsApps\\Claude_<version>_<arch>__pzs8sxrjxfjjc\\"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "claude_desktop.local_config_library",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Claude-3p\\configLibrary\\",
+                        "~/.config/Claude-3p/configLibrary/",
+                        "~/Library/Application Support/Claude-3p/configLibrary/<id>.json",
+                        "~/Library/Application Support/Claude-3p/configLibrary/_meta.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "claude_desktop.managed_policy_linux",
+                    "os": [
+                        "linux"
+                    ],
+                    "paths": [
+                        "/etc/claude-desktop/managed-settings.json"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "claude_desktop.managed_policy_macos",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "/Library/Managed Preferences/<user>/com.anthropic.claudefordesktop.plist",
+                        "/Library/Managed Preferences/com.anthropic.claudefordesktop.plist",
+                        "~/Library/Preferences/com.anthropic.claudefordesktop.plist"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "claude_desktop.managed_policy_windows",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "HKCU\\SOFTWARE\\Policies\\Claude",
+                        "HKLM\\SOFTWARE\\Policies\\Claude"
+                    ],
+                    "root": "registry",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "first",
+                    "id": "claude_desktop.mcp_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\claude_desktop_config.json",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\claude_desktop_config.json",
+                        "~/.config/Claude/claude_desktop_config.json",
+                        "~/Library/Application Support/Claude/claude_desktop_config.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "live_only",
+                    "id": "claude_desktop.oauth_and_signin_tokens",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Microsoft\\Credentials\\",
+                        "~/Library/Keychains/login.keychain-db"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "unverified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "claude_desktop.org_plugins",
+                    "os": [
+                        "macos",
+                        "windows"
+                    ],
+                    "paths": [
+                        "/Library/Application Support/Claude/org-plugins/",
+                        "C:\\Program Files\\Claude\\org-plugins\\"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "claude_desktop.renderer_state",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\IndexedDB\\",
+                        "%APPDATA%\\Claude\\Local Storage\\",
+                        "%LOCALAPPDATA%\\Claude-3p\\IndexedDB\\",
+                        "%LOCALAPPDATA%\\Claude\\IndexedDB\\",
+                        "~/Library/Application Support/Claude-3p/IndexedDB/",
+                        "~/Library/Application Support/Claude/IndexedDB/",
+                        "~/Library/Application Support/Claude/Local Storage/",
+                        "~/Library/Application Support/Claude/Session Storage/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "first",
+                    "id": "claude_desktop.scheduled_tasks",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.claude\\scheduled-tasks\\<task-name>\\SKILL.md",
+                        "~/.claude/scheduled-tasks/<task-name>/SKILL.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "durable",
+                    "id": "claude_desktop.ssh_remote_artifacts",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.claude/remote/ccd-cli/<version>",
+                        "~/.claude/remote/plugins/<hash>/",
+                        "~/.claude/remote/run/<id>/",
+                        "~/.claude/remote/srv/<version>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "live_only",
+                    "id": "claude_desktop.transient_session_credentials",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\ccd-session-secrets\\<session-id>\\",
+                        "%APPDATA%\\Claude\\host-creds-<hash>.json",
+                        "~/Library/Application Support/Claude-3p/ccd-session-secrets/<session-id>/",
+                        "~/Library/Application Support/Claude-3p/host-creds-<hash>.json",
+                        "~/Library/Application Support/Claude/ccd-session-secrets/<session-id>/",
+                        "~/Library/Application Support/Claude/host-creds-<hash>.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "first",
+                    "id": "claude_desktop.user_output_folder",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\Claude\\",
+                        "%USERPROFILE%\\Claude\\Projects\\<name>\\",
+                        "~/Claude/",
+                        "~/Claude/Projects/<name>/",
+                        "~/Documents/Claude/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "first",
+                    "id": "claude_desktop.user_plugins",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Claude\\cowork_plugins\\",
+                        "%LOCALAPPDATA%\\Claude-3p\\cowork_plugins\\",
+                        "~/.config/Claude/cowork_plugins/",
+                        "~/Library/Application Support/Claude-3p/cowork_plugins/",
+                        "~/Library/Application Support/Claude/cowork_plugins/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
             "agent": "cline",
             "artifacts": [
                 {
@@ -3372,19 +4291,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
-                        "$HOME/.copilot/mcp-config.json",
-                        "%APPDATA%\\Claude\\claude_desktop_config.json",
-                        "%USERPROFILE%\\.mcp.json",
-                        "<project>/.cursor/mcp.json",
-                        "<project>/.gemini/settings.json",
                         "<project>/.mcp.json",
-                        "<project>/.vscode/mcp.json",
-                        "~/.claude.json",
-                        "~/.config/Claude/claude_desktop_config.json",
-                        "~/.cursor/mcp.json",
-                        "~/.gemini/settings.json",
-                        "~/.vscode/mcp.json",
-                        "~/Library/Application Support/Claude/claude_desktop_config.json"
+                        "~/.claude.json"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -5260,6 +6168,416 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         },
         {
+            "agent": "kiro",
+            "artifacts": [
+                {
+                    "category": "transcript",
+                    "collect_priority": "live_only",
+                    "id": "kiro.acp_wire_record",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_ACP_RECORD_PATH"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "kiro.agents",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_HOME/agents/*",
+                        "%USERPROFILE%\\.kiro\\agents\\*",
+                        "<project>/.kiro/agents/*",
+                        "~/.kiro/agents/*"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "kiro.cli_install",
+                    "os": [
+                        "linux",
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/.local/bin/kiro-cli",
+                        "~/.local/bin/kirocli",
+                        "~/.local/bin/q"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "live_only",
+                    "id": "kiro.cli_log",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_CHAT_LOG_FILE",
+                        "$TMPDIR/kiro-log/kiro-chat.log",
+                        "$XDG_RUNTIME_DIR/kiro-log/kiro-chat.log",
+                        "%TEMP%\\kiro-log\\logs\\kiro-chat.log",
+                        "/tmp/kiro-log/*.log"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "kiro.cli_session_database",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_HOME/*.sqlite3",
+                        "%USERPROFILE%\\.kiro\\*.sqlite3",
+                        "~/.kiro/*.sqlite3"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "kiro.cli_session_files",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_HOME/sessions/cli/*",
+                        "~/.kiro/sessions/cli/*.lock",
+                        "~/.kiro/sessions/cli/<session-id>.json",
+                        "~/.kiro/sessions/cli/<session-id>.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "kiro.cli_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_HOME/settings/cli.json",
+                        "%USERPROFILE%\\.kiro\\settings\\cli.json",
+                        "~/.kiro/settings/cli.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "kiro.hooks",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_HOME/hooks/*.json",
+                        "%USERPROFILE%\\.kiro\\hooks\\*.json",
+                        "<project>/.kiro/hooks/*.json",
+                        "<project>/.kiro/hooks/<id>.json",
+                        "~/.kiro/hooks/*.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "durable",
+                    "id": "kiro.ide_legacy_global_storage",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Kiro\\User\\globalStorage\\kiro.kiroagent\\**",
+                        "~/.config/Kiro/User/globalStorage/kiro.kiroagent/**",
+                        "~/Library/Application Support/Kiro/User/globalStorage/kiro.kiroagent/**",
+                        "~/Library/Application Support/kiro/User/globalStorage/kiro.kiroagent/**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "kiro.ide_session_files",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_HOME/sessions/<workspace-hash>/<session-id>/*",
+                        "~/.kiro/sessions/<workspace-hash>/<session-id>/messages.jsonl",
+                        "~/.kiro/sessions/<workspace-hash>/<session-id>/session.json",
+                        "~/.kiro/sessions/<workspace-hash>/<session-id>/sub-executions/*.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "kiro.kiroignore",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/**/.kiroignore",
+                        "<project>/.kiroignore"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "kiro.legacy_amazonq_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.amazonq/**",
+                        "~/.aws/amazonq/**"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "kiro.managed_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "/Library/Application Support/Kiro/managed-settings.json",
+                        "/etc/kiro/managed-settings.json",
+                        "C:\\ProgramData\\Kiro\\managed-settings.json"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "first",
+                    "id": "kiro.mcp_config_project",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.kiro/settings/mcp.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "first",
+                    "id": "kiro.mcp_config_user",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_HOME/settings/mcp.json",
+                        "%USERPROFILE%\\.kiro\\settings\\mcp.json",
+                        "~/.kiro/settings/mcp.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "first",
+                    "id": "kiro.permissions_user",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_HOME/settings/permissions.yaml",
+                        "%USERPROFILE%\\.kiro\\settings\\permissions.yaml",
+                        "~/.kiro/settings/permissions.yaml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "first",
+                    "id": "kiro.permissions_workspace",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_HOME/workspace-roots/<hash>/permissions.yaml",
+                        "%USERPROFILE%\\.kiro\\workspace-roots\\<hash>\\permissions.yaml",
+                        "~/.kiro/workspace-roots/<hash>/permissions.yaml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "kiro.prompt_library",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_HOME/prompts/*",
+                        "%USERPROFILE%\\.kiro\\prompts\\*",
+                        "<project>/.kiro/prompts/*",
+                        "~/.kiro/prompts/*"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "kiro.skills_powers",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_HOME/powers/**",
+                        "$KIRO_HOME/skills/**",
+                        "<project>/.kiro/skills/**",
+                        "<project>/.kiro/skills/*/SKILL.md",
+                        "~/.kiro/powers/**",
+                        "~/.kiro/skills/**",
+                        "~/.kiro/skills/*/SKILL.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "kiro.specs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.kiro/specs/**",
+                        "<project>/.kiro/specs/*/bugfix.md",
+                        "<project>/.kiro/specs/*/design.md",
+                        "<project>/.kiro/specs/*/requirements.md",
+                        "<project>/.kiro/specs/*/tasks.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "kiro.steering_project",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/**/AGENTS.md",
+                        "<project>/.kiro/steering/*.md",
+                        "<project>/AGENTS.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "kiro.steering_user",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$KIRO_HOME/steering/*.md",
+                        "%USERPROFILE%\\.kiro\\steering\\*.md",
+                        "~/.kiro/steering/*.md",
+                        "~/.kiro/steering/AGENTS.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
             "agent": "lmstudio",
             "artifacts": [
                 {
@@ -5929,6 +7247,593 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.pi/agent/settings.json"
                     ],
                     "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                }
+            ]
+        },
+        {
+            "agent": "qwen_code",
+            "artifacts": [
+                {
+                    "category": "memory",
+                    "collect_priority": "normal",
+                    "id": "qwen_code.auto_memory",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\memories\\*",
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\memory\\*",
+                        "<project>/.qwen/memory/*",
+                        "~/.qwen/memories/*",
+                        "~/.qwen/memories/MEMORY.md",
+                        "~/.qwen/projects/<sanitized-project-path>/memory/MEMORY.md",
+                        "~/.qwen/projects/<sanitized-project-path>/memory/extract-cursor.json",
+                        "~/.qwen/projects/<sanitized-project-path>/memory/meta.json",
+                        "~/.qwen/projects/<sanitized-project-path>/memory/pinned/*"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "qwen_code.channels_scheduled_tasks",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\channels\\cron.json",
+                        "%USERPROFILE%\\.qwen\\channels\\service.pid",
+                        "%USERPROFILE%\\.qwen\\channels\\sessions.json",
+                        "~/.qwen/channels/cron.json",
+                        "~/.qwen/channels/daemon/<hash>/*",
+                        "~/.qwen/channels/service.pid",
+                        "~/.qwen/channels/sessions.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "qwen_code.conversation_transcript",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\chats\\<session-id>.jsonl",
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\chats\\archive\\<session-id>.jsonl",
+                        "~/.qwen/projects/<sanitized-project-path>/chats/<session-id>.jsonl",
+                        "~/.qwen/projects/<sanitized-project-path>/chats/archive/<session-id>.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "qwen_code.debug_logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\debug\\<session-id>.txt",
+                        "~/.qwen/debug/<session-id>.txt"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "first",
+                    "id": "qwen_code.env_files",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.env",
+                        "%USERPROFILE%\\.qwen\\.env",
+                        "<project>/.env",
+                        "<project>/.qwen/.env",
+                        "~/.env",
+                        "~/.qwen/.env"
+                    ],
+                    "root": "project",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "first",
+                    "id": "qwen_code.file_history_backups",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\file-history\\<session-id>\\<hash>@v<version>",
+                        "~/.qwen/file-history/<session-id>/<hash>@v<version>"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "qwen_code.ignore_files",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.agentignore",
+                        "<project>/.aiignore",
+                        "<project>/.qwenignore"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "durable",
+                    "id": "qwen_code.install_evidence",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\bin\\**",
+                        "%USERPROFILE%\\.qwen\\installation_id",
+                        "%USERPROFILE%\\.qwen\\source.json",
+                        "%USERPROFILE%\\.qwen\\updates\\npm\\<launcher-id>\\versions\\<version>\\**",
+                        "~/.qwen/bin/**",
+                        "~/.qwen/installation_id",
+                        "~/.qwen/source.json",
+                        "~/.qwen/updates/npm/<launcher-id>/versions/<version>/**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "first",
+                    "id": "qwen_code.mcp_approvals",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\mcpApprovals.json",
+                        "~/.qwen/mcpApprovals.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "first",
+                    "id": "qwen_code.mcp_oauth_tokens",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\mcp-oauth-tokens-v2.json",
+                        "%USERPROFILE%\\.qwen\\mcp-oauth-tokens.json",
+                        "~/.qwen/mcp-oauth-tokens-v2.json",
+                        "~/.qwen/mcp-oauth-tokens.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "qwen_code.openai_api_logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/logs/openai/openai-<timestamp>-<id>-<suffix>.json",
+                        "<project>/logs/openai/openai-<timestamp>-<id>.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "qwen_code.plan_files",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\plans\\<session-id>.md",
+                        "~/.qwen/plans/<session-id>.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "qwen_code.project_extension_points",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.qwen/agents/<name>.md",
+                        "<project>/.qwen/commands/**",
+                        "<project>/.qwen/extensions/**",
+                        "<project>/.qwen/extensions/qwen-extension.json",
+                        "<project>/.qwen/rules/**",
+                        "<project>/.qwen/skills/**/SKILL.md",
+                        "<project>/.qwen/workflows/<name>.js"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "first",
+                    "id": "qwen_code.project_instructions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/**/AGENTS.md",
+                        "<project>/**/QWEN.md",
+                        "<project>/.qwen/PROJECT_SUMMARY.md",
+                        "<project>/.qwen/QWEN.local.md",
+                        "<project>/.qwen/team-memory/*",
+                        "<project>/.qwen/team-memory/MEMORY.md",
+                        "<project>/AGENTS.md",
+                        "<project>/QWEN.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "first",
+                    "id": "qwen_code.project_mcp_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.mcp.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "qwen_code.project_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.qwen/sandbox-macos-<profile>.sb",
+                        "<project>/.qwen/sandbox.Dockerfile",
+                        "<project>/.qwen/settings.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "live_only",
+                    "id": "qwen_code.project_temp_spill",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\tmp\\<project-hash>\\background-shells\\<session-id>\\shell-bg_<hex>.output",
+                        "%USERPROFILE%\\.qwen\\tmp\\<project-hash>\\checkpoint-<tag>.json",
+                        "%USERPROFILE%\\.qwen\\tmp\\<project-hash>\\checkpoints\\*",
+                        "%USERPROFILE%\\.qwen\\tmp\\<project-hash>\\tool-results\\*",
+                        "~/.qwen/tmp/<project-hash>/<tool-name>_<hex>",
+                        "~/.qwen/tmp/<project-hash>/background-shells/<session-id>/shell-bg_<hex>.output",
+                        "~/.qwen/tmp/<project-hash>/checkpoint-<tag>.json",
+                        "~/.qwen/tmp/<project-hash>/checkpoints/*",
+                        "~/.qwen/tmp/<project-hash>/tool-results/*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "first",
+                    "id": "qwen_code.prompt_history_log",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\tmp\\<project-hash>\\logs.json",
+                        "~/.qwen/tmp/<project-hash>/logs.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "first",
+                    "id": "qwen_code.prompt_terminal_ledger",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\chats\\<session-id>.ledger.jsonl",
+                        "~/.qwen/projects/<sanitized-project-path>/chats/<session-id>.ledger.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "first",
+                    "id": "qwen_code.qwen_oauth_credentials",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\oauth_creds.json",
+                        "%USERPROFILE%\\.qwen\\oauth_creds.lock",
+                        "~/.qwen/oauth_creds.json",
+                        "~/.qwen/oauth_creds.lock"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "live_only",
+                    "id": "qwen_code.session_registry",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\sessions\\<pid>.json",
+                        "~/.qwen/sessions/<pid>.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "qwen_code.session_sidecars",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\chats\\<session-id>.pr.json",
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\chats\\<session-id>.runtime.json",
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\chats\\<session-id>.worktree.json",
+                        "~/.qwen/projects/<sanitized-project-path>/chats/<session-id>.pr.json",
+                        "~/.qwen/projects/<sanitized-project-path>/chats/<session-id>.runtime.json",
+                        "~/.qwen/projects/<sanitized-project-path>/chats/<session-id>.worktree.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "shell_history",
+                    "collect_priority": "first",
+                    "id": "qwen_code.shell_history",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\tmp\\<project-hash>\\shell_history",
+                        "~/.qwen/tmp/<project-hash>/shell_history"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "qwen_code.subagent_transcripts",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\subagents\\<session-id>\\*",
+                        "~/.qwen/projects/<sanitized-project-path>/subagents/<session-id>/*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "qwen_code.system_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "/Library/Application Support/QwenCode/settings.json",
+                        "/Library/Application Support/QwenCode/system-defaults.json",
+                        "/etc/qwen-code/settings.json",
+                        "/etc/qwen-code/system-defaults.json",
+                        "C:\\ProgramData\\qwen-code\\settings.json",
+                        "C:\\ProgramData\\qwen-code\\system-defaults.json"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "first",
+                    "id": "qwen_code.trusted_folders",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\trustedFolders.json",
+                        "~/.qwen/trustedFolders.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "qwen_code.usage_history",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\usage_record.jsonl",
+                        "~/.qwen/usage_record.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "qwen_code.user_extension_points",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.agents\\skills\\**",
+                        "%USERPROFILE%\\.qwen\\agents\\<name>.md",
+                        "%USERPROFILE%\\.qwen\\commands\\**",
+                        "%USERPROFILE%\\.qwen\\extensions\\**",
+                        "%USERPROFILE%\\.qwen\\rules\\**",
+                        "%USERPROFILE%\\.qwen\\skills\\**",
+                        "%USERPROFILE%\\.qwen\\workflows\\<name>.js",
+                        "~/.agents/skills/**",
+                        "~/.qwen/agents/<name>.md",
+                        "~/.qwen/commands/**",
+                        "~/.qwen/extensions/**",
+                        "~/.qwen/locales/**",
+                        "~/.qwen/rules/**",
+                        "~/.qwen/skills/**",
+                        "~/.qwen/workflows/<name>.js"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "first",
+                    "id": "qwen_code.user_instructions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\AGENTS.md",
+                        "%USERPROFILE%\\.qwen\\QWEN.md",
+                        "%USERPROFILE%\\.qwen\\memory.md",
+                        "~/.qwen/AGENTS.md",
+                        "~/.qwen/QWEN.md",
+                        "~/.qwen/memory.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "qwen_code.user_settings",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\settings.json",
+                        "~/.qwen/settings.json"
+                    ],
+                    "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "verified"
                 }
@@ -6792,7 +8697,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "6ded654026cf1394d574f018531e8353ca13975c327baa83d7328faeb4ea39cc"
+    "sha256": "d921d2e54a96538f3153a7e1e0f770e52042575900cb12acac3310fe9aacd73b"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)
@@ -6989,6 +8894,13 @@ _WIN_PLACEHOLDERS = {
     "%USERPROFILE%": "",
     "%APPDATA%": "AppData/Roaming",
     "%LOCALAPPDATA%": "AppData/Local",
+    # Per-user temporary directory. Three agents write their logs here and one writes its
+    # chat log here, and without this the patterns were refused as not absolute, so the
+    # logs of a crashed or failing agent run were never collected. Windows sets both names
+    # to the same place by default; a host that has moved them is the reason the live value
+    # is preferred over this default when the environment can be read.
+    "%TEMP%": "AppData/Local/Temp",
+    "%TMP%": "AppData/Local/Temp",
 }
 
 # Windows placeholders that are machine-wide rather than relative to a profile. Kept apart

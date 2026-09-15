@@ -1,0 +1,886 @@
+# Qwen Code artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: qwen_code
+title: Qwen Code
+vendor: Qwen Team, Alibaba Group
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://github.com/QwenLM/qwen-code
+- https://qwenlm.github.io/qwen-code-docs/
+- https://www.npmjs.com/package/@qwen-code/qwen-code
+description: |-
+  Qwen Code is an open-source command line coding agent (npm package @qwen-code/qwen-code) that began as a fork of Google's Gemini CLI and has since diverged very far from it, adding a daemon and browser Web Shell, an SDK, workflows, subagents, managed memory and scheduled channel runs. Everything user-level lives under ~/.qwen (relocatable with QWEN_HOME, and the runtime output subset again with QWEN_RUNTIME_DIR). The one thing an analyst must know is that the conversation transcripts are NOT where the upstream layout or even the fork's own stale code comment says: they are per-session append-only JSONL under ~/.qwen/projects/<cwd-with-non-alphanumerics-replaced-by-hyphens>/chats/, they have NO retention policy and are never deleted on a schedule, while the pre-edit file backups and subagent transcripts beside them DO expire after 30 days and the raw model API logs after 7.
+env_overrides:
+- name: QWEN_HOME
+  effect: |-
+    Replaces ~/.qwen as the global configuration directory (absolute, relative to cwd, or leading ~). Moves settings, credentials, trusted folders, MCP approvals, memory, skills, plans, file-history, the projects/ transcript tree and almost everything else in one go. Project-level .qwen directories are unaffected. An empty string counts as unset. Collect the process environment first: with this set, the default ~/.qwen holds nothing and a default-path collection returns 'agent never used'. The one exception is ~/.qwen/source.json, which the installer writes to the real home directory regardless.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/settings.md
+- name: QWEN_RUNTIME_DIR
+  effect: |-
+    Overrides only the runtime output base (conversations, logs, todos) while configuration stays under QWEN_HOME. Because transcripts, the tmp/<project-hash> tree, debug logs and the projects/ tree hang off the runtime base, this can split the evidence across two filesystems. It takes precedence over the runtimeOutputDir setting.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/settings.md
+- name: QWEN_CODE_SYSTEM_SETTINGS_PATH
+  effect: |-
+    Overrides the system settings file path. System settings have the highest precedence of all settings files, so the policy actually in force may be at an arbitrary path.
+  source: https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/
+- name: QWEN_CODE_SYSTEM_DEFAULTS_PATH
+  effect: |-
+    Overrides the system defaults file path (the lowest-precedence layer).
+  source: https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/
+- name: QWEN_CODE_MCP_APPROVALS_PATH
+  effect: |-
+    Relocates mcpApprovals.json wholesale. Set, and ~/.qwen/mcpApprovals.json is empty or absent while MCP approval decisions exist elsewhere.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/cli/src/config/mcpApprovals.ts#L49
+- name: QWEN_CODE_MEMORY_BASE_DIR
+  effect: |-
+    Moves the managed auto-memory base (both the projects/<...>/memory tiers and ~/.qwen/memories) away from the runtime base directory.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/memory/paths.ts#L68
+- name: QWEN_CODE_MEMORY_LOCAL
+  effect: |-
+    =1 moves project auto-memory into <project>/.qwen/memory instead of under the user profile, which puts model-written memory inside the working copy where it may be committed.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/memory/paths.ts#L113
+- name: QWEN_CODE_MEMORY_PROJECT_SCOPE
+  effect: |-
+    =workspace keys project auto-memory on the resolved workspace directory instead of the nearest git root, so the memory directory name for one project differs between the two modes.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/memory/paths.ts#L93
+- name: QWEN_CODE_FORCE_ENCRYPTED_FILE_STORAGE
+  effect: |-
+    =true switches MCP OAuth tokens from plaintext ~/.qwen/mcp-oauth-tokens.json to the OS keychain where available, or to ~/.qwen/mcp-oauth-tokens-v2.json with AES-256-GCM. Absence of the plaintext file then means nothing.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/features/mcp.md
+- name: QWEN_DEBUG_LOG_FILE
+  effect: |-
+    =1 turns on the per-session debug log at ~/.qwen/debug/<session-id>.txt. Unset (the normal state) makes almost every internal debug call a no-op, so an empty debug directory is expected rather than suspicious.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/conversations-recovery.md
+- name: QWEN_TELEMETRY_OUTFILE
+  effect: |-
+    Writes OpenTelemetry data to the named file instead of exporting it over OTLP, creating an on-disk telemetry artifact at an operator-chosen path. Pairs with QWEN_TELEMETRY_LOG_PROMPTS and QWEN_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES, which decide whether prompt text lands in it.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/settings.md
+- name: QWEN_CODE_PROFILE_STARTUP
+  effect: |-
+    =1 writes JSON startup timing reports to ~/.qwen/startup-perf/. Minor, but it is an extra directory under the global dir that confirms the tool ran.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/settings.md
+- name: SEATBELT_PROFILE
+  effect: |-
+    Do not move artifacts but decide whether confinement ran at all and with which profile or image, including a custom profile read from <project>/.qwen/sandbox-macos-<name>.sb. Needed to answer whether a safety control was in place, and the project rejects all four from project-scoped .env files for exactly that reason.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/settings.md
+- name: QWEN_SANDBOX
+  effect: |-
+    Do not move artifacts but decide whether confinement ran at all and with which profile or image, including a custom profile read from <project>/.qwen/sandbox-macos-<name>.sb. Needed to answer whether a safety control was in place, and the project rejects all four from project-scoped .env files for exactly that reason.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/settings.md
+- name: QWEN_SANDBOX_IMAGE
+  effect: |-
+    Do not move artifacts but decide whether confinement ran at all and with which profile or image, including a custom profile read from <project>/.qwen/sandbox-macos-<name>.sb. Needed to answer whether a safety control was in place, and the project rejects all four from project-scoped .env files for exactly that reason.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/settings.md
+- name: QWEN_SANDBOX_NET
+  effect: |-
+    Do not move artifacts but decide whether confinement ran at all and with which profile or image, including a custom profile read from <project>/.qwen/sandbox-macos-<name>.sb. Needed to answer whether a safety control was in place, and the project rejects all four from project-scoped .env files for exactly that reason.
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/settings.md
+artifacts:
+- id: qwen_code.conversation_transcript
+  title: Conversation transcript (per session JSONL)
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\chats\<session-id>.jsonl'
+  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\chats\archive\<session-id>.jsonl'
+  - ~/.qwen/projects/<sanitized-project-path>/chats/<session-id>.jsonl
+  - ~/.qwen/projects/<sanitized-project-path>/chats/archive/<session-id>.jsonl
+  format: jsonl
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/services/chatRecordingService.ts#L1126
+  source_kind: source_code
+  record_types:
+  - assistant
+  - system
+  - system/agent_bootstrap
+  - system/agent_launch_prompt
+  - system/agent_retry
+  - system/agent_session_ready
+  - system/at_command
+  - system/attribution_snapshot
+  - system/background_task_completed
+  - system/branch_checkpoint
+  - system/chat_compression
+  - system/cron
+  - system/custom_title
+  - system/file_history_snapshot
+  - system/goal_runtime
+  - system/goal_state
+  - system/mid_turn_user_message
+  - system/notification
+  - system/parent_session
+  - system/realtime_message
+  - system/rewind
+  - system/session_artifact_event
+  - system/session_artifact_snapshot
+  - system/session_model
+  - system/session_source
+  - system/session_sources_snapshot
+  - system/slash_command
+  - system/turn_result
+  - system/ui_telemetry
+  - system/user_text_elements
+  - tool_result
+  - user
+  volatility: |-
+    Nothing in the fork deletes these on a schedule. They are removed only by explicit user or API action (session delete, which also unlinks the sidecars and the matching ~/.qwen/file-history/<session-id>/ directory) or moved into chats/archive/ by session archive. Records are append-only: a rewind is written as a system/rewind record and the rewound turns are re-rooted onto a dead branch rather than erased, so the abandoned branch is still on disk. If general.chatRecording is set to false no transcript is written at all (getTranscriptPath() returns an empty string).
+  notes: |-
+    Primary evidence. Append-only JSONL, one record per line, tree structured: every record carries uuid, parentUuid, sessionId, ISO 8601 timestamp, type, optional subtype, cwd, CLI version and gitBranch. Linear history is reconstructed by walking parentUuid from the tail, so a parser that just reads lines in order will show abandoned branches as if they were real turns, and a parser that only follows the live chain will hide them. Traps: (1) the service's own docstring says 'File location: ~/.qwen/tmp/<project_id>/chats/', which is stale upstream text and NOT where the code writes; the code joins Storage.getProjectDir(), which is <runtime-base>/projects/<sanitizeCwd(projectRoot)>. Collecting only ~/.qwen/tmp/ (the upstream Gemini CLI layout) finds no transcripts. (2) <sanitized-project-path> is not a hash: sanitizeCwd() replaces every character that is not [A-Za-z0-9] with '-' (and lowercases on Windows), so '/home/alice/work/app' becomes '-home-alice-work-app' and the original project path is readable straight off the directory name. (3) the SAME project reached through a different path spelling (symlink, /var vs /private/var, a git worktree under <repo>/.qwen/worktrees/<slug>) produces a DIFFERENT projects/ leaf, so sessions for one logical project can be split across several directories. (4) system/file_history_snapshot records are the index that maps a prompt to the pre-edit file copies under ~/.qwen/file-history/, which do expire.
+  parser: null
+- id: qwen_code.session_sidecars
+  title: Per-session sidecar files (runtime status, worktree, pull request)
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\chats\<session-id>.pr.json'
+  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\chats\<session-id>.runtime.json'
+  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\chats\<session-id>.worktree.json'
+  - ~/.qwen/projects/<sanitized-project-path>/chats/<session-id>.pr.json
+  - ~/.qwen/projects/<sanitized-project-path>/chats/<session-id>.runtime.json
+  - ~/.qwen/projects/<sanitized-project-path>/chats/<session-id>.worktree.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/services/sessionService.ts#L921
+  source_kind: source_code
+  record_types:
+  - pr_session
+  - runtime_status
+  - worktree_session
+  volatility: |-
+    The runtime-status sidecar tracks a live process and is deliberately transient; the worktree sidecar is cleared when the worktree is removed. All three are unlinked when the session is deleted. No age-based expiry.
+  notes: |-
+    Deliberately co-located with the transcripts so external observers can scan one directory for live sessions. The runtime sidecar carries sessionId and workDir, which is how the tool re-attributes a session whose recorded cwd hashes to a different project (for example a git worktree). For an analyst these are the cheap way to tell which sessions were live at collection time and which working copy each one was driving.
+  parser: null
+- id: qwen_code.prompt_terminal_ledger
+  title: Per-session prompt terminal ledger
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\chats\<session-id>.ledger.jsonl'
+  - ~/.qwen/projects/<sanitized-project-path>/chats/<session-id>.ledger.jsonl
+  format: jsonl
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/services/sessionService.ts#L999
+  source_kind: source_code
+  volatility: |-
+    Append-only sidecar next to the transcript; removed with the session. No age-based expiry.
+  notes: |-
+    The code calls it the 'per-session prompt terminal ledger' and an append-only sidecar whose absence must be read as 'no ledger evidence' rather than 'nothing happened'. Useful as a cross-check on the transcript: if the transcript was edited or truncated the ledger may still carry the prompt terminations.
+  parser: null
+- id: qwen_code.prompt_history_log
+  title: Prompt history log (logs.json)
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\tmp\<project-hash>\logs.json'
+  - ~/.qwen/tmp/<project-hash>/logs.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/core/logger.ts#L178
+  source_kind: source_code
+  record_types:
+  - model_switch
+  - user
+  volatility: |-
+    Rewritten atomically as a whole-file JSON array, so a failed write can lose the tail. Not swept by housekeeping.
+  notes: |-
+    Flat JSON array of {sessionId, messageId, timestamp, type, message}. type is 'user' (the raw prompt the user typed) or 'model_switch' (with fromModel, toModel and a reason of vision_auto_switch, manual, fallback or other). This survives independently of the transcript, so it is the fallback source for 'what did the user ask' when a transcript is missing, and the place where an automatic model switch is visible. <project-hash> here is sha256(projectRoot) in full hex (lowercased path on Windows) - a DIFFERENT keying scheme from the projects/ directory used for transcripts, so the same project appears under two different directory names in ~/.qwen.
+  parser: null
+- id: qwen_code.shell_history
+  title: Shell command history
+  category: shell_history
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\tmp\<project-hash>\shell_history'
+  - ~/.qwen/tmp/<project-hash>/shell_history
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/settings.md
+  source_kind: official
+  volatility: |-
+    Grows in place; not swept by housekeeping.
+  notes: |-
+    The project documentation states the location verbatim ('Location: ~/.qwen/tmp/<project_hash>/shell_history') and the source constructs the same path from getProjectTempDir(). Plain text, one command per line. Because it is keyed on the project hash rather than a session id it mixes every session in that project, so correlate with the transcripts for attribution.
+  parser: null
+- id: qwen_code.project_temp_spill
+  title: 'Project temp directory: truncated tool output, captured background shell output, checkpoints'
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\tmp\<project-hash>\background-shells\<session-id>\shell-bg_<hex>.output'
+  - '%USERPROFILE%\.qwen\tmp\<project-hash>\checkpoint-<tag>.json'
+  - '%USERPROFILE%\.qwen\tmp\<project-hash>\checkpoints\*'
+  - '%USERPROFILE%\.qwen\tmp\<project-hash>\tool-results\*'
+  - ~/.qwen/tmp/<project-hash>/<tool-name>_<hex>
+  - ~/.qwen/tmp/<project-hash>/background-shells/<session-id>/shell-bg_<hex>.output
+  - ~/.qwen/tmp/<project-hash>/checkpoint-<tag>.json
+  - ~/.qwen/tmp/<project-hash>/checkpoints/*
+  - ~/.qwen/tmp/<project-hash>/tool-results/*
+  format: directory
+  sensitivity: normal
+  collect_priority: live_only
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/config/storage.ts
+  source_kind: source_code
+  volatility: |-
+    The checkpoints/ subdirectory is deleted recursively at EVERY CLI startup (cleanupCheckpoints() is awaited during startup in packages/cli/src/llm.tsx), so it only ever holds the current run. The truncated tool-output and background-shell files are not swept and persist.
+  notes: |-
+    High value and easy to miss. When a tool result is too large the full content is written here and only a preview goes into the transcript, so the transcript alone understates what the agent read; the same directory holds web_fetch payloads (the content actually pulled from the network) and the captured stdout/stderr of background shells. Collect live: anything under checkpoints/ is gone the next time the CLI starts. checkpoint-<tag>.json files are user-saved conversation checkpoints where <tag> is percent-encoded.
+  parser: null
+- id: qwen_code.user_settings
+  title: User settings (permissions, approval mode, MCP servers, inline API keys)
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\settings.json'
+  - ~/.qwen/settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/
+  source_kind: official
+  contains_credentials:
+  - env
+  - mcpServers.*.env
+  - mcpServers.*.headers
+  - mcpServers.*.oauth.clientSecret
+  - modelProviders.*.customHeaders
+  volatility: |-
+    Rewritten in place whenever a setting or a persisted permission changes. Legacy files are renamed to a backup on configuration migration, so a *.json backup beside it can preserve an older state.
+  notes: |-
+    The single most informative configuration artifact. Carries tools.approvalMode (whose DEFAULT in this fork is 'auto', an LLM classifier that auto-approves actions it judges safe, with 'yolo' auto-approving everything), permissions.allow / permissions.ask / permissions.deny, mcpServers, hooks, telemetry, general.chatRecording and general.cleanupPeriodDays. Choosing 'always allow' on a tool confirmation writes a rule into permissions.allow at user or workspace scope, so this file is the durable record of granted permissions. JSON with comments is accepted (values are read through strip-json-comments), so a strict JSON parser can fail on a valid file. String values may be $VAR / ${VAR} references resolved at load time, so a key can look absent here and still be set. The env object holds API keys in plaintext by the project's own documented recommendation.
+  parser: null
+- id: qwen_code.project_settings
+  title: Project settings and the project .qwen directory
+  category: config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.qwen/sandbox-macos-<profile>.sb
+  - <project>/.qwen/sandbox.Dockerfile
+  - <project>/.qwen/settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/
+  source_kind: official
+  contains_credentials:
+  - env
+  - mcpServers.*.env
+  - mcpServers.*.headers
+  volatility: |-
+    Lives in the working copy, so git history may hold prior versions. Rewritten when a workspace-scoped permission is persisted.
+  notes: |-
+    Overrides user settings, and is the surface an attacker-supplied repository would use: it can declare mcpServers, hooks and permissions.allow. Not loaded at all when the folder is untrusted, which is why trustedFolders.json has to be read alongside it - a rule here that looks active may never have been applied. A few keys are read from operator scopes only and are ignored here (review policy, ui.brand.name), so presence in this file is not proof of effect. The custom sandbox profile and Dockerfile are the record of how confinement was configured for this project.
+  parser: null
+- id: qwen_code.system_settings
+  title: System settings and system defaults
+  category: config
+  root: system
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - /Library/Application Support/QwenCode/settings.json
+  - /Library/Application Support/QwenCode/system-defaults.json
+  - /etc/qwen-code/settings.json
+  - /etc/qwen-code/system-defaults.json
+  - 'C:\ProgramData\qwen-code\settings.json'
+  - 'C:\ProgramData\qwen-code\system-defaults.json'
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/
+  source_kind: official
+  volatility: |-
+    Administrator managed; changes only when an operator edits it.
+  notes: |-
+    System settings have the HIGHEST precedence of the files and system defaults the lowest, so both ends of the precedence chain live here. Either path can be moved by QWEN_CODE_SYSTEM_SETTINGS_PATH or QWEN_CODE_SYSTEM_DEFAULTS_PATH, so check the process environment before concluding the default path is authoritative. Note the macOS directory is spelled 'QwenCode' while the Linux and Windows ones are 'qwen-code'.
+  parser: null
+- id: qwen_code.trusted_folders
+  title: Trusted folders decisions
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\trustedFolders.json'
+  - ~/.qwen/trustedFolders.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/trusted-folders.md
+  source_kind: official
+  volatility: |-
+    Appended to the first time the user answers the trust prompt for a folder; entries are not expired.
+  notes: |-
+    The durable record of which directories the user let the tool treat as trusted. Forensically decisive: in an untrusted folder the workspace .qwen/settings.json is not loaded at all, so a project-declared MCP server or hook only ever ran if the folder appears here as trusted. The project documentation describes the file as the central store and tells users to inspect it directly. When an IDE is connected the IDE's own trust decision is consulted first, so a folder can be effectively trusted without an entry here.
+  parser: null
+- id: qwen_code.mcp_approvals
+  title: MCP server approval decisions
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\mcpApprovals.json'
+  - ~/.qwen/mcpApprovals.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/cli/src/config/mcpApprovals.ts#L49
+  source_kind: source_code
+  record_types:
+  - approved
+  - rejected
+  volatility: |-
+    Written when the user approves or rejects a project-scoped MCP server; entries are not expired. Relocatable by QWEN_CODE_MCP_APPROVALS_PATH, in which case the default path holds nothing.
+  notes: |-
+    Shape is { '<absolute project root>': { '<server name>': { hash, status } } } where status is 'approved' or 'rejected' and hash is a canonical hash of the exact server configuration the user reviewed. This is the artifact that proves a project-declared MCP server was consciously accepted, and it names the project roots the user worked in. The hash binding means an approval silently lapses to pending if .mcp.json is later edited, so a stored 'approved' whose hash does not match the .mcp.json on disk is evidence the configuration CHANGED after approval.
+  parser: null
+- id: qwen_code.project_mcp_config
+  title: Project MCP server configuration (.mcp.json)
+  category: mcp_config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.mcp.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/cli/src/config/mcpJson.ts#L43
+  source_kind: source_code
+  contains_credentials:
+  - mcpServers.*.env
+  - mcpServers.*.headers
+  volatility: |-
+    Part of the working copy; git history may hold earlier versions.
+  notes: |-
+    Read from the workspace root only, never from ancestors, and each server is tagged scope:'project' and left UNTRUSTED until the user approves it (pair with mcpApprovals.json before claiming a server ran). Comments are stripped before parsing, so expect JSONC. Credentials can sit inline in a server's headers or env. MCP servers are ALSO configurable in settings.json at user, project and system scope, so .mcp.json alone is not the full MCP picture.
+  parser: null
+- id: qwen_code.mcp_oauth_tokens
+  title: MCP OAuth token store
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\mcp-oauth-tokens-v2.json'
+  - '%USERPROFILE%\.qwen\mcp-oauth-tokens.json'
+  - ~/.qwen/mcp-oauth-tokens-v2.json
+  - ~/.qwen/mcp-oauth-tokens.json
+  format: json
+  sensitivity: secret
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/features/mcp.md
+  source_kind: official
+  volatility: |-
+    Rewritten on every token refresh, so the file mtime tracks the last successful MCP authentication rather than the first.
+  notes: |-
+    The project documentation states the default is PLAINTEXT at mode 0600, and that setting QWEN_CODE_FORCE_ENCRYPTED_FILE_STORAGE=true switches to OS keychain where available or to mcp-oauth-tokens-v2.json with AES-256-GCM. So the absence of the plaintext file is not the absence of MCP credentials: check the v2 file and the keychain. Tells you which remote MCP services the user actually authenticated to, which is direct evidence of an egress path.
+  parser: null
+- id: qwen_code.qwen_oauth_credentials
+  title: Qwen OAuth credential cache
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\oauth_creds.json'
+  - '%USERPROFILE%\.qwen\oauth_creds.lock'
+  - ~/.qwen/oauth_creds.json
+  - ~/.qwen/oauth_creds.lock
+  format: json
+  sensitivity: secret
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/qwen/qwenOAuth2.ts#L1255
+  source_kind: source_code
+  volatility: |-
+    Rewritten on refresh (a lock file beside it coordinates concurrent processes) and unlinked by the sign-out path, which also clears the in-process cache. mtime therefore reflects the last refresh, not the login.
+  notes: |-
+    Fields are access_token, refresh_token, id_token, expiry_date, token_type and resource_url; resource_url records which API endpoint the account was bound to. Note the project documentation states the Qwen OAuth free tier was discontinued on 2026-04-15, so on a recently provisioned endpoint expect API-key authentication instead and treat this file as historical. The same directory has a vestigial google_accounts.json path helper inherited from the upstream (Storage.getGoogleAccountsPath()) with no writer anywhere in the fork: collect the file if present, but its absence means nothing.
+  parser: null
+- id: qwen_code.env_files
+  title: Environment files holding API keys
+  category: credentials
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.env'
+  - '%USERPROFILE%\.qwen\.env'
+  - <project>/.env
+  - <project>/.qwen/.env
+  - ~/.env
+  - ~/.qwen/.env
+  format: text
+  sensitivity: secret
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/auth.md
+  source_kind: official
+  volatility: |-
+    User maintained.
+  notes: |-
+    Documented search order, walking UPWARD from the current directory: .qwen/.env then .env at each level, then ~/.qwen/.env then ~/.env. Only the FIRST file found is loaded and values are not merged, so the file that actually supplied the key depends on the cwd the session started in - record that cwd (it is in every transcript record) before deciding which .env was in effect. Also the surface an attacker-supplied repository would use, which is why the project rejects loader-affecting variables (NODE_OPTIONS, LD_PRELOAD, GIT_SSH_COMMAND and a long documented denylist) from project-scoped .env files: a rejected key present in a project .env is itself a finding.
+  parser: null
+- id: qwen_code.user_instructions
+  title: User level agent instructions and memory
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\AGENTS.md'
+  - '%USERPROFILE%\.qwen\QWEN.md'
+  - '%USERPROFILE%\.qwen\memory.md'
+  - ~/.qwen/AGENTS.md
+  - ~/.qwen/QWEN.md
+  - ~/.qwen/memory.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/settings.md
+  source_kind: official
+  volatility: |-
+    Appended to by /memory add under the '## Qwen Added Memories' heading. Not expired.
+  notes: |-
+    The default context filename list in this fork is BOTH QWEN.md and AGENTS.md (QWEN.md first, for backward compatibility), and context.fileName in settings can replace the list entirely - so read that setting before deciding the file is absent. The documentation states the global slot is '~/.qwen/<configured-context-filename>'. This is where injected or user-planted standing instructions would persist across every project, so it is the first place to look for a durable prompt-injection foothold. memory.md has a path helper (Storage.getGlobalMemoryFilePath()) but no caller in the fork; collect it if present, draw nothing from its absence.
+  parser: null
+- id: qwen_code.project_instructions
+  title: Project level agent instructions, project summary and team memory
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/**/AGENTS.md
+  - <project>/**/QWEN.md
+  - <project>/.qwen/PROJECT_SUMMARY.md
+  - <project>/.qwen/QWEN.local.md
+  - <project>/.qwen/team-memory/*
+  - <project>/.qwen/team-memory/MEMORY.md
+  - <project>/AGENTS.md
+  - <project>/QWEN.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/utils/memory-constants.ts
+  source_kind: source_code
+  unsourced_paths:
+  - <project>/.qwen/PROJECT_SUMMARY.md
+  volatility: |-
+    Tracked in git in the normal case, so prior versions are recoverable from the repository. team-memory is git-tracked by design and, with memory.enableTeamMemorySync on, is automatically committed, pulled and pushed at session start.
+  notes: |-
+    Context files are discovered by walking UP from the cwd to the git root or the home directory, and downward through the workspace, so a QWEN.md far from the project root can still be in the prompt; the /memory dialog shows the actual concatenation. QWEN.local.md is loaded from one fixed slot, <projectRoot>/.qwen/, after all other project context, and is intended to be gitignored, which makes it the most likely place for instructions that are NOT in the repository history. Instruction files support @path/to/file.md imports, so the effective prompt can pull in content from files that are not themselves context files - follow the imports. PROJECT_SUMMARY.md is stated by the settings documentation (ui.enableWelcomeBack) and written by /summary; its path is cited from the summary command source rather than the constants module linked here.
+  parser: null
+- id: qwen_code.ignore_files
+  title: Ignore files controlling what the agent may read
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.agentignore
+  - <project>/.aiignore
+  - <project>/.qwenignore
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/qwen-ignore.md
+  source_kind: official
+  volatility: |-
+    Part of the working copy.
+  notes: |-
+    gitignore syntax. .agentignore and .aiignore are the documented DEFAULT compatibility names and context.fileFiltering.customIgnoreFiles can add or replace them, so read that setting rather than assuming the three names are exhaustive. Relevant twice over: it bounds what the agent could have read, and a late edit that un-ignores a sensitive directory is a meaningful event.
+  parser: null
+- id: qwen_code.auto_memory
+  title: Managed auto-memory (project and user tiers)
+  category: memory
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\memories\*'
+  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\memory\*'
+  - <project>/.qwen/memory/*
+  - ~/.qwen/memories/*
+  - ~/.qwen/memories/MEMORY.md
+  - ~/.qwen/projects/<sanitized-project-path>/memory/MEMORY.md
+  - ~/.qwen/projects/<sanitized-project-path>/memory/extract-cursor.json
+  - ~/.qwen/projects/<sanitized-project-path>/memory/meta.json
+  - ~/.qwen/projects/<sanitized-project-path>/memory/pinned/*
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/memory/paths.ts#L125
+  source_kind: source_code
+  volatility: |-
+    Written by the extraction and consolidation agents during and after sessions; consolidation rewrites the index, so earlier wording is lost. Not swept by housekeeping.
+  notes: |-
+    Model-written durable memory, which makes it both intelligence about the user and a prompt-injection persistence surface: content extracted from a session (potentially from injected text) is replayed into later system prompts. The project tier is keyed on the nearest GIT ROOT by default, not the cwd, so it will not line up with the transcripts' projects/ leaf for a session started in a subdirectory; QWEN_CODE_MEMORY_PROJECT_SCOPE=workspace switches it to the workspace dir and QWEN_CODE_MEMORY_LOCAL=1 moves the whole project tier into <project>/.qwen/memory. The user tier at ~/.qwen/memories is cross-project.
+  parser: null
+- id: qwen_code.file_history_backups
+  title: Pre-edit file backups for /rewind
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\file-history\<session-id>\<hash>@v<version>'
+  - ~/.qwen/file-history/<session-id>/<hash>@v<version>
+  format: binary
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/services/fileHistoryService.ts#L210
+  source_kind: source_code
+  volatility: |-
+    THIS is what expires. A background housekeeping pass, running at most once per day, deletes every <session-id> directory whose mtime is older than general.cleanupPeriodDays (default 30 days), excluding the currently active session. Also unlinked outright when its session is deleted.
+  notes: |-
+    Verbatim copies of each file as it was BEFORE the agent edited it, so this is the only place the pre-modification content of a file the agent overwrote can be recovered. The filename is the first 16 hex characters of sha256(absolute file path) followed by '@v<version>', which means the backups themselves do NOT name the file they came from: the mapping lives in the system/file_history_snapshot records inside the session transcript, which are not expired. An analyst who collects the transcripts but not this directory keeps the index and loses the content; one who collects this directory without the transcripts keeps content that cannot be attributed to a path. Collect both. On a 30-day-old case expect these to be gone while the transcripts remain.
+  parser: null
+- id: qwen_code.subagent_transcripts
+  title: Background subagent transcripts
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\subagents\<session-id>\*'
+  - ~/.qwen/projects/<sanitized-project-path>/subagents/<session-id>/*
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/cli/src/utils/housekeeping/cleanup.ts#L128
+  source_kind: source_code
+  volatility: |-
+    Swept by the same housekeeping pass and the same general.cleanupPeriodDays cutoff (default 30 days) as the file-history backups, excluding the active session. Unlike file-history the ROOT directory is deliberately left in place for file watchers, so an empty subagents/ directory is the normal post-sweep state.
+  notes: |-
+    Work delegated to background subagents is recorded here rather than in the main transcript, so a main transcript that shows a delegation and no detail is expected, not evidence of tampering. Same per-session-directory layout as file-history. These DO expire at 30 days while the main transcripts do not, which makes an old case look as though the agent did far less autonomous work than it did.
+  parser: null
+- id: qwen_code.openai_api_logs
+  title: Raw model API request and response logs
+  category: log
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/logs/openai/openai-<timestamp>-<id>-<suffix>.json
+  - <project>/logs/openai/openai-<timestamp>-<id>.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/utils/openaiLogger.ts#L25
+  source_kind: source_code
+  volatility: |-
+    Swept by housekeeping against model.openAILogRetentionDays, default 7 DAYS - a much shorter window than anything else, chosen because one file is written per API call. The sweep runs even when logging is currently off, so residue from an earlier debugging session is also removed.
+  notes: |-
+    Off by default (model.enableOpenAILogging false), but when it was on this is the richest artifact in the whole product: the complete request and response of every model call, including the full system prompt, every tool definition and the raw model output. Default location is 'logs/openai' UNDER THE CURRENT WORKING DIRECTORY, so it lands inside the user's project checkout (and may be committed); model.openAILoggingDir or --openai-logging-dir moves it anywhere, including outside the project. Each file records the session id, which is how you tie it back to a transcript. Seven-day retention means it is usually the first thing to disappear.
+  parser: null
+- id: qwen_code.debug_logs
+  title: Per-session debug log
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\debug\<session-id>.txt'
+  - ~/.qwen/debug/<session-id>.txt
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/config/storage.ts
+  source_kind: source_code
+  volatility: |-
+    Written only when debug logging is enabled (QWEN_DEBUG_LOG_FILE=1 or debug mode); not swept by housekeeping, so files persist once created.
+  notes: |-
+    Normally absent - almost every debugLogger call is a no-op unless QWEN_DEBUG_LOG_FILE is set, so absence is the expected state and carries no meaning. When present it holds internal diagnostics including resolved storage and session-writer lock paths, which is the reliable way to learn where a daemon-hosted session actually wrote (the project's own recovery documentation tells operators not to guess that path from the default home directory).
+  parser: null
+- id: qwen_code.usage_history
+  title: Per-session usage ledger
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\usage_record.jsonl'
+  - ~/.qwen/usage_record.jsonl
+  format: jsonl
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/services/usageHistoryService.ts#L139
+  source_kind: source_code
+  volatility: |-
+    Appended at session end. Can be REBUILT from the transcripts under ~/.qwen/projects/*/chats, so a record here may postdate the session it describes. Not swept by housekeeping.
+  notes: |-
+    One line per completed session with sessionId, startTime, endTime, the project path and token metrics. The cheapest way to enumerate which projects were worked on and when, and the only place a session leaves a trace after its transcript has been deleted - a sessionId here with no matching chats/<id>.jsonl is positive evidence that a transcript was removed, since nothing expires transcripts automatically.
+  parser: null
+- id: qwen_code.plan_files
+  title: Approved plan-mode plans
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\plans\<session-id>.md'
+  - ~/.qwen/plans/<session-id>.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/config/storage.ts
+  source_kind: source_code
+  volatility: |-
+    Not expired. Relocated into the project when the plansDirectory setting is used, in which case the path must stay inside the project root.
+  notes: |-
+    The plan the user approved before the agent acted, keyed by session id, which makes it directly comparable with what the transcript shows the agent then did. The settings documentation states the default is ~/.qwen/plans and that a configured plansDirectory resolves relative to the project root, so check settings.json before treating an empty ~/.qwen/plans as 'plan mode was never used'.
+  parser: null
+- id: qwen_code.user_extension_points
+  title: User level executable extension points (skills, commands, subagents, rules, workflows, extensions)
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.agents\skills\**'
+  - '%USERPROFILE%\.qwen\agents\<name>.md'
+  - '%USERPROFILE%\.qwen\commands\**'
+  - '%USERPROFILE%\.qwen\extensions\**'
+  - '%USERPROFILE%\.qwen\rules\**'
+  - '%USERPROFILE%\.qwen\skills\**'
+  - '%USERPROFILE%\.qwen\workflows\<name>.js'
+  - ~/.agents/skills/**
+  - ~/.qwen/agents/<name>.md
+  - ~/.qwen/commands/**
+  - ~/.qwen/extensions/**
+  - ~/.qwen/locales/**
+  - ~/.qwen/rules/**
+  - ~/.qwen/skills/**
+  - ~/.qwen/workflows/<name>.js
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/config/storage.ts
+  source_kind: source_code
+  volatility: |-
+    User or extension-installer maintained; not expired.
+  notes: |-
+    Persistence and capability surface. Skills and subagent definitions are markdown that becomes part of the model's instructions; workflows are JavaScript the product executes; extensions can declare their own MCP servers and context files. Anything planted here affects EVERY project the user opens. Note the second skills root: SKILL_PROVIDER_CONFIG_DIRS is ['.qwen', '.agents'], so ~/.agents/skills is also loaded and is easily missed. Only the .qwen entries move with QWEN_HOME; ~/.agents/skills is resolved from the real home directory.
+  parser: null
+- id: qwen_code.project_extension_points
+  title: Project level executable extension points
+  category: config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.qwen/agents/<name>.md
+  - <project>/.qwen/commands/**
+  - <project>/.qwen/extensions/**
+  - <project>/.qwen/extensions/qwen-extension.json
+  - <project>/.qwen/rules/**
+  - <project>/.qwen/skills/**/SKILL.md
+  - <project>/.qwen/workflows/<name>.js
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/config/storage.ts
+  source_kind: source_code
+  volatility: |-
+    Part of the working copy; git history may hold earlier versions.
+  notes: |-
+    Repository-supplied instructions and code that the agent will load, and therefore the classic injection route for a hostile or compromised repository. Gated by folder trust: in an untrusted folder the workspace configuration is not loaded, so pair with trustedFolders.json before concluding any of it ran. Project scope wins over user scope when the same workflow or command name exists in both.
+  parser: null
+- id: qwen_code.channels_scheduled_tasks
+  title: Channel service state and scheduled tasks
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\channels\cron.json'
+  - '%USERPROFILE%\.qwen\channels\service.pid'
+  - '%USERPROFILE%\.qwen\channels\sessions.json'
+  - ~/.qwen/channels/cron.json
+  - ~/.qwen/channels/daemon/<hash>/*
+  - ~/.qwen/channels/service.pid
+  - ~/.qwen/channels/sessions.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/cli/src/commands/channel/runtime.ts#L43
+  source_kind: source_code
+  volatility: |-
+    Maintained by the channel service while it runs; the pid file is only meaningful live.
+  notes: |-
+    Evidence of UNATTENDED operation: cron.json is the schedule on which the agent runs itself with no human at the keyboard, and sessions.json maps channel conversations to sessions. Transcripts produced by these runs carry system/cron and system/notification subtypes, which is how you separate autonomous activity from interactive activity. Collect before the host is powered down so the pid file still resolves.
+  parser: null
+- id: qwen_code.session_registry
+  title: Live session registry
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\sessions\<pid>.json'
+  - ~/.qwen/sessions/<pid>.json
+  format: json
+  sensitivity: normal
+  collect_priority: live_only
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/services/session-registry.ts#L321
+  source_kind: source_code
+  volatility: |-
+    Registered at session start, patched during the session and removed at clean exit; a record left behind by a crash or a reboot is stale by design.
+  notes: |-
+    Records are keyed by PID and carry identity fields (pidNs and a boot-derived prefix) precisely because PIDs collide across namespaces, machines and reboots. Treat a record as a claim about a process, not proof one is running. Collect live: this is how you enumerate the agent processes that were active at the moment of collection and tie each to its session id.
+  parser: null
+- id: qwen_code.install_evidence
+  title: Installation identity, install source and downloaded versions
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.qwen\bin\**'
+  - '%USERPROFILE%\.qwen\installation_id'
+  - '%USERPROFILE%\.qwen\source.json'
+  - '%USERPROFILE%\.qwen\updates\npm\<launcher-id>\versions\<version>\**'
+  - ~/.qwen/bin/**
+  - ~/.qwen/installation_id
+  - ~/.qwen/source.json
+  - ~/.qwen/updates/npm/<launcher-id>/versions/<version>/**
+  format: text
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/config/storage.ts
+  source_kind: source_code
+  unsourced_paths:
+  - '%USERPROFILE%\.qwen\source.json'
+  - '%USERPROFILE%\.qwen\updates\npm\<launcher-id>\versions\<version>\**'
+  - ~/.qwen/source.json
+  - ~/.qwen/updates/npm/<launcher-id>/versions/<version>/**
+  volatility: |-
+    installation_id is written once and then stable, which makes it a durable pseudonymous identifier for the install. Older version directories under updates/npm are pruned by the updater.
+  notes: |-
+    installation_id and bin are constructed in storage.ts (the cited source). source.json is read by the telemetry client from BOTH the QWEN_HOME-relative path and the literal ~/.qwen/source.json, because the installer writes to the real home directory regardless of QWEN_HOME - so with QWEN_HOME set this file is the one artifact that stays behind; that path is stated in packages/core/src/telemetry/qwen-logger/qwen-logger.ts, not in the cited file. The updates/npm tree is stated in packages/cli/src/utils/managed-npm-update.ts and gives a version history of the install. The npm package name is @qwen-code/qwen-code, so also check the global npm prefix and its node_modules for the installed version, which is not under ~/.qwen at all.
+  parser: null

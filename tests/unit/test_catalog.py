@@ -36,8 +36,21 @@ def normalise_path(path: str) -> str:
     module tests for slip through.
     """
     text = path.lower().replace("\\", "/")
-    text = re.sub(r"^(%userprofile%|%appdata%|%localappdata%|\$[a-z_]+|~)", "~", text)
-    return re.sub(r"<[^>]+>", "*", text).rstrip("/")
+    # The two Windows application-data variables are real subdirectories of the profile, so
+    # folding them into the profile itself would make %APPDATA%/Claude and ~/Claude compare
+    # equal and report a conflict between two directories that are not the same place.
+    text = re.sub(r"^%appdata%", "~/appdata/roaming", text)
+    text = re.sub(r"^%localappdata%", "~/appdata/local", text)
+    # A relocation variable stands in for the profile only when a path follows it. A
+    # pattern that is nothing but a variable, which is how a fully relocated file is
+    # written, would otherwise collapse to the profile itself and collide with every other
+    # such pattern in the catalogue.
+    text = re.sub(r"^(%userprofile%|\$[a-z_]+|~)(?=/)", "~", text)
+    # The first segment says which root the path hangs off, and a project, a plugin and a
+    # marketplace are three different roots. Only the variable segments deeper in the path
+    # are interchangeable.
+    head, sep, tail = text.partition("/")
+    return head + sep + re.sub(r"<[^>]+>", "*", tail).rstrip("/")
 
 
 @pytest.fixture(scope="module")
@@ -53,6 +66,17 @@ def _load_collector() -> Any:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def is_bare_variable(path: str) -> bool:
+    """Whether a path is a relocation variable and nothing else.
+
+    Such a path is whatever the operator pointed the variable at, so it has no platform
+    spelling to check and no default location to compare against. One agent records its
+    whole protocol trace this way, which means the trace is invisible to any collection
+    that only walks known directories.
+    """
+    return bool(re.fullmatch(r"\$\{?[A-Za-z_][A-Za-z0-9_]*\}?", path))
 
 
 def test_catalogue_loads_and_is_not_empty(catalogue: Catalogue) -> None:
@@ -108,6 +132,27 @@ def test_verified_entries_rest_on_their_own_vendor(catalogue: Catalogue) -> None
     assert not overclaimed, (
         "verified entries whose source is not first party. Either re-source them to the "
         f"vendor or set status: unverified with source_kind: community: {overclaimed}"
+    )
+
+
+def test_a_vendor_repository_is_not_a_vendor_statement(catalogue: Catalogue) -> None:
+    """An issue in the vendor's own repository is written by whoever opened it.
+
+    Found by a research pass that cited one: the URL sits under the vendor's organization,
+    so the prefix check above accepts it, while the text is a member of the public
+    describing what they saw on their machine. That is community research and often good
+    research, but it is not the vendor stating where its product writes, and the
+    difference is the whole point of the verified mark.
+    """
+    borrowed = [
+        (artifact.id, artifact.source)
+        for artifact in catalogue.artifacts
+        if artifact.is_verified
+        and any(part in artifact.source for part in ("/issues/", "/discussions/", "/pull/"))
+    ]
+    assert not borrowed, (
+        "these verified entries cite a thread rather than the vendor's own documentation "
+        f"or code: {borrowed}"
     )
 
 
@@ -329,6 +374,8 @@ def test_windows_paths_are_present_for_profile_anchored_windows_artifacts(
     for artifact in catalogue.artifacts:
         if "windows" not in artifact.os or artifact.needs_project_roots or artifact.is_registry:
             continue
+        if all(is_bare_variable(p) for p in artifact.paths):
+            continue
         joined = " ".join(artifact.paths)
         # <vscode-user> is a real placeholder, not a wildcard: the collector expands it to
         # the per-OS user directory of VS Code and of every fork that inherits its storage
@@ -351,6 +398,8 @@ def test_posix_paths_are_present_for_profile_anchored_posix_artifacts(
     for artifact in catalogue.artifacts:
         posix = {"macos", "linux"} & set(artifact.os)
         if not posix or artifact.needs_project_roots or artifact.is_registry:
+            continue
+        if all(is_bare_variable(p) for p in artifact.paths):
             continue
         joined = " ".join(artifact.paths)
         if "<vscode-user>" in joined:
@@ -376,6 +425,13 @@ def test_every_artifact_resolves_to_at_least_one_pattern_per_declared_os(
             if entry.get("root") == "registry":
                 # A registry key is not a filesystem path. collect.ps1 reads these; the
                 # POSIX collector has nothing to expand and correctly resolves nothing.
+                continue
+            if all(is_bare_variable(p) for p in entry["paths"]):
+                # An artifact that exists only where a variable points has no default
+                # location, so resolving to nothing when the variable is unset is the
+                # right answer rather than a hole. It is in the catalogue so that an
+                # analyst knows to read the variable off the endpoint: one agent records
+                # its entire protocol trace this way, at a path no directory walk finds.
                 continue
             for target_os in entry["os"]:
                 home = homes[target_os]

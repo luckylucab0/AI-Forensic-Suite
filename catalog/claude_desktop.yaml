@@ -1,0 +1,973 @@
+# Claude Desktop artifact catalogue.
+#
+# Generated from vendor documentation and then maintained by hand. status: verified
+# means somebody fetched that URL and the page states that path; anything else is
+# unverified, is still collected by glob, and is reported as unverified so an empty
+# result reads as inconclusive rather than as proof the agent was never used.
+#
+# sensitivity is operational: 'secret' means metadata and a hash only, no content,
+# and is reserved for credential stores. collect_priority is collection order on a
+# live endpoint. See catalog/schema/catalog.schema.json and docs/COLLECTION.md.
+
+agent: claude_desktop
+title: Claude Desktop
+vendor: Anthropic
+# URL prefixes that count as first party for this agent. status: verified requires the
+# source to start with one of them, because a third party who reverse-engineered a path
+# writes it down just as confidently as the vendor does and an analyst cannot tell the
+# two apart from the path alone. Third-party research stays in the catalogue as
+# source_kind: community with status: unverified.
+vendor_sources:
+- https://claude.com/docs/
+- https://code.claude.com/docs/
+- https://platform.claude.com/docs/
+- https://docs.claude.com/
+- https://support.claude.com/
+- https://www.anthropic.com/
+- https://github.com/anthropics/
+description: |-
+  Anthropic's desktop application, which is now one application with a chat surface, an agentic surface called Cowork and a surface that runs the Claude Code command line agent, so on an endpoint it is no longer cleanly separable from that command line product: several paths belong to both and the catalogue says which. Four things decide what a collection means here. The vendor's own page documenting the on-disk layout is written for a managed third-party deployment whose directory carries a distinct name, and a sibling page states that a standard install uses the same layout under the ordinary name, which is why the standard spellings in this file are marked unsourced rather than dropped. On Windows the root is genuinely uncertain: the vendor states one location, documents a completed move to another for the managed build, and a packaged install redirects writes to a third under a package container, so probe all three and record which had content. Every Cowork and chat session carries an append-only event log whose entries are chained so that deletions are detectable, which is the closest thing to a tamper-evident record any agent in this catalogue offers, and verifying it needs a key that only a live host can decrypt. And an organization can set a retention period that deletes whole idle sessions with their attached files, so an absent conversation may be policy rather than anything a user did.
+env_overrides:
+- name: CLAUDE_CONFIG_DIR
+  effect: |-
+    Moves the whole Claude Code configuration directory away from ~/.claude. Claude Desktop's Code tab runs an embedded Claude Code, so this relocates the Code tab conversation transcripts (projects/), the desktop app's scheduled-task SKILL.md files, plugins and the .credentials.json store. A collection that only walks ~/.claude will find nothing on a machine where this is set, while the desktop app's own store under the Claude application-data directory is unaffected.
+  source: https://code.claude.com/docs/en/env-vars
+- name: CLAUDE_CODE_PROJECT_DIR_NAME
+  effect: |-
+    Only honoured together with CLAUDE_CONFIG_DIR. Replaces the working-directory-derived name of the projects/ subdirectory, so the usual path-encoding rule (slashes to dashes) no longer maps a transcript folder back to the project it came from.
+  source: https://code.claude.com/docs/en/env-vars
+- name: CLAUDE_DESKTOP_ADD_REPO
+  effect: |-
+    Read from /etc/default/claude-desktop on Linux. Set to false, the .deb does not register Anthropic's apt repository, so /etc/apt/sources.list.d/claude-desktop.list and the keyring file are absent and the usual Linux install evidence is missing even though the app is installed.
+  source: https://code.claude.com/docs/en/desktop-linux
+- name: CLAUDE_PLUGIN_ROOT
+  effect: |-
+    Substituted into a plugin's .mcp.json command path and resolves to that plugin's directory. Tells an analyst which on-disk plugin directory an MCP server entry was launched from.
+  source: https://claude.com/docs/third-party/claude-desktop/extensions
+artifacts:
+- id: claude_desktop.mcp_config
+  title: User MCP server configuration (claude_desktop_config.json)
+  category: mcp_config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\claude_desktop_config.json'
+  - '%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\claude_desktop_config.json'
+  - ~/.config/Claude/claude_desktop_config.json
+  - ~/Library/Application Support/Claude/claude_desktop_config.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/anthropics/claude-cookbooks/blob/main/managed_agents/cma-mcp/skill.md
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Claude\claude_desktop_config.json'
+  - '%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\claude_desktop_config.json'
+  - ~/.config/Claude/claude_desktop_config.json
+  contains_credentials:
+  - mcpServers.<name>.args
+  - mcpServers.<name>.env
+  - mcpServers.<name>.headers
+  record_types:
+  - app preference keys
+  - globalShortcut
+  - mcpServers
+  volatility: |-
+    Rewritten in place whenever the user edits it or toggles a server in Settings. No rotation, no backup copy. An MSIX profile reset recreates the parent directory and loses it.
+  notes: |-
+    The vendor names the file itself in first-party docs (code.claude.com/docs/en/desktop: 'The Desktop app loads MCP servers from claude_desktop_config.json into local Code tab sessions, alongside servers from ~/.claude.json and .mcp.json') and the vendor's own cookbook repository states the macOS path. The Windows and Linux spellings are inferred from the vendor's statement that standard installs use %APPDATA%\Claude\ (macOS: ~/Library/Application Support/Claude/) as the application-data directory, plus community reports; they are listed as unsourced. Traps: (1) only local stdio servers live here. Remote MCP servers are claude.ai connectors held server-side, and Anthropic's own plugin documentation says remote servers configured in this file are ignored, so an empty mcpServers block does NOT mean no MCP was used. (2) On Microsoft Store / MSIX installs the file the app actually reads is the virtualized LocalCache\Roaming copy; the in-app 'Edit Config' button opens the non-virtualized %APPDATA%\Claude copy, so both can exist with different contents and the %APPDATA% one may be dead. (3) Credentials are routinely pasted inline into the env block. (4) The standalone Claude Code CLI does not read this file; 'claude mcp add-from-claude-desktop' copies entries into ~/.claude.json, which is how an entry can appear in both products.
+  parser: null
+- id: claude_desktop.cowork_session_store
+  title: Cowork and Chat session store (local-agent-mode-sessions)
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\local-agent-mode-sessions\<uuid>\<uuid>\local_<uuid>\'
+  - '%LOCALAPPDATA%\Claude-3p\local-agent-mode-sessions\<uuid>\<uuid>\local_<uuid>\'
+  - '%LOCALAPPDATA%\Claude\local-agent-mode-sessions\<uuid>\<uuid>\local_<uuid>\'
+  - '%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\local-agent-mode-sessions\<uuid>\<uuid>\local_<uuid>\'
+  - ~/.config/Claude-3p/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/
+  - ~/.config/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/
+  - ~/Library/Application Support/Claude-3p/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>.json
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Claude\local-agent-mode-sessions\<uuid>\<uuid>\local_<uuid>\'
+  - '%LOCALAPPDATA%\Claude\local-agent-mode-sessions\<uuid>\<uuid>\local_<uuid>\'
+  - '%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\local-agent-mode-sessions\<uuid>\<uuid>\local_<uuid>\'
+  - ~/.config/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>.json
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/
+  record_types:
+  - .audit-key
+  - .claude/projects/<encoded-dir>/<cliSessionId>.jsonl
+  - audit.jsonl
+  - cowork_account_settings.json
+  - local_<uuid>.json session state file
+  - memory/
+  - outputs/
+  - per-session working directory
+  - spaces/<projectId>/memory/
+  - subagents/agent-<id>.jsonl
+  - uploads/
+  volatility: |-
+    The vendor states that local Cowork conversation history exists only on the device, is outside Anthropic's standard retention, and that 'deleting it is unrecoverable'. Organization configuration keys chatSessionRetentionDays, coworkSessionRetentionDays and codeSessionRetentionDays (1 to 3650 days, unset means keep forever) delete whole idle sessions from the device with their attached files and outputs; sessionRetentionHold suspends that as a legal hold. Community reports also document total loss of this tree when an app update recreates the Electron profile, with no copy in the Recycle Bin and none in the account data export.
+  notes: |-
+    This is the single most important Cowork artifact and the answer to 'where are Cowork sessions recorded'. The vendor's own data-storage page documents the layout: one local_<uuid>.json state file plus a working directory per session, scoped by account and organization UUID, with uploads/ holding copies (or hard links) of attached files and outputs/ holding files Claude creates. The same page says Chat conversations use the identical model, so Chat is on disk here too. Anthropic's Cowork changelog independently confirms the naming ('tooling that matches the local_ prefix should also match the new names') and that Cowork 'store[s] Claude Code transcripts under a short fixed folder name'. The transcript itself is a Claude Code JSONL written inside the session working directory under .claude/projects/<encoded-dir>/<cliSessionId>.jsonl, with per-subagent JSONL under subagents/; the three-field join from the manifest (sessionId, cliSessionId, working-directory encoding) is community-documented, not vendor-stated, and one community report found that .claude/projects/ subtree absent on their install while 16 session folders existed inside the VM disk instead. Treat the exact intra-session layout as version-dependent and enumerate the tree rather than assuming a path. The vendor documentation quoted here is written for the third-party (3P) deployment mode, whose directory is Claude-3p; Anthropic separately states that 'standard (non-3P) installs use ~/Library/Application Support/Claude/ with the same subpath' and '%APPDATA%\Claude\ with the same subpath', which is the basis for the standard-mode spellings, all listed as unsourced above. Session names are human-readable three-word slugs. A user-initiated session export writes transcript.jsonl into an archive at a location of the user's choosing.
+  parser: null
+- id: claude_desktop.cowork_audit_log
+  title: Per-session audit log (audit.jsonl and .audit-key)
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\local-agent-mode-sessions\<uuid>\<uuid>\<session-id>\audit.jsonl'
+  - '%LOCALAPPDATA%\Claude-3p\local-agent-mode-sessions\<uuid>\<uuid>\<session-id>\audit.jsonl'
+  - ~/Library/Application Support/Claude-3p/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/audit.jsonl
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/audit.jsonl
+  format: jsonl
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Claude\local-agent-mode-sessions\<uuid>\<uuid>\<session-id>\audit.jsonl'
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/audit.jsonl
+  record_types:
+  - file operation
+  - permission decision
+  - tool invocation
+  volatility: |-
+    Append-only for the life of the session, deleted with the session directory (user delete, or the retention keys above). Each entry is HMAC-chained to the previous one, so a removed or edited line is detectable; the chain is the strongest anti-forensic tripwire this product offers.
+  notes: |-
+    The vendor describes it as an 'append-only log of session events (tool invocations, permission decisions, file operations)' with each entry HMAC-chained to the previous one, and a companion .audit-key holding the per-session signing key encrypted via the OS keychain. For an analyst this is the record of what the agent did and what the user approved, independent of the transcript, and it can be verified for tampering if the key can be recovered from the keychain on a live host. Community reports describe an audit.jsonl at the session root carrying costs, durations and rate limits as well. Because the key lives in the OS keychain, chain verification is live-only work; collect the key material before imaging if verification matters. The vendor text describing this is the third-party mode page; standard-mode spellings are unsourced.
+
+    Adjusted when this entry was written into the catalogue. It was marked as a credential store, which would have reduced this file to a hash. It is the opposite of that: the record of every tool the agent invoked, every permission decision and every file operation, which is most of what an investigation is trying to establish. The signing key beside it is the credential, and it has its own entry so that one path carries one claim.
+  parser: null
+- id: claude_desktop.cowork_audit_key
+  title: Per-session audit signing key (.audit-key)
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\local-agent-mode-sessions\<uuid>\<uuid>\<session-id>\.audit-key'
+  - '%LOCALAPPDATA%\Claude-3p\local-agent-mode-sessions\<uuid>\<uuid>\<session-id>\.audit-key'
+  - ~/Library/Application Support/Claude-3p/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/.audit-key
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/.audit-key
+  format: binary
+  sensitivity: secret
+  collect_priority: live_only
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Claude\local-agent-mode-sessions\<uuid>\<uuid>\<session-id>\.audit-key'
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/.audit-key
+  volatility: |-
+    Created with the session and removed with it, so it disappears together with the log it signs. The vendor states the file is encrypted through the operating system's secure storage, which means the decrypting material is in the keychain of a live host and not in an image of the disk.
+  notes: |-
+    Split out of the audit log entry so that one path carries one sensitivity claim. This file is the key that signs the audit chain, so on its own it is credential material and the collector takes its metadata and a hash rather than its content.
+
+    Its forensic value is entirely about the chain. The vendor states each audit entry is HMAC-chained to the previous one so that edits and deletions are detectable, which is the closest thing to a tamper-evident log any agent in this catalogue offers. Verifying that chain needs this key, the key is encrypted through the operating system's secure storage, and that storage is only openable on a live host with the user's session. So chain verification is live-only work: if it matters to the case, get the key material out before the machine is imaged or powered off, because afterwards the log can be read but not proved intact.
+  parser: null
+- id: claude_desktop.cowork_memory
+  title: Cowork memory and global instructions
+  category: memory
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\local-agent-mode-sessions\*\*\memory\memory\*.md'
+  - '%LOCALAPPDATA%\Claude-3p\local-agent-mode-sessions\*\*\memory\memory\*.md'
+  - ~/Library/Application Support/Claude-3p/local-agent-mode-sessions/*/*/memory/memory/*.md
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/memory/CLAUDE.md
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/memory/memory/*.md
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/spaces/<uuid>/memory/*.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Claude\local-agent-mode-sessions\*\*\memory\memory\*.md'
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/memory/CLAUDE.md
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/memory/memory/*.md
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/spaces/<uuid>/memory/*.md
+  record_types:
+  - global CLAUDE.md instructions
+  - memory note
+  - per-project memory note
+  volatility: |-
+    Written and updated by Claude during sessions. Users can delete individual entries or pause memory (existing files kept but not read or updated). The vendor states memory survives the automatic idle-session deletion that removes sessions. Project memory lives under spaces/<projectId>/memory/ and is kept when a project is archived only in the sense that archiving deletes project metadata; check both.
+  notes: |-
+    High value for the injected-instruction question: the CLAUDE.md here is included in every session, so text planted in it steers every later run, and the memory notes are Markdown Claude wrote about the user's preferences, projects and feedback. A Chat conversation inside a project can read project memory but cannot change it; Cowork sessions inside a project read and update the project memory instead of the global one. Vendor text is the third-party mode page; standard-mode spellings are unsourced.
+  parser: null
+- id: claude_desktop.cowork_session_files
+  title: Session uploads and outputs (attached files and files Claude created)
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\local-agent-mode-sessions\<uuid>\<uuid>\local_<uuid>\outputs\'
+  - '%APPDATA%\Claude\local-agent-mode-sessions\<uuid>\<uuid>\local_<uuid>\uploads\'
+  - ~/Library/Application Support/Claude-3p/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/outputs/
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/outputs/
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/uploads/
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Claude\local-agent-mode-sessions\<uuid>\<uuid>\local_<uuid>\outputs\'
+  - '%APPDATA%\Claude\local-agent-mode-sessions\<uuid>\<uuid>\local_<uuid>\uploads\'
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/outputs/
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/uploads/
+  record_types:
+  - agent-created output file
+  - copied or hard-linked attachment
+  volatility: |-
+    Removed with the session. Deleted by the retention keys together with the session.
+  notes: |-
+    Answers 'which data was handed to the agent' directly: uploads/ holds copies of every file attached to the conversation. The vendor notes attachments are hard-linked where the filesystem allows, so an uploads/ entry can share an inode with the user's original file and an edit to the original is visible to the conversation; record inode and link count, not just the hash. outputs/ is the agent's scratch and product directory. A community report documents the UI presenting outputs/ content as if it were in the user's chosen project folder while that folder stayed empty on disk, which an analyst will otherwise read as file deletion; the sandbox for advanced file analysis writes only inside outputs/. Vendor text is the third-party mode page; standard-mode spellings are unsourced.
+  parser: null
+- id: claude_desktop.cowork_vm_bundle
+  title: Cowork sandbox VM bundle and session data disk
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\vm_bundles\claudevm.bundle\'
+  - '%LOCALAPPDATA%\Claude-3p\vm_bundles\'
+  - '%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\vm_bundles\claudevm.bundle\sessiondata.vhdx'
+  - ~/Library/Application Support/Claude-3p/vm_bundles/
+  - ~/Library/Application Support/Claude/vm_bundles/
+  format: binary
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Claude\vm_bundles\claudevm.bundle\'
+  - '%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\vm_bundles\claudevm.bundle\sessiondata.vhdx'
+  - ~/Library/Application Support/Claude/vm_bundles/
+  record_types:
+  - .auto_reinstall_attempted marker
+  - rootfs disk image
+  - session data disk (ext4)
+  volatility: |-
+    The app deletes and re-downloads this bundle on its own as a repair step. Community reports document an auto-reinstall path that deleted an 8 GB rootfs disk twice, and a marker file that then blocks further retries. Expect large, frequently rewritten images.
+  notes: |-
+    The vendor describes vm_bundles/ as a 'cached copy of the VM workspace bundle that Cowork sessions run in, plus the data disk the app creates to hold those sessions' home directories inside the VM'. On-device Cowork runs a Linux VM: macOS and Windows use the platform hypervisor, Linux uses QEMU with virtiofsd. The data disk is where the session home directories live, so shell history, temporary files and anything the agent wrote outside a mounted host folder are inside this image, not on the host filesystem. The filename seen in community reports is sessiondata.vhdx on Windows with a sessiondata.img also appearing in repair logs. One community reporter mounted the VHDX read-only under WSL2, found 16 session folders and ext4, but no conversation transcripts inside, which supports the reading that the transcripts live on the host side under local-agent-mode-sessions and the VM disk holds the working filesystem. Collect it, but expect tens of gigabytes and treat it as a second filesystem to parse rather than a file. Windows deployment guidance warns the folder must be excluded from NTFS compression and EFS or the VM disk will not start.
+  parser: null
+- id: claude_desktop.cowork_account_settings
+  title: Cowork account settings
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\local-agent-mode-sessions\*\*\cowork_account_settings.json'
+  - '%LOCALAPPDATA%\Claude-3p\local-agent-mode-sessions\*\*\cowork_account_settings.json'
+  - ~/Library/Application Support/Claude-3p/local-agent-mode-sessions/*/*/cowork_account_settings.json
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/cowork_account_settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Claude\local-agent-mode-sessions\*\*\cowork_account_settings.json'
+  - ~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/cowork_account_settings.json
+  record_types:
+  - display name
+  - locale
+  - memory toggle
+  volatility: |-
+    Rewritten when the user changes a preference in Settings.
+  notes: |-
+    Small but useful: the memory toggle records whether Cowork memory was on, which decides whether the absence of memory notes means nothing was learned or that recording was off. Vendor text is the third-party mode page; standard-mode spellings are unsourced.
+  parser: null
+- id: claude_desktop.code_session_index
+  title: Code tab session records (claude-code-sessions)
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\claude-code-sessions\<uuid>\<uuid>\local_<session-id>.json'
+  - '%LOCALAPPDATA%\Claude-3p\claude-code-sessions\'
+  - '%LOCALAPPDATA%\Claude\claude-code-sessions\<uuid>\<uuid>\local_<session-id>.json'
+  - ~/Library/Application Support/Claude-3p/claude-code-sessions/
+  - ~/Library/Application Support/Claude/claude-code-sessions/<uuid>/<uuid>/local_<session-id>.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Claude\claude-code-sessions\<uuid>\<uuid>\local_<session-id>.json'
+  - '%LOCALAPPDATA%\Claude\claude-code-sessions\<uuid>\<uuid>\local_<session-id>.json'
+  - ~/Library/Application Support/Claude/claude-code-sessions/<uuid>/<uuid>/local_<session-id>.json
+  record_types:
+  - cliSessionId
+  - sessionId
+  - settings
+  - summary
+  - title
+  - transcriptUnavailable
+  - working folder
+  volatility: |-
+    The vendor states the conversation transcripts are not here but in Claude Code's own store at ~/.claude/projects/. Community investigation on macOS reports two independent decay processes: the .jsonl transcript under ~/.claude/projects/ disappears roughly 2 to 15 days after session creation, and the cliSessionId pointer in this file is separately nulled with transcriptUnavailable flipped to true after about seven weeks, one-directionally and without recovery. Claude Code's own cleanupPeriodDays (default 30) governs transcript deletion but community reports say transcript mtimes are refreshed in clusters, which defeats mtime-based ageing. Sidebar 'Delete session' is reported to remove only the index entry and leave the .jsonl on disk.
+  notes: |-
+    This is the index that maps a desktop Code session to its working folder and to the transcript file in the shared Claude Code store. It is the join key an analyst needs, and it is also the artifact most likely to be out of sync with reality in both directions: entries whose transcript is already gone, and transcripts on disk with no entry. Treat the index as a claim, not as evidence of presence or absence, and always enumerate ~/.claude/projects/ independently. The vendor page documenting the layout is the third-party mode page; standard-mode spellings come from community reports plus Anthropic's statement that standard installs use the Claude directory with the same subpaths.
+  parser: null
+- id: claude_desktop.app_logs
+  title: Application logs (main.log, cowork_vm_node.log, mcp-server-<name>.log)
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\logs\main.log'
+  - '%LOCALAPPDATA%\Claude-3p\logs\main.log'
+  - '%LOCALAPPDATA%\Claude\Logs\main.log'
+  - '%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\logs\'
+  - ~/.config/Claude-3p/logs/main.log
+  - ~/.config/Claude/logs/main.log
+  - ~/Library/Logs/Claude-3p/main.log
+  - ~/Library/Logs/Claude/claude.ai-web.log
+  - ~/Library/Logs/Claude/cowork_vm_node.log
+  - ~/Library/Logs/Claude/main.log
+  - ~/Library/Logs/Claude/mcp-server-<name>.log
+  - ~/Library/Logs/Claude/mcp.log
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://code.claude.com/docs/en/admin-setup
+  source_kind: official
+  unsourced_paths:
+  - '%LOCALAPPDATA%\Claude\Logs\main.log'
+  - '%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\logs\'
+  - ~/Library/Logs/Claude/claude.ai-web.log
+  - ~/Library/Logs/Claude/cowork_vm_node.log
+  - ~/Library/Logs/Claude/main.log
+  - ~/Library/Logs/Claude/mcp-server-<name>.log
+  - ~/Library/Logs/Claude/mcp.log
+  record_types:
+  - MCP connection events (mcp.log, mcp-server-<name>.log)
+  - application and configuration-validation events (main.log)
+  - renderer events (claude.ai-web.log)
+  - sandbox VM activity (cowork_vm_node.log)
+  volatility: |-
+    Rotated and overwritten by the app; community log excerpts show only recent days. A profile recreation on update loses the whole folder. There is no documented retention.
+  notes: |-
+    Two first-party statements pin this down. code.claude.com/docs/en/admin-setup states the live file is at %APPDATA%\Claude\logs\main.log when Claude Desktop was installed with the .exe installer, and that Help > Troubleshooting > Show Logs in Explorer saves a copy of the log folder to the user's Downloads folder, which is itself a collectable artifact. claude.com/docs/third-party/claude-desktop/data-storage names the files in the folder: main.log, cowork_vm_node.log, claude.ai-web.log, mcp.log and mcp-server-<name>.log, and gives ~/Library/Logs/Claude-3p/ for macOS in third-party mode, from which the standard-mode ~/Library/Logs/Claude/ follows but is not stated. The Linux standard-mode folder ~/.config/Claude/logs/ IS stated directly on claude.com/docs/third-party/claude-desktop/configuration. Analyst value: main.log carries session load warnings naming session ids and transcript byte sizes, the WSL policy gate decisions, managed-settings parse failures, and the Electron profile boot lines that reveal a profile reset; mcp-server-<name>.log is the record of which MCP server started, with what, and what it said on stderr. Windows is genuinely ambiguous between %APPDATA%\Claude\logs and %LOCALAPPDATA%\Claude\Logs: the vendor documents the third-party build moving from Roaming to Local, and community reports from 2026 cite both for the standard build. Collect both, plus the MSIX virtualized copy.
+  parser: null
+- id: claude_desktop.coworkd_service_log
+  title: Cowork host service log (coworkd)
+  category: log
+  root: system
+  os:
+  - macos
+  - windows
+  paths:
+  - 'C:\ProgramData\Claude\Logs\coworkd\user-<sid>.log'
+  - ~/Library/Logs/Claude/coworkd.log
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: https://github.com/anthropics/claude-code/issues/93385
+  source_kind: community
+  record_types:
+  - session mount event with session name, local_<uuid> folder and mounted host path
+  volatility: |-
+    Community report states this log survived an Electron profile recreation that destroyed 22 local Cowork session directories, which makes it the most durable record of Cowork activity on Windows. No documented rotation.
+  notes: |-
+    Community only, and the single best corroborating artifact when the session store has been wiped. The reported line format records, per session, the human-readable session name, the uid, the read/write mode and the mapping from the host path to the in-VM /sessions/<name> mount, so it proves both that a session existed and which host folder the agent was pointed at, even with no transcript left. Under ProgramData on Windows it is outside the user profile, so a user-profile-only collection misses it. A Windows service named CoworkVMService is reported alongside it. The macOS filename is from a separate community report and is weaker.
+  parser: null
+- id: claude_desktop.managed_policy_macos
+  title: Managed configuration and approved folders (macOS preference domain)
+  category: permissions
+  root: system
+  os:
+  - macos
+  paths:
+  - /Library/Managed Preferences/<user>/com.anthropic.claudefordesktop.plist
+  - /Library/Managed Preferences/com.anthropic.claudefordesktop.plist
+  - ~/Library/Preferences/com.anthropic.claudefordesktop.plist
+  format: plist
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/mdm
+  source_kind: official
+  unsourced_paths:
+  - ~/Library/Preferences/com.anthropic.claudefordesktop.plist
+  contains_credentials:
+  - inferenceBedrockBearerToken
+  - inferenceGatewayApiKey
+  record_types:
+  - allowedWorkspaceFolders
+  - autoUpdaterEnforcementHours
+  - chatSessionRetentionDays
+  - codeSessionRetentionDays
+  - coworkEgressAllowedHosts
+  - coworkSessionRetentionDays
+  - disableAutoUpdates
+  - effortLevel
+  - forceLoginOrgUUID
+  - isClaudeCodeForDesktopEnabled
+  - isDesktopExtensionDirectoryEnabled
+  - isDesktopExtensionEnabled
+  - isLocalDevMcpEnabled
+  - managedMcpServers
+  - requireCoworkFullVmSandbox
+  - secureVmFeaturesEnabled
+  - sessionRetentionHold
+  - sshHostAllowlist
+  volatility: |-
+    Rewritten by MDM. The managed-preferences copy is replaced whenever the profile is redeployed, so the version in force at the time of an event may not be recoverable.
+  notes: |-
+    This is the permissions and approved-directories artifact. allowedWorkspaceFolders is the allowlist of folders a user may attach to a Cowork session, and the vendor states a folder can carry mode ro, that a leading ~ expands per user, and that a fixed set of %VAR% tokens is expanded. The retention keys here decide whether session records are being deleted on a schedule, which an analyst must read before concluding that absence of sessions means absence of use. secureVmFeaturesEnabled and requireCoworkFullVmSandbox decide whether device-deployed policy reaches Cowork at all. The Managed Preferences paths are stated by the vendor; the unmanaged user-domain plist path is the standard macOS location for the same domain but the vendor does not state it, so it is listed as unsourced. Inference credentials can be delivered through these keys, so treat the file as potentially secret-bearing.
+  parser: null
+- id: claude_desktop.managed_policy_windows
+  title: Managed configuration and approved folders (Windows policy registry)
+  category: permissions
+  root: registry
+  os:
+  - windows
+  paths:
+  - 'HKCU\SOFTWARE\Policies\Claude'
+  - 'HKLM\SOFTWARE\Policies\Claude'
+  format: registry
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://support.claude.com/en/articles/12622667-enterprise-configuration-for-claude-desktop
+  source_kind: official
+  contains_credentials:
+  - inferenceBedrockBearerToken
+  - inferenceGatewayApiKey
+  record_types:
+  - allowedWorkspaceFolders
+  - disableAutoUpdates
+  - disableWslSessions
+  - isClaudeCodeForDesktopEnabled
+  - isLocalDevMcpEnabled
+  - secureVmFeaturesEnabled
+  - sessionRetentionHold
+  volatility: |-
+    Group policy refresh overwrites values. The machine key needs administrator rights; the user key does not, which makes HKCU a place a user could plausibly loosen their own configuration.
+  notes: |-
+    The vendor states machine-level settings override user-level ones. Critical naming trap for a catalogue that already carries Claude Code: SOFTWARE\Policies\Claude is the Claude Desktop policy key and SOFTWARE\Policies\ClaudeCode is the separate Claude Code managed-settings key. Anthropic's own admin documentation says exactly this: the disableWslSessions value 'sits under the Claude Desktop policy key, separate from the ClaudeCode key that carries managed settings'. A collector that globs Policies\Claude* will pick up both and must attribute them separately. Claude Code's managed settings are carried in a Settings value under the ClaudeCode key, and that key is also read by Desktop's Code and Cowork sessions.
+  parser: null
+- id: claude_desktop.managed_policy_linux
+  title: Managed configuration (Linux managed-settings.json)
+  category: permissions
+  root: system
+  os:
+  - linux
+  paths:
+  - /etc/claude-desktop/managed-settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/configuration
+  source_kind: official
+  contains_credentials:
+  - inferenceGatewayApiKey
+  record_types:
+  - same configuration keys as the macOS plist and Windows registry, flat at the top level
+  volatility: |-
+    Replaced by configuration management. The app rejects the whole file if /etc/claude-desktop is a symlink, is not root-owned, or is group- or world-writable, and logs the reason to main.log.
+  notes: |-
+    Anthropic's Cowork changelog records the addition: 'administrators can provision settings in a root-owned /etc/claude-desktop/managed-settings.json, validated against the same schema as the macOS and Windows sources'. Distinct from Claude Code's /etc/claude-code/managed-settings.json, which is a different file for a different product and is also read by Desktop's sessions. If the file is present but rejected, the device is treated as managed but unreadable and local settings are disabled too, so a rejected file changes behaviour and is worth reporting.
+  parser: null
+- id: claude_desktop.local_config_library
+  title: Locally authored configuration (configLibrary)
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%LOCALAPPDATA%\Claude-3p\configLibrary\'
+  - ~/.config/Claude-3p/configLibrary/
+  - ~/Library/Application Support/Claude-3p/configLibrary/<id>.json
+  - ~/Library/Application Support/Claude-3p/configLibrary/_meta.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/configuration
+  source_kind: official
+  contains_credentials:
+  - inferenceBedrockBearerToken
+  - inferenceGatewayApiKey
+  record_types:
+  - <id>.json saved configuration
+  - _meta.json applied-configuration pointer
+  volatility: |-
+    Ignored entirely when a managed profile is present, so it can sit on disk describing a configuration that is not in force. Deleted by the user through Settings.
+  notes: |-
+    Only present in third-party deployment mode, where it is the lowest-precedence configuration source: locally authored settings from the in-app configuration window. _meta.json records which saved configuration is applied. An analyst must check for a managed profile before treating any of it as effective. Inference credentials can be stored here.
+  parser: null
+- id: claude_desktop.oauth_and_signin_tokens
+  title: OAuth tokens and stored sign-ins (OS secure storage)
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%LOCALAPPDATA%\Microsoft\Credentials\'
+  - ~/Library/Keychains/login.keychain-db
+  format: binary
+  sensitivity: secret
+  collect_priority: live_only
+  status: unverified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  record_types:
+  - OS keychain or Credential Manager entry
+  - encrypted token blob in the application-data directory
+  volatility: |-
+    Rewritten on refresh. Community report: stored sign-ins were lost when the system keychain was temporarily locked, which Anthropic fixed, so absence can mean a keychain problem rather than no sign-in.
+  notes: |-
+    The vendor states that OAuth tokens (in-app Google sign-in, MCP servers with oauth: true) are 'stored in the application-data directory, encrypted with the operating system's secure storage (Keychain on macOS, DPAPI on Windows)'. Anthropic's support article on local MCP servers separately states that sensitive extension configuration goes to the Keychain on macOS, the Credential Manager on Windows, and the distro's keychain manager on Linux, so part of this material is not in a file at all and cannot be recovered from a dead image without the user's login secret. Collect on a live host or capture the keychain container and the DPAPI master keys. The exact file name inside the application-data directory is not documented and I could not source it; do not invent one, enumerate the directory. The user identity that ties tokens to an account is separately recorded as lastKnownAccountUuid in a config.json according to a community report.
+
+    Narrowed when this entry was written into the catalogue. The vendor states that these tokens live in the application-data directory encrypted with the operating system's secure storage, and names no file. This entry therefore claimed the application-data directory itself, which would have made the collector withhold the content of everything inside it, the conversation history included. It now claims only the two operating-system credential stores, and its status says what is true: no vendor source names the file.
+  parser: null
+- id: claude_desktop.transient_session_credentials
+  title: Transient per-session credential files
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\ccd-session-secrets\<session-id>\'
+  - '%APPDATA%\Claude\host-creds-<hash>.json'
+  - ~/Library/Application Support/Claude-3p/ccd-session-secrets/<session-id>/
+  - ~/Library/Application Support/Claude-3p/host-creds-<hash>.json
+  - ~/Library/Application Support/Claude/ccd-session-secrets/<session-id>/
+  - ~/Library/Application Support/Claude/host-creds-<hash>.json
+  format: json
+  sensitivity: secret
+  collect_priority: live_only
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Claude\ccd-session-secrets\<session-id>\'
+  - '%APPDATA%\Claude\host-creds-<hash>.json'
+  - ~/Library/Application Support/Claude/ccd-session-secrets/<session-id>/
+  - ~/Library/Application Support/Claude/host-creds-<hash>.json
+  record_types:
+  - ccd-session-secrets/<session-id>/
+  - host-creds-<random-id>.json
+  volatility: |-
+    By design short-lived: host-creds is rewritten on each credential refresh and deleted when the app quits, with crash leftovers removed at the next launch; ccd-session-secrets is created at session start, removed at session end, and the whole directory is swept before the next Code session and on provider sign-out. Mode 0600 on macOS, per-user ACLs on Windows. A crash leftover found on disk is therefore evidence of an abnormal termination.
+  notes: |-
+    Documented by the vendor in detail, including that the random path segment is regenerated on sign-out or credential rotation so a process holding the old path loses access. For Cowork, the same file-based credentials are written into the session working directory that is mounted into the sandbox VM, which means provider credentials were inside the reach of the agent's own sandbox. This is a live-only artifact: on a dead image expect nothing, and a present file is itself a finding. The vendor page is the third-party mode page; standard-mode spellings are unsourced.
+  parser: null
+- id: claude_desktop.user_plugins
+  title: User-installed and org-provisioned plugins (cowork_plugins)
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\cowork_plugins\'
+  - '%LOCALAPPDATA%\Claude-3p\cowork_plugins\'
+  - ~/.config/Claude/cowork_plugins/
+  - ~/Library/Application Support/Claude-3p/cowork_plugins/
+  - ~/Library/Application Support/Claude/cowork_plugins/
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Claude\cowork_plugins\'
+  - ~/.config/Claude/cowork_plugins/
+  - ~/Library/Application Support/Claude/cowork_plugins/
+  record_types:
+  - .claude-plugin/plugin.json
+  - .mcp.json
+  - .mcpb desktop extension
+  - agents/*.md
+  - commands/*.md
+  - hooks
+  - skills/*/SKILL.md
+  - version.json
+  volatility: |-
+    Created on first plugin install. Re-synced from a marketplace when version.json changes or the directory mtime changes; a plugin removed from a marketplace is unregistered and uninstalled on the next sync, so the on-disk copy can vanish without user action.
+  notes: |-
+    The vendor states cowork_plugins/ holds 'user-installed and org-provisioned plugins'. This is where the injected-instruction question is answered for the Cowork and Chat surfaces: a plugin carries skills, slash commands, sub-agents, hooks and MCP servers, all of which are instructions or execution the agent obeys. Desktop extensions (.mcpb bundles, zip archives containing a local MCP server and a manifest.json) are installed here too when allowed; Anthropic's extensions page says 'user-added extensions are stored in the user's local data directory'. Note the surface split the vendor documents: Cowork sessions run hooks from marketplace plugins, org-plugins and user plugins, while Code sessions do not load org-plugins hooks or skills. Cowork does NOT read the Claude Code CLI's ~/.claude directory for skills and plugins; those come from the claude.ai account and are synced at session start, which means a skill that only exists server-side may leave no on-disk copy at all.
+  parser: null
+- id: claude_desktop.org_plugins
+  title: Administrator-provisioned plugin directory (org-plugins)
+  category: instructions
+  root: system
+  os:
+  - macos
+  - windows
+  paths:
+  - /Library/Application Support/Claude/org-plugins/
+  - 'C:\Program Files\Claude\org-plugins\'
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/extensions
+  source_kind: official
+  record_types:
+  - .claude-plugin/plugin.json
+  - .mcp.json
+  - agents/*.md
+  - commands/*.md
+  - skills/*/SKILL.md
+  - version.json
+  volatility: |-
+    Replaced by software distribution. version.json changing by any string triggers a re-sync into each user's copy.
+  notes: |-
+    Both paths are stated verbatim by the vendor, and these are standard Claude directory names, not the third-party Claude-3p ones. Each subdirectory is one plugin and the directory name is the plugin's canonical name; a directory without .claude-plugin/plugin.json or a top-level SKILL.md is ignored. The vendor notes Windows uses Program Files rather than ProgramData so only administrators can write it, and that Claude Desktop treats the presence of this directory as an admin-provisioned source. Symlinks inside a plugin are followed only when the target resolves inside the plugin directory, but a symlinked top-level plugin directory is followed, which is a path worth checking for an instruction planted outside the collected tree.
+  parser: null
+- id: claude_desktop.user_output_folder
+  title: User-visible output folder (~/Claude)
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\Claude\'
+  - '%USERPROFILE%\Claude\Projects\<name>\'
+  - ~/Claude/
+  - ~/Claude/Projects/<name>/
+  - ~/Documents/Claude/
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  unsourced_paths:
+  - '%USERPROFILE%\Claude\'
+  - '%USERPROFILE%\Claude\Projects\<name>\'
+  record_types:
+  - artifact file
+  - project folder
+  - scheduled-task result
+  volatility: |-
+    The vendor states this folder 'is not removed when you delete the application-data directory', which makes it the most durable place agent output survives. Cowork project folders live under ~/Claude/Projects/<name>.
+  notes: |-
+    Two first-party sources. The data-storage page states Claude Desktop writes user-visible outputs, Artifacts and scheduled-task results, to ~/Claude/ in the home directory, or ~/Documents/Claude/ on legacy installs. Anthropic's Cowork changelog independently names ~/Claude/Projects/<Name> as the project folder and records that the new-project folder picker now defaults to ~/Claude/Projects instead of ~/Documents. For an analyst this is where agent product landed in a place the user can see, and it is the right place to look first for what left the sandbox. The Windows spellings are inferred from the POSIX form and are unsourced.
+  parser: null
+- id: claude_desktop.renderer_state
+  title: Electron renderer state and caches
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\IndexedDB\'
+  - '%APPDATA%\Claude\Local Storage\'
+  - '%LOCALAPPDATA%\Claude-3p\IndexedDB\'
+  - '%LOCALAPPDATA%\Claude\IndexedDB\'
+  - ~/Library/Application Support/Claude-3p/IndexedDB/
+  - ~/Library/Application Support/Claude/IndexedDB/
+  - ~/Library/Application Support/Claude/Local Storage/
+  - ~/Library/Application Support/Claude/Session Storage/
+  format: leveldb
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Claude\IndexedDB\'
+  - '%APPDATA%\Claude\Local Storage\'
+  - '%LOCALAPPDATA%\Claude\IndexedDB\'
+  - ~/Library/Application Support/Claude/IndexedDB/
+  - ~/Library/Application Support/Claude/Local Storage/
+  - ~/Library/Application Support/Claude/Session Storage/
+  record_types:
+  - UI preferences
+  - recent folders
+  - window layout
+  volatility: |-
+    Rewritten constantly while the app runs; LevelDB keeps deleted records in .log and .ldb files until compaction, so recently removed entries are often still recoverable. Destroyed when the app recreates the Electron profile, which community reports document happening across an update sequence.
+  notes: |-
+    The vendor describes these as 'renderer-side UI state (window layout, recent folders, preferences)', which understates their forensic value: recent folders is a list of directories the user pointed the agent at, and LevelDB tombstones frequently retain entries the UI no longer shows. This is an Electron application (Electron 44 / Chromium 152 as of the September 2026 release notes), so expect the usual Chromium siblings next to these: Cache, Code Cache, GPUCache, Network, Cookies, Preferences, Crashpad. The vendor does not enumerate those and I did not source them, so they must be collected by enumerating the application-data directory rather than by a fixed list.
+  parser: null
+- id: claude_desktop.device_identifier
+  title: Per-device identifier (ant-did)
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%LOCALAPPDATA%\Claude-3p\ant-did'
+  - ~/.config/Claude-3p/ant-did
+  - ~/Library/Application Support/Claude-3p/ant-did
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/data-storage
+  source_kind: official
+  record_types:
+  - base64-encoded random UUID
+  volatility: |-
+    Generated once on first launch in third-party mode and then stable. Regenerated if the application-data directory is recreated, which is itself a signal.
+  notes: |-
+    Documented only for third-party deployment mode: on first launch the app generates a random UUID and writes it base64-encoded to ant-did. It is the identifier attached to telemetry events alongside deploymentOrganizationUuid, so it is the join key between this endpoint and any OpenTelemetry records an organization holds. The vendor states it is random per device and per OS-user account and cannot be traced back to a device or person by Anthropic. I found no evidence of an equivalent file in standard (account-signed-in) mode, where the account UUID plays that role instead; a community report names lastKnownAccountUuid in a config.json for that.
+  parser: null
+- id: claude_desktop.embedded_claude_code
+  title: Embedded Claude Code engine and VM workspace
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Claude\claude-code\<version>\claude.exe'
+  - '%LOCALAPPDATA%\Claude-3p\claude-code\<version>\'
+  - ~/Library/Application Support/Claude-3p/claude-code/<version>/claude.app/Contents/MacOS/claude
+  - ~/Library/Application Support/Claude/claude-code-vm/
+  - ~/Library/Application Support/Claude/claude-code/<version>/claude.app/Contents/MacOS/claude
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/installation
+  source_kind: official
+  unsourced_paths:
+  - ~/Library/Application Support/Claude/claude-code-vm/
+  record_types:
+  - VM workspace data
+  - versioned claude binary
+  volatility: |-
+    A new version directory appears on each engine update and old ones are pruned, so the set of directories present is a coarse timeline of which engine versions ran on this device.
+  notes: |-
+    This is the artifact that proves the desktop app shipped and ran its own Claude Code, and it is directly stated by the vendor: claude.com/docs/third-party/claude-desktop/installation gives ~/Library/Application Support/Claude-3p/claude-code/<version>/claude.app/Contents/MacOS/claude and then says in the same section 'Standard (non-3P) installs use ~/Library/Application Support/Claude/ with the same subpath' and 'Standard installs use %APPDATA%\Claude\ with the same subpath'. That sentence is the only first-party statement I found that names the standard-mode application-data directory on both platforms, and it is what makes every standard-mode path in this catalogue entry more than a guess. The same page gives the macOS code-signing team identifier Q6L2SF6YDW for the helper and says the Windows helper is Authenticode-signed with publisher 'Anthropic, PBC', which are good integrity checks. The vendor's data-storage page lists claude-code/ and claude-code-vm/ as 'Claude Code binary and VM workspace data for Code sessions'. An analyst should read the version from the directory name rather than executing the binary.
+  parser: null
+- id: claude_desktop.scheduled_tasks
+  title: Scheduled task definitions
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.claude\scheduled-tasks\<task-name>\SKILL.md'
+  - ~/.claude/scheduled-tasks/<task-name>/SKILL.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://code.claude.com/docs/en/desktop-scheduled-tasks
+  source_kind: official
+  unsourced_paths:
+  - '%USERPROFILE%\.claude\scheduled-tasks\<task-name>\SKILL.md'
+  record_types:
+  - YAML frontmatter name and description
+  - prompt body
+  volatility: |-
+    The vendor states deleting a task archives all sessions it created, and an 'Also delete files on disk' checkbox additionally removes the task's SKILL.md and associated data. Schedule, folder, model and enabled state are NOT in this file and are held elsewhere, so the file alone does not tell you whether the task was active.
+  notes: |-
+    Directly stated: 'To edit a task's prompt on disk, open ~/.claude/scheduled-tasks/<task-name>/SKILL.md (or under CLAUDE_CONFIG_DIR if set)'. Forensically this is a standing, unattended instruction that runs Claude on a schedule with a permission mode and a folder, so it is a prime place for a persistence mechanism or an injected instruction. It sits inside the shared ~/.claude directory even though it is a desktop-app feature, which is exactly the attribution problem this catalogue has to flag: a finding here cannot be attributed to the CLI. Allow rules from ~/.claude/settings.json also apply to scheduled task sessions.
+  parser: null
+- id: claude_desktop.code_launch_config
+  title: Preview server configuration written into the project (.claude/launch.json)
+  category: config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.claude/launch.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://code.claude.com/docs/en/desktop
+  source_kind: official
+  record_types:
+  - autoVerify
+  - dev server command
+  volatility: |-
+    Written automatically when the desktop app first detects a dev server setup, then edited by the user or Claude. Lives in the user's working copy, so it can be committed to version control and travel off the endpoint.
+  notes: |-
+    The vendor states Claude 'automatically detects your dev server setup and stores the configuration in .claude/launch.json at the root of the folder you selected when starting the session'. Its presence in a repository is evidence that the Claude Code Desktop app, not the terminal CLI, was used on that working copy, which is one of the few positive discriminators between the two products. It also records a command the app will run, so it is a place an attacker could plant execution. autoVerify false records that automatic post-edit verification was turned off.
+  parser: null
+- id: claude_desktop.ssh_remote_artifacts
+  title: Artifacts Claude Desktop writes on an SSH remote host
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.claude/remote/ccd-cli/<version>
+  - ~/.claude/remote/plugins/<hash>/
+  - ~/.claude/remote/run/<id>/
+  - ~/.claude/remote/srv/<version>/
+  format: directory
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://claude.com/docs/third-party/claude-desktop/ssh-remote-sessions
+  source_kind: official
+  record_types:
+  - Claude Code engine binary
+  - attached files
+  - remote server binary
+  - socket, token and log
+  - synced plugins
+  volatility: |-
+    The vendor states the three most recent engine versions are kept and reused, and that ~/.claude/uploads/<session-id>/ is 'not removed when the session ends', which makes the uploads directory a durable record of what the user handed the agent. The run directory is per connection.
+  notes: |-
+    These paths are on the SSH target, not the analyst's endpoint, and they are written by Claude Desktop into the same ~/.claude tree the Claude Code CLI uses on that host. They are the reason a ~/.claude finding on a server cannot be attributed to a terminal CLI session without checking for remote/ and uploads/. The run directory contains a token, so treat it as secret. The vendor also states the Code session transcripts and attached files for an SSH session are on the remote host, not on the device, so a device-only collection will miss the content of remote sessions entirely. Claude Desktop applies the device's ~/.ssh/config and requires the host key to be in ~/.ssh/known_hosts already, both of which are corroborating artifacts on the endpoint.
+
+    Two adjustments made when this entry was written into the catalogue. It was marked as a credential store, which would have reduced a tree of attached files and agent binaries to hashes; the one directory that holds a token is named in contains_credentials instead. And it claimed the uploads directory on the remote host, which the command line interface's own entry already claims: the two products share that tree, so the path is left with the entry that has the vendor's statement for it, and this note is the record that a hit there can belong to either product.
+  parser: null
+- id: claude_desktop.install_evidence_macos
+  title: macOS install evidence
+  category: install_evidence
+  root: system
+  os:
+  - macos
+  paths:
+  - /Applications/Claude.app
+  - ~/Applications/Claude.app
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://support.claude.com/en/articles/12611117-deploy-claude-desktop-for-macos
+  source_kind: official
+  unsourced_paths:
+  - /Applications/Claude.app
+  - ~/Applications/Claude.app
+  record_types:
+  - Info.plist version
+  - application bundle
+  volatility: |-
+    Replaced in place by auto-update unless disableAutoUpdates is set, so the version on disk is the current one and not the one that ran at the time of an event; correlate with main.log and with the claude-code/<version> directories instead.
+  notes: |-
+    The vendor states the app 'installs to /Applications and updates automatically', and that a user-level install under ~/Applications can self-update without administrator rights, which is a meaningful finding on a managed endpoint. Distributed as .pkg (recommended for enterprise) or .dmg. The vendor names the directories but not the bundle name Claude.app, so the exact bundle paths are listed as unsourced. Read the version from Contents/Info.plist; do not launch the application.
+  parser: null
+- id: claude_desktop.install_evidence_windows
+  title: Windows install evidence
+  category: install_evidence
+  root: system
+  os:
+  - windows
+  paths:
+  - '%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\'
+  - 'C:\Program Files\WindowsApps\Claude_<version>_<arch>__pzs8sxrjxfjjc\'
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: https://github.com/anthropics/claude-code/issues/26073
+  source_kind: community
+  record_types:
+  - MSIX package directory
+  - package LocalCache redirection root
+  volatility: |-
+    A new package version directory replaces the previous one on update. The LocalCache tree persists across package updates but community reports document it being recreated by an update sequence, destroying the session store.
+  notes: |-
+    Anthropic officially documents deploying Claude Desktop on Windows as an MSIX package via Add-AppxPackage or Add-AppxProvisionedPackage, and separately offers an .exe installer; the vendor does not publish the package family name or the install directory, so the paths here are community. The package family name appearing in community reports is Claude_pzs8sxrjxfjjc. This distinction drives everything else on Windows: under MSIX, writes to %APPDATA%\Claude are redirected to %LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude, so a collector that reads only %APPDATA%\Claude on an MSIX machine can find an empty or stale directory and conclude the product was unused. Determine the install type first (presence of the Packages directory, or Get-AppxPackage) and then collect the matching root. Also check whether the profile is redirected: one community report describes %APPDATA%\Claude reaching LocalCache through a reparse point onto a second volume, and Anthropic's release notes mention Windows hosts using FSLogix or similar profile containers.
+  parser: null
+- id: claude_desktop.install_evidence_linux
+  title: Linux install evidence
+  category: install_evidence
+  root: system
+  os:
+  - linux
+  paths:
+  - /etc/apt/sources.list.d/claude-desktop.list
+  - /etc/default/claude-desktop
+  - /usr/share/keyrings/claude-desktop-archive-keyring.asc
+  - /var/lib/dpkg/info/claude-desktop.*
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://code.claude.com/docs/en/desktop-linux
+  source_kind: official
+  unsourced_paths:
+  - /var/lib/dpkg/info/claude-desktop.*
+  record_types:
+  - CLAUDE_DESKTOP_ADD_REPO setting
+  - apt repository entry
+  - dpkg package metadata
+  - repository signing key
+  volatility: |-
+    Uninstalling the package removes the repository entry and signing key it registered, so absence of these files does not mean the app was never installed. The dpkg metadata and logs outlive the package files.
+  notes: |-
+    The vendor states the package name is claude-desktop, installed from Anthropic's apt repository at downloads.claude.ai, registering /etc/apt/sources.list.d/claude-desktop.list and /usr/share/keyrings/claude-desktop-archive-keyring.asc, and that creating /etc/default/claude-desktop with CLAUDE_DESKTOP_ADD_REPO="false" suppresses the repository registration. Cowork on Linux needs QEMU, OVMF and virtiofsd plus the vhost_vsock kernel module, so /etc/modules-load.d/vhost_vsock.conf is corroborating evidence that on-device Cowork was set up. Linux is a beta platform. The dpkg path is the standard location and is not stated by the vendor, so it is listed as unsourced; prefer /var/log/apt and the dpkg status file for the install timeline.
+  parser: null
