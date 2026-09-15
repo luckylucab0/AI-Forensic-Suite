@@ -41,7 +41,11 @@ SESSION_B = "4f8c1e2a-0000-4000-8000-000000000002"
 def write(path: Path, content: str | bytes, mtime: int = RECENT) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     if isinstance(content, str):
-        path.write_text(content, encoding="utf-8")
+        # newline="" so "\n" is written verbatim. Without it Windows writes CRLF, the same
+        # fixture has different bytes and different hashes on different platforms, and a
+        # test that compares one collector's output with another's is comparing two
+        # different trees.
+        path.write_text(content, encoding="utf-8", newline="")
     else:
         path.write_bytes(content)
     os.utime(path, (mtime, mtime))

@@ -394,8 +394,10 @@ def test_a_relocation_variable_is_followed_rather_than_guessed_at(
     )
     assert result.returncode in (0, 1), result.stderr
     manifest = json.loads((out / "manifest.json").read_text())
+    # The manifest holds forward slashes on every platform, by design: see "Fields allowed
+    # to differ" in docs/BUNDLE_FORMAT.md and the separator convention in the collector.
     collected = [e["original_path"] for e in manifest["files"]]
-    assert str(moved) in collected, (
+    assert moved.as_posix() in collected, (
         "a transcript in a relocated configuration directory was not collected; "
         "the bundle would read as a host where Claude Code had never run"
     )

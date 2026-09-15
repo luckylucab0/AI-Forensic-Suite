@@ -6484,7 +6484,12 @@ def sha256_file(path: str, preserve_atime: bool) -> tuple[str, int]:
     also captures atime beforehand and writes that value into the manifest. Between the
     two, the manifest never reports an access time this tool caused.
     """
-    flags = os.O_RDONLY
+    # O_BINARY, or nothing else in this function is true. On Windows os.open defaults to
+    # text mode and os.read then translates CRLF to LF, so the hash and the byte count
+    # described content that is not what is on disk and not what the copy puts in the
+    # bundle: every text file in a Windows collection failed its own verification. The
+    # flag does not exist on POSIX, where there is no translation to turn off.
+    flags = os.O_RDONLY | getattr(os, "O_BINARY", 0)
     if preserve_atime:
         flags |= getattr(os, "O_NOATIME", 0)
     digest = hashlib.sha256()
@@ -6493,7 +6498,7 @@ def sha256_file(path: str, preserve_atime: bool) -> tuple[str, int]:
         fd = os.open(path, flags)
     except OSError as exc:
         if preserve_atime and exc.errno in (errno.EPERM, errno.EACCES):
-            fd = os.open(path, os.O_RDONLY)
+            fd = os.open(path, os.O_RDONLY | getattr(os, "O_BINARY", 0))
         else:
             raise
     try:
