@@ -1,0 +1,625 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     roo_code.custom_storage_path
+#     roo_code.rules
+Description: AI coding agent artifacts, Roo Code
+Author: agentforensics
+Version: 1.0
+Id: 7511251a-878e-3d40-f7a8-1388f7144e53
+RecreateDirectories: true
+Targets:
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*\.git\info\exclude
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*\checkpoints
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*\.git\info\exclude
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*\checkpoints
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*\.git\info\exclude
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*\checkpoints
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*\.git\info\exclude
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*\checkpoints
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*\.git\info\exclude
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*\checkpoints
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*\.git\info\exclude
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*\checkpoints
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*\.git\info\exclude
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*\checkpoints
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints\*\.git\info\exclude
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*\checkpoints
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage
+        FileMask: "rooveterinaryinc.roo-cline"
+        Recursive: false
+    -
+        Name: roo_code.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage
+        FileMask: "rooveterinaryinc.roo-cline"
+        Recursive: false
+    -
+        Name: roo_code.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage
+        FileMask: "rooveterinaryinc.roo-cline"
+        Recursive: false
+    -
+        Name: roo_code.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage
+        FileMask: "rooveterinaryinc.roo-cline"
+        Recursive: false
+    -
+        Name: roo_code.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage
+        FileMask: "rooveterinaryinc.roo-cline"
+        Recursive: false
+    -
+        Name: roo_code.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage
+        FileMask: "rooveterinaryinc.roo-cline"
+        Recursive: false
+    -
+        Name: roo_code.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage
+        FileMask: "rooveterinaryinc.roo-cline"
+        Recursive: false
+    -
+        Name: roo_code.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage
+        FileMask: "rooveterinaryinc.roo-cline"
+        Recursive: false
+    -
+        Name: roo_code.global_dirs
+        Category: instructions
+        Path: C:\Users\%user%
+        FileMask: ".agents"
+        Recursive: false
+    -
+        Name: roo_code.global_dirs
+        Category: instructions
+        Path: C:\Users\%user%
+        FileMask: ".roo"
+        Recursive: false
+    -
+        Name: roo_code.global_dirs
+        Category: instructions
+        Path: C:\Users\%user%\.roo
+        FileMask: "rules-*"
+        Recursive: false
+    -
+        Name: roo_code.global_dirs
+        Category: instructions
+        Path: C:\Users\%user%\.roo\rules
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "custom_modes.yaml"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "mcp_settings.json"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "custom_modes.yaml"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "mcp_settings.json"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\rooveterinaryinc.roo-cline\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "custom_modes.yaml"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "mcp_settings.json"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\rooveterinaryinc.roo-cline\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "custom_modes.yaml"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "mcp_settings.json"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\rooveterinaryinc.roo-cline\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "custom_modes.yaml"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "mcp_settings.json"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\rooveterinaryinc.roo-cline\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "custom_modes.yaml"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "mcp_settings.json"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\rooveterinaryinc.roo-cline\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "custom_modes.yaml"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "mcp_settings.json"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "custom_modes.yaml"
+        Recursive: false
+    -
+        Name: roo_code.settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\settings
+        FileMask: "mcp_settings.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline\tasks
+        FileMask: "_index.json"
+        Recursive: true
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "history_item.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\tasks
+        FileMask: "_index.json"
+        Recursive: true
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "history_item.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\rooveterinaryinc.roo-cline\tasks
+        FileMask: "_index.json"
+        Recursive: true
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "history_item.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\rooveterinaryinc.roo-cline\tasks
+        FileMask: "_index.json"
+        Recursive: true
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "history_item.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\rooveterinaryinc.roo-cline\tasks
+        FileMask: "_index.json"
+        Recursive: true
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "history_item.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\rooveterinaryinc.roo-cline\tasks
+        FileMask: "_index.json"
+        Recursive: true
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "history_item.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\rooveterinaryinc.roo-cline\tasks
+        FileMask: "_index.json"
+        Recursive: true
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "history_item.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\tasks
+        FileMask: "_index.json"
+        Recursive: true
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "history_item.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: roo_code.tasks
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false

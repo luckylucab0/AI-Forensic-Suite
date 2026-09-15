@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
 - `model/` das einheitliche Ereignismodell und das SQLite-Fallschema
 - `timeline/` Aufbau der Zeitachse und Exporte (CSV, JSONL, Timesketch-JSONL)
 - `rules/` die deklarative YAML-Regel-Engine
-- `exporters/` die Generatoren für Sammelregeln
+- `exporters/` die Generatoren für Sammelregeln, ein Modul pro Zielformat
 - `webui/` die lokale, nur lesende API, die auch den Viewer ausliefert
 - `cli.py` der Befehl `agentforensics`, kurz `afx`
 

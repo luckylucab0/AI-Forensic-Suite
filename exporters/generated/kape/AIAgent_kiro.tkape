@@ -1,0 +1,130 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     kiro.agents
+#     kiro.hooks
+#     kiro.kiroignore
+#     kiro.legacy_amazonq_config
+#     kiro.mcp_config_project
+#     kiro.prompt_library
+#     kiro.skills_powers
+#     kiro.specs
+#     kiro.steering_project
+#   reachable only through a relocation variable, which KAPE cannot resolve: read the variable off the endpoint
+#     kiro.acp_wire_record
+Description: AI coding agent artifacts, Kiro
+Author: agentforensics
+Version: 1.0
+Id: 8a70875e-ae8e-c79f-130b-071eb7dfbe61
+RecreateDirectories: true
+Targets:
+    -
+        Name: kiro.cli_log
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\Temp\kiro-log\logs
+        FileMask: "kiro-chat.log"
+        Recursive: false
+    -
+        Name: kiro.cli_session_database
+        Category: transcript
+        Path: C:\Users\%user%\.kiro
+        FileMask: "*.sqlite3"
+        Recursive: false
+    -
+        Name: kiro.cli_session_files
+        Category: transcript
+        Path: C:\Users\%user%\.kiro\sessions\cli
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: kiro.cli_session_files
+        Category: transcript
+        Path: C:\Users\%user%\.kiro\sessions\cli
+        FileMask: "*.jsonl"
+        Recursive: false
+    -
+        Name: kiro.cli_session_files
+        Category: transcript
+        Path: C:\Users\%user%\.kiro\sessions\cli
+        FileMask: "*.lock"
+        Recursive: false
+    -
+        Name: kiro.cli_settings
+        Category: config
+        Path: C:\Users\%user%\.kiro\settings
+        FileMask: "cli.json"
+        Recursive: false
+    -
+        Name: kiro.ide_legacy_global_storage
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage
+        FileMask: "kiro.kiroagent"
+        Recursive: true
+    -
+        Name: kiro.ide_session_files
+        Category: transcript
+        Path: C:\Users\%user%\.kiro\sessions\*\*
+        FileMask: "messages.jsonl"
+        Recursive: false
+    -
+        Name: kiro.ide_session_files
+        Category: transcript
+        Path: C:\Users\%user%\.kiro\sessions\*\*
+        FileMask: "session.json"
+        Recursive: false
+    -
+        Name: kiro.ide_session_files
+        Category: transcript
+        Path: C:\Users\%user%\.kiro\sessions\*\*\sub-executions
+        FileMask: "*.jsonl"
+        Recursive: false
+    -
+        Name: kiro.managed_settings
+        Category: permissions
+        Path: C:\ProgramData\Kiro
+        FileMask: "managed-settings.json"
+        Recursive: false
+    -
+        Name: kiro.mcp_config_user
+        Category: mcp_config
+        Path: C:\Users\%user%\.kiro\settings
+        FileMask: "mcp.json"
+        Recursive: false
+    -
+        Name: kiro.permissions_user
+        Category: permissions
+        Path: C:\Users\%user%\.kiro\settings
+        FileMask: "permissions.yaml"
+        Recursive: false
+    -
+        Name: kiro.permissions_workspace
+        Category: permissions
+        Path: C:\Users\%user%\.kiro\workspace-roots\*
+        FileMask: "permissions.yaml"
+        Recursive: false
+    -
+        Name: kiro.steering_user
+        Category: instructions
+        Path: C:\Users\%user%\.kiro\steering
+        FileMask: "*.md"
+        Recursive: false
+    -
+        Name: kiro.steering_user
+        Category: instructions
+        Path: C:\Users\%user%\.kiro\steering
+        FileMask: "AGENTS.md"
+        Recursive: false

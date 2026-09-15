@@ -1,0 +1,86 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     goose.hints
+#     goose.memory
+#     goose.recipes
+Description: AI coding agent artifacts, Goose
+Author: agentforensics
+Version: 1.0
+Id: 441977d5-19d6-7d65-209c-7692499bced9
+RecreateDirectories: true
+Targets:
+    -
+        Name: goose.cli_logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Roaming\Block\goose\data\logs\cli
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: goose.config
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Block\goose\config
+        FileMask: "config.yaml"
+        Recursive: false
+    -
+        Name: goose.desktop_log
+        Category: log
+        Path: C:\Users\%user%\AppData\Roaming\Block\goose\logs
+        FileMask: "main.log"
+        Recursive: false
+    -
+        Name: goose.permissions
+        Category: permissions
+        Path: C:\Users\%user%\AppData\Roaming\Block\goose\config
+        FileMask: "permission.yaml"
+        Recursive: false
+    -
+        Name: goose.permissions
+        Category: permissions
+        Path: C:\Users\%user%\AppData\Roaming\Block\goose\config\permissions
+        FileMask: "tool_permissions.json"
+        Recursive: false
+    -
+        Name: goose.prompts
+        Category: instructions
+        Path: C:\Users\%user%\AppData\Roaming\Block\goose\config\prompts
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: goose.secrets
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Roaming\Block\goose\config
+        FileMask: "secrets.yaml"
+        Recursive: false
+    -
+        Name: goose.server_logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Roaming\Block\goose\data\logs\server
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: goose.sessions_db_windows
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Block\goose\data\sessions
+        FileMask: "sessions.db"
+        Recursive: false
+    -
+        Name: goose.sessions_jsonl_legacy
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Block\goose\data\sessions
+        FileMask: "*.jsonl"
+        Recursive: false

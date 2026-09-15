@@ -1,0 +1,313 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   a registry key, which is a KAPE registry target rather than a file target
+#     windsurf.enterprise_policy
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     windsurf.hooks
+#     windsurf.ignore_files
+#     windsurf.mcp_config
+#     windsurf.plans
+#     windsurf.project_instructions
+#     windsurf.workflows_and_skills
+Description: AI coding agent artifacts, Windsurf
+Author: agentforensics
+Version: 1.0
+Id: 711dd7b5-5e28-fe09-8519-7a1a3744a8e1
+RecreateDirectories: true
+Targets:
+    -
+        Name: windsurf.acp_registry
+        Category: config
+        Path: C:\Users\%user%\.windsurf-next\acp
+        FileMask: "registry.json"
+        Recursive: false
+    -
+        Name: windsurf.acp_registry
+        Category: config
+        Path: C:\Users\%user%\.windsurf\acp
+        FileMask: "registry.json"
+        Recursive: false
+    -
+        Name: windsurf.auth_credentials
+        Category: credentials
+        Path: C:\Users\%user%\.codeium
+        FileMask: "config.json"
+        Recursive: false
+    -
+        Name: windsurf.auth_credentials
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Local\devin
+        FileMask: "credentials.toml"
+        Recursive: false
+    -
+        Name: windsurf.cascade_trajectories
+        Category: transcript
+        Path: C:\Users\%user%\.codeium\windsurf-insiders\cascade
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: windsurf.cascade_trajectories
+        Category: transcript
+        Path: C:\Users\%user%\.codeium\windsurf-next\cascade
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: windsurf.cascade_trajectories
+        Category: transcript
+        Path: C:\Users\%user%\.codeium\windsurf\cascade
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: windsurf.cascade_trajectories
+        Category: transcript
+        Path: C:\Users\%user%\.codeium\windsurf\cascade
+        FileMask: "*.pb"
+        Recursive: false
+    -
+        Name: windsurf.cascade_trajectories
+        Category: transcript
+        Path: C:\Users\%user%\.codeium\windsurf\cascade
+        FileMask: "*.pb.archived"
+        Recursive: false
+    -
+        Name: windsurf.cascade_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\.devin\transcripts
+        FileMask: "*.jsonl"
+        Recursive: false
+    -
+        Name: windsurf.cascade_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\.windsurf\transcripts
+        FileMask: "*.jsonl"
+        Recursive: false
+    -
+        Name: windsurf.code_tracker_and_settings
+        Category: config
+        Path: C:\Users\%user%\.codeium
+        FileMask: "user_settings.pb"
+        Recursive: false
+    -
+        Name: windsurf.code_tracker_and_settings
+        Category: config
+        Path: C:\Users\%user%\.codeium\windsurf
+        FileMask: "user_settings.pb"
+        Recursive: false
+    -
+        Name: windsurf.code_tracker_and_settings
+        Category: config
+        Path: C:\Users\%user%\.codeium\windsurf\code_tracker
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: windsurf.code_tracker_and_settings
+        Category: config
+        Path: C:\Users\%user%\.codeium\windsurf\installation_id
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: windsurf.embedding_database
+        Category: cache
+        Path: C:\Users\%user%\.codeium\windsurf\database
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: windsurf.embedding_database
+        Category: cache
+        Path: C:\Users\%user%\.codeium\windsurf\database\*
+        FileMask: "embedding_database.sqlite"
+        Recursive: false
+    -
+        Name: windsurf.global_rules
+        Category: instructions
+        Path: C:\Users\%user%\.codeium\windsurf-insiders\memories
+        FileMask: "global_rules.md"
+        Recursive: false
+    -
+        Name: windsurf.global_rules
+        Category: instructions
+        Path: C:\Users\%user%\.codeium\windsurf-next\memories
+        FileMask: "global_rules.md"
+        Recursive: false
+    -
+        Name: windsurf.global_rules
+        Category: instructions
+        Path: C:\Users\%user%\.codeium\windsurf\memories
+        FileMask: "global_rules.md"
+        Recursive: false
+    -
+        Name: windsurf.ide_global_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User\globalStorage
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: windsurf.ide_global_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf - Next\User\globalStorage
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: windsurf.ide_global_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf Insiders\User\globalStorage
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: windsurf.ide_global_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: windsurf.ide_user_data
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: windsurf.ide_user_data
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf
+        FileMask: "argv.json"
+        Recursive: false
+    -
+        Name: windsurf.ide_user_data
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User
+        FileMask: "keybindings.json"
+        Recursive: false
+    -
+        Name: windsurf.ide_user_data
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: windsurf.ide_workspace_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\workspaceStorage\*
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: windsurf.implicit_trajectories
+        Category: transcript
+        Path: C:\Users\%user%\.codeium\windsurf\implicit
+        FileMask: "*.pb"
+        Recursive: false
+    -
+        Name: windsurf.language_server_binaries_and_logs
+        Category: install_evidence
+        Path: C:\Program Files\Windsurf
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: windsurf.language_server_binaries_and_logs
+        Category: install_evidence
+        Path: C:\Users\%user%\.codeium\*
+        FileMask: "language_server_windows_x64.exe"
+        Recursive: false
+    -
+        Name: windsurf.language_server_binaries_and_logs
+        Category: install_evidence
+        Path: C:\Users\%user%\.codeium\*\language_server_linux_x64
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: windsurf.language_server_binaries_and_logs
+        Category: install_evidence
+        Path: C:\Users\%user%\.codeium\*\language_server_macos_arm
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: windsurf.language_server_binaries_and_logs
+        Category: install_evidence
+        Path: C:\Users\%user%\.windsurf-server\data\logs\*
+        FileMask: "1-windsurf.log"
+        Recursive: false
+    -
+        Name: windsurf.language_server_binaries_and_logs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\Programs\Windsurf
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: windsurf.memories
+        Category: memory
+        Path: C:\Users\%user%\.codeium\windsurf-insiders\memories
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: windsurf.memories
+        Category: memory
+        Path: C:\Users\%user%\.codeium\windsurf-next\memories
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: windsurf.memories
+        Category: memory
+        Path: C:\Users\%user%\.codeium\windsurf\memories
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: windsurf.memories
+        Category: memory
+        Path: C:\Users\%user%\.codeium\windsurf\memories
+        FileMask: "*.pb"
+        Recursive: false
+    -
+        Name: windsurf.plugin_log
+        Category: log
+        Path: C:\Users\%user%\.codeium
+        FileMask: "codeium.log"
+        Recursive: false
+    -
+        Name: windsurf.system_config
+        Category: instructions
+        Path: C:\ProgramData\Windsurf
+        FileMask: "hooks.json"
+        Recursive: false
+    -
+        Name: windsurf.system_config
+        Category: instructions
+        Path: C:\ProgramData\Windsurf\rules
+        FileMask: "*.md"
+        Recursive: false
+    -
+        Name: windsurf.system_config
+        Category: instructions
+        Path: C:\ProgramData\Windsurf\skills
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: windsurf.system_config
+        Category: instructions
+        Path: C:\ProgramData\Windsurf\workflows
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: windsurf.worktrees
+        Category: file_snapshot
+        Path: C:\Users\%user%\.devin\worktrees
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: windsurf.worktrees
+        Category: file_snapshot
+        Path: C:\Users\%user%\.windsurf\worktrees
+        FileMask: "*"
+        Recursive: false

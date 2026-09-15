@@ -1,0 +1,313 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     qwen_code.auto_memory
+#     qwen_code.env_files
+#     qwen_code.ignore_files
+#     qwen_code.openai_api_logs
+#     qwen_code.project_extension_points
+#     qwen_code.project_instructions
+#     qwen_code.project_mcp_config
+#     qwen_code.project_settings
+Description: AI coding agent artifacts, Qwen Code
+Author: agentforensics
+Version: 1.0
+Id: 1c379e2e-c81f-f0ac-34d9-ddcafdee789e
+RecreateDirectories: true
+Targets:
+    -
+        Name: qwen_code.channels_scheduled_tasks
+        Category: config
+        Path: C:\Users\%user%\.qwen\channels
+        FileMask: "cron.json"
+        Recursive: false
+    -
+        Name: qwen_code.channels_scheduled_tasks
+        Category: config
+        Path: C:\Users\%user%\.qwen\channels
+        FileMask: "service.pid"
+        Recursive: false
+    -
+        Name: qwen_code.channels_scheduled_tasks
+        Category: config
+        Path: C:\Users\%user%\.qwen\channels
+        FileMask: "sessions.json"
+        Recursive: false
+    -
+        Name: qwen_code.channels_scheduled_tasks
+        Category: config
+        Path: C:\Users\%user%\.qwen\channels\daemon\*
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: qwen_code.conversation_transcript
+        Category: transcript
+        Path: C:\Users\%user%\.qwen\projects\*\chats
+        FileMask: "*.jsonl"
+        Recursive: false
+    -
+        Name: qwen_code.conversation_transcript
+        Category: transcript
+        Path: C:\Users\%user%\.qwen\projects\*\chats\archive
+        FileMask: "*.jsonl"
+        Recursive: false
+    -
+        Name: qwen_code.debug_logs
+        Category: log
+        Path: C:\Users\%user%\.qwen\debug
+        FileMask: "*.txt"
+        Recursive: false
+    -
+        Name: qwen_code.file_history_backups
+        Category: file_snapshot
+        Path: C:\Users\%user%\.qwen\file-history\*
+        FileMask: "*@v*"
+        Recursive: false
+    -
+        Name: qwen_code.install_evidence
+        Category: install_evidence
+        Path: C:\Users\%user%\.qwen
+        FileMask: "source.json"
+        Recursive: false
+    -
+        Name: qwen_code.install_evidence
+        Category: install_evidence
+        Path: C:\Users\%user%\.qwen\bin
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: qwen_code.install_evidence
+        Category: install_evidence
+        Path: C:\Users\%user%\.qwen\installation_id
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: qwen_code.install_evidence
+        Category: install_evidence
+        Path: C:\Users\%user%\.qwen\updates\npm\*\versions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: qwen_code.mcp_approvals
+        Category: permissions
+        Path: C:\Users\%user%\.qwen
+        FileMask: "mcpApprovals.json"
+        Recursive: false
+    -
+        Name: qwen_code.mcp_oauth_tokens
+        Category: credentials
+        Path: C:\Users\%user%\.qwen
+        FileMask: "mcp-oauth-tokens-v2.json"
+        Recursive: false
+    -
+        Name: qwen_code.mcp_oauth_tokens
+        Category: credentials
+        Path: C:\Users\%user%\.qwen
+        FileMask: "mcp-oauth-tokens.json"
+        Recursive: false
+    -
+        Name: qwen_code.plan_files
+        Category: log
+        Path: C:\Users\%user%\.qwen\plans
+        FileMask: "*.md"
+        Recursive: false
+    -
+        Name: qwen_code.project_temp_spill
+        Category: cache
+        Path: C:\Users\%user%\.qwen\tmp\*
+        FileMask: "*_*"
+        Recursive: false
+    -
+        Name: qwen_code.project_temp_spill
+        Category: cache
+        Path: C:\Users\%user%\.qwen\tmp\*
+        FileMask: "checkpoint-*.json"
+        Recursive: false
+    -
+        Name: qwen_code.project_temp_spill
+        Category: cache
+        Path: C:\Users\%user%\.qwen\tmp\*\background-shells\*
+        FileMask: "shell-bg_*.output"
+        Recursive: false
+    -
+        Name: qwen_code.project_temp_spill
+        Category: cache
+        Path: C:\Users\%user%\.qwen\tmp\*\checkpoints
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: qwen_code.project_temp_spill
+        Category: cache
+        Path: C:\Users\%user%\.qwen\tmp\*\tool-results
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: qwen_code.prompt_history_log
+        Category: prompt_history
+        Path: C:\Users\%user%\.qwen\tmp\*
+        FileMask: "logs.json"
+        Recursive: false
+    -
+        Name: qwen_code.prompt_terminal_ledger
+        Category: prompt_history
+        Path: C:\Users\%user%\.qwen\projects\*\chats
+        FileMask: "*.ledger.jsonl"
+        Recursive: false
+    -
+        Name: qwen_code.qwen_oauth_credentials
+        Category: credentials
+        Path: C:\Users\%user%\.qwen
+        FileMask: "oauth_creds.json"
+        Recursive: false
+    -
+        Name: qwen_code.qwen_oauth_credentials
+        Category: credentials
+        Path: C:\Users\%user%\.qwen
+        FileMask: "oauth_creds.lock"
+        Recursive: false
+    -
+        Name: qwen_code.session_registry
+        Category: log
+        Path: C:\Users\%user%\.qwen\sessions
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: qwen_code.session_sidecars
+        Category: log
+        Path: C:\Users\%user%\.qwen\projects\*\chats
+        FileMask: "*.pr.json"
+        Recursive: false
+    -
+        Name: qwen_code.session_sidecars
+        Category: log
+        Path: C:\Users\%user%\.qwen\projects\*\chats
+        FileMask: "*.runtime.json"
+        Recursive: false
+    -
+        Name: qwen_code.session_sidecars
+        Category: log
+        Path: C:\Users\%user%\.qwen\projects\*\chats
+        FileMask: "*.worktree.json"
+        Recursive: false
+    -
+        Name: qwen_code.shell_history
+        Category: shell_history
+        Path: C:\Users\%user%\.qwen\tmp\*\shell_history
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: qwen_code.subagent_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\.qwen\projects\*\subagents\*
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: qwen_code.system_settings
+        Category: config
+        Path: C:\ProgramData\qwen-code
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: qwen_code.system_settings
+        Category: config
+        Path: C:\ProgramData\qwen-code
+        FileMask: "system-defaults.json"
+        Recursive: false
+    -
+        Name: qwen_code.trusted_folders
+        Category: permissions
+        Path: C:\Users\%user%\.qwen
+        FileMask: "trustedFolders.json"
+        Recursive: false
+    -
+        Name: qwen_code.usage_history
+        Category: log
+        Path: C:\Users\%user%\.qwen
+        FileMask: "usage_record.jsonl"
+        Recursive: false
+    -
+        Name: qwen_code.user_extension_points
+        Category: config
+        Path: C:\Users\%user%\.agents\skills
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: qwen_code.user_extension_points
+        Category: config
+        Path: C:\Users\%user%\.qwen\agents
+        FileMask: "*.md"
+        Recursive: false
+    -
+        Name: qwen_code.user_extension_points
+        Category: config
+        Path: C:\Users\%user%\.qwen\commands
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: qwen_code.user_extension_points
+        Category: config
+        Path: C:\Users\%user%\.qwen\extensions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: qwen_code.user_extension_points
+        Category: config
+        Path: C:\Users\%user%\.qwen\locales
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: qwen_code.user_extension_points
+        Category: config
+        Path: C:\Users\%user%\.qwen\rules
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: qwen_code.user_extension_points
+        Category: config
+        Path: C:\Users\%user%\.qwen\skills
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: qwen_code.user_extension_points
+        Category: config
+        Path: C:\Users\%user%\.qwen\workflows
+        FileMask: "*.js"
+        Recursive: false
+    -
+        Name: qwen_code.user_instructions
+        Category: instructions
+        Path: C:\Users\%user%\.qwen
+        FileMask: "AGENTS.md"
+        Recursive: false
+    -
+        Name: qwen_code.user_instructions
+        Category: instructions
+        Path: C:\Users\%user%\.qwen
+        FileMask: "QWEN.md"
+        Recursive: false
+    -
+        Name: qwen_code.user_instructions
+        Category: instructions
+        Path: C:\Users\%user%\.qwen
+        FileMask: "memory.md"
+        Recursive: false
+    -
+        Name: qwen_code.user_settings
+        Category: config
+        Path: C:\Users\%user%\.qwen
+        FileMask: "settings.json"
+        Recursive: false

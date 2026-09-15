@@ -153,8 +153,48 @@ cannot be removed or edited quietly. See [BUNDLE_FORMAT.md](BUNDLE_FORMAT.md).
 
 ## Deploying through other tooling
 
-Generated collection rules for Velociraptor, KAPE, Microsoft Defender live response,
-Advanced Hunting KQL and osquery are planned and will live under `exporters/generated/`,
-rendered from the same catalogue so they cannot drift from it. Until then, the collectors
-are single dependency-free files precisely so they can be pushed through whatever channel
-is available: a live-response `putfile` and `run`, a remote shell, or a USB stick.
+The catalogue is also rendered into the formats other tools already speak, so using it does
+not require adopting this suite's collector. The output is committed under
+`exporters/generated/` and CI fails if it drifts from the catalogue, for the same reason the
+embedded catalogue inside the collectors is checked: a rule that lags the catalogue searches
+last month's locations and reports a clean host.
+
+```bash
+uv run agentforensics export-collection            # every format, into exporters/generated
+uv run agentforensics export-collection --format kape --out /tmp/rules
+```
+
+| Format | What you get | Use it for |
+| --- | --- | --- |
+| `velociraptor` | A collection artifact that globs the catalogue paths and uploads what it finds, and a metadata-only presence artifact | Anything cross-platform. Its glob language is the closest to the catalogue's, so it has the fewest gaps |
+| `kape` | One `.tkape` per agent plus a compound target | A Windows examiner who already works in KAPE |
+| `mde` | A presence-check script and a runbook | A Defender live response session, one host at a time |
+| `kql` | Advanced Hunting queries over file events and process events | Narrowing a fleet from the console, before touching any host |
+| `osquery` | A pack of per-agent, per-platform file queries | A fleet that already runs osquery. Metadata only, so it is triage rather than collection |
+
+### What a generated rule cannot do, and why it says so
+
+Every one of these tools has a narrower path language than the catalogue. KAPE addresses a
+drive and a file mask. osquery has one wildcard depth per segment. Advanced Hunting sees
+events rather than the filesystem and has no user-profile placeholder at all. Live response
+fetches a file only by its exact name.
+
+So every generated file carries, in its own header, the artifacts it could not express and
+the reason for each. Read that section before you read the results. The recurring reasons:
+
+- **Anchored at a working copy.** A project instruction file lives in a repository whose
+  location is in the agent's own state file. Nothing static can find it. This is the
+  largest group and it covers exactly the files a prompt-injection question is about.
+- **Reachable only through a relocation variable.** The agent's tree was moved by an
+  environment variable, so its location is whatever that variable says. One agent writes an
+  entire second transcript to a path the operator chooses.
+- **A registry key**, which is a different table or a different target type in each tool.
+- **Platform scope.** KAPE and the live response package are Windows only, and they say how
+  much of the catalogue that puts out of reach.
+
+The collector reads all four of those. That is the honest division of labour: a generated
+rule finds the hosts worth looking at, the collector gets the evidence.
+
+An empty result from any of these means the paths it searched held nothing. It does not mean
+the host is clean, and each generated file argues that point in its header, because the
+person running the rule is often not the person who generated it.

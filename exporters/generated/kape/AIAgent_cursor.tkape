@@ -1,0 +1,301 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   a registry key, which is a KAPE registry target rather than a file target
+#     cursor.install_and_machine_identity
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     cursor.cli_config
+#     cursor.hooks
+#     cursor.mcp_config
+#     cursor.project_instructions
+#   no Windows path that a drive-and-mask target can express
+#     cursor.retrieval_index
+Description: AI coding agent artifacts, Cursor
+Author: agentforensics
+Version: 1.0
+Id: 0a0769ce-f60b-1737-3668-b6d71b729c3b
+RecreateDirectories: true
+Targets:
+    -
+        Name: cursor.acp_session_store
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\acp-sessions\*
+        FileMask: "meta.json"
+        Recursive: false
+    -
+        Name: cursor.acp_session_store
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\acp-sessions\*
+        FileMask: "store.db"
+        Recursive: false
+    -
+        Name: cursor.acp_session_store
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\acp-sessions\*
+        FileMask: "store.db-shm"
+        Recursive: false
+    -
+        Name: cursor.acp_session_store
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\acp-sessions\*
+        FileMask: "store.db-wal"
+        Recursive: false
+    -
+        Name: cursor.agent_cli_state
+        Category: config
+        Path: C:\Users\%user%\.cursor
+        FileMask: "agent-cli-state.json"
+        Recursive: false
+    -
+        Name: cursor.agent_cli_state
+        Category: config
+        Path: C:\Users\%user%\.cursor
+        FileMask: "hooks.json"
+        Recursive: false
+    -
+        Name: cursor.agent_cli_state
+        Category: config
+        Path: C:\Users\%user%\.cursor\agents
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.agent_cli_state
+        Category: config
+        Path: C:\Users\%user%\.cursor\browser-logs
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.agent_cli_state
+        Category: config
+        Path: C:\Users\%user%\.cursor\commands
+        FileMask: "*.md"
+        Recursive: false
+    -
+        Name: cursor.agent_cli_state
+        Category: config
+        Path: C:\Users\%user%\.cursor\plugins
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.agent_cli_state
+        Category: config
+        Path: C:\Users\%user%\.cursor\sandbox-policies
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.agent_cli_state
+        Category: config
+        Path: C:\Users\%user%\.cursor\skills
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.agent_cli_state
+        Category: config
+        Path: C:\Users\%user%\.cursor\skills-cursor
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.agent_cli_state
+        Category: config
+        Path: C:\Users\%user%\.cursor\snapshots
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.agent_cli_state
+        Category: config
+        Path: C:\Users\%user%\.cursor\worktrees
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.agent_transcripts_jsonl
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\projects\*\agent-tools
+        FileMask: "*.txt"
+        Recursive: false
+    -
+        Name: cursor.agent_transcripts_jsonl
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\projects\*\agent-transcripts
+        FileMask: "*.jsonl"
+        Recursive: false
+    -
+        Name: cursor.agent_transcripts_jsonl
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\projects\*\agent-transcripts
+        FileMask: "*.txt"
+        Recursive: false
+    -
+        Name: cursor.agent_transcripts_jsonl
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\projects\*\agent-transcripts
+        FileMask: "..."
+        Recursive: false
+    -
+        Name: cursor.agent_transcripts_jsonl
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\projects\*\agent-transcripts\*
+        FileMask: "*.jsonl"
+        Recursive: false
+    -
+        Name: cursor.agent_transcripts_jsonl
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\projects\*\agent-transcripts\*
+        FileMask: "transcript.jsonl"
+        Recursive: false
+    -
+        Name: cursor.ai_code_tracking_db
+        Category: log
+        Path: C:\Users\%user%\.cursor\ai-tracking
+        FileMask: "*.db"
+        Recursive: false
+    -
+        Name: cursor.ai_code_tracking_db
+        Category: log
+        Path: C:\Users\%user%\.cursor\ai-tracking
+        FileMask: "ai-code-tracking.db"
+        Recursive: false
+    -
+        Name: cursor.auth_credentials
+        Category: credentials
+        Path: C:\Users\%user%\.cursor
+        FileMask: "auth.json"
+        Recursive: false
+    -
+        Name: cursor.auth_credentials
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Roaming\Cursor
+        FileMask: "auth.json"
+        Recursive: false
+    -
+        Name: cursor.chat_session_meta_json
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\chats\*\*
+        FileMask: "meta.json"
+        Recursive: false
+    -
+        Name: cursor.chat_session_prompt_history
+        Category: prompt_history
+        Path: C:\Users\%user%\.cursor\chats\*\*
+        FileMask: "prompt_history.json"
+        Recursive: false
+    -
+        Name: cursor.chat_store_db
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\chats\*\*
+        FileMask: "store.db"
+        Recursive: false
+    -
+        Name: cursor.chat_store_db
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\chats\*\*
+        FileMask: "store.db-shm"
+        Recursive: false
+    -
+        Name: cursor.chat_store_db
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\chats\*\*
+        FileMask: "store.db-wal"
+        Recursive: false
+    -
+        Name: cursor.commit_checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\anysphere.cursor-commits\checkpoints
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.conversation_search_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage
+        FileMask: "conversation-search.db"
+        Recursive: false
+    -
+        Name: cursor.extensions
+        Category: install_evidence
+        Path: C:\Users\%user%\.cursor-server\extensions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.extensions
+        Category: install_evidence
+        Path: C:\Users\%user%\.cursor\extensions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.extensions
+        Category: install_evidence
+        Path: C:\Users\%user%\.cursor\extensions
+        FileMask: "extensions.json"
+        Recursive: false
+    -
+        Name: cursor.global_prompt_history
+        Category: prompt_history
+        Path: C:\Users\%user%\.cursor
+        FileMask: "prompt_history.json"
+        Recursive: false
+    -
+        Name: cursor.global_state_vscdb
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: cursor.local_file_history
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\History
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\logs
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.pasted_text
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\chats\*\*
+        FileMask: "pasted_text.json"
+        Recursive: false
+    -
+        Name: cursor.project_metadata
+        Category: config
+        Path: C:\Users\%user%\.cursor
+        FileMask: "projects-metadata.json"
+        Recursive: false
+    -
+        Name: cursor.project_metadata
+        Category: config
+        Path: C:\Users\%user%\.cursor\projects\*
+        FileMask: "mcp-approvals.json"
+        Recursive: false
+    -
+        Name: cursor.project_metadata
+        Category: config
+        Path: C:\Users\%user%\.cursor\projects\*
+        FileMask: "repo.json"
+        Recursive: false
+    -
+        Name: cursor.workspace_state_vscdb
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\workspaceStorage\*
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: cursor.worktrees
+        Category: file_snapshot
+        Path: C:\Users\%user%\.cursor\worktrees
+        FileMask: "*"
+        Recursive: false

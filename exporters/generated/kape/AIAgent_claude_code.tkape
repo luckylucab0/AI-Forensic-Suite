@@ -1,0 +1,632 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   a registry key, which is a KAPE registry target rather than a file target
+#     claude_code.managed_settings_registry
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     claude_code.agent_memory
+#     claude_code.agents
+#     claude_code.commands
+#     claude_code.loop_instructions
+#     claude_code.output_styles
+#     claude_code.plugin_manifests
+#     claude_code.project_claude_local_md
+#     claude_code.project_claude_md
+#     claude_code.project_mcp_json
+#     claude_code.project_rules
+#     claude_code.project_settings
+#     claude_code.project_settings_local
+#     claude_code.settings_referenced_executables
+#     claude_code.skills
+#     claude_code.workflows
+#     claude_code.worktreeinclude
+#     claude_code.worktrees
+#   reachable only through a relocation variable, which KAPE cannot resolve: read the variable off the endpoint
+#     claude_code.git_global_excludes
+Description: AI coding agent artifacts, Claude Code
+Author: agentforensics
+Version: 1.0
+Id: b07724b6-6c28-de05-6cf3-06edc21845ab
+RecreateDirectories: true
+Targets:
+    -
+        Name: claude_code.anthropic_active_config
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Anthropic\active_config
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.anthropic_profile_configs
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Anthropic\configs
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: claude_code.anthropic_profile_credentials
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Roaming\Anthropic\credentials
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: claude_code.auto_memory
+        Category: memory
+        Path: C:\Users\%user%\.claude\projects\*\memory
+        FileMask: "*.md"
+        Recursive: false
+    -
+        Name: claude_code.auto_memory
+        Category: memory
+        Path: C:\Users\%user%\.claude\projects\*\memory
+        FileMask: "MEMORY.md"
+        Recursive: false
+    -
+        Name: claude_code.changelog_cache
+        Category: install_evidence
+        Path: C:\Users\%user%\.claude\cache
+        FileMask: "changelog.md"
+        Recursive: false
+    -
+        Name: claude_code.config_backups
+        Category: config
+        Path: C:\Users\%user%\.claude\backups
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.config_backups
+        Category: config
+        Path: C:\Users\%user%\.claude\backups
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.config_backups
+        Category: config
+        Path: C:\Users\%user%\.claude\backups
+        FileMask: ".claude.json.corrupted.*"
+        Recursive: false
+    -
+        Name: claude_code.credentials
+        Category: credentials
+        Path: C:\Users\%user%\.claude
+        FileMask: ".credentials.json"
+        Recursive: false
+    -
+        Name: claude_code.daemon_state
+        Category: log
+        Path: C:\Users\%user%\.claude
+        FileMask: "daemon.lock"
+        Recursive: false
+    -
+        Name: claude_code.daemon_state
+        Category: log
+        Path: C:\Users\%user%\.claude
+        FileMask: "daemon.log"
+        Recursive: false
+    -
+        Name: claude_code.daemon_state
+        Category: log
+        Path: C:\Users\%user%\.claude\daemon
+        FileMask: "roster.json"
+        Recursive: false
+    -
+        Name: claude_code.debug_logs
+        Category: log
+        Path: C:\Users\%user%\.claude\debug
+        FileMask: "*.txt"
+        Recursive: false
+    -
+        Name: claude_code.feedback_bundles
+        Category: transcript
+        Path: C:\Users\%user%\.claude\feedback-bundles
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.feedback_bundles
+        Category: transcript
+        Path: C:\Users\%user%\.claude\feedback-bundles
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.feedback_bundles
+        Category: transcript
+        Path: C:\Users\%user%\.claude\feedback\drafts
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.feedback_drafts
+        Category: log
+        Path: C:\Users\%user%\.claude\feedback\drafts
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.feedback_drafts
+        Category: log
+        Path: C:\Users\%user%\.claude\feedback\drafts
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.file_history_snapshots
+        Category: file_snapshot
+        Path: C:\Users\%user%\.claude\file-history
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.file_history_snapshots
+        Category: file_snapshot
+        Path: C:\Users\%user%\.claude\file-history\*
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.global_config
+        Category: config
+        Path: C:\Users\%user%
+        FileMask: ".claude.json"
+        Recursive: false
+    -
+        Name: claude_code.history_jsonl
+        Category: prompt_history
+        Path: C:\Users\%user%\.claude
+        FileMask: "history.jsonl"
+        Recursive: false
+    -
+        Name: claude_code.image_cache
+        Category: cache
+        Path: C:\Users\%user%\.claude\image-cache
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.image_cache
+        Category: cache
+        Path: C:\Users\%user%\.claude\image-cache\*
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.install_legacy_and_npm
+        Category: install_evidence
+        Path: C:\Users\%user%\.claude\local
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.install_legacy_and_npm
+        Category: install_evidence
+        Path: C:\Users\%user%\.npm-global\lib\node_modules\@anthropic-ai\claude-code
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.install_legacy_and_npm
+        Category: install_evidence
+        Path: C:\Users\%user%\.npm-packages\lib\node_modules\@anthropic-ai\claude-code
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.install_legacy_and_npm
+        Category: install_evidence
+        Path: C:\Users\%user%\.nvm\versions\node\*\lib\node_modules\@anthropic-ai\claude-code
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.install_legacy_and_npm
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.install_native
+        Category: install_evidence
+        Path: C:\Users\%user%\.local\bin
+        FileMask: "claude.exe"
+        Recursive: false
+    -
+        Name: claude_code.jobs
+        Category: log
+        Path: C:\Users\%user%\.claude\jobs\*
+        FileMask: "state.json"
+        Recursive: false
+    -
+        Name: claude_code.jobs
+        Category: log
+        Path: C:\Users\%user%\.claude\jobs\*\tmp
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.jobs
+        Category: log
+        Path: C:\Users\%user%\.claude\jobs\*\tmp
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.keybindings
+        Category: config
+        Path: C:\Users\%user%\.claude
+        FileMask: "keybindings.json"
+        Recursive: false
+    -
+        Name: claude_code.known_marketplaces
+        Category: config
+        Path: C:\Users\%user%\.claude\plugins
+        FileMask: "known_marketplaces.json"
+        Recursive: false
+    -
+        Name: claude_code.legacy_dirs
+        Category: log
+        Path: C:\Users\%user%\.claude\logs
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.legacy_dirs
+        Category: log
+        Path: C:\Users\%user%\.claude\logs
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.legacy_dirs
+        Category: log
+        Path: C:\Users\%user%\.claude\statsig
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.legacy_dirs
+        Category: log
+        Path: C:\Users\%user%\.claude\statsig
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.legacy_dirs
+        Category: log
+        Path: C:\Users\%user%\.claude\todos
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.legacy_dirs
+        Category: log
+        Path: C:\Users\%user%\.claude\todos
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.legacy_state_dirs
+        Category: cache
+        Path: C:\Users\%user%\.claude\logs
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.legacy_state_dirs
+        Category: cache
+        Path: C:\Users\%user%\.claude\statsig
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.legacy_state_dirs
+        Category: cache
+        Path: C:\Users\%user%\.claude\todos
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.managed_claude_md
+        Category: instructions
+        Path: C:\Program Files\ClaudeCode
+        FileMask: "CLAUDE.md"
+        Recursive: false
+    -
+        Name: claude_code.managed_mcp_json
+        Category: mcp_config
+        Path: C:\Program Files\ClaudeCode
+        FileMask: "managed-mcp.json"
+        Recursive: false
+    -
+        Name: claude_code.managed_settings_dropins
+        Category: permissions
+        Path: C:\Program Files\ClaudeCode\managed-settings.d
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: claude_code.managed_settings_file
+        Category: permissions
+        Path: C:\Program Files\ClaudeCode
+        FileMask: "managed-settings.json"
+        Recursive: false
+    -
+        Name: claude_code.managed_settings_file
+        Category: permissions
+        Path: C:\ProgramData\ClaudeCode
+        FileMask: "managed-settings.json"
+        Recursive: false
+    -
+        Name: claude_code.mcp_logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\claude-cli-nodejs\Cache\*\mcp-logs-*
+        FileMask: "*.jsonl"
+        Recursive: false
+    -
+        Name: claude_code.org_policy_cache
+        Category: config
+        Path: C:\Users\%user%\.claude
+        FileMask: "policy-limits.json"
+        Recursive: false
+    -
+        Name: claude_code.org_policy_cache
+        Category: config
+        Path: C:\Users\%user%\.claude
+        FileMask: "remote-settings.json"
+        Recursive: false
+    -
+        Name: claude_code.paste_cache
+        Category: cache
+        Path: C:\Users\%user%\.claude\paste-cache
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.paste_cache
+        Category: cache
+        Path: C:\Users\%user%\.claude\paste-cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.plans
+        Category: instructions
+        Path: C:\Users\%user%\.claude\plans
+        FileMask: "*.md"
+        Recursive: false
+    -
+        Name: claude_code.plugin_cache
+        Category: cache
+        Path: C:\Users\%user%\.claude\plugins\cache\*\*
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.plugin_data
+        Category: cache
+        Path: C:\Users\%user%\.claude\plugins\data
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.plugin_marketplaces_clones
+        Category: install_evidence
+        Path: C:\Users\%user%\.claude\plugins\marketplaces
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.plugins_root
+        Category: install_evidence
+        Path: C:\Users\%user%\.claude\plugins
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.plugins_synced
+        Category: install_evidence
+        Path: C:\Users\%user%\.claude\plugins\synced
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.policy_limits
+        Category: config
+        Path: C:\Users\%user%\.claude
+        FileMask: "policy-limits.json"
+        Recursive: false
+    -
+        Name: claude_code.session_env
+        Category: config
+        Path: C:\Users\%user%\.claude\session-env
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.session_env
+        Category: config
+        Path: C:\Users\%user%\.claude\session-env
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.sessions_dir
+        Category: log
+        Path: C:\Users\%user%\.claude\sessions
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.sessions_dir
+        Category: log
+        Path: C:\Users\%user%\.claude\sessions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.shell_snapshots
+        Category: shell_history
+        Path: C:\Users\%user%\.claude\shell-snapshots
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.shell_snapshots
+        Category: shell_history
+        Path: C:\Users\%user%\.claude\shell-snapshots
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.skills_trash
+        Category: instructions
+        Path: C:\Users\%user%\.claude\skills
+        FileMask: ".trash"
+        Recursive: false
+    -
+        Name: claude_code.stats_cache
+        Category: cache
+        Path: C:\Users\%user%\.claude
+        FileMask: "stats-cache.json"
+        Recursive: false
+    -
+        Name: claude_code.subagent_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*\*\subagents
+        FileMask: "*.jsonl"
+        Recursive: false
+    -
+        Name: claude_code.subagent_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*\*\subagents
+        FileMask: "agent-*.jsonl"
+        Recursive: false
+    -
+        Name: claude_code.subagent_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*\*\subagents
+        FileMask: "agent-*.meta.json"
+        Recursive: false
+    -
+        Name: claude_code.synced_skills
+        Category: instructions
+        Path: C:\Users\%user%\.claude\skills\synced
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.task_lists
+        Category: memory
+        Path: C:\Users\%user%\.claude\tasks
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.task_lists
+        Category: memory
+        Path: C:\Users\%user%\.claude\tasks\*
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.themes
+        Category: config
+        Path: C:\Users\%user%\.claude\themes
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: claude_code.tool_result_spills
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*\*\tool-results
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.tool_result_spills
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*\*\tool-results
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.transcripts
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*
+        FileMask: "*.jsonl"
+        Recursive: false
+    -
+        Name: claude_code.transcripts_set_aside
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*
+        FileMask: "*.jsonl.superseded-*"
+        Recursive: false
+    -
+        Name: claude_code.transcripts_set_aside
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*
+        FileMask: "*.orphaned-*-*.jsonl"
+        Recursive: false
+    -
+        Name: claude_code.transcripts_set_aside
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*
+        FileMask: "*.orphaned-*.jsonl"
+        Recursive: false
+    -
+        Name: claude_code.uploads
+        Category: cache
+        Path: C:\Users\%user%\.claude\uploads
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.uploads
+        Category: cache
+        Path: C:\Users\%user%\.claude\uploads\*
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.usage_data
+        Category: log
+        Path: C:\Users\%user%\.claude\usage-data
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_code.usage_data
+        Category: log
+        Path: C:\Users\%user%\.claude\usage-data
+        FileMask: "report.html"
+        Recursive: false
+    -
+        Name: claude_code.usage_reports
+        Category: log
+        Path: C:\Users\%user%\.claude\usage-data
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.usage_reports
+        Category: log
+        Path: C:\Users\%user%\.claude\usage-data
+        FileMask: "report.html"
+        Recursive: false
+    -
+        Name: claude_code.user_claude_md
+        Category: instructions
+        Path: C:\Users\%user%\.claude
+        FileMask: "CLAUDE.md"
+        Recursive: false
+    -
+        Name: claude_code.user_rules
+        Category: instructions
+        Path: C:\Users\%user%\.claude\rules
+        FileMask: "*.md"
+        Recursive: true
+    -
+        Name: claude_code.user_settings
+        Category: config
+        Path: C:\Users\%user%\.claude
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: claude_code.user_settings_local
+        Category: permissions
+        Path: C:\Users\%user%\.claude
+        FileMask: "settings.local.json"
+        Recursive: false
+    -
+        Name: claude_code.workflow_runs
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*\*\subagents\workflows\*
+        FileMask: "*.jsonl"
+        Recursive: false
+    -
+        Name: claude_code.workflow_runs
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*\*\subagents\workflows\*
+        FileMask: "agent-*.jsonl"
+        Recursive: false
+    -
+        Name: claude_code.workflow_runs
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*\*\subagents\workflows\*
+        FileMask: "agent-*.meta.json"
+        Recursive: false
+    -
+        Name: claude_code.workflow_runs
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*\*\subagents\workflows\*
+        FileMask: "journal.jsonl"
+        Recursive: false
+    -
+        Name: claude_code.workflow_runs
+        Category: transcript
+        Path: C:\Users\%user%\.claude\projects\*\*\workflows
+        FileMask: "*.json"
+        Recursive: false

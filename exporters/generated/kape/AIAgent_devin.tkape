@@ -1,0 +1,34 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Every catalogue artifact for this target is covered.
+Description: AI coding agent artifacts, Devin
+Author: agentforensics
+Version: 1.0
+Id: c05b2d0a-9d74-a23e-3746-e686a4c7f487
+RecreateDirectories: true
+Targets:
+    -
+        Name: devin.acp_events
+        Category: log
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User\acp-events
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: devin.sessions_db
+        Category: transcript
+        Path: C:\Users\%user%\.local\share\devin\cli
+        FileMask: "sessions.db"
+        Recursive: false

@@ -26,6 +26,8 @@ from typing import TextIO
 from agentforensics import __version__
 from agentforensics.bundle import BundleError, verify_bundle
 from agentforensics.catalog import CatalogueError, load_catalogue
+from agentforensics.exporters import FORMATS
+from agentforensics.exporters import render as render_collection_rules
 
 EXIT_OK = 0
 EXIT_FINDING = 1
@@ -40,7 +42,6 @@ _PLANNED = [
     ("timeline", "build and export a device-wide timeline"),
     ("scan", "run the YAML rule packs against a case"),
     ("export", "export a case, including the viewer's event shape"),
-    ("export-collection", "generate collection rules from the artifact catalogue"),
     ("serve", "serve the local read-only API and the viewer on 127.0.0.1"),
 ]
 
@@ -159,6 +160,80 @@ def cmd_catalog(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_export_collection(args: argparse.Namespace) -> int:
+    """Render the catalogue into other tools' collection-rule formats.
+
+    Written to disk rather than to stdout because every format is several files, and the
+    committed copy under exporters/generated is what CI checks for staleness.
+
+    The exit code carries the one thing worth automating on: a format that could not
+    express some of the catalogue exits 1, because a rule with gaps is still useful but
+    whoever generated it needs to know it has them. The gaps are listed in each generated
+    file's own header as well, since the person running the rule is not always the person
+    who generated it.
+    """
+    try:
+        catalogue = load_catalogue(Path(args.catalog))
+    except CatalogueError as exc:
+        _write(sys.stderr, f"export-collection: {exc}")
+        return EXIT_ERROR
+
+    try:
+        rendered = render_collection_rules(catalogue, args.format)
+    except ValueError as exc:
+        _write(sys.stderr, f"export-collection: {exc}")
+        return EXIT_ERROR
+
+    out_dir = Path(args.out)
+    written = []
+    for item in rendered:
+        target = out_dir / item.path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        # newline="" so two platforms produce the same bytes: the committed copy is
+        # compared byte for byte by the staleness check.
+        with target.open("w", encoding="utf-8", newline="") as handle:
+            handle.write(item.text)
+        written.append(item)
+
+    skipped = sum(len(item.skipped) for item in written)
+    if args.json:
+        _write(
+            sys.stdout,
+            json.dumps(
+                {
+                    "out": str(out_dir),
+                    "files": [
+                        {
+                            "path": item.path,
+                            "bytes": len(item.text.encode("utf-8")),
+                            "not_covered": [
+                                {"artifact_id": s.artifact_id, "reason": s.reason}
+                                for s in item.skipped
+                            ],
+                        }
+                        for item in written
+                    ],
+                },
+                indent=2,
+                sort_keys=True,
+            ),
+        )
+    else:
+        for item in written:
+            note = f", {len(item.skipped)} not covered" if item.skipped else ""
+            _write(sys.stdout, f"wrote {out_dir / item.path}{note}")
+        _write(sys.stdout, f"total: {len(written)} file(s)")
+        if skipped:
+            _write(
+                sys.stderr,
+                f"note: {skipped} artifact/target pair(s) could not be expressed. Each "
+                "generated file lists its own, with the reason. Run the suite's collector "
+                "where the gap matters.",
+            )
+
+    return EXIT_FINDING if skipped else EXIT_OK
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="agentforensics",
@@ -195,6 +270,26 @@ def build_parser() -> argparse.ArgumentParser:
     )
     catalog.add_argument("--json", action="store_true")
     catalog.set_defaults(func=cmd_catalog)
+
+    export = sub.add_parser(
+        "export-collection",
+        help="generate collection rules for other tooling from the artifact catalogue",
+        description=cmd_export_collection.__doc__,
+    )
+    export.add_argument("--catalog", default="catalog", help="catalogue directory")
+    export.add_argument(
+        "--out",
+        default="exporters/generated",
+        help="directory to write into. The committed copy lives at the default.",
+    )
+    export.add_argument(
+        "--format",
+        action="append",
+        choices=sorted(FORMATS),
+        help="only this format, repeatable. Default: every format.",
+    )
+    export.add_argument("--json", action="store_true", help="machine-readable report")
+    export.set_defaults(func=cmd_export_collection)
 
     return parser
 

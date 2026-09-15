@@ -81,6 +81,13 @@ repos:
         pass_filenames: false
         files: '^(catalog/|collector/|scripts/build_collectors\.py)'
 
+      - id: collection-rules
+        name: generated collection rules current with the catalogue
+        entry: uv run python scripts/gen_collection_rules.py --check
+        language: system
+        pass_filenames: false
+        files: '^(catalog/|exporters/|src/agentforensics/exporters/|scripts/gen_collection_rules\.py)'
+
       - id: catalogue-schema
         name: catalogue validates against its schema
         entry: uv run python -c "from pathlib import Path; from agentforensics.catalog import load_catalogue; print(len(load_catalogue(Path('catalog')).artifacts), 'artifacts validated')"

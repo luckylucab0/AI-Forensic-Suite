@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
 - `model/` the unified event model and the SQLite case schema
 - `timeline/` timeline construction and exports (CSV, JSONL, Timesketch JSONL)
 - `rules/` the declarative YAML rule engine
-- `exporters/` the collection-rule generators
+- `exporters/` the collection-rule generators, one module per target format
 - `webui/` the local read-only API, which also serves the viewer
 - `cli.py` the `agentforensics` command, aliased `afx`
 
@@ -213,6 +213,7 @@ keeps them to a minimum, and each one is a decision with an ADR.
 | 0 | Repository hygiene, sanitized viewer, tooling, CI, OpSec guard |
 | 1 | Artifact catalogue, both collectors, bundle format, `verify`, synthetic fixtures |
 | 2 | Collection rules generated for Velociraptor, KAPE, Defender live response, KQL, osquery |
+
 | 3 | Analyzer core: ingest, parsers, event model, case database, timeline exports |
 | 4 | Rule engine and starter packs |
 | 5 | Local web UI: read-only API, viewer API source, timeline and findings views |

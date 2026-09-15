@@ -1,0 +1,158 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     amazonq.cli_agents
+#     amazonq.cli_mcp_config
+#     amazonq.cli_subagent_executions
+#     amazonq.cli_todo_lists
+#     amazonq.ide_agent_config
+#     amazonq.ide_chat_export
+#     amazonq.memory_bank
+#     amazonq.project_rules
+#     amazonq.prompt_library
+Description: AI coding agent artifacts, Amazon Q Developer (CLI and IDE extension)
+Author: agentforensics
+Version: 1.0
+Id: 0eb46407-3fa3-dc6b-b934-f4c4fe65beda
+RecreateDirectories: true
+Targets:
+    -
+        Name: amazonq.cli_checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\.aws\amazonq\cli-checkouts
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: amazonq.cli_logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\Temp\amazon-q\logs
+        FileMask: "*.log"
+        Recursive: false
+    -
+        Name: amazonq.cli_logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\Temp\qlog
+        FileMask: "*.log"
+        Recursive: false
+    -
+        Name: amazonq.cli_prompt_history
+        Category: prompt_history
+        Path: C:\Users\%user%\.aws\amazonq
+        FileMask: ".cli_bash_history"
+        Recursive: false
+    -
+        Name: amazonq.cli_settings
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\amazon-q
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: amazonq.cli_state_database
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\amazon-q
+        FileMask: "data.sqlite3"
+        Recursive: false
+    -
+        Name: amazonq.cli_user_rules
+        Category: instructions
+        Path: C:\Users\%user%\.aws\amazonq\rules
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: amazonq.ide_chat_history
+        Category: transcript
+        Path: C:\Users\%user%\.aws\amazonq\history
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: amazonq.ide_chat_history
+        Category: transcript
+        Path: C:\Users\%user%\.aws\amazonq\history
+        FileMask: "chat-history-*.json"
+        Recursive: false
+    -
+        Name: amazonq.ide_chat_history
+        Category: transcript
+        Path: C:\Users\%user%\.aws\amazonq\history
+        FileMask: "chat-history-no-workspace.json"
+        Recursive: false
+    -
+        Name: amazonq.ide_extension_install
+        Category: install_evidence
+        Path: C:\Users\%user%\.vscode\extensions
+        FileMask: "amazonwebservices.amazon-q-vscode-*"
+        Recursive: true
+    -
+        Name: amazonq.ide_extension_install
+        Category: install_evidence
+        Path: C:\Users\%user%\.vscode\extensions
+        FileMask: "amazonwebservices.aws-toolkit-vscode-*"
+        Recursive: true
+    -
+        Name: amazonq.ide_extension_install
+        Category: install_evidence
+        Path: C:\Users\%user%\.vscode\extensions
+        FileMask: "extensions.json"
+        Recursive: false
+    -
+        Name: amazonq.knowledge_bases
+        Category: cache
+        Path: C:\Users\%user%\.aws\amazonq\knowledge_bases
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: amazonq.knowledge_bases
+        Category: cache
+        Path: C:\Users\%user%\.aws\amazonq\knowledge_bases\*
+        FileMask: "contexts.json"
+        Recursive: false
+    -
+        Name: amazonq.knowledge_bases
+        Category: cache
+        Path: C:\Users\%user%\.aws\amazonq\knowledge_bases\*\*
+        FileMask: "bm25_data.json"
+        Recursive: false
+    -
+        Name: amazonq.knowledge_bases
+        Category: cache
+        Path: C:\Users\%user%\.aws\amazonq\knowledge_bases\*\*
+        FileMask: "data.json"
+        Recursive: false
+    -
+        Name: amazonq.legacy_profiles_and_context
+        Category: config
+        Path: C:\Users\%user%\.aws\amazonq
+        FileMask: "global_context.json"
+        Recursive: false
+    -
+        Name: amazonq.legacy_profiles_and_context
+        Category: config
+        Path: C:\Users\%user%\.aws\amazonq\profiles
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: amazonq.sso_token_cache
+        Category: credentials
+        Path: C:\Users\%user%\.aws\sso\cache
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: amazonq.sso_token_cache
+        Category: credentials
+        Path: C:\Users\%user%\.aws\sso\cache
+        FileMask: "aws-toolkit-vscode-client-id-*.json"
+        Recursive: false

@@ -1,0 +1,710 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     cline.checkpoint_refs_in_workspace
+#     cline.rules_project
+#     cline.workspace_specs
+Description: AI coding agent artifacts, Cline
+Author: agentforensics
+Version: 1.0
+Id: eab40580-5b38-bca8-23dc-f1d5c220c015
+RecreateDirectories: true
+Targets:
+    -
+        Name: cline.agent_schedules
+        Category: config
+        Path: C:\Users\%user%\.cline\schedules
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "remote_config_*.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_recommended_models.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "remote_config_*.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_recommended_models.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "remote_config_*.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_recommended_models.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "remote_config_*.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_recommended_models.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "remote_config_*.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_recommended_models.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "remote_config_*.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_recommended_models.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "remote_config_*.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_recommended_models.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\saoudrizwan.claude-dev\cache
+        FileMask: "remote_config_*.json"
+        Recursive: false
+    -
+        Name: cline.cache_and_remote_config
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_recommended_models.json"
+        Recursive: false
+    -
+        Name: cline.chat_workspace
+        Category: file_snapshot
+        Path: C:\Users\%user%\.cline\data\workspaces\chat
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.checkpoint_scratch
+        Category: file_snapshot
+        Path: C:\Users\%user%\.cline\data\checkpoint-scratch\*\index
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.checkpoint_scratch
+        Category: file_snapshot
+        Path: C:\Users\%user%\.cline\data\checkpoint-scratch\*\pathspec
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.checkpoints_shadow_git_legacy
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\saoudrizwan.claude-dev\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: cline.checkpoints_shadow_git_legacy
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: cline.checkpoints_shadow_git_legacy
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\saoudrizwan.claude-dev\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: cline.checkpoints_shadow_git_legacy
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\saoudrizwan.claude-dev\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: cline.checkpoints_shadow_git_legacy
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\saoudrizwan.claude-dev\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: cline.checkpoints_shadow_git_legacy
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\saoudrizwan.claude-dev\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: cline.checkpoints_shadow_git_legacy
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\saoudrizwan.claude-dev\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: cline.checkpoints_shadow_git_legacy
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\saoudrizwan.claude-dev\checkpoints\*
+        FileMask: ".git"
+        Recursive: false
+    -
+        Name: cline.cli_sessions
+        Category: transcript
+        Path: C:\Users\%user%\.cline\data\sessions\*
+        FileMask: "*.hooks.jsonl"
+        Recursive: false
+    -
+        Name: cline.cli_sessions
+        Category: transcript
+        Path: C:\Users\%user%\.cline\data\sessions\*
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: cline.cli_sessions
+        Category: transcript
+        Path: C:\Users\%user%\.cline\data\sessions\*
+        FileMask: "*.messages.json"
+        Recursive: false
+    -
+        Name: cline.cli_sessions
+        Category: transcript
+        Path: C:\Users\%user%\.cline\data\sessions\*\subagents
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.connector_settings_and_logs
+        Category: log
+        Path: C:\Users\%user%\.cline\data\connectors
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: cline.connector_settings_and_logs
+        Category: log
+        Path: C:\Users\%user%\.cline\data\logs
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.connector_settings_and_logs
+        Category: log
+        Path: C:\Users\%user%\.cline\data\logs\connectors\*
+        FileMask: "*.log"
+        Recursive: false
+    -
+        Name: cline.data_dir_root
+        Category: config
+        Path: C:\Users\%user%
+        FileMask: ".cline"
+        Recursive: false
+    -
+        Name: cline.data_dir_root
+        Category: config
+        Path: C:\Users\%user%\.cline\data
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.data_tasks
+        Category: transcript
+        Path: C:\Users\%user%\.cline\data\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: cline.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage
+        FileMask: "saoudrizwan.claude-dev"
+        Recursive: false
+    -
+        Name: cline.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage
+        FileMask: "saoudrizwan.claude-dev"
+        Recursive: false
+    -
+        Name: cline.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage
+        FileMask: "saoudrizwan.claude-dev"
+        Recursive: false
+    -
+        Name: cline.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage
+        FileMask: "saoudrizwan.claude-dev"
+        Recursive: false
+    -
+        Name: cline.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage
+        FileMask: "saoudrizwan.claude-dev"
+        Recursive: false
+    -
+        Name: cline.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage
+        FileMask: "saoudrizwan.claude-dev"
+        Recursive: false
+    -
+        Name: cline.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage
+        FileMask: "saoudrizwan.claude-dev"
+        Recursive: false
+    -
+        Name: cline.extension_id
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage
+        FileMask: "saoudrizwan.claude-dev"
+        Recursive: false
+    -
+        Name: cline.global_settings
+        Category: config
+        Path: C:\Users\%user%\.cline\data\settings
+        FileMask: "global-settings.json"
+        Recursive: false
+    -
+        Name: cline.global_state_json
+        Category: config
+        Path: C:\Users\%user%\.cline\data
+        FileMask: "globalState.json"
+        Recursive: false
+    -
+        Name: cline.global_state_json
+        Category: config
+        Path: C:\Users\%user%\.cline\data\workspaces\*
+        FileMask: "workspaceState.json"
+        Recursive: false
+    -
+        Name: cline.home_config_tree
+        Category: config
+        Path: C:\Users\%user%\.agents\plugins
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.home_config_tree
+        Category: config
+        Path: C:\Users\%user%\.cline\agents
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.home_config_tree
+        Category: config
+        Path: C:\Users\%user%\.cline\cron
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.home_config_tree
+        Category: config
+        Path: C:\Users\%user%\.cline\hooks
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.home_config_tree
+        Category: config
+        Path: C:\Users\%user%\.cline\plugins
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.home_config_tree
+        Category: config
+        Path: C:\Users\%user%\.cline\rules
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.home_config_tree
+        Category: config
+        Path: C:\Users\%user%\.cline\skills
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.home_config_tree
+        Category: config
+        Path: C:\Users\%user%\.cline\tasks
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.home_config_tree
+        Category: config
+        Path: C:\Users\%user%\.cline\workflows
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.mcp_settings
+        Category: mcp_config
+        Path: C:\Users\%user%\.cline\data\settings
+        FileMask: "cline_mcp_settings.json"
+        Recursive: false
+    -
+        Name: cline.mcp_settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_mcp_settings.json"
+        Recursive: false
+    -
+        Name: cline.mcp_settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_mcp_settings.json"
+        Recursive: false
+    -
+        Name: cline.mcp_settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_mcp_settings.json"
+        Recursive: false
+    -
+        Name: cline.mcp_settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_mcp_settings.json"
+        Recursive: false
+    -
+        Name: cline.mcp_settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_mcp_settings.json"
+        Recursive: false
+    -
+        Name: cline.mcp_settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_mcp_settings.json"
+        Recursive: false
+    -
+        Name: cline.mcp_settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_mcp_settings.json"
+        Recursive: false
+    -
+        Name: cline.mcp_settings
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\saoudrizwan.claude-dev\settings
+        FileMask: "cline_mcp_settings.json"
+        Recursive: false
+    -
+        Name: cline.provider_settings
+        Category: credentials
+        Path: C:\Users\%user%\.cline\data\settings
+        FileMask: "providers.json"
+        Recursive: false
+    -
+        Name: cline.rules_global
+        Category: instructions
+        Path: C:\Users\%user%\Cline\Rules
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.secrets_json
+        Category: credentials
+        Path: C:\Users\%user%\.cline\data
+        FileMask: "secrets.json"
+        Recursive: false
+    -
+        Name: cline.sqlite_dbs
+        Category: transcript
+        Path: C:\Users\%user%\.cline\data\db
+        FileMask: "connectors.db"
+        Recursive: false
+    -
+        Name: cline.sqlite_dbs
+        Category: transcript
+        Path: C:\Users\%user%\.cline\data\db
+        FileMask: "cron.db"
+        Recursive: false
+    -
+        Name: cline.sqlite_dbs
+        Category: transcript
+        Path: C:\Users\%user%\.cline\data\db
+        FileMask: "tasks.db"
+        Recursive: false
+    -
+        Name: cline.team_data
+        Category: config
+        Path: C:\Users\%user%\.cline\data\teams
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "context_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "context_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "context_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "context_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "context_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "context_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "context_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "api_conversation_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "context_history.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "task_metadata.json"
+        Recursive: false
+    -
+        Name: cline.vscode_task_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\saoudrizwan.claude-dev\tasks\*
+        FileMask: "ui_messages.json"
+        Recursive: false

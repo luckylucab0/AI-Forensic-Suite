@@ -1,0 +1,205 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# A compound target: it pulls in the per-agent files beside it, so KAPE
+# collects every agent in one pass. Use it when you do not yet know
+# which agent was used, which is the usual state at the start of a case.
+Description: AI coding agent artifacts, every agent
+Author: agentforensics
+Version: 1.0
+Id: fce5b809-29da-93e8-9570-32f1391602cb
+RecreateDirectories: true
+Targets:
+    -
+        Name: Aider
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_aider.tkape
+    -
+        Name: Amazon Q Developer (CLI and IDE extension)
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_amazonq.tkape
+    -
+        Name: Amp
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_amp.tkape
+    -
+        Name: ChatGPT Desktop
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_chatgpt_desktop.tkape
+    -
+        Name: Claude Code
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_claude_code.tkape
+    -
+        Name: Claude Desktop
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_claude_desktop.tkape
+    -
+        Name: Cline
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_cline.tkape
+    -
+        Name: Continue
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_continue.tkape
+    -
+        Name: Cross-cutting evidence
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_crosscutting.tkape
+    -
+        Name: Cursor
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_cursor.tkape
+    -
+        Name: Devin
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_devin.tkape
+    -
+        Name: Factory Droid
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_factory_droid.tkape
+    -
+        Name: Gemini CLI
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_gemini_cli.tkape
+    -
+        Name: GitHub Copilot CLI
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_copilot.tkape
+    -
+        Name: Goose
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_goose.tkape
+    -
+        Name: Hermes
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_hermes.tkape
+    -
+        Name: JetBrains AI Assistant
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_jetbrains_ai.tkape
+    -
+        Name: Junie
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_junie.tkape
+    -
+        Name: Kilo Code
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_kilo_code.tkape
+    -
+        Name: Kiro
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_kiro.tkape
+    -
+        Name: LM Studio
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_lmstudio.tkape
+    -
+        Name: Ollama
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_ollama.tkape
+    -
+        Name: OpenAI Codex CLI
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_codex.tkape
+    -
+        Name: OpenCode
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_opencode.tkape
+    -
+        Name: Qwen Code
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_qwen_code.tkape
+    -
+        Name: Roo Code
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_roo_code.tkape
+    -
+        Name: Visual Studio Code host storage
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_vscode.tkape
+    -
+        Name: Warp
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_warp.tkape
+    -
+        Name: Windsurf
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_windsurf.tkape
+    -
+        Name: Zed
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_zed.tkape
+    -
+        Name: pi
+        Category: AIAgents
+        Path: ""
+        FileMask: ""
+        Comment: AIAgent_pi.tkape

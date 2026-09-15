@@ -1,0 +1,108 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     vscode.mcp_config
+Description: AI coding agent artifacts, Visual Studio Code host storage
+Author: agentforensics
+Version: 1.0
+Id: 1bbb5781-49e4-d309-f98f-2299fc1ff892
+RecreateDirectories: true
+Targets:
+    -
+        Name: vscode.extension_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\.cursor\extensions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.extension_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\.vscode-insiders\extensions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.extension_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\.vscode-server\extensions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.extension_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\.vscode\extensions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.extension_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\.windsurf\extensions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.extension_install_evidence
+        Category: install_evidence
+        Path: C:\Users\%user%\.vscode-server\extensions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.extension_install_evidence
+        Category: install_evidence
+        Path: C:\Users\%user%\.vscode\extensions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.extension_install_evidence
+        Category: install_evidence
+        Path: C:\Users\%user%\.vscode\extensions
+        FileMask: "extensions.json"
+        Recursive: false
+    -
+        Name: vscode.extension_install_evidence
+        Category: install_evidence
+        Path: C:\Users\%user%\.vscode\extensions
+        FileMask: "kilocode.kilo-code-*"
+        Recursive: false
+    -
+        Name: vscode.extension_install_evidence
+        Category: install_evidence
+        Path: C:\Users\%user%\.vscode\extensions
+        FileMask: "rooveterinaryinc.roo-cline-*"
+        Recursive: false
+    -
+        Name: vscode.extension_install_evidence
+        Category: install_evidence
+        Path: C:\Users\%user%\.vscode\extensions
+        FileMask: "saoudrizwan.claude-dev-*"
+        Recursive: false
+    -
+        Name: vscode.state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: vscode.user_data_roots
+        Category: config
+        Path: C:\Users\%user%\.vscode-server\data\User\globalStorage
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.user_data_roots
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage
+        FileMask: "*"
+        Recursive: true

@@ -1,0 +1,40 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Every catalogue artifact for this target is covered.
+Description: AI coding agent artifacts, ChatGPT Desktop
+Author: agentforensics
+Version: 1.0
+Id: ec794a6f-3bae-69c5-d066-53504e9bac77
+RecreateDirectories: true
+Targets:
+    -
+        Name: chatgpt_desktop.windows_msix_localcache
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\Packages\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\LocalCache\Roaming\ChatGPT
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: chatgpt_desktop.windows_msix_localcache
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\Packages\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\LocalCache\Roaming\ChatGPT\IndexedDB
+        FileMask: "https_chatgpt.com_0.indexeddb.leveldb"
+        Recursive: false
+    -
+        Name: chatgpt_desktop.windows_msix_localcache
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\Packages\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\LocalCache\Roaming\ChatGPT\Local Storage\leveldb
+        FileMask: "*"
+        Recursive: true

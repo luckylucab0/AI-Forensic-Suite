@@ -1,0 +1,186 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     copilot.lsp_config_repo
+Description: AI coding agent artifacts, GitHub Copilot CLI
+Author: agentforensics
+Version: 1.0
+Id: 3eada2d2-ac26-ee94-a655-9b1a06aeda29
+RecreateDirectories: true
+Targets:
+    -
+        Name: copilot.agents_skills_hooks
+        Category: instructions
+        Path: C:\Users\%user%\.copilot\agents
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.agents_skills_hooks
+        Category: instructions
+        Path: C:\Users\%user%\.copilot\hooks
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.agents_skills_hooks
+        Category: instructions
+        Path: C:\Users\%user%\.copilot\skills
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.cache
+        Category: cache
+        Path: C:\Users\%user%\AppData\Local\copilot
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.command_history
+        Category: prompt_history
+        Path: C:\Users\%user%\.copilot\command-history-state
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.config_json
+        Category: config
+        Path: C:\Users\%user%\.copilot
+        FileMask: "config.json"
+        Recursive: false
+    -
+        Name: copilot.extensions_and_plugins
+        Category: install_evidence
+        Path: C:\Users\%user%\.copilot\extensions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.extensions_and_plugins
+        Category: install_evidence
+        Path: C:\Users\%user%\.copilot\installed-plugins
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.extensions_and_plugins
+        Category: install_evidence
+        Path: C:\Users\%user%\.copilot\plugin-data
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.ide_locks
+        Category: install_evidence
+        Path: C:\Users\%user%\.copilot\ide
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.instructions
+        Category: instructions
+        Path: C:\Users\%user%\.copilot
+        FileMask: "copilot-instructions.md"
+        Recursive: false
+    -
+        Name: copilot.instructions
+        Category: instructions
+        Path: C:\Users\%user%\.copilot\instructions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.logs
+        Category: log
+        Path: C:\Users\%user%\.copilot\logs
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.lsp_config
+        Category: config
+        Path: C:\Users\%user%\.copilot
+        FileMask: "lsp-config.json"
+        Recursive: false
+    -
+        Name: copilot.mcp_config
+        Category: mcp_config
+        Path: C:\Users\%user%\.copilot
+        FileMask: "mcp-config.json"
+        Recursive: false
+    -
+        Name: copilot.mcp_config_jetbrains
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Local\github-copilot\intellij
+        FileMask: "mcp.json"
+        Recursive: false
+    -
+        Name: copilot.mcp_credentials
+        Category: credentials
+        Path: C:\Users\%user%\.copilot\mcp-oauth-config
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.mcp_credentials
+        Category: credentials
+        Path: C:\Users\%user%\.copilot\mcp-secrets
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.permissions
+        Category: permissions
+        Path: C:\Users\%user%\.copilot
+        FileMask: "permissions-config.json"
+        Recursive: false
+    -
+        Name: copilot.providers
+        Category: config
+        Path: C:\Users\%user%\.copilot
+        FileMask: "providers.json"
+        Recursive: false
+    -
+        Name: copilot.session_event_log
+        Category: transcript
+        Path: C:\Users\%user%\.copilot\session-state\*
+        FileMask: "events.jsonl"
+        Recursive: false
+    -
+        Name: copilot.session_event_log
+        Category: transcript
+        Path: C:\Users\%user%\.copilot\session-state\*
+        FileMask: "workspace.yaml"
+        Recursive: false
+    -
+        Name: copilot.session_state
+        Category: transcript
+        Path: C:\Users\%user%\.copilot\session-state
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: copilot.session_store
+        Category: transcript
+        Path: C:\Users\%user%\.copilot
+        FileMask: "session-store.db"
+        Recursive: false
+    -
+        Name: copilot.session_store_sidecars
+        Category: transcript
+        Path: C:\Users\%user%\.copilot
+        FileMask: "session-store.db-shm"
+        Recursive: false
+    -
+        Name: copilot.session_store_sidecars
+        Category: transcript
+        Path: C:\Users\%user%\.copilot
+        FileMask: "session-store.db-wal"
+        Recursive: false
+    -
+        Name: copilot.settings
+        Category: config
+        Path: C:\Users\%user%\.copilot
+        FileMask: "settings.json"
+        Recursive: false

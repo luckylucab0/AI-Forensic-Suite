@@ -1,0 +1,118 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Every catalogue artifact for this target is covered.
+Description: AI coding agent artifacts, Hermes
+Author: agentforensics
+Version: 1.0
+Id: 18238fd9-8984-72e8-3b14-e0313ebd61a3
+RecreateDirectories: true
+Targets:
+    -
+        Name: hermes.auth
+        Category: credentials
+        Path: C:\Users\%user%\.hermes
+        FileMask: "auth.json"
+        Recursive: false
+    -
+        Name: hermes.config
+        Category: config
+        Path: C:\Users\%user%\.hermes
+        FileMask: "config.yaml"
+        Recursive: false
+    -
+        Name: hermes.cron
+        Category: config
+        Path: C:\Users\%user%\.hermes\cron
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.env
+        Category: credentials
+        Path: C:\Users\%user%\.hermes
+        FileMask: ".env"
+        Recursive: false
+    -
+        Name: hermes.logs
+        Category: log
+        Path: C:\Users\%user%\.hermes\logs
+        FileMask: "errors.log"
+        Recursive: false
+    -
+        Name: hermes.logs
+        Category: log
+        Path: C:\Users\%user%\.hermes\logs
+        FileMask: "gateway.log"
+        Recursive: false
+    -
+        Name: hermes.memories
+        Category: memory
+        Path: C:\Users\%user%\.hermes\memories
+        FileMask: "MEMORY.md"
+        Recursive: false
+    -
+        Name: hermes.memories
+        Category: memory
+        Path: C:\Users\%user%\.hermes\memories
+        FileMask: "USER.md"
+        Recursive: false
+    -
+        Name: hermes.profiles
+        Category: config
+        Path: C:\Users\%user%\.hermes\profiles
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: hermes.sandboxes
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\sandboxes
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.sessions_dir
+        Category: transcript
+        Path: C:\Users\%user%\.hermes\sessions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.skills
+        Category: instructions
+        Path: C:\Users\%user%\.hermes\skills
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.soul
+        Category: instructions
+        Path: C:\Users\%user%\.hermes
+        FileMask: "SOUL.md"
+        Recursive: false
+    -
+        Name: hermes.state_db
+        Category: transcript
+        Path: C:\Users\%user%\.hermes
+        FileMask: "state.db"
+        Recursive: false
+    -
+        Name: hermes.state_db
+        Category: transcript
+        Path: C:\Users\%user%\.hermes
+        FileMask: "state.db-shm"
+        Recursive: false
+    -
+        Name: hermes.state_db
+        Category: transcript
+        Path: C:\Users\%user%\.hermes
+        FileMask: "state.db-wal"
+        Recursive: false

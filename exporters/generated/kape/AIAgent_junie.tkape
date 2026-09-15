@@ -1,0 +1,103 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     junie.mcp_config
+#     junie.project_dir
+Description: AI coding agent artifacts, Junie
+Author: agentforensics
+Version: 1.0
+Id: afb4b795-7ce6-f30c-519a-973e93e51d9b
+RecreateDirectories: true
+Targets:
+    -
+        Name: junie.allowlist
+        Category: permissions
+        Path: C:\Users\%user%\.junie
+        FileMask: "allowlist.json"
+        Recursive: false
+    -
+        Name: junie.cli_sessions
+        Category: transcript
+        Path: C:\Users\%user%\.junie\sessions
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: junie.cli_sessions
+        Category: transcript
+        Path: C:\Users\%user%\.junie\sessions\*
+        FileMask: "events.jsonl"
+        Recursive: false
+    -
+        Name: junie.cli_sessions
+        Category: transcript
+        Path: C:\Users\%user%\.junie\sessions\*
+        FileMask: "transcript.md"
+        Recursive: false
+    -
+        Name: junie.cli_sessions
+        Category: transcript
+        Path: C:\Users\%user%\.junie\sessions\*\subagents
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: junie.home_config
+        Category: config
+        Path: C:\Users\%user%\.junie
+        FileMask: "AGENTS.md"
+        Recursive: false
+    -
+        Name: junie.home_config
+        Category: config
+        Path: C:\Users\%user%\.junie
+        FileMask: "config.json"
+        Recursive: false
+    -
+        Name: junie.home_config
+        Category: config
+        Path: C:\Users\%user%\.junie
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: junie.jcp_outbox
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\JetBrains\junie-jcp-outbox
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: junie.matterhorn_project_logs
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\JetBrains\projects\*\matterhorn
+        FileMask: ".matterhorn"
+        Recursive: true
+    -
+        Name: junie.plugin_install_evidence
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\JetBrains\plugins\ml-llm
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: junie.trust_and_auth_key
+        Category: credentials
+        Path: C:\Users\%user%\.junie\trust
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: junie.trust_and_auth_key
+        Category: credentials
+        Path: C:\Users\%user%\.junie\trust\authentication-key
+        FileMask: "*"
+        Recursive: true

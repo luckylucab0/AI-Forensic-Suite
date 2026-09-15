@@ -1,0 +1,326 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   a registry key, which is a KAPE registry target rather than a file target
+#     claude_desktop.managed_policy_windows
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     claude_desktop.code_launch_config
+Description: AI coding agent artifacts, Claude Desktop
+Author: agentforensics
+Version: 1.0
+Id: c4cf497e-6080-7f07-0d55-f5fcfe658617
+RecreateDirectories: true
+Targets:
+    -
+        Name: claude_desktop.app_logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\Claude-3p\logs
+        FileMask: "main.log"
+        Recursive: false
+    -
+        Name: claude_desktop.app_logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\Claude\Logs
+        FileMask: "main.log"
+        Recursive: false
+    -
+        Name: claude_desktop.app_logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\logs
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.app_logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Roaming\Claude\logs
+        FileMask: "main.log"
+        Recursive: false
+    -
+        Name: claude_desktop.code_session_index
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\Claude-3p\claude-code-sessions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.code_session_index
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\Claude\claude-code-sessions\*\*
+        FileMask: "local_*.json"
+        Recursive: false
+    -
+        Name: claude_desktop.code_session_index
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Claude\claude-code-sessions\*\*
+        FileMask: "local_*.json"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_account_settings
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\Claude-3p\local-agent-mode-sessions\*\*
+        FileMask: "cowork_account_settings.json"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_account_settings
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Claude\local-agent-mode-sessions\*\*
+        FileMask: "cowork_account_settings.json"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_audit_key
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Local\Claude-3p\local-agent-mode-sessions\*\*\*
+        FileMask: ".audit-key"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_audit_key
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Roaming\Claude\local-agent-mode-sessions\*\*\*
+        FileMask: ".audit-key"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_audit_log
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\Claude-3p\local-agent-mode-sessions\*\*\*
+        FileMask: "audit.jsonl"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_audit_log
+        Category: log
+        Path: C:\Users\%user%\AppData\Roaming\Claude\local-agent-mode-sessions\*\*\*
+        FileMask: "audit.jsonl"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_memory
+        Category: memory
+        Path: C:\Users\%user%\AppData\Local\Claude-3p\local-agent-mode-sessions\*\*\memory\memory
+        FileMask: "*.md"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_memory
+        Category: memory
+        Path: C:\Users\%user%\AppData\Roaming\Claude\local-agent-mode-sessions\*\*\memory\memory
+        FileMask: "*.md"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_session_files
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Claude\local-agent-mode-sessions\*\*\local_*\outputs
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.cowork_session_files
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Claude\local-agent-mode-sessions\*\*\local_*\uploads
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.cowork_session_store
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\Claude-3p\local-agent-mode-sessions\*\*
+        FileMask: "local_*"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_session_store
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\Claude\local-agent-mode-sessions\*\*
+        FileMask: "local_*"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_session_store
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\local-agent-mode-sessions\*\*
+        FileMask: "local_*"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_session_store
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Claude\local-agent-mode-sessions\*\*
+        FileMask: "local_*"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_vm_bundle
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\Claude-3p\vm_bundles
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.cowork_vm_bundle
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\vm_bundles\claudevm.bundle
+        FileMask: "sessiondata.vhdx"
+        Recursive: false
+    -
+        Name: claude_desktop.cowork_vm_bundle
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Claude\vm_bundles
+        FileMask: "claudevm.bundle"
+        Recursive: false
+    -
+        Name: claude_desktop.coworkd_service_log
+        Category: log
+        Path: C:\ProgramData\Claude\Logs\coworkd
+        FileMask: "user-*.log"
+        Recursive: false
+    -
+        Name: claude_desktop.device_identifier
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\Claude-3p\ant-did
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.embedded_claude_code
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\Claude-3p\claude-code
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_desktop.embedded_claude_code
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Claude\claude-code\*
+        FileMask: "claude.exe"
+        Recursive: false
+    -
+        Name: claude_desktop.install_evidence_windows
+        Category: install_evidence
+        Path: C:\Program Files\WindowsApps
+        FileMask: "Claude_*_*__pzs8sxrjxfjjc"
+        Recursive: false
+    -
+        Name: claude_desktop.install_evidence_windows
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\Packages\Claude_pzs8sxrjxfjjc
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.local_config_library
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\Claude-3p\configLibrary
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.mcp_config
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude
+        FileMask: "claude_desktop_config.json"
+        Recursive: false
+    -
+        Name: claude_desktop.mcp_config
+        Category: mcp_config
+        Path: C:\Users\%user%\AppData\Roaming\Claude
+        FileMask: "claude_desktop_config.json"
+        Recursive: false
+    -
+        Name: claude_desktop.oauth_and_signin_tokens
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Local\Microsoft\Credentials
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.org_plugins
+        Category: instructions
+        Path: C:\Program Files\Claude\org-plugins
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.renderer_state
+        Category: cache
+        Path: C:\Users\%user%\AppData\Local\Claude-3p\IndexedDB
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.renderer_state
+        Category: cache
+        Path: C:\Users\%user%\AppData\Local\Claude\IndexedDB
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.renderer_state
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Claude\IndexedDB
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.renderer_state
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Claude\Local Storage
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.scheduled_tasks
+        Category: instructions
+        Path: C:\Users\%user%\.claude\scheduled-tasks\*
+        FileMask: "SKILL.md"
+        Recursive: false
+    -
+        Name: claude_desktop.ssh_remote_artifacts
+        Category: file_snapshot
+        Path: C:\Users\%user%\.claude\remote\ccd-cli
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_desktop.ssh_remote_artifacts
+        Category: file_snapshot
+        Path: C:\Users\%user%\.claude\remote\plugins
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_desktop.ssh_remote_artifacts
+        Category: file_snapshot
+        Path: C:\Users\%user%\.claude\remote\run
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_desktop.ssh_remote_artifacts
+        Category: file_snapshot
+        Path: C:\Users\%user%\.claude\remote\srv
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_desktop.transient_session_credentials
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Roaming\Claude
+        FileMask: "host-creds-*.json"
+        Recursive: false
+    -
+        Name: claude_desktop.transient_session_credentials
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Roaming\Claude\ccd-session-secrets
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_desktop.user_output_folder
+        Category: file_snapshot
+        Path: C:\Users\%user%\Claude
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.user_output_folder
+        Category: file_snapshot
+        Path: C:\Users\%user%\Claude\Projects
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_desktop.user_plugins
+        Category: instructions
+        Path: C:\Users\%user%\AppData\Local\Claude-3p\cowork_plugins
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: claude_desktop.user_plugins
+        Category: instructions
+        Path: C:\Users\%user%\AppData\Roaming\Claude\cowork_plugins
+        FileMask: "*"
+        Recursive: true

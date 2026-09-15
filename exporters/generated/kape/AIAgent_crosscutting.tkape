@@ -1,0 +1,180 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   a registry key, which is a KAPE registry target rather than a file target
+#     crosscutting.windows_execution_evidence_registry
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     crosscutting.hook_scripts
+#     crosscutting.instructions_agents_md
+#     crosscutting.instructions_claude_md
+#     crosscutting.instructions_clinerules
+#     crosscutting.instructions_copilot_instructions
+#     crosscutting.instructions_cursor_rules
+#     crosscutting.instructions_gemini_md
+#     crosscutting.instructions_junie_guidelines
+#     crosscutting.instructions_kiro_steering
+#     crosscutting.instructions_windsurf_rules
+#     crosscutting.mcp_config_files
+Description: AI coding agent artifacts, Cross-cutting evidence
+Author: agentforensics
+Version: 1.0
+Id: e1c81afd-382b-cb1b-baac-ab880604af33
+RecreateDirectories: true
+Targets:
+    -
+        Name: crosscutting.npm_debug_logs
+        Category: log
+        Path: C:\Users\%user%\.npm\_logs
+        FileMask: "*-debug-*.log"
+        Recursive: false
+    -
+        Name: crosscutting.npm_debug_logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\npm-cache\_logs
+        FileMask: "*-debug-*.log"
+        Recursive: false
+    -
+        Name: crosscutting.npm_global_install_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\.nvm\versions\node\*\lib\node_modules
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: crosscutting.npm_global_install_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\npm
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: crosscutting.npm_global_install_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\npm\node_modules
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: crosscutting.npm_npx_cache
+        Category: install_evidence
+        Path: C:\Users\%user%\.npm\_npx\*
+        FileMask: "package.json"
+        Recursive: false
+    -
+        Name: crosscutting.npm_npx_cache
+        Category: install_evidence
+        Path: C:\Users\%user%\.npm\_npx\*\node_modules
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: crosscutting.npm_npx_cache
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\npm-cache\_npx\*
+        FileMask: "package.json"
+        Recursive: false
+    -
+        Name: crosscutting.pipx_home_and_bin
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\pipx\pipx\venvs
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: crosscutting.shell_psreadline_history
+        Category: shell_history
+        Path: C:\Users\%user%\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine
+        FileMask: "*_history.txt"
+        Recursive: false
+    -
+        Name: crosscutting.shell_psreadline_history
+        Category: shell_history
+        Path: C:\Users\%user%\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine
+        FileMask: "ConsoleHost_history.txt"
+        Recursive: false
+    -
+        Name: crosscutting.uv_tool_dir
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\uv\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: crosscutting.uv_tool_dir
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\uv\data\tools
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: crosscutting.windows_appdata_program_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\Ollama
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: crosscutting.windows_appdata_program_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\Packages
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: crosscutting.windows_appdata_program_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\Programs
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: crosscutting.windows_appdata_program_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\Programs\Ollama
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: crosscutting.windows_appdata_program_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: crosscutting.windows_execution_evidence_files
+        Category: install_evidence
+        Path: C:\Windows\AppCompat\Programs
+        FileMask: "Amcache.hve"
+        Recursive: false
+    -
+        Name: crosscutting.windows_execution_evidence_files
+        Category: install_evidence
+        Path: C:\Windows\AppCompat\Programs
+        FileMask: "Amcache.hve.LOG1"
+        Recursive: false
+    -
+        Name: crosscutting.windows_execution_evidence_files
+        Category: install_evidence
+        Path: C:\Windows\AppCompat\Programs
+        FileMask: "Amcache.hve.LOG2"
+        Recursive: false
+    -
+        Name: crosscutting.windows_execution_evidence_files
+        Category: install_evidence
+        Path: C:\Windows\Prefetch
+        FileMask: "*.pf"
+        Recursive: false
+    -
+        Name: crosscutting.windows_execution_evidence_files
+        Category: install_evidence
+        Path: C:\Windows\System32\Tasks
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: crosscutting.windows_execution_evidence_files
+        Category: install_evidence
+        Path: C:\Windows\System32\sru
+        FileMask: "SRUDB.dat"
+        Recursive: false

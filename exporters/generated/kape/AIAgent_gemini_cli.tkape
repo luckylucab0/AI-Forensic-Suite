@@ -1,0 +1,84 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     gemini_cli.project_config
+Description: AI coding agent artifacts, Gemini CLI
+Author: agentforensics
+Version: 1.0
+Id: 1ce6417c-3a70-28e8-1e6b-7852ed396c75
+RecreateDirectories: true
+Targets:
+    -
+        Name: gemini_cli.chats
+        Category: transcript
+        Path: C:\Users\%user%\.gemini\sessions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: gemini_cli.chats
+        Category: transcript
+        Path: C:\Users\%user%\.gemini\tmp\*\chats
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: gemini_cli.credentials
+        Category: credentials
+        Path: C:\Users\%user%\.gemini
+        FileMask: "oauth_creds.json"
+        Recursive: false
+    -
+        Name: gemini_cli.google_accounts
+        Category: config
+        Path: C:\Users\%user%\.gemini
+        FileMask: "google_accounts.json"
+        Recursive: false
+    -
+        Name: gemini_cli.home_tree
+        Category: config
+        Path: C:\Users\%user%
+        FileMask: ".gemini"
+        Recursive: false
+    -
+        Name: gemini_cli.shell_history
+        Category: shell_history
+        Path: C:\Users\%user%\.gemini\tmp\*\shell_history
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: gemini_cli.system_settings
+        Category: permissions
+        Path: C:\ProgramData\gemini-cli
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: gemini_cli.system_settings
+        Category: permissions
+        Path: C:\ProgramData\gemini-cli
+        FileMask: "system-defaults.json"
+        Recursive: false
+    -
+        Name: gemini_cli.trusted_folders
+        Category: permissions
+        Path: C:\Users\%user%\.gemini
+        FileMask: "trustedFolders.json"
+        Recursive: false
+    -
+        Name: gemini_cli.user_settings
+        Category: config
+        Path: C:\Users\%user%\.gemini
+        FileMask: "settings.json"
+        Recursive: false

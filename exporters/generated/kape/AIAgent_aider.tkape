@@ -1,0 +1,42 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     aider.chat_history
+#     aider.config
+#     aider.dotenv
+#     aider.input_history
+#     aider.model_metadata
+#     aider.model_settings
+#     aider.tags_cache
+Description: AI coding agent artifacts, Aider
+Author: agentforensics
+Version: 1.0
+Id: 3e28d8fc-d6d1-98f4-e036-b0b337ed8f07
+RecreateDirectories: true
+Targets:
+    -
+        Name: aider.analytics
+        Category: install_evidence
+        Path: C:\Users\%user%\.aider
+        FileMask: "analytics.json"
+        Recursive: false
+    -
+        Name: aider.caches
+        Category: cache
+        Path: C:\Users\%user%\.aider\caches
+        FileMask: "*"
+        Recursive: true

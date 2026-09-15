@@ -1,0 +1,109 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     continue.agents
+#     continue.config
+Description: AI coding agent artifacts, Continue
+Author: agentforensics
+Version: 1.0
+Id: 75d1d515-08af-8585-80bd-79eef179552a
+RecreateDirectories: true
+Targets:
+    -
+        Name: continue.aux_config
+        Category: config
+        Path: C:\Users\%user%\.continue
+        FileMask: ".configs"
+        Recursive: false
+    -
+        Name: continue.aux_config
+        Category: config
+        Path: C:\Users\%user%\.continue
+        FileMask: ".continueignore"
+        Recursive: false
+    -
+        Name: continue.aux_config
+        Category: config
+        Path: C:\Users\%user%\.continue
+        FileMask: ".migrations"
+        Recursive: false
+    -
+        Name: continue.aux_config
+        Category: config
+        Path: C:\Users\%user%\.continue\prompts
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: continue.dev_data
+        Category: log
+        Path: C:\Users\%user%\.continue\dev_data
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: continue.dev_data
+        Category: log
+        Path: C:\Users\%user%\.continue\logs
+        FileMask: "core.log"
+        Recursive: false
+    -
+        Name: continue.diffs
+        Category: file_snapshot
+        Path: C:\Users\%user%\.continue
+        FileMask: ".diffs"
+        Recursive: false
+    -
+        Name: continue.index
+        Category: cache
+        Path: C:\Users\%user%\.continue\.utils
+        FileMask: "repo_map.txt"
+        Recursive: false
+    -
+        Name: continue.index
+        Category: cache
+        Path: C:\Users\%user%\.continue\index
+        FileMask: "autocompleteCache.sqlite"
+        Recursive: false
+    -
+        Name: continue.index
+        Category: cache
+        Path: C:\Users\%user%\.continue\index
+        FileMask: "docs.sqlite"
+        Recursive: false
+    -
+        Name: continue.index
+        Category: cache
+        Path: C:\Users\%user%\.continue\index
+        FileMask: "index.sqlite"
+        Recursive: false
+    -
+        Name: continue.index
+        Category: cache
+        Path: C:\Users\%user%\.continue\index\lancedb
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: continue.sessions
+        Category: transcript
+        Path: C:\Users\%user%\.continue\sessions
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: continue.sessions
+        Category: transcript
+        Path: C:\Users\%user%\.continue\sessions
+        FileMask: "sessions.json"
+        Recursive: false

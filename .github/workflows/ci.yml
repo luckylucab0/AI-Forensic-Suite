@@ -90,6 +90,12 @@ jobs:
       - name: Embedded catalogue current in both collectors
         run: uv run python scripts/build_collectors.py --check
 
+      # Same failure mode one step further out: somebody takes a Velociraptor artifact or a
+      # KAPE target out of exporters/generated and runs it against a fleet. If it lags the
+      # catalogue it searches last month's locations and reports clean hosts.
+      - name: Generated collection rules current with the catalogue
+        run: uv run python scripts/gen_collection_rules.py --check
+
   legacy-interpreter:
     name: Python 3.8 compatibility
     runs-on: ubuntu-latest

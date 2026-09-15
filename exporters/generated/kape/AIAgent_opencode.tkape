@@ -1,0 +1,55 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     opencode.agents_commands
+#     opencode.config
+#     opencode.tui_config
+#   no Windows path that a drive-and-mask target can express
+#     opencode.legacy_json_storage
+#   reachable only through a relocation variable, which KAPE cannot resolve: read the variable off the endpoint
+#     opencode.mcp_auth
+#     opencode.repos_cache
+Description: AI coding agent artifacts, OpenCode
+Author: agentforensics
+Version: 1.0
+Id: 20932a16-e007-8706-c530-ff7c71dce546
+RecreateDirectories: true
+Targets:
+    -
+        Name: opencode.auth
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Local\opencode
+        FileMask: "auth.json"
+        Recursive: false
+    -
+        Name: opencode.db
+        Category: transcript
+        Path: C:\Users\%user%\.local\share\opencode
+        FileMask: "opencode.db"
+        Recursive: false
+    -
+        Name: opencode.log
+        Category: log
+        Path: C:\Users\%user%\.local\share\opencode\log
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: opencode.managed_config
+        Category: config
+        Path: C:\ProgramData\opencode
+        FileMask: "*"
+        Recursive: true

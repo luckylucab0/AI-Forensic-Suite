@@ -160,9 +160,52 @@ verändert werden kann. Siehe [BUNDLE_FORMAT.de.md](BUNDLE_FORMAT.de.md).
 
 ## Ausrollen über andere Werkzeuge
 
-Generierte Sammelregeln für Velociraptor, KAPE, Microsoft Defender Live Response, Advanced
-Hunting KQL und osquery sind geplant und werden unter `exporters/generated/` liegen,
-erzeugt aus demselben Katalog, damit sie nicht von ihm abweichen können. Bis dahin sind die
-Kollektoren genau deshalb einzelne Dateien ohne Abhängigkeiten: damit sie über jeden
-verfügbaren Kanal gehen, ein `putfile` und `run` in der Live Response, eine Remote-Shell
-oder einen USB-Stick.
+Der Katalog wird auch in die Formate übersetzt, die andere Werkzeuge schon sprechen, damit
+man ihn nutzen kann, ohne den Collector dieser Suite einzuführen. Die Ausgabe ist unter
+`exporters/generated/` eingecheckt, und CI schlägt fehl, wenn sie vom Katalog abweicht, aus
+demselben Grund wie beim eingebetteten Katalog in den Collectors: eine Regel, die dem
+Katalog nachläuft, sucht an den Orten des letzten Monats und meldet einen sauberen Host.
+
+```bash
+uv run agentforensics export-collection            # alle Formate, nach exporters/generated
+uv run agentforensics export-collection --format kape --out /tmp/rules
+```
+
+| Format | Was dabei herauskommt | Wofür |
+| --- | --- | --- |
+| `velociraptor` | Ein Sammelartefakt, das die Katalogpfade globt und Fundstellen hochlädt, plus ein Präsenzartefakt nur mit Metadaten | Alles plattformübergreifende. Seine Glob-Sprache liegt dem Katalog am nächsten, also hat es die wenigsten Lücken |
+| `kape` | Ein `.tkape` pro Agent plus ein Sammelziel | Eine Windows-Auswertung, die ohnehin in KAPE stattfindet |
+| `mde` | Ein Präsenz-Skript und ein Runbook | Eine Defender-Live-Response-Sitzung, Host für Host |
+| `kql` | Advanced-Hunting-Abfragen über Datei- und Prozessereignisse | Eine Flotte aus der Konsole eingrenzen, bevor ein Host angefasst wird |
+| `osquery` | Ein Pack mit Dateiabfragen pro Agent und Plattform | Eine Flotte, die osquery schon betreibt. Nur Metadaten, also Triage statt Sicherung |
+
+### Was eine generierte Regel nicht kann, und warum sie es sagt
+
+Jedes dieser Werkzeuge hat eine engere Pfadsprache als der Katalog. KAPE adressiert ein
+Laufwerk und eine Dateimaske. osquery hat eine Wildcard-Tiefe pro Segment. Advanced Hunting
+sieht Ereignisse statt des Dateisystems und hat überhaupt keinen Platzhalter für das
+Benutzerprofil. Live Response holt eine Datei nur über ihren exakten Namen.
+
+Deshalb trägt jede generierte Datei im eigenen Kopf die Artefakte, die sie nicht ausdrücken
+konnte, samt Grund. Lesen Sie diesen Abschnitt, bevor Sie die Ergebnisse lesen. Die
+wiederkehrenden Gründe:
+
+- **An einer Arbeitskopie verankert.** Eine Projekt-Instruktionsdatei liegt in einem
+  Repository, dessen Ort in der Zustandsdatei des Agenten steht. Nichts Statisches findet
+  sie. Das ist die größte Gruppe, und sie umfasst genau die Dateien, um die es bei einer
+  Injection-Frage geht.
+- **Nur über eine Verschiebungsvariable erreichbar.** Der Baum des Agenten wurde per
+  Umgebungsvariable verschoben, sein Ort ist also, was die Variable sagt. Ein Agent
+  schreibt ein komplettes zweites Transkript an einen Pfad, den der Betreiber wählt.
+- **Ein Registry-Schlüssel**, der in jedem Werkzeug eine andere Tabelle oder ein anderer
+  Zieltyp ist.
+- **Plattformumfang.** KAPE und das Live-Response-Paket sind nur Windows, und sie sagen,
+  wie viel des Katalogs damit außer Reichweite liegt.
+
+Der Collector liest alle vier. Das ist die ehrliche Arbeitsteilung: eine generierte Regel
+findet die Hosts, die man ansehen muss, der Collector holt die Beweise.
+
+Ein leeres Ergebnis aus einer dieser Regeln bedeutet, dass an den durchsuchten Pfaden nichts
+lag. Es bedeutet nicht, dass der Host sauber ist, und jede generierte Datei widerspricht
+diesem Schluss in ihrem Kopf, weil die Person, die die Regel ausführt, oft nicht die Person
+ist, die sie generiert hat.

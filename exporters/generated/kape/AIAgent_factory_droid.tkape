@@ -1,0 +1,45 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     factory_droid.config
+#     factory_droid.mcp_and_hooks
+#     factory_droid.sessions
+#     factory_droid.skills_and_droids
+Description: AI coding agent artifacts, Factory Droid
+Author: agentforensics
+Version: 1.0
+Id: 4930b43d-cbab-855c-4e05-3a68dbffb7d9
+RecreateDirectories: true
+Targets:
+    -
+        Name: factory_droid.auth
+        Category: config
+        Path: C:\Users\%user%
+        FileMask: ".factory"
+        Recursive: false
+    -
+        Name: factory_droid.logs
+        Category: log
+        Path: C:\Users\%user%\.factory\bug-reports
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: factory_droid.logs
+        Category: log
+        Path: C:\Users\%user%\.factory\logs
+        FileMask: "*"
+        Recursive: true

@@ -1,0 +1,99 @@
+// Generated from the artifact catalogue. Do not edit by hand:
+// run `afx export-collection` and commit the result.
+// Catalogue digest: 65f5a975ba29
+//
+// An empty result from this rule means the paths it searched held nothing. It does
+// not mean the host is clean. Unverified catalogue entries, relocated data trees and
+// the paths listed as not covered below are all reasons a used agent leaves no hit
+// here. Where this matters, run the suite's own collector instead: it reads the
+// relocation variables and the agents' own state files, which no static rule can.
+//
+// A process start is a stronger signal than a file: a file can arrive by
+// profile sync or by restoring a backup, while a process start means the
+// binary ran on this device.
+//
+// The names come from the catalogue's install-evidence entries. An agent
+// installed under a name the catalogue does not record, or run through an
+// interpreter so the process name is the interpreter's, will not appear.
+// The second query below covers the interpreter case by command line.
+//
+// Advanced Hunting retention is finite and the window below is thirty days,
+// so a device that used an agent before that leaves no row here. Absence is
+// not evidence: it narrows a fleet, it does not clear a device.
+//
+// One caution before you run this: q is short enough to collide with unrelated software, so filter a hit from it
+// by FolderPath before treating it as an agent. It is in the list because it is
+// the vendor's real binary name, and dropping it would lose real detections.
+//
+// Every catalogue artifact for this target is covered.
+let AgentBinaries = datatable(Agent: string, FileName: string)
+[
+    "claude_code", "claude",
+    "claude_code", "claude.exe",
+    "claude_desktop", "claude.exe",
+    "kiro", "kiro-cli",
+    "kiro", "kirocli",
+    "kiro", "q",
+    "lmstudio", "lms",
+    "lmstudio", "lms.exe",
+    "windsurf", "language_server_linux_x64",
+    "windsurf", "language_server_windows_x64.exe",
+];
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| extend Lowered = tolower(FileName)
+| join kind=inner (AgentBinaries | extend Lowered = tolower(FileName)) on Lowered
+| project Timestamp, DeviceName, AccountName, Agent, FileName, ProcessCommandLine,
+          InitiatingProcessFileName, InitiatingProcessCommandLine, FolderPath
+| order by Timestamp desc
+
+// An agent started through a package runner or a language runtime shows the
+// runtime as its process name, so the same run is invisible above. This finds
+// it on the command line instead, and is deliberately a separate query because
+// a command-line contains is far more expensive than a filename join.
+//
+// DeviceProcessEvents
+// | where Timestamp > ago(30d)
+// | where ProcessCommandLine has_any (
+//     "aider",
+//     "amazonq",
+//     "amp",
+//     "chatgpt_desktop",
+//     "claude",
+//     "claude.exe",
+//     "claude_code",
+//     "claude_desktop",
+//     "cline",
+//     "codex",
+//     "continue",
+//     "copilot",
+//     "crosscutting",
+//     "cursor",
+//     "devin",
+//     "factory_droid",
+//     "gemini_cli",
+//     "goose",
+//     "hermes",
+//     "jetbrains_ai",
+//     "junie",
+//     "kilo_code",
+//     "kiro",
+//     "kiro-cli",
+//     "kirocli",
+//     "language_server_linux_x64",
+//     "language_server_windows_x64.exe",
+//     "lms",
+//     "lms.exe",
+//     "lmstudio",
+//     "ollama",
+//     "opencode",
+//     "pi",
+//     "q",
+//     "qwen_code",
+//     "roo_code",
+//     "vscode",
+//     "warp",
+//     "windsurf",
+//     "zed",
+//   )
+// | project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine

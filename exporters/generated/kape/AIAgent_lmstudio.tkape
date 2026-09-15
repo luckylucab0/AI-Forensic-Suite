@@ -1,0 +1,64 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Every catalogue artifact for this target is covered.
+Description: AI coding agent artifacts, LM Studio
+Author: agentforensics
+Version: 1.0
+Id: 2dbac2cc-ce3d-223a-9317-7d72c6c4b65e
+RecreateDirectories: true
+Targets:
+    -
+        Name: lmstudio.cli_and_server
+        Category: install_evidence
+        Path: C:\Users\%user%\.lmstudio\bin
+        FileMask: "lms.exe"
+        Recursive: false
+    -
+        Name: lmstudio.cli_and_server
+        Category: install_evidence
+        Path: C:\Users\%user%\.lmstudio\bin\lms
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: lmstudio.conversations
+        Category: transcript
+        Path: C:\Users\%user%\.lmstudio\conversations
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: lmstudio.hub_downloads
+        Category: instructions
+        Path: C:\Users\%user%\.lmstudio\hub
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: lmstudio.mcp_config
+        Category: mcp_config
+        Path: C:\Users\%user%\.lmstudio
+        FileMask: "mcp.json"
+        Recursive: false
+    -
+        Name: lmstudio.models
+        Category: install_evidence
+        Path: C:\Users\%user%\.lmstudio\models\*\*
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: lmstudio.presets
+        Category: instructions
+        Path: C:\Users\%user%\.lmstudio\config-presets
+        FileMask: "*"
+        Recursive: true

@@ -1,0 +1,172 @@
+# Generated from the artifact catalogue. Do not edit by hand:
+# run `afx export-collection` and commit the result.
+# Catalogue digest: 65f5a975ba29
+#
+# An empty result from this rule means the paths it searched held nothing. It does
+# not mean the host is clean. Unverified catalogue entries, relocated data trees and
+# the paths listed as not covered below are all reasons a used agent leaves no hit
+# here. Where this matters, run the suite's own collector instead: it reads the
+# relocation variables and the agents' own state files, which no static rule can.
+#
+# KAPE is Windows only. 28 of the 460 catalogue artifacts declare
+# no Windows path and are therefore outside this target's scope entirely, which is a
+# different thing from the per-artifact gaps listed below. For a macOS or Linux
+# endpoint use the Velociraptor artifact or this suite's own collector.
+#
+# Every catalogue artifact for this target is covered.
+Description: AI coding agent artifacts, OpenAI Codex CLI
+Author: agentforensics
+Version: 1.0
+Id: 62660cfd-1f41-7cc6-2896-bb1b436468b1
+RecreateDirectories: true
+Targets:
+    -
+        Name: codex.archived_sessions
+        Category: transcript
+        Path: C:\Users\%user%\.codex\archived_sessions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.auth
+        Category: credentials
+        Path: C:\Users\%user%\.codex
+        FileMask: "auth.json"
+        Recursive: false
+    -
+        Name: codex.config
+        Category: config
+        Path: C:\Users\%user%\.codex
+        FileMask: "*.config.toml"
+        Recursive: false
+    -
+        Name: codex.config
+        Category: config
+        Path: C:\Users\%user%\.codex
+        FileMask: "config.toml"
+        Recursive: false
+    -
+        Name: codex.log_dir
+        Category: log
+        Path: C:\Users\%user%\.codex\log
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.mcp_and_notify
+        Category: mcp_config
+        Path: C:\Users\%user%\.codex
+        FileMask: "config.toml"
+        Recursive: false
+    -
+        Name: codex.mcp_oauth_credentials
+        Category: credentials
+        Path: C:\Users\%user%\.codex
+        FileMask: ".credentials.json"
+        Recursive: false
+    -
+        Name: codex.prompt_history
+        Category: prompt_history
+        Path: C:\Users\%user%\.codex
+        FileMask: "history.jsonl"
+        Recursive: false
+    -
+        Name: codex.requirements_and_permissions
+        Category: permissions
+        Path: C:\Users\%user%\.codex
+        FileMask: "permissions.toml"
+        Recursive: false
+    -
+        Name: codex.requirements_and_permissions
+        Category: permissions
+        Path: C:\Users\%user%\.codex
+        FileMask: "requirements.toml"
+        Recursive: false
+    -
+        Name: codex.rollouts
+        Category: transcript
+        Path: C:\Users\%user%\.codex\sessions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.rollouts
+        Category: transcript
+        Path: C:\Users\%user%\.codex\sessions\*\*
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: codex.rollouts_compressed
+        Category: transcript
+        Path: C:\Users\%user%\.codex\sessions
+        FileMask: "rollout-*.jsonl.*.tmp"
+        Recursive: true
+    -
+        Name: codex.rollouts_compressed
+        Category: transcript
+        Path: C:\Users\%user%\.codex\sessions
+        FileMask: "rollout-*.jsonl.zst"
+        Recursive: true
+    -
+        Name: codex.rollouts_compressed
+        Category: transcript
+        Path: C:\Users\%user%\.codex\sessions
+        FileMask: "rollout-compress-*.tmp"
+        Recursive: true
+    -
+        Name: codex.sqlite_glob
+        Category: transcript
+        Path: C:\Users\%user%\.codex
+        FileMask: "*.sqlite"
+        Recursive: false
+    -
+        Name: codex.sqlite_write_ahead_logs
+        Category: transcript
+        Path: C:\Users\%user%\.codex
+        FileMask: "*.sqlite-shm"
+        Recursive: false
+    -
+        Name: codex.sqlite_write_ahead_logs
+        Category: transcript
+        Path: C:\Users\%user%\.codex
+        FileMask: "*.sqlite-wal"
+        Recursive: false
+    -
+        Name: codex.state_databases
+        Category: transcript
+        Path: C:\Users\%user%\.codex
+        FileMask: "goals_1.sqlite"
+        Recursive: false
+    -
+        Name: codex.state_databases
+        Category: transcript
+        Path: C:\Users\%user%\.codex
+        FileMask: "logs_2.sqlite"
+        Recursive: false
+    -
+        Name: codex.state_databases
+        Category: transcript
+        Path: C:\Users\%user%\.codex
+        FileMask: "memories_1.sqlite"
+        Recursive: false
+    -
+        Name: codex.state_databases
+        Category: transcript
+        Path: C:\Users\%user%\.codex
+        FileMask: "memories_v2_1.sqlite"
+        Recursive: false
+    -
+        Name: codex.state_databases
+        Category: transcript
+        Path: C:\Users\%user%\.codex
+        FileMask: "queue_1.sqlite"
+        Recursive: false
+    -
+        Name: codex.state_databases
+        Category: transcript
+        Path: C:\Users\%user%\.codex
+        FileMask: "state_5.sqlite"
+        Recursive: false
+    -
+        Name: codex.state_databases
+        Category: transcript
+        Path: C:\Users\%user%\.codex
+        FileMask: "thread_history_1.sqlite"
+        Recursive: false
