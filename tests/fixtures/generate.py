@@ -158,6 +158,158 @@ def transcript(session_id: str, cwd: str) -> str:
     return text
 
 
+def codex_rollout(session_id: str, cwd: str) -> str:
+    """A Codex rollout, including the records that break naive parsers.
+
+    Deliberately in here: an event_msg that mirrors a response_item, so a parser that maps
+    both doubles the conversation; a compacted record, which is the usual explanation for a
+    gap in a transcript; a function_call whose argument JSON was truncated by a killed
+    process; and a response_item type from a future version.
+    """
+    return jsonl(
+        [
+            {
+                "timestamp": "2026-09-06T09:00:00.000Z",
+                "type": "session_meta",
+                "payload": {
+                    "id": session_id,
+                    "cwd": cwd,
+                    "cli_version": "9.9.9",
+                    "model": "example-model-2",
+                    "git": {"branch": "main"},
+                    "instructions": "AGENTS.md",
+                },
+            },
+            {
+                "timestamp": "2026-09-06T09:00:01.000Z",
+                "type": "response_item",
+                "payload": {"type": "message", "role": "user", "content": "check the lockfile"},
+            },
+            {
+                "timestamp": "2026-09-06T09:00:02.000Z",
+                "type": "response_item",
+                "payload": {"type": "reasoning", "summary": [{"text": "read it first"}]},
+            },
+            {
+                "timestamp": "2026-09-06T09:00:03.000Z",
+                "type": "response_item",
+                "payload": {
+                    "type": "local_shell_call",
+                    "call_id": "c1",
+                    "action": {"command": ["npm", "ci"], "workdir": cwd},
+                },
+            },
+            {
+                "timestamp": "2026-09-06T09:00:04.000Z",
+                "type": "event_msg",
+                "payload": {"type": "agent_message", "message": "mirrors the item above"},
+            },
+            {
+                "timestamp": "2026-09-06T09:00:05.000Z",
+                "type": "response_item",
+                "payload": {
+                    "type": "function_call_output",
+                    "call_id": "c1",
+                    "output": {"success": False, "content": "lockfile out of date"},
+                },
+            },
+            {
+                "timestamp": "2026-09-06T09:00:06.000Z",
+                "type": "compacted",
+                "payload": {"message": "earlier turns were summarised"},
+            },
+            {
+                "timestamp": "2026-09-06T09:00:07.000Z",
+                "type": "response_item",
+                "payload": {"type": "some_future_item", "detail": "unknown to this parser"},
+            },
+            {
+                "timestamp": "2026-09-06T09:00:08.000Z",
+                "type": "some_future_record",
+                "payload": {"detail": "unknown to this parser"},
+            },
+        ]
+    ) + (
+        # A function_call whose arguments were cut off mid-write. Valid as a line, invalid
+        # as an argument list, and still evidence of what the agent was about to do.
+        '{"timestamp": "2026-09-06T09:00:09.000Z", "type": "response_item", "payload": '
+        '{"type": "function_call", "call_id": "c2", "name": "apply_patch", '
+        '"arguments": "{\\"path\\": \\"/src/app/pkg"}}\n'
+    )
+
+
+def copilot_events(session_id: str, cwd: str) -> str:
+    """A Copilot CLI session event log, with the same kinds of awkwardness."""
+    return jsonl(
+        [
+            {
+                "type": "session.start",
+                "id": "e1",
+                "timestamp": "2026-09-06T10:00:00.000Z",
+                "data": {"copilotVersion": "9.9.9", "cwd": cwd, "sessionId": session_id},
+            },
+            {
+                "type": "session.model_change",
+                "id": "e2",
+                "timestamp": "2026-09-06T10:00:01.000Z",
+                "data": {"newModel": "example-model-3", "previousModel": "example-model-2"},
+            },
+            {
+                "type": "user.message",
+                "id": "e3",
+                "timestamp": "2026-09-06T10:00:02.000Z",
+                "data": {"content": "rename the helper"},
+            },
+            {
+                "type": "tool.execution_start",
+                "id": "e4",
+                "timestamp": "2026-09-06T10:00:03.000Z",
+                "data": {
+                    "toolCallId": "t1",
+                    "toolName": "bash",
+                    "arguments": {"command": "grep -rn helper ."},
+                },
+            },
+            {
+                "type": "tool.execution_start",
+                "id": "e5",
+                "timestamp": "2026-09-06T10:00:04.000Z",
+                "data": {
+                    "toolCallId": "t2",
+                    "toolName": "read_file",
+                    "mcpServerName": "filesystem",
+                    "mcpToolName": "read",
+                    "arguments": {"path": "/src/app/helper.py"},
+                },
+            },
+            {
+                "type": "tool.execution_complete",
+                "id": "e6",
+                "timestamp": "2026-09-06T10:00:05.000Z",
+                "data": {"toolCallId": "t2", "success": True, "result": {"content": "ok"}},
+            },
+            {
+                "type": "assistant.message",
+                "id": "e7",
+                "timestamp": "2026-09-06T10:00:06.000Z",
+                "data": {"content": "renamed it"},
+            },
+            {
+                "type": "subagent.started",
+                "id": "e8",
+                "timestamp": "2026-09-06T10:00:07.000Z",
+                "data": {"agentName": "reviewer", "agentDisplayName": "Reviewer"},
+            },
+            {
+                "type": "some.future.event",
+                "id": "e9",
+                "timestamp": "2026-09-06T10:00:08.000Z",
+                "data": {"detail": "unknown to this parser"},
+            },
+        ]
+    )
+
+
 def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     """Create the synthetic profile. Returns a summary for assertions."""
     project = home / "src" / "app"
@@ -319,11 +471,38 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         ": 1788912060:0;export CLAUDE_CODE_SKIP_PROMPT_HISTORY=1\n",
     )
 
+    # Two more agents, so that the parsers for the three formats the viewer already knows
+    # are exercised against a tree rather than only against inline test strings.
+    codex = home / ".codex"
+    write(
+        codex
+        / "sessions"
+        / "2026"
+        / "09"
+        / "06"
+        / f"rollout-2026-09-06T09-00-00-{SESSION_A}.jsonl",
+        codex_rollout(SESSION_A, str(project)),
+        RECENT,
+    )
+    write(
+        codex / "history.jsonl",
+        jsonl([{"session_id": SESSION_A, "ts": 1788912000, "text": "check the lockfile"}]),
+        RECENT,
+    )
+
+    copilot = home / ".copilot"
+    write(
+        copilot / "session-state" / SESSION_A / "events.jsonl",
+        copilot_events(SESSION_A, str(project)),
+        RECENT,
+    )
+
     summary = {
         "home": str(home),
         "project": str(project),
         "encoded_project_dir": encoded,
         "sessions": [SESSION_A, SESSION_B],
+        "agents": ["claude_code", "cline", "codex", "copilot", "crosscutting"],
     }
 
     if with_edge_cases:

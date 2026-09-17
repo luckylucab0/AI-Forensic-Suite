@@ -373,3 +373,331 @@ def test_a_file_with_no_parser_returns_none() -> None:
     """Which is recorded as unsupported rather than hidden."""
     assert for_artifact("windsurf.cascade_trajectories") is None
     assert for_artifact(None) is None
+
+
+# ------------------------------------------------------------- the Codex parser
+
+CODEX_BASE = {"timestamp": "2026-09-06T09:00:00.000Z"}
+
+
+def codex(tmp_path: Path, records: list[object], extra: str = "") -> Path:
+    path = tmp_path / "rollout-2026-09-06T09-00-00-s1.jsonl"
+    path.write_text(
+        "".join(json.dumps(record) + "\n" for record in records) + extra, encoding="utf-8"
+    )
+    return path
+
+
+def parse_codex(path: Path, artifact_id: str = "codex.rollouts") -> list:
+    parser = for_artifact(artifact_id)
+    assert parser is not None
+    return list(
+        parser.parse(
+            ParseContext(
+                bundle_uuid="b1",
+                original_path="/home/alice/.codex/sessions/2026/09/06/" + path.name,
+                local_path=path,
+                sha256="aa",
+                artifact_id=artifact_id,
+                agent="codex",
+                user="alice",
+            )
+        )
+    )
+
+
+SESSION_META = {
+    **CODEX_BASE,
+    "type": "session_meta",
+    "payload": {"id": "s1", "cwd": "/src/app", "model": "m", "git": {"branch": "main"}},
+}
+
+
+def test_codex_session_metadata_sets_the_context_for_the_rest(tmp_path: Path) -> None:
+    """Those facts arrive once and apply to everything after them, so they are carried
+    forward rather than looked up per event."""
+    events = parse_codex(
+        codex(
+            tmp_path,
+            [
+                SESSION_META,
+                {
+                    **CODEX_BASE,
+                    "type": "response_item",
+                    "payload": {"type": "message", "role": "user", "content": "hi"},
+                },
+            ],
+        )
+    )
+    assert [e.kind for e in events] == ["session.start", "user.prompt"]
+    assert events[1].session_id == "s1"
+    assert events[1].project_path == "/src/app"
+    assert events[1].git_branch == "main"
+    assert events[1].payload["models"] == [{"model": "m"}]
+
+
+def test_codex_event_msg_is_counted_not_mapped(tmp_path: Path) -> None:
+    """It mirrors response_item, so mapping both would double every turn.
+
+    Counted and reported once per file instead, which keeps the records accounted for
+    without inflating the conversation.
+    """
+    events = parse_codex(
+        codex(
+            tmp_path,
+            [
+                SESSION_META,
+                {**CODEX_BASE, "type": "event_msg", "payload": {"type": "agent_message"}},
+                {**CODEX_BASE, "type": "event_msg", "payload": {"type": "agent_message"}},
+            ],
+        )
+    )
+    kinds = [e.kind for e in events]
+    assert kinds.count("assistant.text") == 0, "the mirror must not become a turn"
+    summary = [e for e in events if e.payload.get("event_msg_counts")]
+    assert len(summary) == 1
+    assert summary[0].payload["event_msg_counts"] == {"agent_message": 2}
+    assert "not doubled" in summary[0].payload["text"]
+
+
+def test_codex_compaction_is_an_event_not_a_gap(tmp_path: Path) -> None:
+    """It is the usual explanation for an apparent hole in a transcript."""
+    events = parse_codex(
+        codex(
+            tmp_path,
+            [SESSION_META, {**CODEX_BASE, "type": "compacted", "payload": {"message": "x"}}],
+        )
+    )
+    compaction = [e for e in events if e.payload.get("compaction")]
+    assert len(compaction) == 1
+    assert "compacted" in compaction[0].payload["text"]
+
+
+def test_codex_a_shell_call_produces_the_command(tmp_path: Path) -> None:
+    """The command can be argv rather than a string, which is how the sandbox spells it."""
+    events = parse_codex(
+        codex(
+            tmp_path,
+            [
+                SESSION_META,
+                {
+                    **CODEX_BASE,
+                    "type": "response_item",
+                    "payload": {
+                        "type": "local_shell_call",
+                        "call_id": "c1",
+                        "action": {"command": ["npm", "ci"], "workdir": "/src/app"},
+                    },
+                },
+            ],
+        )
+    )
+    command = next(e for e in events if e.kind == "command.exec")
+    assert command.payload["commands"][0]["command"] == "npm ci"
+    assert command.payload["commands"][0]["executable"] == "npm"
+
+
+def test_codex_truncated_arguments_are_kept_as_evidence(tmp_path: Path) -> None:
+    """A killed process leaves a valid line with an invalid argument list.
+
+    A partial argument list is still evidence of what the agent was about to do, so it is
+    kept and the parse problem is recorded rather than the call being discarded.
+    """
+    path = codex(
+        tmp_path,
+        [SESSION_META],
+        extra='{"timestamp": "2026-09-06T09:00:09.000Z", "type": "response_item", "payload": '
+        '{"type": "function_call", "call_id": "c2", "name": "apply_patch", '
+        '"arguments": "{\\"path\\": \\"/src/pkg"}}\n',
+    )
+    call = next(e for e in parse_codex(path) if e.kind == "tool.call")
+    assert "/src/pkg" in str(call.payload["input"])
+    assert "did not parse" in (call.parse_problem or "")
+
+
+def test_codex_unknown_types_are_kept_at_both_levels(tmp_path: Path) -> None:
+    """The record envelope and the item inside it can each be a type from a newer version."""
+    events = parse_codex(
+        codex(
+            tmp_path,
+            [
+                SESSION_META,
+                {**CODEX_BASE, "type": "future_record", "payload": {}},
+                {**CODEX_BASE, "type": "response_item", "payload": {"type": "future_item"}},
+            ],
+        )
+    )
+    problems = [e.parse_problem for e in events if e.kind == "unparsed.record"]
+    assert any("record type" in (p or "") for p in problems)
+    assert any("response_item type" in (p or "") for p in problems)
+    assert all(e.ts_utc for e in events if e.kind == "unparsed.record"), (
+        "an unknown record still has to sort into the timeline"
+    )
+
+
+def test_codex_prompt_history_is_its_own_artifact(tmp_path: Path) -> None:
+    path = tmp_path / "history.jsonl"
+    path.write_text(
+        json.dumps({"session_id": "s1", "ts": 1788912000, "text": "hi"}) + "\n", encoding="utf-8"
+    )
+    events = parse_codex(path, "codex.prompt_history")
+    assert [e.kind for e in events] == ["prompt.history"]
+    assert events[0].ts_utc is not None
+
+
+# ----------------------------------------------------------- the Copilot parser
+
+
+def copilot(tmp_path: Path, records: list[object]) -> Path:
+    directory = tmp_path / "session-state" / "sess-1"
+    directory.mkdir(parents=True)
+    path = directory / "events.jsonl"
+    path.write_text("".join(json.dumps(r) + "\n" for r in records), encoding="utf-8")
+    return path
+
+
+def parse_copilot(path: Path) -> list:
+    parser = for_artifact("copilot.session_event_log")
+    assert parser is not None
+    return list(
+        parser.parse(
+            ParseContext(
+                bundle_uuid="b1",
+                original_path="/home/alice/.copilot/session-state/sess-1/events.jsonl",
+                local_path=path,
+                sha256="aa",
+                artifact_id="copilot.session_event_log",
+                agent="copilot",
+                user="alice",
+            )
+        )
+    )
+
+
+def test_copilot_takes_the_session_id_from_the_directory(tmp_path: Path) -> None:
+    """The records do not always carry it, and the directory name is the session id.
+
+    Reading it from the path is what keeps two sessions in one case apart.
+    """
+    events = parse_copilot(
+        copilot(
+            tmp_path,
+            [
+                {
+                    "type": "user.message",
+                    "timestamp": "2026-09-06T10:00:00Z",
+                    "data": {"content": "hi"},
+                }
+            ],
+        )
+    )
+    assert events[0].session_id == "sess-1"
+
+
+def test_copilot_carries_the_model_forward(tmp_path: Path) -> None:
+    """The model is announced once and applies to everything after it, so a case that wants
+    to know which model wrote a turn has to carry that state rather than read the turn."""
+    events = parse_copilot(
+        copilot(
+            tmp_path,
+            [
+                {
+                    "type": "session.model_change",
+                    "timestamp": "2026-09-06T10:00:00Z",
+                    "data": {"newModel": "m2"},
+                },
+                {
+                    "type": "assistant.message",
+                    "timestamp": "2026-09-06T10:00:01Z",
+                    "data": {"content": "done"},
+                },
+            ],
+        )
+    )
+    turn = next(e for e in events if e.kind == "assistant.text")
+    assert turn.payload["models"] == [{"model": "m2"}]
+
+
+def test_copilot_names_the_mcp_server_from_its_own_field(tmp_path: Path) -> None:
+    """Which is better than the prefix convention the other agents use: no parsing, and no
+    ambiguity about where the server name ends."""
+    events = parse_copilot(
+        copilot(
+            tmp_path,
+            [
+                {
+                    "type": "tool.execution_start",
+                    "timestamp": "2026-09-06T10:00:00Z",
+                    "data": {
+                        "toolCallId": "t1",
+                        "toolName": "read_file",
+                        "mcpServerName": "filesystem",
+                        "mcpToolName": "read",
+                        "arguments": {"path": "/src/a.py"},
+                    },
+                }
+            ],
+        )
+    )
+    assert events[0].kind == "mcp.call"
+    assert events[0].payload["mcp"] == [{"server": "filesystem", "tool": "read"}]
+
+
+def test_copilot_a_shell_tool_produces_the_command(tmp_path: Path) -> None:
+    events = parse_copilot(
+        copilot(
+            tmp_path,
+            [
+                {
+                    "type": "tool.execution_start",
+                    "timestamp": "2026-09-06T10:00:00Z",
+                    "data": {
+                        "toolCallId": "t1",
+                        "toolName": "bash",
+                        "arguments": {"command": "rm -rf /tmp/x"},
+                    },
+                }
+            ],
+        )
+    )
+    assert [e.kind for e in events] == ["tool.call", "command.exec"]
+    assert events[1].payload["commands"][0]["executable"] == "rm"
+
+
+def test_copilot_a_subagent_is_recorded(tmp_path: Path) -> None:
+    """Its own work may never appear in this file, so the case has to know to look."""
+    events = parse_copilot(
+        copilot(
+            tmp_path,
+            [
+                {
+                    "type": "subagent.started",
+                    "timestamp": "2026-09-06T10:00:00Z",
+                    "data": {"agentName": "reviewer"},
+                }
+            ],
+        )
+    )
+    assert events[0].payload["subagent"] == "reviewer"
+
+
+def test_copilot_an_unknown_event_type_is_kept(tmp_path: Path) -> None:
+    events = parse_copilot(
+        copilot(
+            tmp_path,
+            [{"type": "some.future.event", "timestamp": "2026-09-06T10:00:00Z", "data": {}}],
+        )
+    )
+    assert [e.kind for e in events] == ["unparsed.record"]
+    assert "event type" in (events[0].parse_problem or "")
+    assert events[0].ts_utc is not None
+
+
+def test_the_three_formats_the_viewer_knows_all_have_parsers() -> None:
+    for artifact_id in (
+        "claude_code.transcripts",
+        "codex.rollouts",
+        "codex.archived_sessions",
+        "copilot.session_event_log",
+    ):
+        assert for_artifact(artifact_id) is not None, artifact_id

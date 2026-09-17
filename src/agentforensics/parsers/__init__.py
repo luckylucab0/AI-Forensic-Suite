@@ -24,11 +24,13 @@ from agentforensics.parsers.base import (
     text_of,
 )
 from agentforensics.parsers.claude_code import ClaudeCodeParser
+from agentforensics.parsers.codex import CodexParser
+from agentforensics.parsers.copilot import CopilotParser
 
 # Order matters only in that the first parser to claim an artifact wins, so a more specific
 # parser has to come before a general one. Kept as a tuple rather than a registry decorator
 # so that reading this file tells you the whole set.
-PARSERS: tuple[Parser, ...] = (ClaudeCodeParser(),)
+PARSERS: tuple[Parser, ...] = (ClaudeCodeParser(), CodexParser(), CopilotParser())
 
 
 def for_artifact(artifact_id: str | None) -> Parser | None:
