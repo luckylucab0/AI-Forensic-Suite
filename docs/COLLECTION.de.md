@@ -173,11 +173,67 @@ uv run agentforensics export-collection --format kape --out /tmp/rules
 
 | Format | Was dabei herauskommt | Wofür |
 | --- | --- | --- |
-| `velociraptor` | Ein Sammelartefakt, das die Katalogpfade globt und Fundstellen hochlädt, plus ein Präsenzartefakt nur mit Metadaten | Alles plattformübergreifende. Seine Glob-Sprache liegt dem Katalog am nächsten, also hat es die wenigsten Lücken |
+| `velociraptor` | Drei Artefakte: ein Sammelartefakt, das die Katalogpfade globt und Fundstellen hochlädt, ein Präsenzartefakt nur mit Metadaten, und ein Unified-Log-Artefakt, das auf dem Endpunkt parst und die Konversation als Zeilen zurückgibt | Alles plattformübergreifende. Seine Glob-Sprache liegt dem Katalog am nächsten, also hat es die wenigsten Lücken |
 | `kape` | Ein `.tkape` pro Agent plus ein Sammelziel | Eine Windows-Auswertung, die ohnehin in KAPE stattfindet |
 | `mde` | Ein Präsenz-Skript und ein Runbook | Eine Defender-Live-Response-Sitzung, Host für Host |
 | `kql` | Advanced-Hunting-Abfragen über Datei- und Prozessereignisse | Eine Flotte aus der Konsole eingrenzen, bevor ein Host angefasst wird |
 | `osquery` | Ein Pack mit Dateiabfragen pro Agent und Plattform | Eine Flotte, die osquery schon betreibt. Nur Metadaten, also Triage statt Sicherung |
+
+### Velociraptor: die Dateien holen, oder die Konversation zurückgeben
+
+Die drei Velociraptor-Artefakte beantworten drei verschiedene Fragen, und ein Hunt, der die
+falsche stellt, holt entweder Gigabytes von jedem Endpunkt oder kommt mit nichts zurück.
+
+`Custom.Forensics.AIAgents.Presence` meldet, welche Agenten eine Spur hinterlassen haben, und
+lädt nichts hoch. Damit fängt man in einer Flotte an: die Frage "wer hat einen KI-Coding-Agenten
+benutzt" ist aus der Existenz von Verzeichnissen beantwortbar, und sie durch das Hochladen
+jedes Transkripts im Bestand zu beantworten ist langsam und schafft ein Datenschutzproblem,
+das es vorher nicht gab.
+
+`Custom.Forensics.AIAgents.Collect` lädt die Dateien hoch. Das ist für einen Host, an dem man
+arbeiten wird; das Ergebnis liest `afx ingest`, und daraus kommen die Falldatenbank, die
+Zeitachse und die vollständige Deutung pro Zug.
+
+`Custom.Forensics.AIAgents.UnifiedLog` liest die Agenten-Logs dort, wo sie liegen, und gibt sie
+als Zeilen im vendorneutralen Format aus, das in
+[docs/UNIFIED_FORMAT.de.md](UNIFIED_FORMAT.de.md) beschrieben ist. Es wird nichts hochgeladen
+und nichts auf den Endpunkt gebracht. Das nimmt man, wenn man die Konversationen vieler Hosts
+auf einmal will, oder wenn das Hochladen von Transkripten nicht in Frage kommt.
+
+Was das Unified-Log-Artefakt bewusst weniger tut, hier genannt, weil ein Sammelwerkzeug, das
+stillschweigend weniger tut als es scheint, schlimmer ist als eines, das scheitert:
+
+- **Eine Zeile pro Datensatz, nie pro Inhaltsblock.** Ein Assistenten-Zug mit drei
+  Werkzeugaufrufen ist eine Zeile. Der vollständige Datensatz reist in `raw` mit, es geht also
+  nichts verloren; ein erneutes Lesen des Logs mit dem Analyzer dieser Suite zerlegt ihn
+  weiter. Grob ist die Deutung, nicht der Beweis.
+- **Es deutet die fünf Formate, die gegen ihren Hersteller gelesen wurden**: Transkript und
+  Prompt-Verlauf von Claude Code, Rollout und Prompt-Verlauf von Codex, und das Ereignis-Log
+  der Copilot CLI. Jedes andere zeilenweise Agenten-Log kommt Datensatz für Datensatz mit der
+  Art `unparsed.record` zurück, denn eine für ein unverifiziertes Format erfundene Abbildung
+  erzeugt Ausgaben, die wie eine Antwort aussehen.
+- **Es liest keine SQLite-Speicher, JSON-Dokumente oder binären Sitzungsdateien.** Die kommen
+  als je eine `artifact.fs`-Zeile zurück, mit Pfad, Hash und Zeitstempeln, damit ein Speicher,
+  den niemand gelesen hat, als genau das sichtbar ist und nicht als ein Agent, der nichts
+  hinterlassen hat.
+- **Es prüft sein eigenes Lesen.** Velociraptors Zeilenleser arbeitet mit einem Puffer, und
+  eine Zeile, die länger ist als der Puffer, beendet den Durchlauf und nimmt den Rest der
+  Datei mit. Agenten-Transkripte enthalten Zeilen von mehreren Megabyte, sobald eine
+  Werkzeugausgabe groß war, deshalb vergleicht das Artefakt die gelesenen Bytes mit der
+  Dateigröße und gibt einen Datensatz zurück, wenn das nicht aufgeht. Dann `MaxLineSize`
+  erhöhen und erneut sammeln.
+- **Es benutzt `parse_jsonl` nicht.** Dieses Plugin überspringt eine Zeile, die es nicht
+  dekodieren kann. Eine übersprungene Zeile liest sich wie eine Zeile, die es nie gab, und
+  genau dahinter würde sich ein abgeschnittener oder absichtlich beschädigter Datensatz
+  verstecken. Das Artefakt dekodiert die Zeilen deshalb selbst und gibt die zurück, die es
+  nicht lesen konnte.
+
+Zum Prüfen braucht es eine Velociraptor-Binärdatei, die dieses Repository nicht mitliefert.
+`scripts/check_velociraptor_vql.py --runner <binärdatei>` führt das Artefakt gegen ein
+synthetisches Profil in einer Sandbox aus, validiert jede Zeile gegen das Schema des Formats
+und vergleicht die zurückgegebenen Datensätze mit denen, die `afx normalize` aus demselben
+Profil liest. Ohne `--runner` tut es nichts und sagt das. Die statischen Prüfungen in
+`tests/unit/test_velociraptor_unified.py` laufen überall und bei jedem Commit.
 
 ### Was eine generierte Regel nicht kann, und warum sie es sagt
 

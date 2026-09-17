@@ -166,11 +166,63 @@ uv run agentforensics export-collection --format kape --out /tmp/rules
 
 | Format | What you get | Use it for |
 | --- | --- | --- |
-| `velociraptor` | A collection artifact that globs the catalogue paths and uploads what it finds, and a metadata-only presence artifact | Anything cross-platform. Its glob language is the closest to the catalogue's, so it has the fewest gaps |
+| `velociraptor` | Three artifacts: a collection artifact that globs the catalogue paths and uploads what it finds, a metadata-only presence artifact, and a unified-log artifact that parses on the endpoint and returns the conversation as rows | Anything cross-platform. Its glob language is the closest to the catalogue's, so it has the fewest gaps |
 | `kape` | One `.tkape` per agent plus a compound target | A Windows examiner who already works in KAPE |
 | `mde` | A presence-check script and a runbook | A Defender live response session, one host at a time |
 | `kql` | Advanced Hunting queries over file events and process events | Narrowing a fleet from the console, before touching any host |
 | `osquery` | A pack of per-agent, per-platform file queries | A fleet that already runs osquery. Metadata only, so it is triage rather than collection |
+
+### Velociraptor: collect the files, or return the conversation
+
+The three Velociraptor artifacts answer three different questions, and a hunt that asks the
+wrong one either takes gigabytes off every endpoint or comes back with nothing.
+
+`Custom.Forensics.AIAgents.Presence` reports which agents left a trace and uploads nothing.
+Start here on a fleet: the question "who has used an AI coding agent" is answerable from
+directory existence, and answering it by uploading every transcript in the estate is both
+slow and a data-protection problem of its own making.
+
+`Custom.Forensics.AIAgents.Collect` uploads the files. Use it for a host you are going to
+work on, and read the result with `afx ingest`, which gives you a case database, the
+timeline and the full per-turn interpretation.
+
+`Custom.Forensics.AIAgents.UnifiedLog` reads the agent logs where they are and returns them
+as rows in the vendor-neutral format documented in [docs/UNIFIED_FORMAT.md](UNIFIED_FORMAT.md).
+Nothing is uploaded and nothing is shipped to the endpoint. Use it when you want the
+conversations from many hosts at once, or when uploading transcripts is not an option.
+
+What the unified-log artifact deliberately does less of, stated here because a collection
+tool that quietly does less than it appears to is worse than one that fails:
+
+- **One row per record, never per content block.** An assistant turn that called three tools
+  is one row. The complete record travels in `raw`, so nothing is lost; re-reading the log
+  with this suite's own analyzer splits it further. What is coarse is the interpretation, not
+  the evidence.
+- **It interprets the five formats that have been read against their vendor**: the Claude
+  Code transcript and prompt history, the Codex rollout and prompt history, and the Copilot
+  CLI event log. Any other line-delimited agent log comes back record by record with kind
+  `unparsed.record`, because a mapping invented for a format nobody has verified produces
+  output that looks like an answer.
+- **It does not read SQLite stores, JSON documents or binary session files.** Those come back
+  as one `artifact.fs` row each, naming the path, the hash and the timestamps, so a store
+  nobody has read is visible as a store nobody has read rather than as an agent that left
+  nothing behind.
+- **It checks its own reading.** Velociraptor's line reader is buffered, and a line longer
+  than the buffer ends the scan and takes the rest of the file with it. Agent transcripts
+  carry multi-megabyte lines whenever a tool output was large, so the artifact compares the
+  bytes it read against each file's size and returns a record saying so when they do not add
+  up. Raise `MaxLineSize` and collect again when you see one.
+- **It does not use `parse_jsonl`.** That plugin skips a line it cannot decode. A skipped
+  line reads as a line that was never there, which is exactly what a truncated or
+  deliberately corrupted record would hide behind, so the artifact decodes lines itself and
+  returns the ones it could not read.
+
+Checking it needs a Velociraptor binary, which this repository does not ship.
+`scripts/check_velociraptor_vql.py --runner <binary>` runs the artifact against a synthetic
+profile inside a sandbox, validates every row against the format's schema, and compares the
+records it returned against the records `afx normalize` reads from the same profile. Without
+`--runner` it does nothing and says so. The static checks in
+`tests/unit/test_velociraptor_unified.py` run everywhere and on every commit.
 
 ### What a generated rule cannot do, and why it says so
 

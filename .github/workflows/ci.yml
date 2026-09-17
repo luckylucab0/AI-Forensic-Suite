@@ -96,6 +96,16 @@ jobs:
       - name: Generated collection rules current with the catalogue
         run: uv run python scripts/gen_collection_rules.py --check
 
+      # The unified-log artifact's VQL is checked as text by the test suite, which cannot
+      # tell whether the engine does what the query means. This step runs it for real when
+      # a Velociraptor binary is available. Unconditional on purpose: without a runner the
+      # script does nothing and exits 0, so the day a binary can be fetched here the check
+      # starts working without anybody remembering to enable it.
+      - name: Generated VQL runs and returns the unified format
+        run: uv run python scripts/check_velociraptor_vql.py --runner "${VELOCIRAPTOR:-}"
+        env:
+          VELOCIRAPTOR: ${{ vars.VELOCIRAPTOR_BINARY }}
+
   legacy-interpreter:
     name: Python 3.8 compatibility
     runs-on: ubuntu-latest
