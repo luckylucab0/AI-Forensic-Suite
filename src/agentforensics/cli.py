@@ -28,6 +28,8 @@ from agentforensics.bundle import BundleError, verify_bundle
 from agentforensics.catalog import CatalogueError, load_catalogue
 from agentforensics.exporters import FORMATS
 from agentforensics.exporters import render as render_collection_rules
+from agentforensics.ingest import ingest as ingest_source
+from agentforensics.model import Case, CaseError
 
 EXIT_OK = 0
 EXIT_FINDING = 1
@@ -38,7 +40,6 @@ EXIT_NOTHING_FOUND = 3
 # rather than only the fragment that exists. A user can then tell a missing capability
 # apart from an undocumented one.
 _PLANNED = [
-    ("ingest", "read a bundle, a KAPE tree or a Velociraptor collection into a case"),
     ("timeline", "build and export a device-wide timeline"),
     ("scan", "run the YAML rule packs against a case"),
     ("export", "export a case, including the viewer's event shape"),
@@ -234,6 +235,139 @@ def cmd_export_collection(args: argparse.Namespace) -> int:
     return EXIT_FINDING if skipped else EXIT_OK
 
 
+def cmd_ingest(args: argparse.Namespace) -> int:
+    """Read a bundle, a collected tree or an exported profile into a case.
+
+    Idempotent: the same evidence produces the same event identifiers, so re-running this
+    after a parser is fixed rebuilds a case rather than doubling it.
+
+    The exit code distinguishes the two results a caller has to tell apart. Nothing found
+    exits 3, because a host with no agent artifacts is a valid and useful answer that must
+    not look like a crash. A source that carried files nothing in the catalogue claims
+    exits 1: that is a finding, either an agent nobody has catalogued or a gap in the
+    catalogue, and it should not pass unnoticed in a script.
+    """
+    source = Path(args.source)
+    if not source.exists():
+        _write(sys.stderr, f"ingest: no such path: {source}")
+        return EXIT_ERROR
+
+    try:
+        catalogue = load_catalogue(Path(args.catalog))
+    except CatalogueError as exc:
+        _write(sys.stderr, f"ingest: {exc}")
+        return EXIT_ERROR
+
+    try:
+        case = Case.open(Path(args.case))
+    except CaseError as exc:
+        _write(sys.stderr, f"ingest: {exc}")
+        return EXIT_ERROR
+
+    try:
+        report = ingest_source(case, source, catalogue, kind=args.kind)
+    except (BundleError, OSError) as exc:
+        _write(sys.stderr, f"ingest: {exc}")
+        return EXIT_ERROR
+    finally:
+        case.close()
+
+    if args.json:
+        _write(
+            sys.stdout,
+            json.dumps(
+                {
+                    "case": str(args.case),
+                    "bundle_uuid": report.bundle_uuid,
+                    "source_kind": report.source_kind,
+                    "source_path": report.source_path,
+                    "artifacts": report.artifacts,
+                    "collected": report.collected,
+                    "attributed_by_collector": report.attributed_by_collector,
+                    "attributed_by_path": report.attributed_by_path,
+                    "unattributed": report.unattributed,
+                    "events": report.events,
+                    "gaps": report.gaps,
+                    "unclaimed_paths": report.unclaimed_paths,
+                },
+                indent=2,
+                sort_keys=True,
+            ),
+        )
+    else:
+        _write(sys.stdout, report.summary())
+
+    if report.artifacts == 0:
+        return EXIT_NOTHING_FOUND
+    return EXIT_FINDING if report.unclaimed_paths else EXIT_OK
+
+
+def cmd_case(args: argparse.Namespace) -> int:
+    """Show what a case holds, including the numbers that qualify it.
+
+    The uncomfortable counts are here on purpose. How many files were collected and not
+    read, how many records no parser could parse, how many events have no timestamp, and
+    how many holes the collection itself reported. A case summary that showed only what
+    was understood would read as completeness.
+    """
+    try:
+        case = Case.open(Path(args.case), create=False)
+    except CaseError as exc:
+        _write(sys.stderr, f"case: {exc}")
+        return EXIT_ERROR
+
+    try:
+        counts = case.counts()
+        bundles = case.query(
+            "SELECT bundle_uuid, source_kind, source_path, collected_host, collected_os, "
+            "started_utc FROM bundles ORDER BY bundle_uuid"
+        )
+        agents = case.query(
+            "SELECT agent, count(*) AS events FROM events GROUP BY agent ORDER BY events DESC"
+        )
+    finally:
+        case.close()
+
+    if args.json:
+        _write(
+            sys.stdout,
+            json.dumps(
+                {
+                    "counts": counts,
+                    "bundles": [dict(row) for row in bundles],
+                    "agents": [dict(row) for row in agents],
+                },
+                indent=2,
+                sort_keys=True,
+            ),
+        )
+        return EXIT_OK
+
+    for row in bundles:
+        host = row["collected_host"] or "unknown host"
+        _write(
+            sys.stdout,
+            f"{row['bundle_uuid']}  {row['source_kind']:<12} {host} ({row['collected_os'] or '?'})",
+        )
+    for row in agents:
+        _write(sys.stdout, f"  {row['agent']:<18} {row['events']} event(s)")
+    _write(
+        sys.stdout,
+        f"total: {counts['events']} event(s) from {counts['artifacts_collected']} "
+        f"collected file(s) of {counts['artifacts']} recorded",
+    )
+    # Said on stderr so that a --json consumer and a piped summary stay clean, and said
+    # every time rather than only when it looks bad.
+    _write(
+        sys.stderr,
+        f"qualifications: {counts['artifacts_unparsed']} collected file(s) no parser read, "
+        f"{counts['events_unparsed']} record(s) that could not be parsed, "
+        f"{counts['events_without_timestamp']} event(s) with no timestamp, "
+        f"{counts['collection_gaps']} gap(s) reported by the collection itself",
+    )
+    return EXIT_OK
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="agentforensics",
@@ -290,6 +424,33 @@ def build_parser() -> argparse.ArgumentParser:
     )
     export.add_argument("--json", action="store_true", help="machine-readable report")
     export.set_defaults(func=cmd_export_collection)
+
+    ingest = sub.add_parser(
+        "ingest",
+        help="read a bundle, a collected tree or an exported profile into a case",
+        description=cmd_ingest.__doc__,
+    )
+    ingest.add_argument("source", help="bundle directory, collected tree, or profile")
+    ingest.add_argument("--case", required=True, help="case database to create or add to")
+    ingest.add_argument("--catalog", default="catalog", help="catalogue directory")
+    ingest.add_argument(
+        "--kind",
+        choices=("native", "kape", "velociraptor", "directory"),
+        help="override the detected source kind. A bundle with a manifest is always read "
+        "as native whatever this says, because the manifest is the only record of what "
+        "the endpoint knew.",
+    )
+    ingest.add_argument("--json", action="store_true", help="machine-readable report")
+    ingest.set_defaults(func=cmd_ingest)
+
+    case = sub.add_parser(
+        "case",
+        help="show what a case holds, and the counts that qualify it",
+        description=cmd_case.__doc__,
+    )
+    case.add_argument("--case", required=True, help="case database")
+    case.add_argument("--json", action="store_true")
+    case.set_defaults(func=cmd_case)
 
     return parser
 

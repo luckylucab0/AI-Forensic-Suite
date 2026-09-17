@@ -1,0 +1,204 @@
+"""The unified event model.
+
+Every parser emits this shape, whatever agent produced the record. That is what makes a
+device-wide timeline possible at all: twelve agents with twelve transcript formats become
+one ordered sequence, and a rule written once matches all of them.
+
+Three properties of this dataclass are load-bearing rather than convenient.
+
+`raw` keeps the original record verbatim. It is not redundancy, it is the guarantee that a
+mapping mistake in a parser costs interpretation and not evidence: whatever a parser got
+wrong, the original is still there to re-read. Nothing in the pipeline is allowed to drop
+it.
+
+`event_id` is derived from provenance, never from a counter. The same evidence therefore
+produces the same identifier, which makes re-ingest idempotent: ingesting a bundle twice
+does not double a case, and a finding recorded last week still points at the same event.
+
+`ts_utc` is nullable and always accompanied by `ts_precision` and `ts_source`. A great many
+agent records carry no timestamp at all, and the honest representation of that is an absent
+timestamp with a stated reason, not a zero, not the ingest time, and not the file's mtime
+silently presented as the event's own.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+from dataclasses import dataclass, field
+from typing import Any, Literal
+
+# Agent-neutral on purpose. A kind names what happened, not which agent it happened in, so
+# a rule about a dangerous command is written once rather than twelve times.
+EVENT_KINDS = (
+    "session.start",
+    "session.end",
+    "user.prompt",
+    "assistant.text",
+    "assistant.thinking",
+    "tool.call",
+    "tool.result",
+    "file.read",
+    "file.write",
+    "file.snapshot",
+    "command.exec",
+    "network.request",
+    "mcp.call",
+    "permission.decision",
+    "config.snapshot",
+    "memory.write",
+    "plan.write",
+    "prompt.history",
+    # The filesystem timestamps of an artifact file itself. Some artifacts carry no internal
+    # timestamps at all, and for those this is the only temporal evidence there is: without
+    # this kind they would be missing from every timeline.
+    "artifact.fs",
+    # A record the parsers could not read, or a record type none of them knows. It is an
+    # event like any other so that it appears on the timeline and in every count, because a
+    # record that is quietly dropped reads as a record that never existed.
+    "unparsed.record",
+)
+
+# How much of the timestamp is real. An analyst reading a timeline has to be able to tell a
+# millisecond from an agent's own clock apart from a date inferred from a directory name,
+# and ordering two events inside the same minute is meaningless if both are minute-precise.
+TsPrecision = Literal["exact", "second", "minute", "hour", "day", "filesystem", "absent"]
+
+# Who acted. Separate from the kind because the same kind has different meaning depending
+# on the actor: a file write by the agent is its work product, a file write by the user is
+# context the agent then read.
+Actor = Literal["user", "assistant", "tool", "system", "unknown"]
+
+
+@dataclass(frozen=True, slots=True)
+class Provenance:
+    """Where an event came from, precisely enough to go back and look.
+
+    Every field here answers a question an analyst will be asked in a report: which
+    collection this came from, which file on the endpoint, whether that file is still the
+    one that was collected, and where in it this record sits.
+    """
+
+    bundle_uuid: str
+    original_path: str
+    sha256: str
+    artifact_id: str | None = None
+    # A line number for a line-delimited file, a byte offset for anything else, a table and
+    # rowid for a database. Kept as text because those are three different things and
+    # forcing them into an integer would lose which one it is.
+    locator: str | None = None
+
+    def key(self) -> str:
+        """The string the event id is derived from."""
+        return "\x00".join(
+            (
+                self.bundle_uuid,
+                self.original_path,
+                self.sha256,
+                self.artifact_id or "",
+                self.locator or "",
+            )
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class Event:
+    """One thing that happened, as the case database stores it."""
+
+    kind: str
+    provenance: Provenance
+    agent: str
+    raw: Any
+    ts_utc: str | None = None
+    ts_precision: TsPrecision = "absent"
+    # Where the timestamp came from: the name of the record field, or which filesystem
+    # timestamp. An analyst has to be able to tell the agent's own clock from the
+    # filesystem's, because only one of the two is evidence of when the agent acted.
+    ts_source: str | None = None
+    actor: Actor = "unknown"
+    client: str | None = None
+    host: str | None = None
+    user: str | None = None
+    session_id: str | None = None
+    project_path: str | None = None
+    git_branch: str | None = None
+    payload: dict[str, Any] = field(default_factory=dict)
+    # Set when this event's kind is unparsed.record, or when a parser mapped the record but
+    # could not map part of it. Surfaced in the analyzer's output either way.
+    parse_problem: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.kind not in EVENT_KINDS:
+            raise ValueError(f"unknown event kind: {self.kind}")
+        if self.ts_utc is None and self.ts_precision != "absent":
+            raise ValueError("a precision was given for a timestamp that is not there")
+        if self.ts_utc is not None and self.ts_precision == "absent":
+            raise ValueError("a timestamp was given with no precision")
+
+    @property
+    def event_id(self) -> str:
+        """A stable identifier, derived from provenance and the kind.
+
+        The kind is in the hash because one record can legitimately produce several events:
+        a transcript turn that calls a tool is both an assistant turn and a tool call, and
+        those need separate identities while sharing a locator.
+        """
+        digest = hashlib.sha256()
+        digest.update(self.provenance.key().encode("utf-8"))
+        digest.update(b"\x00")
+        digest.update(self.kind.encode("utf-8"))
+        return digest.hexdigest()[:32]
+
+    def raw_json(self) -> str:
+        """The original record as stored text.
+
+        sort_keys so that re-ingesting the same evidence writes the same bytes, and
+        ensure_ascii=False so a prompt in any language stays readable in the database
+        rather than becoming escapes. default=str so that a value no JSON encoder knows
+        still lands in the column instead of failing the ingest: losing the record would be
+        worse than storing a coarse rendering of it.
+        """
+        return json.dumps(self.raw, sort_keys=True, ensure_ascii=False, default=str)
+
+    def payload_json(self) -> str:
+        return json.dumps(self.payload, sort_keys=True, ensure_ascii=False, default=str)
+
+
+def unparsed(
+    provenance: Provenance,
+    agent: str,
+    raw: Any,
+    problem: str,
+    ts_utc: str | None = None,
+    ts_precision: TsPrecision = "absent",
+    ts_source: str | None = None,
+    **fields: Any,
+) -> Event:
+    """An event for a record nothing could read.
+
+    A helper rather than a convention because this is the path that must never be skipped,
+    and making it one call means a parser's failure branch is shorter than its success
+    branch. The record itself is kept in raw, so an analyst reading the case sees the text
+    the parser choked on rather than a count of failures.
+    """
+    return Event(
+        kind="unparsed.record",
+        provenance=provenance,
+        agent=agent,
+        raw=raw,
+        ts_utc=ts_utc,
+        ts_precision=ts_precision,
+        ts_source=ts_source,
+        parse_problem=problem,
+        **fields,
+    )
+
+
+__all__ = [
+    "EVENT_KINDS",
+    "Actor",
+    "Event",
+    "Provenance",
+    "TsPrecision",
+    "unparsed",
+]
