@@ -65,10 +65,28 @@ class Case:
     # ---------------------------------------------------------------- lifecycle
 
     @classmethod
-    def open(cls, path: Path, *, create: bool = True) -> Case:
+    def open(cls, path: Path, *, create: bool = True, read_only: bool = False) -> Case:
+        """Open a case. `read_only` opens the file so that SQLite itself refuses a write.
+
+        The read-only mode exists for the local web UI. A reader that only intends to read
+        is not the same claim as a connection that cannot write: the first is a promise
+        about this build's code, the second is enforced one layer down and holds even for a
+        bug. A case is derived evidence, and a viewer must not be able to alter it.
+        """
         if not create and not path.exists():
             raise CaseError(f"no case at {path}")
         existed = path.exists()
+        if read_only:
+            if not existed:
+                raise CaseError(f"no case at {path}")
+            # A URI connection is the only way to ask SQLite for a read-only handle.
+            # as_uri() percent-encodes the path, which is what makes a path holding a
+            # question mark or a hash land intact rather than being read as a query.
+            connection = sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True)
+            connection.row_factory = sqlite3.Row
+            case = cls(path, connection)
+            case._check_version()
+            return case
         path.parent.mkdir(parents=True, exist_ok=True)
         connection = sqlite3.connect(path)
         connection.row_factory = sqlite3.Row

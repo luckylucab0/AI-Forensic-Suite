@@ -184,7 +184,13 @@ def _payload(row: sqlite3.Row) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
-def _record(row: sqlite3.Row) -> dict[str, Any]:
+def record(row: sqlite3.Row) -> dict[str, Any]:
+    """One timeline row as a mapping, in COLUMNS order.
+
+    Public because the local web UI serves the same rows over HTTP. A second renderer with
+    its own idea of what a timeline row holds would let the exported file and the screen
+    disagree about the same case, and a report is written from one of the two.
+    """
     return {
         "ts_utc": row["ts_utc"],
         "ts_precision": row["ts_precision"],
@@ -228,7 +234,7 @@ def _write_csv(case: Case, stream: TextIO, filters: Filters | None) -> tuple[int
     out.writeheader()
     written = undated = 0
     for row in rows(case, filters):
-        out.writerow(_record(row))
+        out.writerow(record(row))
         written += 1
         undated += row["ts_utc"] is None
     return written, undated
@@ -237,12 +243,12 @@ def _write_csv(case: Case, stream: TextIO, filters: Filters | None) -> tuple[int
 def _write_jsonl(case: Case, stream: TextIO, filters: Filters | None) -> tuple[int, int]:
     written = undated = 0
     for row in rows(case, filters):
-        record = _record(row)
+        out = record(row)
         # The whole original record travels with the row in this format, because this is
         # the one meant to be read back by a tool rather than by a person, and a tool that
         # has the original does not have to trust the mapping.
-        record["raw"] = _raw(row)
-        stream.write(json.dumps(record, sort_keys=True, ensure_ascii=False, default=str) + "\n")
+        out["raw"] = _raw(row)
+        stream.write(json.dumps(out, sort_keys=True, ensure_ascii=False, default=str) + "\n")
         written += 1
         undated += row["ts_utc"] is None
     return written, undated
@@ -263,16 +269,16 @@ def _write_timesketch(case: Case, stream: TextIO, filters: Filters | None) -> tu
         if row["ts_utc"] is None:
             undated += 1
             continue
-        record = _record(row)
+        out = record(row)
         stream.write(
             json.dumps(
                 {
-                    "message": f"{row['agent']} {row['kind']}: {record['summary']}",
+                    "message": f"{row['agent']} {row['kind']}: {out['summary']}",
                     "datetime": row["ts_utc"],
                     "timestamp_desc": f"{row['ts_source'] or 'unknown source'} "
                     f"({row['ts_precision']} precision)",
                     "data_type": f"agentforensics:{row['kind']}",
-                    **{k: v for k, v in record.items() if v is not None},
+                    **{k: v for k, v in out.items() if v is not None},
                 },
                 sort_keys=True,
                 ensure_ascii=False,
@@ -332,4 +338,13 @@ def parse_kinds(values: Sequence[str] | None) -> tuple[str, ...]:
     return tuple(dict.fromkeys(values or ()))
 
 
-__all__ = ["COLUMNS", "FORMATS", "Filters", "header_notes", "rows", "summarise", "write"]
+__all__ = [
+    "COLUMNS",
+    "FORMATS",
+    "Filters",
+    "header_notes",
+    "record",
+    "rows",
+    "summarise",
+    "write",
+]

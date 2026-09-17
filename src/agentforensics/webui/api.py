@@ -1,0 +1,527 @@
+"""What a case looks like through the local read-only API.
+
+Every projection in here is a plain function from an open case to JSON-able data, with no
+HTTP anywhere near it. That split is deliberate: the questions a projection answers are
+where the forensic care is, and they have to be testable without a socket, a port or a
+browser. `server.py` is then only routing and hardening.
+
+Three shapes in here are decisions rather than plumbing.
+
+A session's events are served in the unified log format, the same one `afx normalize` and
+the Velociraptor artifact write. The viewer therefore reads a case through the reader it
+already has, and there is no third event shape that could disagree with the other two. See
+docs/UNIFIED_FORMAT.md.
+
+A session's identity is derived, not stored. A case holds events, and what a viewer calls a
+session is a group of them: one agent, one host, one user, one working directory, one
+session id. The group's key is a hash of exactly those six values, so the same case always
+produces the same keys and a bookmarked URL still resolves after a re-ingest.
+
+Every count that qualifies a case travels with it. Records nothing could parse, events with
+no timestamp, files collected and never read, holes the collection itself reported, and
+whether anybody has run the rules at all. A viewer that showed only what was understood
+would read as completeness, which is the one failure this suite must not have.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import sqlite3
+from itertools import islice
+from typing import Any
+
+from agentforensics import __version__
+from agentforensics.model import Case
+from agentforensics.model.schema import SCHEMA_VERSION
+from agentforensics.timeline import Filters, record, rows
+from agentforensics.unified import FORMAT_NAME, FORMAT_VERSION
+
+# Bumped when the shape of a response changes in a way a reader has to know about. The
+# viewer reads it out of /api/case and refuses a version it was not written for, rather
+# than rendering half a case from fields it guessed at.
+API_VERSION = 1
+
+# How many events one page of a session or a timeline carries by default, and the ceiling a
+# caller can ask for. Paged because ADR 0006 chose the standard library over a framework
+# and accepted worse streaming as the cost: a session projection is assembled in memory, so
+# it has to be bounded. The default is large enough that a normal conversation arrives in
+# one request.
+DEFAULT_PAGE = 2000
+MAX_PAGE = 20000
+
+
+class ApiError(Exception):
+    """A request that named something the case does not have."""
+
+
+# ---------------------------------------------------------------------------- case
+
+
+def case_summary(case: Case) -> dict[str, Any]:
+    """The case as a whole: what is in it, where it came from, and what is missing.
+
+    The marker field is `afx_api`. The viewer probes for it to decide whether it is being
+    served by `afx serve` or is just an HTML file somebody opened, and a probe needs
+    something unambiguous to find: a 200 with the wrong JSON is not a case.
+    """
+    counts = case.counts()
+    bundles = [
+        dict(row)
+        for row in case.query(
+            "SELECT bundle_uuid, source_kind, source_path, tool_name, tool_version, "
+            "       format_version, collected_os, collected_host, collector_user, "
+            "       elevated, started_utc, finished_utc, local_timezone, "
+            "       local_timezone_name, manifest_sha256, ingested_utc "
+            "  FROM bundles ORDER BY bundle_uuid"
+        )
+    ]
+    agents = [
+        dict(row)
+        for row in case.query(
+            "SELECT agent, count(*) AS events, "
+            "       sum(CASE WHEN kind = 'unparsed.record' THEN 1 ELSE 0 END) AS unparsed, "
+            "       min(ts_utc) AS first_ts, max(ts_utc) AS last_ts "
+            "  FROM events GROUP BY agent ORDER BY events DESC, agent"
+        )
+    ]
+    kinds = [
+        dict(row)
+        for row in case.query(
+            "SELECT kind, count(*) AS events FROM events GROUP BY kind ORDER BY kind"
+        )
+    ]
+    gaps = [
+        dict(row)
+        for row in case.query(
+            "SELECT bundle_uuid, kind, detail, reason FROM collection_gaps "
+            " ORDER BY bundle_uuid, kind, detail"
+        )
+    ]
+    scans = [
+        dict(row)
+        for row in case.query(
+            "SELECT run_id, started_utc, finished_utc, rules_run, events_read, findings, "
+            "       tool_version FROM scan_runs ORDER BY started_utc DESC"
+        )
+    ]
+    return {
+        "afx_api": API_VERSION,
+        "tool": "agentforensics",
+        "tool_version": __version__,
+        "unified_format": {"name": FORMAT_NAME, "version": FORMAT_VERSION},
+        "case": {"path": str(case.path), "schema_version": SCHEMA_VERSION},
+        "counts": counts,
+        "bundles": bundles,
+        "agents": agents,
+        "kinds": kinds,
+        "collection_gaps": gaps,
+        "scan_runs": scans,
+        # Said as its own field rather than left to be inferred from an empty list. A case
+        # with no findings and a case nobody scanned look identical otherwise, and those
+        # are opposite conclusions.
+        "scanned": bool(scans),
+    }
+
+
+# ------------------------------------------------------------------ sessions and groups
+
+# One row per derived session. The two CASE expressions are what put the filesystem events
+# in a group of their own: they are one per collected file rather than part of a
+# conversation, and on a large collection they outnumber it by an order of magnitude. They
+# are still served, in their own group, because for an artifact with no internal timestamps
+# they are the only temporal evidence there is.
+_GROUPS_SQL = """
+SELECT e.agent                                                             AS agent,
+       h.name                                                              AS host,
+       u.name                                                              AS user,
+       CASE WHEN e.kind = 'artifact.fs' THEN 1 ELSE 0 END                  AS files,
+       CASE WHEN e.kind = 'artifact.fs' THEN NULL ELSE e.project_path END  AS project_path,
+       CASE WHEN e.kind = 'artifact.fs' THEN NULL ELSE e.session_id END    AS session_id,
+       count(*)                                                            AS events,
+       min(e.ts_utc)                                                       AS first_ts,
+       max(e.ts_utc)                                                       AS last_ts,
+       sum(CASE WHEN e.kind = 'unparsed.record' THEN 1 ELSE 0 END)         AS unparsed,
+       sum(CASE WHEN e.ts_utc IS NULL THEN 1 ELSE 0 END)                   AS undated,
+       group_concat(DISTINCT e.kind)                                       AS kinds
+  FROM events e
+  LEFT JOIN hosts h ON h.host_id = e.host_id
+  LEFT JOIN users u ON u.user_id = e.user_id
+ GROUP BY agent, host, user, files, project_path, session_id
+ ORDER BY files, agent, project_path IS NULL, project_path, host, user,
+          first_ts IS NULL, first_ts, session_id
+"""
+
+# The six values a session is grouped by, in the order they go into its key.
+_GROUP_FIELDS = ("agent", "host", "user", "files", "project_path", "session_id")
+
+
+def _group_key(row: sqlite3.Row) -> str:
+    """A stable key for one derived session.
+
+    Derived from the group's own values rather than from a counter, so the same case always
+    produces the same keys: a link an analyst pasted into a report still opens the same
+    session after the case is rebuilt from the same bundle.
+
+    An absent value and an empty one are hashed differently. A session id that is null and
+    one that is the empty string are different claims about the evidence, and two groups
+    that collided onto one key would silently merge two sessions into one transcript.
+    """
+    digest = hashlib.sha256()
+    for field in _GROUP_FIELDS:
+        value = row[field]
+        digest.update(b"\x01" if value is None else b"\x02")
+        digest.update(str("" if value is None else value).encode("utf-8"))
+        digest.update(b"\x00")
+    return digest.hexdigest()[:32]
+
+
+def sessions(case: Case) -> list[dict[str, Any]]:
+    """Every derived session in the case, with the counts a sidebar shows."""
+    out = []
+    for row in case.query(_GROUPS_SQL):
+        key = _group_key(row)
+        out.append(
+            {
+                "key": key,
+                # The path the viewer fetches this session's events from. Handed out by the
+                # server rather than assembled in the browser, so the URL shape stays this
+                # module's business.
+                "path": f"api/sessions/{key}/events",
+                "agent": row["agent"],
+                "host": row["host"],
+                "user": row["user"],
+                "project_path": row["project_path"],
+                "session_id": row["session_id"],
+                "files": bool(row["files"]),
+                "events": int(row["events"]),
+                "unparsed": int(row["unparsed"] or 0),
+                "undated": int(row["undated"] or 0),
+                "first_ts": row["first_ts"],
+                "last_ts": row["last_ts"],
+                "kinds": sorted((row["kinds"] or "").split(",")),
+            }
+        )
+    return out
+
+
+def projects(case: Case) -> dict[str, Any]:
+    """The sessions grouped the way the viewer's sidebar shows them.
+
+    Grouped by agent, working directory, host and user, because one case can hold several
+    agents, several users and several hosts at once, which is what comes back from a fleet
+    collection. A session with no session id of its own is not dropped: it becomes a group
+    named for what it is, so that a prompt from a history file is visible rather than
+    absent.
+    """
+    groups: dict[str, dict[str, Any]] = {}
+    for session in sessions(case):
+        agent = session["agent"] or "unknown agent"
+        host = f" · {session['host']}" if session["host"] else ""
+        user = f" · {session['user']}" if session["user"] else ""
+        if session["files"]:
+            group_id = f"files:{agent}{host}{user}"
+            name = f"{agent}: files on disk{host}{user}"
+        else:
+            cwd = session["project_path"] or "(no working directory recorded)"
+            group_id = f"case:{agent}|{cwd}{host}{user}"
+            name = f"{agent} · {cwd}{host}{user}"
+        group = groups.setdefault(group_id, {"id": group_id, "name": name, "sessions": []})
+        group["sessions"].append(session)
+    return {
+        "afx_api": API_VERSION,
+        "projects": [groups[key] for key in sorted(groups)],
+    }
+
+
+def session_records(
+    case: Case, key: str, *, offset: int = 0, limit: int = DEFAULT_PAGE
+) -> tuple[list[dict[str, Any]], int | None]:
+    """One page of a session's events, as unified log records.
+
+    Returns the records and the offset to ask for next, or None when the page was the last
+    one. Whether more remain is answered by reading one row past the page rather than by
+    comparing against a count, because a count taken in a second query could disagree with
+    the page if the case is being written while it is read, which is exactly what happens
+    when an analyst opens a case during an ingest.
+    """
+    group = _resolve(case, key)
+    limit = max(1, min(int(limit), MAX_PAGE))
+    offset = max(0, int(offset))
+    parameters = [group[field] for field in _GROUP_FIELDS] + [limit + 1, offset]
+    fetched = case.query(_SESSION_SQL, parameters)
+    more = len(fetched) > limit
+    page = fetched[:limit]
+    return [_unified(row) for row in page], (offset + len(page)) if more else None
+
+
+def _resolve(case: Case, key: str) -> dict[str, Any]:
+    """The group one key names, or an error naming what went wrong.
+
+    Re-derived per request rather than held in memory. The case is a file that can grow
+    while it is being served, and a cached group list would serve a session list that no
+    longer matches the case it claims to describe.
+    """
+    for session in sessions(case):
+        if session["key"] == key:
+            return session
+    raise ApiError(f"no session {key} in this case")
+
+
+# The columns every unified record is built from. One select, used by the session page
+# and by the single-event lookup, so the two cannot come back describing different fields.
+_EVENT_SELECT = """
+SELECT e.event_id, e.kind, e.agent, e.ts_utc, e.ts_precision, e.ts_source, e.actor,
+       e.client, e.session_id, e.project_path, e.git_branch, e.artifact_id,
+       e.original_path, e.locator, e.file_sha256, e.bundle_uuid, e.payload, e.raw,
+       e.parse_problem, u.name AS user, h.name AS host
+  FROM events e
+  LEFT JOIN hosts h ON h.host_id = e.host_id
+  LEFT JOIN users u ON u.user_id = e.user_id
+"""
+
+# The six values a session's key was derived from, matched back with IS rather than =, so
+# that a null working directory matches the group whose working directory is null. With =
+# every group that has one would come back empty, which would look like a session that
+# holds no events.
+# Ordered the same way the timeline is: an event with no timestamp comes first, because its
+# position is unknown rather than early, and a reader must meet it rather than have to
+# scroll past everything to find it.
+#
+# The locator is sorted by length before content, which looks odd and is on purpose. A
+# locator is text ("line:9", "byte:4096", "table:x rowid:5") because those are different
+# things, and sorting text puts "line:10" before "line:9". Comparing length first restores
+# numeric order for the decimal numbers that share a prefix, which is every locator a
+# line-delimited transcript produces, and a transcript read out of order is a transcript
+# nobody can follow.
+_SESSION_SQL = (
+    _EVENT_SELECT
+    + """
+ WHERE e.agent IS ?
+   AND h.name IS ?
+   AND u.name IS ?
+   AND (CASE WHEN e.kind = 'artifact.fs' THEN 1 ELSE 0 END) IS ?
+   AND (CASE WHEN e.kind = 'artifact.fs' THEN NULL ELSE e.project_path END) IS ?
+   AND (CASE WHEN e.kind = 'artifact.fs' THEN NULL ELSE e.session_id END) IS ?
+ ORDER BY e.ts_utc IS NULL DESC, e.ts_utc, e.original_path,
+          length(e.locator), e.locator, e.kind
+ LIMIT ? OFFSET ?
+"""
+)
+
+
+def event_record(case: Case, event_id: str) -> dict[str, Any]:
+    """One event by its id, as a unified record. What a finding links to."""
+    found = case.query(_EVENT_SELECT + " WHERE e.event_id = ?", [event_id])
+    if not found:
+        raise ApiError(f"no event {event_id} in this case")
+    return _unified(found[0])
+
+
+def _unified(row: sqlite3.Row) -> dict[str, Any]:
+    """One stored event as one unified log record.
+
+    Built from the row rather than by reconstructing an `Event` and converting it. The
+    model validates on construction, so a row whose stored precision and timestamp
+    disagreed, from an older build or a parser since fixed, would raise here and cost the
+    whole page. A record must be servable whatever state it is in: that is the difference
+    between a viewer that shows a problem and one that shows nothing.
+
+    `event_id` is the stored one. A reader recomputes it from the provenance and reports a
+    disagreement rather than correcting it, which is what makes a mismatch visible instead
+    of quietly resolved.
+    """
+    payload = _decode(row["payload"])
+    return {
+        "v": FORMAT_VERSION,
+        "agent": row["agent"],
+        "kind": row["kind"],
+        "event_id": row["event_id"],
+        "ts_utc": row["ts_utc"],
+        "ts_precision": row["ts_precision"],
+        "ts_source": row["ts_source"],
+        "actor": row["actor"],
+        "client": row["client"],
+        "host": row["host"],
+        "user": row["user"],
+        "session_id": row["session_id"],
+        "project_path": row["project_path"],
+        "git_branch": row["git_branch"],
+        "payload": payload if isinstance(payload, dict) else {"payload": payload},
+        "parse_problem": row["parse_problem"],
+        "provenance": {
+            "bundle_uuid": row["bundle_uuid"],
+            "original_path": row["original_path"],
+            "sha256": row["file_sha256"],
+            "artifact_id": row["artifact_id"],
+            "locator": row["locator"],
+        },
+        "raw": _decode(row["raw"]),
+        "producer": f"agentforensics/{__version__} (case)",
+    }
+
+
+def _decode(text: Any) -> Any:
+    """Stored JSON back into a value, and the text itself when it is not JSON.
+
+    Returning the text is the point. A column that cannot be decoded is evidence of
+    something having gone wrong at ingest, and handing the reader the characters that are
+    actually in the case is more use than an empty object standing where a record was.
+    """
+    if text is None:
+        return None
+    try:
+        return json.loads(text)
+    except (TypeError, ValueError):
+        return {"__undecodable__": str(text)}
+
+
+# ------------------------------------------------------------------------- timeline
+
+
+def timeline(
+    case: Case,
+    *,
+    offset: int = 0,
+    limit: int = DEFAULT_PAGE,
+    agents: tuple[str, ...] = (),
+    kinds: tuple[str, ...] = (),
+    since: str | None = None,
+    until: str | None = None,
+    session_id: str | None = None,
+    exclude_artifact_fs: bool = False,
+) -> dict[str, Any]:
+    """A page of the device-wide timeline, in the same shape the exports write.
+
+    The rows come from the timeline module rather than from a query of its own, so the CSV
+    an analyst attaches to a report and the table they read on screen cannot describe the
+    same case differently.
+    """
+    limit = max(1, min(int(limit), MAX_PAGE))
+    offset = max(0, int(offset))
+    filters = Filters(
+        agents=agents,
+        kinds=kinds,
+        since=since,
+        until=until,
+        session_id=session_id,
+        exclude_artifact_fs=exclude_artifact_fs,
+    )
+    # islice over the cursor rather than LIMIT in SQL: the filter clause lives in the
+    # timeline module, and reaching in to add paging to it would be a second place that
+    # decides what a timeline contains. SQLite streams the rows, so the cost of skipping is
+    # the rows skipped, not the whole table.
+    stream = rows(case, filters)
+    page = list(islice(stream, offset, offset + limit + 1))
+    more = len(page) > limit
+    page = page[:limit]
+    return {
+        "afx_api": API_VERSION,
+        "rows": [record(row) for row in page],
+        "offset": offset,
+        "next_offset": (offset + len(page)) if more else None,
+        "undated": sum(1 for row in page if row["ts_utc"] is None),
+    }
+
+
+# ------------------------------------------------------------------------- findings
+
+
+def findings(case: Case) -> dict[str, Any]:
+    """What the rules found, and the fact of their having run.
+
+    The scan runs travel with the findings for the same reason the collector records a glob
+    it declined to search: an empty list means nothing until a reader knows whether anybody
+    looked.
+    """
+    scans = [
+        dict(row)
+        for row in case.query(
+            "SELECT run_id, started_utc, finished_utc, rules_run, rule_ids, events_read, "
+            "       findings, tool_version FROM scan_runs ORDER BY started_utc DESC"
+        )
+    ]
+    out = []
+    for row in case.query(
+        "SELECT f.finding_id, f.rule_id, f.pack, f.severity, f.title, f.ts_utc, f.agent, "
+        "       f.session_id, f.summary, f.matched, f.event_count, f.rule_sha256, "
+        "       f.scanned_utc, u.name AS user "
+        "  FROM findings f LEFT JOIN users u ON u.user_id = f.user_id "
+        " ORDER BY CASE f.severity WHEN 'critical' THEN 0 WHEN 'high' THEN 1 "
+        "          WHEN 'medium' THEN 2 WHEN 'low' THEN 3 ELSE 4 END, "
+        "          f.ts_utc IS NULL DESC, f.ts_utc, f.rule_id"
+    ):
+        finding = dict(row)
+        finding["matched"] = _decode(finding["matched"])
+        finding["event_ids"] = [
+            str(event["event_id"])
+            for event in case.query(
+                "SELECT event_id FROM finding_events WHERE finding_id = ? ORDER BY event_id",
+                [finding["finding_id"]],
+            )
+        ]
+        out.append(finding)
+    return {
+        "afx_api": API_VERSION,
+        "findings": out,
+        "scan_runs": scans,
+        "scanned": bool(scans),
+    }
+
+
+# ------------------------------------------------------------------------ artifacts
+
+
+def artifacts(case: Case) -> dict[str, Any]:
+    """Every file the collection carried, read or not, plus the holes it reported.
+
+    This is the view that qualifies every other one. The difference between no events from
+    an agent and nothing from that agent having been collected is the difference between
+    two opposite conclusions, and it is only visible here.
+    """
+    out = [
+        dict(row)
+        for row in case.query(
+            "SELECT a.bundle_uuid, a.artifact_id, a.agent, a.category, a.original_path, "
+            "       a.sha256, a.size, a.status, a.collected, a.reason, a.mtime_utc, "
+            "       a.birthtime_utc, a.symlink, a.changed_while_reading, a.parser, "
+            "       a.parse_status, a.parse_detail, a.events_parsed, a.records_unparsed, "
+            "       u.name AS user "
+            "  FROM artifacts a LEFT JOIN users u ON u.user_id = a.user_id "
+            " ORDER BY a.agent IS NULL, a.agent, a.original_path"
+        )
+    ]
+    for entry in out:
+        entry["collected"] = bool(entry["collected"])
+        entry["changed_while_reading"] = (
+            None if entry["changed_while_reading"] is None else bool(entry["changed_while_reading"])
+        )
+    gaps = [
+        dict(row)
+        for row in case.query(
+            "SELECT bundle_uuid, kind, detail, reason FROM collection_gaps "
+            " ORDER BY bundle_uuid, kind, detail"
+        )
+    ]
+    return {
+        "afx_api": API_VERSION,
+        "artifacts": out,
+        "collection_gaps": gaps,
+        "counts": case.counts(),
+    }
+
+
+__all__ = [
+    "API_VERSION",
+    "DEFAULT_PAGE",
+    "MAX_PAGE",
+    "ApiError",
+    "artifacts",
+    "case_summary",
+    "event_record",
+    "findings",
+    "projects",
+    "session_records",
+    "sessions",
+    "timeline",
+]

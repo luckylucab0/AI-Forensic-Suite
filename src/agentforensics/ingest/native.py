@@ -14,6 +14,7 @@ evidence and they have to be visible from the case rather than only from the bun
 
 from __future__ import annotations
 
+import hashlib
 import json
 from collections.abc import Iterator
 from pathlib import Path
@@ -35,9 +36,15 @@ class NativeBundle:
         if not manifest_path.is_file():
             raise BundleError(f"{root} has no manifest.json")
         try:
-            self._manifest: dict[str, Any] = json.loads(manifest_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
+            raw = manifest_path.read_bytes()
+            self._manifest: dict[str, Any] = json.loads(raw.decode("utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
             raise BundleError(f"{manifest_path} could not be read: {exc}") from exc
+        # Hashed from the bytes in hand rather than read out of the manifest, which cannot
+        # state its own hash. This is the value the bundle's custody records commit to, so
+        # carrying it into the case is what lets somebody a year later check the case
+        # against the bundle it came from without re-running verify.
+        self._manifest_sha256 = hashlib.sha256(raw).hexdigest()
         if "files" not in self._manifest or "collection" not in self._manifest:
             raise BundleError(f"{manifest_path} is not a bundle manifest")
 
@@ -63,7 +70,7 @@ class NativeBundle:
             finished_utc=collection.get("finished_utc"),
             local_timezone=collection.get("local_timezone"),
             local_timezone_name=collection.get("local_timezone_name"),
-            manifest_sha256=self._manifest.get("sha256"),
+            manifest_sha256=self._manifest_sha256,
         )
 
     def entries(self) -> Iterator[SourceEntry]:

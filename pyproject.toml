@@ -64,6 +64,13 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/agentforensics"]
 
+# The viewer is one standalone HTML file an analyst can also open on its own (ADR 0001), so
+# it lives at viewer/index.html in the repository rather than inside the package. `afx
+# serve` needs it at runtime, and a wheel install has no repository, so a copy travels
+# inside the package. The server looks in both places, the package copy first.
+[tool.hatch.build.targets.wheel.force-include]
+"viewer/index.html" = "agentforensics/webui/viewer/index.html"
+
 [tool.hatch.build.targets.sdist]
 # The catalogue and the collectors are the product, not build inputs, so they ship.
 include = [

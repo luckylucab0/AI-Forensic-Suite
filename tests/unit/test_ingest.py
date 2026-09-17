@@ -9,6 +9,7 @@ false-claim cases first because those are the ones that look like success.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -239,10 +240,16 @@ def test_a_native_bundle_is_preferred_over_a_tree_reading(
     with Case.open(tmp_path / "case.sqlite") as case:
         report = ingest(case, bundle, catalogue)
         row = case.query("SELECT sha256, status FROM artifacts")[0]
+        bundle_row = case.query("SELECT manifest_sha256 FROM bundles")[0]
     assert report.attributed_by_collector == 1
     assert report.attributed_by_path == 0
     assert row["sha256"] == "deadbeef", "the manifest's hash, not one recomputed here"
     assert report.gaps >= 1, "a refused glob is a hole in the evidence and belongs in the case"
+    # The manifest cannot state its own hash, so it has to be computed from the bytes in
+    # hand. Without this the column was always null and a case could not be checked against
+    # the bundle it came from: the custody records commit to exactly this value.
+    expected = hashlib.sha256((bundle / "manifest.json").read_bytes()).hexdigest()
+    assert bundle_row["manifest_sha256"] == expected
 
 
 def test_an_artifact_row_exists_even_when_nothing_was_collected(

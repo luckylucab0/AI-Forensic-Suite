@@ -19,7 +19,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from pathlib import Path
 from typing import TextIO
 
@@ -39,6 +39,7 @@ from agentforensics.timeline import Filters, header_notes
 from agentforensics.timeline import write as write_timeline
 from agentforensics.unified import FORMAT_VERSION as UNIFIED_VERSION
 from agentforensics.unified import write_log as write_unified_log
+from agentforensics.webui import serve as serve_case
 
 EXIT_OK = 0
 EXIT_FINDING = 1
@@ -50,7 +51,6 @@ EXIT_NOTHING_FOUND = 3
 # apart from an undocumented one.
 _PLANNED = [
     ("export", "export a case, including the viewer's event shape"),
-    ("serve", "serve the local read-only API and the viewer on 127.0.0.1"),
 ]
 
 
@@ -648,6 +648,53 @@ def _write_findings(report: ScanReport, destination: Path, fmt: str) -> None:
             )
 
 
+def _announce(lines: Iterable[str]) -> None:
+    """The startup notice, on stderr so a piped stdout stays clean."""
+    for line in lines:
+        _write(sys.stderr, line)
+
+
+def cmd_serve(args: argparse.Namespace) -> int:
+    """Serve one case to a browser on 127.0.0.1, read-only, and nothing else.
+
+    The viewer is the same single file an analyst can open on its own; served from here it
+    reads the case through a local API instead of a directory of transcripts, which is what
+    lets one page show every agent in the case, the device-wide timeline, the rule findings
+    and the list of what was collected and never read.
+
+    Three properties are the point, and all three are enforced rather than promised. The
+    socket binds loopback and there is no option to change it. The case is opened read-only,
+    so SQLite itself refuses a write. Every URL lives under a token generated for this run
+    and printed below, so a page already open in the analyst's browser cannot read the case
+    by guessing the address.
+
+    Nothing leaves the machine: no telemetry, no update check, and a content security
+    policy that forbids the page from loading or contacting anything off this server.
+    """
+    case_path = Path(args.case)
+    try:
+        serve_case(
+            case_path,
+            port=args.port,
+            viewer=Path(args.viewer) if args.viewer else None,
+            log=(lambda line: _write(sys.stderr, f"serve: {line}")) if args.access_log else None,
+            announce=_announce,
+        )
+    except (CaseError, FileNotFoundError) as exc:
+        _write(sys.stderr, f"serve: {exc}")
+        return EXIT_ERROR
+    except OSError as exc:
+        # Almost always the port being taken. Said with the remedy, because this is the
+        # kind of failure that gets read once and acted on immediately.
+        _write(
+            sys.stderr,
+            f"serve: cannot listen on 127.0.0.1:{args.port}: {exc}. "
+            "Use --port to pick another, or --port 0 to let the system choose one.",
+        )
+        return EXIT_ERROR
+    return EXIT_OK
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="agentforensics",
@@ -785,6 +832,30 @@ def build_parser() -> argparse.ArgumentParser:
     )
     scan.add_argument("--json", action="store_true", help="machine-readable report on stdout")
     scan.set_defaults(func=cmd_scan)
+
+    serve = sub.add_parser(
+        "serve",
+        help="serve the case and the viewer to a browser on 127.0.0.1",
+        description=cmd_serve.__doc__,
+    )
+    serve.add_argument("--case", required=True, help="case database to serve")
+    serve.add_argument(
+        "--port",
+        type=int,
+        default=8765,
+        help="port on 127.0.0.1. 0 lets the system pick one, which is printed. Default 8765.",
+    )
+    serve.add_argument(
+        "--viewer",
+        help="path to the viewer HTML file. Defaults to the copy shipped with this build.",
+    )
+    serve.add_argument(
+        "--access-log",
+        action="store_true",
+        help="log every request to stderr. Off by default: a request line carries the "
+        "access token, and a terminal scrollback is a place a token gets left behind.",
+    )
+    serve.set_defaults(func=cmd_serve)
 
     timeline = sub.add_parser(
         "timeline",
