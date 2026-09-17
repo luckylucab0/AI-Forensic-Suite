@@ -30,6 +30,9 @@ from agentforensics.exporters import FORMATS
 from agentforensics.exporters import render as render_collection_rules
 from agentforensics.ingest import ingest as ingest_source
 from agentforensics.model import Case, CaseError
+from agentforensics.timeline import FORMATS as TIMELINE_FORMATS
+from agentforensics.timeline import Filters, header_notes
+from agentforensics.timeline import write as write_timeline
 
 EXIT_OK = 0
 EXIT_FINDING = 1
@@ -40,7 +43,6 @@ EXIT_NOTHING_FOUND = 3
 # rather than only the fragment that exists. A user can then tell a missing capability
 # apart from an undocumented one.
 _PLANNED = [
-    ("timeline", "build and export a device-wide timeline"),
     ("scan", "run the YAML rule packs against a case"),
     ("export", "export a case, including the viewer's event shape"),
     ("serve", "serve the local read-only API and the viewer on 127.0.0.1"),
@@ -368,6 +370,57 @@ def cmd_case(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_timeline(args: argparse.Namespace) -> int:
+    """Export a device-wide timeline from a case.
+
+    One ordered sequence across every agent, which is what the unified event model is for.
+    Events with no timestamp are listed first rather than omitted: their position is
+    unknown, not early, and leaving them out would make them invisible in the view an
+    analyst reads first.
+
+    The notes printed on stderr are not decoration. A timeline is the view that gets
+    trusted most and questioned least, so the counts that qualify it, unreadable records,
+    files with no parser, holes the collection reported, travel with it.
+    """
+    try:
+        case = Case.open(Path(args.case), create=False)
+    except CaseError as exc:
+        _write(sys.stderr, f"timeline: {exc}")
+        return EXIT_ERROR
+
+    filters = Filters(
+        agents=tuple(args.agent or ()),
+        kinds=tuple(args.kind or ()),
+        since=args.since,
+        until=args.until,
+        session_id=args.session,
+        exclude_artifact_fs=args.no_filesystem_events,
+    )
+
+    try:
+        if args.out:
+            destination = Path(args.out)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            # newline="" because csv writes its own line terminator, and so that two
+            # platforms produce the same bytes: a timeline gets hashed and compared.
+            with destination.open("w", encoding="utf-8", newline="") as handle:
+                written, undated = write_timeline(case, handle, args.format, filters)
+        else:
+            written, undated = write_timeline(case, sys.stdout, args.format, filters)
+        notes = header_notes(case, written, undated, args.format)
+    except (OSError, ValueError) as exc:
+        _write(sys.stderr, f"timeline: {exc}")
+        return EXIT_ERROR
+    finally:
+        case.close()
+
+    for note in notes:
+        _write(sys.stderr, f"timeline: {note}")
+    if written == 0:
+        return EXIT_NOTHING_FOUND
+    return EXIT_OK
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="agentforensics",
@@ -451,6 +504,30 @@ def build_parser() -> argparse.ArgumentParser:
     case.add_argument("--case", required=True, help="case database")
     case.add_argument("--json", action="store_true")
     case.set_defaults(func=cmd_case)
+
+    timeline = sub.add_parser(
+        "timeline",
+        help="export a device-wide timeline from a case",
+        description=cmd_timeline.__doc__,
+    )
+    timeline.add_argument("--case", required=True, help="case database")
+    timeline.add_argument(
+        "--format", choices=sorted(TIMELINE_FORMATS), default="csv", help="output format"
+    )
+    timeline.add_argument("--out", help="write to a file instead of stdout")
+    timeline.add_argument("--agent", action="append", help="only this agent, repeatable")
+    timeline.add_argument("--kind", action="append", help="only this event kind, repeatable")
+    timeline.add_argument("--session", help="only this session id")
+    timeline.add_argument("--since", help="only events at or after this UTC timestamp")
+    timeline.add_argument("--until", help="only events at or before this UTC timestamp")
+    timeline.add_argument(
+        "--no-filesystem-events",
+        action="store_true",
+        help="leave out the one-per-file artifact.fs events. They can outnumber the "
+        "conversation on a large collection, and for an artifact with no internal "
+        "timestamps they are the only temporal evidence there is.",
+    )
+    timeline.set_defaults(func=cmd_timeline)
 
     return parser
 

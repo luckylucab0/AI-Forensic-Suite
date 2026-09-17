@@ -6,10 +6,10 @@ that a case can always answer the question its own reliability rests on: what di
 collect and fail to read. A pipeline that only wrote rows for the files it understood would
 make an unparsed transcript indistinguishable from an agent that was never used.
 
-Parsing itself is not here yet. This module records the artifacts, the collection gaps and
-one filesystem event per collected file, which is already enough to answer when an agent
-last wrote anything, and it leaves a per-file parse status of 'unsupported' that the
-parsers will fill in as they arrive.
+A parser is chosen by the catalogue entry that claimed the file, so the catalogue stays the
+one source of truth: nothing here decides what a file is from its name or its contents. A
+file no parser handles keeps a status of 'unsupported' and its filesystem event, which
+already answers when an agent last wrote anything.
 """
 
 from __future__ import annotations
@@ -23,6 +23,7 @@ from agentforensics.ingest.native import NativeBundle
 from agentforensics.ingest.source import Source, SourceEntry
 from agentforensics.ingest.tree import CollectedTree
 from agentforensics.model import Case, Event, Provenance
+from agentforensics.parsers import ParseContext, for_artifact
 
 
 @dataclass
@@ -38,6 +39,12 @@ class IngestReport:
     attributed_by_path: int = 0
     unattributed: int = 0
     events: int = 0
+    parsed_records: int = 0
+    # Records a parser reached and could not read. Reported separately from the events
+    # because it is the number that qualifies everything else: a case with a thousand
+    # events and two hundred unreadable records is a different case from one with a
+    # thousand events and none.
+    unparsed_records: int = 0
     gaps: int = 0
     # Paths nothing in the catalogue claimed. Kept as a list rather than a count because
     # each one is a lead: an agent nobody has catalogued, or a gap in the catalogue.
@@ -52,6 +59,11 @@ class IngestReport:
             f"{self.attributed_by_path} matched from the path, {self.unattributed} unclaimed",
             f"  {self.events} event(s)",
         ]
+        if self.unparsed_records:
+            lines.append(
+                f"  {self.unparsed_records} record(s) no parser could read, kept in the "
+                "case as unparsed events"
+            )
         if self.gaps:
             lines.append(f"  {self.gaps} gap(s) in the collection, recorded in the case")
         if self.unclaimed_paths:
@@ -114,18 +126,31 @@ def ingest(
                     report.unclaimed_paths.append(entry.original_path)
 
             events = list(_filesystem_events(record.bundle_uuid, entry))
+            parsed, unreadable, parser_name, detail = _parse(record.bundle_uuid, entry)
+            events.extend(parsed)
             report.events += case.add_events(events)
+            report.parsed_records += len(parsed) - unreadable
+            report.unparsed_records += unreadable
+
+            if not entry.collected or entry.local_path is None:
+                status, detail = (
+                    "skipped",
+                    (detail or entry.reason or "the collection did not carry this file's content"),
+                )
+            elif parser_name is None:
+                status = "unsupported"
+            elif detail:
+                status = "failed"
+            else:
+                status = "parsed"
             case.set_parse_result(
                 record.bundle_uuid,
                 entry.original_path,
-                parser=None,
-                status="unsupported" if entry.collected else "skipped",
-                detail=(
-                    None
-                    if entry.collected
-                    else entry.reason or "the collection did not carry this file's content"
-                ),
+                parser=parser_name,
+                status=status,
+                detail=detail,
                 events=len(events),
+                unparsed_records=unreadable,
             )
 
         for gap in source.gaps():
@@ -145,6 +170,36 @@ def ingest(
 
     case.set_meta("last_ingest", record.bundle_uuid)
     return report
+
+
+def _parse(bundle_uuid: str, entry: SourceEntry) -> tuple[list[Event], int, str | None, str | None]:
+    """Run the parser for one file, if there is one.
+
+    Returns its events, how many of them are unreadable records, the parser's name and a
+    failure detail. A parser that raises is caught here: one malformed file must not abandon
+    the rest of a collection, and the exception itself becomes a recorded parse failure
+    rather than a traceback an analyst has to interpret.
+    """
+    if not entry.collected or entry.local_path is None:
+        return [], 0, None, None
+    parser = for_artifact(entry.artifact_id)
+    if parser is None:
+        return [], 0, None, None
+    context = ParseContext(
+        bundle_uuid=bundle_uuid,
+        original_path=entry.original_path,
+        local_path=entry.local_path,
+        sha256=entry.sha256 or "",
+        artifact_id=entry.artifact_id,
+        agent=entry.agent or parser.name,
+        user=entry.user,
+    )
+    try:
+        events = list(parser.parse(context))
+    except Exception as exc:
+        return [], 0, parser.name, f"the parser raised {type(exc).__name__}: {exc}"
+    unreadable = sum(1 for event in events if event.kind == "unparsed.record")
+    return events, unreadable, parser.name, None
 
 
 def _filesystem_events(bundle_uuid: str, entry: SourceEntry) -> list[Event]:

@@ -110,7 +110,10 @@ ist, dass das nicht *unbemerkt* geht.
 - `bundle/` schreibt, liest, hasht und verifiziert Bundles und die Custody-Kette
 - `ingest/` Adapter für ein eigenes Bundle, einen KAPE-Baum, eine Velociraptor-Sammlung
   sowie ein einfaches Verzeichnis oder eingebundenes Abbild
-- `parsers/` ein Modul pro Agent, das Rohdatensätze in einheitliche Ereignisse überführt
+- `parsers/` ein Modul pro Agent, das Rohdatensätze in einheitliche Ereignisse überführt.
+  Welcher Parser läuft, entscheidet der Katalogeintrag, der die Datei beansprucht hat,
+  damit ein Parser dem Katalog nie widersprechen kann. Eine Datei ohne Parser wird als
+  nicht unterstützt festgehalten, nicht übersprungen.
 - `model/` das einheitliche Ereignismodell und das SQLite-Fallschema
 - `timeline/` Aufbau der Zeitachse und Exporte (CSV, JSONL, Timesketch-JSONL)
 - `rules/` die deklarative YAML-Regel-Engine
