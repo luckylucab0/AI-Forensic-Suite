@@ -103,10 +103,13 @@ it cannot be rewritten *quietly*.
 - `bundle/` writes, reads, hashes and verifies bundles and the custody chain
 - `ingest/` adapters for a native bundle, a KAPE tree, a Velociraptor collection, and a
   plain directory or mounted image root
-- `parsers/` one module per agent, turning raw records into unified events. A parser is
-  chosen by the catalogue entry that claimed the file, so it can never disagree with the
-  catalogue about what a file is. A file with no parser is recorded as unsupported
-  rather than skipped.
+- `parsers/` one module per agent or per format family, turning raw records into unified
+  events. A parser is chosen by the catalogue entry that claimed the file, so it can never
+  disagree with the catalogue about what a file is. A file with no parser is recorded as
+  unsupported rather than skipped. Seven agents are read today: Claude Code, Codex CLI,
+  Copilot CLI, Gemini CLI and Qwen Code (one module, because Qwen is a fork and both write
+  the Gemini content shape), Pi, and Cline with its forks Roo Code and Kilo Code (one
+  module for the same reason).
 - `model/` the unified event model and the SQLite case schema
 - `unified/` the event model on the wire: the JSON Lines format and its schema, plus
   the normalizer that turns a collection into one log without building a case

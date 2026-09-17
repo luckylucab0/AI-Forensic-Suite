@@ -310,6 +310,394 @@ def copilot_events(session_id: str, cwd: str) -> str:
     )
 
 
+def gemini_session(session_id: str, project_hash: str) -> str:
+    """A Gemini CLI session file, including the records that catch a naive reader.
+
+    Deliberately in here: a header that carries a project hash rather than a path, so a
+    parser that treats it as a working directory produces a path nobody can find; a
+    $set metadata update; a $rewindTo record, which means the turns above it left the
+    agent's view while staying in the file; a message record whose type is from a later
+    version; and a record carrying none of the keys the format is told apart by.
+    """
+    return jsonl(
+        [
+            {
+                "sessionId": session_id,
+                "projectHash": project_hash,
+                "startTime": "2026-09-08T10:00:00.000Z",
+                "lastUpdated": "2026-09-08T10:05:00.000Z",
+                "kind": "main",
+                "directories": ["/home/alice/src/app"],
+            },
+            {
+                "id": "m1",
+                "timestamp": "2026-09-08T10:00:01.000Z",
+                "type": "user",
+                "content": "why does the build fail",
+            },
+            {
+                "id": "m2",
+                "timestamp": "2026-09-08T10:00:02.000Z",
+                "type": "gemini",
+                "model": "example-model-3",
+                "tokens": {"input": 120, "output": 40, "cached": 0, "total": 160},
+                "thoughts": [
+                    {
+                        "subject": "Checking the log",
+                        "description": "read the build log first",
+                        "timestamp": "2026-09-08T10:00:02.500Z",
+                    }
+                ],
+                "content": [
+                    {"text": "planning", "thought": True},
+                    {"text": "Reading the build log."},
+                    {
+                        "functionCall": {
+                            "id": "fc1",
+                            "name": "read_file",
+                            "args": {"absolute_path": "/home/alice/src/app/build.log"},
+                        }
+                    },
+                ],
+                "toolCalls": [
+                    {
+                        "id": "fc1",
+                        "name": "run_shell_command",
+                        "args": {"command": "npm run build", "directory": "/home/alice/src/app"},
+                        "status": "Success",
+                        "timestamp": "2026-09-08T10:00:03.000Z",
+                        "result": [{"text": "error: missing dependency acme-widget"}],
+                    },
+                    {
+                        "id": "fc2",
+                        "name": "web_fetch",
+                        "args": {"prompt": "read https://example.org/acme-widget for the fix"},
+                        "status": "Success",
+                        "timestamp": "2026-09-08T10:00:04.000Z",
+                    },
+                ],
+            },
+            {"$set": {"summary": "the build was missing a dependency"}},
+            {"$rewindTo": "m2"},
+            {
+                "id": "m3",
+                "timestamp": "2026-09-08T10:00:06.000Z",
+                "type": "some_future_type",
+                "content": "unknown to this parser",
+            },
+            {"unexpected": "a record with none of the keys this format is told apart by"},
+        ]
+    )
+
+
+def qwen_transcript(session_id: str, cwd: str) -> str:
+    """A Qwen Code transcript, with the awkward records it really writes.
+
+    Deliberately in here: a prompt the writer itself classified as not coming from a
+    person, which is the difference between what a user asked and what the harness
+    injected; a chat_compression record, which is the usual explanation for a gap; a
+    functionResponse carrying a tool result; and a record type from a later version.
+    """
+    return jsonl(
+        [
+            {
+                "uuid": "q1",
+                "parentUuid": None,
+                "sessionId": session_id,
+                "timestamp": "2026-09-08T11:00:00.000Z",
+                "type": "user",
+                "provenance": "real_user",
+                "cwd": cwd,
+                "version": "8.8.8",
+                "gitBranch": "main",
+                "message": {"role": "user", "parts": [{"text": "bump the lockfile"}]},
+            },
+            {
+                "uuid": "q2",
+                "parentUuid": "q1",
+                "sessionId": session_id,
+                "timestamp": "2026-09-08T11:00:01.000Z",
+                "type": "user",
+                "provenance": "assistant_output",
+                "subtype": "slash_command",
+                "cwd": cwd,
+                "message": {"role": "user", "parts": [{"text": "/compress"}]},
+            },
+            {
+                "uuid": "q3",
+                "parentUuid": "q2",
+                "sessionId": session_id,
+                "timestamp": "2026-09-08T11:00:02.000Z",
+                "type": "assistant",
+                "model": "example-model-4",
+                "cwd": cwd,
+                "usageMetadata": {"promptTokenCount": 90, "candidatesTokenCount": 30},
+                "message": {
+                    "role": "model",
+                    "parts": [
+                        {"text": "thinking about it", "thought": True},
+                        {"text": "Running the package manager."},
+                        {
+                            "functionCall": {
+                                "id": "t1",
+                                "name": "run_shell_command",
+                                "args": {"command": "npm install", "directory": cwd},
+                            }
+                        },
+                    ],
+                },
+            },
+            {
+                "uuid": "q4",
+                "parentUuid": "q3",
+                "sessionId": session_id,
+                "timestamp": "2026-09-08T11:00:03.000Z",
+                "type": "tool_result",
+                "cwd": cwd,
+                "message": {
+                    "role": "user",
+                    "parts": [
+                        {
+                            "functionResponse": {
+                                "id": "t1",
+                                "name": "run_shell_command",
+                                "response": {"output": "added 1 package"},
+                            }
+                        }
+                    ],
+                },
+            },
+            {
+                "uuid": "q5",
+                "parentUuid": "q4",
+                "sessionId": session_id,
+                "timestamp": "2026-09-08T11:00:04.000Z",
+                "type": "system",
+                "subtype": "chat_compression",
+                "cwd": cwd,
+                "message": {"role": "user", "parts": [{"text": "earlier turns summarised"}]},
+                "systemPayload": {"originalTokenCount": 9000, "newTokenCount": 900},
+            },
+            {
+                "uuid": "q6",
+                "parentUuid": "q5",
+                "sessionId": session_id,
+                "timestamp": "2026-09-08T11:00:05.000Z",
+                "type": "some_future_type",
+                "cwd": cwd,
+                "message": {"role": "user", "parts": [{"text": "unknown to this parser"}]},
+            },
+        ]
+    )
+
+
+def pi_session(session_id: str, cwd: str) -> str:
+    """A Pi session file, with the entries that make the format worth having a parser for.
+
+    Deliberately in here: a header naming a parent session, which means the turns this
+    conversation continues from are in another file; a tool result that failed, carried as
+    its own message with isError rather than as a block inside a turn; a redacted thinking
+    block, which is the provider withholding reasoning rather than the model not having
+    reasoned; a namespaced tool call, which came from an external server; a compaction; and
+    an entry type from a later version.
+    """
+    return jsonl(
+        [
+            {
+                "type": "session",
+                "version": 3,
+                "id": session_id,
+                "timestamp": "2026-09-09T12:00:00.000Z",
+                "cwd": cwd,
+                "parentSession": "c0ffee00-0000-4000-8000-000000000000",
+            },
+            {
+                "type": "message",
+                "id": "p1",
+                "parentId": None,
+                "timestamp": "2026-09-09T12:00:01.000Z",
+                "message": {
+                    "role": "user",
+                    "content": [{"type": "text", "text": "delete the stale branches"}],
+                    "timestamp": 1789041601000,
+                },
+            },
+            {
+                "type": "model_change",
+                "id": "p2",
+                "parentId": "p1",
+                "timestamp": "2026-09-09T12:00:02.000Z",
+                "provider": "example-provider",
+                "modelId": "example-model-5",
+            },
+            {
+                "type": "message",
+                "id": "p3",
+                "parentId": "p2",
+                "timestamp": "2026-09-09T12:00:03.000Z",
+                "message": {
+                    "role": "assistant",
+                    "model": "example-model-5",
+                    "provider": "example-provider",
+                    "stopReason": "toolUse",
+                    "usage": {"input": 200, "output": 60, "cost": 0.002},
+                    "content": [
+                        {"type": "thinking", "thinking": "list them first", "redacted": True},
+                        {"type": "text", "text": "Listing the branches."},
+                        {
+                            "type": "toolCall",
+                            "id": "tc1",
+                            "name": "bash",
+                            "arguments": {"command": "git branch --merged", "cwd": cwd},
+                        },
+                        {
+                            "type": "toolCall",
+                            "id": "tc2",
+                            "name": "search_issues",
+                            "namespace": "example-tracker",
+                            "arguments": {"query": "stale branch"},
+                        },
+                        {"type": "some_future_block", "detail": "unknown to this parser"},
+                    ],
+                },
+            },
+            {
+                "type": "message",
+                "id": "p4",
+                "parentId": "p3",
+                "timestamp": "2026-09-09T12:00:04.000Z",
+                "message": {
+                    "role": "toolResult",
+                    "toolCallId": "tc1",
+                    "toolName": "bash",
+                    "isError": True,
+                    "content": [{"type": "text", "text": "fatal: not a git repository"}],
+                    "timestamp": 1789041604000,
+                },
+            },
+            {
+                "type": "message",
+                "id": "p5",
+                "parentId": "p4",
+                "timestamp": "2026-09-09T12:00:05.000Z",
+                "message": {
+                    "role": "system",
+                    "content": "",
+                    "sections": {"preamble": "you are an agent", "tools": "<tools/>"},
+                    "toolsRemoved": [{"name": "write"}],
+                },
+            },
+            {
+                "type": "compaction",
+                "id": "p6",
+                "parentId": "p5",
+                "timestamp": "2026-09-09T12:00:06.000Z",
+                "summary": "earlier turns were summarised",
+            },
+            {
+                "type": "some_future_entry",
+                "id": "p7",
+                "parentId": "p6",
+                "timestamp": "2026-09-09T12:00:07.000Z",
+            },
+        ]
+    )
+
+
+def cline_api_history() -> str:
+    """A Cline task's API conversation history: the provider's own message array.
+
+    No timestamps anywhere in it, on purpose, because the real file has none: it is what
+    was sent to the provider, and the provider is not told when anything happened. A parser
+    that filled them in from the file's mtime would date every turn in the task to the
+    moment it last changed.
+    """
+    return json.dumps(
+        [
+            {"role": "user", "content": "remove the debug logging"},
+            {
+                "role": "assistant",
+                "content": [
+                    {"type": "thinking", "thinking": "find the call sites first"},
+                    {"type": "text", "text": "I will search for them."},
+                    {
+                        "type": "tool_use",
+                        "id": "u1",
+                        "name": "execute_command",
+                        "input": {"command": "rg -n console.log", "requires_approval": False},
+                    },
+                    {
+                        "type": "tool_use",
+                        "id": "u2",
+                        "name": "write_to_file",
+                        "input": {"path": "src/app/index.js", "content": "const a = 1;\n"},
+                    },
+                    {
+                        "type": "tool_use",
+                        "id": "u3",
+                        "name": "use_mcp_tool",
+                        "input": {
+                            "server_name": "example-tracker",
+                            "tool_name": "create_issue",
+                            "arguments": {"title": "remove logging"},
+                        },
+                    },
+                ],
+            },
+            {
+                "role": "user",
+                "content": [
+                    {"type": "tool_result", "tool_use_id": "u1", "content": "3 matches"},
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": "u2",
+                        "is_error": True,
+                        "content": "EACCES: permission denied",
+                    },
+                ],
+            },
+            {"role": "some_future_role", "content": "unknown to this parser"},
+        ],
+        indent=2,
+    )
+
+
+def cline_ui_messages() -> str:
+    """A Cline task's UI log, which is the only file in a task that records an approval."""
+    return json.dumps(
+        [
+            {"ts": 1789041600000, "type": "say", "say": "text", "text": "starting"},
+            {
+                "ts": 1789041601000,
+                "type": "ask",
+                "ask": "command",
+                "text": "rg -n console.log",
+            },
+            {
+                "ts": 1789041602000,
+                "type": "say",
+                "say": "command_output",
+                "text": "3 matches",
+            },
+            {
+                "ts": 1789041603000,
+                "type": "ask",
+                "ask": "auto_approval_max_req_reached",
+                "text": "the automatic approval limit was reached",
+            },
+            {"ts": 1789041604000, "type": "say", "say": "reasoning", "text": "thinking"},
+            {
+                "ts": 1789041605000,
+                "type": "say",
+                "say": "user_feedback",
+                "text": "yes, go ahead",
+            },
+            {"ts": 1789041606000, "type": "some_future_type", "text": "unknown"},
+        ],
+        indent=2,
+    )
+
+
 def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     """Create the synthetic profile. Returns a summary for assertions."""
     project = home / "src" / "app"
@@ -497,12 +885,105 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         RECENT,
     )
 
+    # Gemini CLI keys its per-project state on a hash of the working directory, which is
+    # why the fixture uses a hash-shaped directory name rather than an encoded path.
+    gemini = home / ".gemini"
+    project_hash = "7f3a9c2e1b8d4f60"
+    write(
+        gemini / "tmp" / project_hash / "chats" / f"session-{SESSION_A}.jsonl",
+        gemini_session(SESSION_A, project_hash),
+        RECENT,
+    )
+
+    # Pi encodes the working directory into the session directory's name, with the
+    # separators replaced and a marker either side of it.
+    pi_dir = "--" + str(project).lstrip("/").replace("/", "-") + "--"
+    write(
+        home / ".pi" / "agent" / "sessions" / pi_dir / f"2026-09-09T12-00-00_{SESSION_A}.jsonl",
+        pi_session(SESSION_A, str(project)),
+        RECENT,
+    )
+
+    # A Cline task directory under the editor's global storage. Roo Code and Kilo Code
+    # keep the same layout under their own extension ids, which is why one parser reads
+    # all three.
+    task = (
+        home
+        / ".config"
+        / "Code"
+        / "User"
+        / "globalStorage"
+        / "saoudrizwan.claude-dev"
+        / "tasks"
+        / SESSION_A
+    )
+    write(task / "api_conversation_history.json", cline_api_history(), RECENT)
+    write(task / "ui_messages.json", cline_ui_messages(), RECENT)
+    write(
+        task / "task_metadata.json",
+        json.dumps(
+            {
+                "files_in_context": [
+                    {"path": "src/app/index.js", "record_state": "active"},
+                    {"path": "src/app/util.js", "record_state": "stale"},
+                ],
+                "model_usage": {"example-model-6": {"requests": 3}},
+                "environment_history": [],
+            },
+            indent=2,
+        ),
+        RECENT,
+    )
+    # Present and deliberately truncated: these files are whole JSON documents, so a
+    # killed write costs the file rather than its last record, and that has to be visible.
+    write(task / "context_history.json", '{"truncated": ', RECENT)
+
+    qwen = home / ".qwen"
+    write(
+        qwen / "projects" / encoded / "chats" / f"{SESSION_A}.jsonl",
+        qwen_transcript(SESSION_A, str(project)),
+        RECENT,
+    )
+    # One JSON array rewritten in place on every append, not a line-delimited log.
+    write(
+        qwen / "tmp" / project_hash / "logs.json",
+        json.dumps(
+            [
+                {
+                    "sessionId": SESSION_A,
+                    "messageId": 0,
+                    "timestamp": "2026-09-08T11:00:00.000Z",
+                    "type": "user",
+                    "message": "bump the lockfile",
+                },
+                {
+                    "sessionId": SESSION_A,
+                    "messageId": 1,
+                    "timestamp": "2026-09-08T11:00:06.000Z",
+                    "type": "user",
+                    "message": "and commit it",
+                },
+            ],
+            indent=2,
+        ),
+        RECENT,
+    )
+
     summary = {
         "home": str(home),
         "project": str(project),
         "encoded_project_dir": encoded,
         "sessions": [SESSION_A, SESSION_B],
-        "agents": ["claude_code", "cline", "codex", "copilot", "crosscutting"],
+        "agents": [
+            "claude_code",
+            "cline",
+            "codex",
+            "copilot",
+            "crosscutting",
+            "gemini_cli",
+            "pi",
+            "qwen_code",
+        ],
     }
 
     if with_edge_cases:

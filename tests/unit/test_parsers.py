@@ -766,3 +766,664 @@ def test_a_refusal_with_no_category_still_reads_as_a_refusal(tmp_path: Path) -> 
     )
     refusal = next(e for e in events if e.kind == "safety.refusal")
     assert refusal.payload["refusal"] == "refusal"
+
+
+# ------------------------------------- the Gemini CLI and Qwen Code parser
+
+
+def jsonl_file(tmp_path: Path, name: str, records: list[object]) -> Path:
+    path = tmp_path / name
+    path.write_text("".join(json.dumps(record) + "\n" for record in records), encoding="utf-8")
+    return path
+
+
+def parse_as(path: Path, artifact_id: str, agent: str) -> list:
+    """Parse one file as a named artifact of a named agent.
+
+    The agent is a parameter because three of the parsers serve several agents, and an
+    event attributed to the wrong one is worse than an event nobody parsed: a case would
+    then say an agent was used that never was.
+    """
+    parser = for_artifact(artifact_id)
+    assert parser is not None, artifact_id
+    return list(
+        parser.parse(
+            ParseContext(
+                bundle_uuid="b1",
+                original_path=f"/home/alice/{name_of(artifact_id)}/{path.name}",
+                local_path=path,
+                sha256="aa",
+                artifact_id=artifact_id,
+                agent=agent,
+                user="alice",
+            )
+        )
+    )
+
+
+def name_of(artifact_id: str) -> str:
+    return artifact_id.split(".")[0]
+
+
+def test_gemini_records_are_told_apart_by_which_key_they_carry(tmp_path: Path) -> None:
+    """The service's own discrimination order, and the reason to test it is that the
+    records overlap: a message record has a timestamp and so does the header, so a reader
+    testing in the wrong order reads one as the other."""
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "session-s1.jsonl",
+            [
+                {
+                    "sessionId": "s1",
+                    "projectHash": "abc123",
+                    "startTime": "2026-09-08T10:00:00.000Z",
+                    "kind": "main",
+                },
+                {
+                    "id": "m1",
+                    "timestamp": "2026-09-08T10:00:01.000Z",
+                    "type": "user",
+                    "content": "hi",
+                },
+                {"$set": {"summary": "a summary"}},
+                {"$rewindTo": "m1"},
+            ],
+        ),
+        "gemini_cli.chats",
+        "gemini_cli",
+    )
+    kinds = [event.kind for event in events]
+    assert kinds == ["session.start", "user.prompt", "config.snapshot", "session.end"]
+    assert all(event.agent == "gemini_cli" for event in events)
+
+
+def test_gemini_does_not_present_a_project_hash_as_a_working_directory(tmp_path: Path) -> None:
+    """The header records a hash of the directory, not the directory. A path nobody can
+    find is worse than an absent one, because an analyst will go looking for it."""
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "session-s1.jsonl",
+            [{"sessionId": "s1", "projectHash": "abc123", "startTime": "2026-09-08T10:00:00.000Z"}],
+        ),
+        "gemini_cli.chats",
+        "gemini_cli",
+    )
+    assert events[0].project_path is None
+    assert events[0].payload["project_hash"] == "abc123"
+
+
+def test_gemini_a_rewind_is_an_event_not_a_gap(tmp_path: Path) -> None:
+    """The turns it discards are still in the file. Without this event a reader sees turns
+    the model never saw again and has nothing telling them so."""
+    events = parse_as(
+        jsonl_file(tmp_path, "session-s1.jsonl", [{"$rewindTo": "m2"}]),
+        "gemini_cli.chats",
+        "gemini_cli",
+    )
+    assert events[0].kind == "session.end"
+    assert events[0].payload["rewind_to"] == "m2"
+    assert "still in this file" in events[0].payload["text"]
+
+
+def test_gemini_a_thought_part_is_not_mixed_into_the_answer(tmp_path: Path) -> None:
+    """A plan the model formed and an answer it gave are different claims."""
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "session-s1.jsonl",
+            [
+                {
+                    "id": "m1",
+                    "timestamp": "2026-09-08T10:00:02.000Z",
+                    "type": "gemini",
+                    "content": [
+                        {"text": "let me think", "thought": True},
+                        {"text": "the answer"},
+                    ],
+                }
+            ],
+        ),
+        "gemini_cli.chats",
+        "gemini_cli",
+    )
+    thinking = next(e for e in events if e.kind == "assistant.thinking")
+    text = next(e for e in events if e.kind == "assistant.text")
+    assert thinking.payload["text"] == "let me think"
+    assert text.payload["text"] == "the answer"
+
+
+def test_gemini_a_shell_tool_produces_the_command(tmp_path: Path) -> None:
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "session-s1.jsonl",
+            [
+                {
+                    "id": "m1",
+                    "timestamp": "2026-09-08T10:00:02.000Z",
+                    "type": "gemini",
+                    "toolCalls": [
+                        {
+                            "id": "c1",
+                            "name": "run_shell_command",
+                            "args": {"command": "rm -rf build", "directory": "/srv/app"},
+                            "status": "Success",
+                            "result": [{"text": "done"}],
+                        }
+                    ],
+                }
+            ],
+        ),
+        "gemini_cli.chats",
+        "gemini_cli",
+    )
+    command = next(e for e in events if e.kind == "command.exec")
+    assert command.payload["commands"][0]["command"] == "rm -rf build"
+    assert command.payload["commands"][0]["executable"] == "rm"
+    assert command.payload["commands"][0]["cwd"] == "/srv/app"
+    assert any(e.kind == "tool.result" for e in events)
+
+
+def test_gemini_an_unknown_tool_still_records_its_arguments(tmp_path: Path) -> None:
+    """A facet nobody mapped costs an index. Guessing from the name would write a command
+    into a case that nothing ran."""
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "session-s1.jsonl",
+            [
+                {
+                    "id": "m1",
+                    "timestamp": "2026-09-08T10:00:02.000Z",
+                    "type": "gemini",
+                    "toolCalls": [
+                        {"id": "c1", "name": "some_new_tool", "args": {"command": "rm -rf /"}}
+                    ],
+                }
+            ],
+        ),
+        "gemini_cli.chats",
+        "gemini_cli",
+    )
+    assert not [e for e in events if e.kind == "command.exec"]
+    call = next(e for e in events if e.kind == "tool.call")
+    assert call.payload["input"]["command"] == "rm -rf /"
+
+
+def test_gemini_a_record_with_no_known_key_is_kept(tmp_path: Path) -> None:
+    events = parse_as(
+        jsonl_file(tmp_path, "session-s1.jsonl", [{"unexpected": True}]),
+        "gemini_cli.chats",
+        "gemini_cli",
+    )
+    assert events[0].kind == "unparsed.record"
+    assert "told apart by" in (events[0].parse_problem or "")
+
+
+def test_qwen_keeps_the_writers_own_view_of_who_typed_a_prompt(tmp_path: Path) -> None:
+    """`provenance` is the writer saying whether a person typed this. That is exactly the
+    question an analyst has about a prompt, so it travels rather than being flattened."""
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "s1.jsonl",
+            [
+                {
+                    "uuid": "q1",
+                    "sessionId": "s1",
+                    "timestamp": "2026-09-08T11:00:00.000Z",
+                    "type": "user",
+                    "provenance": "assistant_output",
+                    "cwd": "/srv/app",
+                    "gitBranch": "main",
+                    "message": {"role": "user", "parts": [{"text": "/compress"}]},
+                }
+            ],
+        ),
+        "qwen_code.conversation_transcript",
+        "qwen_code",
+    )
+    assert events[0].kind == "user.prompt"
+    assert events[0].payload["provenance_class"] == "assistant_output"
+    assert events[0].project_path == "/srv/app"
+    assert events[0].git_branch == "main"
+
+
+def test_qwen_a_compression_is_an_event_not_a_gap(tmp_path: Path) -> None:
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "s1.jsonl",
+            [
+                {
+                    "uuid": "q1",
+                    "sessionId": "s1",
+                    "timestamp": "2026-09-08T11:00:00.000Z",
+                    "type": "system",
+                    "subtype": "chat_compression",
+                    "message": {"role": "user", "parts": [{"text": "summarised"}]},
+                }
+            ],
+        ),
+        "qwen_code.conversation_transcript",
+        "qwen_code",
+    )
+    assert events[0].kind == "session.end"
+    assert events[0].payload["compaction"] is True
+
+
+def test_qwen_a_function_response_is_a_tool_result(tmp_path: Path) -> None:
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "s1.jsonl",
+            [
+                {
+                    "uuid": "q1",
+                    "sessionId": "s1",
+                    "timestamp": "2026-09-08T11:00:00.000Z",
+                    "type": "tool_result",
+                    "message": {
+                        "role": "user",
+                        "parts": [
+                            {
+                                "functionResponse": {
+                                    "id": "t1",
+                                    "name": "run_shell_command",
+                                    "response": {"output": "ok"},
+                                }
+                            }
+                        ],
+                    },
+                }
+            ],
+        ),
+        "qwen_code.conversation_transcript",
+        "qwen_code",
+    )
+    assert events[0].kind == "tool.result"
+    assert events[0].actor == "tool"
+    assert events[0].payload["tool"] == "run_shell_command"
+
+
+def test_qwen_prompt_history_is_a_json_array_not_a_log(tmp_path: Path) -> None:
+    """logs.json is rewritten whole on every append, so it is read as one document. Reading
+    it line by line would produce nothing at all from a valid file."""
+    path = tmp_path / "logs.json"
+    path.write_text(
+        json.dumps(
+            [
+                {
+                    "sessionId": "s1",
+                    "messageId": 0,
+                    "timestamp": "2026-09-08T11:00:00.000Z",
+                    "type": "user",
+                    "message": "bump the lockfile",
+                }
+            ],
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    events = parse_as(path, "qwen_code.prompt_history_log", "qwen_code")
+    assert [event.kind for event in events] == ["prompt.history"]
+    assert events[0].payload["text"] == "bump the lockfile"
+    assert events[0].provenance.locator == "index:0"
+
+
+def test_qwen_a_prompt_history_that_is_not_an_array_is_reported(tmp_path: Path) -> None:
+    path = tmp_path / "logs.json"
+    path.write_text('{"not": "an array"}', encoding="utf-8")
+    events = parse_as(path, "qwen_code.prompt_history_log", "qwen_code")
+    assert events[0].kind == "unparsed.record"
+    assert "not the array this format writes" in (events[0].parse_problem or "")
+
+
+# ------------------------------------------------------------- the Pi parser
+
+
+def test_pi_the_header_supplies_the_working_directory_for_the_file(tmp_path: Path) -> None:
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "2026-09-09T12-00-00_s1.jsonl",
+            [
+                {
+                    "type": "session",
+                    "version": 3,
+                    "id": "s1",
+                    "timestamp": "2026-09-09T12:00:00.000Z",
+                    "cwd": "/srv/app",
+                },
+                {
+                    "type": "message",
+                    "id": "p1",
+                    "timestamp": "2026-09-09T12:00:01.000Z",
+                    "message": {"role": "user", "content": "hello"},
+                },
+            ],
+        ),
+        "pi.sessions",
+        "pi",
+    )
+    assert events[1].kind == "user.prompt"
+    assert events[1].session_id == "s1"
+    assert events[1].project_path == "/srv/app"
+
+
+def test_pi_a_forked_session_says_so(tmp_path: Path) -> None:
+    """The turns it continues from are in another file. A conversation that starts
+    mid-thought is a fork, not a truncated collection, and only this says which."""
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "s.jsonl",
+            [
+                {
+                    "type": "session",
+                    "id": "s1",
+                    "timestamp": "2026-09-09T12:00:00.000Z",
+                    "cwd": "/srv/app",
+                    "parentSession": "s0",
+                }
+            ],
+        ),
+        "pi.sessions",
+        "pi",
+    )
+    assert events[0].payload["parent_session"] == "s0"
+    assert "forked from s0" in events[0].payload["text"]
+
+
+def test_pi_a_tool_result_carries_its_failure(tmp_path: Path) -> None:
+    """A failed tool call and a successful one are different evidence, and this format is
+    one of the few that says which without the reader inferring it from the output."""
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "s.jsonl",
+            [
+                {
+                    "type": "message",
+                    "id": "p1",
+                    "timestamp": "2026-09-09T12:00:04.000Z",
+                    "message": {
+                        "role": "toolResult",
+                        "toolCallId": "tc1",
+                        "toolName": "bash",
+                        "isError": True,
+                        "content": [{"type": "text", "text": "fatal: not a git repository"}],
+                    },
+                }
+            ],
+        ),
+        "pi.sessions",
+        "pi",
+    )
+    assert events[0].kind == "tool.result"
+    assert events[0].payload["is_error"] is True
+    assert "not a git repository" in events[0].payload["text"]
+
+
+def test_pi_a_namespaced_tool_is_an_external_server(tmp_path: Path) -> None:
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "s.jsonl",
+            [
+                {
+                    "type": "message",
+                    "id": "p1",
+                    "timestamp": "2026-09-09T12:00:03.000Z",
+                    "message": {
+                        "role": "assistant",
+                        "content": [
+                            {
+                                "type": "toolCall",
+                                "id": "tc1",
+                                "name": "search_issues",
+                                "namespace": "example-tracker",
+                                "arguments": {"query": "x"},
+                            }
+                        ],
+                    },
+                }
+            ],
+        ),
+        "pi.sessions",
+        "pi",
+    )
+    call = next(e for e in events if e.kind == "mcp.call")
+    assert call.payload["mcp"] == [{"server": "example-tracker", "tool": "search_issues"}]
+
+
+def test_pi_redacted_reasoning_is_distinguished_from_none(tmp_path: Path) -> None:
+    """The provider withholding the reasoning and the model not having reasoned are
+    different facts, and a case that conflated them would understate what happened."""
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "s.jsonl",
+            [
+                {
+                    "type": "message",
+                    "id": "p1",
+                    "timestamp": "2026-09-09T12:00:03.000Z",
+                    "message": {
+                        "role": "assistant",
+                        "content": [
+                            {"type": "thinking", "thinking": "hidden", "redacted": True},
+                            {"type": "text", "text": "done"},
+                        ],
+                    },
+                }
+            ],
+        ),
+        "pi.sessions",
+        "pi",
+    )
+    thinking = next(e for e in events if e.kind == "assistant.thinking")
+    assert thinking.payload["redacted"] is True
+
+
+def test_pi_a_system_message_records_what_the_agent_could_do(tmp_path: Path) -> None:
+    """Tools handed to or taken from the model mid-session are the answer to what this
+    agent was able to do at that moment."""
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "s.jsonl",
+            [
+                {
+                    "type": "message",
+                    "id": "p1",
+                    "timestamp": "2026-09-09T12:00:05.000Z",
+                    "message": {
+                        "role": "system",
+                        "content": "",
+                        "sections": {"preamble": "p", "tools": "t"},
+                        "toolsRemoved": [{"name": "write"}],
+                    },
+                }
+            ],
+        ),
+        "pi.sessions",
+        "pi",
+    )
+    assert events[0].kind == "config.snapshot"
+    assert events[0].payload["sections"] == ["preamble", "tools"]
+    assert events[0].payload["tools_removed"] == [{"name": "write"}]
+
+
+def test_pi_an_unknown_entry_type_is_kept(tmp_path: Path) -> None:
+    events = parse_as(
+        jsonl_file(
+            tmp_path,
+            "s.jsonl",
+            [{"type": "some_future_entry", "id": "p1", "timestamp": "2026-09-09T12:00:07.000Z"}],
+        ),
+        "pi.sessions",
+        "pi",
+    )
+    assert events[0].kind == "unparsed.record"
+    assert "some_future_entry" in (events[0].parse_problem or "")
+
+
+# ------------------------- the Cline, Roo Code and Kilo Code parser
+
+
+def cline_task(tmp_path: Path, name: str, document: object) -> Path:
+    task = tmp_path / "tasks" / "t1"
+    task.mkdir(parents=True, exist_ok=True)
+    path = task / name
+    path.write_text(json.dumps(document, indent=2), encoding="utf-8")
+    return path
+
+
+def parse_task(path: Path, agent: str = "cline") -> list:
+    """Parse one file of a task directory, with the path the session id comes from.
+
+    The original path matters here: none of the four files carries a session id inside, so
+    it comes from the directory name, and a test that passed a flat path would be testing
+    a situation the collector never produces.
+    """
+    parser = for_artifact("cline.vscode_task_transcripts")
+    assert parser is not None
+    return list(
+        parser.parse(
+            ParseContext(
+                bundle_uuid="b1",
+                original_path=f"/home/alice/.config/Code/User/globalStorage/x/tasks/t1/{path.name}",
+                local_path=path,
+                sha256="aa",
+                artifact_id="cline.vscode_task_transcripts",
+                agent=agent,
+                user="alice",
+            )
+        )
+    )
+
+
+def test_cline_the_session_id_comes_from_the_task_directory(tmp_path: Path) -> None:
+    events = parse_task(
+        cline_task(tmp_path, "api_conversation_history.json", [{"role": "user", "content": "hi"}])
+    )
+    assert events[0].session_id == "t1"
+
+
+def test_cline_a_tool_result_in_a_user_entry_is_not_a_prompt(tmp_path: Path) -> None:
+    """The provider's API expects tool results under the user role, so a reader going by
+    role alone attributes the agent's own tool output to the person at the keyboard."""
+    events = parse_task(
+        cline_task(
+            tmp_path,
+            "api_conversation_history.json",
+            [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "tool_result", "tool_use_id": "u1", "content": "3 matches"}
+                    ],
+                }
+            ],
+        )
+    )
+    assert [event.kind for event in events] == ["tool.result"]
+    assert events[0].actor == "tool"
+
+
+def test_cline_the_api_history_has_no_timestamps_and_says_so(tmp_path: Path) -> None:
+    """Filling them in from the file's mtime would date every turn in a task to the moment
+    it last changed, which reads as evidence and is not."""
+    events = parse_task(
+        cline_task(tmp_path, "api_conversation_history.json", [{"role": "user", "content": "hi"}])
+    )
+    assert events[0].ts_utc is None
+    assert events[0].ts_precision == "absent"
+
+
+def test_cline_an_ask_is_a_permission_event_with_no_answer_assumed(tmp_path: Path) -> None:
+    """An assumed approval would be the worst defect this field could have: it is the
+    difference between an agent that was allowed to act and one that acted unasked."""
+    events = parse_task(
+        cline_task(
+            tmp_path,
+            "ui_messages.json",
+            [{"ts": 1789041601000, "type": "ask", "ask": "command", "text": "rm -rf build"}],
+        )
+    )
+    assert events[0].kind == "permission.decision"
+    assert events[0].payload["permissions"][0]["decision"] == "asked"
+    assert events[0].payload["permissions"][0]["subject"] == "command"
+    assert events[0].ts_utc is not None
+
+
+def test_cline_user_feedback_in_the_ui_log_is_a_prompt(tmp_path: Path) -> None:
+    events = parse_task(
+        cline_task(
+            tmp_path,
+            "ui_messages.json",
+            [{"ts": 1789041605000, "type": "say", "say": "user_feedback", "text": "go ahead"}],
+        )
+    )
+    assert events[0].kind == "user.prompt"
+    assert events[0].actor == "user"
+
+
+def test_cline_a_file_in_context_is_not_recorded_as_a_read(tmp_path: Path) -> None:
+    """A file can enter the context through a mention or an open editor tab. Claiming it
+    was read would put a tool call in the case that nothing made."""
+    events = parse_task(
+        cline_task(
+            tmp_path,
+            "task_metadata.json",
+            {
+                "files_in_context": [{"path": "src/app/index.js"}],
+                "model_usage": {"example-model-6": {"requests": 1}},
+            },
+        )
+    )
+    assert events[0].kind == "config.snapshot"
+    assert events[0].payload["files"] == [{"path": "src/app/index.js", "operation": "unknown"}]
+
+
+def test_cline_a_truncated_document_is_reported_as_one(tmp_path: Path) -> None:
+    """These files are whole JSON documents, so a killed write costs the file rather than
+    its last record. A task whose history will not parse while its siblings do is that."""
+    task = tmp_path / "tasks" / "t1"
+    task.mkdir(parents=True)
+    path = task / "api_conversation_history.json"
+    path.write_text('[{"role": "user", ', encoding="utf-8")
+    events = parse_task(path)
+    assert events[0].kind == "unparsed.record"
+    assert "not valid JSON" in (events[0].parse_problem or "")
+
+
+def test_cline_an_unknown_file_in_a_task_directory_is_reported(tmp_path: Path) -> None:
+    """One catalogue entry claims four files, so the parser dispatches on the name. A name
+    it does not know has to be said out loud rather than read as one of the four."""
+    events = parse_task(cline_task(tmp_path, "something_new.json", {"a": 1}))
+    assert events[0].kind == "unparsed.record"
+    assert "not a file this parser maps" in (events[0].parse_problem or "")
+
+
+def test_cline_serves_three_agents_without_mislabelling_them() -> None:
+    """A fork's events must carry the fork's name. An event attributed to the wrong agent
+    would have a case say an agent was used that never was."""
+    for artifact_id in (
+        "cline.vscode_task_transcripts",
+        "cline.data_tasks",
+        "roo_code.tasks",
+        "kilo_code.extension_id_legacy_tree",
+    ):
+        assert for_artifact(artifact_id) is not None, artifact_id
+
+
+def test_the_agent_of_an_event_is_the_catalogues_not_the_parsers(tmp_path: Path) -> None:
+    events = parse_task(
+        cline_task(tmp_path, "api_conversation_history.json", [{"role": "user", "content": "hi"}]),
+        agent="roo_code",
+    )
+    assert events[0].agent == "roo_code"

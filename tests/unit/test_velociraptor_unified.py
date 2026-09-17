@@ -30,6 +30,7 @@ from agentforensics.exporters.velociraptor_unified import (
     MAPPERS,
     NOT_NORMALIZED,
     PRODUCER,
+    UNINTERPRETED,
     Target,
     UnsafeTarget,
     render,
@@ -249,21 +250,64 @@ def test_join_over_a_possibly_absent_value_is_guarded(artifact: dict) -> None:
 # ----------------------------------------------------- parity with the analyzer
 
 
-def test_every_artifact_a_python_parser_claims_has_a_vql_mapper(catalogue: Catalogue) -> None:
-    """The two producers of this format read the same files. A parser added on one side and
-    not the other is how they would start disagreeing, and the disagreement would show up
-    as a fleet hunt that returns less than an examiner's own ingest of the same host."""
+def test_every_artifact_a_python_parser_claims_is_accounted_for(catalogue: Catalogue) -> None:
+    """The two producers of this format read the same files, and where they cannot, the gap
+    is written down.
+
+    A format VQL cannot read line by line is a real limit: a whole JSON document and a
+    directory with no stated extension are both outside what this query does. The invariant
+    is therefore not that the two producers are equal, which would be a lie, but that every
+    difference is either the generic normalizer, which returns every record uninterpreted
+    and loses nothing, or an entry in UNINTERPRETED, which the generated artifact prints so
+    an operator reads it before running a hunt rather than after."""
     claimed = {
         artifact.id
         for artifact in catalogue.artifacts
         if any(parser.handles(artifact.id) for parser in PARSERS)
     }
     in_scope = {artifact.id for artifact in catalogue.artifacts if artifact.category in CATEGORIES}
-    missing = sorted((claimed & in_scope) - set(MAPPERS))
-    assert not missing, (
-        "a Python parser reads these and the Velociraptor artifact does not, so a fleet "
-        f"hunt would return less than an ingest of the same host: {missing}"
+    by_id = {artifact.id: artifact for artifact in catalogue.artifacts}
+
+    unaccounted = []
+    for artifact_id in sorted(claimed & in_scope):
+        if artifact_id in MAPPERS or artifact_id in UNINTERPRETED:
+            continue
+        artifact = by_id[artifact_id]
+        # The generic normalizer covers a line-delimited log with no verified mapping, and
+        # it returns every record, so it is not a gap. Anything else is one.
+        mappers = {
+            unified._mapper_for(artifact, glob)
+            for os_name in ("linux", "macos", "windows")
+            for glob in (unified._covered(artifact, os_name)[0] or [])
+        }
+        if mappers and mappers <= {GENERIC}:
+            continue
+        unaccounted.append(artifact_id)
+    assert not unaccounted, (
+        "a Python parser reads these, the Velociraptor artifact returns only the file, and "
+        "nothing says so. Add a normalizer or name the gap in UNINTERPRETED: "
+        f"{unaccounted}"
     )
+
+
+def test_the_artifact_names_the_formats_it_does_not_interpret(catalogue: Catalogue) -> None:
+    """A limit an operator cannot read before running a hunt is a limit they discover
+    afterwards, from an empty result that looks like an agent nobody used."""
+    (rendered,) = render(catalogue)
+    text = rendered.text
+    for artifact_id, reason in UNINTERPRETED.items():
+        assert artifact_id in text, artifact_id
+        assert reason in text, reason
+
+
+def test_nothing_in_the_uninterpreted_list_is_invented(catalogue: Catalogue) -> None:
+    """Both directions: an entry naming an artifact no parser reads would be describing a
+    gap that does not exist, and one naming an artifact with a mapper would be wrong."""
+    known = {artifact.id for artifact in catalogue.artifacts}
+    for artifact_id in UNINTERPRETED:
+        assert artifact_id in known, artifact_id
+        assert artifact_id not in MAPPERS, artifact_id
+        assert any(parser.handles(artifact_id) for parser in PARSERS), artifact_id
 
 
 def test_no_vql_mapper_claims_an_artifact_no_parser_knows(catalogue: Catalogue) -> None:

@@ -104,6 +104,24 @@ GENERIC = "generic_jsonl"
 # database nobody has read" is the difference between two opposite conclusions.
 NOT_NORMALIZED = "file_only"
 
+# The formats the suite's own parsers read and this artifact does not, with the reason. The
+# gap is real and it is listed rather than left to be discovered: an operator running a
+# fleet hunt has to know that for these agents the rows say a file was there and nothing
+# about what is in it, so the answer is to collect the files and ingest them.
+#
+# Every entry here is a format VQL cannot read line by line: a whole JSON document, or a
+# directory this artifact will not guess an extension for. A line-delimited log needs no
+# entry, because the generic normalizer already returns every one of its records.
+UNINTERPRETED: dict[str, str] = {
+    "cline.data_tasks": "a task directory of whole JSON documents",
+    "cline.vscode_task_transcripts": "a task directory of whole JSON documents",
+    "gemini_cli.chats": "a chats directory this artifact will not narrow to an extension",
+    "kilo_code.extension_id_legacy_tree": "a task directory of whole JSON documents",
+    "qwen_code.prompt_history_log": "one JSON document rewritten whole on every append",
+    "qwen_code.subagent_transcripts": "a directory with no stated file format",
+    "roo_code.tasks": "a task directory of whole JSON documents",
+}
+
 _OS_SOURCES = (
     ("windows", "SELECT OS FROM info() WHERE OS = 'windows'"),
     ("macos", "SELECT OS FROM info() WHERE OS = 'darwin'"),
@@ -319,6 +337,11 @@ def _description() -> list[str]:
         "    timestamps, so that a store nobody has read is visible as a store nobody has",
         "    read rather than as an agent that left nothing behind.",
         "",
+        "  - Seven of the formats the suite's own analyzer reads are not read here, and",
+        "    they are named in the notes below. For those agents a row says the file was",
+        "    there, with its hash and timestamps, and nothing about the conversation in",
+        "    it. Collect the files with the Collect artifact and ingest them.",
+        "",
         "  - Records carry no `event_id`. It is derived from provenance and the kind, and a",
         "    reader recomputes it, so emitting one here would only create something to",
         "    disagree with.",
@@ -351,6 +374,10 @@ def _header_notes(catalogue: Catalogue) -> list[str]:
         f"Normalizers with a verified mapping: {', '.join(mapped)}.",
         "Every other line-delimited log is returned uninterpreted, and every other format",
         "is returned as one row per file. Both are visible in the output, never omitted.",
+        "",
+        "Read by the suite's own parsers and NOT interpreted here, so a fleet hunt returns",
+        "the file and not the conversation. Collect these and ingest them:",
+        *[f"  - {key}: {reason}" for key, reason in sorted(UNINTERPRETED.items())],
         "",
         "It deliberately avoids parse_jsonl, which skips a line it cannot decode. A",
         "skipped line reads as a line that was never there, and that is the one failure",

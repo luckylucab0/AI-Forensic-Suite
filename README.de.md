@@ -176,9 +176,10 @@ Einzige, was der Viewer irgendwo schreibt, ist die Themenwahl in `localStorage`.
 - Der Secret-Scan besteht aus Heuristiken auf Basis regulärer Ausdrücke, nicht aus
   einem vollwertigen Scanner. Fehlalarme und übersehene Funde sind zu erwarten, jeder
   Fund gehört geprüft.
-- Die Parser für Codex und Copilot entstanden aus öffentlichen Formatbeschreibungen.
-  Sie erhalten alles, was sie nicht erkennen, brauchen aber möglicherweise Anpassungen
-  an neue Agentenversionen.
+- Die Parser für alles außer Claude Code entstanden aus dem Quellcode und der
+  Formatdokumentation der Hersteller, nicht aus echten Transkripten. Sie erhalten alles,
+  was sie nicht erkennen, brauchen aber möglicherweise Anpassungen an neue
+  Agentenversionen.
 
 ## Die lokale Web-UI
 

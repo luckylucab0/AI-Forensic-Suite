@@ -2,9 +2,9 @@
   "_comment": "sha256 of each English document whose German sibling was confirmed current. Refresh with scripts/check_translations.py --update after updating a translation, or after an English edit that needs none.",
   "english_hashes": {
     "CONTRIBUTING.md": "46a615c64f0fefbcf791607cbd940e5844a1ab6ed0738540fc95d9b46052a742",
-    "README.md": "9095be0c1d84baadcda470060dc1c2093bccec35905d9a72e1076edc55ceffc8",
+    "README.md": "eefe3e51c407b57ee84dae997c4e1602e3727f6cf1f8ad14aa733515e1971da5",
     "SECURITY.md": "d762c856c43ffe27dab58d6f00918c2e0fb47f1f2dcea722e64c6259c2eb0041",
-    "docs/ARCHITECTURE.md": "526d8cfad5db1e06b60fcd453445bfca2a750f5af868292c400e0b03e877ae10",
+    "docs/ARCHITECTURE.md": "236e8907250b08a0ca8c9bb77b2e00653a11e58860cb43f1a74c5a5b414e5458",
     "docs/BUNDLE_FORMAT.md": "cda3d15852b62d388641880ef74d44a04b8a8820982064660d70211a838f2752",
     "docs/COLLECTION.md": "62af5a06eabd5f8f7777e05afd68069cec05196cf36a87996a153e26a9c50394",
     "docs/UNIFIED_FORMAT.md": "f53eda154177e6fed5e64932d3b7bc424cafa6b40814b8b6b55e625701e99ff3",

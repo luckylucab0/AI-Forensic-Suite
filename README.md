@@ -157,8 +157,9 @@ thing the viewer writes anywhere is your theme choice, in `localStorage`.
 - Parsing happens in the browser, so a very large session is loaded into memory whole.
 - The secret scan is regex-based heuristics, not a full scanner. Expect false positives
   and false negatives, and verify any finding.
-- The Codex and Copilot parsers were built from public format descriptions. They preserve
-  anything they do not recognize, but may need adjusting against new agent releases.
+- The parsers for everything other than Claude Code were built from the vendors' own
+  source and format documentation, not from real transcripts. They preserve anything they
+  do not recognize, but may need adjusting against new agent releases.
 
 ## The local web UI
 

@@ -110,10 +110,13 @@ ist, dass das nicht *unbemerkt* geht.
 - `bundle/` schreibt, liest, hasht und verifiziert Bundles und die Custody-Kette
 - `ingest/` Adapter für ein eigenes Bundle, einen KAPE-Baum, eine Velociraptor-Sammlung
   sowie ein einfaches Verzeichnis oder eingebundenes Abbild
-- `parsers/` ein Modul pro Agent, das Rohdatensätze in einheitliche Ereignisse überführt.
-  Welcher Parser läuft, entscheidet der Katalogeintrag, der die Datei beansprucht hat,
-  damit ein Parser dem Katalog nie widersprechen kann. Eine Datei ohne Parser wird als
-  nicht unterstützt festgehalten, nicht übersprungen.
+- `parsers/` ein Modul pro Agent oder pro Formatfamilie, das Rohdatensätze in einheitliche
+  Ereignisse überführt. Welcher Parser läuft, entscheidet der Katalogeintrag, der die Datei
+  beansprucht hat, damit ein Parser dem Katalog nie widersprechen kann. Eine Datei ohne
+  Parser wird als nicht unterstützt festgehalten, nicht übersprungen. Sieben Agenten werden
+  heute gelesen: Claude Code, Codex CLI, Copilot CLI, Gemini CLI und Qwen Code (ein Modul,
+  weil Qwen ein Fork ist und beide die Gemini-Inhaltsform schreiben), Pi sowie Cline mit
+  seinen Forks Roo Code und Kilo Code (aus demselben Grund ein Modul).
 - `model/` das einheitliche Ereignismodell und das SQLite-Fallschema
 - `unified/` das Ereignismodell als Datenstrom: das JSON-Lines-Format und sein Schema,
   dazu der Normalisierer, der eine Sammlung ohne Falldatenbank in ein Log überführt
