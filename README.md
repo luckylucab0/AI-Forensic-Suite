@@ -8,8 +8,9 @@ OpenAI Codex CLI, GitHub Copilot, Gemini CLI, Cursor, Kiro, Cline and others lea
 behind on macOS, Windows and Linux.
 
 > **Status: early.** The transcript viewer is complete and usable on its own today. The
-> artifact catalogue, the collectors and the bundle format are being built. The analyzer,
-> the rule engine and the web UI are not there yet. See [Roadmap](#roadmap).
+> artifact catalogue, the collectors, the bundle format, the analyzer, the rule engine and
+> the local web UI are in. More per-agent parsers are what is still being built. See
+> [Roadmap](#roadmap).
 
 ## Authorization and law come first
 
@@ -122,8 +123,9 @@ collection can open this page and that file and be reading. It is also the only 
 an agent the viewer has no layout for, because the normalizing happened before the file
 was written.
 
-**D. Point it at a case database.** Once `agentforensics serve` lands it will expose a
-local read-only API and the viewer will read a whole case from it.
+**D. Point it at a case database.** `afx serve --case case.db` opens one case behind this
+same page, on 127.0.0.1 and read-only, and adds four views for the questions that are about
+a case rather than a transcript. See [the local web UI](#the-local-web-ui).
 
 No build step, no `npm install`, no backend. Everything runs in the browser. The only
 thing the viewer writes anywhere is your theme choice, in `localStorage`.
@@ -151,12 +153,35 @@ thing the viewer writes anywhere is your theme choice, in `localStorage`.
 ### Known limitations
 
 - The directory-listing mode understands the HTML index that Python's `http.server`
-  emits. Other servers' autoindex formats are not parsed. Use mode B or C instead.
+  emits. Other servers' autoindex formats are not parsed. Use mode B, C or D instead.
 - Parsing happens in the browser, so a very large session is loaded into memory whole.
 - The secret scan is regex-based heuristics, not a full scanner. Expect false positives
   and false negatives, and verify any finding.
 - The Codex and Copilot parsers were built from public format descriptions. They preserve
   anything they do not recognize, but may need adjusting against new agent releases.
+
+## The local web UI
+
+```bash
+uv run afx ingest /evidence/bundle-2026-09-17 --case case.db   # read a collection in
+uv run afx scan --case case.db                                 # run the rule packs
+uv run afx serve --case case.db                                # open it in a browser
+```
+
+`serve` binds `127.0.0.1` only, opens the case read-only so SQLite itself refuses a write,
+and puts every URL under a token generated for that run and printed on the console. No
+telemetry, no update check, and a content security policy that forbids the page from
+loading or contacting anything off this server.
+
+It serves the same single-file viewer, with four views added: the case and the counts that
+qualify it, the device-wide timeline across every agent, the rule findings, and every file
+the collection carried whether or not a parser read it.
+
+![The case view, with the counts that qualify the case](docs/images/webui-case.png)
+
+The full walk-through, the API, and the rest of the screenshots are in
+[docs/WEBUI.md](docs/WEBUI.md). All images there are of one synthetic case: no real agent
+data appears anywhere in this repository.
 
 ## Roadmap
 
@@ -167,7 +192,7 @@ thing the viewer writes anywhere is your theme choice, in `localStorage`.
 | 2 | Collection rules generated for Velociraptor, KAPE, Defender live response, KQL, osquery | done |
 | 3 | Analyzer core: ingest adapters, per-agent parsers, unified event model, SQLite case database, unified log format, timeline exports | in progress |
 | 4 | Declarative YAML rule engine and the starter rule packs | done |
-| 5 | Local web UI: read-only API, viewer API source, timeline and findings views | planned |
+| 5 | Local web UI: read-only API, viewer API source, case, timeline, findings and artifact views | done |
 
 Not planned for now: case management with triage states, HTML and PDF reporting,
 pseudonymization, and a shell fallback collector.
@@ -185,6 +210,8 @@ pseudonymization, and a shell fallback collector.
 - [docs/UNIFIED_FORMAT.md](docs/UNIFIED_FORMAT.md), the vendor-neutral agent log: one
   JSON Lines record per event, whichever agent left the evidence and whichever tool
   read it
+- [docs/WEBUI.md](docs/WEBUI.md), the local web UI: what `afx serve` exposes, what it
+  refuses to do, and screenshots of every view
 - [docs/adr/](docs/adr/), one short record per architecture decision, with the reasoning
   and the cost each one accepts
 - [CONTRIBUTING.md](CONTRIBUTING.md), how to work in this repository, including the OpSec

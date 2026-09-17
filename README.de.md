@@ -8,8 +8,9 @@ analysiert, was Werkzeuge wie Claude Code, OpenAI Codex CLI, GitHub Copilot, Gem
 Cursor, Kiro oder Cline auf macOS, Windows und Linux auf der Platte zurücklassen.
 
 > **Stand: früh.** Der Transkript-Viewer ist fertig und schon heute eigenständig
-> nutzbar. Artefaktkatalog, Kollektoren und Bundle-Format entstehen gerade. Analyzer,
-> Regel-Engine und Web-UI fehlen noch. Siehe [Fahrplan](#fahrplan).
+> nutzbar. Artefaktkatalog, Kollektoren, Bundle-Format, Analyzer, Regel-Engine und die
+> lokale Web-UI sind drin. Was noch entsteht, sind weitere Parser pro Agent. Siehe
+> [Fahrplan](#fahrplan).
 
 ## Zuerst die Befugnis, dann das Werkzeug
 
@@ -136,8 +137,9 @@ Seite und diese Datei und liest. Es ist außerdem der einzige Weg, einen Agenten
 für den der Viewer kein Layout kennt, denn das Normalisieren ist passiert, bevor die Datei
 geschrieben wurde.
 
-**D. Auf eine Falldatenbank zeigen.** Sobald `agentforensics serve` da ist, stellt es eine
-lokale, nur lesende API bereit, und der Viewer liest daraus einen ganzen Fall.
+**D. Auf eine Falldatenbank zeigen.** `afx serve --case case.db` legt einen Fall hinter
+dieselbe Seite, auf 127.0.0.1 und nur lesend, und ergänzt vier Ansichten für die Fragen, die
+einen Fall statt ein Transkript betreffen. Siehe [die lokale Web-UI](#die-lokale-web-ui).
 
 Kein Build-Schritt, kein `npm install`, kein Backend. Alles läuft im Browser. Das
 Einzige, was der Viewer irgendwo schreibt, ist die Themenwahl in `localStorage`.
@@ -167,7 +169,7 @@ Einzige, was der Viewer irgendwo schreibt, ist die Themenwahl in `localStorage`.
 ### Bekannte Grenzen
 
 - Der Verzeichnislisten-Modus versteht den HTML-Index, den Pythons `http.server`
-  ausgibt. Autoindex-Formate anderer Server werden nicht geparst. Dort Modus B oder C
+  ausgibt. Autoindex-Formate anderer Server werden nicht geparst. Dort Modus B, C oder D
   verwenden.
 - Das Parsen passiert im Browser, eine sehr grosse Sitzung wird also komplett in den
   Speicher geladen.
@@ -178,6 +180,30 @@ Einzige, was der Viewer irgendwo schreibt, ist die Themenwahl in `localStorage`.
   Sie erhalten alles, was sie nicht erkennen, brauchen aber möglicherweise Anpassungen
   an neue Agentenversionen.
 
+## Die lokale Web-UI
+
+```bash
+uv run afx ingest /evidence/bundle-2026-09-17 --case case.db   # eine Sammlung einlesen
+uv run afx scan --case case.db                                 # die Regelpakete laufen lassen
+uv run afx serve --case case.db                                # im Browser öffnen
+```
+
+`serve` bindet ausschliesslich an `127.0.0.1`, öffnet den Fall nur lesend, sodass SQLite
+selbst das Schreiben verweigert, und legt jede URL unter ein Token, das für diesen Lauf
+erzeugt und auf der Konsole ausgegeben wird. Keine Telemetrie, kein Update-Check, und eine
+Content-Security-Policy, die der Seite verbietet, irgendetwas ausserhalb dieses Servers zu
+laden oder zu kontaktieren.
+
+Ausgeliefert wird derselbe Einzeldatei-Viewer, ergänzt um vier Ansichten: den Fall samt den
+Zahlen, die ihn relativieren, die geräteweite Timeline über alle Agenten, die Regel-Funde,
+und jede Datei, die die Sammlung mitgebracht hat, gelesen oder nicht.
+
+![Die Fall-Ansicht mit den relativierenden Zahlen](docs/images/webui-case.png)
+
+Der ausführliche Durchgang, die API und die übrigen Screenshots stehen in
+[docs/WEBUI.de.md](docs/WEBUI.de.md). Alle Bilder dort zeigen einen synthetischen Fall:
+echte Agentendaten kommen in diesem Repository nirgends vor.
+
 ## Fahrplan
 
 | Phase | Inhalt | Stand |
@@ -187,7 +213,7 @@ Einzige, was der Viewer irgendwo schreibt, ist die Themenwahl in `localStorage`.
 | 2 | Generierte Sammelregeln für Velociraptor, KAPE, Defender Live Response, KQL, osquery | fertig |
 | 3 | Analyzer-Kern: Ingest-Adapter, Parser pro Agent, einheitliches Ereignismodell, SQLite-Falldatenbank, vereinheitlichtes Logformat, Timeline-Exporte | laufend |
 | 4 | Deklarative YAML-Regel-Engine und die ersten Regelpakete | fertig |
-| 5 | Lokale Web-UI: nur lesende API, API-Quelle im Viewer, Timeline- und Fundansichten | geplant |
+| 5 | Lokale Web-UI: nur lesende API, API-Quelle im Viewer, Ansichten für Fall, Timeline, Funde und Artefakte | fertig |
 
 Vorerst nicht geplant: Fallverwaltung mit Triage-Status, Berichte als HTML und PDF,
 Pseudonymisierung, und ein Shell-Kollektor als Rückfallebene.
@@ -206,6 +232,8 @@ Pseudonymisierung, und ein Shell-Kollektor als Rückfallebene.
 - [docs/UNIFIED_FORMAT.de.md](docs/UNIFIED_FORMAT.de.md), das vendorneutrale Agenten-Log:
   ein JSON-Lines-Datensatz pro Ereignis, egal welcher Agent die Spuren hinterlassen hat
   und egal welches Werkzeug sie liest
+- [docs/WEBUI.de.md](docs/WEBUI.de.md), die lokale Web-UI: was `afx serve` bereitstellt,
+  was es ausdrücklich nicht tut, und Screenshots jeder Ansicht
 - [docs/adr/](docs/adr/), je ein kurzer Eintrag pro Architekturentscheidung, mit der
   Begründung und dem Preis, den sie in Kauf nimmt (englisch)
 - [CONTRIBUTING.de.md](CONTRIBUTING.de.md), wie in diesem Repository gearbeitet wird,

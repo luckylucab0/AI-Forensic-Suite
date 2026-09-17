@@ -227,6 +227,33 @@ event kind, all of these render as their own visible row, and the session header
 unparsed lines. Silently rendering nothing would make an analyst conclude nothing was
 there, which is the one failure mode a forensic tool must not have.
 
+### The local web UI
+
+`afx serve --case <db>` puts one case behind the viewer, on 127.0.0.1, read-only. Two
+modules: `webui/api.py` turns a case into the data a viewer shows and knows nothing about
+HTTP, so every projection is testable without a socket; `webui/server.py` binds the socket
+and carries the hardening.
+
+A session endpoint answers with the unified log format, not a shape of its own. The viewer
+therefore reads a case with the reader it already had, and this project has exactly one wire
+format for an agent event rather than a fourth one that could disagree with the other three.
+
+A session is derived rather than stored. A case holds events; what the sidebar calls a
+session is a group of them sharing six values (agent, host, user, whether they are
+filesystem timestamps, working directory, session id), and the key in the URL is a hash of
+exactly those. Same case, same keys, so a link into a session survives a re-ingest.
+
+The hardening is part of the decision rather than a later concern, because a forensic
+workstation is not a friendly network: loopback only with no option to change it, a random
+per-run path token, a `Host` check against DNS rebinding, an `Origin` check, GET and HEAD
+only, a request with a body refused unread, one explicit route table with no fallback, the
+viewer served from an in-process byte string so there is no path to traverse, a content
+security policy that forbids reaching off the server, and the case opened `mode=ro` so
+SQLite refuses a write. ADR 0006 notes that such a list is the part most likely to rot, so
+each item has its own test.
+
+See ADR 0006 and ADR 0020, and docs/WEBUI.md.
+
 ## Cross-cutting decisions
 
 **Offline, with no exceptions.** No network access at runtime, no telemetry, no update
@@ -255,10 +282,9 @@ keeps them to a minimum, and each one is a decision with an ADR.
 | 0 | Repository hygiene, sanitized viewer, tooling, CI, OpSec guard |
 | 1 | Artifact catalogue, both collectors, bundle format, `verify`, synthetic fixtures |
 | 2 | Collection rules generated for Velociraptor, KAPE, Defender live response, KQL, osquery |
-
 | 3 | Analyzer core: ingest, parsers, event model, case database, timeline exports |
 | 4 | Rule engine and starter packs |
-| 5 | Local web UI: read-only API, viewer API source, timeline and findings views |
+| 5 | Local web UI: read-only API, viewer API source, case, timeline, findings and artifact views |
 
 Deliberately out of scope for now: case management with triage states and notes, HTML and
 PDF reporting, pseudonymization, and a shell fallback collector for hosts without Python.

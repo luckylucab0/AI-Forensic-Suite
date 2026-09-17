@@ -248,6 +248,36 @@ sichtbare Zeile, und der Sitzungskopf zählt die nicht parsbaren Zeilen mit. Sti
 darzustellen würde zu dem Schluss führen, es sei nichts da gewesen, und das ist der eine
 Fehlerfall, den ein Forensikwerkzeug nicht haben darf.
 
+### Die lokale Web-UI
+
+`afx serve --case <db>` legt einen Fall hinter den Viewer, auf 127.0.0.1, nur lesend. Zwei
+Module: `webui/api.py` verwandelt einen Fall in die Daten, die ein Viewer zeigt, und weiss
+nichts von HTTP, sodass jede Projektion ohne Socket testbar ist; `webui/server.py` bindet
+den Socket und trägt die Härtung.
+
+Ein Session-Endpunkt antwortet im vereinheitlichten Log-Format, nicht in einer eigenen Form.
+Der Viewer liest einen Fall damit über den Leser, den er schon hatte, und dieses Projekt hat
+genau ein Wire-Format für ein Agentenereignis statt eines vierten, das den anderen drei
+widersprechen könnte.
+
+Eine Session ist abgeleitet, nicht gespeichert. Ein Fall enthält Ereignisse; was die
+Seitenleiste eine Session nennt, ist eine Gruppe von Ereignissen mit sechs gemeinsamen
+Werten (Agent, Host, Benutzer, ob es Dateisystem-Zeitstempel sind, Arbeitsverzeichnis,
+Session-ID), und der Key in der URL ist ein Hash genau dieser sechs. Derselbe Fall, dieselben
+Keys, also übersteht ein Link in eine Session ein erneutes Einlesen.
+
+Die Härtung gehört zur Entscheidung und ist kein Nachgedanke, denn eine forensische
+Workstation ist kein freundliches Netz: ausschliesslich Loopback ohne Option auf etwas
+anderes, ein zufälliges Pfad-Token pro Lauf, eine `Host`-Prüfung gegen DNS-Rebinding, eine
+`Origin`-Prüfung, nur GET und HEAD, eine Anfrage mit Body wird ungelesen abgewiesen, eine
+explizite Routentabelle ohne Fallback, der Viewer aus einer Byte-Kette im Speicher, sodass
+es keinen Pfad zum Traversieren gibt, eine Content-Security-Policy, die jeden Zugriff
+ausserhalb des Servers verbietet, und der Fall mit `mode=ro` geöffnet, sodass SQLite das
+Schreiben verweigert. ADR 0006 hält fest, dass eine solche Liste der Teil ist, der am
+ehesten verrottet, deshalb hat jeder Punkt seinen eigenen Test.
+
+Siehe ADR 0006 und ADR 0020 sowie docs/WEBUI.de.md.
+
 ## Übergreifende Entscheidungen
 
 **Offline, ohne Ausnahme.** Kein Netzzugriff zur Laufzeit, keine Telemetrie, keine
@@ -280,7 +310,7 @@ Analyzer hält sie minimal, und jede einzelne ist eine Entscheidung mit einem AD
 | 2 | Generierte Sammelregeln für Velociraptor, KAPE, Defender Live Response, KQL, osquery |
 | 3 | Analyzer-Kern: Ingest, Parser, Ereignismodell, Falldatenbank, Timeline-Exporte |
 | 4 | Regel-Engine und erste Regelpakete |
-| 5 | Lokale Web-UI: nur lesende API, API-Quelle im Viewer, Timeline- und Fundansichten |
+| 5 | Lokale Web-UI: nur lesende API, API-Quelle im Viewer, Ansichten für Fall, Timeline, Funde und Artefakte |
 
 Bewusst vorerst ausserhalb des Umfangs: Fallverwaltung mit Triage-Status und Notizen,
 Berichte als HTML und PDF, Pseudonymisierung, und ein Shell-Kollektor als Rückfallebene für

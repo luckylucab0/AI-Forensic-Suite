@@ -27,3 +27,4 @@ Add one with the next free number, using [0000-template.md](0000-template.md).
 | [0017](0017-unattributed-evidence-is-a-finding.md) | A file the catalogue does not claim is a finding, not a non-event |
 | [0018](0018-one-unified-log-format.md) | One unified log format, and it is the event model on the wire |
 | [0019](0019-rules-are-data-with-their-own-tests.md) | A rule is data, carries its own tests, and findings live in the case |
+| [0020](0020-the-case-is-read-as-a-unified-log.md) | The local UI reads a case as a unified log, under a per-run token |

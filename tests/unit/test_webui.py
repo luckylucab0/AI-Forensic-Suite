@@ -470,6 +470,29 @@ def test_a_case_is_readable_end_to_end_over_http(client: Client) -> None:
     assert records and all(record["v"] == 1 for record in records)
 
 
+def test_the_documented_screenshots_exist() -> None:
+    """Every image the web UI documentation points at is in the repository.
+
+    A broken image in a public README is the kind of thing nobody notices from a checkout,
+    because the file is there locally right up until it is not committed. The images are
+    regenerated with scripts/shot_webui.py.
+    """
+    import re
+
+    missing = []
+    for doc in (REPO_ROOT / "docs" / "WEBUI.md", REPO_ROOT / "docs" / "WEBUI.de.md"):
+        text = doc.read_text(encoding="utf-8")
+        for target in re.findall(r"!\[[^\]]*\]\(([^)]+)\)", text):
+            if not (doc.parent / target).is_file():
+                missing.append(f"{doc.name} -> {target}")
+    for doc in (REPO_ROOT / "README.md", REPO_ROOT / "README.de.md"):
+        text = doc.read_text(encoding="utf-8")
+        for target in re.findall(r"!\[[^\]]*\]\(([^)]+)\)", text):
+            if not (REPO_ROOT / target).is_file():
+                missing.append(f"{doc.name} -> {target}")
+    assert not missing, missing
+
+
 @pytest.mark.viewer
 def test_the_viewer_renders_a_served_session(client: Client, tmp_path: Path) -> None:
     """One session, fetched over the API and put through the viewer's own normalizer.
