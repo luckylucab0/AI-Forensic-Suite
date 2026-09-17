@@ -196,7 +196,19 @@ own data. That is a different product, it would put internal domains and code na
 public repository, and it would pull the suite away from the question it exists to answer.
 The packs stay focused on agent behavior: secrets that reached a transcript, dangerous
 commands, sensitive paths, exfiltration indicators, permission bypass, anti-forensics,
-prompt injection, supply chain and third-party endpoints. The engine and the packs are phase 4 work and `docs/RULES.md` does not exist yet.
+prompt injection, supply chain and third-party endpoints.
+
+Findings live in the case database next to the events they rest on, linked through a table
+rather than a column, because an aggregate rule fires on a group: twenty files read in one
+minute is one finding over twenty events, and a finding that could only point at one of
+them would be a finding an analyst cannot check. A finding is keyed by its rule and its
+evidence, so re-scanning a case after a rule is fixed leaves the counts intact rather than
+doubling them.
+
+Every scan is recorded whether or not anything fired, naming each rule that ran. Without
+that record a case with no findings and a case nobody scanned look identical, and those are
+opposite conclusions. It is the same rule the collection side follows for a glob it declined
+to search.
 
 ### The viewer
 

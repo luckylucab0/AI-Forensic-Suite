@@ -1,0 +1,61 @@
+id: AFX-PERMISSIONBYPASS-003
+pack: permission_bypass
+title: A permission rule allows every call of a whole tool
+severity: medium
+description: >
+  A configuration snapshot holds an allow entry that is a bare tool name. The vendor
+  documents a bare name as matching every call of that tool, so an entry of Bash allows
+  every shell command, Read every file read and WebFetch every outbound request.
+rationale: >
+  This is the quiet version of a bypass. Nobody typed a dangerous-looking flag and no mode
+  changed; a line in a settings file means the prompt for a whole class of action never
+  appears again, in every session, for as long as the file says so. An analyst reading a
+  transcript with no permission prompts in it needs to know whether that is because nothing
+  needed approving or because a rule had already approved it.
+applies_to:
+  kinds: [config.snapshot]
+match:
+  field: payload.permissions[].subject
+  equals_any: [Bash, Read, Write, Edit, MultiEdit, WebFetch, WebSearch, NotebookEdit]
+tags:
+  - T1562.001
+  - permission-bypass
+false_positives:
+  - >-
+    A bare Read entry is close to harmless on its own, because reads inside the working
+    directory need no approval anyway.
+  - >-
+    A project that has deliberately allowed a tool and constrained it another way, for
+    example with a deny rule or a pre-tool hook, which the vendor documents as taking
+    precedence over an allow rule.
+references:
+  - https://code.claude.com/docs/en/permissions
+tests:
+  - name: every shell command allowed
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload:
+        permissions: [{decision: allow, subject: "Bash", scope: project}]
+  - name: every outbound request allowed
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload:
+        permissions: [{decision: allow, subject: "WebFetch", scope: user}]
+  - name: one specific command allowed
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload:
+        permissions: [{decision: allow, subject: "Bash(npm run build)", scope: project}]
+  - name: a specific domain allowed
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload:
+        permissions: [{decision: allow, subject: "WebFetch(domain:example.org)", scope: project}]

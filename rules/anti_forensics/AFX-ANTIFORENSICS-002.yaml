@@ -1,0 +1,58 @@
+id: AFX-ANTIFORENSICS-002
+pack: anti_forensics
+title: Prompt history recording was suppressed by an environment variable
+severity: high
+description: >
+  An environment variable that stops the agent writing its prompt history appears in a
+  record. For Claude Code the variable is CLAUDE_CODE_SKIP_PROMPT_HISTORY.
+rationale: >
+  Prompt history normally outlives the transcripts, because it is a small append-only file
+  that no retention sweep of the same aggressiveness touches. It is therefore often the
+  only surviving record of what a user asked, and suppressing it removes the one artifact
+  that answers that question after the transcripts are gone. A variable set in a shell
+  profile also applies to every future session, which makes it a durable decision rather
+  than a one-off.
+applies_to:
+  kinds: [any]
+match:
+  field: event_text
+  regex_any:
+    - 'CLAUDE_CODE_SKIP_PROMPT_HISTORY'
+    - '(?i)\bSKIP_PROMPT_HISTORY\s*=\s*(?:1|true|yes)'
+tags:
+  - T1070.003
+  - history-suppressed
+false_positives:
+  - >-
+    A mention in documentation or in a discussion about privacy settings, which matches
+    because the text on disk is what is searched.
+  - >-
+    A variable set to 0 or to an empty value, which the second pattern excludes but the
+    first does not, because the name appearing at all in a shell profile is worth reading.
+references:
+  - https://code.claude.com/docs/en/settings
+tests:
+  - name: the variable in a shell history line
+    match: true
+    event:
+      kind: prompt.history
+      agent: crosscutting
+      payload: {text: "export CLAUDE_CODE_SKIP_PROMPT_HISTORY=1"}
+  - name: a generically named variable set to true
+    match: true
+    event:
+      kind: config.snapshot
+      agent: codex
+      payload: {text: "SKIP_PROMPT_HISTORY=true"}
+  - name: an unrelated environment variable
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload: {text: "export CLAUDE_CONFIG_DIR=/opt/agents"}
+  - name: an ordinary prompt
+    match: false
+    event:
+      kind: user.prompt
+      agent: claude_code
+      payload: {text: "how do I clear my prompt history"}

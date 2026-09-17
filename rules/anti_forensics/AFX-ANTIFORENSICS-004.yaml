@@ -1,0 +1,79 @@
+id: AFX-ANTIFORENSICS-004
+pack: anti_forensics
+title: A command removed an agent store, a transcript or a shell history
+severity: high
+description: >
+  A shell command deletes or truncates a path that holds agent history or shell history:
+  an agent's configuration directory, a transcript store, or one of the shell history files
+  a command invocation would be recorded in.
+rationale: >
+  Unlike a purge command this leaves nothing behind that names itself, so the deletion has
+  to be read out of the command that did it. It is also the version that reaches the
+  artifacts an agent's own purge does not touch. A shell history removed in the same
+  session as agent work is the specific pattern worth escalating: it removes the record of
+  how the agent was invoked, which is where the flags that answer the bypass question live.
+applies_to:
+  kinds: [command.exec, prompt.history]
+match:
+  all:
+    - field: event_text
+      regex: '(?:\brm\b(?:\s+-[a-zA-Z]+)*\s|\bshred\b|\bunlink\b|\btruncate\b|>\s*)'
+    - field: event_text
+      regex_any:
+        - '\.claude(?:\.json)?\b'
+        - '\.codex\b'
+        - '\.copilot\b'
+        - '\.gemini\b'
+        - '\.cursor\b'
+        - '(?:bash|zsh)_history\b'
+        - 'fish_history\b'
+        - 'ConsoleHost_history\.txt'
+tags:
+  - T1070.003
+  - T1485
+  - deliberate-destruction
+false_positives:
+  - >-
+    Ordinary housekeeping. Clearing a cache under an agent directory, or removing a stale
+    lock file, matches and is not destruction of evidence.
+  - >-
+    An installer or an uninstaller doing what it is for.
+  - >-
+    A redirection into an unrelated file whose path merely mentions one of these
+    directories, since the two halves of this rule are matched over the whole record
+    rather than against each other.
+tests:
+  - name: a shell history removed
+    match: true
+    event:
+      kind: command.exec
+      agent: crosscutting
+      payload:
+        commands: [{command: "rm -f ~/.bash_history"}]
+  - name: an agent store removed recursively
+    match: true
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "rm -rf ~/.claude/projects"}]
+  - name: a history file truncated by redirection
+    match: true
+    event:
+      kind: prompt.history
+      agent: crosscutting
+      payload: {text: "> ~/.zsh_history"}
+  - name: an unrelated removal
+    match: false
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "rm -rf node_modules"}]
+  - name: reading a transcript rather than removing it
+    match: false
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "wc -l ~/.claude/projects/*/*.jsonl"}]

@@ -22,7 +22,11 @@ bundle row went away would be a way to lose evidence by accident.
 
 from __future__ import annotations
 
-SCHEMA_VERSION = 1
+# 2 added the findings tables. No migration on purpose: this module's own rule is that a
+# case is evidence, and the version check refuses an older file with a sentence telling the
+# reader to re-ingest rather than editing it in place. Re-ingest is idempotent and cheap,
+# and a partly migrated case is worse than two honest ones.
+SCHEMA_VERSION = 2
 
 # Kept as one statement per string so a migration can be expressed as a list of additions
 # and the whole schema can be applied to an empty file in one transaction.
@@ -216,6 +220,66 @@ SCHEMA: tuple[str, ...] = (
     )
     """,
     "CREATE INDEX IF NOT EXISTS facet_instructions_path ON facet_instructions(path)",
+    """
+    -- What the rules found. One row per finding, and a finding is about evidence rather
+    -- than about a rule: it names the rule and the version of the rule file that produced
+    -- it, so a finding can be reproduced a year later against the same rule text even if
+    -- the rule has since been edited. A rule that changed and left findings nobody can
+    -- reproduce would leave opinions in a case where evidence is supposed to be.
+    CREATE TABLE IF NOT EXISTS findings (
+        finding_id   TEXT PRIMARY KEY,
+        rule_id      TEXT NOT NULL,
+        pack         TEXT NOT NULL,
+        severity     TEXT NOT NULL,
+        title        TEXT NOT NULL,
+        -- The earliest timestamp among the events this finding rests on, or null when none
+        -- of them had one. Null rather than the scan time: when a finding happened is a
+        -- claim about the evidence, and the scan time is a claim about the examiner.
+        ts_utc       TEXT,
+        agent        TEXT,
+        user_id      INTEGER REFERENCES users(user_id),
+        session_id   TEXT,
+        -- One line an analyst reads first, and what matched, as JSON. The second is empty
+        -- for a rule marked redact: there the matched value is the credential itself, and
+        -- a finding is exported and pasted into reports, so copying it into a second place
+        -- would spread the credential rather than report it.
+        summary      TEXT NOT NULL,
+        matched      TEXT NOT NULL,
+        event_count  INTEGER NOT NULL DEFAULT 1,
+        rule_sha256  TEXT NOT NULL,
+        scanned_utc  TEXT NOT NULL
+    )
+    """,
+    "CREATE INDEX IF NOT EXISTS findings_rule ON findings(rule_id)",
+    "CREATE INDEX IF NOT EXISTS findings_severity ON findings(severity, ts_utc)",
+    "CREATE INDEX IF NOT EXISTS findings_session ON findings(session_id)",
+    """
+    -- Which events a finding rests on. A separate table because an aggregate rule fires on
+    -- a group: "twenty files read in one minute" is one finding over twenty events, and a
+    -- finding that could only point at one of them would be a finding an analyst cannot
+    -- check.
+    CREATE TABLE IF NOT EXISTS finding_events (
+        finding_id TEXT NOT NULL REFERENCES findings(finding_id),
+        event_id   TEXT NOT NULL REFERENCES events(event_id),
+        PRIMARY KEY (finding_id, event_id)
+    )
+    """,
+    "CREATE INDEX IF NOT EXISTS finding_events_event ON finding_events(event_id)",
+    """
+    -- Every rule that ran, whether or not it found anything. This is the table that makes
+    -- an empty findings list mean something: without it, a case with no findings and a case
+    -- nobody scanned look identical, and those are opposite conclusions.
+    CREATE TABLE IF NOT EXISTS scan_runs (
+        run_id       TEXT PRIMARY KEY,
+        started_utc  TEXT NOT NULL,
+        finished_utc TEXT NOT NULL,
+        rules_run    INTEGER NOT NULL,
+        rule_ids     TEXT NOT NULL,
+        events_read  INTEGER NOT NULL,
+        findings     INTEGER NOT NULL,
+        tool_version TEXT NOT NULL
+    )
+    """,
     """
     -- Patterns the collection declined to search, carried over from the manifest. A hole in
     -- the evidence has to be visible inside the case, not only in the bundle it came from,

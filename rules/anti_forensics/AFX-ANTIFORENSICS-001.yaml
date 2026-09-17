@@ -1,0 +1,67 @@
+id: AFX-ANTIFORENSICS-001
+pack: anti_forensics
+title: Transcript retention was lowered below the vendor default
+severity: high
+description: >
+  A configuration snapshot sets the retention period for transcripts to fewer days than the
+  vendor's default of 30. Claude Code spells this cleanupPeriodDays, and
+  desktopSessionCleanupPeriodDays for desktop and Cowork transcripts.
+rationale: >
+  Retention is the setting that decides how much of an agent's history still exists when
+  somebody comes to look. Lowering it does not delete anything visibly and leaves no
+  command in a shell history, but it shortens the window in which any of this is
+  recoverable, and a value of 0 or 1 means the evidence for all but the current work is
+  already gone. The setting is also the explanation for an absence, which is the other
+  reason to find it: a transcript store that looks swept is a different finding depending
+  on whether the sweep was configured or somebody ran something.
+applies_to:
+  kinds: [config.snapshot]
+match:
+  any:
+    - field: payload.cleanupPeriodDays
+      lt: 30
+    - field: payload.desktopSessionCleanupPeriodDays
+      lt: 30
+    - field: raw.cleanupPeriodDays
+      lt: 30
+    - field: raw.desktopSessionCleanupPeriodDays
+      lt: 30
+tags:
+  - T1070
+  - retention-reduced
+false_positives:
+  - >-
+    A deliberate privacy choice. An individual or an organization can decide to keep less,
+    and that is a legitimate configuration rather than an attempt to destroy evidence. The
+    finding says the window is short, not why.
+  - >-
+    A machine that was configured once and has kept the setting since, where the low value
+    long predates whatever is being investigated.
+references:
+  - https://code.claude.com/docs/en/settings-reference
+  - https://code.claude.com/docs/en/data-usage
+tests:
+  - name: retention lowered to a day
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload: {cleanupPeriodDays: 1}
+  - name: desktop retention lowered
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_desktop
+      payload: {desktopSessionCleanupPeriodDays: 3}
+  - name: the vendor default
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload: {cleanupPeriodDays: 30}
+  - name: retention raised, which is the opposite
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload: {cleanupPeriodDays: 365}

@@ -213,8 +213,20 @@ Projektnamen in ein öffentliches Repository bringen, und es würde die Suite vo
 wegziehen, für die sie existiert. Die Pakete bleiben auf das Verhalten der Agenten
 fokussiert: Zugangsdaten, die in ein Transkript geraten sind, gefährliche Befehle,
 sensible Pfade, Exfiltrationshinweise, Umgehung von Berechtigungen, Anti-Forensik,
-Prompt-Injection, Lieferkette und Drittanbieter-Endpunkte. Engine und Pakete sind Arbeit
-aus Phase 4, `docs/RULES.de.md` existiert noch nicht.
+Prompt-Injection, Lieferkette und Drittanbieter-Endpunkte.
+
+Funde liegen in der Falldatenbank neben den Ereignissen, auf denen sie ruhen, verbunden
+über eine Tabelle statt über eine Spalte. Denn eine Aggregatregel feuert auf eine Gruppe:
+zwanzig gelesene Dateien in einer Minute sind ein Fund über zwanzig Ereignisse, und ein
+Fund, der nur auf eines davon zeigen könnte, wäre ein Fund, den ein Analyst nicht
+nachprüfen kann. Ein Fund wird über seine Regel und seine Beweise geschlüsselt, deshalb
+bleiben die Zahlen beim erneuten Scannen nach einer Regelkorrektur erhalten und verdoppeln
+sich nicht.
+
+Jeder Scan wird festgehalten, ob etwas gefeuert hat oder nicht, und nennt jede Regel, die
+gelaufen ist. Ohne diese Aufzeichnung sehen ein Fall ohne Funde und ein Fall, den niemand
+gescannt hat, gleich aus, und das sind entgegengesetzte Schlüsse. Es ist dieselbe Regel,
+der die Sammelseite für ein Glob folgt, das sie nicht durchsucht hat.
 
 ### Der Viewer
 

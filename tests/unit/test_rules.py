@@ -1,0 +1,701 @@
+"""The rule engine, and every rule's own tests.
+
+The first test in this file is the one the brief asked for and the one that matters: every
+positive and negative sample in every shipped rule file is its own pytest case, so a rule
+that stops working names itself in the failure output. A detection pack whose rules are not
+executed by the test suite is a pack that silently rots, and the failure mode is not a rule
+that misses, it is a rule that fires on everything and trains an analyst to skip the pack.
+
+The rest is the engine. Most of it is about the two ways a rule can be wrong in a way
+nobody notices: a selector that resolves to nothing, and a condition that matches
+everything. Both look like a working tool from the outside, one reporting a clean case and
+the other reporting noise.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+from agentforensics.model import Case
+from agentforensics.rules import (
+    PACKS,
+    SEVERITIES,
+    Rule,
+    RuleError,
+    load,
+    load_file,
+    scan,
+)
+from agentforensics.rules import testing as rule_testing
+from agentforensics.rules.conditions import ConditionError, parse
+from agentforensics.rules.select import SelectorError, check, flatten, resolve
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+RULES_DIR = REPO_ROOT / "rules"
+
+
+@pytest.fixture(scope="module")
+def rules() -> list[Rule]:
+    return load(RULES_DIR)
+
+
+def _samples() -> list[tuple[str, str, Rule, Any]]:
+    """Every (rule, sample) pair, for parametrization.
+
+    Collected at import time because pytest parametrization happens then. A rule directory
+    that will not load is therefore a collection error naming the file, which is what should
+    happen: a pack that cannot be loaded must not be reported as a pack with no failures.
+    """
+    out = []
+    for rule in load(RULES_DIR):
+        for test in rule.tests:
+            out.append((rule.id, test.name, rule, test))
+    return out
+
+
+SAMPLES = _samples()
+
+
+@pytest.mark.parametrize(
+    ("rule", "sample"),
+    [(rule, sample) for _, _, rule, sample in SAMPLES],
+    ids=[f"{rule_id}:{name}" for rule_id, name, _, _ in SAMPLES],
+)
+def test_a_rule_agrees_with_its_own_sample(rule: Rule, sample: Any) -> None:
+    """One case per sample, so a broken rule names itself and its sample."""
+    event = rule_testing.view(sample.event)
+    got = rule.matches(event)
+    assert got == sample.should_match, "\n".join(
+        [
+            f"{rule.id} sample {sample.name!r}: "
+            f"expected {'a match' if sample.should_match else 'no match'}, got the opposite",
+            f"condition: {rule.condition.describe()}",
+            f"the event as a rule sees it:\n{flatten(sample.event)}",
+        ]
+    )
+
+
+def test_every_sample_is_reachable() -> None:
+    """A sample whose event the rule does not even look at tests nothing.
+
+    Checked separately from the sample itself because such a sample can still pass: a
+    negative sample that the rule's scope excludes passes for the wrong reason, and would
+    keep passing if the condition were deleted.
+    """
+    unreachable = []
+    for rule_id, name, rule, sample in SAMPLES:
+        if not rule.applies_to(rule_testing.view(sample.event)):
+            unreachable.append(f"{rule_id}: {name}")
+    assert not unreachable, (
+        "these samples are outside their rule's own applies_to, so the rule never looks at "
+        "them and a negative sample among them passes for the wrong reason: "
+        f"{unreachable}"
+    )
+
+
+# ----------------------------------------------------------------- pack hygiene
+
+
+def test_every_rule_loads_and_the_ids_are_unique(rules: list[Rule]) -> None:
+    assert rules
+    ids = [rule.id for rule in rules]
+    assert len(ids) == len(set(ids))
+    assert ids == sorted(ids), "load() has to return a stable order, so two reports compare"
+
+
+def test_every_rule_names_a_pack_this_suite_ships(rules: list[Rule]) -> None:
+    for rule in rules:
+        assert rule.pack in PACKS
+        assert rule.path.parent.name == rule.pack
+
+
+def test_there_is_no_organization_scope_pack() -> None:
+    """ADR 0010. The strings such rules need are exactly the strings a public repository
+    must not carry, and the question they answer is a data loss prevention question rather
+    than a question about what an agent did."""
+    assert "org_scope" not in PACKS
+    assert not (RULES_DIR / "org_scope").exists()
+
+
+def test_no_rule_id_carries_the_superseded_acronym(rules: list[Rule]) -> None:
+    """ADR 0002 keeps the brief's working name out of the repository, and a rule id is the
+    string that ends up quoted in somebody's report."""
+    for rule in rules:
+        assert rule.id.startswith("AFX-")
+
+
+def test_every_rule_explains_why_an_analyst_cares(rules: list[Rule]) -> None:
+    """The field that decides whether a rule is worth shipping. A rule nobody can explain
+    the point of gets ignored, and a pack whose rules get ignored is worse than no pack."""
+    for rule in rules:
+        assert len(rule.rationale) >= 40, f"{rule.id} has a rationale of {len(rule.rationale)}"
+        assert rule.rationale != rule.description
+
+
+def test_a_severe_rule_says_what_it_fires_on_wrongly(rules: list[Rule]) -> None:
+    """A high or critical rule interrupts somebody, so it has to have had its false
+    positives thought about. An empty list would be a claim that there are none."""
+    for rule in rules:
+        if rule.severity in ("high", "critical"):
+            assert rule.false_positives, f"{rule.id} is {rule.severity} and lists none"
+
+
+def test_every_severity_is_one_of_the_five(rules: list[Rule]) -> None:
+    for rule in rules:
+        assert rule.severity in SEVERITIES
+
+
+def test_a_secrets_rule_never_quotes_what_it_matched(rules: list[Rule]) -> None:
+    """The matched value there is the credential. A finding is exported to CSV and pasted
+    into reports, so quoting it would spread the credential rather than report it."""
+    for rule in rules:
+        if rule.pack == "secrets":
+            assert rule.redact, f"{rule.id} matches credentials and does not redact them"
+
+
+def test_every_rule_file_hashes_to_something_stable(rules: list[Rule]) -> None:
+    """A finding carries the hash of the rule text that produced it, so a rule edited after
+    a scan leaves findings that can still be reproduced against the right text."""
+    for rule in rules:
+        assert len(rule.sha256) == 64
+        assert load_file(rule.path, pack=rule.pack).sha256 == rule.sha256
+
+
+# ------------------------------------------------------- the loader refuses things
+
+
+def write(tmp_path: Path, pack: str, name: str, body: str) -> Path:
+    directory = tmp_path / pack
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / name
+    path.write_text(body, encoding="utf-8")
+    return path
+
+
+MINIMAL = """
+id: AFX-SECRETS-900
+pack: secrets
+title: A rule used by the loader tests
+severity: low
+description: Long enough to satisfy the schema's minimum length for a description.
+rationale: Long enough to satisfy the schema's minimum length for a rationale field.
+redact: true
+match:
+  field: text
+  contains: needle
+tests:
+  - name: the needle
+    match: true
+    event: {payload: {text: needle}}
+  - name: no needle
+    match: false
+    event: {payload: {text: hay}}
+"""
+
+
+def test_the_minimal_rule_the_other_tests_build_on_loads(tmp_path: Path) -> None:
+    path = write(tmp_path, "secrets", "AFX-SECRETS-900.yaml", MINIMAL)
+    rule = load_file(path, pack="secrets")
+    assert rule.id == "AFX-SECRETS-900"
+    assert not rule_testing.run(rule)
+
+
+def test_a_rule_with_only_positive_tests_is_refused(tmp_path: Path) -> None:
+    """The failure that matters is a rule that fires on everything, and such a rule passes
+    every positive test it has."""
+    body = MINIMAL.replace(
+        """  - name: no needle
+    match: false
+    event: {payload: {text: hay}}""",
+        """  - name: another needle
+    match: true
+    event: {payload: {text: needle two}}""",
+    )
+    path = write(tmp_path, "secrets", "AFX-SECRETS-901.yaml", body.replace("900", "901"))
+    with pytest.raises(RuleError, match="should not match"):
+        load_file(path, pack="secrets")
+
+
+def test_a_rule_with_no_positive_test_is_refused(tmp_path: Path) -> None:
+    body = MINIMAL.replace(
+        """  - name: the needle
+    match: true
+    event: {payload: {text: needle}}""",
+        """  - name: also no needle
+    match: false
+    event: {payload: {text: straw}}""",
+    )
+    path = write(tmp_path, "secrets", "AFX-SECRETS-902.yaml", body.replace("900", "902"))
+    with pytest.raises(RuleError, match="should ever match"):
+        load_file(path, pack="secrets")
+
+
+def test_a_misspelled_field_is_refused_at_load_time(tmp_path: Path) -> None:
+    """Rather than a rule that runs and never fires. A rule that silently matches nothing
+    is the worst outcome available: it looks like a clean case."""
+    body = MINIMAL.replace("field: text", "field: payloadd.text").replace("900", "903")
+    path = write(tmp_path, "secrets", "AFX-SECRETS-903.yaml", body)
+    with pytest.raises(RuleError, match="not something an event can be asked for"):
+        load_file(path, pack="secrets")
+
+
+def test_a_regex_that_does_not_compile_is_refused_at_load_time(tmp_path: Path) -> None:
+    body = MINIMAL.replace("contains: needle", "regex: '[unclosed'").replace("900", "904")
+    path = write(tmp_path, "secrets", "AFX-SECRETS-904.yaml", body)
+    with pytest.raises(RuleError):
+        load_file(path, pack="secrets")
+
+
+def test_an_id_that_disagrees_with_its_pack_is_refused(tmp_path: Path) -> None:
+    """The id's middle segment names its pack, so an id quoted in a report says where to
+    look without anybody holding a mapping in their head."""
+    body = MINIMAL.replace("AFX-SECRETS-900", "AFX-SUPPLYCHAIN-900")
+    path = write(tmp_path, "secrets", "AFX-SUPPLYCHAIN-900.yaml", body)
+    with pytest.raises(RuleError, match="middle"):
+        load_file(path, pack="secrets")
+
+
+def test_a_rule_in_the_wrong_directory_is_refused(tmp_path: Path) -> None:
+    path = write(tmp_path, "anti_forensics", "AFX-SECRETS-900.yaml", MINIMAL)
+    with pytest.raises(RuleError, match="directory decides"):
+        load_file(path, pack="anti_forensics")
+
+
+def test_a_directory_that_is_not_a_pack_is_refused(tmp_path: Path) -> None:
+    """Rather than ignored. A rule pack somebody added and nobody ran is worse than none."""
+    write(tmp_path, "my_rules", "AFX-SECRETS-900.yaml", MINIMAL)
+    with pytest.raises(RuleError, match="not a known pack"):
+        load(tmp_path)
+
+
+def test_two_rules_may_not_share_an_id(tmp_path: Path) -> None:
+    write(tmp_path, "secrets", "a.yaml", MINIMAL)
+    write(tmp_path, "secrets", "b.yaml", MINIMAL)
+    with pytest.raises(RuleError, match="already used by"):
+        load(tmp_path)
+
+
+def test_a_test_that_states_a_field_no_event_has_is_refused() -> None:
+    """A test that set a payload key at the top level would otherwise pass while testing
+    nothing, and a rule whose tests test nothing looks covered."""
+    with pytest.raises(rule_testing.TestEventError, match="which an event does not have"):
+        rule_testing.view({"command": "rm -rf /"})
+
+
+# ------------------------------------------------------------ the condition language
+
+
+def event(**fields: Any) -> Any:
+    return rule_testing.view(fields)
+
+
+def cond(node: Any) -> Any:
+    return parse(node)
+
+
+def test_a_selector_resolves_to_every_value_it_names() -> None:
+    """The property that removes the class of rule that only checks the first element."""
+    view = event(payload={"commands": [{"command": "a"}, {"command": "b"}, {"command": "c"}]})
+    assert resolve(view, "payload.commands[].command") == ["a", "b", "c"]
+    assert cond({"field": "payload.commands[].command", "equals": "c"}).matches(view)
+
+
+def test_an_absent_field_resolves_to_nothing_rather_than_none() -> None:
+    view = event(payload={})
+    assert resolve(view, "payload.nope") == []
+    assert cond({"field": "payload.nope", "exists": False}).matches(view)
+    assert not cond({"field": "payload.nope", "exists": True}).matches(view)
+
+
+def test_a_group_condition_holds_exactly_one_operator() -> None:
+    with pytest.raises(ConditionError, match="exactly one of all, any or none"):
+        cond({"all": [{"field": "kind", "equals": "a"}], "any": [{"field": "kind", "equals": "b"}]})
+
+
+def test_none_is_the_negation_the_language_has() -> None:
+    """Not a general not: a bare negation over a field that resolves to a list has two
+    defensible meanings, and a detection language should not have one of those."""
+    view = event(payload={"commands": [{"command": "git push origin main"}]})
+    condition = cond(
+        {
+            "all": [
+                {"field": "payload.commands[].command", "contains": "git push"},
+                {"none": [{"field": "payload.commands[].command", "contains": "--dry-run"}]},
+            ]
+        }
+    )
+    assert condition.matches(view)
+    dry = event(payload={"commands": [{"command": "git push --dry-run origin main"}]})
+    assert not condition.matches(dry)
+
+
+def test_a_leaf_needs_exactly_one_operator() -> None:
+    with pytest.raises(ConditionError, match="exactly one operator"):
+        cond({"field": "text", "contains": "a", "equals": "b"})
+    with pytest.raises(ConditionError, match="exactly one operator"):
+        cond({"field": "text"})
+
+
+def test_an_unknown_key_in_a_leaf_is_refused() -> None:
+    """Rather than ignored, because a misspelled operator would be a condition with no
+    test in it, and a leaf with no test matches nothing."""
+    with pytest.raises(ConditionError, match="unknown key"):
+        cond({"field": "text", "containss": "a"})
+
+
+def test_contains_ignores_case_and_regex_does_not() -> None:
+    """A silent (?i) on a hand-written pattern would change what it matches, so the pattern
+    says so itself."""
+    view = event(payload={"text": "DROP TABLE users"})
+    assert cond({"field": "text", "contains": "drop table"}).matches(view)
+    assert not cond({"field": "text", "regex": "drop table"}).matches(view)
+    assert cond({"field": "text", "regex": "(?i)drop table"}).matches(view)
+
+
+def test_a_glob_stops_at_a_separator_unless_it_says_otherwise() -> None:
+    """fnmatch's * crosses separators, which would make a rule that says .ssh/* match
+    .ssh/a/b/c, and nobody could reason about such a rule.
+
+    A pattern is anchored at both ends, so a single * is exactly one segment. The
+    distinction this pins is between one level under a directory and any depth under it,
+    which is the difference between "a key file in .ssh" and "anything in .ssh at all".
+    """
+    shallow = event(payload={"files": [{"path": "/home/alice/.ssh/id_ed25519"}]})
+    deep = event(payload={"files": [{"path": "/home/alice/.ssh/keys/old/id_rsa"}]})
+    one_level = cond({"field": "payload.files[].path", "glob": "**/.ssh/*"})
+    assert one_level.matches(shallow)
+    assert not one_level.matches(deep)
+    any_depth = cond({"field": "payload.files[].path", "glob": "**/.ssh/**"})
+    assert any_depth.matches(shallow)
+    assert any_depth.matches(deep)
+    # A single leading * really is one segment, which is what makes the two distinct.
+    assert not cond({"field": "payload.files[].path", "glob": "*/.ssh/*"}).matches(shallow)
+
+
+def test_a_glob_matches_either_separator() -> None:
+    """So one rule covers both platforms."""
+    windows = event(payload={"files": [{"path": "C:\\Users\\alice\\.ssh\\id_rsa"}]})
+    assert cond({"field": "payload.files[].path", "glob": "**/.ssh/**"}).matches(windows)
+
+
+def test_a_numeric_comparison_ignores_a_value_that_is_not_a_number() -> None:
+    assert cond({"field": "payload.n", "gt": 5}).matches(event(payload={"n": 6}))
+    assert cond({"field": "payload.n", "gt": 5}).matches(event(payload={"n": "6"}))
+    assert not cond({"field": "payload.n", "gt": 5}).matches(event(payload={"n": "six"}))
+
+
+def test_count_gte_counts_values_rather_than_testing_one() -> None:
+    many = event(payload={"files": [{"path": f"/a/{n}"} for n in range(25)]})
+    few = event(payload={"files": [{"path": "/a/1"}]})
+    condition = cond({"field": "payload.files[].path", "count_gte": 20})
+    assert condition.matches(many)
+    assert not condition.matches(few)
+
+
+def test_length_measures_a_string_or_a_list() -> None:
+    assert cond({"field": "text", "length_gt": 10}).matches(event(payload={"text": "x" * 11}))
+    assert not cond({"field": "text", "length_gt": 10}).matches(event(payload={"text": "x"}))
+
+
+# ------------------------------------------------------------- the whole-record text
+
+
+def test_whole_record_text_is_not_json() -> None:
+    """The first implementation rendered JSON, and the rule tests caught it: JSON escapes
+    the quotes inside a string, so a pattern written for AUTH_TOKEN = "value" stopped
+    matching once the string was nested. A pattern that depends on the serialisation of the
+    thing it searches breaks on the next producer."""
+    rendered = flatten({"text": 'AUTH_TOKEN = "abcd1234"'})
+    assert '\\"' not in rendered
+    assert 'AUTH_TOKEN = "abcd1234"' in rendered
+
+
+def test_a_field_name_and_its_value_read_as_an_assignment() -> None:
+    """Which is what makes one pattern cover a credential in a command line and the same
+    credential stored as a field."""
+    assert "password = s3cr3t" in flatten({"password": "s3cr3t"})
+
+
+def test_whole_record_text_reaches_a_field_nobody_mapped() -> None:
+    """The reason the secrets pack searches it. A credential can sit in any field of any
+    record, including one no parser understood."""
+    view = event(payload={}, raw={"a_field_nobody_maps": "AKIAIOSFODNN7EXAMPLE"})
+    assert cond({"field": "event_text", "regex": r"\bAKIA[0-9A-Z]{16}\b"}).matches(view)
+
+
+def test_a_raw_record_that_is_a_string_is_still_searched() -> None:
+    """Which is the shape a line that did not decode arrives in."""
+    view = event(kind="unparsed.record", raw='{"truncated": "AKIAIOSFODNN7EXAMPLE')
+    assert cond({"field": "event_text", "regex": r"\bAKIA[0-9A-Z]{16}\b"}).matches(view)
+
+
+def test_check_refuses_a_provenance_field_that_does_not_exist() -> None:
+    check("provenance.original_path")
+    with pytest.raises(SelectorError, match="provenance has no field"):
+        check("provenance.nope")
+
+
+# ----------------------------------------------------------------------- the engine
+
+
+def ingested(tmp_path: Path) -> Case:
+    """A tiny case with three events, built by hand.
+
+    By hand rather than from the fixture profile, because these tests are about the engine
+    and a case whose contents can change under them would make a failure here ambiguous.
+    """
+    from agentforensics.model import BundleRecord
+    from agentforensics.model.event import Event, Provenance
+
+    case = Case.open(tmp_path / "case.sqlite")
+    case.add_bundle(BundleRecord(bundle_uuid="b1", source_kind="directory", source_path="/x"))
+
+    def make(index: int, command: str, ts: str | None) -> Event:
+        return Event(
+            kind="command.exec",
+            provenance=Provenance(
+                "b1", "/home/alice/.claude/history.jsonl", "aa", None, f"line:{index}"
+            ),
+            agent="claude_code",
+            raw={"command": command},
+            ts_utc=ts,
+            ts_precision="second" if ts else "absent",
+            ts_source="timestamp" if ts else None,
+            actor="assistant",
+            user="alice",
+            session_id="s1",
+            payload={"commands": [{"command": command}]},
+        )
+
+    case.add_events(
+        [
+            make(1, "rm -rf ~/.claude/projects", "2026-09-06T09:00:00Z"),
+            make(2, "npm ci", "2026-09-06T09:00:10Z"),
+            make(3, "claude --dangerously-skip-permissions", None),
+        ]
+    )
+    return case
+
+
+def test_a_scan_records_itself_even_when_it_finds_nothing(tmp_path: Path) -> None:
+    """Without that record, a case with no findings and a case nobody scanned look the
+    same, and those are opposite conclusions."""
+    quiet = write(
+        tmp_path / "rules",
+        "secrets",
+        "AFX-SECRETS-905.yaml",
+        MINIMAL.replace("900", "905").replace("contains: needle", "contains: nothinghere"),
+    )
+    # The rule's own positive test still has to pass, so the needle moves rather than going
+    # away: this is about the scan finding nothing in the case, not about a broken rule.
+    quiet.write_text(
+        quiet.read_text(encoding="utf-8").replace(
+            "event: {payload: {text: needle}}", "event: {payload: {text: nothinghere}}"
+        ),
+        encoding="utf-8",
+    )
+    rules = load(tmp_path / "rules")
+    with ingested(tmp_path) as case:
+        report = scan(case, rules)
+        assert not report.findings
+        assert report.silent == ["AFX-SECRETS-905"]
+        runs = case.query("SELECT rules_run, findings, rule_ids FROM scan_runs")
+        assert len(runs) == 1
+        assert runs[0]["rules_run"] == 1
+        assert runs[0]["findings"] == 0
+        assert "AFX-SECRETS-905" in runs[0]["rule_ids"]
+
+
+def test_a_finding_links_to_the_events_it_rests_on(tmp_path: Path, rules: list[Rule]) -> None:
+    with ingested(tmp_path) as case:
+        report = scan(case, rules)
+        assert report.findings
+        for finding in report.findings:
+            assert finding.event_ids
+            rows = case.query(
+                "SELECT event_id FROM finding_events WHERE finding_id = ?", (finding.finding_id,)
+            )
+            assert {row["event_id"] for row in rows} == set(finding.event_ids)
+
+
+def test_re_scanning_a_case_does_not_double_its_findings(tmp_path: Path, rules: list[Rule]) -> None:
+    """A finding is keyed by the rule and the evidence, so the same evidence and the same
+    rule always produce the same row. Re-scanning after a rule is fixed is what an analyst
+    does, and the counts have to survive it."""
+    with ingested(tmp_path) as case:
+        first = scan(case, rules)
+        before = case.query("SELECT count(*) AS n FROM findings")[0]["n"]
+        scan(case, rules)
+        after = case.query("SELECT count(*) AS n FROM findings")[0]["n"]
+        assert before == after == len(first.findings)
+
+
+def test_a_finding_says_what_matched(tmp_path: Path, rules: list[Rule]) -> None:
+    """A finding that only named a rule would be something an analyst has to take on
+    trust, and nothing in this tool is meant to be taken on trust."""
+    with ingested(tmp_path) as case:
+        report = scan(case, rules, store=False)
+        bypass = next(f for f in report.findings if f.rule.id == "AFX-PERMISSIONBYPASS-001")
+        quoted = " ".join(str(v) for v in bypass.matched.values())
+        assert "dangerously-skip-permissions" in quoted
+
+
+def test_a_redacted_rule_does_not_put_the_secret_in_the_finding(tmp_path: Path) -> None:
+    """The matched value there is the credential, and a finding is exported to CSV and
+    pasted into reports."""
+    from agentforensics.model import BundleRecord
+    from agentforensics.model.event import Event, Provenance
+
+    case = Case.open(tmp_path / "secret.sqlite")
+    case.add_bundle(BundleRecord(bundle_uuid="b1", source_kind="directory", source_path="/x"))
+    case.add_events(
+        [
+            Event(
+                kind="user.prompt",
+                provenance=Provenance("b1", "/p", "aa", None, "line:1"),
+                agent="claude_code",
+                raw={"text": "use AKIAIOSFODNN7EXAMPLE"},
+                actor="user",
+                payload={"text": "use AKIAIOSFODNN7EXAMPLE"},
+            )
+        ]
+    )
+    rules = [r for r in load(RULES_DIR) if r.id == "AFX-SECRETS-001"]
+    report = scan(case, rules, store=False)
+    case.close()
+    assert len(report.findings) == 1
+    text = str(report.findings[0].matched) + report.findings[0].summary
+    assert "AKIAIOSFODNN7EXAMPLE" not in text
+    assert "redacted" in text
+
+
+def test_an_aggregate_rule_fires_once_per_group(tmp_path: Path) -> None:
+    """A burst is one finding over many events, not many findings. A rule that reported the
+    twentieth member of a burst would be reporting the wrong thing."""
+    body = """
+id: AFX-DATAVOLUME-900
+pack: data_volume
+title: A rule used by the aggregate engine tests
+severity: low
+description: Fires when several matching commands appear in one session, for the tests.
+rationale: Long enough to satisfy the schema, and it exists only to exercise aggregation.
+applies_to:
+  kinds: [command.exec]
+match:
+  field: payload.commands[].command
+  exists: true
+aggregate:
+  group_by: [session_id]
+  min_count: 2
+tests:
+  - name: a command
+    match: true
+    event: {kind: command.exec, payload: {commands: [{command: ls}]}}
+  - name: no command
+    match: false
+    event: {kind: command.exec, payload: {}}
+"""
+    write(tmp_path / "rules", "data_volume", "AFX-DATAVOLUME-900.yaml", body)
+    rules = load(tmp_path / "rules")
+    with ingested(tmp_path) as case:
+        report = scan(case, rules, store=False)
+        assert len(report.findings) == 1, "three commands in one session are one finding"
+        assert len(report.findings[0].event_ids) == 3
+
+
+def test_an_aggregate_window_does_not_fold_undated_events_in(tmp_path: Path) -> None:
+    """Their position is unknown, and a burst assembled out of events that might not have
+    been close together would be a finding built on a guess."""
+    body = """
+id: AFX-DATAVOLUME-901
+pack: data_volume
+title: A windowed rule used by the aggregate engine tests
+severity: low
+description: Fires when several matching commands appear close together, for the tests.
+rationale: Long enough to satisfy the schema, and it exists only to exercise windowing.
+applies_to:
+  kinds: [command.exec]
+match:
+  field: payload.commands[].command
+  exists: true
+aggregate:
+  group_by: [session_id]
+  min_count: 2
+  window_minutes: 1
+tests:
+  - name: a command
+    match: true
+    event: {kind: command.exec, payload: {commands: [{command: ls}]}}
+  - name: no command
+    match: false
+    event: {kind: command.exec, payload: {}}
+"""
+    write(tmp_path / "rules", "data_volume", "AFX-DATAVOLUME-901.yaml", body)
+    rules = load(tmp_path / "rules")
+    with ingested(tmp_path) as case:
+        report = scan(case, rules, store=False)
+        # The two dated events are ten seconds apart, so they are one window. The undated
+        # one is on its own and never reaches min_count, so it produces no finding.
+        assert len(report.findings) == 1
+        assert len(report.findings[0].event_ids) == 2
+
+
+def test_the_scan_reports_events_no_rule_looked_at(tmp_path: Path) -> None:
+    """A large number there is a gap in the pack rather than a clean case, and it is the
+    number a pack's author should read first."""
+    body = MINIMAL.replace("900", "906").replace(
+        "match:\n  field: text\n  contains: needle",
+        "applies_to:\n  kinds: [mcp.call]\nmatch:\n  field: text\n  contains: needle",
+    )
+    body = body.replace(
+        "event: {payload: {text: needle}}", "event: {kind: mcp.call, payload: {text: needle}}"
+    ).replace("event: {payload: {text: hay}}", "event: {kind: mcp.call, payload: {text: hay}}")
+    write(tmp_path / "rules", "secrets", "AFX-SECRETS-906.yaml", body)
+    rules = load(tmp_path / "rules")
+    with ingested(tmp_path) as case:
+        report = scan(case, rules, store=False)
+        assert report.events_read == 3
+        assert report.events_no_rule_applied == 3
+
+
+def test_findings_are_ordered_by_severity(tmp_path: Path, rules: list[Rule]) -> None:
+    """So two scans of one case produce comparable reports, and the thing that should
+    interrupt somebody is at the top."""
+    with ingested(tmp_path) as case:
+        report = scan(case, rules, store=False)
+        ranks = [finding.severity_rank for finding in report.findings]
+        assert ranks == sorted(ranks)
+
+
+def test_no_rule_file_carries_key_material(rules: list[Rule]) -> None:
+    """The secrets pack is about credentials, so its files hold the shapes it matches.
+
+    A PEM header is one of those shapes, and it is why `detect-private-key` is excluded for
+    this directory in the pre-commit configuration. This is the check that makes the
+    exclusion narrow rather than a hole: a header with nothing after it is a pattern, and a
+    header followed by a long run of base64 is a key somebody pasted in.
+
+    The same applies to the other shapes the pack matches. A sample is allowed to look like
+    a credential, which is the point of it, and the loader's own honesty rule is that a
+    sample's value has to be an example rather than a live one. What can be checked
+    mechanically is the length: nothing in a rule file needs a 100-character opaque string.
+    """
+    import re
+
+    body = re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----[^\n]*\n?[A-Za-z0-9+/=]{60,}")
+    long_opaque = re.compile(r"\b[A-Za-z0-9+/=_-]{100,}\b")
+    for rule in rules:
+        text = rule.path.read_text(encoding="utf-8")
+        assert not body.search(text), (
+            f"{rule.path} carries a PEM header followed by key material. A rule sample "
+            "needs the header, which is what its pattern matches, and never a body."
+        )
+        found = long_opaque.findall(text)
+        assert not found, (
+            f"{rule.path} carries an opaque string of {len(found[0])} characters. Nothing "
+            "in a rule file needs one, and a credential long enough to be real does not "
+            "belong in a repository."
+        )

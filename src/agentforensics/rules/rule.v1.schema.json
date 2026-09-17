@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/luckylucab0/AI-Forensic-Suite/src/agentforensics/rules/rule.v1.schema.json",
+  "title": "A detection rule, version 1",
+  "description": "One YAML file per rule. A rule is data: it names fields and operators and carries its own tests. There is no expression to evaluate and no code to run, which is what lets a pack be reviewed by an analyst who will never read the engine.",
+  "type": "object",
+  "required": ["id", "pack", "title", "severity", "description", "rationale", "match", "tests"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "description": "AFX-<PACK>-<nnn>. This is what a report cites, so it is stable: a rule whose meaning changes gets a new id rather than a new definition under the old one.",
+      "type": "string",
+      "pattern": "^AFX-[A-Z][A-Z0-9_]*-[0-9]{3}$"
+    },
+    "pack": {
+      "description": "Which pack this rule belongs to, and therefore which directory it sits in. The two have to agree.",
+      "type": "string",
+      "enum": [
+        "anti_forensics",
+        "dangerous_commands",
+        "data_volume",
+        "exfil_indicators",
+        "permission_bypass",
+        "prompt_injection",
+        "secrets",
+        "sensitive_paths",
+        "supply_chain",
+        "third_party_endpoints"
+      ]
+    },
+    "title": {
+      "description": "One line, in the words a finding will be read in. Not a restatement of the condition: what happened, not what matched.",
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 120
+    },
+    "severity": {
+      "description": "How much this should interrupt an analyst. critical is reserved for something that is almost never benign; a rule whose false-positive list is long does not get to be high.",
+      "type": "string",
+      "enum": ["info", "low", "medium", "high", "critical"]
+    },
+    "description": { "description": "What the rule looks for, in prose.", "type": "string", "minLength": 20 },
+    "rationale": {
+      "description": "Why an analyst cares. Required, and the field that decides whether a rule is worth shipping: a rule nobody can explain the point of will be ignored, and a pack whose rules get ignored is worse than no pack.",
+      "type": "string",
+      "minLength": 20
+    },
+    "applies_to": {
+      "description": "Which events the rule is even shown. Narrowing here is what keeps a pack cheap to run over a large case, and it is also documentation: a rule about a command should say so.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "agents": {
+          "description": "Catalogue agent names, or [any].",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "kinds": {
+          "description": "Event kinds from the unified format, or [any].",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        }
+      }
+    },
+    "match": { "$ref": "#/$defs/condition" },
+    "aggregate": {
+      "description": "Present when the rule fires on a count rather than on one event. Such a rule produces one finding per group, so the finding is about the burst rather than about its last member.",
+      "type": "object",
+      "required": ["group_by", "min_count"],
+      "additionalProperties": false,
+      "properties": {
+        "group_by": {
+          "description": "Event fields to group by, for example [session_id] or [session_id, agent].",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "min_count": {
+          "description": "How many matching events a group needs before the rule fires.",
+          "type": "integer",
+          "minimum": 2
+        },
+        "window_minutes": {
+          "description": "Optional. When set, the count has to be reached inside a sliding window of this many minutes, so a rule about a burst does not fire on the same number of events spread over a week. Events with no timestamp are counted in a group of their own, never folded into a window they might not belong to.",
+          "type": ["integer", "null"],
+          "minimum": 1
+        }
+      }
+    },
+    "redact": {
+      "description": "When true, a finding names what matched without quoting it. Used by the secrets pack: the matched value there is the credential itself, and a finding is exported to CSV and pasted into reports, so quoting it would spread the credential rather than report it. The event still holds the original, which is where an analyst looks.",
+      "type": "boolean"
+    },
+    "tags": {
+      "description": "MITRE ATT&CK technique ids where one fits honestly, and free-form labels otherwise. A technique id that only nearly fits is worse than none: it lands in a report as a claim about attacker behaviour.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 2 }
+    },
+    "false_positives": {
+      "description": "The benign cases this rule is known to fire on, in the words an analyst would recognise them by. A rule with an empty list is claiming there are none, which is rarely true and is worth having had to think about.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 10 }
+    },
+    "references": {
+      "description": "URLs, preferably the vendor documentation that says the thing this rule looks for exists.",
+      "type": "array",
+      "items": { "type": "string", "format": "uri" }
+    },
+    "tests": {
+      "description": "The rule's own tests, which pytest runs. At least one of each direction is required by the loader: a rule with only positive tests is a rule nobody can trust, because a rule that fires on everything passes them all.",
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["name", "match", "event"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "description": "What this sample is, in a few words.", "type": "string", "minLength": 4 },
+          "match": { "description": "Whether the rule should fire on it.", "type": "boolean" },
+          "event": {
+            "description": "A partial event. Anything left out is filled in with a neutral default, so a test states only what it is about.",
+            "type": "object"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "condition": {
+      "description": "A condition is either a group (exactly one of all, any, none, holding more conditions) or a leaf (one field and exactly one operator). There is no general negation: the useful shape is always 'and none of these apply', and a bare not over a field that resolves to a list has two defensible meanings.",
+      "type": "object",
+      "minProperties": 1,
+      "oneOf": [
+        {
+          "required": ["all"],
+          "additionalProperties": false,
+          "properties": { "all": { "$ref": "#/$defs/conditions" } }
+        },
+        {
+          "required": ["any"],
+          "additionalProperties": false,
+          "properties": { "any": { "$ref": "#/$defs/conditions" } }
+        },
+        {
+          "required": ["none"],
+          "additionalProperties": false,
+          "properties": { "none": { "$ref": "#/$defs/conditions" } }
+        },
+        { "$ref": "#/$defs/leaf" }
+      ]
+    },
+    "conditions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/condition" }
+    },
+    "leaf": {
+      "type": "object",
+      "required": ["field"],
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "description": "What to look at. An event field by name, a path under payload., raw. or provenance., or one of the whole-record text views: raw_text, payload_text, event_text. A path segment ending in [] fans out over a list, so files[].path over four files gives four paths and the condition holds when any of them satisfies it.",
+          "type": "string",
+          "minLength": 1
+        },
+        "regex": { "type": "string" },
+        "regex_any": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "contains": { "type": "string" },
+        "contains_any": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "equals": { "type": "string" },
+        "equals_any": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "glob": {
+          "description": "A path pattern. * stops at a separator and ** crosses them, unlike fnmatch, so a rule that says ~/.ssh/* does not match ~/.ssh/a/b/c. Either separator matches either, so one rule covers both platforms.",
+          "type": "string"
+        },
+        "glob_any": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "startswith": { "type": "string" },
+        "startswith_any": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "endswith": { "type": "string" },
+        "endswith_any": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "gt": { "type": "number" },
+        "gte": { "type": "number" },
+        "lt": { "type": "number" },
+        "lte": { "type": "number" },
+        "length_gt": { "description": "Characters for a string, elements for a list.", "type": "integer", "minimum": 0 },
+        "length_gte": { "type": "integer", "minimum": 0 },
+        "length_lt": { "type": "integer", "minimum": 0 },
+        "count_gte": {
+          "description": "How many values the field resolved to, rather than what any one of them is. For 'this event touched at least twenty files'.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "exists": {
+          "description": "Whether the field resolved to anything at all. false is a real condition, not a special case: an absent field resolves to an empty list.",
+          "type": "boolean"
+        },
+        "ignore_case": {
+          "description": "Defaults to true for contains, equals, startswith and endswith, and to false for regex, where the pattern says so itself with (?i). A silent (?i) on a hand-written pattern would change what it matches.",
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

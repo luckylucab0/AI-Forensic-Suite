@@ -30,6 +30,10 @@ from agentforensics.exporters import FORMATS
 from agentforensics.exporters import render as render_collection_rules
 from agentforensics.ingest import ingest as ingest_source
 from agentforensics.model import Case, CaseError
+from agentforensics.rules import RuleError, ScanReport
+from agentforensics.rules import load as load_rules
+from agentforensics.rules import scan as run_scan
+from agentforensics.rules import testing as rule_testing
 from agentforensics.timeline import FORMATS as TIMELINE_FORMATS
 from agentforensics.timeline import Filters, header_notes
 from agentforensics.timeline import write as write_timeline
@@ -45,7 +49,6 @@ EXIT_NOTHING_FOUND = 3
 # rather than only the fragment that exists. A user can then tell a missing capability
 # apart from an undocumented one.
 _PLANNED = [
-    ("scan", "run the YAML rule packs against a case"),
     ("export", "export a case, including the viewer's event shape"),
     ("serve", "serve the local read-only API and the viewer on 127.0.0.1"),
 ]
@@ -475,6 +478,176 @@ def cmd_timeline(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_scan(args: argparse.Namespace) -> int:
+    """Run the rule packs over a case, and record what they found.
+
+    Every rule that ran is recorded whether or not it fired, because a case with no
+    findings and a case nobody scanned look identical otherwise, and those are opposite
+    conclusions. The same reason the collector records a glob it declined to search.
+
+    Re-running is safe: a finding is keyed by the rule and the events it rests on, so a
+    second scan of one case leaves it unchanged rather than doubling its findings. That is
+    what lets an analyst re-scan after a rule is fixed without wondering whether the counts
+    are now wrong.
+
+    --self-test runs each rule's own positive and negative samples and nothing else. It
+    reads no case and needs none, so an operator handed a rule pack can check it with the
+    same runner that checked it here.
+
+    The exit code says which of three things happened. A finding exits 1, because a scan
+    whose whole purpose is to find something should be distinguishable in a script from one
+    that found nothing. Nothing found exits 3. A case that could not be read exits 2.
+    """
+    try:
+        rules = load_rules(Path(args.rules) if args.rules else None, packs=args.pack)
+    except RuleError as exc:
+        _write(sys.stderr, f"scan: {exc}")
+        return EXIT_ERROR
+
+    if args.self_test:
+        problems: list[str] = []
+        for rule in rules:
+            problems.extend(rule_testing.run(rule))
+        samples = sum(len(rule.tests) for rule in rules)
+        _write(
+            sys.stdout,
+            f"scan: {len(rules)} rule(s), {samples} sample(s) from the rules' own files",
+        )
+        for line in problems:
+            _write(sys.stderr, f"scan: {line}")
+        if problems:
+            return EXIT_FINDING
+        _write(sys.stdout, "scan: every rule agrees with its own tests")
+        return EXIT_OK
+
+    if not args.case:
+        _write(sys.stderr, "scan: --case is required unless --self-test is given")
+        return EXIT_ERROR
+
+    try:
+        case = Case.open(Path(args.case), create=False)
+    except CaseError as exc:
+        _write(sys.stderr, f"scan: {exc}")
+        return EXIT_ERROR
+
+    try:
+        report = run_scan(case, rules, store=not args.no_store)
+    except (OSError, CaseError) as exc:
+        _write(sys.stderr, f"scan: {exc}")
+        return EXIT_ERROR
+    finally:
+        case.close()
+
+    if args.out:
+        try:
+            _write_findings(report, Path(args.out), args.format)
+        except OSError as exc:
+            _write(sys.stderr, f"scan: {exc}")
+            return EXIT_ERROR
+
+    if args.json:
+        _write(sys.stdout, json.dumps(_scan_json(report), indent=2, sort_keys=True))
+    else:
+        _write(sys.stdout, report.summary())
+        for finding in report.findings:
+            _write(sys.stdout, f"  [{finding.rule.severity}] {finding.rule.id} {finding.summary}")
+
+    if not report.findings:
+        return EXIT_NOTHING_FOUND
+    return EXIT_FINDING
+
+
+def _scan_json(report: ScanReport) -> dict[str, object]:
+    return {
+        "run_id": report.run_id,
+        "started_utc": report.started_utc,
+        "finished_utc": report.finished_utc,
+        "events_read": report.events_read,
+        "rules_run": report.rules_run,
+        "by_severity": report.by_severity(),
+        # Named, not counted. A rule that ran and matched nothing is what makes an empty
+        # result a statement rather than an absence.
+        "rules_that_matched_nothing": report.silent,
+        "events_no_rule_applied": report.events_no_rule_applied,
+        "findings": [
+            {
+                "finding_id": finding.finding_id,
+                "rule_id": finding.rule.id,
+                "pack": finding.rule.pack,
+                "severity": finding.rule.severity,
+                "title": finding.rule.title,
+                "ts_utc": finding.ts_utc,
+                "agent": finding.agent,
+                "user": finding.user,
+                "session_id": finding.session_id,
+                "summary": finding.summary,
+                "matched": finding.matched,
+                "event_ids": list(finding.event_ids),
+                "rule_sha256": finding.rule.sha256,
+            }
+            for finding in report.findings
+        ],
+    }
+
+
+def _write_findings(report: ScanReport, destination: Path, fmt: str) -> None:
+    """Write the findings to a file, as JSON or as CSV.
+
+    CSV because a findings list gets opened in a spreadsheet and sorted by severity more
+    often than it gets parsed, and JSON because the same list gets fed to a ticketing
+    system. Both carry the event ids, so a row in either can be taken back to the evidence.
+    """
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if fmt == "json":
+        destination.write_text(
+            json.dumps(_scan_json(report), indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        return
+
+    import csv
+
+    columns = [
+        "finding_id",
+        "severity",
+        "rule_id",
+        "pack",
+        "title",
+        "ts_utc",
+        "agent",
+        "user",
+        "session_id",
+        "summary",
+        "matched",
+        "event_count",
+        "event_ids",
+        "rule_sha256",
+    ]
+    # newline="" because csv writes its own terminator, and so that two platforms produce
+    # the same bytes: a findings export gets hashed and attached to a report.
+    with destination.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(columns)
+        for finding in report.findings:
+            writer.writerow(
+                [
+                    finding.finding_id,
+                    finding.rule.severity,
+                    finding.rule.id,
+                    finding.rule.pack,
+                    finding.rule.title,
+                    finding.ts_utc or "",
+                    finding.agent or "",
+                    finding.user or "",
+                    finding.session_id or "",
+                    finding.summary,
+                    json.dumps(finding.matched, sort_keys=True, ensure_ascii=False),
+                    len(finding.event_ids),
+                    " ".join(finding.event_ids),
+                    finding.rule.sha256,
+                ]
+            )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="agentforensics",
@@ -575,6 +748,43 @@ def build_parser() -> argparse.ArgumentParser:
     case.add_argument("--case", required=True, help="case database")
     case.add_argument("--json", action="store_true")
     case.set_defaults(func=cmd_case)
+
+    scan = sub.add_parser(
+        "scan",
+        help="run the YAML rule packs over a case",
+        description=cmd_scan.__doc__,
+    )
+    scan.add_argument("--case", help="case database to scan. Not needed with --self-test.")
+    scan.add_argument(
+        "--rules",
+        help="rule directory. Defaults to rules/ next to the working directory.",
+    )
+    scan.add_argument(
+        "--pack",
+        action="append",
+        help="only this pack, repeatable. Default: every pack in the directory.",
+    )
+    scan.add_argument(
+        "--self-test",
+        action="store_true",
+        help="run each rule's own positive and negative samples and exit. Reads no case.",
+    )
+    scan.add_argument("--out", help="write the findings to this file as well")
+    scan.add_argument(
+        "--format",
+        choices=("csv", "json"),
+        default="csv",
+        help="format for --out. Default csv, because a findings list is sorted in a "
+        "spreadsheet more often than it is parsed.",
+    )
+    scan.add_argument(
+        "--no-store",
+        action="store_true",
+        help="do not write the findings into the case. For trying a rule out against a "
+        "case somebody else will read later.",
+    )
+    scan.add_argument("--json", action="store_true", help="machine-readable report on stdout")
+    scan.set_defaults(func=cmd_scan)
 
     timeline = sub.add_parser(
         "timeline",

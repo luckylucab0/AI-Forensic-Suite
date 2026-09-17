@@ -1,0 +1,63 @@
+id: AFX-ANTIFORENSICS-003
+pack: anti_forensics
+title: An agent's own state was purged with its purge command
+severity: critical
+description: >
+  A command line runs an agent's own command for removing its stored state for a project.
+  Claude Code spells this claude project purge, which the vendor documents as removing that
+  project's state.
+rationale: >
+  This is the one action in this pack that destroys evidence on purpose and says so in its
+  own name. The reason it is worth a critical rather than a high is that the purge is
+  incomplete in a way the vendor documents: the agent's configuration backups, its startup
+  shell snapshots and its session markers are explicitly left alone because they are not
+  project-scoped. So a purge both establishes intent and tells an analyst exactly which
+  directories are still worth reading, which is the most productive kind of finding this
+  tool can produce.
+applies_to:
+  kinds: [command.exec, prompt.history]
+match:
+  field: event_text
+  regex_any:
+    - '\bclaude\s+project\s+purge\b'
+    - '\bcodex\s+(?:session|history)\s+(?:purge|clear|delete)\b'
+tags:
+  - T1070
+  - T1485
+  - deliberate-destruction
+false_positives:
+  - >-
+    A purge run for a legitimate reason, such as removing a customer's data from a
+    developer machine at the end of an engagement. Intent is not what this rule reads.
+  - >-
+    The command quoted in a runbook or a cleanup script rather than run, which matches
+    because the text on disk is what is searched.
+references:
+  - https://code.claude.com/docs/en/claude-directory
+tests:
+  - name: the purge command in a shell history
+    match: true
+    event:
+      kind: prompt.history
+      agent: crosscutting
+      payload: {text: "claude project purge --all"}
+  - name: the purge command run by the agent itself
+    match: true
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "claude project purge"}]
+  - name: an ordinary project command
+    match: false
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "claude project list"}]
+  - name: somebody asking about purging rather than purging
+    match: false
+    event:
+      kind: prompt.history
+      agent: claude_code
+      payload: {text: "what does project purge remove"}

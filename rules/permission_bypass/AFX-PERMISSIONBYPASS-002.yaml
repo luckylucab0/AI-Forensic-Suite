@@ -1,0 +1,62 @@
+id: AFX-PERMISSIONBYPASS-002
+pack: permission_bypass
+title: The approval mode was changed mid-session to one that stops asking
+severity: high
+description: >
+  A permission.change event records the agent's approval mode moving to one that
+  auto-approves tool calls. For Claude Code the vendor documents acceptEdits, auto and
+  bypassPermissions as modes that do not prompt for the calls they cover.
+rationale: >
+  A mode set at startup is a decision about the whole session. A mode changed part way
+  through is a decision about what comes next, which makes the moment it changed the thing
+  to read the transcript around: what was the agent about to do, and who decided it should
+  not be asked about. This is the half of the bypass question a flag on a command line
+  cannot answer.
+applies_to:
+  kinds: [permission.change]
+match:
+  field: payload.permissions[].mode
+  equals_any: [bypassPermissions, acceptEdits, auto, dontAsk]
+tags:
+  - T1562.001
+  - permission-bypass
+false_positives:
+  - >-
+    acceptEdits is a routine choice for a developer working in a scratch repository, and
+    on its own says little. Read it together with what the agent did next.
+  - >-
+    dontAsk auto-denies rather than auto-approves, so it appears here because it stops the
+    prompting rather than because it widens what is allowed. It is in the list because a
+    session that stopped asking is a session whose transcript reads differently, in either
+    direction.
+references:
+  - https://code.claude.com/docs/en/permissions
+tests:
+  - name: a change to the mode that skips every prompt
+    match: true
+    event:
+      kind: permission.change
+      agent: claude_code
+      payload:
+        permissions: [{mode: bypassPermissions, previous: default, scope: session}]
+  - name: a change to accepting edits
+    match: true
+    event:
+      kind: permission.change
+      agent: claude_code
+      payload:
+        permissions: [{mode: acceptEdits, previous: default, scope: session}]
+  - name: a change back to prompting
+    match: false
+    event:
+      kind: permission.change
+      agent: claude_code
+      payload:
+        permissions: [{mode: default, previous: acceptEdits, scope: session}]
+  - name: a change into plan mode, which does not edit
+    match: false
+    event:
+      kind: permission.change
+      agent: claude_code
+      payload:
+        permissions: [{mode: plan, previous: default, scope: session}]

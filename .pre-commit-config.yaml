@@ -28,6 +28,16 @@ repos:
       - id: trailing-whitespace
         exclude: '\.md$'
       - id: detect-private-key
+        # The secrets rule pack is about private keys, so its rule files legitimately
+        # carry the PEM header this hook matches on, as the sample its regex is tested
+        # against. The hook matches the header alone, which is the right heuristic
+        # everywhere else and a guaranteed false positive here.
+        #
+        # The exclusion is narrow and it is not a hole: what would actually matter in a
+        # rule file is key material, and a test in tests/unit/test_rules.py refuses a rule
+        # whose sample carries a PEM body rather than just the header. A header with
+        # nothing after it is not a key.
+        exclude: '^rules/secrets/.*\.yaml$'
 
   # Pinned to the ruff version in uv.lock, which is what CI runs. The two formatters
   # disagreeing is not a cosmetic problem: the hook rewrites a file, CI rejects what the

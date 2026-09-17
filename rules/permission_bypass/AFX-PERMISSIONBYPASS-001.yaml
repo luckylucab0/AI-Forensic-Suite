@@ -1,0 +1,67 @@
+id: AFX-PERMISSIONBYPASS-001
+pack: permission_bypass
+title: The agent was started with permission prompts skipped
+severity: high
+description: >
+  A command line starts an agent with the flag that skips permission prompts, or with the
+  permission mode that does the same. For Claude Code these are
+  --dangerously-skip-permissions and --permission-mode bypassPermissions, which the vendor
+  documents as equivalent.
+rationale: >
+  This is the single clearest answer to the question whether safety controls were bypassed,
+  because it is not a control that failed, it is a control somebody turned off and had to
+  type a word like dangerously to turn off. In this mode the agent writes without asking,
+  including to the paths the vendor protects by default such as the repository's own git
+  directory and the agent's own configuration, so anything found afterwards has to be read
+  knowing that nobody was asked.
+applies_to:
+  kinds: [command.exec, config.snapshot, prompt.history]
+match:
+  any:
+    - field: event_text
+      regex: '--dangerously-skip-permissions'
+    - field: event_text
+      regex: '--permission-mode[= ]+bypassPermissions'
+tags:
+  - T1562.001
+  - permission-bypass
+false_positives:
+  - >-
+    A deliberate use inside a container or a virtual machine, which is what the vendor
+    documentation recommends the mode for. The finding is still correct; whether it was
+    appropriate depends on where the agent was running.
+  - >-
+    Documentation, a README or a script that mentions the flag without running it, which
+    matches because the text is what is on disk.
+references:
+  - https://code.claude.com/docs/en/cli-reference
+  - https://code.claude.com/docs/en/permissions
+tests:
+  - name: the flag on a command line
+    match: true
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "claude --dangerously-skip-permissions -p 'fix the build'"}]
+  - name: the equivalent permission mode
+    match: true
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "claude --permission-mode bypassPermissions"}]
+  - name: a mode that does not skip prompts
+    match: false
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "claude --permission-mode plan"}]
+  - name: an ordinary invocation
+    match: false
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "claude -p 'fix the build'"}]
