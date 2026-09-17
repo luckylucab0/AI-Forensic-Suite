@@ -1,0 +1,19 @@
+AI Agent Forensic Suite
+Copyright (c) 2026 The AI Agent Forensic Suite contributors
+
+Licensed under the Elastic License 2.0. See LICENSE for the full terms, which are
+what govern; this file only points at the parts a fork has to act on.
+
+  - Under Limitations, you may not alter, remove or obscure any licensing,
+    copyright or other notices. This file is such a notice, so a fork keeps it,
+    which is how the original work stays credited.
+  - Under Notices, anyone who gets a copy of any part of this software from you
+    also has to get a copy of the license terms, and a modified copy has to carry
+    prominent notices saying that you modified it.
+  - Under Limitations, you may not provide this software to third parties as a
+    hosted or managed service that gives users access to a substantial set of its
+    features. Using it yourself, including in paid work, is not what that forbids.
+
+Versions published before 2026-09-17 were released under the MIT License. That
+grant was given and is not withdrawn: anyone who obtained those versions keeps it
+for them. The Elastic License 2.0 governs this version and later ones.

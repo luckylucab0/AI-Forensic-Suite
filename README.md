@@ -226,4 +226,11 @@ pseudonymization, and a shell fallback collector.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+[Elastic License 2.0](LICENSE). Use it, read it, change it and fork it, including in paid
+work. What it forbids is providing the software to third parties as a hosted or managed
+service that gives them a substantial set of its features, removing or obscuring the
+licensing and copyright notices, and shipping a modified copy without saying it is
+modified. See [NOTICE](NOTICE) for the short version of what a fork has to do.
+
+This is not an OSI-approved open source licence. Versions published before 2026-09-17 were
+released under the MIT License, and that grant stands for those versions.

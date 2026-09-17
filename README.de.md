@@ -250,4 +250,13 @@ Pseudonymisierung, und ein Shell-Kollektor als Rückfallebene.
 
 ## Lizenz
 
-MIT, siehe [LICENSE](LICENSE).
+[Elastic License 2.0](LICENSE). Benutzen, lesen, ändern und forken ist erlaubt, auch in
+bezahlter Arbeit. Verboten ist, die Software Dritten als gehosteten oder betreuten Dienst
+mit einem wesentlichen Teil ihrer Funktionen bereitzustellen, die Lizenz- und
+Urhebervermerke zu entfernen oder zu verdecken, und eine geänderte Kopie weiterzugeben,
+ohne die Änderung deutlich zu kennzeichnen. [NOTICE](NOTICE) sagt in Kurzform, was ein
+Fork tun muss.
+
+Das ist keine von der OSI anerkannte Open-Source-Lizenz. Versionen, die vor dem
+17.09.2026 veröffentlicht wurden, standen unter der MIT-Lizenz, und diese Erlaubnis gilt
+für jene Versionen weiter.

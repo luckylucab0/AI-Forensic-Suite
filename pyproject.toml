@@ -4,8 +4,11 @@ version = "0.1.0"
 description = "Offline forensic suite for the on-disk history of AI coding agents on endpoints"
 readme = "README.md"
 requires-python = ">=3.11"
-license = "MIT"
-license-files = ["LICENSE"]
+# Not an OSI-approved open source licence, deliberately. Use it, change it, fork it, and
+# use it in paid work; what it forbids is offering it to third parties as a hosted or
+# managed service and removing the notices. See LICENSE and NOTICE.
+license = "Elastic-2.0"
+license-files = ["LICENSE", "NOTICE"]
 # No author names on purpose. See docs/adr/0008-opsec-guard-and-fresh-history.md: package
 # metadata is published to an index and is one of the places an identity leaks without
 # anyone noticing.
@@ -15,7 +18,6 @@ classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",
   "Intended Audience :: Information Technology",
-  "License :: OSI Approved :: MIT License",
   "Operating System :: MacOS",
   "Operating System :: Microsoft :: Windows",
   "Operating System :: POSIX :: Linux",
@@ -83,6 +85,7 @@ include = [
   "tests/",
   "README.md",
   "LICENSE",
+  "NOTICE",
 ]
 
 [tool.ruff]
