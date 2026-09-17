@@ -147,10 +147,10 @@ thing the viewer writes anywhere is your theme choice, in `localStorage`.
 
 | Phase | Content | State |
 | --- | --- | --- |
-| 0 | Repository hygiene, sanitized viewer, tooling, CI, OpSec guard | in progress |
-| 1 | Artifact catalogue, both collectors, evidence bundle format, `verify`, synthetic fixtures | in progress |
-| 2 | Collection rules generated for Velociraptor, KAPE, Defender live response, KQL, osquery | planned |
-| 3 | Analyzer core: ingest adapters, per-agent parsers, unified event model, SQLite case database, timeline exports | planned |
+| 0 | Repository hygiene, sanitized viewer, tooling, CI, OpSec guard | done |
+| 1 | Artifact catalogue, both collectors, evidence bundle format, `verify`, synthetic fixtures | done |
+| 2 | Collection rules generated for Velociraptor, KAPE, Defender live response, KQL, osquery | done |
+| 3 | Analyzer core: ingest adapters, per-agent parsers, unified event model, SQLite case database, unified log format, timeline exports | in progress |
 | 4 | Declarative YAML rule engine and the starter rule packs | planned |
 | 5 | Local web UI: read-only API, viewer API source, timeline and findings views | planned |
 
@@ -165,6 +165,9 @@ pseudonymization, and a shell fallback collector.
 - [docs/ARTIFACTS.md](docs/ARTIFACTS.md), the generated artifact reference, grouped by
   how fast each artifact disappears
 - [docs/BUNDLE_FORMAT.md](docs/BUNDLE_FORMAT.md), the evidence bundle format
+- [docs/UNIFIED_FORMAT.md](docs/UNIFIED_FORMAT.md), the vendor-neutral agent log: one
+  JSON Lines record per event, whichever agent left the evidence and whichever tool
+  read it
 - [docs/adr/](docs/adr/), one short record per architecture decision, with the reasoning
   and the cost each one accepts
 - [CONTRIBUTING.md](CONTRIBUTING.md), how to work in this repository, including the OpSec

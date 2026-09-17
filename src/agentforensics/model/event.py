@@ -45,6 +45,15 @@ EVENT_KINDS = (
     "network.request",
     "mcp.call",
     "permission.decision",
+    # A change to what the agent is allowed to do, as opposed to a single decision under
+    # the rules in force. Separate because the two answer different questions: one is what
+    # happened to a request, the other is who moved the goalposts and when.
+    "permission.change",
+    # The model declining a request on safety grounds. Only some agents record it, so its
+    # absence is never evidence that nothing was refused. Kept distinct from a permission
+    # denial: a denial is the harness saying no, a refusal is the model saying no, and an
+    # analyst asking whether controls were bypassed needs to tell them apart.
+    "safety.refusal",
     "config.snapshot",
     "memory.write",
     "plan.write",

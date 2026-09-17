@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from agentforensics.ingest.ingest import IngestReport, ingest
+from agentforensics.ingest.ingest import EntryEvents, IngestReport, events_for, ingest, open_source
 from agentforensics.ingest.match import Match, Matcher
 from agentforensics.ingest.native import NativeBundle
 from agentforensics.ingest.source import Attribution, Gap, Source, SourceEntry
@@ -53,6 +53,7 @@ def _safe_iterdir(path: Path) -> list[Path]:
 __all__ = [
     "Attribution",
     "CollectedTree",
+    "EntryEvents",
     "Gap",
     "IngestReport",
     "Match",
@@ -61,5 +62,7 @@ __all__ = [
     "Source",
     "SourceEntry",
     "detect",
+    "events_for",
     "ingest",
+    "open_source",
 ]

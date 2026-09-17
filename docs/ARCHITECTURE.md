@@ -108,6 +108,8 @@ it cannot be rewritten *quietly*.
   catalogue about what a file is. A file with no parser is recorded as unsupported
   rather than skipped.
 - `model/` the unified event model and the SQLite case schema
+- `unified/` the event model on the wire: the JSON Lines format and its schema, plus
+  the normalizer that turns a collection into one log without building a case
 - `timeline/` timeline construction and exports (CSV, JSONL, Timesketch JSONL)
 - `rules/` the declarative YAML rule engine
 - `exporters/` the collection-rule generators, one module per target format
@@ -132,8 +134,15 @@ does not double a case, and a finding from last week still points at the same ev
 Event kinds are deliberately agent-neutral: `session.start`, `session.end`, `user.prompt`,
 `assistant.text`, `assistant.thinking`, `tool.call`, `tool.result`, `file.read`,
 `file.write`, `file.snapshot`, `command.exec`, `network.request`, `mcp.call`,
-`permission.decision`, `config.snapshot`, `memory.write`, `plan.write`, `prompt.history`
-and `artifact.fs`.
+`permission.decision`, `permission.change`, `safety.refusal`, `config.snapshot`,
+`memory.write`, `plan.write`, `prompt.history` and `artifact.fs`.
+
+Three of those are worth a sentence. `permission.decision` is one request answered under the
+rules in force, and `permission.change` is a change to the rules themselves: the bypass
+question needs both, because one says what happened to a request and the other says who
+moved the goalposts and when. `safety.refusal` is the model declining, which is not the same
+as the harness denying a permission, and only some agents record it, so its absence is never
+evidence that nothing was refused.
 
 `artifact.fs` is the one that needs explaining: it carries the filesystem timestamps of an
 artifact file itself. Some artifacts have no internal timestamps at all, and for those the
@@ -150,6 +159,24 @@ frequency, are one indexed query rather than a scan over JSON payloads.
 The identity columns point at `users` and `hosts` tables rather than holding names
 directly. That indirection is there now so that pseudonymization later is a feature and not
 a rewrite.
+
+### The unified log
+
+The same event model, serialized as JSON Lines, one event per record, defined by
+`src/agentforensics/unified/agentlog.v1.schema.json`. `docs/UNIFIED_FORMAT.md` is the
+reference; ADR 0018 records why it is the event model on the wire rather than a second
+model.
+
+It exists because three consumers need agent history in a form that is not a case database:
+a fleet collection that returns many hosts at once, a collection tool that normalizes on the
+endpoint and returns only the parsed result, and the viewer, which runs in a browser with no
+server. Every record stands alone and carries its own version, so two logs concatenate into
+a valid third one and a producer that emits rows rather than files can write the format
+directly.
+
+`afx normalize <source>` produces it through the same adapters and parsers as `afx ingest`,
+which is what stops the two paths from reading a file differently. A test asserts that a log
+and a case built from one source hold exactly the same events.
 
 ### The rule engine
 

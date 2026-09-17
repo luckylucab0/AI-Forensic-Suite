@@ -115,6 +115,8 @@ ist, dass das nicht *unbemerkt* geht.
   damit ein Parser dem Katalog nie widersprechen kann. Eine Datei ohne Parser wird als
   nicht unterstützt festgehalten, nicht übersprungen.
 - `model/` das einheitliche Ereignismodell und das SQLite-Fallschema
+- `unified/` das Ereignismodell als Datenstrom: das JSON-Lines-Format und sein Schema,
+  dazu der Normalisierer, der eine Sammlung ohne Falldatenbank in ein Log überführt
 - `timeline/` Aufbau der Zeitachse und Exporte (CSV, JSONL, Timesketch-JSONL)
 - `rules/` die deklarative YAML-Regel-Engine
 - `exporters/` die Generatoren für Sammelregeln, ein Modul pro Zielformat
@@ -142,8 +144,16 @@ weiterhin auf dasselbe Ereignis.
 Die Ereignisarten sind absichtlich agentenneutral: `session.start`, `session.end`,
 `user.prompt`, `assistant.text`, `assistant.thinking`, `tool.call`, `tool.result`,
 `file.read`, `file.write`, `file.snapshot`, `command.exec`, `network.request`, `mcp.call`,
-`permission.decision`, `config.snapshot`, `memory.write`, `plan.write`, `prompt.history`
-und `artifact.fs`.
+`permission.decision`, `permission.change`, `safety.refusal`, `config.snapshot`,
+`memory.write`, `plan.write`, `prompt.history` und `artifact.fs`.
+
+Drei davon verdienen einen Satz. `permission.decision` ist eine Anfrage, entschieden nach
+den geltenden Regeln, und `permission.change` ist eine Änderung der Regeln selbst: die
+Umgehungsfrage braucht beide, denn das eine sagt, was mit einer Anfrage passiert ist, und
+das andere, wer die Torpfosten verschoben hat und wann. `safety.refusal` ist das Modell, das
+ablehnt, und das ist nicht dasselbe wie eine von der Umgebung verweigerte Berechtigung. Nur
+manche Agenten halten es fest, sein Fehlen ist also nie ein Beweis, dass nichts abgelehnt
+wurde.
 
 `artifact.fs` braucht eine Erklärung: diese Art trägt die Dateisystem-Zeitstempel der
 Artefaktdatei selbst. Manche Artefakte enthalten überhaupt keine eigenen Zeitstempel, und
@@ -162,6 +172,26 @@ JSON-Feldern.
 Die Identitätsspalten zeigen auf Tabellen `users` und `hosts` statt Namen direkt zu halten.
 Diese Indirektion ist jetzt schon da, damit Pseudonymisierung später eine Funktion ist und
 kein Neubau.
+
+### Das vereinheitlichte Log
+
+Dasselbe Ereignismodell, serialisiert als JSON Lines, ein Ereignis pro Datensatz, definiert
+durch `src/agentforensics/unified/agentlog.v1.schema.json`. `docs/UNIFIED_FORMAT.de.md` ist
+die Referenz; ADR 0018 hält fest, warum es das Ereignismodell als Datenstrom ist und kein
+zweites Modell.
+
+Es existiert, weil drei Konsumenten die Agentenhistorie in einer Form brauchen, die keine
+Falldatenbank ist: eine Flottensammlung, die viele Hosts auf einmal zurückgibt, ein
+Sammelwerkzeug, das auf dem Endpunkt normalisiert und nur das geparste Ergebnis
+zurückliefert, und der Viewer, der im Browser ohne Server läuft. Jeder Datensatz steht für
+sich und trägt seine eigene Version, deshalb lassen sich zwei Logs zu einem gültigen dritten
+aneinanderhängen, und ein Produzent, der Zeilen statt Dateien ausgibt, kann das Format
+direkt schreiben.
+
+`afx normalize <quelle>` erzeugt es über dieselben Adapter und Parser wie `afx ingest`, und
+genau das verhindert, dass die beiden Pfade eine Datei unterschiedlich lesen. Ein Test
+prüft, dass ein Log und ein aus derselben Quelle gebauter Fall genau dieselben Ereignisse
+enthalten.
 
 ### Die Regel-Engine
 

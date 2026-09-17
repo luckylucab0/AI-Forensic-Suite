@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/luckylucab0/AI-Forensic-Suite/src/agentforensics/unified/agentlog.v1.schema.json",
+  "title": "AI agent unified log, version 1",
+  "description": "One record per line of a JSON Lines stream. Every line stands on its own: there is no file header and no ordering requirement, so two logs concatenate into a valid third one and a row-based producer such as a Velociraptor query can emit the format directly. Whatever produced a record, the record says which agent it came from, where on the endpoint it was read, and what the original text was.",
+  "type": "object",
+  "required": ["v", "agent", "kind", "ts_precision", "actor", "payload", "provenance", "raw"],
+  "properties": {
+    "v": {
+      "description": "Format version. Present on every record rather than once per file, because a producer that emits rows has nowhere to put a header, and because a concatenation of two logs has to stay readable.",
+      "type": "integer",
+      "const": 1
+    },
+    "agent": {
+      "description": "Which agent produced the evidence, as the artifact catalogue names it. Required on every record with no default: an event whose agent is unknown is worth less than no event, because it cannot be attributed and will be counted anyway.",
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "description": "What happened, in agent-neutral terms. The closed vocabulary is what makes one query work across every agent.",
+      "type": "string",
+      "enum": [
+        "session.start",
+        "session.end",
+        "user.prompt",
+        "assistant.text",
+        "assistant.thinking",
+        "tool.call",
+        "tool.result",
+        "file.read",
+        "file.write",
+        "file.snapshot",
+        "command.exec",
+        "network.request",
+        "mcp.call",
+        "permission.decision",
+        "permission.change",
+        "safety.refusal",
+        "config.snapshot",
+        "memory.write",
+        "plan.write",
+        "prompt.history",
+        "artifact.fs",
+        "unparsed.record"
+      ]
+    },
+    "event_id": {
+      "description": "Optional. Derived from provenance and kind, so a consumer can recompute it and does not have to trust it. A reader that finds a mismatch reports it rather than correcting it silently: the disagreement is itself evidence about the producer.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "ts_utc": {
+      "description": "UTC, ISO 8601. Null when the record carried no time of its own. Null is the honest answer: neither the ingest time nor the file's mtime may be presented as the event's own.",
+      "type": ["string", "null"]
+    },
+    "ts_precision": {
+      "description": "How much of the timestamp is real. Ordering two events inside one minute is meaningless if both are minute-precise, and an analyst has to be able to see that before relying on the order.",
+      "type": "string",
+      "enum": ["exact", "second", "minute", "hour", "day", "filesystem", "absent"]
+    },
+    "ts_source": {
+      "description": "Which field or which filesystem timestamp the time came from. This is how an analyst tells the agent's own clock from the filesystem's, and only one of the two is evidence of when the agent acted.",
+      "type": ["string", "null"]
+    },
+    "actor": {
+      "type": "string",
+      "enum": ["user", "assistant", "tool", "system", "unknown"]
+    },
+    "client": {
+      "description": "Which surface the agent ran on: a CLI, an IDE extension, a desktop app, an SDK, CI.",
+      "type": ["string", "null"]
+    },
+    "host": { "type": ["string", "null"] },
+    "user": { "type": ["string", "null"] },
+    "session_id": { "type": ["string", "null"] },
+    "project_path": {
+      "description": "The working directory the agent acted in.",
+      "type": ["string", "null"]
+    },
+    "git_branch": { "type": ["string", "null"] },
+    "payload": {
+      "description": "What happened, in fields a query can reach. Additional keys are allowed on purpose: an agent-specific field that nobody has mapped yet belongs here rather than nowhere. The keys below are the shared vocabulary, and a producer that uses them makes its records queryable alongside every other agent's.",
+      "type": "object",
+      "properties": {
+        "text": {
+          "description": "The event as text: a prompt, a turn, a reasoning summary, a tool result body. Never shortened. A truncated prompt reads as a short prompt.",
+          "type": ["string", "null"]
+        },
+        "tool": { "description": "The tool's name as the agent spells it.", "type": ["string", "null"] },
+        "tool_use_id": {
+          "description": "The agent's own call identifier, which is what joins a call to its result.",
+          "type": ["string", "null"]
+        },
+        "input": { "description": "A tool call's arguments, verbatim." },
+        "output": { "description": "A tool call's output, verbatim." },
+        "is_error": { "type": ["boolean", "null"] },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": { "type": "string" },
+              "operation": { "type": "string", "enum": ["read", "write", "delete", "snapshot", "unknown"] },
+              "bytes": { "type": ["integer", "null"] }
+            },
+            "required": ["path"]
+          }
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "command": { "type": "string" },
+              "executable": { "type": ["string", "null"] },
+              "cwd": { "type": ["string", "null"] },
+              "exit_code": { "type": ["integer", "null"] }
+            },
+            "required": ["command"]
+          }
+        },
+        "network": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "host": { "type": "string" },
+              "url": { "type": ["string", "null"] },
+              "method": { "type": ["string", "null"] }
+            },
+            "required": ["host"]
+          }
+        },
+        "mcp": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "server": { "type": "string" },
+              "tool": { "type": ["string", "null"] }
+            },
+            "required": ["server"]
+          }
+        },
+        "models": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "model": { "type": "string" },
+              "input_tokens": { "type": ["integer", "null"] },
+              "output_tokens": { "type": ["integer", "null"] },
+              "cost": { "type": ["number", "null"] }
+            },
+            "required": ["model"]
+          }
+        },
+        "permissions": {
+          "description": "What the agent was allowed to do, and whether anybody said yes. Used by permission.decision for one answered request and by permission.change for a change to the rules themselves.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "mode": { "description": "The agent's own name for its approval mode.", "type": ["string", "null"] },
+              "decision": { "description": "What was decided. Deliberately not a closed list: the shared vocabulary is allow, deny, always_allow, ask and unknown, and an agent whose records use a different word keeps that word rather than being coerced into one of ours. Coercion here would destroy the distinction an analyst is looking for, and a consumer that needs a normalized answer reads the case database's permission facet, which does map.", "type": ["string", "null"] },
+              "subject": { "description": "The tool or command the decision was about.", "type": ["string", "null"] },
+              "previous": { "description": "What the setting was before, where the record says.", "type": ["string", "null"] },
+              "scope": { "type": ["string", "null"], "enum": ["managed", "user", "project", "local", "session", "unknown", null] }
+            }
+          }
+        },
+        "instructions": {
+          "description": "Which instruction files were in effect. The injected-instruction question is answered by joining this against the content the collection carried.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": { "type": "string" },
+              "scope": { "type": ["string", "null"], "enum": ["managed", "user", "project", "local", "session", "unknown", null] }
+            },
+            "required": ["path"]
+          }
+        },
+        "refusal": {
+          "description": "Used by safety.refusal: the agent's own category for the refusal, where it records one.",
+          "type": ["string", "null"]
+        },
+        "subagent": { "type": ["string", "null"] }
+      }
+    },
+    "parse_problem": {
+      "description": "Set when the producer could not read the record, or read it only in part. Never a reason to drop the record: the record is emitted with this field filled in, and the original stays in raw.",
+      "type": ["string", "null"]
+    },
+    "provenance": {
+      "description": "Where this came from, precisely enough to go back and look. Every field answers a question a report will be challenged on.",
+      "type": "object",
+      "required": ["bundle_uuid", "original_path", "sha256"],
+      "properties": {
+        "bundle_uuid": {
+          "description": "Which collection this came from. A producer that is not a bundle uses a stable identifier for the run, so that two collections from one host stay apart.",
+          "type": "string"
+        },
+        "original_path": {
+          "description": "The absolute path on the endpoint, not the path inside a collection. This is what an analyst goes back to.",
+          "type": "string"
+        },
+        "sha256": {
+          "description": "The source file's hash, so it can be shown to be the file that was read. Empty string only where the producer genuinely could not hash it, which is itself worth recording.",
+          "type": "string"
+        },
+        "artifact_id": {
+          "description": "The catalogue entry that claimed the path, which is how a finding is traced back to the entry that predicted the location.",
+          "type": ["string", "null"]
+        },
+        "locator": {
+          "description": "Where in the file: a line number, a byte offset, or a table and row id. Text, because those are three different things and an integer would lose which one it is.",
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "raw": {
+      "description": "The original record, verbatim. Required, and not redundancy: it is the guarantee that a mapping mistake costs interpretation and not evidence. A producer that cannot keep the parsed original keeps the source text as a string."
+    },
+    "producer": {
+      "description": "What normalized this record, name and version. A Velociraptor collection and this suite's own analyzer will not always agree, and an analyst needs to know which one read the file.",
+      "type": ["string", "null"]
+    }
+  },
+  "additionalProperties": false
+}

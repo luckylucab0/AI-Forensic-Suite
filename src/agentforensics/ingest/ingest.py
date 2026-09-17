@@ -78,6 +78,54 @@ class IngestReport:
         return "\n".join(lines)
 
 
+@dataclass(frozen=True)
+class EntryEvents:
+    """Everything reading one collected file produced.
+
+    Public because two callers need it: the ingest that writes a case, and the normalizer
+    that writes a unified log without one. Sharing this rather than duplicating the loop is
+    what stops the two paths from reading the same file differently, which would show up as
+    a case and a log that disagree with no way to tell which is right.
+    """
+
+    events: list[Event]
+    # How many of the events came from a parser rather than from the filesystem. Counted
+    # separately because "records read out of this file" is a statement about the agent's
+    # own log, and the one artifact.fs event per file is not one of them.
+    parser_events: int
+    unparsed_records: int
+    parser: str | None
+    detail: str | None
+
+    @property
+    def status(self) -> str:
+        """How the file read, in the words the case and the report both use."""
+        if self.parser is None:
+            return "unsupported"
+        if self.detail:
+            return "failed"
+        return "parsed"
+
+
+def events_for(bundle_uuid: str, entry: SourceEntry) -> EntryEvents:
+    """Read one collected file: its filesystem event, then whatever a parser makes of it.
+
+    The filesystem event comes first and comes always. For an artifact with no internal
+    timestamps it is the only temporal evidence there is, and a file no parser understands
+    still has to appear on a timeline.
+    """
+    events = list(_filesystem_events(bundle_uuid, entry))
+    parsed, unreadable, parser_name, detail = _parse(bundle_uuid, entry)
+    events.extend(parsed)
+    return EntryEvents(
+        events=events,
+        parser_events=len(parsed),
+        unparsed_records=unreadable,
+        parser=parser_name,
+        detail=detail,
+    )
+
+
 def open_source(path: Path, catalogue: Catalogue, kind: str | None = None) -> Source:
     """The adapter for a path.
 
@@ -125,32 +173,25 @@ def ingest(
                 if entry.collected:
                     report.unclaimed_paths.append(entry.original_path)
 
-            events = list(_filesystem_events(record.bundle_uuid, entry))
-            parsed, unreadable, parser_name, detail = _parse(record.bundle_uuid, entry)
-            events.extend(parsed)
-            report.events += case.add_events(events)
-            report.parsed_records += len(parsed) - unreadable
-            report.unparsed_records += unreadable
+            read = events_for(record.bundle_uuid, entry)
+            report.events += case.add_events(read.events)
+            report.parsed_records += read.parser_events - read.unparsed_records
+            report.unparsed_records += read.unparsed_records
 
+            status, detail = read.status, read.detail
             if not entry.collected or entry.local_path is None:
                 status, detail = (
                     "skipped",
                     (detail or entry.reason or "the collection did not carry this file's content"),
                 )
-            elif parser_name is None:
-                status = "unsupported"
-            elif detail:
-                status = "failed"
-            else:
-                status = "parsed"
             case.set_parse_result(
                 record.bundle_uuid,
                 entry.original_path,
-                parser=parser_name,
+                parser=read.parser,
                 status=status,
                 detail=detail,
-                events=len(events),
-                unparsed_records=unreadable,
+                events=len(read.events),
+                unparsed_records=read.unparsed_records,
             )
 
         for gap in source.gaps():

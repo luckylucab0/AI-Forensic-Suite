@@ -330,12 +330,18 @@ def test_a_broken_line_does_not_stop_the_rest_of_the_file(tmp_path: Path) -> Non
 
 
 def test_a_permission_mode_change_is_recorded(tmp_path: Path) -> None:
-    """The record the question "were safety controls bypassed" turns on."""
+    """The record the question "were safety controls bypassed" turns on.
+
+    A change to the rules rather than a decision made under them. The distinction is the
+    whole point of the kind: one says what happened to a request, the other says who moved
+    the goalposts and when, and only the second one answers the bypass question.
+    """
     events = parse(
         transcript(tmp_path, [{**BASE, "type": "permission-mode", "mode": "acceptEdits"}])
     )
-    assert events[0].kind == "permission.decision"
+    assert events[0].kind == "permission.change"
     assert events[0].payload["permissions"][0]["mode"] == "acceptEdits"
+    assert events[0].payload["permissions"][0]["scope"] == "session"
 
 
 def test_the_prompt_history_is_parsed_from_its_own_artifact(tmp_path: Path) -> None:
@@ -701,3 +707,62 @@ def test_the_three_formats_the_viewer_knows_all_have_parsers() -> None:
         "copilot.session_event_log",
     ):
         assert for_artifact(artifact_id) is not None, artifact_id
+
+
+def test_a_refusal_is_its_own_event(tmp_path: Path) -> None:
+    """The model declining, as opposed to the harness denying a permission.
+
+    The API reports it as a stop reason on a normal 200 response, so nothing else in the
+    transcript marks the turn as refused. The question "was anything refused, and what"
+    has to be answerable without reading every assistant turn in a case.
+    """
+    events = parse(
+        transcript(
+            tmp_path,
+            [
+                {
+                    **BASE,
+                    "type": "assistant",
+                    "message": {
+                        "id": "msg_1",
+                        "role": "assistant",
+                        "model": "example-model",
+                        "stop_reason": "refusal",
+                        "stop_details": {"type": "example_policy"},
+                        "content": [{"type": "text", "text": "I cannot help with that."}],
+                    },
+                }
+            ],
+        )
+    )
+    refusals = [e for e in events if e.kind == "safety.refusal"]
+    assert len(refusals) == 1
+    assert refusals[0].payload["refusal"] == "example_policy"
+    assert "cannot help" in refusals[0].payload["text"]
+    assert any(e.kind == "assistant.text" for e in events), (
+        "the wording of a refusal is what tells manipulation apart from an ordinary "
+        "decline, so the turn is kept as well"
+    )
+
+
+def test_a_refusal_with_no_category_still_reads_as_a_refusal(tmp_path: Path) -> None:
+    """A null there would read as 'no refusal' to anything filtering on the field."""
+    events = parse(
+        transcript(
+            tmp_path,
+            [
+                {
+                    **BASE,
+                    "type": "assistant",
+                    "message": {
+                        "id": "msg_1",
+                        "role": "assistant",
+                        "stop_reason": "refusal",
+                        "content": [{"type": "text", "text": "no"}],
+                    },
+                }
+            ],
+        )
+    )
+    refusal = next(e for e in events if e.kind == "safety.refusal")
+    assert refusal.payload["refusal"] == "refusal"

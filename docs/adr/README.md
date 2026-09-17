@@ -25,3 +25,4 @@ Add one with the next free number, using [0000-template.md](0000-template.md).
 | [0015](0015-verified-means-the-vendor-said-so.md) | verified means the vendor said so, not that somebody wrote it down |
 | [0016](0016-one-sqlite-file-per-case.md) | One SQLite file per case, with every event keyed by its provenance |
 | [0017](0017-unattributed-evidence-is-a-finding.md) | A file the catalogue does not claim is a finding, not a non-event |
+| [0018](0018-one-unified-log-format.md) | One unified log format, and it is the event model on the wire |

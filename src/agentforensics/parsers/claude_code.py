@@ -144,15 +144,23 @@ class ClaudeCodeParser:
 
         if record_type == "permission-mode":
             # The agent's approval mode changing mid-session, which is the record the
-            # question "were safety controls bypassed" turns on.
+            # question "were safety controls bypassed" turns on. A change to the rules, not
+            # a decision made under them: the two answer different questions, and an
+            # analyst needs the one that says who moved the goalposts and when.
             yield Event(
-                kind="permission.decision",
+                kind="permission.change",
                 provenance=context.provenance(line.locator),
                 agent=self.name,
                 raw=record,
                 actor="user",
                 payload={
-                    "permissions": [{"mode": record.get("mode"), "decision": "mode_change"}],
+                    "permissions": [
+                        {
+                            "mode": record.get("mode"),
+                            "previous": record.get("previousMode"),
+                            "scope": "session",
+                        }
+                    ],
                     "mode": record.get("mode"),
                 },
                 parse_problem=note,
@@ -217,6 +225,42 @@ class ClaudeCodeParser:
         )
         blocks = content if isinstance(content, list) else [{"type": "text", "text": content}]
         emitted = False
+
+        # The model declining on safety grounds. The API reports it as a stop reason on the
+        # turn rather than as a content block, and it arrives as a normal 200 response, so
+        # nothing else in the transcript marks the turn as refused.
+        # Source: https://platform.claude.com/docs/en/api/handling-stop-reasons, which
+        # documents stop_reason "refusal" as "Claude declined to respond" and says the
+        # stop_details object identifies the policy category that triggered it.
+        #
+        # Its own event rather than a field on the turn, because the question an analyst
+        # asks is "was anything refused, and what", and that has to be answerable without
+        # reading every assistant turn in a case. The turn's text is emitted as well by the
+        # loop below: a refusal usually carries the wording, and the wording is what tells a
+        # manipulation attempt apart from an ordinary decline.
+        if message.get("stop_reason") == "refusal":
+            emitted = True
+            details = _mapping(message.get("stop_details"))
+            yield Event(
+                kind="safety.refusal",
+                provenance=context.provenance(f"{line.locator}#refusal"),
+                agent=self.name,
+                raw=record,
+                actor="assistant",
+                payload={
+                    # The vendor's own category where the record carries one. Falling back
+                    # to the bare stop reason rather than to null: an unclassified refusal
+                    # is still a refusal, and a null here would read as "no refusal" to
+                    # anything filtering on the field.
+                    "refusal": str(details.get("type") or details.get("category") or "refusal"),
+                    "stop_details": details or None,
+                    "text": text_of(content),
+                    "models": models,
+                    "message_id": message.get("id"),
+                },
+                parse_problem=note,
+                **common,
+            )
 
         for index, block in enumerate(blocks):
             if not isinstance(block, dict):

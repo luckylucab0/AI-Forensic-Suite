@@ -164,10 +164,10 @@ Einzige, was der Viewer irgendwo schreibt, ist die Themenwahl in `localStorage`.
 
 | Phase | Inhalt | Stand |
 | --- | --- | --- |
-| 0 | Repository-Hygiene, bereinigter Viewer, Werkzeugkette, CI, OpSec-Wächter | laufend |
-| 1 | Artefaktkatalog, beide Kollektoren, Bundle-Format, `verify`, synthetische Testdaten | laufend |
-| 2 | Generierte Sammelregeln für Velociraptor, KAPE, Defender Live Response, KQL, osquery | geplant |
-| 3 | Analyzer-Kern: Ingest-Adapter, Parser pro Agent, einheitliches Ereignismodell, SQLite-Falldatenbank, Timeline-Exporte | geplant |
+| 0 | Repository-Hygiene, bereinigter Viewer, Werkzeugkette, CI, OpSec-Wächter | fertig |
+| 1 | Artefaktkatalog, beide Kollektoren, Bundle-Format, `verify`, synthetische Testdaten | fertig |
+| 2 | Generierte Sammelregeln für Velociraptor, KAPE, Defender Live Response, KQL, osquery | fertig |
+| 3 | Analyzer-Kern: Ingest-Adapter, Parser pro Agent, einheitliches Ereignismodell, SQLite-Falldatenbank, vereinheitlichtes Logformat, Timeline-Exporte | laufend |
 | 4 | Deklarative YAML-Regel-Engine und die ersten Regelpakete | geplant |
 | 5 | Lokale Web-UI: nur lesende API, API-Quelle im Viewer, Timeline- und Fundansichten | geplant |
 
@@ -182,6 +182,9 @@ Pseudonymisierung, und ein Shell-Kollektor als Rückfallebene.
 - [docs/ARTIFACTS.de.md](docs/ARTIFACTS.de.md), die generierte Artefaktreferenz,
   gruppiert danach, wie schnell ein Artefakt verschwindet
 - [docs/BUNDLE_FORMAT.de.md](docs/BUNDLE_FORMAT.de.md), das Format des Beweismittel-Bundles
+- [docs/UNIFIED_FORMAT.de.md](docs/UNIFIED_FORMAT.de.md), das vendorneutrale Agenten-Log:
+  ein JSON-Lines-Datensatz pro Ereignis, egal welcher Agent die Spuren hinterlassen hat
+  und egal welches Werkzeug sie liest
 - [docs/adr/](docs/adr/), je ein kurzer Eintrag pro Architekturentscheidung, mit der
   Begründung und dem Preis, den sie in Kauf nimmt (englisch)
 - [CONTRIBUTING.de.md](CONTRIBUTING.de.md), wie in diesem Repository gearbeitet wird,

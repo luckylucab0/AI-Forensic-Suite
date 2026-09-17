@@ -33,6 +33,8 @@ from agentforensics.model import Case, CaseError
 from agentforensics.timeline import FORMATS as TIMELINE_FORMATS
 from agentforensics.timeline import Filters, header_notes
 from agentforensics.timeline import write as write_timeline
+from agentforensics.unified import FORMAT_VERSION as UNIFIED_VERSION
+from agentforensics.unified import write_log as write_unified_log
 
 EXIT_OK = 0
 EXIT_FINDING = 1
@@ -304,6 +306,58 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     return EXIT_FINDING if report.unclaimed_paths else EXIT_OK
 
 
+def cmd_normalize(args: argparse.Namespace) -> int:
+    """Turn a collection into one vendor-neutral log, without building a case.
+
+    The short path. `ingest` builds a SQLite case, which is what an examiner wants for a
+    device they will work on for a week. This is for the other situation: a collection came
+    back from a fleet hunt and somebody wants the conversation as one ordered file they can
+    grep, hand over, or open in the viewer.
+
+    It reads through the same adapters and the same parsers as `ingest`, so the two cannot
+    disagree about what an agent's log says.
+
+    The exit code distinguishes the answers a caller has to tell apart. Nothing found exits
+    3, because a host with no agent artifacts is a valid result and must not look like a
+    crash. A collection carrying paths nothing in the catalogue claims exits 1: an agent
+    nobody has catalogued, or a gap in the catalogue, and either is a finding.
+    """
+    source = Path(args.source)
+    if not source.exists():
+        _write(sys.stderr, f"normalize: no such path: {source}")
+        return EXIT_ERROR
+
+    try:
+        catalogue = load_catalogue(Path(args.catalog))
+    except CatalogueError as exc:
+        _write(sys.stderr, f"normalize: {exc}")
+        return EXIT_ERROR
+
+    try:
+        if args.out:
+            destination = Path(args.out)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            # newline="" so that two platforms produce the same bytes. A log gets hashed
+            # and compared, and a CRLF translation would break that for no gain.
+            with destination.open("w", encoding="utf-8", newline="") as handle:
+                report = write_unified_log(source, catalogue, handle, kind=args.kind)
+        else:
+            report = write_unified_log(source, catalogue, sys.stdout, kind=args.kind)
+    except (BundleError, OSError) as exc:
+        _write(sys.stderr, f"normalize: {exc}")
+        return EXIT_ERROR
+
+    # On stderr always, even without --out, so that a log written to stdout stays a clean
+    # stream while the numbers that qualify it still reach the operator.
+    _write(sys.stderr, f"normalize: unified agent log, format version {UNIFIED_VERSION}")
+    for line in report.summary().splitlines():
+        _write(sys.stderr, f"normalize: {line}")
+
+    if report.files == 0:
+        return EXIT_NOTHING_FOUND
+    return EXIT_FINDING if report.unclaimed_paths else EXIT_OK
+
+
 def cmd_case(args: argparse.Namespace) -> int:
     """Show what a case holds, including the numbers that qualify it.
 
@@ -495,6 +549,23 @@ def build_parser() -> argparse.ArgumentParser:
     )
     ingest.add_argument("--json", action="store_true", help="machine-readable report")
     ingest.set_defaults(func=cmd_ingest)
+
+    normalize = sub.add_parser(
+        "normalize",
+        help="turn a collection into one vendor-neutral agent log",
+        description=cmd_normalize.__doc__,
+    )
+    normalize.add_argument("source", help="bundle directory, collected tree, or profile")
+    normalize.add_argument("--catalog", default="catalog", help="catalogue directory")
+    normalize.add_argument(
+        "--out", help="write to a file instead of stdout. The summary goes to stderr either way."
+    )
+    normalize.add_argument(
+        "--kind",
+        choices=("native", "kape", "velociraptor", "directory"),
+        help="override the detected source kind",
+    )
+    normalize.set_defaults(func=cmd_normalize)
 
     case = sub.add_parser(
         "case",
