@@ -78,11 +78,11 @@ def main(argv=None):
             sessions = page.locator("#project-list .session")
             best, best_count = 0, -1
             for index in range(sessions.count()):
-                text = sessions.nth(index).inner_text()
+                words = sessions.nth(index).inner_text().split()
                 count = sum(
-                    int(part[:-1])
-                    for part in text.split()
-                    if part[:-1].isdigit() and part[-1] in "↑⏺"
+                    int(words[i - 1])
+                    for i, word in enumerate(words)
+                    if word in ("msg", "tools") and i and words[i - 1].isdigit()
                 )
                 if count > best_count:
                     best, best_count = index, count
