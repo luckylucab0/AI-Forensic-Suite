@@ -101,6 +101,28 @@ collected and a file that was collected and never read. Those are different gaps
 different remedies, and a case whose events are thin for one of those reasons says nothing
 about the agent's use.
 
+## Filters
+
+Three of the views filter, and they follow one rule: a filter may take rows off the screen
+because somebody asked it to, and it may never leave them looking absent. So every filtered
+view says how many rows are out of view, and the per-chat filter keeps a count and an undo
+on screen for as long as it is set.
+
+**Inside one chat**, a row of chips above the transcript shows only the prompts, only the
+answers, only the turns that used a tool, only the recorded reasoning, or only the rows that
+did not parse. Each chip carries the number of rows it would show, so the shape of a
+conversation is readable before anything is clicked. The filter keeps whole turns: an
+assistant turn that reasoned, answered and called a tool is one row, and it is kept by any
+of those three chips, which is why the chip says "tool use" rather than "tool calls".
+
+**Across sessions**, the tools view and the security view both start with a scope switch:
+all sessions, or the one that is open. "This session" only appears when a session is open,
+because a scope that quietly meant "all" would be a filter that lies about what it shows.
+The tools view then filters by tool, by failures only, and by free text over the tool name,
+its summary and its session. The security view filters by severity and by rule.
+
+![One chat filtered to the turns that used a tool, with the hidden-row count](images/webui-filter.png)
+
 ## The API
 
 Ten routes, all `GET`, all under the run's token. They are listed here because an analyst

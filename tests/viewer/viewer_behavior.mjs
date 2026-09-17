@@ -71,6 +71,7 @@ vm.runInContext(
   clientInfo, blocksToText, buildToolResultMap,
   normalizeUnified, groupUnified, unifiedEvent, unifiedDerived, assistantNameFor,
   apiSource, probeCaseApi, findCaseSession, artifactState, CASE_API_VERSION, tailPath,
+  filterToolRows, filterFindingRows, filterTimelineItems, turnKinds, scopePath, buildTimeline,
 };
 globalThis.__setSource = (s) => { dataSource = s; };
 `,
@@ -461,6 +462,123 @@ if (process.env.AFX_UNIFIED_LOG) {
     records.some((r) => r.kind === 'unparsed.record'),
     'and it carries a record nothing could read, which the viewer has to show',
   );
+}
+
+// ------------------------------------------------------------------------ filters
+
+{
+  const rows = [
+    { name: 'Bash', summary: 'npm ci', project: 'p1', path: 's1', isErr: false },
+    { name: 'Bash', summary: 'rm -rf build', project: 'p1', path: 's2', isErr: true },
+    { name: 'Read', summary: '/home/alice/.ssh/id_rsa', project: 'p2', path: 's1', isErr: false },
+  ];
+  eq(api.filterToolRows(rows, {}).length, 3, 'no filter keeps every tool call');
+  eq(api.filterToolRows(rows, { path: 's1' }).length, 2, 'a scope keeps only its own session');
+  eq(api.filterToolRows(rows, { name: 'Bash' }).length, 2, 'a name filter keeps that tool');
+  eq(api.filterToolRows(rows, { name: 'all' }).length, 3, "the name 'all' is not a tool name");
+  eq(api.filterToolRows(rows, { errOnly: true }).length, 1, 'failed only keeps the failures');
+  eq(
+    api.filterToolRows(rows, { query: '.SSH' }).length,
+    1,
+    'the text filter is case-insensitive and searches the summary',
+  );
+  eq(
+    api.filterToolRows(rows, { path: 's1', name: 'Bash', query: 'npm' }).length,
+    1,
+    'the filters combine rather than replacing each other',
+  );
+  eq(
+    api.filterToolRows(rows, { path: 's2', errOnly: true, name: 'Read' }).length,
+    0,
+    'and an impossible combination returns nothing rather than falling back to everything',
+  );
+}
+
+{
+  const found = [
+    { rule: 'AWS access key', sev: 'high', path: 's1' },
+    { rule: 'JWT', sev: 'med', path: 's1' },
+    { rule: 'JWT', sev: 'med', path: 's2' },
+  ];
+  eq(api.filterFindingRows(found, {}).length, 3, 'no filter keeps every finding');
+  eq(api.filterFindingRows(found, { path: 's1' }).length, 2, 'a scope keeps its own session');
+  eq(api.filterFindingRows(found, { sev: 'high' }).length, 1, 'a severity filter works');
+  eq(api.filterFindingRows(found, { rule: 'JWT' }).length, 2, 'a rule filter works');
+  eq(
+    api.filterFindingRows(found, { sev: 'all', rule: 'all' }).length,
+    3,
+    "'all' means all for both",
+  );
+}
+
+{
+  // What one transcript row counts as. The assistant turn is the interesting case: it is
+  // one row holding several kinds, and the filter keeps whole turns.
+  const events = [
+    { type: 'user', message: { content: 'do the thing' } },
+    {
+      type: 'assistant',
+      message: {
+        id: 'a1',
+        content: [
+          { type: 'thinking', thinking: 'plan' },
+          { type: 'text', text: 'doing it' },
+          { type: 'tool_use', id: 't1', name: 'Bash', input: { command: 'ls' } },
+        ],
+      },
+    },
+    { type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 't1', content: 'ok' }] } },
+    { type: 'parse-error', raw: 'broken', __line: 9 },
+  ];
+  const items = api.buildTimeline(events);
+  eq(items.length, 4, 'the timeline groups the assistant records into one turn');
+  const kinds = items.map((item) => api.turnKinds(item));
+  ok(kinds[0].includes('prompts'), 'a typed message is a prompt');
+  ok(
+    kinds[1].includes('tools') && kinds[1].includes('thinking') && kinds[1].includes('answers'),
+    'one assistant turn can be all three at once, so a filter on any of them keeps it',
+  );
+  ok(
+    kinds[2].includes('tools') && !kinds[2].includes('prompts'),
+    'a user record carrying only tool results is not counted as something a person typed',
+  );
+  ok(kinds[3].includes('problems'), 'a line that did not parse is a problem row');
+
+  for (const [mode, expected] of [
+    ['all', 4],
+    ['prompts', 1],
+    ['tools', 2],
+    ['thinking', 1],
+    ['answers', 1],
+    ['problems', 1],
+  ]) {
+    eq(api.filterTimelineItems(items, mode).items.length, expected, `the ${mode} filter keeps ${expected}`);
+  }
+  // The property the honesty rule rests on: what is filtered out is counted, so the
+  // interface can say how much is off screen instead of leaving it looking absent.
+  const only = api.filterTimelineItems(items, 'prompts');
+  eq(only.hidden, 3, 'a filter reports how many rows it took out of view');
+  eq(api.filterTimelineItems(items, 'all').hidden, 0, 'and no filter hides nothing');
+  eq(
+    api.filterTimelineItems(items, 'prompts').items.length + only.hidden,
+    items.length,
+    'every row is either shown or counted as hidden, never neither',
+  );
+}
+
+{
+  api.state.scope = 'all';
+  api.state.current = { path: 's1' };
+  eq(api.scopePath(), null, 'the default scope is every session');
+  api.state.scope = 'session';
+  eq(api.scopePath(), 's1', 'scoping to a session uses the open one');
+  api.state.current = null;
+  eq(
+    api.scopePath(),
+    null,
+    'and with no session open it falls back to all, which the chip row says out loud',
+  );
+  api.state.scope = 'all';
 }
 
 // ------------------------------------------------------- the case API source (afx serve)

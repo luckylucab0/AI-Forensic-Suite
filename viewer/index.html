@@ -212,7 +212,20 @@ mark.hl.hl-current{background:var(--coral);color:#fff;}
 .panel-sub{color:var(--text-faint);font-size:12px;margin-bottom:16px;max-width:76ch;}
 .panel-sub code{font-family:var(--mono);font-size:11px;color:var(--text-dim);background:var(--bg-elev-2);border-radius:3px;padding:1px 4px;}
 .tab-badge{font-family:var(--mono);font-size:10px;color:var(--red);}
-.tool-filters{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px;}
+.tool-filters{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px;align-items:center;}
+.filter-row{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:8px;}
+.filter-label{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-right:4px;}
+.filter-input{background:var(--bg-input);border:1px solid var(--border);border-radius:99px;color:var(--text);padding:2px 10px;font-size:11px;font-family:var(--mono);min-width:180px;}
+.filter-input:focus{outline:none;border-color:var(--coral-dim);}
+.filter-input::placeholder{color:var(--text-faint);}
+/* The filter that hides transcript rows, and the notice that says so. ADR 0009 forbids
+   hiding a record silently, not hiding one on request: the count of what is out of view is
+   always on screen while a filter is set. */
+.turn-filters{flex:none;display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:8px 28px;border-bottom:1px solid var(--border-soft);}
+.turn-filters.hidden{display:none;}
+.filter-note{font-family:var(--mono);font-size:10.5px;color:var(--yellow);margin-left:auto;display:flex;gap:8px;align-items:center;}
+.filter-note button{background:none;border:1px solid var(--border);color:var(--text-dim);border-radius:99px;font-size:10px;font-family:var(--mono);padding:1px 8px;cursor:pointer;}
+.filter-note button:hover{color:var(--text);border-color:var(--coral-dim);}
 .tfilter{border:1px solid var(--border);color:var(--text-dim);border-radius:99px;padding:2px 10px;font-size:11px;cursor:pointer;font-family:var(--mono);}
 .tfilter:hover{color:var(--text);border-color:var(--coral-dim);}
 .tfilter.active{border-color:var(--coral);color:var(--coral);}
@@ -344,18 +357,22 @@ mark.hl.hl-current{background:var(--coral);color:#fff;}
         <button id="search-clear" class="sbtn" title="Clear">✕</button>
       </div>
     </div>
+    <div id="turn-filters" class="turn-filters hidden"></div>
     <div id="transcript" class="transcript">
       <div class="empty-state"><div class="empty-mark"></div><p>Select a session to inspect.</p></div>
     </div>
     <div id="tools-panel" class="view-panel hidden">
       <div class="panel-h">Tool usage <span class="panel-sub" id="tools-count" style="margin:0"></span></div>
       <div class="panel-sub">Every tool call across all sessions. Click a row to open it in context.</div>
+      <div id="tool-scope" class="filter-row"></div>
       <div id="tool-filters" class="tool-filters"></div>
       <div id="tools-list"></div>
     </div>
     <div id="security-panel" class="view-panel hidden">
       <div class="panel-h">Potential secret leakage <span class="tab-badge" id="sec-total" style="display:none">0</span></div>
       <div class="panel-sub">Heuristic scan of file reads and assistant text for keys, tokens & credentials. Verify before trusting.</div>
+      <div id="sec-scope" class="filter-row"></div>
+      <div id="sec-filters" class="tool-filters"></div>
       <div id="sec-list"></div>
     </div>
     <div id="case-panel" class="view-panel hidden">
@@ -394,7 +411,11 @@ const state = { projects: [], current: null, cache: {}, normCache: {}, view: 'se
   // Set only when this page is served by `afx serve` and there is a case behind it.
   // Null in the two standalone modes, which is what the case tabs key off.
   caseApi: null, caseFindings: null, caseArtifacts: null,
-  timeline: null, timelineAgent: 'all', timelineNoFs: false, artifactFilter: 'all' };
+  timeline: null, timelineAgent: 'all', timelineNoFs: false, artifactFilter: 'all',
+  // Whether the two cross-session views show the whole log or only the open session.
+  // One setting for both, so switching tabs does not change what is being looked at.
+  scope: 'all',
+  toolQuery: '', toolErrOnly: false, secSev: 'all', secRule: 'all', turnFilter: 'all' };
 
 // ---------- DOM helpers ----------
 function el(tag, attrs = {}, children = []) {
@@ -1017,6 +1038,12 @@ function resetData(){
   if(caseTabs) caseTabs.classList.add('hidden');
   document.getElementById('transcript').innerHTML=
     '<div class="empty-state"><div class="empty-mark"></div><p>Select a session to inspect.</p></div>';
+  // Every filter goes back to showing everything. A filter carried over from the previous
+  // source would be hiding rows of evidence nobody has looked at yet.
+  state.scope='all'; state.toolFilter='all'; state.toolQuery=''; state.toolErrOnly=false;
+  state.secSev='all'; state.secRule='all'; state.turnFilter='all';
+  const turnBar=document.getElementById('turn-filters');
+  if(turnBar){turnBar.innerHTML='';turnBar.classList.add('hidden');}
   renderSidebar();
   if(typeof updateSecBadge==='function') updateSecBadge();
   if(typeof updateFindBadge==='function') updateFindBadge();
@@ -2041,14 +2068,63 @@ function buildToolResultMap(events){
   for(const ev of events)if(ev.type==='user'&&ev.message&&Array.isArray(ev.message.content))for(const b of ev.message.content)if(b.type==='tool_result')map[b.tool_use_id]={block:b,toolUseResult:ev.toolUseResult};
   return map;
 }
+// The kinds a single chat can be filtered to, in the order the chips appear. The label is
+// what the chip says, and it says "turns that used a tool" rather than "tool calls",
+// because the filter keeps whole turns.
+const TURN_FILTERS=[
+  ['all','everything',''],
+  ['prompts','prompts','What the user typed'],
+  ['answers','answers','Assistant turns that said something'],
+  ['tools','tool use','Turns that called a tool, and the results that came back'],
+  ['thinking','thinking','Turns with reasoning the agent recorded'],
+  ['problems','problems','Lines that did not parse, and record types no parser knows'],
+];
+
 function renderTranscript(events){
   const transcript=document.getElementById('transcript');transcript.innerHTML='';
   const toolResults=buildToolResultMap(events);
-  for(const item of buildTimeline(events)){
+  const all=buildTimeline(events);
+  const shown=filterTimelineItems(all,state.turnFilter);
+  renderTurnFilters(all,shown.hidden);
+  for(const item of shown.items){
     if(item.kind==='assistant')transcript.appendChild(renderAssistantTurn(item.events,toolResults));
     else{const n=renderEvent(item.event);if(n)transcript.appendChild(n);}
   }
+  if(!shown.items.length){
+    transcript.appendChild(el('div',{class:'agg-empty',
+      text:'Nothing in this session is a '+state.turnFilter+' row. '
+        +all.length+' row(s) are out of view.'}));
+  }
   transcript.scrollTop=0;
+}
+
+// The chips above one chat, and the count of what they are hiding.
+//
+// The count is the point. A view filter is allowed to take rows off the screen because
+// somebody asked it to; what it may never do is leave them looking absent, and a filter
+// set three sessions ago and forgotten is exactly how that happens. So the number of
+// hidden rows stays on screen for as long as the filter is set, with one click to undo it.
+function renderTurnFilters(items,hidden){
+  const bar=document.getElementById('turn-filters');
+  bar.innerHTML='';
+  bar.classList.remove('hidden');
+  const counts={};
+  for(const item of items)for(const kind of turnKinds(item))counts[kind]=(counts[kind]||0)+1;
+  for(const [key,label,title] of TURN_FILTERS){
+    if(key!=='all'&&!counts[key]) continue;
+    bar.appendChild(chip(label,state.turnFilter===key,
+      ()=>{state.turnFilter=key;if(state.current)renderTranscript(state.normCache[state.current.path]||[]);},
+      key==='all'?items.length:counts[key],title));
+  }
+  if(state.turnFilter!=='all'){
+    bar.appendChild(el('div',{class:'filter-note'},[
+      document.createTextNode(hidden+' row'+(hidden===1?'':'s')+' hidden by this filter'),
+      el('button',{type:'button',text:'show everything',onclick:()=>{
+        state.turnFilter='all';
+        if(state.current)renderTranscript(state.normCache[state.current.path]||[]);
+      }}),
+    ]));
+  }
 }
 // Render one non-assistant record.
 //
@@ -2175,6 +2251,7 @@ function switchView(view){
   document.getElementById('session-header').classList.toggle('hidden',!isSess||!state.current);
   document.getElementById('search-bar').classList.toggle('hidden',!isSess||!state.current);
   document.getElementById('transcript').classList.toggle('hidden',!isSess);
+  document.getElementById('turn-filters').classList.toggle('hidden',!isSess||!state.current);
   for(const name of Object.keys(VIEW_PANELS)){
     const panel=document.getElementById(name+'-panel');
     if(panel) panel.classList.toggle('hidden',view!==name);
@@ -2185,17 +2262,164 @@ function switchView(view){
 function findSession(path){for(const p of state.projects)for(const s of p.sessions)if(s.path===path)return {p,s};return null;}
 function openByPath(path){const f=findSession(path);if(!f)return;switchView('sessions');openSession(f.p,f.s);}
 
+// ============================================================================
+// Filters
+//
+// The deciding is done here, as functions over plain arrays, and the panels below only
+// draw the result. That is what lets the rules be tested without a browser, and the rules
+// are the part worth testing: a filter that quietly drops a row it should have kept is
+// indistinguishable, on screen, from evidence that was never there.
+//
+// Two of these hide things an analyst asked to have hidden, which is allowed. What is not
+// allowed is hiding without saying so, so every one of them reports how many rows it took
+// out, and the panel prints that count for as long as the filter is set. See ADR 0009.
+// ============================================================================
+
+// One chip. A helper because there are five rows of them now and the boilerplate was
+// starting to hide the logic.
+function chip(label,active,onclick,count,title){
+  return el('div',{class:'tfilter'+(active?' active':''),onclick,title:title||null},[
+    document.createTextNode(label),
+    (count===null||count===undefined)?null:el('span',{class:'c',text:String(count)}),
+  ]);
+}
+
+// Which session the cross-session views are scoped to, or null for all of them.
+function scopePath(){
+  return (state.scope==='session'&&state.current)?state.current.path:null;
+}
+
+// The scope switch, shared by the tools and the security view. "This session" only exists
+// when a session is open: a scope that silently meant "all" would be a filter that lies
+// about what it is showing.
+function renderScopeRow(node,total,scoped,rerender){
+  node.innerHTML='';
+  node.appendChild(el('span',{class:'filter-label',text:'scope'}));
+  node.appendChild(chip('all sessions',state.scope!=='session',
+    ()=>{state.scope='all';rerender();},total));
+  if(state.current){
+    node.appendChild(chip('this session',state.scope==='session',
+      ()=>{state.scope='session';rerender();},scoped,
+      state.current.summary&&state.current.summary.title||''));
+  } else {
+    node.appendChild(el('span',{class:'filter-label',
+      text:'open a session to scope to it'}));
+  }
+}
+
+function filterToolRows(rows,f){
+  const query=String(f.query||'').trim().toLowerCase();
+  return rows.filter(t=>{
+    if(f.path&&t.path!==f.path) return false;
+    if(f.name&&f.name!=='all'&&t.name!==f.name) return false;
+    if(f.errOnly&&!t.isErr) return false;
+    if(query){
+      const hay=(t.name+' '+(t.summary||'')+' '+(t.project||'')).toLowerCase();
+      if(hay.indexOf(query)<0) return false;
+    }
+    return true;
+  });
+}
+
+function filterFindingRows(rows,f){
+  return rows.filter(h=>{
+    if(f.path&&h.path!==f.path) return false;
+    if(f.sev&&f.sev!=='all'&&h.sev!==f.sev) return false;
+    if(f.rule&&f.rule!=='all'&&h.rule!==f.rule) return false;
+    return true;
+  });
+}
+
+// What one transcript row is, for the purpose of filtering a single chat.
+//
+// Turn-level rather than block-level, and the chip labels say so: an assistant turn that
+// called a tool is one row holding its text, its reasoning and the call, and splitting it
+// would mean a second renderer for a partial turn. So "tool use" means "turns that used a
+// tool", which is a claim this can make honestly.
+function turnKinds(item){
+  const kinds=[];
+  if(item.kind==='assistant'){
+    for(const ev of item.events){
+      const content=(ev.message&&ev.message.content)||[];
+      const blocks=Array.isArray(content)?content:[{type:'text'}];
+      for(const b of blocks){
+        if(b.type==='tool_use') kinds.push('tools');
+        else if(b.type==='thinking'||b.type==='redacted_thinking') kinds.push('thinking');
+        else kinds.push('answers');
+      }
+    }
+    return kinds.length?kinds:['answers'];
+  }
+  const ev=item.event||{};
+  if(ev.type==='user'){
+    const c=ev.message&&ev.message.content;
+    // A user record carrying nothing but tool results is the agent's own output in the
+    // place the provider's API puts it, not something a person typed.
+    if(Array.isArray(c)&&c.length&&c.every(b=>b.type==='tool_result')) return ['tools'];
+    return ['prompts'];
+  }
+  if(ev.type==='parse-error'||ev.type==='unstructured-record'||ev.type==='unknown-record')
+    return ['problems'];
+  return ['other'];
+}
+
+// Filter one chat's rows, and say how many went out of view.
+function filterTimelineItems(items,mode){
+  if(!mode||mode==='all') return {items,hidden:0};
+  const kept=items.filter(item=>turnKinds(item).indexOf(mode)>=0);
+  return {items:kept,hidden:items.length-kept.length};
+}
+
 function renderToolsPanel(){
   const filters=document.getElementById('tool-filters');const list=document.getElementById('tools-list');
-  const counts={};for(const t of state.allTools)counts[t.name]=(counts[t.name]||0)+1;
+  const path=scopePath();
+  // Everything the scope allows, which is what the name chips are counted over: a chip
+  // showing a count from outside the scope would be a count nobody can get to.
+  const inScope=filterToolRows(state.allTools,{path});
+  renderScopeRow(document.getElementById('tool-scope'),state.allTools.length,
+    state.current?filterToolRows(state.allTools,{path:state.current.path}).length:null,
+    renderToolsPanel);
+
+  const counts={};for(const t of inScope)counts[t.name]=(counts[t.name]||0)+1;
   const names=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
-  document.getElementById('tools-count').textContent='· '+state.allTools.length+' calls';
+  const failed=inScope.filter(t=>t.isErr).length;
+
   filters.innerHTML='';
-  filters.appendChild(el('div',{class:'tfilter'+(state.toolFilter==='all'?' active':''),onclick:()=>{state.toolFilter='all';renderToolsPanel();}},[document.createTextNode('all'),el('span',{class:'c',text:String(state.allTools.length)})]));
-  for(const n of names)filters.appendChild(el('div',{class:'tfilter'+(state.toolFilter===n?' active':''),onclick:()=>{state.toolFilter=n;renderToolsPanel();}},[document.createTextNode(shortName(n)),el('span',{class:'c',text:String(counts[n])})]));
-  const rows=state.allTools.filter(t=>state.toolFilter==='all'||t.name===state.toolFilter).slice().reverse();
+  filters.appendChild(chip('all',state.toolFilter==='all',
+    ()=>{state.toolFilter='all';renderToolsPanel();},inScope.length));
+  for(const n of names)filters.appendChild(chip(shortName(n),state.toolFilter===n,
+    ()=>{state.toolFilter=n;renderToolsPanel();},counts[n],n));
+  filters.appendChild(chip('failed only',state.toolErrOnly,
+    ()=>{state.toolErrOnly=!state.toolErrOnly;renderToolsPanel();},failed,
+    'Only the calls whose result came back as an error'));
+  const box=el('input',{class:'filter-input',type:'text',placeholder:'contains…',
+    value:state.toolQuery,title:'Match the tool name, its summary or its session'});
+  box.addEventListener('input',()=>{
+    state.toolQuery=box.value;
+    drawToolRows();
+    // Re-rendering the whole panel on every keystroke would take the focus out of this
+    // box, so only the rows are redrawn while typing.
+  });
+  filters.appendChild(box);
+  drawToolRows();
+}
+
+function drawToolRows(){
+  const list=document.getElementById('tools-list');
+  const path=scopePath();
+  const rows=filterToolRows(state.allTools,{path,name:state.toolFilter,
+    errOnly:state.toolErrOnly,query:state.toolQuery}).slice().reverse();
+  const total=filterToolRows(state.allTools,{path}).length;
+  document.getElementById('tools-count').textContent=
+    '· '+rows.length+(rows.length===total?'':' of '+total)+' calls'
+    +(path?' in this session':'');
   list.innerHTML='';
-  if(!rows.length){list.appendChild(el('div',{class:'agg-empty',text:'No tool calls yet — sessions still loading.'}));return;}
+  if(!rows.length){
+    list.appendChild(el('div',{class:'agg-empty',text:total
+      ?'No tool call here matches these filters. '+total+' are out of view.'
+      :'No tool calls yet — sessions still loading.'}));
+    return;
+  }
   for(const t of rows)list.appendChild(el('div',{class:'agg-row'+(t.isErr?' err':''),onclick:()=>openByPath(t.path)},[
     el('span',{class:'nm',text:shortName(t.name)}),
     el('span',{class:'sm',text:t.summary||''}),
@@ -2205,11 +2429,39 @@ function renderToolsPanel(){
 }
 function renderSecurityPanel(){
   const list=document.getElementById('sec-list');
-  document.getElementById('sec-total').textContent=String(state.findings.length);
-  document.getElementById('sec-total').style.display=state.findings.length?'inline-block':'none';
+  const path=scopePath();
+  const inScope=filterFindingRows(state.findings,{path});
+  renderScopeRow(document.getElementById('sec-scope'),state.findings.length,
+    state.current?filterFindingRows(state.findings,{path:state.current.path}).length:null,
+    renderSecurityPanel);
+
+  const rules={};for(const h of inScope)rules[h.rule]=(rules[h.rule]||0)+1;
+  const bySev={};for(const h of inScope)bySev[h.sev]=(bySev[h.sev]||0)+1;
+  const filters=document.getElementById('sec-filters');
+  filters.innerHTML='';
+  filters.appendChild(el('span',{class:'filter-label',text:'severity'}));
+  filters.appendChild(chip('any',state.secSev==='all',
+    ()=>{state.secSev='all';renderSecurityPanel();},inScope.length));
+  for(const sev of ['high','med'])if(bySev[sev])filters.appendChild(chip(sev,state.secSev===sev,
+    ()=>{state.secSev=sev;renderSecurityPanel();},bySev[sev]));
+  filters.appendChild(el('span',{class:'filter-label',text:'rule'}));
+  filters.appendChild(chip('any',state.secRule==='all',
+    ()=>{state.secRule='all';renderSecurityPanel();},null));
+  for(const rule of Object.keys(rules).sort())filters.appendChild(chip(rule,state.secRule===rule,
+    ()=>{state.secRule=rule;renderSecurityPanel();},rules[rule]));
+
+  const sorted=filterFindingRows(state.findings,{path,sev:state.secSev,rule:state.secRule})
+    .slice().sort((a,b)=>(a.sev==='high'?0:1)-(b.sev==='high'?0:1));
+  document.getElementById('sec-total').textContent=String(sorted.length);
+  document.getElementById('sec-total').style.display=sorted.length?'inline-block':'none';
   list.innerHTML='';
-  if(!state.findings.length){list.appendChild(el('div',{class:'agg-empty',text:'No potential secret leakage detected.'}));return;}
-  const sorted=state.findings.slice().sort((a,b)=>(a.sev==='high'?0:1)-(b.sev==='high'?0:1));
+  if(!sorted.length){
+    list.appendChild(el('div',{class:'agg-empty',text:inScope.length
+      ?'No finding here matches these filters. '+inScope.length+' are out of view.'
+      :(path?'No potential secret leakage in this session.'
+            :'No potential secret leakage detected.')}));
+    return;
+  }
   for(const f of sorted){
     const snip=el('div',{class:'fsnip'});
     snip.innerHTML=esc(f.snippet).replace(new RegExp(escRe(esc(f.match)),'g'),'<b>'+esc(f.match)+'</b>');

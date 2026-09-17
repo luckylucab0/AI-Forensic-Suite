@@ -141,9 +141,14 @@ thing the viewer writes anywhere is your theme choice, in `localStorage`.
 - **Two scoped searches**, one over message text and one over everything including tool
   input, output and thinking, with inline highlighting, a match counter, keyboard
   navigation, and automatic expansion of any collapsed block that contains a match
-- **Cross-session tool usage**: every tool call from every session in one filterable list
+- **Cross-session tool usage**: every tool call from every session in one list, filterable
+  by tool, by failures only, by free text, and scopeable to the open session alone
+- **Filters inside one chat**: show only the prompts, only the answers, only the turns that
+  used a tool, only the recorded reasoning, or only the rows that did not parse. A filter
+  that takes rows off the screen says how many it hid, with one click to undo it
 - **A heuristic secret scan** over tool input, tool output and assistant text, flagging
-  likely keys, tokens and credentials
+  likely keys, tokens and credentials, filterable by severity and by rule and scopeable to
+  one session
 - **Every record, always.** A line that fails to parse, a record type the parser does not
   know, an assistant turn without an id: all of these are rendered as their own visible
   row rather than dropped, and the session header counts unparsed lines. In a forensic

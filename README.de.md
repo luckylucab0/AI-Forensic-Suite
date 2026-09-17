@@ -157,9 +157,15 @@ Einzige, was der Viewer irgendwo schreibt, ist die Themenwahl in `localStorage`.
   Hervorhebung im Text, Trefferzähler, Tastaturnavigation und automatischem Aufklappen
   jedes eingeklappten Blocks, der einen Treffer enthält
 - **Werkzeugnutzung über alle Sitzungen**: jeder Werkzeugaufruf aus jeder Sitzung in
-  einer filterbaren Liste
+  einer Liste, filterbar nach Werkzeug, nur Fehlschläge, freiem Text, und eingrenzbar auf
+  die geöffnete Sitzung allein
+- **Filter innerhalb eines Chats**: nur die Prompts, nur die Antworten, nur die Züge mit
+  Werkzeugaufruf, nur die festgehaltenen Überlegungen oder nur die Zeilen, die sich nicht
+  parsen liessen. Ein Filter, der Zeilen vom Schirm nimmt, sagt wie viele, mit einem Klick
+  zurück
 - **Ein heuristischer Secret-Scan** über Werkzeugeingaben, Werkzeugausgaben und
-  Assistententext, der wahrscheinliche Schlüssel, Tokens und Zugangsdaten markiert
+  Assistententext, der wahrscheinliche Schlüssel, Tokens und Zugangsdaten markiert,
+  filterbar nach Schweregrad und Regel und eingrenzbar auf eine Sitzung
 - **Jeder Datensatz, immer.** Eine Zeile, die sich nicht parsen lässt, ein Datensatztyp,
   den der Parser nicht kennt, ein Assistenten-Zug ohne Kennung: alles davon wird als
   eigene, sichtbare Zeile dargestellt statt verworfen, und der Sitzungskopf zählt die

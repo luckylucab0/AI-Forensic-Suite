@@ -90,6 +90,17 @@ def main(argv=None):
             page.wait_for_timeout(1200)
             page.screenshot(path=str(out / "webui-sessions.png"))
 
+            # The same session with its own filter set, which is the one screenshot that
+            # has to show the hidden-row count: a filter that takes rows off the screen is
+            # only honest while it says how many.
+            tools_chip = page.locator("#turn-filters .tfilter", has_text="tool use")
+            if tools_chip.count():
+                tools_chip.first.click()
+                page.wait_for_timeout(700)
+                page.screenshot(path=str(out / "webui-filter.png"))
+                page.locator("#turn-filters .tfilter", has_text="everything").first.click()
+                page.wait_for_timeout(400)
+
             for view in VIEWS:
                 page.locator('.tab[data-view="%s"]' % view).click()
                 page.wait_for_timeout(1400)
@@ -108,7 +119,7 @@ def main(argv=None):
         server.shutdown()
         server.server_close()
 
-    print("shot-webui: wrote %d image(s) to %s" % (len(VIEWS) + 1, out), file=sys.stderr)
+    print("shot-webui: wrote %d image(s) to %s" % (len(VIEWS) + 2, out), file=sys.stderr)
     return 0
 
 

@@ -107,6 +107,31 @@ gelesen wurde. Das sind verschiedene Lücken mit verschiedenen Gegenmitteln, und
 dessen Ereignisse aus einem dieser Gründe dünn sind, sagt nichts über die Nutzung des
 Agenten aus.
 
+## Filter
+
+Drei der Ansichten filtern, und alle drei folgen einer Regel: ein Filter darf Zeilen vom
+Schirm nehmen, weil jemand danach gefragt hat, und er darf sie niemals abwesend aussehen
+lassen. Jede gefilterte Ansicht sagt deshalb, wie viele Zeilen ausserhalb des Blickfelds
+sind, und der Filter innerhalb eines Chats hält Zahl und Rücknahme sichtbar, solange er
+gesetzt ist.
+
+**Innerhalb eines Chats** zeigt eine Reihe von Chips über dem Transkript nur die Prompts,
+nur die Antworten, nur die Züge mit Werkzeugaufruf, nur die festgehaltenen Überlegungen oder
+nur die Zeilen, die sich nicht parsen liessen. Jeder Chip trägt die Zahl der Zeilen, die er
+zeigen würde, sodass die Form einer Konversation lesbar ist, bevor man klickt. Der Filter
+behält ganze Züge: ein Assistentenzug, der überlegt, geantwortet und ein Werkzeug gerufen
+hat, ist eine Zeile und bleibt bei allen drei Chips erhalten. Deshalb heisst der Chip
+"tool use" und nicht "tool calls".
+
+**Über Sitzungen hinweg** beginnen die Werkzeug- und die Sicherheitsansicht mit einem
+Bereichsschalter: alle Sitzungen oder die geöffnete. "This session" erscheint nur, wenn eine
+Sitzung offen ist, denn ein Bereich, der stillschweigend "alle" bedeutet, wäre ein Filter,
+der über seinen eigenen Inhalt täuscht. Die Werkzeugansicht filtert danach nach Werkzeug,
+nach nur Fehlschlägen und nach freiem Text über Werkzeugname, Zusammenfassung und Sitzung.
+Die Sicherheitsansicht filtert nach Schweregrad und Regel.
+
+![Ein Chat, gefiltert auf die Züge mit Werkzeugaufruf, mit der Zahl der ausgeblendeten Zeilen](images/webui-filter.png)
+
 ## Die API
 
 Zehn Routen, alle `GET`, alle unter dem Token des Laufs. Sie stehen hier, weil eine
