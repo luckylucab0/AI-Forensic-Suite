@@ -1,0 +1,70 @@
+id: AFX-THIRDPARTYENDPOINTS-001
+pack: third_party_endpoints
+title: The agent's model endpoint was pointed somewhere other than its vendor
+severity: high
+description: >
+  A base URL override, a proxy variable or a custom provider setting appears in a record:
+  ANTHROPIC_BASE_URL, OPENAI_BASE_URL, an equivalent for another provider, or an HTTPS proxy
+  set for the agent's process.
+rationale: >
+  This decides where the conversation went. Every prompt, every file the agent read into
+  context and every credential that reached a transcript was sent to whatever this points
+  at, so an override changes the answer to "which data left the device" for the whole
+  session. It is also a quiet setting: nothing in a transcript says which endpoint served
+  it, so the configuration is the only place the answer exists.
+applies_to:
+  kinds: [config.snapshot, command.exec, prompt.history, session.start]
+match:
+  field: event_text
+  regex_any:
+    # [^\S\n] rather than \s throughout: \s matches a newline, and the text a rule
+    # searches is the record's leaves one per line, so a pattern written with \s reaches
+    # into the next field. An unset variable followed by anything at all would match.
+    - '(?i)\b(?:ANTHROPIC|OPENAI|AZURE_OPENAI|GOOGLE|GEMINI|MISTRAL|GROQ|DEEPSEEK|OPENROUTER)_(?:BASE_URL|API_BASE|ENDPOINT)[^\S\n]*[:=][^\S\n]*\S'
+    - '(?i)\bANTHROPIC_AUTH_TOKEN[^\S\n]*[:=][^\S\n]*\S'
+    - '(?i)\b(?:HTTPS?_PROXY|ALL_PROXY)[^\S\n]*[:=][^\S\n]*\S'
+    - '(?i)"(?:baseURL|base_url|apiBase|api_base|endpoint)"[^\S\n]*:[^\S\n]*"https?://'
+tags:
+  - T1090
+  - T1071
+  - third-party-endpoint
+false_positives:
+  - >-
+    A corporate proxy or an approved inference gateway, which is a legitimate and common
+    configuration. The finding says where the traffic went, not whether that was allowed.
+  - >-
+    A base URL for something other than the model endpoint, such as an application's own
+    API, which matches the last pattern because the key name is generic.
+references:
+  - https://code.claude.com/docs/en/llm-gateway
+tests:
+  - name: a base URL override in a shell profile
+    match: true
+    event:
+      kind: prompt.history
+      agent: crosscutting
+      payload: {text: "export ANTHROPIC_BASE_URL=https://gateway.example.org/v1"}
+  - name: a proxy set for the agent
+    match: true
+    event:
+      kind: config.snapshot
+      agent: codex
+      payload: {text: "HTTPS_PROXY=http://proxy.example.org:3128"}
+  - name: a custom provider in a configuration file
+    match: true
+    event:
+      kind: config.snapshot
+      agent: qwen_code
+      payload: {text: '{"provider": {"baseURL": "https://inference.example.org/v1"}}'}
+  - name: an unset proxy variable
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload: {text: "HTTPS_PROXY="}
+  - name: an ordinary configuration
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload: {text: '{"model": "example-model", "theme": "dark"}'}

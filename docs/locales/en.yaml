@@ -56,3 +56,35 @@ rules:
   heuristic_warning: >-
     Every rule is a heuristic. A finding is a lead that needs analyst review, never a
     verdict.
+  col_pack: Pack
+  col_fields: Fields read
+  section_condition: What it matches
+  section_scope: Scope
+  section_tests: Samples in the rule file
+  toc: Packs
+  intro: >-
+    One file per rule under rules/, grouped into packs. A rule is data rather than code: a
+    tree of conditions over named event fields, with no expression to evaluate and nothing
+    callable in a rule file. See docs/adr/0019-rules-are-data-with-their-own-tests.md.
+  tests_note: >-
+    Every rule carries its own positive and negative samples, and pytest runs each one as
+    its own case. A rule with only positive samples is refused by the loader, because the
+    failure that matters is not a rule that misses: it is a rule that fires on everything,
+    and such a rule passes every positive sample it has.
+  findings_note: >-
+    Findings are written into the case database next to the events they rest on, and every
+    scan is recorded whether or not anything fired. A case with no findings and a case
+    nobody scanned would otherwise look identical, and those are opposite conclusions.
+  redact_note: >-
+    This rule does not quote what it matched. The matched value is a credential, and a
+    finding is exported and pasted into reports, so the value stays in the event it came
+    from.
+  aggregate_note: >-
+    Fires on a count rather than on one event, grouped by
+  severity_order_note: >-
+    Rules are listed by pack, and within a pack by id.
+  untranslated_marker: "[EN]"
+  translation_note: >-
+    Rule files are English, like the code and the architecture decision records, so
+    most paragraphs below are marked [EN]. A rule may carry a translation, and the
+    ones that do are not marked.

@@ -1,0 +1,73 @@
+id: AFX-DANGEROUSCOMMANDS-001
+pack: dangerous_commands
+title: A recursive delete was run against a broad path
+severity: high
+description: >
+  The agent ran a recursive, forced delete whose target is a root, a home directory, a
+  wildcard at the top of a tree, or a variable that was empty when the command was built.
+  The last case is the one worth reading twice: rm -rf "$DIR"/ with DIR unset deletes from
+  the filesystem root.
+rationale: >
+  This is the destructive action an agent is most likely to take by accident, and the one
+  whose damage is hardest to establish afterwards, because what was deleted leaves nothing
+  behind that says what it was. Finding the command is often the only way to bound the
+  loss, and the timestamp on it is what tells a restore which backup to go back to.
+applies_to:
+  kinds: [command.exec]
+match:
+  all:
+    - field: payload.commands[].command
+      regex: '\brm\b[^|;&]*\s-[a-zA-Z]*[rR][a-zA-Z]*f|\brm\b[^|;&]*\s-[a-zA-Z]*f[a-zA-Z]*[rR]'
+    - field: payload.commands[].command
+      regex_any:
+        - '\brm\b[^|;&]*\s+/\s*$'
+        - '\brm\b[^|;&]*\s+/[a-z]*\s+'
+        - '\brm\b[^|;&]*\s+["'']?(?:~|\$HOME|%USERPROFILE%)["'']?/?\s*$'
+        - '\brm\b[^|;&]*\s+["'']?\$\{?[A-Za-z_][A-Za-z0-9_]*\}?["'']?/'
+        - '\brm\b[^|;&]*\s+/\*'
+tags:
+  - T1485
+  - destructive-command
+false_positives:
+  - >-
+    A delete inside a container or a build directory that happens to be spelled with an
+    absolute path, which is common in a Dockerfile or a CI script the agent was editing.
+  - >-
+    A variable that was in fact set, which the transcript usually cannot confirm. The
+    pattern flags the shape, and the shape is worth reading whether or not it fired.
+tests:
+  - name: a delete from the filesystem root
+    match: true
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "rm -rf /"}]
+  - name: a delete through a variable that may be empty
+    match: true
+    event:
+      kind: command.exec
+      agent: codex
+      payload:
+        commands: [{command: 'rm -rf "$BUILD_DIR"/artifacts'}]
+  - name: a delete of the home directory
+    match: true
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "rm -rf ~"}]
+  - name: a scoped delete inside the project
+    match: false
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "rm -rf ./build"}]
+  - name: a recursive delete without force, of a relative path
+    match: false
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "rm -r node_modules"}]

@@ -1,0 +1,84 @@
+id: AFX-SENSITIVEPATHS-003
+pack: sensitive_paths
+title: The agent read a browser profile, a keychain or a password store
+severity: critical
+description: >
+  A file read or a command names a browser profile database, an operating system keychain or
+  credential store, or the data directory of a password manager.
+rationale: >
+  There is no ordinary software engineering reason to read any of these. A browser profile
+  holds saved passwords, cookies and session tokens for everything the user is signed in
+  to; a keychain holds the credentials the operating system keeps on the user's behalf; a
+  password manager's store is the whole of it. This is the one rule in the pack where a
+  match is closer to a conclusion than to a lead, which is why it is critical and why its
+  false positive list is short.
+applies_to:
+  kinds: [file.read, command.exec, tool.call]
+match:
+  any:
+    - field: payload.files[].path
+      glob_any:
+        - "**/Login Data"
+        - "**/Cookies"
+        - "**/logins.json"
+        - "**/key4.db"
+        - "**/cert9.db"
+        - "**/Library/Keychains/**"
+        - "**/.local/share/keyrings/**"
+        - "**/.password-store/**"
+        - "**/*.kdbx"
+        - "**/1Password/**"
+        - "**/Bitwarden*/**"
+    - field: payload.commands[].command
+      regex_any:
+        - '\bsecurity\s+(?:find-generic-password|find-internet-password|dump-keychain)\b'
+        - '\bsecret-tool\s+(?:lookup|search)\b'
+        - '(?i)\bGet-Credential\b|\bcmdkey\s+/list\b'
+        - '\.kdbx\b|\.password-store\b|logins\.json\b|key4\.db\b'
+tags:
+  - T1555
+  - T1539
+  - credential-store-access
+false_positives:
+  - >-
+    Work on a tool that legitimately integrates with one of these stores, such as a
+    credential helper the agent was asked to write or debug.
+  - >-
+    A path named Cookies or Login Data belonging to something other than a browser
+    profile, which the finding's full path settles in one glance.
+tests:
+  - name: a browser credential database read
+    match: true
+    event:
+      kind: file.read
+      agent: claude_code
+      payload:
+        files: [{path: "/home/alice/.config/google-chrome/Default/Login Data", operation: read}]
+  - name: a keychain queried by a command
+    match: true
+    event:
+      kind: command.exec
+      agent: codex
+      payload:
+        commands: [{command: "security find-generic-password -s example -w"}]
+  - name: a password manager database read
+    match: true
+    event:
+      kind: file.read
+      agent: copilot
+      payload:
+        files: [{path: "/home/alice/Documents/vault.kdbx", operation: read}]
+  - name: a project cookie handling module
+    match: false
+    event:
+      kind: file.read
+      agent: claude_code
+      payload:
+        files: [{path: "/src/app/cookies.py", operation: read}]
+  - name: a command that mentions passwords without reading a store
+    match: false
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "grep -rn password src/"}]

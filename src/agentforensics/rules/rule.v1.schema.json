@@ -39,11 +39,13 @@
       "type": "string",
       "enum": ["info", "low", "medium", "high", "critical"]
     },
-    "description": { "description": "What the rule looks for, in prose.", "type": "string", "minLength": 20 },
+    "description": {
+      "description": "What the rule looks for, in prose. A plain string is English; an {en: ..., de: ...} mapping carries a translation, the same convention the artifact catalogue uses. The generated reference marks an untranslated paragraph rather than passing English off as a translation.",
+      "$ref": "#/$defs/prose"
+    },
     "rationale": {
-      "description": "Why an analyst cares. Required, and the field that decides whether a rule is worth shipping: a rule nobody can explain the point of will be ignored, and a pack whose rules get ignored is worse than no pack.",
-      "type": "string",
-      "minLength": 20
+      "description": "Why an analyst cares. Required, and the field that decides whether a rule is worth shipping: a rule nobody can explain the point of will be ignored, and a pack whose rules get ignored is worse than no pack. Accepts a translation mapping like description.",
+      "$ref": "#/$defs/prose"
     },
     "applies_to": {
       "description": "Which events the rule is even shown. Narrowing here is what keeps a pack cheap to run over a large case, and it is also documentation: a rule about a command should say so.",
@@ -101,7 +103,7 @@
     "false_positives": {
       "description": "The benign cases this rule is known to fire on, in the words an analyst would recognise them by. A rule with an empty list is claiming there are none, which is rarely true and is worth having had to think about.",
       "type": "array",
-      "items": { "type": "string", "minLength": 10 }
+      "items": { "$ref": "#/$defs/prose" }
     },
     "references": {
       "description": "URLs, preferably the vendor documentation that says the thing this rule looks for exists.",
@@ -120,14 +122,30 @@
           "name": { "description": "What this sample is, in a few words.", "type": "string", "minLength": 4 },
           "match": { "description": "Whether the rule should fire on it.", "type": "boolean" },
           "event": {
-            "description": "A partial event. Anything left out is filled in with a neutral default, so a test states only what it is about.",
+            "description": "A partial event. Anything left out is filled in with a neutral default, so a test states only what it is about. Any value may be written as {repeat: \"x\", times: 60001} instead of literally, which is how a rule about length states a sample without sixty kilobytes of characters in the file. It is the only expansion there is: a test format with a second way to compute a value starts becoming a language.",
             "type": "object"
+          },
+          "out_of_scope": {
+            "description": "Set on a negative sample whose event the rule deliberately does not look at, where that exclusion is the thing being demonstrated. The prompt-injection rule about instruction-like text is the case it exists for: it must not fire on a user prompt, because the user is entitled to instruct the agent, and the applies_to list is what guarantees that. Without the flag such a sample is indistinguishable from one whose author got the scope wrong, and a test suite cannot tell a deliberate exclusion from a mistake unless the rule says which it is.",
+            "type": "boolean"
           }
         }
       }
     }
   },
   "$defs": {
+    "prose": {
+      "description": "Free text: a plain string, which is English, or a mapping from language code to text.",
+      "oneOf": [
+        { "type": "string", "minLength": 10 },
+        {
+          "type": "object",
+          "required": ["en"],
+          "additionalProperties": { "type": "string", "minLength": 10 },
+          "properties": { "en": { "type": "string", "minLength": 10 } }
+        }
+      ]
+    },
     "condition": {
       "description": "A condition is either a group (exactly one of all, any, none, holding more conditions) or a leaf (one field and exactly one operator). There is no general negation: the useful shape is always 'and none of these apply', and a bare not over a field that resolves to a list has two defensible meanings.",
       "type": "object",
@@ -166,7 +184,10 @@
           "type": "string",
           "minLength": 1
         },
-        "regex": { "type": "string" },
+        "regex": {
+          "description": "A Python regular expression, searched (not anchored). Written case-sensitively unless ignore_case is set or the pattern says (?i) itself. One trap is worth knowing before writing one: the whole-record text views emit a record's leaves one per line, and \\s matches a newline, so a pattern like NAME\\s*=\\s*\\S reaches past the end of its own field and matches an unset NAME followed by whatever the next field holds. Use [^\\S\\n] for whitespace that has to stay on one line. Two shipped rules were wrong this way before their own tests caught it.",
+          "type": "string"
+        },
         "regex_any": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
         "contains": { "type": "string" },
         "contains_any": { "type": "array", "items": { "type": "string" }, "minItems": 1 },

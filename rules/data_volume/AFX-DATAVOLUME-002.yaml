@@ -1,0 +1,48 @@
+id: AFX-DATAVOLUME-002
+pack: data_volume
+title: A single prompt or tool result carried a very large body of text
+severity: low
+description: >
+  One record holds more than sixty thousand characters of text: a paste into a prompt, or a
+  tool result the agent read in one piece.
+rationale: >
+  Volume is where a leak hides. A credential in a one-line prompt is findable by every rule
+  in the secrets pack; the same credential inside a sixty-thousand-character paste is
+  findable by those rules too, but a human reviewing the transcript will not read that far,
+  and the question of what else was in it stays open. This rule exists to put such a record
+  on the list of things to look at deliberately rather than to accuse it of anything, which
+  is why it is low.
+applies_to:
+  kinds: [user.prompt, tool.result, file.read]
+match:
+  any:
+    - field: payload.text
+      length_gt: 60000
+    - field: payload.output
+      length_gt: 60000
+tags:
+  - T1005
+  - large-transfer
+false_positives:
+  - >-
+    A log file or a test output the agent was asked to analyse, which is a normal request
+    and produces exactly this.
+  - >-
+    A generated file, a lockfile or a minified bundle read in one piece, none of which a
+    person pasted.
+tests:
+  - name: a very large paste
+    match: true
+    event:
+      kind: user.prompt
+      agent: claude_code
+      payload:
+        # Stated as a length rather than written out, which is what the repeat form is
+        # for: a rule about size cannot have its sample typed into the file.
+        text: {repeat: "x", times: 60001}
+  - name: an ordinary prompt
+    match: false
+    event:
+      kind: user.prompt
+      agent: claude_code
+      payload: {text: "why does the build fail"}

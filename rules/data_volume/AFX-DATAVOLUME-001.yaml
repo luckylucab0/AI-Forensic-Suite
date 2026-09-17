@@ -1,0 +1,52 @@
+id: AFX-DATAVOLUME-001
+pack: data_volume
+title: A session read many files in a short time
+severity: medium
+description: >
+  Twenty or more file reads from one session inside ten minutes. The count is over reads
+  the agent performed, not over files that exist, so a repository the agent walked once
+  counts once per read.
+rationale: >
+  A burst of reads is what collection looks like from the inside. An agent working on a
+  change reads the files around it; an agent enumerating a tree reads everything, and the
+  difference between the two is the rate rather than any single read. This is a shape rule
+  rather than a content rule, so it says where in the timeline to look and nothing about
+  what was found there.
+applies_to:
+  kinds: [file.read]
+match:
+  field: payload.files[].path
+  exists: true
+aggregate:
+  group_by: [session_id]
+  min_count: 20
+  window_minutes: 10
+tags:
+  - T1005
+  - T1083
+  - collection
+false_positives:
+  - >-
+    Ordinary work in an unfamiliar repository, where reading twenty files in ten minutes
+    is what understanding the code requires and is the most common cause of this finding.
+  - >-
+    A refactor or a dependency upgrade touching many files, which reads all of them.
+  - >-
+    A search tool that reports each hit as its own read, which inflates the count without
+    the agent having read twenty distinct things.
+tests:
+  - name: a file read
+    match: true
+    event:
+      kind: file.read
+      agent: claude_code
+      session_id: s1
+      payload:
+        files: [{path: /src/app/main.py, operation: read}]
+  - name: an event with no file in it
+    match: false
+    event:
+      kind: file.read
+      agent: claude_code
+      session_id: s1
+      payload: {tool: Read}

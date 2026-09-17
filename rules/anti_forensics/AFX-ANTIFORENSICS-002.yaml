@@ -18,7 +18,10 @@ match:
   field: event_text
   regex_any:
     - 'CLAUDE_CODE_SKIP_PROMPT_HISTORY'
-    - '(?i)\bSKIP_PROMPT_HISTORY\s*=\s*(?:1|true|yes)'
+    # [^\S\n] rather than \s: the text a rule searches is the record's leaves one per
+    # line, and \s matches a newline, so this would otherwise match the name on one line
+    # and a 1 belonging to an unrelated field on the next.
+    - '(?i)\bSKIP_PROMPT_HISTORY[^\S\n]*=[^\S\n]*(?:1|true|yes)'
 tags:
   - T1070.003
   - history-suppressed

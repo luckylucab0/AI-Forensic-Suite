@@ -1,0 +1,87 @@
+id: AFX-PROMPTINJECTION-003
+pack: prompt_injection
+title: A project instruction file arrived with the work rather than with the project
+severity: medium
+description: >
+  An instruction file was written or changed during the session, or one was read from a path
+  outside the working directory the agent reported. Instruction files are the ones an agent
+  loads and obeys: CLAUDE.md, AGENTS.md, GEMINI.md, .cursorrules, .windsurfrules, the files
+  under .cursor/rules and .github/instructions, and an MCP configuration.
+rationale: >
+  These files are instructions to the agent that no user has to type and that persist into
+  every later session. A repository that was cloned with one already in it has effectively
+  shipped instructions to whoever opens it next, and one written mid-session has changed
+  the rules the rest of the session ran under. Either way the question an analyst needs
+  settled is whether the agent's instructions came from the person operating it.
+applies_to:
+  kinds: [file.write, file.read, config.snapshot, memory.write]
+match:
+  any:
+    - all:
+        - field: kind
+          equals_any: [file.write, memory.write]
+        - field: payload.files[].path
+          glob_any:
+            - "**/CLAUDE.md"
+            - "**/CLAUDE.local.md"
+            - "**/AGENTS.md"
+            - "**/GEMINI.md"
+            - "**/.cursorrules"
+            - "**/.windsurfrules"
+            - "**/.cursor/rules/**"
+            - "**/.github/copilot-instructions.md"
+            - "**/.github/instructions/**"
+            - "**/.kiro/steering/**"
+            - "**/.mcp.json"
+            - "**/mcp.json"
+            - "**/claude_desktop_config.json"
+    - field: payload.instructions[].scope
+      equals_any: [project, local]
+tags:
+  - prompt-injection
+  - T1547
+  - persistence
+false_positives:
+  - >-
+    A developer asking the agent to write or update the project's own instruction file,
+    which is a normal and recommended thing to do and produces exactly this event.
+  - >-
+    A project whose instruction file has been in version control for months, where the
+    finding says only that it was in effect.
+tests:
+  - name: an instruction file written during the session
+    match: true
+    event:
+      kind: file.write
+      agent: claude_code
+      payload:
+        tool: Write
+        files: [{path: "/src/app/CLAUDE.md", operation: write}]
+  - name: an MCP configuration written during the session
+    match: true
+    event:
+      kind: file.write
+      agent: codex
+      payload:
+        files: [{path: "/src/app/.mcp.json", operation: write}]
+  - name: a project-scoped instruction file in effect
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload:
+        instructions: [{path: "/src/app/CLAUDE.md", scope: project}]
+  - name: an instruction file merely read
+    match: false
+    event:
+      kind: file.read
+      agent: claude_code
+      payload:
+        files: [{path: "/src/app/CLAUDE.md", operation: read}]
+  - name: an ordinary file written
+    match: false
+    event:
+      kind: file.write
+      agent: claude_code
+      payload:
+        files: [{path: "/src/app/main.py", operation: write}]

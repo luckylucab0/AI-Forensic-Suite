@@ -1,0 +1,80 @@
+id: AFX-SENSITIVEPATHS-001
+pack: sensitive_paths
+title: The agent read a private key or an SSH configuration
+severity: high
+description: >
+  A file read, a shell command or a tool argument names a path under an SSH directory, a
+  key file by its conventional name, or a certificate or keystore extension.
+rationale: >
+  A private key the agent read has been sent to a model provider as part of the
+  conversation and written into a transcript on disk, so the read is the moment the key
+  left the developer's control regardless of what the agent did next. An SSH configuration
+  is worth almost as much: it names the hosts and the identities available from this
+  machine, which is the map somebody moving laterally would want.
+applies_to:
+  kinds: [file.read, command.exec, tool.call]
+match:
+  any:
+    - field: payload.files[].path
+      glob_any:
+        - "**/.ssh/**"
+        - "**/id_rsa"
+        - "**/id_ed25519"
+        - "**/id_ecdsa"
+        - "**/id_dsa"
+        - "**/*.pem"
+        - "**/*.p12"
+        - "**/*.pfx"
+        - "**/*.jks"
+        - "**/*.keystore"
+    - field: payload.commands[].command
+      regex: '(?:^|[\s"''=])(?:~|/[A-Za-z0-9_./-]*)?/\.ssh/|\bid_(?:rsa|ed25519|ecdsa|dsa)\b'
+tags:
+  - T1552.004
+  - sensitive-path-read
+false_positives:
+  - >-
+    Reading a public key, which shares the directory and often most of the name. The
+    finding names the path, so the distinction is one glance away.
+  - >-
+    Legitimate work on SSH configuration, which is a normal thing to ask an agent for and
+    requires reading exactly these files.
+  - >-
+    A test key inside a project, which many projects carry for their own test suites.
+tests:
+  - name: a private key read
+    match: true
+    event:
+      kind: file.read
+      agent: claude_code
+      payload:
+        tool: Read
+        files: [{path: "/home/alice/.ssh/id_ed25519", operation: read}]
+  - name: an SSH config read by a shell command
+    match: true
+    event:
+      kind: command.exec
+      agent: codex
+      payload:
+        commands: [{command: "cat ~/.ssh/config"}]
+  - name: a certificate bundle read
+    match: true
+    event:
+      kind: file.read
+      agent: claude_code
+      payload:
+        files: [{path: "/etc/ssl/private/server.pem", operation: read}]
+  - name: an ordinary source file
+    match: false
+    event:
+      kind: file.read
+      agent: claude_code
+      payload:
+        files: [{path: "/src/app/main.py", operation: read}]
+  - name: a command that mentions ssh without touching its directory
+    match: false
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "ssh alice@example.org uptime"}]

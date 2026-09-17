@@ -98,6 +98,20 @@ repos:
         pass_filenames: false
         files: '^(catalog/|exporters/|src/agentforensics/exporters/|scripts/gen_collection_rules\.py)'
 
+      - id: rule-self-test
+        name: every rule agrees with its own samples
+        entry: uv run agentforensics scan --self-test
+        language: system
+        pass_filenames: false
+        files: '^(rules/|src/agentforensics/rules/)'
+
+      - id: rule-docs
+        name: docs/RULES.md current with the rule files
+        entry: uv run python scripts/gen_rule_docs.py --check
+        language: system
+        pass_filenames: false
+        files: '^(rules/|src/agentforensics/rules/|docs/locales/|scripts/gen_rule_docs\.py|docs/RULES)'
+
       - id: catalogue-schema
         name: catalogue validates against its schema
         entry: uv run python -c "from pathlib import Path; from agentforensics.catalog import load_catalogue; print(len(load_catalogue(Path('catalog')).artifacts), 'artifacts validated')"

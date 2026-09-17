@@ -186,7 +186,7 @@ Einzige, was der Viewer irgendwo schreibt, ist die Themenwahl in `localStorage`.
 | 1 | Artefaktkatalog, beide Kollektoren, Bundle-Format, `verify`, synthetische Testdaten | fertig |
 | 2 | Generierte Sammelregeln für Velociraptor, KAPE, Defender Live Response, KQL, osquery | fertig |
 | 3 | Analyzer-Kern: Ingest-Adapter, Parser pro Agent, einheitliches Ereignismodell, SQLite-Falldatenbank, vereinheitlichtes Logformat, Timeline-Exporte | laufend |
-| 4 | Deklarative YAML-Regel-Engine und die ersten Regelpakete | geplant |
+| 4 | Deklarative YAML-Regel-Engine und die ersten Regelpakete | fertig |
 | 5 | Lokale Web-UI: nur lesende API, API-Quelle im Viewer, Timeline- und Fundansichten | geplant |
 
 Vorerst nicht geplant: Fallverwaltung mit Triage-Status, Berichte als HTML und PDF,
@@ -200,6 +200,9 @@ Pseudonymisierung, und ein Shell-Kollektor als Rückfallebene.
 - [docs/ARTIFACTS.de.md](docs/ARTIFACTS.de.md), die generierte Artefaktreferenz,
   gruppiert danach, wie schnell ein Artefakt verschwindet
 - [docs/BUNDLE_FORMAT.de.md](docs/BUNDLE_FORMAT.de.md), das Format des Beweismittel-Bundles
+- [docs/RULES.de.md](docs/RULES.de.md), die generierte Erkennungsreferenz: jede Regel
+  mit ihrer Bedingung, warum sie für die Analyse zählt, und den harmlosen Fällen, auf
+  die sie bekanntermaßen feuert
 - [docs/UNIFIED_FORMAT.de.md](docs/UNIFIED_FORMAT.de.md), das vendorneutrale Agenten-Log:
   ein JSON-Lines-Datensatz pro Ereignis, egal welcher Agent die Spuren hinterlassen hat
   und egal welches Werkzeug sie liest

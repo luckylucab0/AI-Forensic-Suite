@@ -1,0 +1,916 @@
+<!-- Generated file. Do not edit. -->
+
+# Erkennungsregeln
+
+*Erzeugt aus rules/ durch scripts/gen_rule_docs.py. Nicht von Hand bearbeiten.*
+
+Eine Datei pro Regel unter rules/, gruppiert in Pakete. Eine Regel ist Daten und kein Code: ein Baum von Bedingungen über benannte Ereignisfelder, ohne auszuwertenden Ausdruck und ohne etwas Aufrufbares in einer Regeldatei. Siehe docs/adr/0019-rules-are-data-with-their-own-tests.md.
+
+> Jede Regel ist eine Heuristik. Ein Fund ist ein Hinweis, der von einer Analystin oder einem Analysten geprüft werden muss, niemals ein Urteil.
+
+Jede Regel trägt ihre eigenen positiven und negativen Stichproben, und pytest führt jede einzelne als eigenen Fall aus. Eine Regel mit ausschließlich positiven Stichproben weist der Lader ab, denn der Fehler, auf den es ankommt, ist nicht eine Regel, die etwas übersieht: es ist eine Regel, die auf alles feuert, und die besteht jede positive Stichprobe, die sie hat.
+
+Funde werden in die Falldatenbank geschrieben, neben die Ereignisse, auf denen sie ruhen, und jeder Scan wird festgehalten, ob etwas gefeuert hat oder nicht. Sonst sähen ein Fall ohne Funde und ein Fall, den niemand gescannt hat, gleich aus, und das sind entgegengesetzte Schlüsse.
+
+## Pakete
+
+| Paket | Kennung | Schweregrad |
+| --- | --- | --- |
+| [`anti_forensics`](#anti-forensics) | [AFX-ANTIFORENSICS-001](#afx-antiforensics-001) | hoch |
+|  | [AFX-ANTIFORENSICS-002](#afx-antiforensics-002) | hoch |
+|  | [AFX-ANTIFORENSICS-003](#afx-antiforensics-003) | kritisch |
+|  | [AFX-ANTIFORENSICS-004](#afx-antiforensics-004) | hoch |
+| [`dangerous_commands`](#dangerous-commands) | [AFX-DANGEROUSCOMMANDS-001](#afx-dangerouscommands-001) | hoch |
+|  | [AFX-DANGEROUSCOMMANDS-002](#afx-dangerouscommands-002) | hoch |
+|  | [AFX-DANGEROUSCOMMANDS-003](#afx-dangerouscommands-003) | mittel |
+| [`data_volume`](#data-volume) | [AFX-DATAVOLUME-001](#afx-datavolume-001) | mittel |
+|  | [AFX-DATAVOLUME-002](#afx-datavolume-002) | niedrig |
+| [`exfil_indicators`](#exfil-indicators) | [AFX-EXFILINDICATORS-001](#afx-exfilindicators-001) | hoch |
+|  | [AFX-EXFILINDICATORS-002](#afx-exfilindicators-002) | mittel |
+|  | [AFX-EXFILINDICATORS-003](#afx-exfilindicators-003) | mittel |
+| [`permission_bypass`](#permission-bypass) | [AFX-PERMISSIONBYPASS-001](#afx-permissionbypass-001) | hoch |
+|  | [AFX-PERMISSIONBYPASS-002](#afx-permissionbypass-002) | hoch |
+|  | [AFX-PERMISSIONBYPASS-003](#afx-permissionbypass-003) | mittel |
+| [`prompt_injection`](#prompt-injection) | [AFX-PROMPTINJECTION-001](#afx-promptinjection-001) | hoch |
+|  | [AFX-PROMPTINJECTION-002](#afx-promptinjection-002) | hoch |
+|  | [AFX-PROMPTINJECTION-003](#afx-promptinjection-003) | mittel |
+| [`secrets`](#secrets) | [AFX-SECRETS-001](#afx-secrets-001) | hoch |
+|  | [AFX-SECRETS-002](#afx-secrets-002) | kritisch |
+|  | [AFX-SECRETS-003](#afx-secrets-003) | hoch |
+|  | [AFX-SECRETS-004](#afx-secrets-004) | hoch |
+|  | [AFX-SECRETS-005](#afx-secrets-005) | mittel |
+| [`sensitive_paths`](#sensitive-paths) | [AFX-SENSITIVEPATHS-001](#afx-sensitivepaths-001) | hoch |
+|  | [AFX-SENSITIVEPATHS-002](#afx-sensitivepaths-002) | hoch |
+|  | [AFX-SENSITIVEPATHS-003](#afx-sensitivepaths-003) | kritisch |
+| [`supply_chain`](#supply-chain) | [AFX-SUPPLYCHAIN-001](#afx-supplychain-001) | mittel |
+|  | [AFX-SUPPLYCHAIN-002](#afx-supplychain-002) | hoch |
+| [`third_party_endpoints`](#third-party-endpoints) | [AFX-THIRDPARTYENDPOINTS-001](#afx-thirdpartyendpoints-001) | hoch |
+
+Regeln sind nach Paket aufgeführt, innerhalb eines Pakets nach Id.
+
+Regeldateien sind englisch, wie der Code und die Architekturentscheidungen, deshalb sind die meisten Absätze unten mit [EN] markiert. Eine Regel kann eine Übersetzung mitbringen, und die, die es tun, sind nicht markiert.
+
+## anti forensics
+
+Schritte, die den Nachweis verkürzen oder entfernen. Der ergiebigste Fund in diesem Paket ist der, der als unvollständig dokumentiert ist, denn er belegt die Absicht und nennt die Verzeichnisse, die noch zu lesen lohnen.
+
+#### AFX-ANTIFORENSICS-001
+
+**Transcript retention was lowered below the vendor default**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `anti_forensics` |
+| Agenten | `any` |
+| Ereignisarten | `config.snapshot` |
+| Gelesene Felder | `payload.cleanupPeriodDays`, `payload.desktopSessionCleanupPeriodDays`, `raw.cleanupPeriodDays`, `raw.desktopSessionCleanupPeriodDays` |
+| Schlagworte | `T1070`, `retention-reduced` |
+
+[EN] A configuration snapshot sets the retention period for transcripts to fewer days than the vendor's default of 30. Claude Code spells this cleanupPeriodDays, and desktopSessionCleanupPeriodDays for desktop and Cowork transcripts.
+
+*Worauf sie trifft:* `(payload.cleanupPeriodDays < 30 or payload.desktopSessionCleanupPeriodDays < 30 or raw.cleanupPeriodDays < 30 or raw.desktopSessionCleanupPeriodDays < 30)`
+
+*Warum das für die Analyse zählt:* [EN] Retention is the setting that decides how much of an agent's history still exists when somebody comes to look. Lowering it does not delete anything visibly and leaves no command in a shell history, but it shortens the window in which any of this is recoverable, and a value of 0 or 1 means the evidence for all but the current work is already gone. The setting is also the explanation for an absence, which is the other reason to find it: a transcript store that looks swept is a different finding depending on whether the sweep was configured or somebody ran something.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A deliberate privacy choice. An individual or an organization can decide to keep less, and that is a legitimate configuration rather than an attempt to destroy evidence. The finding says the window is short, not why.
+- [EN] A machine that was configured once and has kept the setting since, where the low value long predates whatever is being investigated.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/settings-reference>
+- <https://code.claude.com/docs/en/data-usage>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-ANTIFORENSICS-002
+
+**Prompt history recording was suppressed by an environment variable**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `anti_forensics` |
+| Agenten | `any` |
+| Ereignisarten | `any` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1070.003`, `history-suppressed` |
+
+[EN] An environment variable that stops the agent writing its prompt history appears in a record. For Claude Code the variable is CLAUDE_CODE_SKIP_PROMPT_HISTORY.
+
+*Worauf sie trifft:* `event_text matches /CLAUDE_CODE_SKIP_PROMPT_HISTORY/ or /(?i)\bSKIP_PROMPT_HISTORY[^\S\n]*=[^\S\n]*(?:1\|true\|yes)/`
+
+*Warum das für die Analyse zählt:* [EN] Prompt history normally outlives the transcripts, because it is a small append-only file that no retention sweep of the same aggressiveness touches. It is therefore often the only surviving record of what a user asked, and suppressing it removes the one artifact that answers that question after the transcripts are gone. A variable set in a shell profile also applies to every future session, which makes it a durable decision rather than a one-off.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A mention in documentation or in a discussion about privacy settings, which matches because the text on disk is what is searched.
+- [EN] A variable set to 0 or to an empty value, which the second pattern excludes but the first does not, because the name appearing at all in a shell profile is worth reading.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/settings>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-ANTIFORENSICS-003
+
+**An agent's own state was purged with its purge command**
+
+| | |
+| --- | --- |
+| Schweregrad | kritisch |
+| Paket | `anti_forensics` |
+| Agenten | `any` |
+| Ereignisarten | `command.exec`, `prompt.history` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1070`, `T1485`, `deliberate-destruction` |
+
+[EN] A command line runs an agent's own command for removing its stored state for a project. Claude Code spells this claude project purge, which the vendor documents as removing that project's state.
+
+*Worauf sie trifft:* `event_text matches /\bclaude\s+project\s+purge\b/ or /\bcodex\s+(?:session\|history)\s+(?:purge\|clear\|delete)\b/`
+
+*Warum das für die Analyse zählt:* [EN] This is the one action in this pack that destroys evidence on purpose and says so in its own name. The reason it is worth a critical rather than a high is that the purge is incomplete in a way the vendor documents: the agent's configuration backups, its startup shell snapshots and its session markers are explicitly left alone because they are not project-scoped. So a purge both establishes intent and tells an analyst exactly which directories are still worth reading, which is the most productive kind of finding this tool can produce.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A purge run for a legitimate reason, such as removing a customer's data from a developer machine at the end of an engagement. Intent is not what this rule reads.
+- [EN] The command quoted in a runbook or a cleanup script rather than run, which matches because the text on disk is what is searched.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/claude-directory>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-ANTIFORENSICS-004
+
+**A command removed an agent store, a transcript or a shell history**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `anti_forensics` |
+| Agenten | `any` |
+| Ereignisarten | `command.exec`, `prompt.history` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1070.003`, `T1485`, `deliberate-destruction` |
+
+[EN] A shell command deletes or truncates a path that holds agent history or shell history: an agent's configuration directory, a transcript store, or one of the shell history files a command invocation would be recorded in.
+
+*Worauf sie trifft:* `event_text matches /(?:\brm\b(?:\s+-[a-zA-Z]+)*\s\|\bshred\b\|\bunlink\b\|\btruncate\b\|>\s*)/ and event_text matches /\.claude(?:\.json)?\b/ or /\.codex\b/ or /\.copilot\b/ or /\.gemini\b/ or /\.cursor\b/ or /(?:bash\|zsh)_history\b/ or /fish_history\b/ or /ConsoleHost_history\.txt/`
+
+*Warum das für die Analyse zählt:* [EN] Unlike a purge command this leaves nothing behind that names itself, so the deletion has to be read out of the command that did it. It is also the version that reaches the artifacts an agent's own purge does not touch. A shell history removed in the same session as agent work is the specific pattern worth escalating: it removes the record of how the agent was invoked, which is where the flags that answer the bypass question live.
+
+*Bekannte Fehlalarme:*
+
+- [EN] Ordinary housekeeping. Clearing a cache under an agent directory, or removing a stale lock file, matches and is not destruction of evidence.
+- [EN] An installer or an uninstaller doing what it is for.
+- [EN] A redirection into an unrelated file whose path merely mentions one of these directories, since the two halves of this rule are matched over the whole record rather than against each other.
+
+*Stichproben in der Regeldatei:* 3 / 2 (+/-)
+
+## dangerous commands
+
+Befehle, deren Wirkung schwer rückgängig zu machen oder hinterher schwer festzustellen ist. Zwei davon betreffen Zerstörung, eine eine Zeitachse, der nicht mehr zu trauen ist, und das ist ein anderer Verlust und genauso relevant.
+
+#### AFX-DANGEROUSCOMMANDS-001
+
+**A recursive delete was run against a broad path**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `dangerous_commands` |
+| Agenten | `any` |
+| Ereignisarten | `command.exec` |
+| Gelesene Felder | `payload.commands[].command` |
+| Schlagworte | `T1485`, `destructive-command` |
+
+[EN] The agent ran a recursive, forced delete whose target is a root, a home directory, a wildcard at the top of a tree, or a variable that was empty when the command was built. The last case is the one worth reading twice: rm -rf "$DIR"/ with DIR unset deletes from the filesystem root.
+
+*Worauf sie trifft:* `payload.commands[].command matches /\brm\b[^\|;&]*\s-[a-zA-Z]*[rR][a-zA-Z]*f\|\brm\b[^\|;&]*\s-[a-zA-Z]*f[a-zA-Z]*[rR]/ and payload.commands[].command matches /\brm\b[^\|;&]*\s+/\s*$/ or /\brm\b[^\|;&]*\s+/[a-z]*\s+/ or /\brm\b[^\|;&]*\s+["']?(?:~\|\$HOME\|%USERPROFILE%)["']?/?\s*$/ or /\brm\b[^\|;&]*\s+["']?\$\{?[A-Za-z_][A-Za-z0-9_]*\}?["']?// or /\brm\b[^\|;&]*\s+/\*/`
+
+*Warum das für die Analyse zählt:* [EN] This is the destructive action an agent is most likely to take by accident, and the one whose damage is hardest to establish afterwards, because what was deleted leaves nothing behind that says what it was. Finding the command is often the only way to bound the loss, and the timestamp on it is what tells a restore which backup to go back to.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A delete inside a container or a build directory that happens to be spelled with an absolute path, which is common in a Dockerfile or a CI script the agent was editing.
+- [EN] A variable that was in fact set, which the transcript usually cannot confirm. The pattern flags the shape, and the shape is worth reading whether or not it fired.
+
+*Stichproben in der Regeldatei:* 3 / 2 (+/-)
+
+#### AFX-DANGEROUSCOMMANDS-002
+
+**A command piped a download straight into a shell**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `dangerous_commands` |
+| Agenten | `any` |
+| Ereignisarten | `command.exec` |
+| Gelesene Felder | `payload.commands[].command` |
+| Schlagworte | `T1059`, `T1105`, `remote-code-execution` |
+
+[EN] The agent fetched something from the network and piped it into a shell or an interpreter in one command, the curl or wget into sh pattern and its PowerShell equivalent.
+
+*Worauf sie trifft:* `(payload.commands[].command matches /(?:curl\|wget\|Invoke-WebRequest\|iwr\|Invoke-RestMethod)\b[^\|]*\\|\s*(?:sudo\s+)?(?:ba\|z\|d\|k)?sh\b/ or payload.commands[].command matches /(?:curl\|wget)\b[^\|]*\\|\s*(?:sudo\s+)?(?:python[23]?\|perl\|ruby\|node)\b/ or payload.commands[].command matches /(?i)(?:iwr\|Invoke-WebRequest\|Invoke-RestMethod)\b[^\|]*\\|\s*(?:iex\|Invoke-Expression)\b/)`
+
+*Warum das für die Analyse zählt:* [EN] This is remote code execution the agent chose to perform, and the code it ran is not in the transcript: only the address it came from is. So the finding is both the action and the limit of what can be known about it, which is why the address matters more here than in most findings. It is also the shape a prompt injection most often asks an agent to produce, which makes the surrounding conversation worth reading.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A documented installer. Several widely used tools publish exactly this command as their installation instruction, so the pattern is common in legitimate setup work.
+- [EN] A line in a Dockerfile or a CI script the agent was reading or writing rather than running, which reaches the command facet only if the agent also executed it.
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-DANGEROUSCOMMANDS-003
+
+**A command rewrote or force-pushed git history**
+
+| | |
+| --- | --- |
+| Schweregrad | mittel |
+| Paket | `dangerous_commands` |
+| Agenten | `any` |
+| Ereignisarten | `command.exec` |
+| Gelesene Felder | `payload.commands[].command` |
+| Schlagworte | `T1070`, `history-rewritten` |
+
+[EN] The agent force-pushed, reset hard, rewrote history with filter-branch or filter-repo, or amended and pushed.
+
+*Worauf sie trifft:* `(payload.commands[].command matches /\bgit\b[^\|;&]*\bpush\b[^\|;&]*(?:--force\b(?!-with-lease)\|(?<![\w-])-f(?![\w-]))/ or payload.commands[].command matches /\bgit\b[^\|;&]*\breset\b[^\|;&]*--hard\b/ or payload.commands[].command matches /\bgit\b[^\|;&]*\b(?:filter-branch\|filter-repo)\b/)`
+
+*Warum das für die Analyse zählt:* [EN] History rewriting is ordinary developer work and is in this pack for a different reason than the other two: it destroys the timeline an investigation would otherwise use. Commit dates, authorship and the order in which changes appeared are all evidence, and a force push replaces them with something that looks equally authentic. If an agent's work is being reconstructed from a repository, this is the finding that says the repository can no longer be trusted to say when things happened.
+
+*Bekannte Fehlalarme:*
+
+- [EN] Force-pushing a branch the agent itself created is routine and is what a rebase workflow requires, so on its own this says nothing about intent.
+- [EN] A reset hard to discard local changes, which is the ordinary way to start over and destroys nothing that was shared.
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+## data volume
+
+Form statt Inhalt. Diese Regeln sagen, wo in einer Zeitachse bewusst hinzusehen ist, und nichts darüber, was dort zu finden sein wird.
+
+#### AFX-DATAVOLUME-001
+
+**A session read many files in a short time**
+
+| | |
+| --- | --- |
+| Schweregrad | mittel |
+| Paket | `data_volume` |
+| Agenten | `any` |
+| Ereignisarten | `file.read` |
+| Gelesene Felder | `payload.files[].path` |
+| Schlagworte | `T1005`, `T1083`, `collection` |
+
+[EN] Twenty or more file reads from one session inside ten minutes. The count is over reads the agent performed, not over files that exist, so a repository the agent walked once counts once per read.
+
+*Worauf sie trifft:* `payload.files[].path is present`
+
+*Feuert auf eine Anzahl statt auf ein einzelnes Ereignis, gruppiert nach* `session_id`, n >= 20, 10 min.
+
+*Warum das für die Analyse zählt:* [EN] A burst of reads is what collection looks like from the inside. An agent working on a change reads the files around it; an agent enumerating a tree reads everything, and the difference between the two is the rate rather than any single read. This is a shape rule rather than a content rule, so it says where in the timeline to look and nothing about what was found there.
+
+*Bekannte Fehlalarme:*
+
+- [EN] Ordinary work in an unfamiliar repository, where reading twenty files in ten minutes is what understanding the code requires and is the most common cause of this finding.
+- [EN] A refactor or a dependency upgrade touching many files, which reads all of them.
+- [EN] A search tool that reports each hit as its own read, which inflates the count without the agent having read twenty distinct things.
+
+*Stichproben in der Regeldatei:* 1 / 1 (+/-)
+
+#### AFX-DATAVOLUME-002
+
+**A single prompt or tool result carried a very large body of text**
+
+| | |
+| --- | --- |
+| Schweregrad | niedrig |
+| Paket | `data_volume` |
+| Agenten | `any` |
+| Ereignisarten | `user.prompt`, `tool.result`, `file.read` |
+| Gelesene Felder | `payload.text`, `payload.output` |
+| Schlagworte | `T1005`, `large-transfer` |
+
+[EN] One record holds more than sixty thousand characters of text: a paste into a prompt, or a tool result the agent read in one piece.
+
+*Worauf sie trifft:* `(payload.text is > 60000 long or payload.output is > 60000 long)`
+
+*Warum das für die Analyse zählt:* [EN] Volume is where a leak hides. A credential in a one-line prompt is findable by every rule in the secrets pack; the same credential inside a sixty-thousand-character paste is findable by those rules too, but a human reviewing the transcript will not read that far, and the question of what else was in it stays open. This rule exists to put such a record on the list of things to look at deliberately rather than to accuse it of anything, which is why it is low.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A log file or a test output the agent was asked to analyse, which is a normal request and produces exactly this.
+- [EN] A generated file, a lockfile or a minified bundle read in one piece, none of which a person pasted.
+
+*Stichproben in der Regeldatei:* 1 / 1 (+/-)
+
+## exfil indicators
+
+Daten, die das Gerät verlassen. Diese Regeln melden die Form einer Übertragung, nicht ihren Inhalt, jede ist also eine Frage danach, was gesendet wurde, und keine Antwort.
+
+#### AFX-EXFILINDICATORS-001
+
+**A command posted local data to a paste or file sharing site**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `exfil_indicators` |
+| Agenten | `any` |
+| Ereignisarten | `command.exec`, `network.request`, `tool.call` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1567.002`, `T1041`, `exfiltration` |
+
+[EN] A command sends data to a paste service, a transfer service or a webhook collector, or pipes a local file into such a request.
+
+*Worauf sie trifft:* `event_text matches /(?i)\bhttps?://(?:[a-z0-9-]+\.)*(?:pastebin\.com\|paste\.ee\|dpaste\.[a-z]+\|ghostbin\.[a-z]+\|termbin\.com\|0x0\.st\|transfer\.sh\|file\.io\|anonfiles\.[a-z]+\|gofile\.io\|catbox\.moe\|bashupload\.com)\b/ or /(?i)\bhttps?://(?:[a-z0-9-]+\.)*(?:webhook\.site\|requestbin\.[a-z]+\|pipedream\.net\|beeceptor\.com\|interact\.sh\|oast\.[a-z]+)\b/ or /\bnc\s+termbin\.com\s+9999\b/`
+
+*Warum das für die Analyse zählt:* [EN] These destinations exist to make data reachable by URL to anyone who has it, which is what separates them from an ordinary outbound request. An agent asked to share a log or a diff will reach for one, and so will an injected instruction, so the finding is a question about what was sent rather than an answer. The command line usually names the file, which is what makes the question answerable.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A deliberate share. Putting a build log on a paste site to send to a colleague is ordinary, and the finding cannot tell that from the alternative.
+- [EN] A collector URL used on purpose while debugging a webhook integration, which is what those services are for.
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-EXFILINDICATORS-002
+
+**A command encoded local data before sending it**
+
+| | |
+| --- | --- |
+| Schweregrad | mittel |
+| Paket | `exfil_indicators` |
+| Agenten | `any` |
+| Ereignisarten | `command.exec` |
+| Gelesene Felder | `payload.commands[].command` |
+| Schlagworte | `T1132`, `T1041`, `exfiltration` |
+
+[EN] A single command reads or encodes local data and sends it in the same pipeline: a base64 or gzip stage feeding a network client, or a request whose body is built from a file.
+
+*Worauf sie trifft:* `payload.commands[].command matches /\b(?:base64\|openssl\s+enc\|gzip\|tar\s+[a-z]*c\|zip\|xxd)\b/ and payload.commands[].command matches /\b(?:curl\|wget\|nc\|ncat\|socat\|Invoke-WebRequest\|Invoke-RestMethod\|scp\|rsync)\b/`
+
+*Warum das für die Analyse zählt:* [EN] Encoding before sending is not itself suspicious, and that is why this rule is medium. What makes it worth reading is that encoding removes the one thing an outbound request would otherwise reveal, which is what was in it. A finding here says that whatever left cannot be reconstructed from a network record, so the transcript is the only place the answer could still be.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A legitimate upload of an archive, which is how most artifacts are published and which matches because tar and curl are in the same command.
+- [EN] A download that is decoded rather than an upload that is encoded, since the pattern reads the command's parts and not their direction.
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-EXFILINDICATORS-003
+
+**A command pushed to a git remote the agent had just added**
+
+| | |
+| --- | --- |
+| Schweregrad | mittel |
+| Paket | `exfil_indicators` |
+| Agenten | `any` |
+| Ereignisarten | `command.exec` |
+| Gelesene Felder | `payload.commands[].command` |
+| Schlagworte | `T1567`, `exfiltration` |
+
+[EN] Within one event the agent both added or set a git remote and pushed to it, or pushed to a remote whose URL carries an embedded credential.
+
+*Worauf sie trifft:* `(payload.commands[].command matches /\bgit\b[^;&\|]*\bremote\b[^;&\|]*\b(?:add\|set-url)\b[\s\S]{0,400}?\bgit\b[^;&\|]*\bpush\b/ or payload.commands[].command matches /\bgit\b[^;&\|]*\bpush\b[^;&\|]*https?://[^\s/@]+:[^\s/@]+@/)`
+
+*Warum das für die Analyse zählt:* [EN] Pushing code is what a coding agent does, so a push on its own says nothing. A push to a remote that did not exist a moment earlier is different: it means the destination came from the conversation rather than from the repository's own configuration, and a destination that came from the conversation could have come from anywhere in it, including from content the agent read rather than from the user.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A fork workflow, where adding a second remote and pushing to it in one go is the normal way to do the work.
+- [EN] A setup script that configures a remote and pushes an initial commit, which is exactly this shape and entirely routine.
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+## permission bypass
+
+Sicherheitskontrollen, die abgeschaltet wurden, nicht Kontrollen, die versagt haben. Beide Hälften der Frage stehen hier: was beim Start gesetzt war, und was danach geändert wurde.
+
+#### AFX-PERMISSIONBYPASS-001
+
+**The agent was started with permission prompts skipped**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `permission_bypass` |
+| Agenten | `any` |
+| Ereignisarten | `command.exec`, `config.snapshot`, `prompt.history` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1562.001`, `permission-bypass` |
+
+[EN] A command line starts an agent with the flag that skips permission prompts, or with the permission mode that does the same. For Claude Code these are --dangerously-skip-permissions and --permission-mode bypassPermissions, which the vendor documents as equivalent.
+
+*Worauf sie trifft:* `(event_text matches /--dangerously-skip-permissions/ or event_text matches /--permission-mode[= ]+bypassPermissions/)`
+
+*Warum das für die Analyse zählt:* [EN] This is the single clearest answer to the question whether safety controls were bypassed, because it is not a control that failed, it is a control somebody turned off and had to type a word like dangerously to turn off. In this mode the agent writes without asking, including to the paths the vendor protects by default such as the repository's own git directory and the agent's own configuration, so anything found afterwards has to be read knowing that nobody was asked.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A deliberate use inside a container or a virtual machine, which is what the vendor documentation recommends the mode for. The finding is still correct; whether it was appropriate depends on where the agent was running.
+- [EN] Documentation, a README or a script that mentions the flag without running it, which matches because the text is what is on disk.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/cli-reference>
+- <https://code.claude.com/docs/en/permissions>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-PERMISSIONBYPASS-002
+
+**The approval mode was changed mid-session to one that stops asking**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `permission_bypass` |
+| Agenten | `any` |
+| Ereignisarten | `permission.change` |
+| Gelesene Felder | `payload.permissions[].mode` |
+| Schlagworte | `T1562.001`, `permission-bypass` |
+
+[EN] A permission.change event records the agent's approval mode moving to one that auto-approves tool calls. For Claude Code the vendor documents acceptEdits, auto and bypassPermissions as modes that do not prompt for the calls they cover.
+
+*Worauf sie trifft:* `payload.permissions[].mode is 'bypassPermissions' or 'acceptEdits' or 'auto' or 'dontAsk'`
+
+*Warum das für die Analyse zählt:* [EN] A mode set at startup is a decision about the whole session. A mode changed part way through is a decision about what comes next, which makes the moment it changed the thing to read the transcript around: what was the agent about to do, and who decided it should not be asked about. This is the half of the bypass question a flag on a command line cannot answer.
+
+*Bekannte Fehlalarme:*
+
+- [EN] acceptEdits is a routine choice for a developer working in a scratch repository, and on its own says little. Read it together with what the agent did next.
+- [EN] dontAsk auto-denies rather than auto-approves, so it appears here because it stops the prompting rather than because it widens what is allowed. It is in the list because a session that stopped asking is a session whose transcript reads differently, in either direction.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/permissions>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-PERMISSIONBYPASS-003
+
+**A permission rule allows every call of a whole tool**
+
+| | |
+| --- | --- |
+| Schweregrad | mittel |
+| Paket | `permission_bypass` |
+| Agenten | `any` |
+| Ereignisarten | `config.snapshot` |
+| Gelesene Felder | `payload.permissions[].subject` |
+| Schlagworte | `T1562.001`, `permission-bypass` |
+
+[EN] A configuration snapshot holds an allow entry that is a bare tool name. The vendor documents a bare name as matching every call of that tool, so an entry of Bash allows every shell command, Read every file read and WebFetch every outbound request.
+
+*Worauf sie trifft:* `payload.permissions[].subject is 'Bash' or 'Read' or 'Write' or 'Edit' or 'MultiEdit' or 'WebFetch' or 'WebSearch' or 'NotebookEdit'`
+
+*Warum das für die Analyse zählt:* [EN] This is the quiet version of a bypass. Nobody typed a dangerous-looking flag and no mode changed; a line in a settings file means the prompt for a whole class of action never appears again, in every session, for as long as the file says so. An analyst reading a transcript with no permission prompts in it needs to know whether that is because nothing needed approving or because a rule had already approved it.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A bare Read entry is close to harmless on its own, because reads inside the working directory need no approval anyway.
+- [EN] A project that has deliberately allowed a tool and constrained it another way, for example with a deny rule or a pre-tool hook, which the vendor documents as taking precedence over an allow rule.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/permissions>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+## prompt injection
+
+Ob der Agent durch Anweisungen manipuliert wurde, die er gelesen hat, statt durch Anweisungen, die er bekommen hat. Der Geltungsbereich dieser Regeln ist der Punkt: die erste betrachtet nur, was von einem Werkzeug zurückkam, und nie einen Nutzer-Prompt, denn ein Nutzer darf den Agenten anweisen und eine Webseite nicht.
+
+#### AFX-PROMPTINJECTION-001
+
+**Instruction-like text arrived in content the agent read rather than from the user**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `prompt_injection` |
+| Agenten | `any` |
+| Ereignisarten | `tool.result`, `mcp.call`, `network.request` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `prompt-injection`, `T1204` |
+
+[EN] A tool result, a fetched page or an MCP response carries text addressed to the agent: telling it to ignore previous instructions, claiming to be a system message, or instructing it to perform an action. The scope is the point. This rule looks only at what came back from a tool, never at a user prompt, because the user is allowed to instruct the agent and a web page is not.
+
+*Worauf sie trifft:* `(event_text matches /(?i)ignore\s+(?:all\s+)?(?:the\s+)?(?:previous\|prior\|above\|earlier)\s+(?:instructions?\|prompts?\|rules?\|context)/ or event_text matches /(?i)disregard\s+(?:all\s+)?(?:previous\|prior\|the\s+above\|your)\s+(?:instructions?\|rules?\|system\s+prompt)/ or event_text matches /(?i)</?(?:system\|system-reminder\|important_instructions\|IMPORTANT)>/ or event_text matches /(?i)\b(?:you\s+are\s+now\|from\s+now\s+on\s+you\|new\s+instructions?\s*:\|system\s+override)\b/ or event_text matches /(?i)\bdo\s+not\s+(?:tell\|mention\|inform)\s+the\s+user\b/)`
+
+*Warum das für die Analyse zählt:* [EN] This is the answer to whether the agent was manipulated by injected instructions, which is one of the questions this suite exists for. An agent cannot distinguish instructions from data in the text it reads, so content that speaks to the agent in the imperative is the mechanism, and finding it in a tool result is finding the delivery. What the agent did in the turns after the match is where the consequence would be.
+
+*Bekannte Fehlalarme:*
+
+- [EN] Documentation about prompt injection, which necessarily quotes these phrases and is exactly what a developer asks an agent to read when working on the problem.
+- [EN] A test fixture or a security test suite in the repository the agent was working in.
+- [EN] A conversation in an issue tracker or a pull request the agent fetched, where somebody was discussing an agent's behaviour.
+
+*Quellen:*
+
+- <https://owasp.org/www-project-top-10-for-large-language-model-applications/>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-PROMPTINJECTION-002
+
+**Text the agent read contained invisible or direction-changing characters**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `prompt_injection` |
+| Agenten | `any` |
+| Ereignisarten | `tool.result`, `mcp.call`, `network.request`, `file.read`, `user.prompt`, `config.snapshot` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `prompt-injection`, `T1027`, `obfuscation` |
+
+[EN] A record carries zero-width characters, bidirectional overrides, or Unicode tag characters. Zero-width joiners and spaces are invisible; bidi overrides make text render in an order different from the order it is stored in; tag characters are a block that renders as nothing at all and is sometimes used to smuggle a whole instruction.
+
+*Worauf sie trifft:* `event_text matches /[​‌‍⁠﻿]/ or /[‪-‮⁦-⁩]/ or /[󠀀-󠁿]/`
+
+*Warum das für die Analyse zählt:* [EN] A human reviewing a page, a pull request or a configuration file sees one thing and the agent reads another. That gap is the entire technique, and unlike a phrase-based injection there is no benign version of it in ordinary prose. It is also invisible to the reviewer by construction, which is why a tool has to be the thing that finds it.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A legitimate use of a zero-width joiner, which is how several writing systems and most emoji sequences are composed. A record in a language that uses them will match.
+- [EN] A byte order mark at the start of a file, which is ordinary on Windows and matches the first pattern.
+
+*Quellen:*
+
+- <https://www.unicode.org/reports/tr9/>
+
+*Stichproben in der Regeldatei:* 3 / 2 (+/-)
+
+#### AFX-PROMPTINJECTION-003
+
+**A project instruction file arrived with the work rather than with the project**
+
+| | |
+| --- | --- |
+| Schweregrad | mittel |
+| Paket | `prompt_injection` |
+| Agenten | `any` |
+| Ereignisarten | `file.write`, `file.read`, `config.snapshot`, `memory.write` |
+| Gelesene Felder | `kind`, `payload.files[].path`, `payload.instructions[].scope` |
+| Schlagworte | `prompt-injection`, `T1547`, `persistence` |
+
+[EN] An instruction file was written or changed during the session, or one was read from a path outside the working directory the agent reported. Instruction files are the ones an agent loads and obeys: CLAUDE.md, AGENTS.md, GEMINI.md, .cursorrules, .windsurfrules, the files under .cursor/rules and .github/instructions, and an MCP configuration.
+
+*Worauf sie trifft:* `(kind is 'file.write' or 'memory.write' and payload.files[].path matches path **/CLAUDE.md or **/CLAUDE.local.md or **/AGENTS.md or **/GEMINI.md or **/.cursorrules or **/.windsurfrules or **/.cursor/rules/** or **/.github/copilot-instructions.md or **/.github/instructions/** or **/.kiro/steering/** or **/.mcp.json or **/mcp.json or **/claude_desktop_config.json or payload.instructions[].scope is 'project' or 'local')`
+
+*Warum das für die Analyse zählt:* [EN] These files are instructions to the agent that no user has to type and that persist into every later session. A repository that was cloned with one already in it has effectively shipped instructions to whoever opens it next, and one written mid-session has changed the rules the rest of the session ran under. Either way the question an analyst needs settled is whether the agent's instructions came from the person operating it.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A developer asking the agent to write or update the project's own instruction file, which is a normal and recommended thing to do and produces exactly this event.
+- [EN] A project whose instruction file has been in version control for months, where the finding says only that it was in effect.
+
+*Stichproben in der Regeldatei:* 3 / 2 (+/-)
+
+## secrets
+
+Zugangsdaten, die in ein Transkript geraten sind. Diese Regeln durchsuchen den ganzen Datensatz statt der abgebildeten Felder, denn ein Zugangsdatum kann überall darin stehen, auch in einem Feld, das kein Parser verstanden hat. Keine von ihnen zitiert, worauf sie getroffen hat.
+
+#### AFX-SECRETS-001
+
+**A cloud provider access key reached an agent transcript**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `secrets` |
+| Agenten | `any` |
+| Ereignisarten | `any` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1552.001`, `credential-in-transcript` |
+
+[EN] An access key identifier in the shape a major cloud provider issues appears somewhere in this record: a prompt, a tool argument, a tool result or a field no parser mapped. The whole record is searched rather than the fields somebody thought to map, because a credential can sit anywhere in one.
+
+*Worauf sie trifft:* `event_text matches /\bAKIA[0-9A-Z]{16}\b/`
+
+Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein Zugangsdatum, und ein Fund wird exportiert und in Berichte kopiert, deshalb bleibt der Wert in dem Ereignis, aus dem er kommt.
+
+*Warum das für die Analyse zählt:* [EN] A key that reached a transcript has left the developer's control twice over. It was sent to a model provider as part of the conversation, and it is now on disk in a file that is not a secret store, that is not encrypted, and that synchronisation and backup tools treat as ordinary text. Whether the key was used is a separate question; that it has to be rotated is not.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A key of this shape quoted in documentation, a test fixture or an example, which is common in a repository that teaches cloud usage.
+- [EN] A key that was already revoked before the conversation, which the transcript cannot say.
+
+*Quellen:*
+
+- <https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-SECRETS-002
+
+**A private key block reached an agent transcript**
+
+| | |
+| --- | --- |
+| Schweregrad | kritisch |
+| Paket | `secrets` |
+| Agenten | `any` |
+| Ereignisarten | `any` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1552.004`, `credential-in-transcript` |
+
+[EN] The opening line of a PEM private key block appears in this record. Matched on the header rather than on the key material, because the header is the part that is the same across every key type and cannot occur by accident.
+
+*Worauf sie trifft:* `event_text matches /-----BEGIN (?:RSA \|EC \|DSA \|OPENSSH \|PGP \|ENCRYPTED )?PRIVATE KEY-----/`
+
+Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein Zugangsdatum, und ein Fund wird exportiert und in Berichte kopiert, deshalb bleibt der Wert in dem Ereignis, aus dem er kommt.
+
+*Warum das für die Analyse zählt:* [EN] A private key in a transcript is the strongest form of this finding. Unlike an API token it usually cannot be rotated without touching every system that trusts it, the header is unambiguous so there is little room for a false positive, and the reason a key ends up in a conversation is almost always that somebody pasted a file they should not have.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A test key committed to a repository on purpose, which many projects carry for their own test suites.
+- [EN] Documentation that shows the shape of a key file without a real key in it.
+
+*Quellen:*
+
+- <https://www.rfc-editor.org/rfc/rfc7468>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-SECRETS-003
+
+**A model provider API token reached an agent transcript**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `secrets` |
+| Agenten | `any` |
+| Ereignisarten | `any` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1552.001`, `credential-in-transcript` |
+
+[EN] A token in the shape several model providers issue, an sk- prefix followed by a long opaque string, appears in this record.
+
+*Worauf sie trifft:* `event_text matches /\bsk-[A-Za-z0-9_-]{20,}\b/`
+
+Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein Zugangsdatum, und ein Fund wird exportiert und in Berichte kopiert, deshalb bleibt der Wert in dem Ereignis, aus dem er kommt.
+
+*Warum das für die Analyse zählt:* [EN] This is the credential that pays for inference, and one of the few in a developer's possession that bills by use. A token in a transcript is both an unrotated secret and a spending risk, and a transcript is a file that gets copied into bug reports and support tickets more readily than a credential store ever would be.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A revoked or example token quoted in documentation or in a test.
+- [EN] Another vendor's identifier that happens to use the same prefix, which is not rare. The prefix is a convention rather than a registered scheme.
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-SECRETS-004
+
+**A source forge personal access token reached an agent transcript**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `secrets` |
+| Agenten | `any` |
+| Ereignisarten | `any` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1552.001`, `credential-in-transcript` |
+
+[EN] A token in the documented prefixed shape a major source forge issues appears in this record. The prefixes cover personal access tokens, OAuth tokens, user-to-server and server-to-server tokens and refresh tokens.
+
+*Worauf sie trifft:* `event_text matches /\bgh[pousr]_[A-Za-z0-9]{20,}\b/`
+
+Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein Zugangsdatum, und ein Fund wird exportiert und in Berichte kopiert, deshalb bleibt der Wert in dem Ereignis, aus dem er kommt.
+
+*Warum das für die Analyse zählt:* [EN] This token is usually the one with the most reach in a developer's possession: it can read private repositories, push code, and in many configurations act on the organization's behalf. It is also the credential a coding agent has the most reason to be handed, which is what makes a transcript a likely place to find one.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A token already revoked, which the forge does on publication but which the transcript cannot say.
+- [EN] A token of this shape used in a test fixture.
+
+*Quellen:*
+
+- <https://github.blog/security/application-security/behind-githubs-new-authentication-token-formats/>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-SECRETS-005
+
+**A secret was assigned to a named variable in view of the agent**
+
+| | |
+| --- | --- |
+| Schweregrad | mittel |
+| Paket | `secrets` |
+| Agenten | `any` |
+| Ereignisarten | `any` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1552.001`, `credential-in-transcript` |
+
+[EN] A variable or key whose name says it holds a credential, assigned a value of plausible length, appears in this record. This is the shape that catches the credentials no vendor prefix identifies: a database password, an internal service token, a signing key.
+
+*Worauf sie trifft:* `event_text matches /(?i)\b(?:api[_-]?key\|secret\|passwd\|password\|client[_-]?secret\|access[_-]?token\|auth[_-]?token\|private[_-]?key)\b[^\S\n]*[:=][^\S\n]*["']?[A-Za-z0-9_\-/+.]{8,}/`
+
+Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein Zugangsdatum, und ein Fund wird exportiert und in Berichte kopiert, deshalb bleibt der Wert in dem Ereignis, aus dem er kommt.
+
+*Warum das für die Analyse zählt:* [EN] Most credentials have no recognisable prefix, so a pack that only matched known shapes would report the ones that are easy to find and miss the ones that are specific to the organization. Matching the assignment rather than the value is deliberately broad, which is why this rule is medium: it is a lead to read rather than a conclusion.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A placeholder, which this rule cannot tell from a value. Both password=changeme and password=REDACTED match, and both are common in documentation and in templates.
+- [EN] A configuration file the agent read that holds an environment variable name rather than a value, such as password=$DB_PASSWORD.
+- [EN] A key name in a schema or a type definition, where the value is a type rather than a secret.
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+## sensitive paths
+
+Pfade, die ein Agent gelesen hat und die Zugangsdaten oder die Karte dorthin enthalten. Was ein Lesen zum Fund macht, ist das Ziel: der Inhalt ging in eine Konversation mit einem Modellanbieter und auf die Platte in ein Transkript.
+
+#### AFX-SENSITIVEPATHS-001
+
+**The agent read a private key or an SSH configuration**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `sensitive_paths` |
+| Agenten | `any` |
+| Ereignisarten | `file.read`, `command.exec`, `tool.call` |
+| Gelesene Felder | `payload.files[].path`, `payload.commands[].command` |
+| Schlagworte | `T1552.004`, `sensitive-path-read` |
+
+[EN] A file read, a shell command or a tool argument names a path under an SSH directory, a key file by its conventional name, or a certificate or keystore extension.
+
+*Worauf sie trifft:* `(payload.files[].path matches path **/.ssh/** or **/id_rsa or **/id_ed25519 or **/id_ecdsa or **/id_dsa or **/*.pem or **/*.p12 or **/*.pfx or **/*.jks or **/*.keystore or payload.commands[].command matches /(?:^\|[\s"'=])(?:~\|/[A-Za-z0-9_./-]*)?/\.ssh/\|\bid_(?:rsa\|ed25519\|ecdsa\|dsa)\b/)`
+
+*Warum das für die Analyse zählt:* [EN] A private key the agent read has been sent to a model provider as part of the conversation and written into a transcript on disk, so the read is the moment the key left the developer's control regardless of what the agent did next. An SSH configuration is worth almost as much: it names the hosts and the identities available from this machine, which is the map somebody moving laterally would want.
+
+*Bekannte Fehlalarme:*
+
+- [EN] Reading a public key, which shares the directory and often most of the name. The finding names the path, so the distinction is one glance away.
+- [EN] Legitimate work on SSH configuration, which is a normal thing to ask an agent for and requires reading exactly these files.
+- [EN] A test key inside a project, which many projects carry for their own test suites.
+
+*Stichproben in der Regeldatei:* 3 / 2 (+/-)
+
+#### AFX-SENSITIVEPATHS-002
+
+**The agent read a cloud or package registry credential file**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `sensitive_paths` |
+| Agenten | `any` |
+| Ereignisarten | `file.read`, `command.exec`, `tool.call` |
+| Gelesene Felder | `payload.files[].path`, `payload.commands[].command` |
+| Schlagworte | `T1552.001`, `sensitive-path-read` |
+
+[EN] A file read or a command names a credential file belonging to a cloud provider command line tool, a container registry, a package registry or a Kubernetes configuration.
+
+*Worauf sie trifft:* `(payload.files[].path matches path **/.aws/credentials or **/.aws/config or **/.azure/** or **/.config/gcloud/** or **/.kube/config or **/.docker/config.json or **/.npmrc or **/.pypirc or **/.netrc or **/.git-credentials or **/gcloud/application_default_credentials.json or payload.commands[].command matches /\.aws/credentials\b/ or /\.kube/config\b/ or /\.docker/config\.json\b/ or /\.(?:npmrc\|pypirc\|netrc\|git-credentials)\b/ or /application_default_credentials\.json\b/)`
+
+*Warum das für die Analyse zählt:* [EN] These files are the ones that turn a developer machine into access to production. Unlike a password they are usually long-lived, and unlike an SSH key they are frequently read by legitimate tooling, so their appearance in an agent transcript is easy to overlook. What makes it a finding is the destination: the contents went into a conversation with a model provider and onto disk in a transcript.
+
+*Bekannte Fehlalarme:*
+
+- [EN] Legitimate configuration work. Asking an agent to fix a broken cloud profile or a registry authentication problem requires reading exactly these files.
+- [EN] A tool the agent ran that reads the file itself, where the path appears in the command line without the agent having read the contents into the conversation.
+
+*Stichproben in der Regeldatei:* 3 / 2 (+/-)
+
+#### AFX-SENSITIVEPATHS-003
+
+**The agent read a browser profile, a keychain or a password store**
+
+| | |
+| --- | --- |
+| Schweregrad | kritisch |
+| Paket | `sensitive_paths` |
+| Agenten | `any` |
+| Ereignisarten | `file.read`, `command.exec`, `tool.call` |
+| Gelesene Felder | `payload.files[].path`, `payload.commands[].command` |
+| Schlagworte | `T1555`, `T1539`, `credential-store-access` |
+
+[EN] A file read or a command names a browser profile database, an operating system keychain or credential store, or the data directory of a password manager.
+
+*Worauf sie trifft:* `(payload.files[].path matches path **/Login Data or **/Cookies or **/logins.json or **/key4.db or **/cert9.db or **/Library/Keychains/** or **/.local/share/keyrings/** or **/.password-store/** or **/*.kdbx or **/1Password/** or **/Bitwarden*/** or payload.commands[].command matches /\bsecurity\s+(?:find-generic-password\|find-internet-password\|dump-keychain)\b/ or /\bsecret-tool\s+(?:lookup\|search)\b/ or /(?i)\bGet-Credential\b\|\bcmdkey\s+/list\b/ or /\.kdbx\b\|\.password-store\b\|logins\.json\b\|key4\.db\b/)`
+
+*Warum das für die Analyse zählt:* [EN] There is no ordinary software engineering reason to read any of these. A browser profile holds saved passwords, cookies and session tokens for everything the user is signed in to; a keychain holds the credentials the operating system keeps on the user's behalf; a password manager's store is the whole of it. This is the one rule in the pack where a match is closer to a conclusion than to a lead, which is why it is critical and why its false positive list is short.
+
+*Bekannte Fehlalarme:*
+
+- [EN] Work on a tool that legitimately integrates with one of these stores, such as a credential helper the agent was asked to write or debug.
+- [EN] A path named Cookies or Login Data belonging to something other than a browser profile, which the finding's full path settles in one glance.
+
+*Stichproben in der Regeldatei:* 3 / 2 (+/-)
+
+## supply chain
+
+Code, den der Agent geladen hat, und Code, der so konfiguriert ist, dass er ohne Nachfrage läuft. Ein MCP-Server ist beides, Abhängigkeit und Werkzeugoberfläche, deshalb zählt was er ist genauso wie was er getan hat.
+
+#### AFX-SUPPLYCHAIN-001
+
+**An MCP server was launched from a package fetched at start time**
+
+| | |
+| --- | --- |
+| Schweregrad | mittel |
+| Paket | `supply_chain` |
+| Agenten | `any` |
+| Ereignisarten | `config.snapshot`, `command.exec`, `mcp.call` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1195`, `T1072`, `supply-chain` |
+
+[EN] A configuration snapshot or a command starts an MCP server through a runner that downloads the package as it launches it: npx -y, uvx, pipx run, bunx or the equivalent.
+
+*Worauf sie trifft:* `(event_text matches /\buvx\b/ or /\bpipx\s+run\b/ or /\bbunx\b/ or event_text matches /\bnpx\b/ and event_text matches /(?:^\|[\s,=])(?:-y\|--yes)(?:$\|[\s,])/ or event_text matches /\bdeno\s+run\b[^\n]*\b--allow-(?:all\|run\|net)\b/)`
+
+*Warum das für die Analyse zählt:* [EN] An MCP server is code the agent loads and a tool surface the agent will call, so what it is matters as much as what it does. A runner that fetches at start time means the code is whatever the registry served that day, there is no lockfile, and -y suppresses the prompt that would otherwise name the package. Finding the configuration is how an analyst establishes which server versions could have been in play, since the machine may no longer have the answer.
+
+*Bekannte Fehlalarme:*
+
+- [EN] The vendor's own documented way to run most MCP servers, which is exactly this. The finding is about what can be established later, not about a mistake.
+- [EN] An ordinary developer command that has nothing to do with MCP, since npx and uvx are general-purpose runners.
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-SUPPLYCHAIN-002
+
+**A hook or a lifecycle script was configured to run a command**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `supply_chain` |
+| Agenten | `any` |
+| Ereignisarten | `config.snapshot`, `file.write` |
+| Gelesene Felder | `payload.hooks`, `payload.files[].path`, `event_text` |
+| Schlagworte | `T1546`, `T1195.002`, `persistence` |
+
+[EN] A configuration snapshot holds a hook that runs a shell command, or a file write adds a git hook or a package lifecycle script.
+
+*Worauf sie trifft:* `(payload.hooks is present or payload.files[].path matches path **/.git/hooks/* or **/.husky/** or **/.claude/hooks/** or **/.claude/settings.json or **/.claude/settings.local.json or event_text matches /(?i)"(?:PreToolUse\|PostToolUse\|SessionStart\|UserPromptSubmit\|Stop\|PreCompact)"\s*:/ or event_text matches /"scripts"\s*:[\s\S]{0,200}"(?:preinstall\|postinstall\|prepare)"\s*:/)`
+
+*Warum das für die Analyse zählt:* [EN] A hook is code that runs without anyone asking, at a moment the agent chose, and the vendor documents that a pre-tool hook can let a call proceed without the prompt that would otherwise appear. That makes a hook both a persistence mechanism and a permission bypass wearing different clothes. It also survives the session, so a hook found on a machine is a question about every session since it was written, not just this one.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A project that uses hooks for what they are for, formatting on commit being the obvious case, which is good practice and matches.
+- [EN] A settings file written because the developer granted a permission through the agent's own interface, which is the documented way to do it.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/permissions>
+
+*Stichproben in der Regeldatei:* 3 / 2 (+/-)
+
+## third party endpoints
+
+Wohin die Konversation tatsächlich ging. Eine Endpunkt-Umleitung ändert die Antwort darauf, welche Daten das Gerät verlassen haben, für eine ganze Sitzung, und kein Transkript sagt, welcher Endpunkt sie bedient hat.
+
+#### AFX-THIRDPARTYENDPOINTS-001
+
+**The agent's model endpoint was pointed somewhere other than its vendor**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `third_party_endpoints` |
+| Agenten | `any` |
+| Ereignisarten | `config.snapshot`, `command.exec`, `prompt.history`, `session.start` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1090`, `T1071`, `third-party-endpoint` |
+
+[EN] A base URL override, a proxy variable or a custom provider setting appears in a record: ANTHROPIC_BASE_URL, OPENAI_BASE_URL, an equivalent for another provider, or an HTTPS proxy set for the agent's process.
+
+*Worauf sie trifft:* `event_text matches /(?i)\b(?:ANTHROPIC\|OPENAI\|AZURE_OPENAI\|GOOGLE\|GEMINI\|MISTRAL\|GROQ\|DEEPSEEK\|OPENROUTER)_(?:BASE_URL\|API_BASE\|ENDPOINT)[^\S\n]*[:=][^\S\n]*\S/ or /(?i)\bANTHROPIC_AUTH_TOKEN[^\S\n]*[:=][^\S\n]*\S/ or /(?i)\b(?:HTTPS?_PROXY\|ALL_PROXY)[^\S\n]*[:=][^\S\n]*\S/ or /(?i)"(?:baseURL\|base_url\|apiBase\|api_base\|endpoint)"[^\S\n]*:[^\S\n]*"https?:///`
+
+*Warum das für die Analyse zählt:* [EN] This decides where the conversation went. Every prompt, every file the agent read into context and every credential that reached a transcript was sent to whatever this points at, so an override changes the answer to "which data left the device" for the whole session. It is also a quiet setting: nothing in a transcript says which endpoint served it, so the configuration is the only place the answer exists.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A corporate proxy or an approved inference gateway, which is a legitimate and common configuration. The finding says where the traffic went, not whether that was allowed.
+- [EN] A base URL for something other than the model endpoint, such as an application's own API, which matches the last pattern because the key name is generic.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/llm-gateway>
+
+*Stichproben in der Regeldatei:* 3 / 2 (+/-)

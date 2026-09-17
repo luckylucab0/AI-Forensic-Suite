@@ -166,7 +166,7 @@ thing the viewer writes anywhere is your theme choice, in `localStorage`.
 | 1 | Artifact catalogue, both collectors, evidence bundle format, `verify`, synthetic fixtures | done |
 | 2 | Collection rules generated for Velociraptor, KAPE, Defender live response, KQL, osquery | done |
 | 3 | Analyzer core: ingest adapters, per-agent parsers, unified event model, SQLite case database, unified log format, timeline exports | in progress |
-| 4 | Declarative YAML rule engine and the starter rule packs | planned |
+| 4 | Declarative YAML rule engine and the starter rule packs | done |
 | 5 | Local web UI: read-only API, viewer API source, timeline and findings views | planned |
 
 Not planned for now: case management with triage states, HTML and PDF reporting,
@@ -180,6 +180,8 @@ pseudonymization, and a shell fallback collector.
 - [docs/ARTIFACTS.md](docs/ARTIFACTS.md), the generated artifact reference, grouped by
   how fast each artifact disappears
 - [docs/BUNDLE_FORMAT.md](docs/BUNDLE_FORMAT.md), the evidence bundle format
+- [docs/RULES.md](docs/RULES.md), the generated detection reference: every rule with
+  its condition, why an analyst cares, and the benign cases it is known to fire on
 - [docs/UNIFIED_FORMAT.md](docs/UNIFIED_FORMAT.md), the vendor-neutral agent log: one
   JSON Lines record per event, whichever agent left the evidence and whichever tool
   read it

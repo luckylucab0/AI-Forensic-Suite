@@ -78,15 +78,41 @@ def view(partial: dict[str, Any]) -> EventView:
         )
 
     fields = {name: partial.get(name, value) for name, value in DEFAULTS.items()}
-    payload = partial.get("payload") or {}
+    payload = expand(partial.get("payload") or {})
     if not isinstance(payload, dict):
         raise TestEventError("a rule test's payload has to be a mapping")
     provenance = {**PROVENANCE_DEFAULTS, **(partial.get("provenance") or {})}
     # The raw record defaults to the payload rather than to nothing, because a rule that
     # searches whole-record text should see what the test put in the payload. A test that
     # is about the difference between the two states both.
-    raw = partial.get("raw", payload)
+    raw = expand(partial["raw"]) if "raw" in partial else payload
     return EventView(payload=payload, raw=raw, provenance=provenance, **fields)
+
+
+def expand(value: Any) -> Any:
+    """Expand a {repeat: ..., times: n} value into the string it stands for.
+
+    A rule about length cannot have its sample written out: the threshold for a very large
+    paste is sixty thousand characters, and a rule file holding sixty thousand literal
+    characters would be sixty kilobytes of noise around one line of intent, and would also
+    trip every guard this repository has about long opaque strings in a rule file.
+
+    So a sample may say how long the value is instead of being it. Deliberately the only
+    expansion there is: a test format with a second way to compute a value starts becoming
+    a language, and the rule format's whole point is that it is not one.
+    """
+    if isinstance(value, dict):
+        if set(value) == {"repeat", "times"}:
+            times = int(value["times"])
+            if times < 0 or times > 10_000_000:
+                raise TestEventError(
+                    f"a repeat of {times} is not a sample, it is a denial of service"
+                )
+            return str(value["repeat"]) * times
+        return {key: expand(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [expand(item) for item in value]
+    return value
 
 
 def run(rule: Rule) -> list[str]:

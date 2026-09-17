@@ -58,3 +58,39 @@ rules:
   heuristic_warning: >-
     Jede Regel ist eine Heuristik. Ein Fund ist ein Hinweis, der von einer Analystin oder
     einem Analysten geprüft werden muss, niemals ein Urteil.
+  col_pack: Paket
+  col_fields: Gelesene Felder
+  section_condition: Worauf sie trifft
+  section_scope: Geltungsbereich
+  section_tests: Stichproben in der Regeldatei
+  toc: Pakete
+  intro: >-
+    Eine Datei pro Regel unter rules/, gruppiert in Pakete. Eine Regel ist Daten und kein
+    Code: ein Baum von Bedingungen über benannte Ereignisfelder, ohne auszuwertenden
+    Ausdruck und ohne etwas Aufrufbares in einer Regeldatei. Siehe
+    docs/adr/0019-rules-are-data-with-their-own-tests.md.
+  tests_note: >-
+    Jede Regel trägt ihre eigenen positiven und negativen Stichproben, und pytest führt
+    jede einzelne als eigenen Fall aus. Eine Regel mit ausschließlich positiven Stichproben
+    weist der Lader ab, denn der Fehler, auf den es ankommt, ist nicht eine Regel, die
+    etwas übersieht: es ist eine Regel, die auf alles feuert, und die besteht jede positive
+    Stichprobe, die sie hat.
+  findings_note: >-
+    Funde werden in die Falldatenbank geschrieben, neben die Ereignisse, auf denen sie
+    ruhen, und jeder Scan wird festgehalten, ob etwas gefeuert hat oder nicht. Sonst sähen
+    ein Fall ohne Funde und ein Fall, den niemand gescannt hat, gleich aus, und das sind
+    entgegengesetzte Schlüsse.
+  redact_note: >-
+    Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein
+    Zugangsdatum, und ein Fund wird exportiert und in Berichte kopiert, deshalb bleibt der
+    Wert in dem Ereignis, aus dem er kommt.
+  aggregate_note: >-
+    Feuert auf eine Anzahl statt auf ein einzelnes Ereignis, gruppiert nach
+  severity_order_note: >-
+    Regeln sind nach Paket aufgeführt, innerhalb eines Pakets nach Id.
+  untranslated_marker: "[EN]"
+  translation_note: >-
+    Regeldateien sind englisch, wie der Code und die
+    Architekturentscheidungen, deshalb sind die meisten Absätze unten mit [EN]
+    markiert. Eine Regel kann eine Übersetzung mitbringen, und die, die es tun,
+    sind nicht markiert.

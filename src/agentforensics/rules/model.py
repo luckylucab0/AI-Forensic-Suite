@@ -26,6 +26,7 @@ from typing import Any, Literal, cast
 import fastjsonschema
 import yaml
 
+from agentforensics.catalog import resolve_text
 from agentforensics.rules.conditions import Condition, ConditionError, parse
 from agentforensics.rules.select import EventView
 
@@ -83,6 +84,9 @@ class RuleTest:
     name: str
     should_match: bool
     event: dict[str, Any]
+    # True on a negative sample the rule deliberately does not look at, where that
+    # exclusion is what is being demonstrated rather than an oversight.
+    out_of_scope: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -116,6 +120,11 @@ class Rule:
     kinds: tuple[str, ...] = ("any",)
     tags: tuple[str, ...] = ()
     false_positives: tuple[str, ...] = ()
+    # Which of this rule's prose fields fell back to English because the requested
+    # language was missing. Carried so the generated reference can mark them rather than
+    # passing English off as a translation, which is the difference between a documented
+    # gap and a quiet lie.
+    untranslated: frozenset[str] = frozenset()
     references: tuple[str, ...] = ()
     aggregate: Aggregate | None = None
     tests: tuple[RuleTest, ...] = ()
@@ -151,8 +160,13 @@ def _validator() -> Any:
     return fastjsonschema.compile(schema)
 
 
-def load_file(path: Path, pack: str | None = None) -> Rule:
-    """Load and compile one rule file."""
+def load_file(path: Path, pack: str | None = None, lang: str = "en") -> Rule:
+    """Load and compile one rule file.
+
+    `lang` picks which translation of the prose fields to use. The engine always loads
+    English, because a finding's text goes into a case database that has one language;
+    the documentation generator loads each language in turn.
+    """
     try:
         text = path.read_text(encoding="utf-8")
     except OSError as exc:
@@ -204,17 +218,33 @@ def load_file(path: Path, pack: str | None = None) -> Rule:
             name=str(item["name"]),
             should_match=bool(item["match"]),
             event=dict(item.get("event") or {}),
+            out_of_scope=bool(item.get("out_of_scope", False)),
         )
         for item in data["tests"]
     )
     if not any(test.should_match for test in tests):
         raise RuleError(f"{path}: no test says this rule should ever match")
+    contradictory = [test.name for test in tests if test.out_of_scope and test.should_match]
+    if contradictory:
+        raise RuleError(
+            f"{path}: sample(s) {contradictory} are marked out_of_scope and expected to "
+            "match. A rule cannot fire on an event it does not look at, so one of the two "
+            "is wrong."
+        )
     if not any(not test.should_match for test in tests):
         raise RuleError(
             f"{path}: no test says this rule should not match. A rule with only positive "
             "tests is a rule nobody can trust, because a rule that fires on everything "
             "passes them all."
         )
+
+    untranslated = set()
+
+    def prose(value: Any, field_name: str) -> str:
+        text, translated = resolve_text(value, lang)
+        if not translated:
+            untranslated.add(field_name)
+        return " ".join(text.split())
 
     applies = data.get("applies_to") or {}
     aggregate = None
@@ -233,24 +263,31 @@ def load_file(path: Path, pack: str | None = None) -> Rule:
         pack=declared,
         title=str(data["title"]),
         severity=cast(Severity, str(data["severity"])),
-        description=_prose(data["description"]),
-        rationale=_prose(data["rationale"]),
+        description=prose(data["description"], "description"),
+        rationale=prose(data["rationale"], "rationale"),
         condition=condition,
         path=path,
         sha256=_digest(text),
         agents=tuple(applies.get("agents") or ("any",)),
         kinds=tuple(applies.get("kinds") or ("any",)),
         tags=tuple(data.get("tags") or ()),
-        false_positives=tuple(_prose(item) for item in (data.get("false_positives") or ())),
+        false_positives=tuple(
+            prose(item, "false_positives") for item in (data.get("false_positives") or ())
+        ),
         references=tuple(data.get("references") or ()),
         aggregate=aggregate,
         tests=tests,
         redact=bool(data.get("redact", False)),
         fields=_fields(data["match"]),
+        untranslated=frozenset(untranslated),
     )
 
 
-def load(directory: Path | None = None, packs: list[str] | None = None) -> list[Rule]:
+def load(
+    directory: Path | None = None,
+    packs: list[str] | None = None,
+    lang: str = "en",
+) -> list[Rule]:
     """Every rule under a directory, in a stable order.
 
     Sorted by id, so two scans of one case produce findings in the same order and a diff of
@@ -281,7 +318,7 @@ def load(directory: Path | None = None, packs: list[str] | None = None) -> list[
         if wanted is not None and child.name not in wanted:
             continue
         for path in sorted(child.glob("*.yaml")):
-            rule = load_file(path, pack=child.name)
+            rule = load_file(path, pack=child.name, lang=lang)
             if rule.id in seen:
                 raise RuleError(
                     f"{path}: rule id {rule.id} is already used by {seen[rule.id]}. An id "
@@ -294,16 +331,6 @@ def load(directory: Path | None = None, packs: list[str] | None = None) -> list[
         raise RuleError(f"{root} holds no rules")
     rules.sort(key=lambda item: item.id)
     return rules
-
-
-def _prose(value: Any) -> str:
-    """A free-text field, with its wrapping collapsed.
-
-    YAML block scalars keep the line breaks the author used for width. Those are layout,
-    not content, so they are collapsed here: a finding's description goes into a report and
-    a CSV cell, and a hard-wrapped sentence reads as broken in both.
-    """
-    return " ".join(str(value).split())
 
 
 def _digest(text: str) -> str:

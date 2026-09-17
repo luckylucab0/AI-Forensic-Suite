@@ -14,6 +14,7 @@ the other reporting noise.
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -87,11 +88,16 @@ def test_every_sample_is_reachable() -> None:
     """
     unreachable = []
     for rule_id, name, rule, sample in SAMPLES:
+        if sample.out_of_scope:
+            # Declared. Some rules are protected by their scope rather than by their
+            # condition, and for those the exclusion is the thing worth demonstrating.
+            continue
         if not rule.applies_to(rule_testing.view(sample.event)):
             unreachable.append(f"{rule_id}: {name}")
     assert not unreachable, (
         "these samples are outside their rule's own applies_to, so the rule never looks at "
-        "them and a negative sample among them passes for the wrong reason: "
+        "them and a negative sample among them passes for the wrong reason. Either fix the "
+        "sample, or mark it out_of_scope if the exclusion is what it demonstrates: "
         f"{unreachable}"
     )
 
@@ -699,3 +705,97 @@ def test_no_rule_file_carries_key_material(rules: list[Rule]) -> None:
             "in a rule file needs one, and a credential long enough to be real does not "
             "belong in a repository."
         )
+
+
+def test_whitespace_in_a_pattern_can_cross_a_field_boundary() -> None:
+    """The trap two shipped rules fell into, pinned so it is not rediscovered.
+
+    The whole-record text views emit a record's leaves one per line, and `\\s` matches a
+    newline. So a pattern shaped like NAME\\s*=\\s*\\S, meaning "NAME assigned something",
+    reaches past the end of its own field and matches an unset NAME followed by whatever
+    the next field happens to hold. The rule schema says to use [^\\S\\n] instead, and this
+    is the demonstration behind that sentence.
+    """
+    view = event(payload={"a": "HTTPS_PROXY=", "b": "something else"})
+    greedy = cond({"field": "event_text", "regex": r"HTTPS_PROXY\s*=\s*\S"})
+    careful = cond({"field": "event_text", "regex": r"HTTPS_PROXY[^\S\n]*=[^\S\n]*\S"})
+    assert greedy.matches(view), "this is the trap, not a feature: it reads the next field"
+    assert not careful.matches(view)
+    # And the careful one still does its job when the value really is there.
+    assigned = event(payload={"a": "HTTPS_PROXY=http://proxy.example.org:3128"})
+    assert careful.matches(assigned)
+
+
+def test_no_shipped_rule_uses_whitespace_that_can_cross_a_field(rules: list[Rule]) -> None:
+    """Mechanical, because the failure is invisible in the rule text.
+
+    A pattern that pairs a field name with an assignment and then `\\s` is the shape that
+    reaches into the next field. Rules that need whitespace across lines on purpose can
+    say so with an explicit newline in the class, which this allows.
+    """
+    import re
+
+    suspicious = re.compile(r"[:=]\\s\*")
+    for rule in rules:
+        text = rule.path.read_text(encoding="utf-8")
+        for line in text.splitlines():
+            if "regex" not in line and not line.strip().startswith("- '"):
+                continue
+            assert not suspicious.search(line), (
+                f"{rule.path}: {line.strip()}\n"
+                "an assignment followed by \\s* reaches past the end of its own field, "
+                "because the text a rule searches is the record's leaves one per line. "
+                "Use [^\\S\\n]* for whitespace that has to stay on one line."
+            )
+
+
+# --------------------------------------------------------- the generated reference
+
+
+def test_the_committed_rule_reference_is_current() -> None:
+    """The rule files are the source of truth, so the reference is output.
+
+    Checked here as well as by the generator's own --check, because this is the one that
+    runs in every contributor's test suite. A reference that lags the rules describes
+    detections that are not the ones running.
+    """
+    import subprocess
+
+    result = subprocess.run(
+        [sys.executable, str(REPO_ROOT / "scripts" / "gen_rule_docs.py"), "--check"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+
+
+def test_a_translated_prose_field_is_used_and_not_marked(tmp_path: Path) -> None:
+    """The convention the whole project follows for free text: a plain string is English,
+    a mapping carries a translation, and a generated document marks what fell back rather
+    than passing English off as a translation."""
+    body = MINIMAL.replace("900", "907").replace(
+        "description: Long enough to satisfy the schema's minimum length for a description.",
+        "description:\n"
+        "  en: Long enough to satisfy the schema's minimum length for a description.\n"
+        "  de: Lang genug fuer die Mindestlaenge, die das Schema fuer eine Beschreibung fordert.",
+    )
+    path = write(tmp_path, "secrets", "AFX-SECRETS-907.yaml", body)
+
+    english = load_file(path, pack="secrets", lang="en")
+    assert english.description.startswith("Long enough")
+    assert "description" not in english.untranslated
+
+    german = load_file(path, pack="secrets", lang="de")
+    assert german.description.startswith("Lang genug")
+    assert "description" not in german.untranslated
+    # The rationale has no translation, so it falls back and says so.
+    assert "rationale" in german.untranslated
+
+
+def test_the_engine_always_reads_english(rules: list[Rule]) -> None:
+    """A finding's text goes into a case database that has one language, so the engine does
+    not get to pick. Only the documentation generator loads a translation."""
+    for rule in rules:
+        assert load_file(rule.path, pack=rule.pack).description == rule.description

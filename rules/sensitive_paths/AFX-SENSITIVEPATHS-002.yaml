@@ -1,0 +1,83 @@
+id: AFX-SENSITIVEPATHS-002
+pack: sensitive_paths
+title: The agent read a cloud or package registry credential file
+severity: high
+description: >
+  A file read or a command names a credential file belonging to a cloud provider command
+  line tool, a container registry, a package registry or a Kubernetes configuration.
+rationale: >
+  These files are the ones that turn a developer machine into access to production. Unlike
+  a password they are usually long-lived, and unlike an SSH key they are frequently read by
+  legitimate tooling, so their appearance in an agent transcript is easy to overlook. What
+  makes it a finding is the destination: the contents went into a conversation with a model
+  provider and onto disk in a transcript.
+applies_to:
+  kinds: [file.read, command.exec, tool.call]
+match:
+  any:
+    - field: payload.files[].path
+      glob_any:
+        - "**/.aws/credentials"
+        - "**/.aws/config"
+        - "**/.azure/**"
+        - "**/.config/gcloud/**"
+        - "**/.kube/config"
+        - "**/.docker/config.json"
+        - "**/.npmrc"
+        - "**/.pypirc"
+        - "**/.netrc"
+        - "**/.git-credentials"
+        - "**/gcloud/application_default_credentials.json"
+    - field: payload.commands[].command
+      regex_any:
+        - '\.aws/credentials\b'
+        - '\.kube/config\b'
+        - '\.docker/config\.json\b'
+        - '\.(?:npmrc|pypirc|netrc|git-credentials)\b'
+        - 'application_default_credentials\.json\b'
+tags:
+  - T1552.001
+  - sensitive-path-read
+false_positives:
+  - >-
+    Legitimate configuration work. Asking an agent to fix a broken cloud profile or a
+    registry authentication problem requires reading exactly these files.
+  - >-
+    A tool the agent ran that reads the file itself, where the path appears in the command
+    line without the agent having read the contents into the conversation.
+tests:
+  - name: a cloud credential file read
+    match: true
+    event:
+      kind: file.read
+      agent: claude_code
+      payload:
+        files: [{path: "/home/alice/.aws/credentials", operation: read}]
+  - name: a cluster configuration read by a command
+    match: true
+    event:
+      kind: command.exec
+      agent: codex
+      payload:
+        commands: [{command: "cat ~/.kube/config | head -40"}]
+  - name: a registry token file read
+    match: true
+    event:
+      kind: file.read
+      agent: copilot
+      payload:
+        files: [{path: "/home/alice/.npmrc", operation: read}]
+  - name: a project configuration with a similar name
+    match: false
+    event:
+      kind: file.read
+      agent: claude_code
+      payload:
+        files: [{path: "/src/app/config.json", operation: read}]
+  - name: a cloud command that reads nothing local
+    match: false
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "aws sts get-caller-identity"}]

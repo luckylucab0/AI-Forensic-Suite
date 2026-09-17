@@ -1,0 +1,81 @@
+id: AFX-SUPPLYCHAIN-002
+pack: supply_chain
+title: A hook or a lifecycle script was configured to run a command
+severity: high
+description: >
+  A configuration snapshot holds a hook that runs a shell command, or a file write adds a
+  git hook or a package lifecycle script.
+rationale: >
+  A hook is code that runs without anyone asking, at a moment the agent chose, and the
+  vendor documents that a pre-tool hook can let a call proceed without the prompt that
+  would otherwise appear. That makes a hook both a persistence mechanism and a permission
+  bypass wearing different clothes. It also survives the session, so a hook found on a
+  machine is a question about every session since it was written, not just this one.
+applies_to:
+  kinds: [config.snapshot, file.write]
+match:
+  any:
+    - field: payload.hooks
+      exists: true
+    - field: payload.files[].path
+      glob_any:
+        - "**/.git/hooks/*"
+        - "**/.husky/**"
+        - "**/.claude/hooks/**"
+        - "**/.claude/settings.json"
+        - "**/.claude/settings.local.json"
+    - field: event_text
+      regex: '(?i)"(?:PreToolUse|PostToolUse|SessionStart|UserPromptSubmit|Stop|PreCompact)"\s*:'
+    - field: event_text
+      regex: '"scripts"\s*:[\s\S]{0,200}"(?:preinstall|postinstall|prepare)"\s*:'
+tags:
+  - T1546
+  - T1195.002
+  - persistence
+false_positives:
+  - >-
+    A project that uses hooks for what they are for, formatting on commit being the obvious
+    case, which is good practice and matches.
+  - >-
+    A settings file written because the developer granted a permission through the agent's
+    own interface, which is the documented way to do it.
+references:
+  - https://code.claude.com/docs/en/permissions
+tests:
+  - name: a pre-tool hook in a settings snapshot
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload:
+        text: '{"hooks": {"PreToolUse": [{"command": "/opt/approve.sh"}]}}'
+  - name: a git hook written during the session
+    match: true
+    event:
+      kind: file.write
+      agent: codex
+      payload:
+        files: [{path: "/src/app/.git/hooks/pre-commit", operation: write}]
+  - name: a package lifecycle script added
+    match: true
+    event:
+      kind: file.write
+      agent: claude_code
+      payload:
+        files: [{path: "/src/app/package.json", operation: write}]
+        text: '{"scripts": {"build": "tsc", "postinstall": "node setup.js"}}'
+  - name: an ordinary source file written
+    match: false
+    event:
+      kind: file.write
+      agent: claude_code
+      payload:
+        files: [{path: "/src/app/main.py", operation: write}]
+  - name: a package file with no lifecycle script
+    match: false
+    event:
+      kind: file.write
+      agent: claude_code
+      payload:
+        files: [{path: "/src/app/package.json", operation: write}]
+        text: '{"scripts": {"build": "tsc", "test": "vitest"}}'

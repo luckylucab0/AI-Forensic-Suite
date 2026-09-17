@@ -1,0 +1,80 @@
+id: AFX-SUPPLYCHAIN-001
+pack: supply_chain
+title: An MCP server was launched from a package fetched at start time
+severity: medium
+description: >
+  A configuration snapshot or a command starts an MCP server through a runner that
+  downloads the package as it launches it: npx -y, uvx, pipx run, bunx or the equivalent.
+rationale: >
+  An MCP server is code the agent loads and a tool surface the agent will call, so what it
+  is matters as much as what it does. A runner that fetches at start time means the code is
+  whatever the registry served that day, there is no lockfile, and -y suppresses the prompt
+  that would otherwise name the package. Finding the configuration is how an analyst
+  establishes which server versions could have been in play, since the machine may no
+  longer have the answer.
+applies_to:
+  kinds: [config.snapshot, command.exec, mcp.call]
+match:
+  any:
+    # These three always fetch, so the runner's name alone is the finding.
+    - field: event_text
+      regex_any:
+        - '\buvx\b'
+        - '\bpipx\s+run\b'
+        - '\bbunx\b'
+    # npx only fetches without prompting when it is told to, and the runner and its flags
+    # sit in different fields of an MCP configuration, so this is two conditions rather
+    # than one pattern. A pattern spanning both would have matched a command line and
+    # missed every real configuration file.
+    - all:
+        - field: event_text
+          regex: '\bnpx\b'
+        - field: event_text
+          regex: '(?:^|[\s,=])(?:-y|--yes)(?:$|[\s,])'
+    - field: event_text
+      regex: '\bdeno\s+run\b[^\n]*\b--allow-(?:all|run|net)\b'
+tags:
+  - T1195
+  - T1072
+  - supply-chain
+false_positives:
+  - >-
+    The vendor's own documented way to run most MCP servers, which is exactly this. The
+    finding is about what can be established later, not about a mistake.
+  - >-
+    An ordinary developer command that has nothing to do with MCP, since npx and uvx are
+    general-purpose runners.
+tests:
+  - name: a server configured through a fetching runner
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload:
+        mcp: [{server: filesystem, tool: null}]
+        # The shape a real configuration has: the runner and its arguments are separate
+        # fields, which is what the two-condition form above exists for.
+        command: npx
+        args: ["-y", "@example/mcp-filesystem"]
+  - name: a server run through uvx
+    match: true
+    event:
+      kind: command.exec
+      agent: codex
+      payload:
+        commands: [{command: "uvx example-mcp-server --root /src"}]
+  - name: a server run from a pinned local install
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload:
+        command: /usr/local/bin/example-mcp-server
+        args: ["--root", "/src"]
+  - name: an ordinary build command
+    match: false
+    event:
+      kind: command.exec
+      agent: claude_code
+      payload:
+        commands: [{command: "npm run build"}]
