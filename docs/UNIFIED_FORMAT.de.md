@@ -188,6 +188,40 @@ Sammlung Pfade trug, die kein Katalogeintrag beansprucht, 3 wenn überhaupt nich
 wurde. Ein Host ohne Agenten-Artefakte ist eine gültige und nützliche Antwort und darf nicht
 wie ein Absturz aussehen.
 
+## Lesen
+
+Drei Konsumenten, und keiner braucht einen Server.
+
+**Der Viewer.** `viewer/index.html` öffnen und in der Seitenleiste unten auf
+**Open unified log** klicken. Der Viewer gruppiert ein Log nach Agent, Arbeitsverzeichnis
+und Sitzung, sodass eine Sammlung über viele Hosts und mehrere Agenten als ein Satz von
+Sitzungen aufgeht, und alles, was er schon kann, die Transkriptdarstellung, die
+Werkzeugübersicht und die Suche nach Zugangsdaten, funktioniert unverändert. Eine
+`file://`-Seite genügt: kein Server, kein Verzeichniszugriff.
+
+Datensätze ohne eigene Sitzung werden nicht weggelassen. Ein Prompt aus einer Verlaufsdatei,
+eine Datei, die niemand geparst hat, eine Zeile des Logs, die selbst nicht geparst hat:
+jedes bekommt eine eigene Gruppe, denn ein Leser muss einen Agenten, der nichts
+hinterlassen hat, von Beweisen unterscheiden können, die niemand gelesen hat.
+
+Zwei Dinge, nach denen es sich zu suchen lohnt. Eine Ablehnung des Modells ist eine eigene
+Zeile, damit die Frage "wurde etwas abgelehnt" beantwortbar ist, ohne jeden
+Assistenten-Zug zu lesen. Und eine Änderung des Berechtigungsmodus ist eine eigene Zeile,
+denn das ist die Hälfte der Umgehungsfrage, die sagt, wer die Torpfosten verschoben hat und
+wann.
+
+**Der Analyzer.** `afx` liest ein vereinheitlichtes Log zurück in Ereignisse und rechnet
+`event_id` aus der Provenienz jedes Datensatzes neu. Eine Abweichung zur Kennung des
+Produzenten wird festgehalten statt korrigiert, was der Produzent als unlesbar gemeldet hat
+bleibt erhalten, und was er grob gelassen hat wird verfeinert: die Endpunkt-Abfrage gibt
+eine Zeile pro Datensatz zurück, und aus dem `raw` dieser Zeile entsteht die vollständige
+Deutung pro Zug. Genau das macht die Grobheit des Endpunkt-Produzenten zu einer Frage der
+Deutung und nicht der Beweise.
+
+**Alles andere.** Es ist JSON Lines mit einem veröffentlichten Schema, also lesen es `jq`,
+ein SIEM oder das Skript einer Kollegin ohne diese Suite. Prüfen gegen
+`src/agentforensics/unified/agentlog.v1.schema.json`.
+
 ## Versionierung
 
 `v` ist eine ganze Zahl und steht auf jedem Datensatz. Version 1 ist das, was dieses

@@ -81,10 +81,19 @@ stick and open it on a machine where nothing may be installed.
 | Claude Code | `~/.claude/projects/` | `projects/<dir>/<uuid>.jsonl` | one JSON event per line |
 | OpenAI Codex CLI | `~/.codex/sessions/` | `sessions/YYYY/MM/DD/rollout-*-<uuid>.jsonl` | `{timestamp,type,payload}` per line |
 | GitHub Copilot CLI | `~/.copilot/session-state/` | `session-state/<id>/events.jsonl` | `{type,id,timestamp,data}` per line |
+| Any agent, via a unified log | one file, anywhere | one record per line | [the vendor-neutral format](docs/UNIFIED_FORMAT.md) |
 
 Discovery probes each layout directly and under `.claude/`, `.codex/` and `.copilot/`,
 so pointing the viewer at any one of those directories, or at a parent that contains
 several, surfaces every agent's sessions together.
+
+The last row is the general case. A unified agent log is one file holding normalized
+records from any agent, produced either by `afx normalize <source>` or by the
+`Custom.Forensics.AIAgents.UnifiedLog` Velociraptor artifact, which parses on the endpoint
+and returns rows rather than files. The viewer groups such a log by agent, working
+directory and session, so a collection covering many hosts and several agents opens as one
+set of sessions. Records that belong to no session, such as a prompt read from a history
+file or a store nobody has parsed, get a group of their own rather than being left out.
 
 ### Running it
 
@@ -106,9 +115,15 @@ needs a Chromium-based browser (Chrome, Edge, Brave, Arc, Opera) in a secure con
 meaning `https://` or `http://localhost`. A `file://` page does not qualify, so the
 button hides itself there. Firefox and Safari do not implement the API.
 
-**C. Point it at a case database.** Once the analyzer lands, `agentforensics serve` will
-expose a local read-only API and the viewer will read any parsed agent from it, not just
-the three layouts it can discover on its own.
+**C. Open a unified agent log.** Click **Open unified log** in the sidebar footer and pick
+a `.jsonl` file. This is the one option that needs nothing at all: no server, no folder
+access, and it works from a `file://` page, so an analyst with a log from a fleet
+collection can open this page and that file and be reading. It is also the only way to see
+an agent the viewer has no layout for, because the normalizing happened before the file
+was written.
+
+**D. Point it at a case database.** Once `agentforensics serve` lands it will expose a
+local read-only API and the viewer will read a whole case from it.
 
 No build step, no `npm install`, no backend. Everything runs in the browser. The only
 thing the viewer writes anywhere is your theme choice, in `localStorage`.

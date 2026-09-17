@@ -239,6 +239,8 @@ mark.hl.hl-current{background:var(--coral);color:#fff;box-shadow:0 0 0 2px var(-
     <div id="project-list" class="project-list"></div>
     <div class="sidebar-footer">
       <button id="open-folder" class="folder-btn hidden" type="button" title="Load sessions from a local folder">📁 Open local folder…</button>
+      <button id="open-unified" class="folder-btn" type="button" title="Load a unified agent log (one JSON record per line)" onclick="openUnifiedLog()">📄 Open unified log…</button>
+      <input id="unified-file" type="file" accept=".jsonl,.json,.log,.txt" class="hidden" onchange="onUnifiedFileChosen(event)" />
       <span id="root-label">scanning…</span>
     </div>
   </aside>
@@ -308,11 +310,16 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;',
 // Data layer — pluggable source behind a stable path scheme:
 //   'projects/'  'projects/<dir>/'  'projects/<dir>/<file>.jsonl'
 // Two sources implement it:
-//   • httpSource   — scrapes python http.server directory listings (run locally)
-//   • folderSource — reads a folder the user picks via the File System Access API
-//                    (lets this file be hosted on the web instead of served locally)
+//   * httpSource   scrapes python http.server directory listings (run locally)
+//   * folderSource reads a folder the user picks via the File System Access API
+//                  (lets this file be hosted on the web instead of served locally)
 // Everything downstream only ever touches these opaque path strings, so the
 // session list, cache, and aggregation work identically for either source.
+//
+// A third input takes no source at all: a unified agent log is one file, so its
+// records are parsed once and put straight into the fetch cache under a synthetic
+// path. See loadUnifiedLog(). That is what lets a single file behave like a
+// directory of sessions without a second code path downstream.
 // ============================================================================
 
 // Scrape the HTML index python's http.server emits for a directory.
@@ -516,7 +523,8 @@ async function pool(items, limit, worker){
 function normalizeEvents(raw, format){
   if(format==='codex') return normalizeCodex(raw);
   if(format==='copilot') return normalizeCopilot(raw);
-  return raw; // claude — already in the target shape
+  if(format==='unified') return normalizeUnified(raw);
+  return raw; // claude, already in the target shape
 }
 function blocksToText(content){
   if(content==null) return '';
@@ -653,6 +661,162 @@ function normalizeCopilot(raw){
   out.unshift(meta);
   return out;
 }
+
+// ============================================================================
+// The unified agent log — one vendor-neutral record per line, produced either by
+// `afx normalize` or by the Velociraptor artifact that parses on the endpoint.
+// See docs/UNIFIED_FORMAT.md.
+//
+// This is the one source that does not correspond to a directory on disk: it is a
+// single file that can hold many agents, many users and many hosts at once, which is
+// what a fleet collection comes back as. So the records are grouped into synthetic
+// projects and sessions here, and everything downstream (the renderer, the tool
+// aggregation, the secret scan) sees the same shape it sees for a folder.
+// ============================================================================
+
+// Records that are a second view of a record already shown. The analyzer emits a tool
+// call and, for a tool that touched something, a second event carrying the effect, both
+// from the same line. Rendering both would show every file read twice. They are matched
+// by locator rather than by content, because the locator is what says they came from one
+// record; an effect from a producer that did not also emit the call is kept.
+function unifiedDerived(records){
+  const calls=new Set();
+  for(const r of records){
+    const k=unifiedKind(r);
+    if(k==='tool.call'||k==='mcp.call') calls.add(unifiedBaseLocator(r));
+  }
+  return calls;
+}
+function unifiedKind(r){ return r&&typeof r.kind==='string'?r.kind:''; }
+function unifiedBaseLocator(r){
+  const p=(r&&r.provenance)||{};
+  return String(p.original_path||'')+'|'+String(p.locator||'').split('#')[0];
+}
+function unifiedText(r){
+  const pl=(r&&r.payload)||{};
+  if(typeof pl.text==='string') return pl.text;
+  if(pl.text!=null) return JSON.stringify(pl.text);
+  return '';
+}
+// Turn one unified record into the viewer's own event shape, or null to leave it out.
+// Nothing is left out because it was uninteresting: only a record that is a duplicate
+// view of another, and the synthetic meta row.
+function unifiedEvent(r, derived, model){
+  const ts=r.ts_utc||undefined;
+  const pl=r.payload||{};
+  const kind=unifiedKind(r);
+  const sys=(text)=>({type:'system',timestamp:ts,content:text});
+  switch(kind){
+    case 'user.prompt':
+      return {type:'user',timestamp:ts,message:{content:unifiedText(r)}};
+    case 'prompt.history':
+      // From a history file rather than a transcript. Marked as such, because a prompt
+      // with no matching session is one of the more interesting things a collection can
+      // hold and must not read as an ordinary turn.
+      return sys('prompt history: '+unifiedText(r));
+    case 'assistant.text':
+      return {type:'assistant',timestamp:ts,
+              message:{id:pl.message_id||undefined,role:'assistant',model,
+                       content:[{type:'text',text:unifiedText(r)}]}};
+    case 'assistant.thinking':
+      return {type:'assistant',timestamp:ts,
+              message:{role:'assistant',model,content:[{type:'thinking',thinking:unifiedText(r)}]}};
+    case 'tool.call':
+    case 'mcp.call':
+      return {type:'assistant',timestamp:ts,
+              message:{role:'assistant',model,content:[{type:'tool_use',
+                id:pl.tool_use_id||unifiedBaseLocator(r),
+                name:pl.tool||(kind==='mcp.call'?'mcp':'tool'),
+                input:pl.input!=null?pl.input:{}}]}};
+    case 'tool.result':
+      return {type:'user',timestamp:ts,message:{content:[{type:'tool_result',
+                tool_use_id:pl.tool_use_id||unifiedBaseLocator(r),
+                content:pl.output!=null?pl.output:unifiedText(r),
+                is_error:pl.is_error===true}]}};
+    case 'safety.refusal':
+      // Its own visible row. The question "was anything refused" has to be answerable
+      // from the transcript without reading every assistant turn.
+      return {type:'system',timestamp:ts,
+              content:'⛔ the model refused'+(pl.refusal&&pl.refusal!=='refusal'?' ('+pl.refusal+')':'')
+                      +(unifiedText(r)?': '+unifiedText(r):'')};
+    case 'permission.change':{
+      const p=(pl.permissions||[])[0]||{};
+      return sys('permission mode changed'+(p.previous?' from '+p.previous:'')
+                 +(p.mode?' to '+p.mode:'')+(p.scope?' ('+p.scope+')':''));
+    }
+    case 'permission.decision':{
+      const p=(pl.permissions||[])[0]||{};
+      return sys('permission '+(p.decision||'decision')+(p.subject?' for '+p.subject:'')
+                 +(p.mode?' in mode '+p.mode:''));
+    }
+    case 'command.exec':{
+      if(derived.has(unifiedBaseLocator(r))) return null;
+      const c=(pl.commands||[])[0]||{};
+      return sys('command: '+(c.command||''));
+    }
+    case 'file.read': case 'file.write': case 'file.snapshot':{
+      if(derived.has(unifiedBaseLocator(r))) return null;
+      const f=(pl.files||[])[0]||{};
+      return sys(kind.replace('file.','file ')+': '+(f.path||''));
+    }
+    case 'network.request':{
+      if(derived.has(unifiedBaseLocator(r))) return null;
+      const n=(pl.network||[])[0]||{};
+      return sys('network: '+(n.method?n.method+' ':'')+(n.url||n.host||''));
+    }
+    case 'memory.write': case 'plan.write':
+      return sys(kind.replace('.',' ')+(unifiedText(r)?': '+unifiedText(r):''));
+    case 'session.start':
+      return sys('session start'+(r.client?' · '+r.client:''));
+    case 'session.end':
+      return sys(pl.compaction?'session compacted':'session end'
+                 +(unifiedText(r)?': '+unifiedText(r):''));
+    case 'config.snapshot':
+      return sys('config: '+(unifiedText(r)||JSON.stringify(pl)));
+    case 'artifact.fs':
+      // A file, not a turn. Grouped into its own project rather than dropped, because the
+      // difference between an agent that left nothing and a store nobody has read is the
+      // difference between two opposite conclusions.
+      return sys('file on disk: '+((pl.files||[])[0]||{}).path+(pl.mtime_utc?' (modified '+pl.mtime_utc+')':''));
+    case 'unparsed.record':
+      // The whole point of the format's honesty rule, carried into the view: a record
+      // nothing could read is a visible row with its original text one click away.
+      return {type:'unknown-record',timestamp:ts,
+              recordType:(r.parse_problem||'unreadable'),raw:r.raw!=null?r.raw:r};
+    default:
+      // A kind from a newer producer. Kept visible for the same reason.
+      return {type:'unknown-record',timestamp:ts,recordType:'kind '+kind,raw:r};
+  }
+}
+// One session's records, in the viewer's event shape, with a meta row in front.
+function normalizeUnified(records){
+  const derived=unifiedDerived(records);
+  const meta={type:'meta'};
+  const agents={};
+  let model=null;
+  const out=[];
+  for(const r of records){
+    if(!meta.timestamp&&r.ts_utc) meta.timestamp=r.ts_utc;
+    if(r.agent) agents[r.agent]=(agents[r.agent]||0)+1;
+    if(r.client&&!meta.entrypoint) meta.entrypoint=r.client;
+    if(r.project_path&&!meta.cwd) meta.cwd=r.project_path;
+    if(r.git_branch&&!meta.gitBranch) meta.gitBranch=r.git_branch;
+    const pl=r.payload||{};
+    if(pl.version&&!meta.version) meta.version=String(pl.version);
+    // The model is announced once and applies to what follows, so it is carried forward
+    // rather than looked up per turn.
+    const m=(pl.models||[])[0];
+    if(m&&m.model) model=m.model;
+    const ev=unifiedEvent(r,derived,model);
+    if(ev) out.push(ev);
+  }
+  // Which agent wrote this session, by weight. A unified log can hold several, and the
+  // header has to name the one whose records these are rather than "Assistant".
+  meta.unifiedAgent=Object.keys(agents).sort((a,b)=>agents[b]-agents[a])[0]||null;
+  out.unshift(meta);
+  return out;
+}
+
 // Fetch + normalize a session (cached by path).
 async function loadSession(session){
   if(state.normCache[session.path]) return state.normCache[session.path];
@@ -661,8 +825,19 @@ async function loadSession(session){
   state.normCache[session.path]=events;
   return events;
 }
-function assistantNameFor(format){return {claude:'Claude',codex:'Codex',copilot:'Copilot'}[format]||'Assistant';}
-function agentColorFor(format){return {claude:'#d97757',codex:'#10a37f',copilot:'#8957e5'}[format]||'var(--coral)';}
+const AGENT_LABELS={claude:'Claude',claude_code:'Claude',codex:'Codex',copilot:'Copilot'};
+const AGENT_COLORS={claude:'#d97757',claude_code:'#d97757',codex:'#10a37f',copilot:'#8957e5'};
+// A unified log can hold several agents, so the name comes from the records where
+// there are records to read it from, and from the format otherwise. An agent nobody
+// has a colour for keeps its own name rather than becoming 'Assistant', because the
+// name is the only thing on screen that says which tool left this behind.
+function assistantNameFor(format,agent){
+  if(agent) return AGENT_LABELS[agent]||agent;
+  return AGENT_LABELS[format]||'Assistant';
+}
+function agentColorFor(format,agent){
+  return AGENT_COLORS[agent]||AGENT_COLORS[format]||'var(--coral)';
+}
 
 // The File System Access API only exists in a secure context served over
 // http(s) (or localhost) — never from a file:// page. We use that as the
@@ -696,22 +871,162 @@ async function openLocalFolder(){
   await loadProjects();
 }
 
+
+// ============================================================================
+// Loading a unified agent log. One file, no server, and it works from a file://
+// page, which matters: an analyst who has a log from a fleet collection can open
+// this page and that log with nothing installed.
+// ============================================================================
+
+// Group a log's records into the projects and sessions the sidebar shows.
+//
+// Grouped by agent, working directory and session, in that order, because a unified log
+// can hold several agents, several users and several hosts at once, which is what comes
+// back from a fleet hunt. Records with no session of their own are not dropped: they go
+// into a group of their own so that a prompt from a history file, or a file nobody parsed,
+// is visible rather than absent.
+function groupUnified(records){
+  const groups={};
+  for(const r of records){
+    const agent=r.agent||'unknown agent';
+    const host=r.host?' · '+r.host:'';
+    const user=r.user?' · '+r.user:'';
+    let projectKey, projectName, sessionId;
+    if(unifiedKind(r)==='artifact.fs'){
+      // Files rather than turns. Their own group, named for what it is, so nobody reads
+      // "no sessions" as "no evidence".
+      projectKey='files:'+agent+host+user;
+      projectName=agent+': files on disk'+host+user;
+      sessionId='files';
+    } else {
+      const cwd=r.project_path||'(no working directory recorded)';
+      projectKey='u:'+agent+'|'+cwd+host+user;
+      projectName=agent+' · '+cwd+host+user;
+      sessionId=r.session_id||'(no session id)';
+    }
+    const g=groups[projectKey]||(groups[projectKey]={name:projectName,sessions:{}});
+    (g.sessions[sessionId]||(g.sessions[sessionId]=[])).push(r);
+  }
+  return groups;
+}
+
+// Read a unified log and make it the active data. The records are put straight into the
+// fetch cache under a synthetic path, so nothing downstream needs to know this source is
+// a single file: loadSession() finds them there and never asks the data source.
+function loadUnifiedLog(text, label){
+  const records=[]; const broken=[];
+  const lines=String(text).split('\n');
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i].trim();
+    if(!line) continue;
+    try{
+      const rec=JSON.parse(line);
+      if(rec&&typeof rec==='object'&&!Array.isArray(rec)) records.push(rec);
+      // A well-formed line that is not an object is itself an anomaly, and a line that
+      // does not parse at all could be a truncated write or a tampered log. Both are kept
+      // and shown, never counted and discarded.
+      else broken.push({type:'unstructured-record',raw:line,__line:i+1});
+    }catch(e){
+      broken.push({type:'parse-error',raw:line,__line:i+1,error:String((e&&e.message)||e)});
+    }
+  }
+
+  resetData();
+  state.sourceLabel=label;
+  const groups=groupUnified(records);
+  const projects=[];
+  let index=0;
+  for(const key of Object.keys(groups).sort()){
+    const group=groups[key];
+    const pid='unified:'+(index++);
+    const sessions=[];
+    for(const sid of Object.keys(group.sessions).sort()){
+      const path='unified/'+encodeURIComponent(pid)+'/'+encodeURIComponent(sid)+'.jsonl';
+      // Straight into the cache fetchEvents() reads, which is what lets a single file
+      // behave like a directory of sessions without a second code path.
+      state.cache[path]=group.sessions[sid];
+      sessions.push(mkSession(sid,path,'unified'));
+    }
+    projects.push({id:pid,name:group.name,source:'unified',sessions});
+  }
+
+  if(broken.length){
+    // Lines of the log itself that could not be read. Their own session, because a log
+    // that is partly unreadable is a different piece of evidence from one that is not,
+    // and a reader must not have to take our word for which it was.
+    const path='unified/unreadable/lines.jsonl';
+    state.cache[path]=broken;
+    projects.push({id:'unified:unreadable',name:'lines of this log that did not parse',
+                   source:'unified',
+                   sessions:[mkSession('unreadable-lines',path,'claude')]});
+  }
+
+  state.projects=projects;
+  const total=projects.reduce((n,p)=>n+p.sessions.length,0);
+  document.getElementById('root-label').textContent=
+    label+' · '+records.length+' record'+(records.length===1?'':'s')
+    +(broken.length?' · '+broken.length+' unreadable line'+(broken.length===1?'':'s'):'')
+    +' · '+projects.length+' groups · '+total+' sessions';
+  renderSidebar();
+
+  if(!projects.length){
+    document.getElementById('transcript').innerHTML=
+      '<div class="empty-state"><div class="empty-mark">◆</div>'
+      +'<p>That file held no unified records.</p>'
+      +'<p style="max-width:440px;text-align:center">A unified log has one JSON object per '
+      +'line, each with <code>v</code>, <code>agent</code> and <code>kind</code>. '
+      +'Produce one with <code>afx normalize &lt;source&gt;</code> or with the '
+      +'<code>Custom.Forensics.AIAgents.UnifiedLog</code> Velociraptor artifact.</p></div>';
+  }
+  // Fill in the sidebar titles and counts the same way the directory sources do.
+  enrichSessions();
+}
+
+// Let the user pick a unified log. A plain file input rather than the File System Access
+// API, because this has to work from a file:// page where that API does not exist.
+function openUnifiedLog(){
+  const input=document.getElementById('unified-file');
+  input.value='';
+  input.click();
+}
+async function onUnifiedFileChosen(event){
+  const file=event.target.files&&event.target.files[0];
+  if(!file) return;
+  document.getElementById('root-label').textContent='reading '+file.name+'…';
+  let text;
+  try{ text=await file.text(); }
+  catch(e){
+    document.getElementById('root-label').textContent='could not read '+file.name;
+    return;
+  }
+  loadUnifiedLog(text,file.name);
+}
+
 // Shown when the active source can't produce a projects/ listing.
 function showSourceHelp(){
   const t=document.getElementById('transcript');
+  const unified=
+    '<p style="max-width:440px;text-align:center">Or open a <b>unified agent log</b>: one '
+    +'JSON record per line, from <code>afx normalize</code> or from the '
+    +'<code>Custom.Forensics.AIAgents.UnifiedLog</code> Velociraptor artifact. That works '
+    +'from this page with no server and no folder access, and it is what a fleet collection '
+    +'comes back as.</p>'
+    +'<button class="folder-btn" type="button" onclick="openUnifiedLog()">📄 Open unified log…</button>';
   if(canPickFolder){
     t.innerHTML=
       '<div class="empty-state"><div class="empty-mark">◆</div>'
       +'<p>No agent logs found here.</p>'
       +'<p style="max-width:440px;text-align:center">Pick a local <code>.claude</code>, <code>.codex</code> or '
-      +'<code>.copilot</code> folder (or a parent that contains them) to load sessions straight from disk — no server needed.</p>'
-      +'<button class="folder-btn" type="button" onclick="openLocalFolder()">📁 Open local folder…</button></div>';
+      +'<code>.copilot</code> folder (or a parent that contains them) to load sessions straight from disk, no server needed.</p>'
+      +'<button class="folder-btn" type="button" onclick="openLocalFolder()">📁 Open local folder…</button>'
+      +unified+'</div>';
   } else {
     t.innerHTML=
-      '<div class="empty-state"><p>No agent logs found.<br>'
-      +'Run <code>python3 -m http.server</code> inside your <code>.claude</code>, <code>.codex</code> or '
-      +'<code>.copilot</code> directory (or a parent of them) and open this file from there — '
-      +'or host this file and use the folder picker.</p></div>';
+      '<div class="empty-state"><div class="empty-mark">◆</div><p>No agent logs found.</p>'
+      +'<p style="max-width:440px;text-align:center">Run <code>python3 -m http.server</code> inside your '
+      +'<code>.claude</code>, <code>.codex</code> or <code>.copilot</code> directory (or a parent of them) '
+      +'and open this file from there, or host this file and use the folder picker.</p>'
+      +unified+'</div>';
   }
 }
 
@@ -794,10 +1109,18 @@ async function loadProjects(){
   const srcPrefix = dataSource.kind==='folder' ? (state.sourceLabel||'folder')+' · ' : '';
   rootLabel.textContent=srcPrefix+projects.length+' groups · '+total+' sessions';
   renderSidebar();
+  await enrichSessions();
+}
 
-  // Background: load + normalize each session to fill in titles, counts, cwd.
+// Background: load and normalize every session to fill in the sidebar titles, the counts
+// and the working directory, and to run the cross-session aggregation.
+//
+// Extracted so that every source shares it. A source that filled the sidebar its own way
+// would show different counts for the same evidence, and the counts are what an analyst
+// reads first.
+async function enrichSessions(){
   const allSessions=[];
-  for(const p of projects) for(const s of p.sessions) allSessions.push({p,s});
+  for(const p of state.projects) for(const s of p.sessions) allSessions.push({p,s});
   await pool(allSessions,5,async({p,s})=>{
     try{
       const events=await loadSession(s);
@@ -991,7 +1314,10 @@ async function openSession(project,session){
   try{ events=await loadSession(session); }
   catch(e){ transcript.innerHTML='<div class="empty-state"><p>Failed to load session.</p></div>'; return; }
   const summary=summarize(events);
-  state.current={path:session.path,summary,assistantName:assistantNameFor(session.format),agentColor:agentColorFor(session.format)};
+  const unifiedAgent=(events.find(e=>e.type==='meta')||{}).unifiedAgent||null;
+  state.current={path:session.path,summary,
+                 assistantName:assistantNameFor(session.format,unifiedAgent),
+                 agentColor:agentColorFor(session.format,unifiedAgent)};
   renderSidebar();
   renderHeader(session.id,summary);
   renderTranscript(events);

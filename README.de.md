@@ -89,11 +89,22 @@ werden darf.
 | Claude Code | `~/.claude/projects/` | `projects/<dir>/<uuid>.jsonl` | ein JSON-Ereignis pro Zeile |
 | OpenAI Codex CLI | `~/.codex/sessions/` | `sessions/YYYY/MM/DD/rollout-*-<uuid>.jsonl` | `{timestamp,type,payload}` pro Zeile |
 | GitHub Copilot CLI | `~/.copilot/session-state/` | `session-state/<id>/events.jsonl` | `{type,id,timestamp,data}` pro Zeile |
+| Beliebiger Agent, über ein vereinheitlichtes Log | eine Datei, irgendwo | ein Datensatz pro Zeile | [das vendorneutrale Format](docs/UNIFIED_FORMAT.de.md) |
 
 Die Erkennung prüft jedes Layout direkt und zusätzlich unter `.claude/`, `.codex/` und
 `.copilot/`. Zeigt man den Viewer also auf eines dieser Verzeichnisse oder auf ein
 übergeordnetes Verzeichnis, das mehrere davon enthält, erscheinen die Sitzungen aller
 Agenten gemeinsam.
+
+Die letzte Zeile ist der allgemeine Fall. Ein vereinheitlichtes Agenten-Log ist eine
+Datei mit normalisierten Datensätzen beliebiger Agenten, erzeugt entweder durch
+`afx normalize <quelle>` oder durch das Velociraptor-Artefakt
+`Custom.Forensics.AIAgents.UnifiedLog`, das auf dem Endpunkt parst und Zeilen statt
+Dateien zurückgibt. Der Viewer gruppiert ein solches Log nach Agent, Arbeitsverzeichnis
+und Sitzung, sodass eine Sammlung über viele Hosts und mehrere Agenten als ein Satz von
+Sitzungen aufgeht. Datensätze, die zu keiner Sitzung gehören, etwa ein Prompt aus einer
+Verlaufsdatei oder ein Speicher, den niemand geparst hat, erhalten eine eigene Gruppe
+statt weggelassen zu werden.
 
 ### Starten
 
@@ -117,9 +128,16 @@ sicheren Kontext, also `https://` oder `http://localhost`. Eine `file://`-Seite 
 das nicht, dort blendet sich die Schaltfläche selbst aus. Firefox und Safari
 implementieren die API nicht.
 
-**C. Auf eine Falldatenbank zeigen.** Sobald der Analyzer da ist, stellt
-`agentforensics serve` eine lokale, nur lesende API bereit, und der Viewer liest daraus
-jeden geparsten Agenten, nicht nur die drei Layouts, die er selbst erkennen kann.
+**C. Ein vereinheitlichtes Agenten-Log öffnen.** In der Seitenleiste unten auf
+**Open unified log** klicken und eine `.jsonl`-Datei auswählen. Das ist die Variante, die
+überhaupt nichts braucht: keinen Server, keinen Verzeichniszugriff, und sie funktioniert
+von einer `file://`-Seite. Wer ein Log aus einer Flottensammlung hat, öffnet also diese
+Seite und diese Datei und liest. Es ist außerdem der einzige Weg, einen Agenten zu sehen,
+für den der Viewer kein Layout kennt, denn das Normalisieren ist passiert, bevor die Datei
+geschrieben wurde.
+
+**D. Auf eine Falldatenbank zeigen.** Sobald `agentforensics serve` da ist, stellt es eine
+lokale, nur lesende API bereit, und der Viewer liest daraus einen ganzen Fall.
 
 Kein Build-Schritt, kein `npm install`, kein Backend. Alles läuft im Browser. Das
 Einzige, was der Viewer irgendwo schreibt, ist die Themenwahl in `localStorage`.

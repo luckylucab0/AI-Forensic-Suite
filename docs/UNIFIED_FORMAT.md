@@ -180,6 +180,37 @@ Exit codes follow the rest of the tool: 0 for a clean run, 1 when the collection
 paths nothing in the catalogue claims, 3 when nothing was found at all. A host with no agent
 artifacts is a valid and useful answer and must not look like a crash.
 
+## Reading it
+
+Three consumers, and none of them needs a server.
+
+**The viewer.** Open `viewer/index.html` and click **Open unified log** in the sidebar
+footer. The viewer groups a log by agent, working directory and session, so a collection
+covering many hosts and several agents opens as one set of sessions, and everything it
+already does, the transcript rendering, the tool summaries and the credential scan, works
+unchanged. A `file://` page is enough: no server, no folder access.
+
+Records with no session of their own are not left out. A prompt read from a history file, a
+file nobody parsed, a line of the log that did not itself parse: each gets a group of its
+own, because a reader has to be able to tell an agent that left nothing from evidence that
+nobody has read.
+
+Two things the viewer shows that are worth looking for. A model refusal is a row of its
+own, so "was anything refused" is answerable without reading every assistant turn. And a
+permission mode change is a row of its own, because that is the half of the bypass question
+that says who moved the goalposts and when.
+
+**The analyzer.** `afx` reads a unified log back into events, recomputing `event_id` from
+each record's own provenance. It reports a disagreement with the producer's rather than
+correcting it, keeps whatever the producer said it could not read, and refines what the
+producer left coarse: the endpoint query returns one row per record, and reading that row's
+`raw` gives the full per-turn interpretation. That is what makes the endpoint producer's
+coarseness a matter of interpretation and not of evidence.
+
+**Anything else.** It is JSON Lines with a published schema, so `jq`, a SIEM or a
+colleague's script reads it without this suite. Validate against
+`src/agentforensics/unified/agentlog.v1.schema.json`.
+
 ## Versioning
 
 `v` is an integer and it is on every record. Version 1 is what this document describes. A
