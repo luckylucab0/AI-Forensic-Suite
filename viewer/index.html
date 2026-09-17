@@ -222,6 +222,44 @@ mark.hl.hl-current{background:var(--coral);color:#fff;box-shadow:0 0 0 2px var(-
 .flag-row .fsnip{font-family:var(--mono);font-size:11.5px;color:var(--text-dim);background:var(--bg-elev-2);border-radius:5px;padding:6px 9px;margin-top:7px;white-space:pre-wrap;word-break:break-all;}
 .flag-row .fsnip b{color:var(--red);background:rgba(217,108,108,.18);}
 .agg-empty{color:var(--text-faint);padding:30px 0;text-align:center;}
+/* ---- case views, shown only when the page is served by `afx serve` ---- */
+.case-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:8px;margin-bottom:6px;}
+.case-num{background:var(--bg-elev);border:1px solid var(--border-soft);border-radius:6px;padding:9px 11px;}
+.case-num .n{font-size:19px;font-weight:600;color:var(--text);font-family:var(--mono);}
+.case-num .l{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
+.case-num.qual .n{color:var(--yellow);}
+.case-num.qual.zero .n{color:var(--text-dim);}
+.case-block{margin:22px 0 8px;font-size:13px;font-weight:600;color:var(--text);}
+.kv{display:flex;gap:8px;font-family:var(--mono);font-size:11.5px;padding:4px 0;border-bottom:1px solid var(--border-soft);}
+.kv .k{color:var(--text-faint);flex:none;min-width:160px;}
+.kv .v{color:var(--text-dim);word-break:break-all;}
+.tl-row{display:flex;gap:10px;align-items:baseline;padding:5px 9px;border:1px solid var(--border-soft);border-radius:5px;margin-bottom:3px;font-family:var(--mono);font-size:11.5px;cursor:pointer;background:var(--bg-elev);}
+.tl-row:hover{border-color:var(--coral-dim);}
+.tl-row .t{color:var(--text-faint);flex:none;width:212px;}
+.tl-row .kd{color:var(--blue);flex:none;width:130px;}
+.tl-row .ag{color:var(--text-faint);flex:none;width:92px;}
+.tl-row .sm{color:var(--text-dim);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tl-row.undated .t{color:var(--yellow);}
+.tl-row.problem .kd{color:var(--red);}
+.flag-row .sev.critical{background:var(--red);color:#fff;}
+.flag-row .sev.medium{background:var(--yellow);color:#1a1a19;}
+.flag-row .sev.low{background:var(--blue);color:#1a1a19;}
+.flag-row .sev.info{background:var(--border);color:var(--text);}
+.flag-row.calm{border-color:var(--border);border-left-color:var(--blue);}
+.flag-row .fmeta{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;color:var(--text-faint);margin-top:6px;}
+.flag-row .fmeta b{color:var(--text-dim);font-weight:600;}
+.flag-row .fev{color:var(--blue);cursor:pointer;}
+.flag-row .fev:hover{text-decoration:underline;}
+.art-row{display:flex;gap:10px;align-items:baseline;padding:5px 9px;border:1px solid var(--border-soft);border-radius:5px;margin-bottom:3px;font-family:var(--mono);font-size:11.5px;background:var(--bg-elev);}
+.art-row .st{flex:none;width:96px;font-size:9.5px;text-transform:uppercase;letter-spacing:.4px;}
+.art-row .st.parsed{color:var(--green);}
+.art-row .st.unsupported,.art-row .st.skipped{color:var(--yellow);}
+.art-row .st.failed,.art-row .st.gone{color:var(--red);}
+.art-row .pth{color:var(--text-dim);flex:1;word-break:break-all;}
+.art-row .ag{color:var(--text-faint);flex:none;width:92px;}
+.art-row .n{color:var(--text-faint);flex:none;width:110px;text-align:right;}
+.notice{border:1px solid var(--border);border-left:3px solid var(--yellow);border-radius:6px;background:var(--bg-elev);padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--text-dim);}
+.notice b{color:var(--text);}
 </style>
 </head>
 <body>
@@ -233,6 +271,16 @@ mark.hl.hl-current{background:var(--coral);color:#fff;box-shadow:0 0 0 2px var(-
         <div class="tab active" data-view="sessions">Sessions</div>
         <div class="tab" data-view="tools">Tools</div>
         <div class="tab" data-view="security">Security<span id="sec-badge" class="tab-badge" style="display:none">0</span></div>
+      </div>
+      <!-- The case views. Hidden unless this page is being served by `afx serve`, which is
+           the only situation in which there is a case behind it to read. The viewer's
+           standalone modes are untouched: a directory of transcripts or a single unified
+           log still shows exactly the three tabs above. -->
+      <div class="tabs hidden" id="case-tabs">
+        <div class="tab" data-view="case">Case</div>
+        <div class="tab" data-view="timeline">Timeline</div>
+        <div class="tab" data-view="findings">Findings<span id="find-badge" class="tab-badge" style="display:none">0</span></div>
+        <div class="tab" data-view="artifacts">Artifacts</div>
       </div>
       <input id="search" type="text" placeholder="Filter sessions…" autocomplete="off" />
     </div>
@@ -276,6 +324,28 @@ mark.hl.hl-current{background:var(--coral);color:#fff;box-shadow:0 0 0 2px var(-
       <div class="panel-sub">Heuristic scan of file reads and assistant text for keys, tokens & credentials. Verify before trusting.</div>
       <div id="sec-list"></div>
     </div>
+    <div id="case-panel" class="view-panel hidden">
+      <div class="panel-h">Case</div>
+      <div class="panel-sub">What this case holds, where it came from, and what is missing from it.</div>
+      <div id="case-body"></div>
+    </div>
+    <div id="timeline-panel" class="view-panel hidden">
+      <div class="panel-h">Timeline <span class="panel-sub" id="timeline-count" style="margin:0"></span></div>
+      <div class="panel-sub">Every event in the case, across every agent, in one sequence. Click a row to open it in its session.</div>
+      <div id="timeline-filters" class="tool-filters"></div>
+      <div id="timeline-list"></div>
+    </div>
+    <div id="findings-panel" class="view-panel hidden">
+      <div class="panel-h">Rule findings <span class="tab-badge" id="find-total" style="display:none">0</span></div>
+      <div class="panel-sub">What the YAML rule packs found in this case. Run `afx scan --case &lt;db&gt;` to produce them.</div>
+      <div id="findings-body"></div>
+    </div>
+    <div id="artifacts-panel" class="view-panel hidden">
+      <div class="panel-h">Artifacts <span class="panel-sub" id="artifacts-count" style="margin:0"></span></div>
+      <div class="panel-sub">Every file the collection carried, whether or not a parser read it. This is the view that qualifies all the others.</div>
+      <div id="artifacts-filters" class="tool-filters"></div>
+      <div id="artifacts-body"></div>
+    </div>
   </main>
 </div>
 <div id="modal" class="modal hidden">
@@ -286,7 +356,11 @@ mark.hl.hl-current{background:var(--coral);color:#fff;box-shadow:0 0 0 2px var(-
 <script>
 'use strict';
 
-const state = { projects: [], current: null, cache: {}, normCache: {}, view: 'sessions', allTools: [], findings: [], toolFilter: 'all' };
+const state = { projects: [], current: null, cache: {}, normCache: {}, view: 'sessions', allTools: [], findings: [], toolFilter: 'all',
+  // Set only when this page is served by `afx serve` and there is a case behind it.
+  // Null in the two standalone modes, which is what the case tabs key off.
+  caseApi: null, caseFindings: null, caseArtifacts: null,
+  timeline: null, timelineAgent: 'all', timelineNoFs: false, artifactFilter: 'all' };
 
 // ---------- DOM helpers ----------
 function el(tag, attrs = {}, children = []) {
@@ -386,6 +460,55 @@ function makeFolderSource(rootHandle) {
     },
   };
 }
+
+// ============================================================================
+// The case API: the third source, for a page served by `afx serve`.
+//
+// It fetches a case's events in the unified format, so everything downstream is the code
+// path a unified log file already takes: fetchEvents() splits the lines, normalizeUnified()
+// maps them, and the renderer never learns that this session came out of SQLite. A second
+// event shape for the case would be a third thing that could disagree with the other two.
+//
+// Paged, because ADR 0006 chose the standard library for the server and a session
+// projection is assembled in memory there. The next offset arrives in a header rather than
+// in an envelope around the records, which is what keeps the body a unified log an analyst
+// can save straight to a file.
+// ============================================================================
+const CASE_API_VERSION = 1;
+// A ceiling on pages followed for one session, so that a server answering with an offset
+// that never ends cannot spin here forever.
+const CASE_PAGE_GUARD = 5000;
+
+const apiSource = {
+  kind: 'api',
+  async listDir(path) {
+    // There is no directory to list: the session list comes from api/projects. A throw
+    // rather than an empty array, because an empty listing reads as "nothing was there",
+    // which is the one thing this tool must never say by accident.
+    throw new Error('the case API has no directory listing (' + path + ')');
+  },
+  async readText(path) {
+    let offset = 0, out = '';
+    for (let page = 0; page < CASE_PAGE_GUARD; page++) {
+      const url = path + (path.indexOf('?') >= 0 ? '&' : '?') + 'offset=' + offset;
+      const res = await fetch(url, { headers: { Accept: 'application/x-ndjson' } });
+      if (!res.ok) throw new Error('cannot read ' + path + ' (' + res.status + ')');
+      let body = await res.text();
+      // Two pages must never share a line: a record split across the seam would come back
+      // as an unparseable line, which is a record the analyst would have to explain.
+      if (body && !body.endsWith('\n')) body += '\n';
+      out += body;
+      const next = res.headers.get('X-Afx-Next-Offset');
+      if (!next) return out;
+      const parsed = Number(next);
+      // An offset that does not advance would re-fetch the same page forever. Stopping and
+      // keeping what arrived is the lesser evil, and the count in the header says how much.
+      if (!Number.isFinite(parsed) || parsed <= offset) return out;
+      offset = parsed;
+    }
+    return out;
+  },
+};
 
 // The active source. Defaults to the http.server scraper.
 let dataSource = httpSource;
@@ -847,12 +970,20 @@ const canPickFolder = typeof window.showDirectoryPicker === 'function';
 // Wipe everything tied to the previous source before loading a new one.
 function resetData(){
   state.projects=[]; state.cache={}; state.normCache={}; state.allTools=[]; state.findings=[]; state.current=null;
+  // The case-backed state as well, and the tabs that read it. Switching from a served case
+  // to a file the user picked would otherwise leave four tabs pointing at a case that is no
+  // longer the one on screen.
+  state.caseApi=null; state.caseFindings=null; state.caseArtifacts=null; state.timeline=null;
+  const caseTabs=document.getElementById('case-tabs');
+  if(caseTabs) caseTabs.classList.add('hidden');
   document.getElementById('transcript').innerHTML=
     '<div class="empty-state"><div class="empty-mark">◆</div><p>Select a session to inspect.</p></div>';
   renderSidebar();
   if(typeof updateSecBadge==='function') updateSecBadge();
-  if(state.view==='tools') renderToolsPanel();
-  if(state.view==='security') renderSecurityPanel();
+  if(typeof updateFindBadge==='function') updateFindBadge();
+  if(['case','timeline','findings','artifacts'].indexOf(state.view)>=0) switchView('sessions');
+  else if(state.view==='tools') renderToolsPanel();
+  else if(state.view==='security') renderSecurityPanel();
 }
 
 // Let the user pick a local folder and load sessions from it.
@@ -1027,6 +1158,502 @@ function showSourceHelp(){
       +'<code>.claude</code>, <code>.codex</code> or <code>.copilot</code> directory (or a parent of them) '
       +'and open this file from there, or host this file and use the folder picker.</p>'
       +unified+'</div>';
+  }
+}
+
+// ============================================================================
+// Opening a case served by `afx serve`.
+//
+// The three case views (timeline, findings, artifacts) exist only here, because they are
+// questions about a case rather than about a transcript: what happened on this device in
+// order, what the rule packs found, and what was collected and never read. The viewer's
+// standalone modes are untouched.
+// ============================================================================
+
+// Ask this page's own origin whether there is a case behind it.
+//
+// A probe rather than a marker injected into this file, because the copy `afx serve` sends
+// has to stay byte for byte the copy an analyst opens from disk: its hash is printed on the
+// console so they can state which viewer they read the case with. From a file:// page there
+// is no origin to ask, so nothing is attempted at all.
+async function probeCaseApi(){
+  if(location.protocol!=='http:'&&location.protocol!=='https:') return null;
+  let data;
+  try{
+    const res=await fetch('api/case',{headers:{Accept:'application/json'}});
+    if(!res.ok) return null;
+    data=await res.json();
+  }catch(e){ return null; }
+  // A 200 with the wrong JSON is not a case. The marker field is what tells an `afx serve`
+  // apart from any other thing that happens to answer on this port.
+  if(!data||typeof data.afx_api!=='number') return null;
+  return data;
+}
+
+function tailPath(p){ const parts=String(p||'').split(/[\\/]/); return parts[parts.length-1]||String(p||''); }
+
+async function loadCase(summary){
+  dataSource=apiSource;
+  resetData();
+  state.caseApi=summary;
+  document.getElementById('case-tabs').classList.remove('hidden');
+  const rootLabel=document.getElementById('root-label');
+  const transcript=document.getElementById('transcript');
+
+  if(summary.afx_api!==CASE_API_VERSION){
+    // A server newer or older than this file. Said out loud rather than worked around:
+    // rendering whichever fields happen to be recognised would put a partly read case in
+    // front of an analyst, and that is indistinguishable from a case holding less than it
+    // does.
+    rootLabel.textContent='case API version '+summary.afx_api;
+    transcript.innerHTML='<div class="empty-state"><div class="empty-mark">◆</div>'
+      +'<p>This case is served by a different version of the API.</p>'
+      +'<p style="max-width:460px;text-align:center">The server speaks version '
+      +esc(String(summary.afx_api))+' and this viewer reads version '+CASE_API_VERSION
+      +'. Nothing is shown rather than a part of the case, because a case that renders '
+      +'incompletely cannot be told apart from a case that holds less. Use the viewer '
+      +'shipped with the same build as <code>afx serve</code>.</p></div>';
+    renderCasePanel();
+    return;
+  }
+
+  let projects=[];
+  try{
+    const res=await fetch('api/projects',{headers:{Accept:'application/json'}});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    projects=(await res.json()).projects||[];
+  }catch(e){
+    rootLabel.textContent='case unreachable';
+    transcript.innerHTML='<div class="empty-state"><div class="empty-mark">◆</div>'
+      +'<p>The case API stopped answering.</p><p style="max-width:440px;text-align:center">'
+      +esc(String((e&&e.message)||e))+'. The session list could not be read, so nothing is '
+      +'shown. Check whether <code>afx serve</code> is still running.</p></div>';
+    return;
+  }
+
+  state.projects=projects.map(p=>({
+    id:p.id, name:p.name, source:'case',
+    sessions:(p.sessions||[]).map(s=>{
+      const label=s.files?'files on disk':(s.session_id||'(no session id)');
+      const session=mkSession(label,s.path,'unified');
+      // The group this session was derived from, kept so that a finding or a timeline row
+      // can be traced back to the session it belongs in.
+      session.caseSession=s;
+      return session;
+    }),
+  }));
+
+  const counts=summary.counts||{};
+  const total=state.projects.reduce((n,p)=>n+p.sessions.length,0);
+  rootLabel.textContent=tailPath((summary.case||{}).path)+' · '+(counts.events||0)
+    +' events · '+state.projects.length+' groups · '+total+' sessions';
+  renderSidebar();
+  renderCasePanel();
+
+  if(!total){
+    // An empty case is a real answer, and the difference between "no events" and "nothing
+    // was collected" is the difference between two opposite conclusions. So it points at
+    // the view that can tell them apart rather than showing an empty screen.
+    transcript.innerHTML='<div class="empty-state"><div class="empty-mark">◆</div>'
+      +'<p>This case holds no events.</p><p style="max-width:460px;text-align:center">'
+      +(counts.artifacts||0)+' file(s) are recorded in it and '+(counts.artifacts_unparsed||0)
+      +' collected file(s) had no parser. Open the <b>Artifacts</b> tab: a case with no '
+      +'events because nothing was collected and a case with no events because the agent '
+      +'was never used are opposite findings.</p></div>';
+  }
+
+  // Fetched now rather than when the tab is first opened, so the badge is honest from the
+  // start: an analyst should not have to visit a tab to learn that there is something in it.
+  loadCaseFindings();
+  await enrichSessions();
+}
+
+async function loadCaseFindings(){
+  try{
+    const res=await fetch('api/findings',{headers:{Accept:'application/json'}});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    state.caseFindings=await res.json();
+  }catch(e){
+    state.caseFindings={error:String((e&&e.message)||e),findings:[],scan_runs:[],scanned:false};
+  }
+  updateFindBadge();
+  if(state.view==='findings') renderFindingsPanel();
+}
+
+function updateFindBadge(){
+  const data=state.caseFindings;
+  const n=data&&data.findings?data.findings.length:0;
+  for(const id of ['find-badge','find-total']){
+    const node=document.getElementById(id);
+    if(!node) continue;
+    node.textContent=String(n);
+    node.style.display=n?'inline-block':'none';
+  }
+}
+
+// Open the session one event belongs to.
+//
+// The event's own group is asked for rather than guessed: the case says which agent, host,
+// user, working directory and session id it came from, and the session list was derived
+// from the same six values. An event whose group is not in the list is shown as itself
+// rather than dropped, because a record an analyst clicked on and got nothing for is a
+// record they will assume was not there.
+async function openCaseEvent(eventId){
+  let record;
+  try{
+    const res=await fetch('api/events/'+encodeURIComponent(eventId),{headers:{Accept:'application/json'}});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    record=await res.json();
+  }catch(e){
+    showModal('This event could not be read from the case: '+String((e&&e.message)||e));
+    return;
+  }
+  const found=findCaseSession(record);
+  if(!found){
+    showModal(JSON.stringify(record,null,2));
+    return;
+  }
+  switchView('sessions');
+  await openSession(found.p,found.s);
+}
+
+function findCaseSession(record){
+  const files=record.kind==='artifact.fs';
+  const same=(a,b)=>(a==null?null:a)===(b==null?null:b);
+  for(const p of state.projects) for(const s of p.sessions){
+    const group=s.caseSession;
+    if(!group||!!group.files!==files) continue;
+    if(!same(group.agent,record.agent)) continue;
+    if(!same(group.host,record.host)) continue;
+    if(!same(group.user,record.user)) continue;
+    if(files) return {p,s};
+    if(!same(group.project_path,record.project_path)) continue;
+    if(!same(group.session_id,record.session_id)) continue;
+    return {p,s};
+  }
+  return null;
+}
+
+// ---------- the Case view ----------
+function caseNum(n,label,qualifying){
+  return el('div',{class:'case-num'+(qualifying?' qual':'')+(qualifying&&!n?' zero':'')},[
+    el('div',{class:'n',text:String(n==null?'—':n)}),
+    el('div',{class:'l',text:label}),
+  ]);
+}
+function kv(k,v){
+  return el('div',{class:'kv'},[
+    el('span',{class:'k',text:k}),
+    el('span',{class:'v',text:(v===null||v===undefined||v==='')?'—':String(v)}),
+  ]);
+}
+
+function renderCasePanel(){
+  const body=document.getElementById('case-body');
+  body.innerHTML='';
+  const summary=state.caseApi;
+  if(!summary){ body.appendChild(el('div',{class:'agg-empty',text:'No case is being served to this page.'})); return; }
+  const counts=summary.counts||{};
+
+  body.appendChild(el('div',{class:'case-grid'},[
+    caseNum(counts.events||0,'events'),
+    caseNum((summary.agents||[]).length,'agents'),
+    caseNum(counts.artifacts_collected||0,'files collected'),
+    caseNum(counts.bundles||0,'collections'),
+  ]));
+
+  body.appendChild(el('div',{class:'case-block',text:'What this case does not know'}));
+  body.appendChild(el('div',{class:'panel-sub',text:'Shown every time rather than only when it looks bad. A summary of what was understood, with nothing said about the rest, reads as completeness.'}));
+  body.appendChild(el('div',{class:'case-grid'},[
+    caseNum(counts.artifacts_unparsed||0,'collected, no parser',true),
+    caseNum(counts.events_unparsed||0,'records unreadable',true),
+    caseNum(counts.events_without_timestamp||0,'events with no time',true),
+    caseNum(counts.collection_gaps||0,'gaps in collection',true),
+  ]));
+  if(!summary.scanned){
+    body.appendChild(el('div',{class:'notice',html:'<b>Nobody has run the rules over this case.</b> '
+      +'An empty findings list means nothing until a scan has run: <code>afx scan --case &lt;db&gt;</code>.'}));
+  }
+
+  for(const bundle of summary.bundles||[]){
+    body.appendChild(el('div',{class:'case-block',text:'Collection '+(bundle.collected_host||'unknown host')}));
+    body.appendChild(el('div',{},[
+      kv('bundle',bundle.bundle_uuid),
+      kv('source',(bundle.source_kind||'?')+' · '+(bundle.source_path||'?')),
+      kv('endpoint',(bundle.collected_host||'unknown host')+' ('+(bundle.collected_os||'?')+')'),
+      kv('collected by',(bundle.collector_user||'unknown user')+(bundle.elevated?' · elevated':'')),
+      kv('collection ran',(bundle.started_utc||'?')+' to '+(bundle.finished_utc||'?')),
+      // Recorded once for the whole collection, which is what turns a UTC timestamp in
+      // this case back into the wall clock time a user would have seen.
+      kv('endpoint timezone',(bundle.local_timezone_name||'?')+' '+(bundle.local_timezone||'')),
+      kv('collector',(bundle.tool_name||'?')+' '+(bundle.tool_version||'')),
+      kv('manifest sha256',bundle.manifest_sha256),
+      kv('ingested',bundle.ingested_utc),
+    ]));
+  }
+
+  if((summary.agents||[]).length){
+    body.appendChild(el('div',{class:'case-block',text:'Agents'}));
+    for(const agent of summary.agents){
+      body.appendChild(kv(agent.agent,agent.events+' event(s)'
+        +(agent.unparsed?', '+agent.unparsed+' unreadable':'')
+        +' · '+(agent.first_ts||'no earliest timestamp')+' to '+(agent.last_ts||'no latest timestamp')));
+    }
+  }
+
+  if((summary.collection_gaps||[]).length){
+    body.appendChild(el('div',{class:'case-block',text:'Gaps the collection itself reported'}));
+    body.appendChild(el('div',{class:'panel-sub',text:'A pattern the collector declined to search, or an error it hit. A hole in the evidence, carried from the manifest into the case so it is visible here rather than only in the bundle.'}));
+    for(const gap of summary.collection_gaps){
+      body.appendChild(kv(gap.kind,gap.detail+(gap.reason?' — '+gap.reason:'')));
+    }
+  }
+
+  if((summary.scan_runs||[]).length){
+    body.appendChild(el('div',{class:'case-block',text:'Rule scans'}));
+    for(const run of summary.scan_runs){
+      body.appendChild(kv(run.started_utc,run.rules_run+' rule(s) over '+run.events_read
+        +' event(s), '+run.findings+' finding(s), '+run.tool_version));
+    }
+  }
+
+  body.appendChild(el('div',{class:'case-block',text:'This page'}));
+  body.appendChild(el('div',{},[
+    kv('case file',(summary.case||{}).path),
+    kv('case schema',(summary.case||{}).schema_version),
+    kv('served by',(summary.tool||'?')+' '+(summary.tool_version||'')),
+    kv('unified format',(summary.unified_format||{}).name+' v'+(summary.unified_format||{}).version),
+    // The hash of the HTML this page was served from, so a screenshot can be attributed to
+    // a build. Same reason every event carries the hash of the file it came from.
+    kv('viewer sha256',summary.viewer_sha256),
+    kv('api version',summary.afx_api),
+  ]));
+}
+
+// ---------- the Timeline view ----------
+const TIMELINE_PAGE=300;
+
+async function renderTimelinePanel(){
+  const list=document.getElementById('timeline-list');
+  const filters=document.getElementById('timeline-filters');
+  if(!state.caseApi){
+    filters.innerHTML=''; list.innerHTML='';
+    list.appendChild(el('div',{class:'agg-empty',text:'No case is being served to this page.'}));
+    return;
+  }
+  filters.innerHTML='';
+  const names=['all'].concat((state.caseApi.agents||[]).map(a=>a.agent));
+  for(const name of names){
+    filters.appendChild(el('div',{class:'tfilter'+(state.timelineAgent===name?' active':''),
+      onclick:()=>{state.timelineAgent=name;state.timeline=null;renderTimelinePanel();}},
+      [document.createTextNode(name)]));
+  }
+  filters.appendChild(el('div',{class:'tfilter'+(state.timelineNoFs?' active':''),
+    title:'Leave out the one-per-file filesystem events. They can outnumber the conversation, and for a file with no internal timestamps they are the only temporal evidence there is.',
+    onclick:()=>{state.timelineNoFs=!state.timelineNoFs;state.timeline=null;renderTimelinePanel();}},
+    [document.createTextNode('hide file events')]));
+
+  const key=(state.timelineAgent||'all')+'|'+(state.timelineNoFs?'1':'0');
+  if(!state.timeline||state.timeline.key!==key){
+    state.timeline={key,rows:[],next:0,error:null};
+    list.innerHTML='';
+    list.appendChild(el('div',{class:'agg-empty',text:'Loading…'}));
+    await timelineMore();
+    // The tab may have been left while the page was in flight.
+    if(state.view!=='timeline') return;
+  }
+  drawTimeline();
+}
+
+async function timelineMore(){
+  const t=state.timeline;
+  if(!t||t.next===null) return;
+  const params=['limit='+TIMELINE_PAGE,'offset='+t.next];
+  if(state.timelineAgent&&state.timelineAgent!=='all') params.push('agent='+encodeURIComponent(state.timelineAgent));
+  if(state.timelineNoFs) params.push('no_fs=1');
+  try{
+    const res=await fetch('api/timeline?'+params.join('&'),{headers:{Accept:'application/json'}});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    t.rows=t.rows.concat(data.rows||[]);
+    t.next=(data.next_offset===null||data.next_offset===undefined)?null:data.next_offset;
+  }catch(e){
+    t.error=String((e&&e.message)||e);
+    t.next=null;
+  }
+}
+
+function drawTimeline(){
+  const list=document.getElementById('timeline-list');
+  const t=state.timeline||{rows:[],next:null};
+  document.getElementById('timeline-count').textContent='· '+t.rows.length+' row(s) loaded'
+    +(t.next===null?'':' of more');
+  list.innerHTML='';
+  if(t.error) list.appendChild(el('div',{class:'notice',text:'The timeline could not be read in full: '+t.error}));
+  if(!t.rows.length){
+    list.appendChild(el('div',{class:'agg-empty',text:'No events match this filter.'}));
+    return;
+  }
+  for(const row of t.rows){
+    list.appendChild(el('div',{class:'tl-row'+(row.ts_utc?'':' undated')+(row.parse_problem?' problem':''),
+      title:(row.original_path||'')+(row.locator?' · '+row.locator:''),
+      onclick:()=>openCaseEvent(row.event_id)},[
+      // An undated event says so rather than being given a time. Its position is unknown,
+      // not early, which is also why the server puts them first.
+      el('span',{class:'t',text:row.ts_utc||'no timestamp'}),
+      el('span',{class:'kd',text:row.kind}),
+      el('span',{class:'ag',text:row.agent}),
+      el('span',{class:'sm',text:row.summary||''}),
+    ]));
+  }
+  if(t.next!==null){
+    list.appendChild(el('button',{class:'folder-btn',type:'button',
+      text:'Load the next '+TIMELINE_PAGE+' rows',
+      onclick:async()=>{await timelineMore();drawTimeline();}}));
+  }
+}
+
+// ---------- the Findings view ----------
+function renderFindingsPanel(){
+  const body=document.getElementById('findings-body');
+  body.innerHTML='';
+  if(!state.caseApi){
+    body.appendChild(el('div',{class:'agg-empty',text:'No case is being served to this page.'}));
+    return;
+  }
+  const data=state.caseFindings;
+  if(!data){
+    body.appendChild(el('div',{class:'agg-empty',text:'Loading…'}));
+    loadCaseFindings();
+    return;
+  }
+  if(data.error) body.appendChild(el('div',{class:'notice',text:'The findings could not be read: '+data.error}));
+  if(!data.scanned){
+    // The distinction the whole findings table rests on. Without it an unscanned case and
+    // a clean one look identical, and those are opposite conclusions.
+    body.appendChild(el('div',{class:'notice',html:'<b>No scan has been run on this case.</b> '
+      +'This list is empty because nobody has looked, not because there was nothing to find. '
+      +'Run <code>afx scan --case &lt;db&gt;</code> and reload.'}));
+    return;
+  }
+  for(const run of data.scan_runs||[]){
+    body.appendChild(kv('scanned '+run.started_utc,run.rules_run+' rule(s) over '
+      +run.events_read+' event(s) by '+run.tool_version));
+  }
+  if(!(data.findings||[]).length){
+    body.appendChild(el('div',{class:'agg-empty',
+      text:'Every rule ran and none of them matched. That is a result, not an absence of one.'}));
+    return;
+  }
+  for(const finding of data.findings){
+    const calm=finding.severity==='low'||finding.severity==='info';
+    const events=el('div',{class:'fmeta'});
+    events.appendChild(el('span',{},[el('b',{text:finding.rule_id}),
+      document.createTextNode(' · '+finding.pack+' · '+(finding.agent||'no agent recorded')
+        +' · '+(finding.ts_utc||'no timestamp'))]));
+    for(const id of (finding.event_ids||[]).slice(0,12)){
+      events.appendChild(el('span',{class:'fev',text:id.slice(0,8),
+        title:'open the event this finding rests on',
+        onclick:(ev)=>{ev.stopPropagation();openCaseEvent(id);}}));
+    }
+    if((finding.event_ids||[]).length>12){
+      events.appendChild(el('span',{text:'+'+((finding.event_ids||[]).length-12)+' more'}));
+    }
+    body.appendChild(el('div',{class:'flag-row'+(calm?' calm':''),
+      onclick:()=>{ if((finding.event_ids||[]).length) openCaseEvent(finding.event_ids[0]); }},[
+      el('div',{class:'ft'},[
+        el('span',{class:'sev '+finding.severity,text:finding.severity}),
+        el('span',{class:'frule',text:finding.title}),
+        el('span',{class:'floc',text:(finding.session_id||'no session').slice(0,8)
+          +' · '+finding.event_count+' event(s)'}),
+      ]),
+      el('div',{class:'fsnip',text:finding.summary}),
+      events,
+    ]));
+  }
+}
+
+// ---------- the Artifacts view ----------
+async function renderArtifactsPanel(){
+  const body=document.getElementById('artifacts-body');
+  const filters=document.getElementById('artifacts-filters');
+  if(!state.caseApi){
+    filters.innerHTML=''; body.innerHTML='';
+    body.appendChild(el('div',{class:'agg-empty',text:'No case is being served to this page.'}));
+    return;
+  }
+  if(!state.caseArtifacts){
+    body.innerHTML='';
+    body.appendChild(el('div',{class:'agg-empty',text:'Loading…'}));
+    try{
+      const res=await fetch('api/artifacts',{headers:{Accept:'application/json'}});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      state.caseArtifacts=await res.json();
+    }catch(e){
+      state.caseArtifacts={error:String((e&&e.message)||e),artifacts:[],collection_gaps:[]};
+    }
+    if(state.view!=='artifacts') return;
+  }
+  drawArtifacts();
+}
+
+// What a file's state is called in one word. Derived here rather than stored, because the
+// case records two separate facts (was it collected, did a parser read it) and a reader
+// needs the combination: a file that was never collected and a file that was collected and
+// never read are different gaps with different remedies.
+function artifactState(entry){
+  if(!entry.collected) return 'not collected';
+  if(!entry.parse_status) return 'no parser';
+  return entry.parse_status;
+}
+
+function drawArtifacts(){
+  const body=document.getElementById('artifacts-body');
+  const filters=document.getElementById('artifacts-filters');
+  const data=state.caseArtifacts||{artifacts:[]};
+  const all=data.artifacts||[];
+  const counts={};
+  for(const entry of all){ const s=artifactState(entry); counts[s]=(counts[s]||0)+1; }
+  const names=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+  document.getElementById('artifacts-count').textContent='· '+all.length+' file(s)';
+
+  filters.innerHTML='';
+  filters.appendChild(el('div',{class:'tfilter'+(state.artifactFilter==='all'?' active':''),
+    onclick:()=>{state.artifactFilter='all';drawArtifacts();}},
+    [document.createTextNode('all'),el('span',{class:'c',text:String(all.length)})]));
+  for(const name of names){
+    filters.appendChild(el('div',{class:'tfilter'+(state.artifactFilter===name?' active':''),
+      onclick:()=>{state.artifactFilter=name;drawArtifacts();}},
+      [document.createTextNode(name),el('span',{class:'c',text:String(counts[name])})]));
+  }
+
+  body.innerHTML='';
+  if(data.error) body.appendChild(el('div',{class:'notice',text:'The artifact list could not be read: '+data.error}));
+  const rows=all.filter(e=>state.artifactFilter==='all'||artifactState(e)===state.artifactFilter);
+  if(!rows.length){
+    body.appendChild(el('div',{class:'agg-empty',text:'No files in this case match this filter.'}));
+  }
+  for(const entry of rows){
+    const stateName=artifactState(entry);
+    const cls=stateName==='parsed'?'parsed'
+      :(stateName==='failed'?'failed'
+      :(stateName==='not collected'?'gone':'unsupported'));
+    body.appendChild(el('div',{class:'art-row',
+      title:(entry.reason||entry.parse_detail||'')+(entry.sha256?'\nsha256 '+entry.sha256:'')},[
+      el('span',{class:'st '+cls,text:stateName}),
+      el('span',{class:'ag',text:entry.agent||'unclaimed'}),
+      el('span',{class:'pth',text:entry.original_path}),
+      el('span',{class:'n',text:(entry.events_parsed||0)+' ev'
+        +(entry.records_unparsed?' · '+entry.records_unparsed+' bad':'')}),
+    ]));
+  }
+  for(const gap of data.collection_gaps||[]){
+    body.appendChild(el('div',{class:'art-row'},[
+      el('span',{class:'st gone',text:gap.kind}),
+      el('span',{class:'ag',text:'gap'}),
+      el('span',{class:'pth',text:gap.detail+(gap.reason?' — '+gap.reason:'')}),
+      el('span',{class:'n',text:''}),
+    ]));
   }
 }
 
@@ -1493,6 +2120,15 @@ function renderTool(block,toolResults){
 // Cross-session views: tabs, tools panel, security panel
 // ============================================================================
 function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+// Every view other than the transcript, and the renderer that fills it. One list, so a tab
+// that switches to a blank panel is a thing the structure check can catch rather than a
+// thing somebody notices by clicking.
+const VIEW_PANELS={
+  tools:renderToolsPanel, security:renderSecurityPanel,
+  case:renderCasePanel, timeline:renderTimelinePanel,
+  findings:renderFindingsPanel, artifacts:renderArtifactsPanel,
+};
+
 function switchView(view){
   state.view=view;
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===view));
@@ -1500,10 +2136,12 @@ function switchView(view){
   document.getElementById('session-header').classList.toggle('hidden',!isSess||!state.current);
   document.getElementById('search-bar').classList.toggle('hidden',!isSess||!state.current);
   document.getElementById('transcript').classList.toggle('hidden',!isSess);
-  document.getElementById('tools-panel').classList.toggle('hidden',view!=='tools');
-  document.getElementById('security-panel').classList.toggle('hidden',view!=='security');
-  if(view==='tools')renderToolsPanel();
-  if(view==='security')renderSecurityPanel();
+  for(const name of Object.keys(VIEW_PANELS)){
+    const panel=document.getElementById(name+'-panel');
+    if(panel) panel.classList.toggle('hidden',view!==name);
+  }
+  const render=VIEW_PANELS[view];
+  if(render) render();
 }
 function findSession(path){for(const p of state.projects)for(const s of p.sessions)if(s.path===path)return {p,s};return null;}
 function openByPath(path){const f=findSession(path);if(!f)return;switchView('sessions');openSession(f.p,f.s);}
@@ -1689,7 +2327,15 @@ if(canPickFolder){
   openFolderBtn.addEventListener('click',openLocalFolder);
 }
 
-loadProjects();
+// Boot. A case served by `afx serve` wins over directory discovery, because a page that is
+// being served one is a page that has one: scraping a directory listing there would find
+// nothing and report "no logs found", which reads as no evidence.
+async function boot(){
+  const served=await probeCaseApi();
+  if(served){ await loadCase(served); return; }
+  await loadProjects();
+}
+boot();
 </script>
 </body>
 </html>

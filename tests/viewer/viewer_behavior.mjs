@@ -36,6 +36,11 @@ code = code.slice(0, bootAt);
 // DOM during parsing, this harness fails loudly rather than quietly passing.
 const ctx = {
   window: {},
+  // The case API source reads these two. Left as the harmless defaults and overwritten per
+  // test, because the tests that matter here are the ones about what happens when a server
+  // answers badly: a short page, a seam between pages, an offset that does not advance.
+  location: { protocol: 'file:' },
+  fetch: undefined,
   console,
   URL,
   TextEncoder,
@@ -65,6 +70,7 @@ vm.runInContext(
   relPath, toolSummary, scanSecrets, fetchEvents, state, decodeProjectName,
   clientInfo, blocksToText, buildToolResultMap,
   normalizeUnified, groupUnified, unifiedEvent, unifiedDerived, assistantNameFor,
+  apiSource, probeCaseApi, findCaseSession, artifactState, CASE_API_VERSION, tailPath,
 };
 globalThis.__setSource = (s) => { dataSource = s; };
 `,
@@ -455,6 +461,139 @@ if (process.env.AFX_UNIFIED_LOG) {
     records.some((r) => r.kind === 'unparsed.record'),
     'and it carries a record nothing could read, which the viewer has to show',
   );
+}
+
+// ------------------------------------------------------- the case API source (afx serve)
+
+// A stand-in for the server. `pages` is what each call answers with, in order, so a test
+// states the sequence it is about rather than a whole server.
+function fakeFetch(pages) {
+  const calls = [];
+  ctx.fetch = async (url) => {
+    calls.push(url);
+    const page = pages[Math.min(calls.length - 1, pages.length - 1)];
+    return {
+      ok: page.ok !== false,
+      status: page.status || 200,
+      headers: { get: (name) => (name === 'X-Afx-Next-Offset' ? (page.next ?? null) : null) },
+      async text() {
+        return page.body;
+      },
+      async json() {
+        return page.json;
+      },
+    };
+  };
+  return calls;
+}
+
+{
+  const calls = fakeFetch([
+    { body: JSON.stringify({ v: 1, agent: 'claude_code', kind: 'user.prompt' }) + '\n', next: '1' },
+    { body: JSON.stringify({ v: 1, agent: 'claude_code', kind: 'assistant.text' }) + '\n' },
+  ]);
+  setSource(api.apiSource);
+  const events = await api.fetchEvents('api/sessions/' + 'a'.repeat(32) + '/events');
+  eq(events.length, 2, 'the case source follows the pages the server offers');
+  eq(calls.length, 2, 'and stops when the server stops offering a next offset');
+  ok(calls[0].includes('offset=0') && calls[1].includes('offset=1'), 'each page asks for its own offset');
+  eq(events[1].__line, 2, 'line numbers run across the whole session, not per page');
+}
+
+{
+  // A page that does not end in a newline. Without the seam fix the two records either side
+  // of it would be concatenated into one unparseable line, which would show up as a record
+  // the analyst has to explain and a record that vanished.
+  fakeFetch([
+    { body: JSON.stringify({ v: 1, agent: 'codex', kind: 'user.prompt' }), next: '1' },
+    { body: JSON.stringify({ v: 1, agent: 'codex', kind: 'assistant.text' }) + '\n' },
+  ]);
+  const events = await api.fetchEvents('api/sessions/' + 'b'.repeat(32) + '/events');
+  eq(events.length, 2, 'a page with no trailing newline does not swallow the next record');
+  ok(
+    !events.some((e) => e.type === 'parse-error'),
+    'and the seam does not produce an unparseable line',
+  );
+}
+
+{
+  // A server answering with an offset that does not advance. Looping would re-show the
+  // first page forever; keeping what arrived is the lesser failure and is visible.
+  const calls = fakeFetch([
+    { body: JSON.stringify({ v: 1, agent: 'copilot', kind: 'user.prompt' }) + '\n', next: '0' },
+  ]);
+  const events = await api.fetchEvents('api/sessions/' + 'c'.repeat(32) + '/events');
+  eq(calls.length, 1, 'an offset that does not advance stops the paging instead of looping');
+  eq(events.length, 1, 'and what did arrive is kept');
+}
+
+{
+  let threw = false;
+  try {
+    await api.apiSource.listDir('api/');
+  } catch (e) {
+    threw = true;
+  }
+  ok(threw, 'the case source refuses to list a directory rather than returning an empty one');
+}
+
+{
+  ctx.location = { protocol: 'file:' };
+  fakeFetch([{ json: { afx_api: 1 } }]);
+  eq(await api.probeCaseApi(), null, 'a file:// page never probes for a case API');
+
+  ctx.location = { protocol: 'http:' };
+  fakeFetch([{ ok: false, status: 404, json: {} }]);
+  eq(await api.probeCaseApi(), null, 'a 404 is not a case');
+
+  fakeFetch([{ json: { hello: 'world' } }]);
+  eq(await api.probeCaseApi(), null, 'a 200 with the wrong JSON is not a case either');
+
+  fakeFetch([{ json: { afx_api: 1, counts: {} } }]);
+  const found = await api.probeCaseApi();
+  ok(found && found.afx_api === api.CASE_API_VERSION, 'the marker field is what identifies a case');
+
+  fakeFetch([{ json: { afx_api: 99 } }]);
+  const other = await api.probeCaseApi();
+  ok(
+    other && other.afx_api === 99,
+    'a version this viewer does not read is still returned, so the mismatch can be said out loud',
+  );
+}
+
+{
+  // Tracing one event back to the session it belongs in. The six values are the ones the
+  // server derived the session from, so all six have to agree, and a null has to match a
+  // null: a session with no working directory is a real session.
+  const group = {
+    key: 'k', path: 'api/sessions/k/events', agent: 'claude_code', host: null, user: 'alice',
+    project_path: null, session_id: 's1', files: false,
+  };
+  api.state.projects = [{ id: 'p', name: 'p', sessions: [{ path: group.path, caseSession: group }] }];
+  ok(
+    api.findCaseSession({ agent: 'claude_code', host: null, user: 'alice', project_path: null, session_id: 's1', kind: 'user.prompt' }),
+    'an event is traced back to its own session, with nulls matching nulls',
+  );
+  eq(
+    api.findCaseSession({ agent: 'claude_code', host: null, user: 'alice', project_path: null, session_id: 's2', kind: 'user.prompt' }),
+    null,
+    'an event from another session is not silently shown in this one',
+  );
+  eq(
+    api.findCaseSession({ agent: 'claude_code', host: null, user: 'alice', project_path: null, session_id: 's1', kind: 'artifact.fs' }),
+    null,
+    'a filesystem event does not land in a conversation, because the server groups it apart',
+  );
+  api.state.projects = [];
+}
+
+{
+  // The two gaps a reader must be able to tell apart: a file nobody collected, and a file
+  // that was collected and never read.
+  eq(api.artifactState({ collected: false, parse_status: null }), 'not collected', 'an uncollected file says so');
+  eq(api.artifactState({ collected: true, parse_status: null }), 'no parser', 'a collected file with no parser says so');
+  eq(api.artifactState({ collected: true, parse_status: 'parsed' }), 'parsed', 'a parsed file says so');
+  eq(api.artifactState({ collected: true, parse_status: 'failed' }), 'failed', 'a failed parse is not called parsed');
 }
 
 console.error(
