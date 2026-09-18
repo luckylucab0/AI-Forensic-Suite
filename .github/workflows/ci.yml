@@ -246,11 +246,12 @@ jobs:
 
       - name: Fetch a Velociraptor release
         env:
-          # Pin both to hold a version and its hash. VERSION empty means the latest
-          # release, which is how this job starts life: it prints what it got so the pin
-          # can be filled in, and it says out loud that it is running unpinned.
-          VELOCIRAPTOR_VERSION: ""
-          VELOCIRAPTOR_SHA256: ""
+          # Pinned, so that an upstream release cannot change what this job runs and so a
+          # substituted binary fails the job rather than being executed. Taken from the
+          # first run of this job, which printed both. To move the pin, empty the hash,
+          # read what the run prints, and put it back.
+          VELOCIRAPTOR_VERSION: "0.77.2"
+          VELOCIRAPTOR_SHA256: "6c4c23c466d892788ff56ddcd3a31f844e4c0d797ade454c5e2625eb9e427077"
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
@@ -296,7 +297,7 @@ jobs:
           set -euo pipefail
           for source in linux macos windows; do
             uv run python scripts/check_velociraptor_vql.py \
-              --velociraptor ./velociraptor --os "${source}"
+              --velociraptor "${PWD}/velociraptor" --os "${source}"
           done
 
   windows-newlines:

@@ -44,22 +44,61 @@ def test_the_velociraptor_command_line_is_the_verified_one(script) -> None:
     """Read out of the vendor's own command definition. Each flag earns its place:
     --from_files or the file name becomes the query, jsonl or the output is not one object
     per row, --output or it goes to stdout mixed with the engine's own logging, and
-    --nocolor before the command or escape codes reach the parser."""
-    command = script.velociraptor_command(Path("/opt/vr"), Path("/tmp/q.vql"), Path("/tmp/o.jsonl"))
+    --nocolor before the command or escape codes reach the parser.
+
+    The paths are compared as the platform renders them. The first version of this test
+    compared against forward slashes and failed on the Windows runner and nowhere else,
+    which is the defect class tests/unit/test_windows_shapes.py exists for.
+    """
+    binary, query, out = Path("/opt/vr"), Path("/tmp/q.vql"), Path("/tmp/o.jsonl")
+
+    command = script.velociraptor_command(binary, query, out)
 
     assert command == [
-        "/opt/vr",
+        str(binary),
         "--nocolor",
         "query",
         "--from_files",
         "--format",
         "jsonl",
         "--output",
-        "/tmp/o.jsonl",
-        "/tmp/q.vql",
+        str(out),
+        str(query),
     ]
     # The application flag goes before the subcommand, which is how kingpin parses it.
     assert command.index("--nocolor") < command.index("query")
+
+
+def test_the_binary_reaches_argv_with_a_directory_in_front_of_it(script, tmp_path) -> None:
+    """A name with no separator makes the kernel search PATH rather than the working
+    directory. `--velociraptor ./velociraptor` hit exactly that: pathlib drops the leading
+    "./", the existence check passed because the relative name resolves against the
+    process's own directory, and the engine then failed to start with a file-not-found
+    error for a file that was right there. The engine never ran, and the job reported a
+    failure that read like a missing download."""
+    binary = tmp_path / "velociraptor"
+    binary.write_text("#!/bin/sh\n", encoding="utf-8", newline="")
+    query = tmp_path / "q.vql"
+    query.write_text("SELECT 1 FROM scope()", encoding="utf-8", newline="")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--velociraptor",
+            # Deliberately relative, the way a workflow writes it.
+            str(binary.relative_to(tmp_path)),
+        ],
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+        check=False,
+    )
+
+    # It gets past the existence check and fails later, on the engine's own output, which
+    # is what proves argv[0] was not a bare name.
+    assert "no such runner" not in result.stderr
+    assert "No such file or directory: 'velociraptor'" not in result.stderr
 
 
 def test_without_an_engine_it_does_nothing_and_says_so(script) -> None:

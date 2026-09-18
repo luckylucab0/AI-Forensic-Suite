@@ -353,7 +353,11 @@ def main(argv: list[str] | None = None) -> int:
         )
         return EXIT_OK
 
-    runner = Path(args.runner or args.velociraptor)
+    # Resolved, so that what lands at argv[0] carries a directory. `pathlib` drops a
+    # leading "./", and a name with no separator in it makes the kernel search PATH instead
+    # of the working directory, so `--velociraptor ./velociraptor` failed with a file-not-
+    # found error for a file the check two lines down had just confirmed exists.
+    runner = Path(args.runner or args.velociraptor).resolve()
     if not runner.exists():
         print(f"check-velociraptor-vql: no such runner: {runner}", file=sys.stderr)
         return EXIT_ERROR
