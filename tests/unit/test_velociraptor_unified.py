@@ -31,6 +31,7 @@ from agentforensics.exporters.velociraptor_unified import (
     NOT_NORMALIZED,
     PRODUCER,
     UNINTERPRETED,
+    UNINTERPRETED_FORMATS,
     Target,
     UnsafeTarget,
     render,
@@ -273,6 +274,11 @@ def test_every_artifact_a_python_parser_claims_is_accounted_for(catalogue: Catal
         if artifact_id in MAPPERS or artifact_id in UNINTERPRETED:
             continue
         artifact = by_id[artifact_id]
+        # A format the query cannot read at all is named once for the format rather than
+        # once per artifact, so that a store added to the catalogue later is covered by
+        # the statement the operator already reads instead of becoming a silent gap.
+        if artifact.format in UNINTERPRETED_FORMATS:
+            continue
         # The generic normalizer covers a line-delimited log with no verified mapping, and
         # it returns every record, so it is not a gap. Anything else is one.
         mappers = {
@@ -298,6 +304,9 @@ def test_the_artifact_names_the_formats_it_does_not_interpret(catalogue: Catalog
     for artifact_id, reason in UNINTERPRETED.items():
         assert artifact_id in text, artifact_id
         assert reason in text, reason
+    for fmt, reason in UNINTERPRETED_FORMATS.items():
+        assert fmt in text, fmt
+        assert reason in text, reason
 
 
 def test_nothing_in_the_uninterpreted_list_is_invented(catalogue: Catalogue) -> None:
@@ -308,6 +317,15 @@ def test_nothing_in_the_uninterpreted_list_is_invented(catalogue: Catalogue) -> 
         assert artifact_id in known, artifact_id
         assert artifact_id not in MAPPERS, artifact_id
         assert any(parser.handles(artifact_id) for parser in PARSERS), artifact_id
+
+    formats = {artifact.format for artifact in catalogue.artifacts}
+    for fmt in UNINTERPRETED_FORMATS:
+        assert fmt in formats, fmt
+        # A format declared uninterpreted while a mapper reads one of its artifacts would
+        # tell an operator to collect a file the hunt already returns as records.
+        for artifact in catalogue.artifacts:
+            if artifact.format == fmt:
+                assert artifact.id not in MAPPERS, artifact.id
 
 
 def test_no_vql_mapper_claims_an_artifact_no_parser_knows(catalogue: Catalogue) -> None:

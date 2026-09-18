@@ -29,6 +29,7 @@ from agentforensics.parsers.codex import CodexParser
 from agentforensics.parsers.copilot import CopilotParser
 from agentforensics.parsers.gemini import GeminiParser
 from agentforensics.parsers.pi import PiParser
+from agentforensics.parsers.sqlite_generic import SqliteGenericParser
 
 # Order matters only in that the first parser to claim an artifact wins, so a more specific
 # parser has to come before a general one. Kept as a tuple rather than a registry decorator
@@ -40,6 +41,9 @@ PARSERS: tuple[Parser, ...] = (
     CopilotParser(),
     GeminiParser(),
     PiParser(),
+    # Last, and it has to stay last: it claims every SQLite store in the catalogue, so a
+    # verified schema parser placed after it would never be reached.
+    SqliteGenericParser(),
 )
 
 

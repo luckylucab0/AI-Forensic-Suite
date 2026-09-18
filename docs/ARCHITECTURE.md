@@ -109,7 +109,14 @@ it cannot be rewritten *quietly*.
   unsupported rather than skipped. Seven agents are read today: Claude Code, Codex CLI,
   Copilot CLI, Gemini CLI and Qwen Code (one module, because Qwen is a fork and both write
   the Gemini content shape), Pi, and Cline with its forks Roo Code and Kilo Code (one
-  module for the same reason).
+  module for the same reason). Under all of those sits one module that is about a format
+  rather than an agent: every SQLite store in the catalogue, twenty-eight of them across
+  fifteen agents, is opened read-only from a copy and returned table by table and row by
+  row. It reads nothing out of a row beyond what the row literally says, a column named as
+  a time or as text, and every event it produces states that this is an uninterpreted
+  reading. So a chat database nobody has a verified schema for is visible evidence somebody
+  still has to look at, instead of a file the case merely says existed. A verified
+  per-agent parser placed ahead of it takes an artifact over, one schema at a time.
 - `model/` the unified event model and the SQLite case schema
 - `unified/` the event model on the wire: the JSON Lines format and its schema, plus
   the normalizer that turns a collection into one log without building a case

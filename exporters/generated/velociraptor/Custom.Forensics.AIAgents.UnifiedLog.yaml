@@ -32,6 +32,7 @@
 #   - qwen_code.prompt_history_log: one JSON document rewritten whole on every append
 #   - qwen_code.subagent_transcripts: a directory with no stated file format
 #   - roo_code.tasks: a task directory of whole JSON documents
+#   - every artifact the catalogue records as sqlite: a database, which this query does not open. The suite analyzer reads every table of one, so collect the file and ingest it
 #
 # It deliberately avoids parse_jsonl, which skips a line it cannot decode. A
 # skipped line reads as a line that was never there, and that is the one failure

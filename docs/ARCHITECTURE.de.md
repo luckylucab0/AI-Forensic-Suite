@@ -116,7 +116,16 @@ ist, dass das nicht *unbemerkt* geht.
   Parser wird als nicht unterstützt festgehalten, nicht übersprungen. Sieben Agenten werden
   heute gelesen: Claude Code, Codex CLI, Copilot CLI, Gemini CLI und Qwen Code (ein Modul,
   weil Qwen ein Fork ist und beide die Gemini-Inhaltsform schreiben), Pi sowie Cline mit
-  seinen Forks Roo Code und Kilo Code (aus demselben Grund ein Modul).
+  seinen Forks Roo Code und Kilo Code (aus demselben Grund ein Modul). Unter all diesen
+  liegt ein Modul, das nicht zu einem Agenten gehört, sondern zu einem Format: jeder
+  SQLite-Speicher des Katalogs, achtundzwanzig über fünfzehn Agenten, wird aus einer Kopie
+  nur lesend geöffnet und Tabelle für Tabelle, Zeile für Zeile zurückgegeben. Aus einer
+  Zeile wird nichts gelesen, was die Zeile nicht wörtlich sagt, also eine Spalte, die als
+  Zeit oder als Text benannt ist, und jedes Ereignis daraus sagt selbst, dass es eine
+  uninterpretierte Lesung ist. Damit ist eine Chat-Datenbank, für die es noch kein
+  geprüftes Schema gibt, sichtbares Material, das jemand noch ansehen muss, und nicht bloß
+  eine Datei, deren Existenz der Fall vermerkt. Ein geprüfter Parser für einen einzelnen
+  Agenten, der davor eingeordnet wird, übernimmt ein Artefakt, ein Schema auf einmal.
 - `model/` das einheitliche Ereignismodell und das SQLite-Fallschema
 - `unified/` das Ereignismodell als Datenstrom: das JSON-Lines-Format und sein Schema,
   dazu der Normalisierer, der eine Sammlung ohne Falldatenbank in ein Log überführt

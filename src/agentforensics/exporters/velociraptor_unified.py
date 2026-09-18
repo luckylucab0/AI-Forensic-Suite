@@ -122,6 +122,18 @@ UNINTERPRETED: dict[str, str] = {
     "roo_code.tasks": "a task directory of whole JSON documents",
 }
 
+# Whole formats this query returns as files rather than as records, with the reason.
+#
+# Per format rather than per artifact because the limit belongs to the format: the
+# normalizers here read a file line by line, and a database is not lines. Naming the format
+# also keeps the statement honest as the catalogue grows. Listing the SQLite stores one by
+# one would mean a store added tomorrow becomes an unnamed gap, which is exactly the shape
+# of omission this whole mechanism exists to prevent.
+UNINTERPRETED_FORMATS: dict[str, str] = {
+    "sqlite": "a database, which this query does not open. The suite analyzer reads every "
+    "table of one, so collect the file and ingest it",
+}
+
 _OS_SOURCES = (
     ("windows", "SELECT OS FROM info() WHERE OS = 'windows'"),
     ("macos", "SELECT OS FROM info() WHERE OS = 'darwin'"),
@@ -378,6 +390,10 @@ def _header_notes(catalogue: Catalogue) -> list[str]:
         "Read by the suite's own parsers and NOT interpreted here, so a fleet hunt returns",
         "the file and not the conversation. Collect these and ingest them:",
         *[f"  - {key}: {reason}" for key, reason in sorted(UNINTERPRETED.items())],
+        *[
+            f"  - every artifact the catalogue records as {fmt}: {reason}"
+            for fmt, reason in sorted(UNINTERPRETED_FORMATS.items())
+        ],
         "",
         "It deliberately avoids parse_jsonl, which skips a line it cannot decode. A",
         "skipped line reads as a line that was never there, and that is the one failure",
