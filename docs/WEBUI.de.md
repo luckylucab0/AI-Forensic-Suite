@@ -128,7 +128,7 @@ Agenten aus.
 
 ## Filter
 
-Vier der Ansichten filtern, und alle folgen einer Regel: ein Filter darf Zeilen vom
+Fünf der Ansichten filtern, und alle folgen einer Regel: ein Filter darf Zeilen vom
 Schirm nehmen, weil jemand danach gefragt hat, und er darf sie niemals abwesend aussehen
 lassen. Jede gefilterte Ansicht sagt deshalb, wie viele Zeilen ausserhalb des Blickfelds
 sind, und der Filter innerhalb eines Chats hält Zahl und Rücknahme sichtbar, solange er
@@ -141,6 +141,30 @@ zeigen würde, sodass die Form einer Konversation lesbar ist, bevor man klickt. 
 behält ganze Züge: ein Assistentenzug, der überlegt, geantwortet und ein Werkzeug gerufen
 hat, ist eine Zeile und bleibt bei allen drei Chips erhalten. Deshalb heisst der Chip
 "tool use" und nicht "tool calls".
+
+**Ein Zeitfenster** liegt in der Chip-Reihe über dem Transkript und in der Timeline, und
+beide Grenzen bedeuten an beiden Orten dasselbe. Ein blosses Datum meint den ganzen Tag, denn
+`2026-09-06` als obere Grenze hiesse sonst Mitternacht und nähme den Tag aus seinem eigenen
+Fenster. Eine Grenze, die der Viewer nicht lesen kann, wird neben dem Feld gemeldet und nicht
+angewendet: ein unlesbares Fenster, das stillschweigend alles zeigt, wäre ein Filter, der über
+seinen eigenen Inhalt täuscht.
+
+Ein Ereignis ohne Zeitstempel bleibt in jedem Fenster. Seine Position ist unbekannt, nicht
+ausserhalb, und es wegzulassen würde aus "was an jenem Tag geschah" ein "was an jenem Tag
+geschah, abzüglich dessen, was keine Uhr hatte" machen. Die Zahl sagt, wie viele Zeilen aus
+diesem Grund erhalten blieben, und genau das erklärt ein Fenster, das scheinbar nichts tut.
+Die Timeline wendet das Fenster in der Falldatenbank an und nicht im Browser, sodass eine
+lange Timeline vor dem Blättern eingegrenzt wird und der Bildschirm mit
+`afx timeline --since --until` übereinstimmt.
+
+**Die Sessionliste** filtert auf die Sitzungen, in denen eine Regel etwas gefunden hat, und
+auf die Sitzungen mit einem Datensatz, den kein Parser lesen konnte. Beides sind Fragen an
+die Verlässlichkeit des Falls und nicht an seinen Inhalt, und das Zweite ist der Grund für
+den Filter: in einem grossen Fall verschwindet eine Handvoll unlesbarer Datensätze in einer
+Gesamtzahl, und genau die muss eine Analystin ansehen, bevor sie den Rest zitiert. Jede
+Sessionzeile trägt dieselben zwei Markierungen, sodass die Behauptung des Chips ohne Klick
+überprüfbar ist. Die Chips erscheinen nur, wenn ein Fall ausgeliefert wird, denn ein
+Verzeichnis voller Transcripts weiss nichts über Funde.
 
 **Über Sitzungen hinweg** beginnen die Werkzeug- und die Sicherheitsansicht mit einem
 Bereichsschalter: alle Sitzungen oder die geöffnete. "This session" erscheint nur, wenn eine

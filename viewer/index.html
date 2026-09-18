@@ -93,7 +93,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .session-title{display:flex;align-items:center;gap:6px;}
 .session-title .stxt{font-size:12.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .session.active .session-title .stxt{color:var(--coral);}
-.session-meta{display:flex;gap:8px;font-family:var(--mono);font-size:10px;color:var(--text-faint);margin-top:2px;overflow:hidden;white-space:nowrap;}
+/* wrapping rather than clipping: a mark that says a session holds records nobody could
+   read is the reason to open that session, and it was falling off the end of the row. */
+.session-meta{display:flex;flex-wrap:wrap;gap:8px;font-family:var(--mono);font-size:10px;color:var(--text-faint);margin-top:2px;white-space:nowrap;}
 .session-meta .dot::before{content:"·";margin-right:6px;}
 .src-dot{width:6px;height:6px;border-radius:50%;display:inline-block;}
 .sidebar-footer{border-top:1px solid var(--border-soft);padding:10px 16px 12px;flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:6px;}
@@ -216,6 +218,10 @@ mark.hl.hl-current{background:var(--coral);color:#fff;}
 .panel-sub code{font-family:var(--mono);font-size:11px;color:var(--text-dim);background:var(--bg-elev-2);border-radius:3px;padding:1px 4px;}
 .tab-badge{font-family:var(--mono);font-size:10px;color:var(--red);}
 .tool-filters{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px;align-items:center;}
+/* Equal specificity, and this rule is written later, so without it a `tool-filters
+   hidden` element stays visible. The session filter bar is the first one to be hidden
+   this way, and the viewer check fails on it rather than leaving it to be noticed. */
+.tool-filters.hidden{display:none;}
 .filter-row{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:8px;}
 .filter-label{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-right:4px;}
 .filter-input{background:var(--bg-input);border:1px solid var(--border);border-radius:99px;color:var(--text);padding:2px 10px;font-size:11px;font-family:var(--mono);min-width:180px;}
@@ -233,6 +239,15 @@ mark.hl.hl-current{background:var(--coral);color:#fff;}
 .tfilter:hover{color:var(--text);border-color:var(--coral-dim);}
 .tfilter.active{border-color:var(--coral);color:var(--coral);}
 .tfilter .c{opacity:.6;margin-left:5px;}
+.session-meta .smark.find{color:var(--yellow);}
+.session-meta .smark.bad{color:var(--red);}
+/* the time window, in the transcript bar and in the timeline */
+.win{display:flex;gap:4px;align-items:center;font-family:var(--mono);font-size:10.5px;color:var(--text-faint);}
+.win input{background:var(--bg-elev-2);border:1px solid var(--border);border-radius:99px;color:var(--text);font-family:var(--mono);font-size:10.5px;padding:2px 9px;width:154px;}
+.win input:focus{outline:none;border-color:var(--coral-dim);}
+.win input.bad{border-color:var(--red);color:var(--red);}
+.win button{background:none;border:1px solid var(--border);color:var(--text-dim);border-radius:99px;font-size:10px;font-family:var(--mono);padding:1px 8px;cursor:pointer;}
+.win button:hover{color:var(--text);border-color:var(--coral-dim);}
 .agg-empty{color:var(--text-faint);padding:34px 0;text-align:center;font-size:12.5px;}
 
 /* rows: one shared shape, a hairline between them, no boxes */
@@ -352,6 +367,10 @@ mark.hl.hl-current{background:var(--coral);color:#fff;}
         <div class="tab" data-view="artifacts">Artifacts</div>
       </div>
       <input id="search" type="text" placeholder="Filter sessions…" autocomplete="off" />
+      <!-- Shown only when a case is being served: a directory of transcripts knows nothing
+           about findings, and a chip that was always there and always empty would be worse
+           than no chip. -->
+      <div class="tool-filters hidden" id="session-filters"></div>
     </div>
     <div id="project-list" class="project-list"></div>
     <div class="sidebar-footer">
@@ -442,6 +461,10 @@ const state = { projects: [], current: null, cache: {}, normCache: {}, view: 'se
   caseApi: null, caseFindings: null, caseArtifacts: null, caseInstructions: null,
   timeline: null, timelineAgent: 'all', timelineNoFs: false, artifactFilter: 'all',
   insScope: 'all',
+  // The time window, as typed. Kept as text rather than as parsed bounds so that an
+  // input the viewer could not read stays on screen next to its complaint instead of
+  // being replaced by a silent empty window.
+  since: '', until: '', sessionFilter: 'all',
   // Whether the two cross-session views show the whole log or only the open session.
   // One setting for both, so switching tabs does not change what is being looked at.
   scope: 'all',
@@ -1381,6 +1404,9 @@ async function loadCaseFindings(){
     state.caseFindings={error:String((e&&e.message)||e),findings:[],scan_runs:[],scanned:false};
   }
   updateFindBadge();
+  // The sidebar again, because its findings chip cannot be counted until this arrived. The
+  // first render happens before the fetch so the session list is not held up by it.
+  renderSidebar();
   if(state.view==='findings') renderFindingsPanel();
 }
 
@@ -1556,8 +1582,17 @@ async function renderTimelinePanel(){
     title:'Leave out the one-per-file filesystem events. They can outnumber the conversation, and for a file with no internal timestamps they are the only temporal evidence there is.',
     onclick:()=>{state.timelineNoFs=!state.timelineNoFs;state.timeline=null;renderTimelinePanel();}},
     [document.createTextNode('hide file events')]));
+  // The window is applied by the case database rather than here, so that a long timeline
+  // is narrowed before it is paged rather than after, and so that the screen and
+  // `afx timeline --since --until` answer with the same rows.
+  filters.appendChild(windowControls(()=>{state.timeline=null;renderTimelinePanel();}));
+  const win=timeWindow();
+  for(const problem of win.problems){
+    filters.appendChild(el('div',{class:'filter-note',text:problem+', so that bound is not applied'}));
+  }
 
-  const key=(state.timelineAgent||'all')+'|'+(state.timelineNoFs?'1':'0');
+  const key=(state.timelineAgent||'all')+'|'+(state.timelineNoFs?'1':'0')
+    +'|'+(win.since||'')+'|'+(win.until||'');
   if(!state.timeline||state.timeline.key!==key){
     state.timeline={key,rows:[],next:0,error:null};
     list.innerHTML='';
@@ -1575,6 +1610,9 @@ async function timelineMore(){
   const params=['limit='+TIMELINE_PAGE,'offset='+t.next];
   if(state.timelineAgent&&state.timelineAgent!=='all') params.push('agent='+encodeURIComponent(state.timelineAgent));
   if(state.timelineNoFs) params.push('no_fs=1');
+  const win=timeWindow();
+  if(win.since) params.push('since='+encodeURIComponent(win.since));
+  if(win.until) params.push('until='+encodeURIComponent(win.until));
   try{
     const res=await fetch('api/timeline?'+params.join('&'),{headers:{Accept:'application/json'}});
     if(!res.ok) throw new Error('HTTP '+res.status);
@@ -1590,8 +1628,11 @@ async function timelineMore(){
 function drawTimeline(){
   const list=document.getElementById('timeline-list');
   const t=state.timeline||{rows:[],next:null};
+  const win=timeWindow();
+  const undated=t.rows.filter(r=>!r.ts_utc).length;
   document.getElementById('timeline-count').textContent='· '+t.rows.length+' row(s) loaded'
-    +(t.next===null?'':' of more');
+    +(t.next===null?'':' of more')
+    +(win.set?' in this window, '+undated+' of them undated and therefore kept':'');
   list.innerHTML='';
   if(t.error) list.appendChild(el('div',{class:'notice',text:'The timeline could not be read in full: '+t.error}));
   if(!t.rows.length){
@@ -2163,11 +2204,70 @@ function ioToString(content){
 // Sidebar
 // ============================================================================
 function fmtTime(ts){if(!ts)return '';const d=new Date(ts);if(isNaN(d))return '';return d.toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
+// Which sessions a chip keeps. Both questions are about the case's own reliability rather
+// than about its content: where did a rule find something, and where did a parser fail to
+// read a line. The second one matters most on a large case, where a handful of unreadable
+// records is invisible in a total and is exactly what an analyst has to look at before
+// quoting the rest.
+function sessionMarks(session){
+  const info=session.caseSession;
+  if(!info) return [];
+  const marks=[];
+  if(findingSessions().has(info.session_id||'')) marks.push('findings');
+  if(info.unparsed) marks.push('unreadable');
+  return marks;
+}
+
+// The session ids a rule fired in. A finding with no session id belongs to no session and
+// is reachable in the Findings tab; it is not attached to an arbitrary one here.
+function findingSessions(){
+  const data=state.caseFindings;
+  const out=new Set();
+  for(const finding of (data&&data.findings)||[]) if(finding.session_id) out.add(finding.session_id);
+  return out;
+}
+
+const SESSION_FILTERS=[
+  ['all','all',''],
+  ['findings','findings','Sessions a rule found something in'],
+  ['unreadable','unreadable lines','Sessions holding a record no parser could read. Worth '
+    +'opening before quoting the rest of the case.'],
+];
+
+function renderSessionFilters(total,shown){
+  const bar=document.getElementById('session-filters');
+  if(!bar) return;
+  if(!state.caseApi){bar.classList.add('hidden');bar.innerHTML='';return;}
+  const counts={findings:0,unreadable:0};
+  for(const project of state.projects)for(const session of project.sessions){
+    for(const mark of sessionMarks(session)) counts[mark]+=1;
+  }
+  bar.innerHTML='';
+  bar.classList.remove('hidden');
+  for(const [key,label,title] of SESSION_FILTERS){
+    if(key!=='all'&&!counts[key]&&state.sessionFilter!==key) continue;
+    bar.appendChild(chip(label,state.sessionFilter===key,
+      ()=>{state.sessionFilter=key;renderSidebar();},
+      key==='all'?total:counts[key],title));
+  }
+  if(state.sessionFilter!=='all'){
+    bar.appendChild(el('div',{class:'filter-note'},[
+      document.createTextNode((total-shown)+' session'+(total-shown===1?'':'s')+' hidden'),
+      el('button',{type:'button',text:'show all',
+        onclick:()=>{state.sessionFilter='all';renderSidebar();}}),
+    ]));
+  }
+}
+
 function renderSidebar(){
   const filter=document.getElementById('search').value.toLowerCase();
   const list=document.getElementById('project-list');list.innerHTML='';
+  let total=0,shown=0;
   for(const project of state.projects){
-    const sessions=project.sessions.filter(s=>!filter||(s.title||'').toLowerCase().includes(filter)||project.name.toLowerCase().includes(filter)||s.id.toLowerCase().includes(filter));
+    total+=project.sessions.length;
+    const sessions=project.sessions.filter(s=>(!filter||(s.title||'').toLowerCase().includes(filter)||project.name.toLowerCase().includes(filter)||s.id.toLowerCase().includes(filter))
+      &&(state.sessionFilter==='all'||sessionMarks(s).indexOf(state.sessionFilter)>=0));
+    shown+=sessions.length;
     if(!sessions.length)continue;
     const projNode=el('div',{class:'project'},[el('div',{class:'project-name'},[document.createTextNode(project.name),el('span',{class:'count',text:String(sessions.length)})])]);
     for(const s of sessions){
@@ -2182,10 +2282,21 @@ function renderSidebar(){
           el('span',{text:s.id.slice(0,8)}),
           el('span',{class:'dot',text:`${s.userMsgs} msg`}),
           el('span',{class:'dot',text:`${s.toolCalls} tools`}),
+          sessionMarks(s).indexOf('findings')>=0
+            ? el('span',{class:'dot smark find',text:'findings',title:'A rule found something in this session'}):null,
+          sessionMarks(s).indexOf('unreadable')>=0
+            ? el('span',{class:'dot smark bad',
+                text:(s.caseSession.unparsed)+' unreadable',
+                title:'Records in this session that no parser could read. They are in the case, kept with their original text.'}):null,
         ]),
       ]));
     }
     list.appendChild(projNode);
+  }
+  renderSessionFilters(total,shown);
+  if(state.caseApi&&!shown&&total){
+    list.appendChild(el('div',{class:'agg-empty',
+      text:'No session matches. '+total+' are out of view.'}));
   }
 }
 
@@ -2276,16 +2387,18 @@ function renderTranscript(events){
   const transcript=document.getElementById('transcript');transcript.innerHTML='';
   const toolResults=buildToolResultMap(events);
   const all=buildTimeline(events);
-  const shown=filterTimelineItems(all,state.turnFilter);
-  renderTurnFilters(all,shown.hidden);
+  const win=timeWindow();
+  const shown=filterTimelineItems(all,state.turnFilter,win);
+  renderTurnFilters(all,shown,win);
   for(const item of shown.items){
     if(item.kind==='assistant')transcript.appendChild(renderAssistantTurn(item.events,toolResults));
     else{const n=renderEvent(item.event);if(n)transcript.appendChild(n);}
   }
   if(!shown.items.length){
     transcript.appendChild(el('div',{class:'agg-empty',
-      text:'Nothing in this session is a '+state.turnFilter+' row. '
-        +all.length+' row(s) are out of view.'}));
+      text:(win.set?'Nothing in this session is in this window'
+                   :'Nothing in this session is a '+state.turnFilter+' row')
+        +'. '+all.length+' row(s) are out of view.'}));
   }
   transcript.scrollTop=0;
 }
@@ -2296,26 +2409,39 @@ function renderTranscript(events){
 // somebody asked it to; what it may never do is leave them looking absent, and a filter
 // set three sessions ago and forgotten is exactly how that happens. So the number of
 // hidden rows stays on screen for as long as the filter is set, with one click to undo it.
-function renderTurnFilters(items,hidden){
+function renderTurnFilters(items,shown,win){
   const bar=document.getElementById('turn-filters');
   bar.innerHTML='';
   bar.classList.remove('hidden');
+  const redraw=()=>{if(state.current)renderTranscript(state.normCache[state.current.path]||[]);};
   const counts={};
   for(const item of items)for(const kind of turnKinds(item))counts[kind]=(counts[kind]||0)+1;
   for(const [key,label,title] of TURN_FILTERS){
     if(key!=='all'&&!counts[key]) continue;
     bar.appendChild(chip(label,state.turnFilter===key,
-      ()=>{state.turnFilter=key;if(state.current)renderTranscript(state.normCache[state.current.path]||[]);},
+      ()=>{state.turnFilter=key;redraw();},
       key==='all'?items.length:counts[key],title));
   }
-  if(state.turnFilter!=='all'){
-    bar.appendChild(el('div',{class:'filter-note'},[
-      document.createTextNode(hidden+' row'+(hidden===1?'':'s')+' hidden by this filter'),
-      el('button',{type:'button',text:'show everything',onclick:()=>{
-        state.turnFilter='all';
-        if(state.current)renderTranscript(state.normCache[state.current.path]||[]);
-      }}),
-    ]));
+  bar.appendChild(windowControls(redraw));
+  for(const problem of win.problems){
+    bar.appendChild(el('div',{class:'filter-note',text:problem+', so that bound is not applied'}));
+  }
+  if(state.turnFilter!=='all'||win.set){
+    const note=el('div',{class:'filter-note'},[
+      document.createTextNode(shown.hidden+' row'+(shown.hidden===1?'':'s')+' hidden'),
+    ]);
+    if(shown.undated){
+      // The number that explains a window that looks like it did nothing.
+      note.appendChild(el('span',{
+        title:'An event with no timestamp has an unknown position, not one outside the '
+          +'window, so a time filter keeps it. Leaving it out would turn "what happened '
+          +'that day" into "what happened that day, minus whatever had no clock".',
+        text:'· '+shown.undated+' undated row'+(shown.undated===1?'':'s')+' kept'}));
+    }
+    note.appendChild(el('button',{type:'button',text:'show everything',onclick:()=>{
+      state.turnFilter='all';state.since='';state.until='';redraw();
+    }}));
+    bar.appendChild(note);
   }
 }
 // Render one non-assistant record.
@@ -2470,6 +2596,82 @@ function openByPath(path){const f=findSession(path);if(!f)return;switchView('ses
 
 // One chip. A helper because there are five rows of them now and the boilerplate was
 // starting to hide the logic.
+// ---------- the time window ----------
+//
+// An investigation has a window: between one time and another, on one day. The same two
+// bounds drive the transcript and the timeline, and they mean the same thing in both.
+//
+// Two decisions are worth stating. A bare date is expanded to the whole day, because
+// "2026-09-06" as an upper bound would otherwise mean midnight and take the day out of its
+// own window. And an event with no timestamp is kept inside any window rather than
+// filtered out: its position is unknown, not outside, and dropping it would turn "what
+// happened that day" into "what happened that day, minus whatever had no clock". That is
+// the same rule the case database applies server-side, deliberately, so the screen and an
+// exported timeline agree.
+const DATE_ONLY=/^\d{4}-\d{2}-\d{2}$/;
+const STAMP=/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2})?(\.\d{1,6})?Z?$/;
+
+function windowBound(text,upper){
+  const value=(text||'').trim();
+  if(!value) return {value:null,problem:null};
+  if(DATE_ONLY.test(value)){
+    return {value:value+(upper?'T23:59:59.999999Z':'T00:00:00.000000Z'),problem:null};
+  }
+  if(STAMP.test(value)){
+    const body=value.replace(' ','T').replace(/Z$/,'');
+    // Padded to the stored shape so a string comparison means what it looks like: the
+    // case writes microseconds, and "…T09:00" sorts after "…T09:00:00.000000".
+    const parts=body.split('T');
+    let time=parts[1];
+    if(time.length===5) time+=upper?':59':':00';
+    if(time.indexOf('.')<0) time+=upper?'.999999':'.000000';
+    return {value:parts[0]+'T'+time+'Z',problem:null};
+  }
+  return {value:null,problem:'"'+value+'" is not a date or a UTC timestamp'};
+}
+
+// Both bounds, plus every reason one of them was not applied. A bound the viewer could not
+// read is never treated as absent: an unreadable window that silently showed everything
+// would be a filter lying about what it shows.
+function timeWindow(){
+  const since=windowBound(state.since,false);
+  const until=windowBound(state.until,true);
+  const problems=[since.problem,until.problem].filter(Boolean);
+  if(since.value&&until.value&&since.value>until.value){
+    problems.push('the window ends before it starts, so nothing can be inside it');
+  }
+  return {since:since.value,until:until.value,problems,set:Boolean(since.value||until.value)};
+}
+
+function inWindow(ts,win){
+  // No timestamp: kept. See the note above.
+  if(!ts) return true;
+  if(win.since&&ts<win.since) return false;
+  if(win.until&&ts>win.until) return false;
+  return true;
+}
+
+// The two inputs, wherever a view wants them. `apply` runs when a bound changes.
+function windowControls(apply){
+  const win=timeWindow();
+  const box=el('div',{class:'win'});
+  for(const [key,label,hint] of [['since','from','2026-09-06'],
+                                 ['until','to','2026-09-06T17:30']]){
+    const bad=key==='since'?windowBound(state.since,false).problem:windowBound(state.until,true).problem;
+    box.appendChild(el('span',{text:label}));
+    box.appendChild(el('input',{type:'text',value:state[key],placeholder:hint,
+      class:bad?'bad':null,
+      title:'UTC. A date on its own means that whole day. An event with no timestamp '
+        +'stays inside any window: its position is unknown, not outside.',
+      onchange:(e)=>{state[key]=e.target.value;apply();}}));
+  }
+  if(win.set||win.problems.length){
+    box.appendChild(el('button',{type:'button',text:'clear',
+      onclick:()=>{state.since='';state.until='';apply();}}));
+  }
+  return box;
+}
+
 function chip(label,active,onclick,count,title){
   return el('div',{class:'tfilter'+(active?' active':''),onclick,title:title||null},[
     document.createTextNode(label),
@@ -2557,10 +2759,27 @@ function turnKinds(item){
 }
 
 // Filter one chat's rows, and say how many went out of view.
-function filterTimelineItems(items,mode){
-  if(!mode||mode==='all') return {items,hidden:0};
-  const kept=items.filter(item=>turnKinds(item).indexOf(mode)>=0);
-  return {items:kept,hidden:items.length-kept.length};
+function filterTimelineItems(items,mode,win){
+  const window_=win||{set:false};
+  const byKind=(!mode||mode==='all') ? items : items.filter(i=>turnKinds(i).indexOf(mode)>=0);
+  const kept=window_.set ? byKind.filter(i=>inWindow(itemTime(i),window_)) : byKind;
+  return {
+    items:kept,
+    hidden:items.length-kept.length,
+    // Counted separately because it is the one number that explains a window that looks
+    // like it did nothing: these rows have no time at all, so they are inside every window.
+    undated:window_.set ? kept.filter(i=>!itemTime(i)).length : 0,
+  };
+}
+
+// The time a turn happened, which for an assistant turn is the time of its last record.
+function itemTime(item){
+  if(item.kind==='assistant'){
+    const events=item.events||[];
+    for(let i=events.length-1;i>=0;i--) if(events[i].timestamp) return events[i].timestamp;
+    return null;
+  }
+  return (item.event&&item.event.timestamp)||null;
 }
 
 function renderToolsPanel(){

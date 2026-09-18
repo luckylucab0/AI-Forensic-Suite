@@ -121,7 +121,7 @@ about the agent's use.
 
 ## Filters
 
-Four of the views filter, and they follow one rule: a filter may take rows off the screen
+Five of the views filter, and they follow one rule: a filter may take rows off the screen
 because somebody asked it to, and it may never leave them looking absent. So every filtered
 view says how many rows are out of view, and the per-chat filter keeps a count and an undo
 on screen for as long as it is set.
@@ -132,6 +132,27 @@ did not parse. Each chip carries the number of rows it would show, so the shape 
 conversation is readable before anything is clicked. The filter keeps whole turns: an
 assistant turn that reasoned, answered and called a tool is one row, and it is kept by any
 of those three chips, which is why the chip says "tool use" rather than "tool calls".
+
+**A time window** sits in the transcript's chip row and in the timeline, and both bounds mean
+the same thing in both places. A bare date means that whole day, because `2026-09-06` as an
+upper bound would otherwise mean midnight and take the day out of its own window. A bound the
+viewer cannot read is reported next to the input and is not applied, since an unreadable
+window that quietly showed everything would be a filter lying about what it shows.
+
+An event with no timestamp stays inside every window. Its position is unknown, not outside,
+and dropping it would turn "what happened that day" into "what happened that day, minus
+whatever had no clock". The count says how many rows were kept for that reason, which is
+also what explains a window that looks like it did nothing. The timeline applies the window
+in the case database rather than in the browser, so a long timeline is narrowed before it is
+paged and the screen agrees with `afx timeline --since --until`.
+
+**The session list** filters to the sessions a rule found something in, and to the sessions
+holding a record no parser could read. Both are questions about the case's own reliability
+rather than about its content, and the second one is the reason it is there: on a large case
+a handful of unreadable records disappears into a total, and it is exactly what an analyst
+has to look at before quoting the rest. Each session row carries the same two marks, so the
+chip's claim is checkable without clicking it. The chips appear only when a case is being
+served, because a directory of transcripts knows nothing about findings.
 
 **Across sessions**, the tools view and the security view both start with a scope switch:
 all sessions, or the one that is open. "This session" only appears when a session is open,

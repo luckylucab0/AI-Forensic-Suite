@@ -72,6 +72,7 @@ vm.runInContext(
   normalizeUnified, groupUnified, unifiedEvent, unifiedDerived, assistantNameFor,
   apiSource, probeCaseApi, findCaseSession, artifactState, CASE_API_VERSION, tailPath,
   filterToolRows, filterFindingRows, filterTimelineItems, turnKinds, scopePath, buildTimeline,
+  windowBound, timeWindow, inWindow, itemTime, sessionMarks, findingSessions,
 };
 globalThis.__setSource = (s) => { dataSource = s; };
 `,
@@ -712,6 +713,85 @@ function fakeFetch(pages) {
   eq(api.artifactState({ collected: true, parse_status: null }), 'no parser', 'a collected file with no parser says so');
   eq(api.artifactState({ collected: true, parse_status: 'parsed' }), 'parsed', 'a parsed file says so');
   eq(api.artifactState({ collected: true, parse_status: 'failed' }), 'failed', 'a failed parse is not called parsed');
+}
+
+{
+  // ---- the time window ----
+  //
+  // A window is a filter, so it is under the same rule as every other one: it may take
+  // rows off the screen and it may never leave them looking absent. Two of its decisions
+  // are load-bearing and are pinned here.
+  eq(api.windowBound('2026-09-06', false).value, '2026-09-06T00:00:00.000000Z', 'a bare date opens at midnight');
+  eq(
+    api.windowBound('2026-09-06', true).value,
+    '2026-09-06T23:59:59.999999Z',
+    'and closes at the end of that day, not at its start',
+  );
+  eq(
+    api.windowBound('2026-09-06T09:00', false).value,
+    '2026-09-06T09:00:00.000000Z',
+    'a bound without seconds is padded to the shape the case stores',
+  );
+  eq(
+    api.windowBound('2026-09-06T09:00', true).value,
+    '2026-09-06T09:00:59.999999Z',
+    'and an upper bound without seconds means the end of that minute',
+  );
+  eq(api.windowBound('', false).value, null, 'an empty bound is no bound');
+  ok(api.windowBound('yesterday', false).problem, 'an unreadable bound is a problem, not an empty filter');
+
+  api.state.since = 'nonsense';
+  api.state.until = '';
+  ok(api.timeWindow().problems.length === 1, 'the problem travels to the caller');
+  ok(api.timeWindow().set === false, 'and an unreadable bound is never applied as a window');
+  api.state.since = '2026-09-07';
+  api.state.until = '2026-09-06';
+  ok(api.timeWindow().problems.length === 1, 'a window that ends before it starts says so');
+
+  api.state.since = '2026-09-06';
+  api.state.until = '2026-09-06';
+  const win = api.timeWindow();
+  ok(api.inWindow('2026-09-06T12:00:00.000000Z', win), 'an event inside the day is inside');
+  ok(!api.inWindow('2026-09-05T23:59:59.000000Z', win), 'the moment before it is not');
+  ok(!api.inWindow('2026-09-07T00:00:00.000000Z', win), 'and neither is the moment after');
+  // The rule the case database applies server-side, kept here so the screen and an
+  // exported timeline agree: an undated event's position is unknown, not outside.
+  ok(api.inWindow(null, win), 'an event with no timestamp is inside every window');
+
+  const items = [
+    { kind: 'event', event: { type: 'user', timestamp: '2026-09-06T09:00:00.000000Z', message: { content: 'a' } } },
+    { kind: 'event', event: { type: 'user', timestamp: '2026-09-08T09:00:00.000000Z', message: { content: 'b' } } },
+    { kind: 'event', event: { type: 'user', message: { content: 'c' } } },
+  ];
+  const shown = api.filterTimelineItems(items, 'all', win);
+  eq(shown.items.length, 2, 'a window keeps what is inside it and what has no time');
+  eq(shown.hidden, 1, 'and counts what it took out of view');
+  eq(shown.undated, 1, 'counting the undated rows separately, which is what explains the rest');
+  eq(
+    api.filterTimelineItems(items, 'all', { set: false }).items.length,
+    3,
+    'and no window hides nothing',
+  );
+  api.state.since = '';
+  api.state.until = '';
+}
+
+{
+  // ---- the session list's two marks ----
+  //
+  // Both are about the case's own reliability rather than its content: where a rule found
+  // something, and where a parser could not read a line. The second is invisible in a total
+  // on a large case, which is exactly why it gets a chip.
+  api.state.caseFindings = { findings: [{ session_id: 's1' }, { session_id: null }] };
+  eq(api.findingSessions().size, 1, 'a finding with no session belongs to no session');
+  const flagged = { caseSession: { session_id: 's1', unparsed: 0 } };
+  const unreadable = { caseSession: { session_id: 's2', unparsed: 3 } };
+  const quiet = { caseSession: { session_id: 's3', unparsed: 0 } };
+  eq(api.sessionMarks(flagged).join(), 'findings', 'a session a rule fired in is marked');
+  eq(api.sessionMarks(unreadable).join(), 'unreadable', 'a session with a record nobody read is marked');
+  eq(api.sessionMarks(quiet).join(), '', 'and a session with neither is not');
+  eq(api.sessionMarks({}).join(), '', 'a session from a folder source carries no marks at all');
+  api.state.caseFindings = null;
 }
 
 console.error(
