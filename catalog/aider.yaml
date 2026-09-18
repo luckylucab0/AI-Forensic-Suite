@@ -49,7 +49,7 @@ artifacts:
     Enumerates every source file aider parsed for its repo map, with mtimes - i.e. a list of files the agent had visibility into, even ones never edited. Only v3 and v4 exist; do not glob 'v*' expecting other versions.
 
     Record structure: repomap.py: CACHE_VERSION = 3; if USING_TSL_PACK: CACHE_VERSION = 4; TAGS_CACHE_DIR = f'.aider.tags.cache.v{CACHE_VERSION}'. Backed by diskcache.Cache, which stores a SQLite file (cache.db) plus blob files inside the directory. v4 appears when the tree-sitter-language-pack build is in use.
-  parser: null
+  parser: sqlite_generic
 - id: aider.caches
   category: cache
   root: user_profile

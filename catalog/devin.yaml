@@ -75,4 +75,4 @@ artifacts:
     Adjacent-product entry, included because it shows up on the same hosts as Windsurf and is easy to mistake for a Cascade store. One source explicitly retracted an earlier model that assumed a workspaceStorage chat store plus an encrypted Cascade .pb store for the desktop app — there is NO separate Devin desktop chat store; both surfaces write to sessions.db.
 
     Record structure: A single SQLite database (sessions.db) shared by the Devin CLI and the Devin desktop app, with per-session JSON transcripts in a sibling transcripts/ directory. Format is entirely separate from Windsurf's Cascade .pb files despite the shared vendor lineage.
-  parser: null
+  parser: sqlite_generic

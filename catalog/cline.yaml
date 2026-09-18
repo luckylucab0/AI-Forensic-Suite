@@ -501,7 +501,7 @@ artifacts:
     Cline's own enterprise 'prompt storage' doc states verbatim: 'Every Cline task conversation is stored locally in ~/.cline/data/tasks/<taskId>/api_conversation_history.json'. Same doc documents an optional background sync worker that uploads these to a customer S3/R2 bucket - i.e. on an enterprise endpoint the transcripts may ALSO exist off-host, and apps/vscode/src/shared/services/worker/{queue,sync}.ts implement the outbound queue. Worth checking for a queue/outbox on disk.
 
     Record structure: S3 object key shape observed in sdk/packages/shared/src/vcr.ts: /tasks/<userId>/<taskId>/api_conversation_history.json
-  parser: null
+  parser: cline
 - id: cline.agent_schedules
   category: config
   root: user_profile
@@ -583,7 +583,7 @@ artifacts:
     resolveDbDataDir() = join(resolveClineDataDir(), "db"); resolveTasksDbPath/resolveConnectorsDbPath/resolveCronDbPath resolve tasks.db, connectors.db, cron.db inside it. tasks.db is the session/task index that the VS Code history view and `cline` CLI read; cron.db holds scheduled/recurring agent runs (a persistence-mechanism artifact in its own right). Overridable via $CLINE_DB_DATA_DIR.
 
     One gap the verification pass surfaced here: the resolver file describes two of these databases as living alongside a sessions.db, twice, and contains no resolver for that file. So a fourth database is referenced by the vendor's own code and its location is stated nowhere. Glob the database directory rather than the three filenames, and expect a file this catalogue does not name.
-  parser: null
+  parser: sqlite_generic
 - id: cline.vscode_task_transcripts
   category: transcript
   root: user_profile
@@ -609,4 +609,4 @@ artifacts:
     All four names verified verbatim from GlobalFileNames in disk.ts: apiConversationHistory="api_conversation_history.json", contextHistory="context_history.json", uiMessages="ui_messages.json", taskMetadata="task_metadata.json". The task dir is built by ensureTaskDirectoryExists(taskId) -> getGlobalStorageDir("tasks", taskId). Corroborated by apps/vscode/src/core/controller/file/openDiskConversationHistory.ts, which joins HostProvider.get().globalStorageFsPath + "tasks" + taskId + "api_conversation_history.json". NOTE: in Cline 4.x this is treated as the LEGACY store - apps/vscode/src/sdk/legacy-state-reader.ts reads it for migration - so on a 4.x endpoint expect it alongside the ~/.cline tree.
 
     Record structure: api_conversation_history.json is an Anthropic MessageParam array (role + content blocks: text / tool_use / tool_result) per docs/enterprise-solutions/monitoring/prompt-storage.mdx. ui_messages.json is Cline's own say/ask event stream; token accounting lives in say/api_req_started events. task_metadata.json carries files_in_context.
-  parser: null
+  parser: cline

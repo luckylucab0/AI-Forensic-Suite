@@ -57,7 +57,7 @@ artifacts:
     index.sqlite enumerates every file and chunk Continue ingested - a list of source files the agent had visibility into, including files since deleted. autocompleteCache.sqlite can retain completion text (i.e. model output) that never appeared in any session transcript because it was inline autocomplete rather than chat. docs.sqlite and lancedb record which external documentation sites were ingested.
 
     Path correction from the source verification pass: the repository map is built as path.join(getContinueUtilsPath(), "repo_map.txt") where getContinueUtilsPath() joins ".utils" onto the global directory, so the file is at ~/.continue/.utils/repo_map.txt. This entry previously claimed ~/.continue/repo_map.txt, one level too high, which would have collected nothing.
-  parser: null
+  parser: sqlite_generic
 - id: continue.agents
   category: config
   root: project

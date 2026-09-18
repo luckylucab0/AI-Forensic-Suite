@@ -161,7 +161,7 @@ artifacts:
     The filenames inside a session directory, split out from copilot.session_state and left unverified on purpose. The vendor documents that each session directory holds "an event log and workspace artifacts" but does not name events.jsonl or workspace.yaml, and this catalogue does not mark a path verified on the strength of a filename nobody published.
 
     Settled by the source verification pass: the vendor's configuration directory reference does name the event log, saying that each session directory stores an event log (events.jsonl) and workspace artifacts (plans, checkpoints, tracked files). The workspace filename appears nowhere on that page and nowhere else the pass could reach, so it stays in the list marked unsourced. Coverage still does not depend on either name, because the session state entry collects the tree.
-  parser: null
+  parser: copilot
 - id: copilot.command_history
   category: prompt_history
   root: user_profile
@@ -499,4 +499,4 @@ artifacts:
     "SQLite database...for cross-session data such as checkpoint indexing". Useful for the same reason any index is: it can name conversations whose own directories are gone, at least until somebody reindexes.
 
     Copy it with its sidecars and open only a copy, so that reading the evidence does not check the evidence's own write-ahead log into it.
-  parser: null
+  parser: sqlite_generic

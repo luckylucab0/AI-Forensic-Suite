@@ -313,7 +313,7 @@ artifacts:
     Confirmed independently by a live Windsurf process command line captured in a public system report (…--database_dir /home/alice/.codeium/windsurf/database/9c0694567290725d9dcba14ade58e297 --indexed_files_retention_period_days 30 --workspace_id file_home_alice_Desktop_<project> --codeium_dir .codeium/windsurf --windsurf_version 1.12.6…). That command line is also the cleanest source for the workspace_id naming scheme (file_ + absolute path with separators flattened).
 
     Record structure: One directory per workspace hash, holding the local embedding/search index. Concurrent language_servers on the same hash contend on lockfiles. The hash is passed to the process as --database_dir.
-  parser: null
+  parser: sqlite_generic
 - id: windsurf.code_tracker_and_settings
   category: config
   root: user_profile
@@ -423,7 +423,7 @@ artifacts:
     The catalogued path had an explanation appended to it, kept here: ~/.config/Windsurf/User/globalStorage/state.vscdb  (ItemTable key: windsurfAuthStatus)
 
     Record structure: Standard VS Code ItemTable(key, value BLOB). Windsurf-specific keys: windsurfAuthStatus (JSON containing an apiKey field plus base64-encoded protobuf blobs for the cached allowed-models list) and windsurf.settings.cachedPlanInfo (quota/usage counters: quotaUsage, or usedMessages/messages and usedFlowActions/flowActions in newer shapes). Generic VS Code chat keys worth checking: chat.ChatSessionStore.index (observed EMPTY: {"version":1,"entries":{}}), aiService.prompts, workbench.panel.aichat.view.aichat.chatdata, agentSessions.model.cache. CONVERSATION CONTENT IS NOT HERE — only session metadata (title, cwd, lastActivity) and UI state.
-  parser: null
+  parser: sqlite_generic
 - id: windsurf.ide_workspace_state_vscdb
   category: config
   root: user_profile
@@ -449,7 +449,7 @@ artifacts:
     Explicitly described by an independent instrumentation project as a 'narrow legacy DB history fallback' behind the authoritative Cascade transcript. Do not build the Windsurf parser on this.
 
     Record structure: ItemTable only. Legacy VS Code chat keys (aiService.prompts, workbench.panel.aichat.view.aichat.chatdata) can be populated on older builds and are the only SQLite-resident Windsurf chat text; treat as a narrow legacy fallback, not the primary transcript. workspace.json beside it maps the hash to a folder URI.
-  parser: null
+  parser: sqlite_generic
 - id: windsurf.auth_credentials
   category: credentials
   root: user_profile

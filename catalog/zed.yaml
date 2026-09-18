@@ -51,7 +51,7 @@ artifacts:
     The single biggest collection trap in this family: because thread content is zstd-compressed inside a BLOB, keyword searching or strings-ing threads.db finds NOTHING. A collector must decompress the data column before any indexing or the entire Zed corpus reads as empty. parent_id gives subagent thread hierarchy.
 
     Record structure: crates/agent/src/db.rs: threads_dir = paths::data_dir().join('threads'); sqlite_path = threads_dir.join('threads.db'). Schema: CREATE TABLE IF NOT EXISTS threads (id TEXT PRIMARY KEY, summary TEXT NOT NULL, updated_at TEXT NOT NULL, data_type TEXT NOT NULL, data BLOB NOT NULL), with migrations adding parent_id TEXT, folder_paths TEXT, folder_paths_order TEXT, created_at TEXT. THE CONVERSATION IS IN THE data BLOB: data_type 'zstd' means zstd-compressed JSON (compressed with zstd::encode_all at level 3), data_type 'json' means uncompressed legacy JSON. The JSON carries a version field. per-OS data_dir from crates/paths/src/paths.rs: macOS home_dir().join('Library/Application Support').join('Zed'); Linux/FreeBSD dirs::data_local_dir().join('zed') with FLATPAK_XDG_DATA_HOME override; Windows dirs::data_local_dir().join('Zed') i.e. %LOCALAPPDATA%\Zed.
-  parser: null
+  parser: sqlite_generic
 - id: zed.extensions
   category: install_evidence
   root: user_profile
@@ -174,4 +174,4 @@ artifacts:
     Newly discovered and NOT in the starting brief: Zed has moved thread metadata into a sidebar_threads store separate from threads.db. It is the only place agent_id, remote_connection and interacted_at live - i.e. WHICH agent (native or an external ACP agent) ran a thread, and whether it ran over a remote connection. It also carries an archived flag, so archived threads are hidden in the UI but fully present on disk. A known bug class is old threads remaining in threads.db but never reaching sidebar_threads, so the two stores must be reconciled rather than either being trusted alone.
 
     Re-sourced by the verification pass: the store cited before opens the shared database through a macro and names no path. This file holds the database filename and the release-channel directory name, and the path crate supplies the per-platform database directory.
-  parser: null
+  parser: sqlite_generic

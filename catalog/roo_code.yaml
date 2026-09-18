@@ -180,7 +180,7 @@ artifacts:
     File names verified verbatim from GlobalFileNames: apiConversationHistory="api_conversation_history.json", uiMessages="ui_messages.json", mcpSettings="mcp_settings.json", customModes="custom_modes.yaml", taskMetadata="task_metadata.json", historyItem="history_item.json", historyIndex="_index.json". Directory layout verified from src/utils/storage.ts: `const taskDir = path.join(basePath, "tasks", taskId)`. TWO EXTRA FILES the brief does not mention: history_item.json (per-task history record, so unlike Cline <=3.x the task index is on disk, not only in state.vscdb) and _index.json (history index).
 
     Re-sourced by the verification pass: the file cited before is a bare map of filenames with no directory and no path join, so the tasks layout rested on nothing. The storage utility builds it. This is the transcript store, which makes it the worst of the mis-citations the pass found for this agent.
-  parser: null
+  parser: cline
 - id: roo_code.checkpoints
   category: file_snapshot
   root: user_profile

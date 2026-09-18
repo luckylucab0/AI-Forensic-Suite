@@ -279,7 +279,7 @@ artifacts:
     macOS is ambiguous and must be checked in BOTH places: the sessions doc gives ~/.local/share/goose/... for 'macOS and Linux', while the environment-variables doc gives ~/Library/Application Support/Block/goose/ as the macOS root. Goose picks an XDG-style or Apple-style strategy depending on version and on whether ~/.config/goose already exists. Collect both trees.
 
     Re-sourced by the verification pass, which found the base path on the cited page only inside command examples. The environment variable guide states the path root and its per-platform defaults. Note the contradiction the pass surfaced: that guide puts the macOS tree under the application support directory while the logs guide maps macOS to the same .local/share path as Linux, so search both. The two sidecars follow from the journal mode and are marked unsourced.
-  parser: null
+  parser: sqlite_generic
 - id: goose.sessions_db_windows
   category: transcript
   root: user_profile
@@ -298,7 +298,7 @@ artifacts:
     recollection, needs verification
 
     Record structure: Derived, not stated: the environment-variables doc gives the Windows root as %APPDATA%\Block\goose\ and says goose creates config/, data/ and state/ subdirectories under the root, and the logs doc confirms %APPDATA%\Block\goose\data\logs\. The sessions/sessions.db leaf is therefore inferred from the documented Linux layout. Verify on a live image before relying on it.
-  parser: null
+  parser: sqlite_generic
 - id: goose.sessions_jsonl_legacy
   category: transcript
   root: user_profile

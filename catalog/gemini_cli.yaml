@@ -85,7 +85,7 @@ artifacts:
     The primary evidence, and the entry whose status matters most. Google documents the retention policy for chats precisely and does not say where the chats are written, so the path here is a plausible reading of the setting's name and nothing more. It is marked unverified for that reason and collected anyway.
 
     Path correction and promotion from the source verification pass, which was asked to find a source for this entry and found the constructing code instead. Saved chats go into a chats directory under the per-project temporary directory, which is the global runtime directory joined with tmp and then with a per-project identifier. This entry previously claimed a chats directory directly under the agent's home directory, where nothing is written. The vendor's command reference corroborates the parent, stating the per-project temporary directory for the chat save command in both spellings, without naming the chats directory inside it. The cache-rooted spelling is the same directory under the macOS Seatbelt sandbox, where the runtime directory diverts into ~/.cache. A sessions directory is named in no source the pass could find, so it stays marked unsourced.
-  parser: null
+  parser: gemini
 - id: gemini_cli.home_tree
   category: config
   root: user_profile

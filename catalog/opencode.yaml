@@ -250,7 +250,7 @@ artifacts:
     IMPORTANT CORRECTION: the filename is not always opencode.db. database.ts computes: if Flag.OPENCODE_DB is set it wins (absolute path or a name under the data dir, or ':memory:'); otherwise the name is 'opencode.db' only for the latest/beta/prod channels or when OPENCODE_DISABLE_CHANNEL_DB=1, and is otherwise 'opencode-<InstallationChannel>.db'. Glob opencode*.db. Also note the DB now carries a 'credential' table, so the file can contain secrets even though it is collected as transcript evidence.
 
     Windows path correction from the source verification pass, same cause as the log entry: the data directory has no LOCALAPPDATA branch, so the database sits under the profile's .local/share on Windows too. Re-sourced at the same time: the page previously cited holds only the table definitions and constructs no path, while the database module joins the data directory with opencode.db and with the channel-suffixed spelling. The -wal and -shm sidecars are named in no vendor source and follow from the journal mode, so they are marked unsourced.
-  parser: null
+  parser: sqlite_generic
 - id: opencode.legacy_json_storage
   category: transcript
   root: user_profile

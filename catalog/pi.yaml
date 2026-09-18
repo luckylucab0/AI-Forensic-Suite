@@ -210,4 +210,4 @@ artifacts:
     The tree structure is the forensic headline: abandoned branches remain in the file. A naive line-by-line reader will present discarded or retracted turns as if they were the real conversation, and will miss that the operator branched away from something. Reconstruct via id/parentId and identify the active leaf. model_change and thinking_level_change entries give a timeline of capability changes mid-session.
 
     The verification pass confirmed the default session directory and found no environment variable on the cited page: the module defines the variable's name but the documentation page does not state it, so the relocated spelling is marked unsourced.
-  parser: null
+  parser: pi

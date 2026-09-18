@@ -326,4 +326,4 @@ artifacts:
     MAJOR ADDITION - not in the brief. The modern Ollama desktop GUI is a full chat client and stores conversation content in SQLite, so Ollama yields real transcripts and not only the 100-entry CLI prompt ring. Corroborated by ollama/ollama issue #12452 (opened 2025-09-30, v0.12.3, Windows) reporting plaintext chat retained in db.sqlite-wal after deletion.
 
     The verification pass confirmed the three database paths and found no vendor source for the sidecars anywhere. Collect them regardless: unflushed chat records live in the write-ahead log.
-  parser: null
+  parser: sqlite_generic

@@ -24,6 +24,7 @@ from agentforensics.catalog import (
     load_file,
     resolve_text,
 )
+from agentforensics.parsers import PARSERS
 
 CATALOG_DIR = Path(__file__).resolve().parents[2] / "catalog"
 
@@ -618,3 +619,27 @@ def test_empty_directory_is_an_error(tmp_path: Path) -> None:
     (tmp_path / "schema").mkdir()
     with pytest.raises(CatalogueError, match="no catalogue files"):
         load_catalogue(tmp_path)
+
+
+def test_the_parser_field_says_what_actually_reads_the_artifact() -> None:
+    """The field is a claim about the analyzer, so it has to be the analyzer's answer.
+
+    It sat at null for every one of the 460 entries while six parsers were reading 46 of
+    them, which is the quiet kind of wrong this catalogue must not carry: the field is
+    documented as naming what turns the artifact into events, `afx catalog` counts it, and
+    a reader consulting it would have concluded that nothing in the suite reads anything.
+    Asserted in both directions, so a parser added without touching the catalogue fails
+    here and so does a field naming a parser that does not claim the entry.
+    """
+    catalogue = load_catalogue(CATALOG_DIR)
+
+    wrong = []
+    for artifact in catalogue.artifacts:
+        reader = next((parser for parser in PARSERS if parser.handles(artifact.id)), None)
+        expected = reader.name if reader else None
+        if artifact.parser != expected:
+            wrong.append(
+                f"{artifact.id}: catalogue says {artifact.parser!r}, {expected!r} reads it"
+            )
+
+    assert not wrong, wrong

@@ -346,7 +346,7 @@ artifacts:
     Note the shape change: <session-id> is BOTH a .jsonl file and a sibling DIRECTORY under the same project folder. Hook payloads expose the path as `agent_transcript_path`. The subagent's own work - its prompts, its tool calls, its file reads - is only here, not in the parent transcript, so skipping this directory loses most of the agentic activity in a delegation-heavy session. The `.meta.json` sidecar naming and contents come from a third-party parser's source, not from vendor docs.
 
     The verification pass confirmed the transcript naming and could not find the sidecar metadata filename anywhere in the vendor's documentation, so that one path is marked unsourced.
-  parser: null
+  parser: claude_code
 - id: claude_code.tool_result_spills
   category: transcript
   root: user_profile
@@ -395,7 +395,7 @@ artifacts:
     The single richest artifact. Resume/continue works off these files; `claude --resume <transcript-path>` accepts an absolute path to one. A session file is appended to on every resume, so one file can span days. Session IDs are UUIDs (e.g. 00893aaf-19fa-41d2-8238-13269b9b3ca0.jsonl). Path encoding of <project>: the working-directory path with every NON-ALPHANUMERIC character replaced by a single `-`; if the converted name exceeds 200 characters it is truncated to 200 and a hash of the full path appended. So /home/alice/work/my-repo -> -home-alice-work-my-repo; C:\dev\physics_project -> C--dev-physics-project (drive colon and each backslash each become one dash, leading char is a dash on POSIX); dots, spaces and underscores all become dashes; each non-ASCII character becomes one dash (so two different CJK folder names can collide - see corrections). Ingest must NOT hardcode ~/.claude: `CLAUDE_CONFIG_DIR` relocates the whole tree, and `CLAUDE_CODE_PROJECT_DIR_NAME` (v2.1.234+, only honored together with CLAUDE_CONFIG_DIR) replaces the derived <project> name with a literal 1-64 char name. Files are plaintext, never encrypted at rest; OS permissions are the only protection. Writing can be suppressed entirely with CLAUDE_CODE_SKIP_PROMPT_HISTORY=1, `--no-session-persistence` with `-p`, or persistSession:false in the TS SDK.
 
     Record structure: One JSON object per line. Official docs warn the entry format is internal and changes between releases. Field names observed in a third-party parser's models (community): common fields on message entries are `type`, `uuid`, `parentUuid`, `sessionId`, `timestamp`, `cwd`, `version` (the Claude Code version that wrote the line - use it to date the artifact), `isSidechain`, `userType`, `isMeta`, `agentId`, `gitBranch`, `teamName`, `spawnedAgentId`; user entries add `message`, `toolUseResult`, `imagePasteIds`, `sourceToolUseID`; assistant entries add `requestId`. `type` values seen: "user", "assistant", "system" (with `subtype`, `level`, `hookErrors`, `hookInfos`, `compactMetadata`), "summary" (with `summary` + `leafUuid`, no sessionId), "queue-operation", "ai-title", "progress", plus non-message state lines: "file-history-snapshot" (internal file backup metadata), "last-prompt" (trailing marker written as the last line of the file), "permission-mode" ({permissionMode}), "mode", "custom-title", "agent-name", "agent-color", "frame-link" ({path, frameUrl, timestamp} written alongside a successful Artifact publish - maps a local file to a published claude.ai page). Entries form a DAG via parentUuid, so a single file can contain several conversation branches after /rewind or forking. v2.1.212+ records the reasoning-effort level on each assistant message. Pre-edit file copies are embedded in the transcript (capped since v2.1.97). Analyst value: full prompts and responses, every tool call and tool result, therefore file contents read, shell commands and their output, pasted text, cwd per line, git branch per line, model/token/cost metadata, and any secret a tool touched.
-  parser: null
+  parser: claude_code
 - id: claude_code.transcripts_set_aside
   category: transcript
   root: user_profile
@@ -420,7 +420,7 @@ artifacts:
     A previous transcript for the same session ID that Claude Code set aside instead of overwriting or deleting. It does not appear in the session picker, so the user very likely does not know it exists. Two known origins from the changelog: v2.1.196 changed the background-job transcript probe so a misread real transcript is 'set aside, never deleted' instead of being deleted, and v2.1.251 fixed transcripts being silently overwritten when a directory change relocated a session onto an existing same-ID transcript. High DFIR value: an earlier, possibly un-compacted or un-rewound state of a conversation that the live file no longer shows.
 
     Record structure: Same JSONL record structure as the live transcript. Critical for ingest: `<session>.jsonl.superseded-<timestamp>` does NOT match a `*.jsonl` glob, and the `.orphaned-` variant keeps the .jsonl suffix but an unusual stem. Every widely used community parser globs `*.jsonl` only, so these files are routinely missed. Collect by directory listing, not by extension glob.
-  parser: null
+  parser: claude_code
 - id: claude_code.workflow_runs
   category: transcript
   root: user_profile
@@ -446,7 +446,7 @@ artifacts:
     Dynamic workflows fan one prompt out into many subagents. Official docs corroborate the location without giving the exact subpaths: 'Every run writes its script to a file under your session's directory in ~/.claude/projects/' and 'Claude Code keeps the run's saved results under that session's directory in ~/.claude/projects/' (https://code.claude.com/docs/en/workflows.md). Exact subpaths above are from third-party parser source code, hence confidence medium. Analyst value: the orchestration script is code the model wrote and executed, and the snapshot records how many agents ran, with what models, and what each returned.
 
     Record structure: Per a third-party parser's source: `journal.jsonl` is the authoritative live spine (started/result events keyed by agentId, present from the start of the run); `agent-<agentId>.jsonl` is each fan-out agent's side-channel transcript; `agent-<agentId>.meta.json` carries {"agentType": "workflow-subagent"}; `<runId>.json` is a terminal snapshot written only after completion, holding phases, per-agent metadata (tokens/state/model), the JavaScript orchestrator script that actually ran, plus args, summary, error and run totals. Trunk transcript lines for the `Workflow` tool carry `script` (inline source), `scriptPath`, `name`, `args` and `resumeFromRunId`.
-  parser: null
+  parser: claude_code
 - id: claude_code.legacy_state_dirs
   category: cache
   root: user_profile
@@ -1979,4 +1979,4 @@ artifacts:
     Record structure: One record per prompt the user typed, each with a timestamp and the project path. Backs up-arrow recall, Ctrl+R history search and `!` shell-command completion. Plaintext, not encrypted at rest.
 
     Official docs state each entry holds the prompt with its timestamp and project path. Exact field names could not be verified from a page I was able to fetch: a third-party reference (reached only via search snippet, page blocked) reports `display` (prompt text), `pastedContents` (object), `timestamp` (epoch ms) and `project` (path) - treat those names as unverified. No `sessionId` field is documented; the starting brief's 'possibly a sessionId' could not be confirmed. Robustness note: changelog v2.1.243 fixed history search breaking on a MALFORMED entry, and v2.1.89 fixed CJK/emoji prompts being silently dropped when they fall on a 4KB boundary - so expect truncated or corrupt lines, and parse line-by-line with error tolerance rather than failing the file.
-  parser: null
+  parser: claude_code

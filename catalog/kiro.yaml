@@ -81,7 +81,7 @@ artifacts:
     Auto-saved after every conversation turn, so the file is rewritten constantly. Sessions are deletable by the user: kiro-cli chat --delete-session <ID>, Ctrl+D in the /sessions dashboard, and /sessions clean --yes which bulk-deletes empty local sessions and 'cannot be undone'. No vendor-stated age-based expiry.
   notes: |-
     The vendor states twice, under 'Auto-save' and 'Technical details', that Kiro CLI sessions are stored in a local SQLite database in ~/.kiro/, keyed by directory path, with a UUID session id, saved on every turn. What the vendor does NOT state is the database file name, which is why this entry is unverified: collect every *.sqlite3 (and any extensionless SQLite header match) in the ~/.kiro tree rather than guessing a name. The predecessor product used data.sqlite3 and a third-party viewer looks for ~/Library/Application Support/kiro-cli/data.sqlite3 and ~/.local/share/kiro-cli/data.sqlite3, i.e. a data_local_dir location and NOT ~/.kiro, so the two candidate locations disagree and both must be swept. Cloud sessions (--cloud) are stored server side and leave no local transcript, so a session id present in --list-sessions output may have no on-disk body. There is also a local content search index over V2 and V3 transcripts (prompts, optionally agent responses, never tool output), controlled by chat.sessionDashboard.indexResponses.
-  parser: null
+  parser: sqlite_generic
 - id: kiro.cli_session_files
   title: Kiro CLI flat-file session store
   category: transcript

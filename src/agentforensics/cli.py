@@ -141,10 +141,12 @@ def cmd_catalog(args: argparse.Namespace) -> int:
                             "title": agent.title,
                             "artifacts": len(agent.artifacts),
                             "verified": sum(1 for a in agent.artifacts if a.is_verified),
+                            "parsed": sum(1 for a in agent.artifacts if a.parser),
                         }
                         for agent in catalogue
                     ],
                     "artifacts": len(catalogue.artifacts),
+                    "parsed": sum(1 for a in catalogue.artifacts if a.parser),
                 },
                 indent=2,
                 sort_keys=True,
@@ -154,9 +156,14 @@ def cmd_catalog(args: argparse.Namespace) -> int:
 
     for agent in catalogue:
         verified = sum(1 for a in agent.artifacts if a.is_verified)
+        # Also how many of them anything can read. An analyst planning a collection needs
+        # that number as much as the verified one: an artifact with no parser is collected
+        # and lands in the case as a file, so a question it would have answered stays open.
+        parsed = sum(1 for a in agent.artifacts if a.parser)
         _write(
             sys.stdout,
-            f"{agent.title} ({agent.agent}): {len(agent.artifacts)} artifacts, {verified} verified",
+            f"{agent.title} ({agent.agent}): {len(agent.artifacts)} artifacts, "
+            f"{verified} verified, {parsed} parsed",
         )
         if args.os:
             groups = catalogue.by_priority(args.os)
@@ -164,7 +171,12 @@ def cmd_catalog(args: argparse.Namespace) -> int:
                 names = [a.id for a in items if a.agent == agent.agent]
                 if names:
                     _write(sys.stdout, f"  {priority:<10} {len(names)}")
-    _write(sys.stdout, f"total: {len(catalogue.artifacts)} artifacts")
+    parsed = sum(1 for a in catalogue.artifacts if a.parser)
+    _write(
+        sys.stdout,
+        f"total: {len(catalogue.artifacts)} artifacts, {parsed} of them read by a parser. "
+        "The rest are collected and land in a case as files.",
+    )
     return EXIT_OK
 
 

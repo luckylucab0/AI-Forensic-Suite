@@ -341,7 +341,7 @@ artifacts:
     The single best Cursor artifact for AI-vs-human code attribution per commit, and conversation_summaries is a lightweight session index that avoids re-parsing every JSONL. ai_code_hashes.conversationId and the checkpoint metadata.agentRequestId cross-join with cursorDiskKV composerData/agentKv ids — this is the pivot that ties a commit to a specific prompt. Confirmed by three independent sources.
 
     Record structure: Six tables. ai_code_hashes: links code hashes to a source category ('cli' or 'composer'), file name/extension, requestId, conversationId, timestamp, model. scored_commits: commitHash, branchName, tabLinesAdded, composerLinesAdded, humanLinesAdded, v1AiPercentage, v2AiPercentage, message/date. tracked_file_content: git path, conversation, model, timestamp. conversation_summaries: title, TLDR, overview, bullets, model, mode. ai_deleted_files. tracking_state.
-  parser: null
+  parser: sqlite_generic
 - id: cursor.logs
   category: log
   root: user_profile
@@ -530,7 +530,7 @@ artifacts:
     STRUCTURALLY SEPARATE third Cursor CLI store, used when cursor-agent runs in ACP mode (`cursor-agent acp`, IDE/third-party harness integrations). Keyed by ACP session id, not by workspace hash — there is no md5(cwd) directory level. Rich tool-call arguments persist here that are absent from the legacy chats layout. Relocatable via CURSOR_CONFIG_DIR.
 
     Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The vendor's dedicated page for this protocol was read in full and names one path, the server configuration file, and nothing about a session store. The directory name does not occur anywhere in the vendor's documentation or repositories. It stays in the catalogue because it costs a glob and because an agent session store is exactly what an investigation needs, but treat a hit under it as a finding that needs its own explanation and a miss as telling you nothing.
-  parser: null
+  parser: sqlite_generic
 - id: cursor.agent_transcripts_jsonl
   category: transcript
   root: user_profile
@@ -611,7 +611,7 @@ artifacts:
     Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The result is stronger than an absent source. The vendor documents around twenty paths under the same agent directory, among them the agent, skill, subagent, command and worktree directories and the configuration, hook and authentication files, and a chats directory is not one of them. Nothing in two hundred and fifty documentation pages, three changelogs, the data-use and security pages or the vendor's code hosting organization mentions this layout: no hit for the database filename, for the prompt history filename, for a chats directory, or for an md5 keyed directory level. Control searches against the same sources returned hundreds of results, so the absence is real rather than a failed search.
 
     There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and the slug one is the better supported of the two. Collect the whole agent directory rather than either path list, and expect the layout that is actually on the endpoint to settle which is right.
-  parser: null
+  parser: sqlite_generic
 - id: cursor.conversation_search_db
   category: transcript
   root: user_profile
@@ -636,7 +636,7 @@ artifacts:
     Two independent sources (a DFIR timeline tool and a full product teardown). Added in a recent Cursor version; may be absent on older installs. Best single recovery target when a subject has cleared chat history.
 
     Record structure: SQLite user-version 7. conversation_fts is an FTS5 virtual table: fts5(title, body, tokenize='unicode61 remove_diacritics 2', prefix='2 3') — plus the usual FTS5 shadow tables (_data, _idx, _content, _docsize, _config) which may hold recoverable text even after a delete. A `conversations` table carries source/scope/id, archive state, timestamps and root/cache fingerprints. Observed size 287 KB.
-  parser: null
+  parser: sqlite_generic
 - id: cursor.global_state_vscdb
   category: transcript
   root: user_profile
@@ -676,7 +676,7 @@ artifacts:
     Variable location, not globbable: macOS Keychain: generic-password cursor-access-token / cursor-refresh-token / cursor-api-key; service 'Cursor Safe Storage' account 'Cursor Key'
 
     Record structure: Tables: ItemTable(key TEXT UNIQUE ON CONFLICT REPLACE, value BLOB); cursorDiskKV(key TEXT UNIQUE ON CONFLICT REPLACE, value BLOB); and since Cursor 3.0 a real relational table composerHeaders(composerId TEXT PRIMARY KEY, workspaceId TEXT, createdAt INTEGER, lastUpdatedAt INTEGER, isArchived INTEGER, isSubagent INTEGER, recency INTEGER, checkpointAt INTEGER, value TEXT). cursorDiskKV key families: composerData:<composerId> (conversation metadata, model config, context, changed/added/removed files, checkpoints, branches/worktrees, subagent links, todos, token breakdown; fields name, isAgentic, fullConversationHeadersOnly[], _v schema version observed at 13); bubbleId:<composerId>:<bubbleId> (ONE ROW PER MESSAGE — text, type (1=user, 2=assistant), codeBlocks, toolResults, toolFormerData, tokenCount{inputTokens,outputTokens}, images, thinkingDurationMs, todos[], mcpDescriptors, relevantFiles, recentlyViewedFiles, pullRequests, errorDetails; largest single row observed 1.49 MB); checkpointId:<composerId>:<checkpointId> (file-state manifests {files, nonExistentFiles, activeInlineDiffs}); messageRequestContext:<composerId>:<messageId> (full prompt-building context snapshot); composer.content.<hash> and agentKv:blob:<contentId> (content-addressed agent messages, tool payloads, raw provider request/response bodies including SYSTEM PROMPTS, plaintext source, binary protobuf and JPEG attachments — the single largest family, ~2937 rows / 30 MB observed, i.e. ~80% of DB bloat); ofsContent:<contentId> (original-file snapshots); inlineDiff:*. ItemTable keys: composer.composerData, composer.composerHeaders, cursorAuth/* (see cursor_ide.auth_tokens), cursorTrustedExtensionAuthAccess, terminal command/directory history, recently-opened paths, browser-automation history, MCP OAuth secret envelopes in byte-array Buffer form, per-workspace Git IPC secret. Values are predominantly UTF-8 JSON stored in a BLOB column (so SELECT returns bytes — decode before parsing); agentKv:blob values are mixed JSON/binary/JPEG and must be sniffed.
-  parser: null
+  parser: sqlite_generic
 - id: cursor.pasted_text
   category: transcript
   root: user_profile
@@ -726,4 +726,4 @@ artifacts:
     The aiService.prompts / aiService.generations / aichat.chatdata keys are EARLY-VERSION artifacts. On Cursor 3.0+ the workspace DB retains mainly selectedComposerIds and UI state — so finding populated aiService.* keys is itself a dating signal for an older install or an older workspace. workspace.json is the only reliable hash-to-path resolver; VS Code proper does not store folder paths per workspace and needs globalStorage/storage.json openedPathsList instead.
 
     Record structure: ItemTable only (plus cursorDiskKV in some builds). Keys: aiService.prompts (LEGACY prompt-only history: prompt text + commandType), aiService.generations (LEGACY generation event log: UUID + timestamp + type), workbench.panel.aichat.view.aichat.chatdata (LEGACY chat: tabs[] + bubbles[]), composer.composerData (selected/focused composer ids), cursor/pinnedComposers, history.entries, workbench.backgroundComposer.workspacePersistentData, workbench.panel.composerChatViewPane.*, workbench.panel.aichat.<uuid>.numberOfVisibleViews, newAgentSidebar.*, cursor/agentLayout.*, agentSidebar.section.*.collapsed, interactive.sessions. workspace.json beside it maps the opaque hash to the real folder: a "folder" or "workspace" key with a file:// or vscode-remote://ssh-remote+<host>/ URI.
-  parser: null
+  parser: sqlite_generic

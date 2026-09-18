@@ -145,7 +145,7 @@ artifacts:
     Nothing in the fork deletes these on a schedule. They are removed only by explicit user or API action (session delete, which also unlinks the sidecars and the matching ~/.qwen/file-history/<session-id>/ directory) or moved into chats/archive/ by session archive. Records are append-only: a rewind is written as a system/rewind record and the rewound turns are re-rooted onto a dead branch rather than erased, so the abandoned branch is still on disk. If general.chatRecording is set to false no transcript is written at all (getTranscriptPath() returns an empty string).
   notes: |-
     Primary evidence. Append-only JSONL, one record per line, tree structured: every record carries uuid, parentUuid, sessionId, ISO 8601 timestamp, type, optional subtype, cwd, CLI version and gitBranch. Linear history is reconstructed by walking parentUuid from the tail, so a parser that just reads lines in order will show abandoned branches as if they were real turns, and a parser that only follows the live chain will hide them. Traps: (1) the service's own docstring says 'File location: ~/.qwen/tmp/<project_id>/chats/', which is stale upstream text and NOT where the code writes; the code joins Storage.getProjectDir(), which is <runtime-base>/projects/<sanitizeCwd(projectRoot)>. Collecting only ~/.qwen/tmp/ (the upstream Gemini CLI layout) finds no transcripts. (2) <sanitized-project-path> is not a hash: sanitizeCwd() replaces every character that is not [A-Za-z0-9] with '-' (and lowercases on Windows), so '/home/alice/work/app' becomes '-home-alice-work-app' and the original project path is readable straight off the directory name. (3) the SAME project reached through a different path spelling (symlink, /var vs /private/var, a git worktree under <repo>/.qwen/worktrees/<slug>) produces a DIFFERENT projects/ leaf, so sessions for one logical project can be split across several directories. (4) system/file_history_snapshot records are the index that maps a prompt to the pre-edit file copies under ~/.qwen/file-history/, which do expire.
-  parser: null
+  parser: gemini
 - id: qwen_code.session_sidecars
   title: Per-session sidecar files (runtime status, worktree, pull request)
   category: log
@@ -222,7 +222,7 @@ artifacts:
     Rewritten atomically as a whole-file JSON array, so a failed write can lose the tail. Not swept by housekeeping.
   notes: |-
     Flat JSON array of {sessionId, messageId, timestamp, type, message}. type is 'user' (the raw prompt the user typed) or 'model_switch' (with fromModel, toModel and a reason of vision_auto_switch, manual, fallback or other). This survives independently of the transcript, so it is the fallback source for 'what did the user ask' when a transcript is missing, and the place where an automatic model switch is visible. <project-hash> here is sha256(projectRoot) in full hex (lowercased path on Windows) - a DIFFERENT keying scheme from the projects/ directory used for transcripts, so the same project appears under two different directory names in ~/.qwen.
-  parser: null
+  parser: gemini
 - id: qwen_code.shell_history
   title: Shell command history
   category: shell_history
@@ -651,7 +651,7 @@ artifacts:
     Swept by the same housekeeping pass and the same general.cleanupPeriodDays cutoff (default 30 days) as the file-history backups, excluding the active session. Unlike file-history the ROOT directory is deliberately left in place for file watchers, so an empty subagents/ directory is the normal post-sweep state.
   notes: |-
     Work delegated to background subagents is recorded here rather than in the main transcript, so a main transcript that shows a delegation and no detail is expected, not evidence of tampering. Same per-session-directory layout as file-history. These DO expire at 30 days while the main transcripts do not, which makes an old case look as though the agent did far less autonomous work than it did.
-  parser: null
+  parser: gemini
 - id: qwen_code.openai_api_logs
   title: Raw model API request and response logs
   category: log

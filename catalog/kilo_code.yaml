@@ -95,7 +95,7 @@ artifacts:
     MAJOR ARCHITECTURE CHANGE the brief does not cover: Kilo Code is no longer a pure Roo-style fork. It now runs a shared 'Kilo agent runtime' derived from OpenCode (see packages/opencode/ in the repo) and persists sessions to SQLite. The official path table is unusual: Windows is documented as %USERPROFILE%\.local\share\kilo\kilo.db - i.e. Kilo uses the XDG-style .local/share layout on Windows too, NOT %APPDATA%. For VS Code Remote SSH the doc says the db is 'on the remote machine'. Third-party collectors additionally report the extension's globalStorage task logs being usable 'on Linux & remote/WSL only' on recent builds - worth verifying per endpoint.
 
     Record structure: Official schema, three tables: session(id, title, directory, time_updated - time_updated is epoch MILLIseconds, the doc uses datetime(time_updated/1000,'unixepoch')); message(session_id, data JSON, time_created); part(message_id, data JSON, id). session.directory gives the workspace path, which is the project-attribution key the globalStorage tree lacks.
-  parser: null
+  parser: sqlite_generic
 - id: kilo_code.extension_id_legacy_tree
   category: transcript
   root: user_profile
@@ -124,4 +124,4 @@ artifacts:
     The extension folder id 'kilocode.kilo-code' is confirmed by Kilo's OWN documentation (packages/kilo-docs/pages/customize/custom-modes.md gives the full macOS/Linux/Windows triple for .../globalStorage/kilocode.kilo-code/settings/custom_modes.yaml) - that part is high confidence and official. The tasks/<taskId>/ triple is attested by independent third-party parsers rather than by Kilo docs: kenn-io/agentsview describes '<vscode-globalStorage>/kilocode.kilo-code/tasks/<uuid>/ with task_metadata.json (only files_in_context), the Claude-shaped api_conversation_history.json, and the Cline-shaped ui_messages.json', and junhoyeo/tokscale and getagentseal/codeburn hard-code the same path. Marked medium confidence for the file triple, high for the folder id.
 
     Record structure: Task dirs are identified by the presence of task_metadata.json; the id is a UUID. Same Cline-family JSON shapes.
-  parser: null
+  parser: cline
