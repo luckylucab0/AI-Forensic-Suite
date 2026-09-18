@@ -372,7 +372,7 @@ def _decode(text: Any) -> Any:
         return None
     try:
         return json.loads(text)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return {"__undecodable__": str(text)}
 
 

@@ -12,7 +12,7 @@ notes stay out: they would triple the size of a file that has to be pasted into 
 response session, and nothing in the collector reads them.
 
 Written to stay inside this directory's Python 3.8 lint target, though importing the
-analyzer package means it runs on 3.11 or newer.
+analyzer package means it runs on 3.14 or newer.
 """
 
 from __future__ import annotations

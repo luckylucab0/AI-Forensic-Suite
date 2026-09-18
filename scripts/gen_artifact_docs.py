@@ -11,7 +11,7 @@ pressure the question is not "what exists" but "what disappears first", and a li
 by name buries the two artifacts that a clean shutdown destroys.
 
 Written to stay inside this directory's Python 3.8 lint target (see .ruff.toml), even
-though importing the analyzer package means it only runs on 3.11 or newer.
+though importing the analyzer package means it only runs on 3.14 or newer.
 """
 
 from __future__ import annotations

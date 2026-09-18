@@ -1,5 +1,5 @@
 # These scripts run as pre-commit hooks with `language: system`, which means they execute
-# on whatever `python3` the contributor happens to have, not on the project's pinned 3.11
+# on whatever `python3` the contributor happens to have, not on the project's pinned 3.14
 # interpreter. A hook that crashes with a SyntaxError is a hook people disable, so the
 # target here is the same generous floor as the collectors use.
 #
@@ -8,7 +8,7 @@
 # files are the ones most likely to be run outside the project's own environment.
 #
 # The generators in this directory (build_collectors.py, gen_artifact_docs.py) import the
-# analyzer package and therefore need Python 3.11 to RUN. Their own syntax is still kept
+# analyzer package and therefore need Python 3.14 to RUN. Their own syntax is still kept
 # inside this target, because one ruff target per directory is simpler than splitting the
 # directory, and because a contributor should not have to remember which script in here can
 # use which syntax.

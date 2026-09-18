@@ -179,7 +179,7 @@ def summarise(row: sqlite3.Row) -> str:
 def _payload(row: sqlite3.Row) -> dict[str, Any]:
     try:
         value = json.loads(row["payload"])
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return {}
     return value if isinstance(value, dict) else {}
 
@@ -293,7 +293,7 @@ def _write_timesketch(case: Case, stream: TextIO, filters: Filters | None) -> tu
 def _raw(row: sqlite3.Row) -> Any:
     try:
         return json.loads(row["raw"])
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return row["raw"]
 
 

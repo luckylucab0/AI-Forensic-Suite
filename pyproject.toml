@@ -3,7 +3,7 @@ name = "agentforensics"
 version = "0.1.0"
 description = "Offline forensic suite for the on-disk history of AI coding agents on endpoints"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.14"
 # Not an OSI-approved open source licence, deliberately. Use it, change it, fork it, and
 # use it in paid work; what it forbids is offering it to third parties as a hosted or
 # managed service and removing the notices. See LICENSE and NOTICE.
@@ -21,9 +21,7 @@ classifiers = [
   "Operating System :: MacOS",
   "Operating System :: Microsoft :: Windows",
   "Operating System :: POSIX :: Linux",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Security",
   "Topic :: System :: Systems Administration",
   "Typing :: Typed",
@@ -90,7 +88,7 @@ include = [
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py314"
 # The collectors have their own ruff config pinning Python 3.8, because they must run on
 # whatever interpreter a corporate endpoint happens to have. See collector/.ruff.toml.
 extend-exclude = [".venv", "viewer"]
@@ -127,7 +125,7 @@ docstring-code-format = true
 
 [tool.mypy]
 files = ["src"]
-python_version = "3.11"
+python_version = "3.14"
 strict = true
 warn_unreachable = true
 # A missing stub for an optional dependency should not block a type check of our own code.

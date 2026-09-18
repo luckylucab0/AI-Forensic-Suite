@@ -18,7 +18,7 @@ fires on, and a pack that buried the false positives would be a pack that gets t
 much and then not at all.
 
 Written to stay inside this directory's Python 3.8 lint target (see .ruff.toml), even
-though importing the analyzer package means it only runs on 3.11 or newer.
+though importing the analyzer package means it only runs on 3.14 or newer.
 """
 
 from __future__ import annotations

@@ -455,7 +455,7 @@ def make_handler(
                 self.end_headers()
                 if body:
                     self.wfile.write(body)
-            except (BrokenPipeError, ConnectionResetError):
+            except BrokenPipeError, ConnectionResetError:
                 # The browser navigated away mid-response. Not an error worth a traceback,
                 # and definitely not one worth taking the server down for.
                 self.close_connection = True

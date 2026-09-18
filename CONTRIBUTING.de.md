@@ -137,6 +137,13 @@ selbst herausfinden müssen.
 
 ## Arbeiten im Repository
 
+Der Analyzer braucht Python 3.14 oder neuer. Das ist eine junge Untergrenze und sie ist
+gewollt: ein Agent komprimiert seine Transcripts mit zstd, das ab 3.14 in der
+Standardbibliothek liegt, und sie anders zu lesen hiesse eine kompilierte Abhängigkeit.
+ADR 0024 nennt die Begründung und den Preis. `uv` holt einen Interpreter, wenn das System
+keinen hat. Die Kollektoren sind eine andere Sache und laufen weiter auf Python 3.8 und
+PowerShell 5.1, denn sie laufen auf dem, was der Endpunkt gerade hat.
+
 Einrichten, danach die eigene Arbeit mit denselben Befehlen prüfen, die auch die CI
 ausführt:
 

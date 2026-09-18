@@ -255,7 +255,7 @@ def _from_epoch(value: float) -> tuple[str | None, TsPrecision, str | None]:
         unit = "milliseconds"
     try:
         moment = datetime.fromtimestamp(seconds, UTC)
-    except (OverflowError, OSError, ValueError):
+    except OverflowError, OSError, ValueError:
         return None, "absent", f"epoch value out of range: {value!r}"
     note = f"read as epoch {unit}"
     # Whole seconds from a millisecond field still only claim second precision, because the

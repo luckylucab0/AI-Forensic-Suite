@@ -120,6 +120,13 @@ be told rather than left to find out.
 
 ## Working in the repository
 
+The analyzer needs Python 3.14 or newer. That is a recent floor and it is deliberate: one
+agent compresses its transcripts with zstd, which is in the standard library from 3.14, and
+reading them otherwise would mean a compiled dependency. ADR 0024 has the reasoning and the
+cost. `uv` will fetch an interpreter for you if your system has none. The collectors are a
+separate matter and still run on Python 3.8 and PowerShell 5.1, because they run on whatever
+the endpoint happens to have.
+
 Set up, then check your work with the same commands CI runs:
 
 ```bash

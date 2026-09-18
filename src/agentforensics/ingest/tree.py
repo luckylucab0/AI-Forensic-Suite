@@ -75,7 +75,7 @@ def _stamp(value: float | None) -> str | None:
             .isoformat(timespec="microseconds")
             .replace("+00:00", "Z")
         )
-    except (OverflowError, OSError, ValueError):
+    except OverflowError, OSError, ValueError:
         # A timestamp a filesystem cannot represent, which happens with a zeroed or a
         # deliberately corrupted inode. Reported as absent rather than as an epoch date,
         # because a 1970 timestamp on a timeline reads as evidence and is not.
