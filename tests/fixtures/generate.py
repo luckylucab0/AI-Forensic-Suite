@@ -523,6 +523,19 @@ def qwen_transcript(session_id: str, cwd: str) -> str:
     )
 
 
+def pi_session_dir(project: str) -> str:
+    """Pi's session directory name for a working directory.
+
+    The documented encoding removes leading separators and replaces `/`, `\\` and `:` with
+    a dash. All three matter and the first version of this replaced only the forward slash,
+    which is invisible on POSIX and fatal on Windows: there the path begins `C:\\` and the
+    name kept a drive colon and backslashes, so the directory could not be created at all
+    and every test that builds the fixture failed on that platform alone.
+    Source: https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/session-format.md
+    """
+    return "--" + re.sub(r"[/\\:]", "-", project.lstrip("/\\")) + "--"
+
+
 def pi_session(session_id: str, cwd: str) -> str:
     """A Pi session file, with the entries that make the format worth having a parser for.
 
@@ -927,11 +940,13 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         RECENT,
     )
 
-    # Pi encodes the working directory into the session directory's name, with the
-    # separators replaced and a marker either side of it.
-    pi_dir = "--" + str(project).lstrip("/").replace("/", "-") + "--"
     write(
-        home / ".pi" / "agent" / "sessions" / pi_dir / f"2026-09-09T12-00-00_{SESSION_A}.jsonl",
+        home
+        / ".pi"
+        / "agent"
+        / "sessions"
+        / pi_session_dir(str(project))
+        / f"2026-09-09T12-00-00_{SESSION_A}.jsonl",
         pi_session(SESSION_A, str(project)),
         RECENT,
     )

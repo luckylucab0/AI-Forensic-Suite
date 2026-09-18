@@ -58,9 +58,12 @@ def main(argv: list[str] | None = None) -> int:
         expected = {item.path for item in rendered}
         if args.format is None:
             orphans = sorted(
-                str(p.relative_to(OUT_DIR))
+                # as_posix for the same reason the test beside this does it: a
+                # generated path uses forward slashes, and the platform separator would
+                # make every file on Windows look like one nothing generates.
+                p.relative_to(OUT_DIR).as_posix()
                 for p in OUT_DIR.rglob("*")
-                if p.is_file() and str(p.relative_to(OUT_DIR)) not in expected
+                if p.is_file() and p.relative_to(OUT_DIR).as_posix() not in expected
             )
         else:
             orphans = []

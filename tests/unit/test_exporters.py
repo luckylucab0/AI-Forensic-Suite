@@ -206,10 +206,13 @@ def test_the_committed_output_is_current(rendered: list) -> None:
         if not target.exists() or target.read_text(encoding="utf-8") != item.text:
             stale.append(item.path)
     expected = {item.path for item in rendered}
+    # as_posix, because a generated path is spelled with forward slashes and
+    # str(relative_to(...)) uses the platform separator. On Windows every committed file
+    # therefore compared unequal to itself and the whole set came back as orphaned.
     orphans = sorted(
-        str(p.relative_to(GENERATED))
+        p.relative_to(GENERATED).as_posix()
         for p in GENERATED.rglob("*")
-        if p.is_file() and str(p.relative_to(GENERATED)) not in expected
+        if p.is_file() and p.relative_to(GENERATED).as_posix() not in expected
     )
     assert not stale and not orphans, (
         "run scripts/gen_collection_rules.py and commit the result. "

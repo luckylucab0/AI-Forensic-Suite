@@ -43,6 +43,27 @@ def test_the_generated_tree_is_creatable_on_every_platform(tmp_path: Path) -> No
             assert not bad, f"{path} has a component no Windows filesystem can hold: {component!r}"
 
 
+def test_the_session_directory_encoding_survives_a_windows_path() -> None:
+    """The encoding has to be checked against a Windows-shaped input on every platform.
+
+    The test above walks the tree the generator actually built, so it can only see the
+    host's own paths: on POSIX there is no drive letter and no backslash, and an encoding
+    that handles neither looks correct. That is exactly how this shipped broken, with two
+    CI jobs failing on Windows alone while every local run was green. So the input is
+    written out here rather than taken from the filesystem.
+    """
+    from generate import pi_session_dir
+
+    for project in ("/home/alice/src/app", r"C:\Users\alice\src\app", r"\\server\share\app"):
+        encoded = pi_session_dir(project)
+        bad = WINDOWS_FORBIDDEN & set(encoded)
+        assert not bad, f"{project!r} encodes to {encoded!r}, which Windows cannot hold: {bad}"
+        assert encoded.startswith("--") and encoded.endswith("--")
+    # And the POSIX case still produces what it always did, so the fix did not change the
+    # shape the parser is tested against.
+    assert pi_session_dir("/home/alice/src/app") == "--home-alice-src-app--"
+
+
 def test_the_project_directory_name_uses_the_documented_encoding(tmp_path: Path) -> None:
     """Claude Code replaces every non-alphanumeric character with a single dash.
 
