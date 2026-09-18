@@ -108,15 +108,10 @@ jobs:
       - name: docs/RULES.md current with the rule files
         run: uv run python scripts/gen_rule_docs.py --check
 
-      # The unified-log artifact's VQL is checked as text by the test suite, which cannot
-      # tell whether the engine does what the query means. This step runs it for real when
-      # a Velociraptor binary is available. Unconditional on purpose: without a runner the
-      # script does nothing and exits 0, so the day a binary can be fetched here the check
-      # starts working without anybody remembering to enable it.
-      - name: Generated VQL runs and returns the unified format
-        run: uv run python scripts/check_velociraptor_vql.py --runner "${VELOCIRAPTOR:-}"
-        env:
-          VELOCIRAPTOR: ${{ vars.VELOCIRAPTOR_BINARY }}
+      # The unified-log artifact's VQL used to be run here, behind a repository variable
+      # naming a binary on the runner. Nobody ever set it, so the step printed that it had
+      # done nothing while reading like coverage. The velociraptor job below fetches a
+      # binary and runs the query for real.
 
   legacy-interpreter:
     name: Python 3.8 compatibility
@@ -225,6 +220,84 @@ jobs:
         env:
           AFX_POWERSHELL: powershell.exe
         run: uv run pytest tests/conformance -q
+
+  velociraptor:
+    # The one check that needs a program this repository does not ship. Every other test
+    # reads the generated VQL as text, which catches a query that does not parse and a
+    # column spelled two ways. What only an engine knows is the rest: that count()
+    # accumulates across a foreach unless it goes through a stored query, that a buffered
+    # line reader stops at a long line and takes the remainder of the file with it. Each of
+    # those produces a collection that runs clean and returns less than was there.
+    #
+    # The binary is a third-party release, it is downloaded per run, and it never touches
+    # evidence: the script rewrites every glob in the artifact to sit under a sandbox that
+    # holds nothing but a synthetic profile, and fails on the first path from outside it.
+    name: Generated VQL against a real engine
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --all-extras --dev
+
+      - name: Fetch a Velociraptor release
+        env:
+          # Pin both to hold a version and its hash. VERSION empty means the latest
+          # release, which is how this job starts life: it prints what it got so the pin
+          # can be filled in, and it says out loud that it is running unpinned.
+          VELOCIRAPTOR_VERSION: ""
+          VELOCIRAPTOR_SHA256: ""
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ -n "${VELOCIRAPTOR_VERSION}" ]; then
+            tag="v${VELOCIRAPTOR_VERSION#v}"
+            api="https://api.github.com/repos/Velocidex/velociraptor/releases/tags/${tag}"
+          else
+            api="https://api.github.com/repos/Velocidex/velociraptor/releases/latest"
+          fi
+          # The asset is picked by matching the platform suffix rather than by rebuilding
+          # the file name, because the vendor's naming has the version in it and a guessed
+          # name fails as a 404 that reads like a network problem.
+          release=$(curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" "${api}")
+          url=$(printf '%s' "${release}" \
+            | jq -r '.assets[] | select(.name | test("linux-amd64$")) | .browser_download_url' \
+            | head -1)
+          name=$(printf '%s' "${release}" | jq -r '.tag_name')
+          if [ -z "${url}" ] || [ "${url}" = "null" ]; then
+            echo "::error::no linux-amd64 asset in the Velociraptor release ${name}"
+            exit 1
+          fi
+          curl -fsSL --retry 3 --retry-delay 5 -o velociraptor "${url}"
+          got=$(sha256sum velociraptor | cut -d' ' -f1)
+          echo "velociraptor ${name} sha256 ${got}"
+          if [ -n "${VELOCIRAPTOR_SHA256}" ]; then
+            if [ "${got}" != "${VELOCIRAPTOR_SHA256}" ]; then
+              echo "::error::the binary does not match the pinned hash. Expected ${VELOCIRAPTOR_SHA256}"
+              exit 1
+            fi
+            echo "the pinned hash matches"
+          else
+            echo "::notice::running an unpinned binary. Set VELOCIRAPTOR_VERSION to ${name#v} and VELOCIRAPTOR_SHA256 to ${got} in this job to pin it."
+          fi
+          chmod +x velociraptor
+          ./velociraptor --nocolor version
+
+      - name: Run the generated artifact against it, per platform source
+        # All three of the artifact's sources, on one runner. The Windows source can be
+        # exercised here because the sandbox places a synthetic profile under a directory
+        # named after the drive root, so the rewritten globs have something to match. A
+        # query variant nobody runs is a query variant that is wrong.
+        run: |
+          set -euo pipefail
+          for source in linux macos windows; do
+            uv run python scripts/check_velociraptor_vql.py \
+              --velociraptor ./velociraptor --os "${source}"
+          done
 
   windows-newlines:
     # Its own job rather than a second run inside the matrix, so it costs wall clock only

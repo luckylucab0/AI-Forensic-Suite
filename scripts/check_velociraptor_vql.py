@@ -10,14 +10,15 @@ produces a collection that runs clean and reports less than was there, which is 
 failure this project exists to prevent. So this script exists to run the thing.
 
 It needs a VQL engine, which this repository does not ship and cannot: Velociraptor is a
-separate project with its own release binaries. Point `--runner` at one of:
+separate project with its own release binaries. There are two ways to give it one.
 
-  * a Velociraptor binary, used as `velociraptor query --definitions ...`, or
-  * a small program that takes a file of VQL and a JSON Lines output path, which is what
-    a local build of the VQL library gives you.
+  * `--velociraptor <binary>`, a Velociraptor release binary. This script builds the
+    command line itself, from the vendor's own command definition.
+  * `--runner <program>`, anything that takes a file of VQL and a JSON Lines output path,
+    which is what a local build of the VQL library gives you.
 
-Without one the script exits 0 and says it did nothing, so it can sit in CI unconditionally
-and start checking the moment a binary is available.
+Without either the script exits 0 and says it did nothing, so it can sit in CI
+unconditionally and start checking the moment a binary is available.
 
 **The sandbox is the important part of this file.** A collection artifact's whole job is to
 go and find agent data wherever it lives, so running one on a developer's machine would read
@@ -152,13 +153,34 @@ def build_sandbox(root: Path, os_name: str) -> None:
             shutil.copytree(first, home)
 
 
-def run(runner: Path, query: Path, out: Path) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        [str(runner), str(query), str(out)],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+def velociraptor_command(binary: Path, query: Path, out: Path) -> list[str]:
+    """The command line a Velociraptor release binary takes for this.
+
+    Read out of the vendor's own command definition rather than guessed, because a wrong
+    flag here does not fail loudly: `query` would treat the file name as the query itself
+    and return one row of nothing, which looks like a clean run over an empty machine.
+
+    `query` takes its queries as positional arguments; `--from_files` says those arguments
+    are file names holding the VQL; `--format jsonl` with `--output` writes one JSON object
+    per row, which is the shape this script reads. `--nocolor` is an application flag and
+    goes before the command, because escape codes in the output would reach the parser.
+    Source: https://raw.githubusercontent.com/Velocidex/velociraptor/master/bin/query.go
+    """
+    return [
+        str(binary),
+        "--nocolor",
+        "query",
+        "--from_files",
+        "--format",
+        "jsonl",
+        "--output",
+        str(out),
+        str(query),
+    ]
+
+
+def run(command: list[str]) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(command, capture_output=True, text=True, check=False)
 
 
 def check(rows: list[dict[str, Any]], sandbox: Path, problems: list[str]) -> None:
@@ -295,8 +317,15 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--runner",
-        help="a program taking a VQL file and a JSON Lines output path. Without it this "
-        "script does nothing and exits 0.",
+        help="a program taking a VQL file and a JSON Lines output path. Without it, and "
+        "without --velociraptor, this script does nothing and exits 0.",
+    )
+    parser.add_argument(
+        "--velociraptor",
+        help="a Velociraptor release binary, which this script knows how to invoke. Use "
+        "this rather than wrapping the binary in a shell script: the command line lives "
+        "next to the reason for each flag, and a wrapper in a workflow file is the kind of "
+        "thing that rots without anybody noticing it stopped checking.",
     )
     parser.add_argument(
         "--os",
@@ -308,15 +337,23 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--keep", action="store_true", help="leave the sandbox in place")
     args = parser.parse_args(argv)
 
-    if not args.runner:
+    if args.runner and args.velociraptor:
         print(
-            "check-velociraptor-vql: no --runner given, so the generated VQL was not "
-            "executed. The static checks in tests/unit/test_velociraptor_unified.py still "
-            "ran; what is not checked here is engine behaviour."
+            "check-velociraptor-vql: give one of --runner and --velociraptor, not both",
+            file=sys.stderr,
+        )
+        return EXIT_ERROR
+
+    if not args.runner and not args.velociraptor:
+        print(
+            "check-velociraptor-vql: no --runner and no --velociraptor given, so the "
+            "generated VQL was not executed. The static checks in "
+            "tests/unit/test_velociraptor_unified.py still ran; what is not checked here "
+            "is engine behaviour."
         )
         return EXIT_OK
 
-    runner = Path(args.runner)
+    runner = Path(args.runner or args.velociraptor)
     if not runner.exists():
         print(f"check-velociraptor-vql: no such runner: {runner}", file=sys.stderr)
         return EXIT_ERROR
@@ -339,7 +376,12 @@ def main(argv: list[str] | None = None) -> int:
         query.write_text(sandbox_query(document, args.os_name, sandbox), encoding="utf-8")
         out = work / "rows.jsonl"
 
-        result = run(runner, query, out)
+        command = (
+            velociraptor_command(runner, query, out)
+            if args.velociraptor
+            else [str(runner), str(query), str(out)]
+        )
+        result = run(command)
         if result.returncode != 0:
             print(
                 f"check-velociraptor-vql: the runner exited {result.returncode}\n"

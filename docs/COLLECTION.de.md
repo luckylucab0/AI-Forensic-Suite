@@ -229,11 +229,26 @@ stillschweigend weniger tut als es scheint, schlimmer ist als eines, das scheite
   nicht lesen konnte.
 
 Zum Prüfen braucht es eine Velociraptor-Binärdatei, die dieses Repository nicht mitliefert.
-`scripts/check_velociraptor_vql.py --runner <binärdatei>` führt das Artefakt gegen ein
+`scripts/check_velociraptor_vql.py --velociraptor <binärdatei>` führt das Artefakt gegen ein
 synthetisches Profil in einer Sandbox aus, validiert jede Zeile gegen das Schema des Formats
 und vergleicht die zurückgegebenen Datensätze mit denen, die `afx normalize` aus demselben
-Profil liest. Ohne `--runner` tut es nichts und sagt das. Die statischen Prüfungen in
-`tests/unit/test_velociraptor_unified.py` laufen überall und bei jedem Commit.
+Profil liest. Die CI hat dafür einen eigenen Job, der eine Release-Binärdatei herunterlädt
+und alle drei plattformspezifischen Quellen des Artefakts ausführt. `--runner <programm>`
+nimmt alles andere, das eine VQL-Datei und einen Ausgabepfad annimmt, etwa einen lokalen Bau
+der VQL-Bibliothek. Ohne beides tut es nichts und sagt das, sodass das Skript in einer
+Pipeline ohne Engine stehen kann.
+
+Die Sandbox ist der Teil dieses Skripts, den man kennen sollte. Die ganze Aufgabe eines
+Sammelartefakts ist es, Agentendaten zu finden, wo sie liegen; unverändert ausgeführt würde
+es also die Maschine lesen, auf der es läuft. Jeder Glob des Artefakts wird in ein
+Verzeichnis umgeschrieben, das nichts als ein synthetisches Profil enthält, und ein Pfad von
+aussen bringt den Lauf zum Scheitern, statt hinterher herausgefiltert zu werden. Ein Test
+prüft das Umschreiben in beide Richtungen: eine Profilwurzel, die ausserhalb der Sandbox
+geblieben ist, und eine Wurzel, die in ihre eigene Ausgabe hinein umgeschrieben wurde, was
+ein Pfad ist, der in der Sandbox liegt und ins Nichts zeigt.
+
+Die statischen Prüfungen in `tests/unit/test_velociraptor_unified.py` laufen überall und bei
+jedem Commit.
 
 ### Was eine generierte Regel nicht kann, und warum sie es sagt
 

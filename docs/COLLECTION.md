@@ -218,11 +218,24 @@ tool that quietly does less than it appears to is worse than one that fails:
   returns the ones it could not read.
 
 Checking it needs a Velociraptor binary, which this repository does not ship.
-`scripts/check_velociraptor_vql.py --runner <binary>` runs the artifact against a synthetic
-profile inside a sandbox, validates every row against the format's schema, and compares the
-records it returned against the records `afx normalize` reads from the same profile. Without
-`--runner` it does nothing and says so. The static checks in
-`tests/unit/test_velociraptor_unified.py` run everywhere and on every commit.
+`scripts/check_velociraptor_vql.py --velociraptor <binary>` runs the artifact against a
+synthetic profile inside a sandbox, validates every row against the format's schema, and
+compares the records it returned against the records `afx normalize` reads from the same
+profile. CI has its own job for it, which downloads a release binary and runs all three of
+the artifact's per-platform sources. `--runner <program>` takes anything else that accepts a
+VQL file and an output path, such as a local build of the VQL library. With neither it does
+nothing and says so, so the script can sit in a pipeline that has no engine.
+
+The sandbox is the part of that script worth knowing about. A collection artifact's whole
+job is to go and find agent data wherever it lives, so running one unmodified would read the
+machine it runs on. Every glob in the artifact is rewritten to sit under one directory that
+holds nothing but a synthetic profile, and a path that came back from outside it fails the
+run rather than being filtered out afterwards. A test asserts the rewrite in both
+directions: a profile root left outside the sandbox, and a root rewritten into the middle of
+its own output, which is a path still under the sandbox that points at nothing.
+
+The static checks in `tests/unit/test_velociraptor_unified.py` run everywhere and on every
+commit.
 
 ### What a generated rule cannot do, and why it says so
 
