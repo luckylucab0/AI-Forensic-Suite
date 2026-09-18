@@ -29,6 +29,7 @@ from agentforensics.parsers.cline import ClineParser
 from agentforensics.parsers.codex import CodexParser
 from agentforensics.parsers.copilot import CopilotParser
 from agentforensics.parsers.gemini import GeminiParser
+from agentforensics.parsers.hermes import HermesParser
 from agentforensics.parsers.instructions import InstructionsParser
 from agentforensics.parsers.opencode import OpencodeParser
 from agentforensics.parsers.pi import PiParser
@@ -45,6 +46,7 @@ PARSERS: tuple[Parser, ...] = (
     CodexParser(),
     CopilotParser(),
     GeminiParser(),
+    HermesParser(),
     InstructionsParser(),
     # Ahead of the generic SQLite reader, which is what taking a store over looks like:
     # this one has a verified schema, so it claims opencode.db and the reader does not.
