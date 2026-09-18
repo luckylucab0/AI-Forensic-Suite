@@ -129,7 +129,11 @@ ist, dass das nicht *unbemerkt* geht.
   opencode ist das erste: dessen Modul bildet die drei Tabellen ab, deren Schema gegen die
   generierte Migration des Herstellers gelesen wurde, und gibt jede andere Tabelle, auch das
   ältere Message-Paar, an die uninterpretierte Lesung zurück. Ein Speicher ist damit nie halb
-  gelesen, während die andere Hälfte stillschweigend fehlt.
+  gelesen, während die andere Hälfte stillschweigend fehlt. Der CLI-Speicher von Amazon Q ist
+  das zweite, und sein Store enthält, was kein anderes Artefakt hat: die
+  conversations-Tabelle ist nach Arbeitsverzeichnis geschlüsselt, die history-Tabelle ist ein
+  Shell-Kommandoprotokoll mit Exit-Codes, und der Conversation State hält fest, welche Züge
+  der Agent dem Modell nicht mehr schickt, während sie auf der Platte bleiben.
   Daneben liegt ein zweites formatbezogenes Modul, `instructions/`, für den
   Anweisungsbestand: die dreiundsechzig Katalogartefakte mit Skills, Commands, Output
   Styles, Regeln, Steering-Dateien und Hook-Skripten. Es liest jede Datei ganz, unterscheidet

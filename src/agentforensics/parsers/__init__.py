@@ -14,6 +14,7 @@ summarised.
 
 from __future__ import annotations
 
+from agentforensics.parsers.amazonq import AmazonQParser
 from agentforensics.parsers.base import (
     Line,
     ParseContext,
@@ -37,6 +38,7 @@ from agentforensics.parsers.sqlite_generic import SqliteGenericParser
 # parser has to come before a general one. Kept as a tuple rather than a registry decorator
 # so that reading this file tells you the whole set.
 PARSERS: tuple[Parser, ...] = (
+    AmazonQParser(),
     ClaudeCodeParser(),
     ClineParser(),
     CodexParser(),

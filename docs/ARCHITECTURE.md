@@ -120,7 +120,10 @@ it cannot be rewritten *quietly*.
   opencode is the first: its module maps the three tables whose schema was read against the
   vendor's own generated migration and hands every other table, including the older message
   pair, back to the uninterpreted reading, so a store is never half read with the other half
-  silently absent. Beside
+  silently absent. Amazon Q's CLI store is the second, and it is the one whose store holds
+  what no other artifact does: its conversations table is keyed by the working directory,
+  its history table is a shell command log with exit codes, and its conversation state
+  records which turns the agent has stopped sending to the model while keeping them on disk. Beside
   it sits a second format-shaped module, `instructions/`, for the instruction surface: the
   sixty-three catalogue artifacts that hold skills, commands, output styles, rules, steering
   files and hook scripts. It reads each file whole, tells the scope apart from the working
