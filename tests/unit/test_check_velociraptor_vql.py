@@ -211,3 +211,90 @@ def test_the_artifact_the_script_reads_is_the_committed_one(script) -> None:
     """A path that drifted would make this check read something nobody ships."""
     assert script.ARTIFACT.is_file()
     assert script.ARTIFACT.is_relative_to(REPO / "exporters" / "generated")
+
+
+@pytest.fixture(scope="module")
+def profile(tmp_path_factory) -> Path:
+    """A synthetic profile at the place the linux source's globs are rewritten to."""
+    sys.path.insert(0, str(REPO / "tests" / "fixtures"))
+    from generate import build_home
+
+    sandbox = tmp_path_factory.mktemp("vql-sandbox")
+    build_home(sandbox / "home" / "alice")
+    return sandbox
+
+
+def rows_for(script, sandbox: Path) -> list[dict]:
+    """The rows a perfect query would return: one per record the analyzer read."""
+    from agentforensics.catalog import load_catalogue
+    from agentforensics.exporters.velociraptor_unified import MAPPERS
+    from agentforensics.unified import normalize
+
+    events, _ = normalize(sandbox / "home" / "alice", load_catalogue(REPO / "catalog"))
+    rows = {}
+    for event in events:
+        locator = str(event.provenance.locator or "").split("#", 1)[0]
+        if (
+            event.provenance.artifact_id not in MAPPERS
+            or event.kind == "artifact.fs"
+            or not locator.startswith("line:")
+        ):
+            continue
+        path = event.provenance.original_path
+        path = str(sandbox / "home" / "alice") + path[1:] if path.startswith("~/") else path
+        rows[(path, locator)] = {
+            "kind": event.kind,
+            "provenance": {
+                "original_path": path,
+                "locator": locator,
+                "artifact_id": event.provenance.artifact_id,
+            },
+        }
+    return list(rows.values())
+
+
+def test_a_record_the_query_did_not_return_is_a_problem(script, profile) -> None:
+    """The direction that means a collection returned less than was on disk, which is the
+    one failure this whole script exists to find."""
+    rows = rows_for(script, profile)
+    assert rows, "the synthetic profile has records the analyzer reads"
+    problems: list[str] = []
+
+    line = script.differential(rows[1:], profile / "home" / "alice", problems)
+
+    assert problems, "a record missing from the query has to fail the run"
+    assert "returned less than was on disk" in problems[0]
+    assert "1 missing from the query" in line
+
+
+def test_a_record_only_the_query_saw_is_named_and_does_not_fail_the_run(script, profile) -> None:
+    """Not a hole in a collection, so it does not fail: it is the analyzer reading less
+    than the endpoint query did. But a count on its own tells nobody which record to go and
+    look at, and the first run of this check against a real engine reported exactly one
+    such record with no way to find out what it was."""
+    rows = rows_for(script, profile)
+    invented = {
+        "kind": "user.prompt",
+        "provenance": {
+            "original_path": str(profile / "home" / "alice" / ".claude" / "invented.jsonl"),
+            "locator": "line:7",
+            "artifact_id": next(iter(rows[0]["provenance"]["artifact_id"].split())),
+        },
+    }
+    problems: list[str] = []
+
+    line = script.differential([*rows, invented], profile / "home" / "alice", problems)
+
+    assert not problems
+    assert "1 the query saw and the analyzer did not" in line
+    assert "invented.jsonl line:7" in line
+
+
+def test_a_query_that_matched_everything_reports_no_difference(script, profile) -> None:
+    problems: list[str] = []
+
+    line = script.differential(rows_for(script, profile), profile / "home" / "alice", problems)
+
+    assert not problems
+    assert "0 missing from the query" in line
+    assert "0 the query saw and the analyzer did not" in line

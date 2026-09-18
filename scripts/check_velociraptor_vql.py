@@ -306,10 +306,20 @@ def differential(rows: list[dict[str, Any]], sandbox: Path, problems: list[str])
             f"{missing[:5]}"
         )
     extra = sorted(theirs - mine)
+    # Named, not just counted. This direction is not a hole in a collection, so it does not
+    # fail the run, but it is the analyzer reading less than the endpoint query did, and a
+    # count on its own tells nobody which record to go and look at. The first run of this
+    # check against a real engine reported one such record and there was no way to find out
+    # what it was.
+    detail = ""
+    if extra:
+        detail = ". The query saw: " + ", ".join(
+            f"{path.rsplit('/', 1)[-1]} {locator}" for path, locator in extra[:5]
+        )
     return (
         f"{len(mine)} record(s) read by the analyzer, {len(theirs)} by the query, "
         f"{len(missing)} missing from the query, {len(extra)} the query saw and the "
-        "analyzer did not"
+        f"analyzer did not{detail}"
     )
 
 
@@ -422,12 +432,17 @@ def main(argv: list[str] | None = None) -> int:
             print(f"check-velociraptor-vql:   {placement}: {under} row(s)")
 
         # Only where the sandbox's profile sits at a path the analyzer also reads as a
-        # profile root, which is the POSIX placements. The Windows drive-letter placement
-        # is a device of this harness and not a shape the analyzer expects.
-        if args.os_name == "linux":
+        # profile root, which is the POSIX placements. The Windows drive-letter placement is
+        # a device of this harness and not a shape the analyzer expects.
+        #
+        # Both POSIX sources, not only linux. The comment here said POSIX and the code said
+        # linux, so the macOS query's records were never compared against the analyzer at
+        # all: the one source whose profile roots differ most from the analyzer's had the
+        # weakest check behind it.
+        if args.os_name in ("linux", "macos"):
             print(
                 "check-velociraptor-vql: "
-                + differential(rows, sandbox / "home" / "alice", problems)
+                + differential(rows, sandbox / PROFILE_PLACEMENTS[args.os_name][0], problems)
             )
 
         if problems:
