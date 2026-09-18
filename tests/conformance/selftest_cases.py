@@ -13,7 +13,60 @@ characters, because Python uses short escapes for some and \\uXXXX for the rest.
 
 from __future__ import annotations
 
+import importlib.util
 import json
+from pathlib import Path
+
+# The catalogue path shapes whose ranking has actually decided an attribution, plus one of
+# every root kind. `<project>/.mcp.json` against `<plugin-root>/.mcp.json` is the pair that
+# reported a project's own server configuration as a plugin manifest: same nine literal
+# characters, and only the root tells them apart. `~/.claude/CLAUDE.md` against
+# `<project>/.claude/CLAUDE.md` is the pair that reported the user's own instruction file at
+# project scope.
+SPECIFICITY_PATTERNS = (
+    "~/.claude/CLAUDE.md",
+    "<project>/.claude/CLAUDE.md",
+    "<project>/**/CLAUDE.md",
+    "<project>/.mcp.json",
+    "<plugin-root>/.mcp.json",
+    "~/.gemini/",
+    "~/.gemini/tmp/<hash>/chats/*.jsonl",
+    "$CLAUDE_CONFIG_DIR/.claude.json",
+    "%APPDATA%\\Block\\goose\\data\\sessions\\sessions.db",
+    "/etc/claude-code/managed-settings.json",
+)
+
+
+def _collect_py() -> object:
+    """collect.py as a module, without running it.
+
+    Imported by path because it is a standalone single file rather than part of the
+    package: that is the point of it, so it can be pushed through live-response tooling.
+    """
+    path = Path(__file__).resolve().parents[2] / "collector" / "collect.py"
+    spec = importlib.util.spec_from_file_location("_collect_for_parity", path)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _specificity_case() -> dict[str, object]:
+    """The Python collector's own answer for each pattern, which the PowerShell one must
+    reproduce exactly.
+
+    Computed rather than written down, so this compares the two implementations instead of
+    comparing both against a constant that could be wrong. The rule decides which catalogue
+    entry a file is reported under, which decides whether a parser is found for it, so the
+    two collectors disagreeing here is a bundle that reads differently depending on which
+    collector took it. See ADR 0025.
+    """
+    collect = _collect_py()
+    return {
+        pattern: list(collect.pattern_specificity(pattern))  # type: ignore[attr-defined]
+        for pattern in SPECIFICITY_PATTERNS
+    }
+
 
 CASES: dict[str, object] = {
     "dict_mixed": {"b": 1, "a": "two", "c": True, "d": None},
@@ -27,6 +80,7 @@ CASES: dict[str, object] = {
     "numbers": [0, 1, -1, 268435456, 9007199254740991],
     "bools": [True, False],
     "nulls_in_list": [None, "x", None],
+    "pattern_specificity": _specificity_case(),
 }
 
 

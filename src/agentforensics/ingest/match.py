@@ -80,14 +80,33 @@ class Match:
     # directory-level entry and a file-level one belongs to the file-level one, and this is
     # how that is decided: the more literal the pattern, the more specific the claim.
     specificity: int
-    # Whether the pattern was anchored at a root this module knows, as against one that can
-    # match at any depth anywhere on the disk. Literal characters alone cannot tell those
-    # apart, because a placeholder contributes none of them: `~/.claude/CLAUDE.md` and
-    # `<project>/.claude/CLAUDE.md` both count sixteen. They are not equally specific
-    # claims though, and the tie was being broken alphabetically, so the user's own
-    # instruction file was attributed to the project entry and an analyst reading the
-    # instruction surface saw it at project scope. A profile-anchored claim wins.
-    anchored: bool = True
+    # How well the pattern's root can be located: 2 a directory that can be named, 1 a
+    # working copy, 0 a plugin or marketplace directory or a tree relocated by a variable.
+    # Literal characters alone cannot tell these apart, because a placeholder contributes
+    # none of them: `~/.claude/CLAUDE.md` and `<project>/.claude/CLAUDE.md` both count
+    # sixteen. They are not equally specific claims, and the tie was being broken
+    # alphabetically, so the user's own instruction file was attributed to the project entry
+    # and an analyst reading the instruction surface saw it at project scope. Kept as a rank
+    # rather than a flag because the bottom two are not the same either: a plugin root is
+    # substituted with the recorded working copies like a project root is, so a pattern
+    # written for one and matched at the other was matched somewhere it was not written for.
+    # That is what made a project's own server configuration come out as a plugin manifest.
+    root_rank: int = 2
+
+
+def _root_rank(path: str) -> int:
+    """How well this module can say where a pattern's root is. Higher is better.
+
+    The same three answers the collector gives, in collector/collect.py root_rank, and the
+    same order. The two have to agree: a bundle and a directly read tree attributing one
+    file differently is what cost a whole chat transcript once.
+    """
+    head = path.replace("\\", "/").partition("/")[0]
+    if head.startswith("<"):
+        return 1 if head in ("<project>", "<repo-root>", "<repo_root>") else 0
+    if head.startswith("$"):
+        return 0
+    return 2
 
 
 def _segment_regex(segment: str) -> str:
@@ -248,11 +267,10 @@ class _Compiled:
     regex: re.Pattern[str]
     literal: int
     artifact: Artifact
-    # See Match.anchored. Read off the compiled body rather than threaded through every
-    # return in _pattern_regexes, because the bodies that can match anywhere are exactly
-    # the ones that begin with `.*/`: a working copy whose location the catalogue cannot
-    # state, and a tree relocated by a variable.
-    anchored: bool = True
+    # See Match.root_rank. Read off the catalogue path rather than the compiled body,
+    # because the body cannot tell a working copy from a plugin root: both compile to a
+    # leading `.*/`.
+    root_rank: int = 2
 
 
 class Matcher:
@@ -278,9 +296,7 @@ class Matcher:
                         # is skipped here rather than raised so that one malformed entry
                         # cannot stop an ingest that is otherwise fine.
                         continue
-                    self._compiled.append(
-                        _Compiled(regex, literal, artifact, not body.startswith(".*/"))
-                    )
+                    self._compiled.append(_Compiled(regex, literal, artifact, _root_rank(path)))
 
     def __len__(self) -> int:
         return len(self._compiled)
@@ -293,15 +309,18 @@ class Matcher:
             if not entry.regex.match(normalised):
                 continue
             previous = found.get(entry.artifact.id)
-            rank = (entry.literal, entry.anchored)
-            if previous is None or rank > (previous.specificity, previous.anchored):
-                found[entry.artifact.id] = Match(entry.artifact, entry.literal, entry.anchored)
-        # Most literal first, then a claim anchored at a known root ahead of one that could
-        # match anywhere, then by id so two claims that really are equally specific order
-        # stably. The id is the last key and not the second, because deciding which
-        # catalogue entry a file belongs to by alphabet is deciding it by accident.
+            rank = (entry.literal, entry.root_rank)
+            if previous is None or rank > (previous.specificity, previous.root_rank):
+                found[entry.artifact.id] = Match(entry.artifact, entry.literal, entry.root_rank)
+        # Most literal first, then the claim whose root can be placed most precisely, then
+        # by id so two claims that really are equally specific order stably. The id is the
+        # last key and not the second, because deciding which catalogue entry a file belongs
+        # to by alphabet is deciding it by accident.
         return tuple(
-            sorted(found.values(), key=lambda m: (-m.specificity, not m.anchored, m.artifact.id))
+            sorted(
+                found.values(),
+                key=lambda m: (-m.specificity, -m.root_rank, m.artifact.id),
+            )
         )
 
     def matches(self, path: str) -> tuple[Match, ...]:

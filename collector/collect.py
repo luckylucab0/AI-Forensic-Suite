@@ -9028,6 +9028,77 @@ def substitute_anchor(pattern: str, anchor: str) -> str:
     return anchor.rstrip("/\\") + pattern[match.end() :]
 
 
+# Everything a catalogue pattern can hold that is not literal text: a placeholder and a
+# wildcard. Stripped to count how much of a pattern claims a name rather than whatever
+# happens to be there.
+_PATTERN_HOLE = re.compile(r"<[^>]*>|\*")
+
+
+def root_rank(pattern: str) -> int:
+    """How well this collector can say where a pattern's root is. Higher is better.
+
+    Three answers, and the middle one is the reason this is a rank rather than a flag.
+
+      2  a directory this collector can name: `~`, a Windows placeholder, an absolute path.
+      1  a working copy, whose location is not in the catalogue but is recorded in the
+         agent's own state and substituted here.
+      0  a root nothing locates: a plugin or marketplace directory, or a tree relocated by
+         a variable.
+
+    The middle and the bottom matter because both are substituted with the same recorded
+    working copies. A pattern written for a plugin root and matched at a working copy root
+    was matched somewhere it was not written for, so it is the weaker claim: that is what
+    made `<project>/.mcp.json` lose to `<plugin-root>/.mcp.json` for a project's own server
+    configuration, both spelling the same nine literal characters.
+    """
+    head = pattern.replace("\\", "/").partition("/")[0]
+    if head.startswith("<"):
+        return 1 if head in ("<project>", "<repo-root>", "<repo_root>") else 0
+    if head.startswith("$"):
+        return 0
+    return 2
+
+
+def pattern_specificity(pattern: str) -> tuple[int, int]:
+    """How specific one catalogue path is: literal characters, then how known its root is.
+
+    Two catalogue entries can claim the same file, one naming a directory and one naming the
+    file, and the manifest reports it under one of them, which is what decides whether a
+    parser is found for it. This is that decision. It mirrors the analyzer's rule in
+    src/agentforensics/ingest/match.py so a bundle and a directly read tree attribute a file
+    the same way: the two disagreeing cost one agent's whole chat transcript, because the
+    entry that won had no parser behind it. See ADR 0025.
+
+    The count is over the part below the root, because the root is a placeholder in one
+    entry and a literal in another, and counting it would compare two different things.
+    That is also why the root needs its own key: `~/.claude/CLAUDE.md` and
+    `<project>/.claude/CLAUDE.md` both spell sixteen literal characters and are not the
+    same claim, the first naming one directory and the second any directory on the disk.
+    """
+    text = pattern.replace("\\", "/")
+    head, _, tail = text.partition("/")
+    if head.startswith(("<", "$")) or head == "~" or (head.startswith("%") and head.endswith("%")):
+        body = tail
+    else:
+        body = text
+    literal = 0
+    for segment in body.split("/"):
+        if segment in ("", "**"):
+            continue
+        literal += len(_PATTERN_HOLE.sub("", segment))
+    return literal, root_rank(pattern)
+
+
+def claim_order(artifact: dict, pattern: str) -> tuple[int, int, str]:
+    """The sort key that picks a file's primary claimant. Most specific first.
+
+    The id is the last key and not the second: deciding which catalogue entry a file belongs
+    to by alphabet is deciding it by accident.
+    """
+    literal, rank = pattern_specificity(pattern)
+    return (-literal, -rank, artifact["id"])
+
+
 def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> list[str]:
     """Turn one catalogue path pattern into concrete glob patterns on this filesystem.
 
@@ -9607,18 +9678,27 @@ def run(args: argparse.Namespace) -> dict:
                                         }
                                     )
                             for target in targets:
-                                matches.setdefault(target, []).append(artifact)
+                                # The catalogue pattern travels with the claim, because a
+                                # claim's specificity is a property of the pattern that
+                                # matched and not of the entry that holds it.
+                                matches.setdefault(target, []).append((artifact, pattern))
 
         for target in sorted(matches):
             if target in seen_paths:
                 continue
             seen_paths.add(target)
             claimants = matches[target]
-            # Attributed to the most specific claim, which is the artifact with the fewest
-            # path patterns, so a file is reported under the entry that names it rather
-            # than under a directory glob that happened to include it.
-            primary = sorted(claimants, key=lambda a: (len(a["paths"]), a["id"]))[0]
-            withhold = any(a.get("sensitivity") == "secret" for a in claimants)
+            # Attributed to the most specific claim, so a file is reported under the entry
+            # that names it rather than under a directory glob that happened to include it.
+            #
+            # This was the artifact with the fewest path patterns, which is a proxy and the
+            # wrong way round: an entry holding one broad glob over a directory has fewer
+            # patterns than an entry whose pattern names the file. A chat transcript was
+            # therefore attributed to the home tree containing it and reported with category
+            # config, while the analyzer, which ranks by the pattern, disagreed. See
+            # pattern_specificity and ADR 0025.
+            primary = sorted(claimants, key=lambda c: claim_order(c[0], c[1]))[0][0]
+            withhold = any(a.get("sensitivity") == "secret" for a, _ in claimants)
             entry = collect_file(
                 primary,
                 target,
@@ -9632,7 +9712,7 @@ def run(args: argparse.Namespace) -> dict:
             )
             # One artifact can claim the same path through two of its own patterns, which
             # is not a second claim and must not produce a one-element list.
-            claimant_ids = sorted({a["id"] for a in claimants})
+            claimant_ids = sorted({a["id"] for a, _ in claimants})
             if len(claimant_ids) > 1:
                 entry["artifact_ids"] = claimant_ids
             entries.append(entry)

@@ -8872,18 +8872,33 @@ function ConvertTo-CanonicalJson {
     if ($Value -is [System.Collections.IDictionary]) {
         if ($Value.Count -eq 0) { return '{}' }
         $parts = [System.Collections.Generic.List[string]]::new()
-        # Entries are enumerated rather than looked up by key. An OrderedDictionary exposes
-        # both an [object] and an [int] indexer, and Sort-Object hands keys back wrapped in
-        # PSObject, so $Value[$key] cannot resolve the overload and throws "Argument types
-        # do not match" at runtime. Enumerating sidesteps the indexer entirely.
+        # Keys are sorted by code point, which is what Python's json.dumps(sort_keys=True)
+        # does, and this is not what it looked like.
         #
-        # -CaseSensitive gives an ordinal sort, matching Python's sort by code point. A
-        # culture-aware sort would order keys differently on a machine with another locale,
-        # and the manifest would stop being comparable between two collections.
-        $entries = @($Value.GetEnumerator()) | Sort-Object -Property Key -CaseSensitive
-        foreach ($entry in $entries) {
-            $rendered = ConvertTo-CanonicalJson -Value $entry.Value -Indent ($Indent + 2)
-            $parts.Add($padInner + (ConvertTo-JsonString ([string]$entry.Key)) + ': ' + [string]$rendered)
+        # It was `Sort-Object -Property Key -CaseSensitive`, under a comment saying that
+        # gives an ordinal sort. It does not: -CaseSensitive makes the comparison
+        # case-sensitive and leaves it culture-aware, which this same file states correctly
+        # thirteen hundred lines further down in Sort-Ordinal. With alphanumeric keys the
+        # two orders happen to agree, so the parity check never saw it. A key beginning with
+        # punctuation is where they part: a culture-aware sort put "$VAR/..." last and
+        # "/etc/..." first, and Python puts them the other way round, because "$" is U+0024
+        # and "/" is U+002F. A manifest whose key order depends on the machine's locale is
+        # not the same document from two collections of one host.
+        #
+        # Entries are copied into a dictionary rather than looked up on the original. An
+        # OrderedDictionary exposes both an [object] and an [int] indexer and a key that has
+        # been through the pipeline comes back wrapped in PSObject, so $Value[$key] cannot
+        # resolve the overload and throws "Argument types do not match" at runtime.
+        $byKey = [System.Collections.Generic.Dictionary[string, object]]::new(
+            [System.StringComparer]::Ordinal)
+        $keys = [System.Collections.Generic.List[string]]::new()
+        foreach ($entry in @($Value.GetEnumerator())) {
+            $byKey[[string]$entry.Key] = $entry.Value
+            $keys.Add([string]$entry.Key)
+        }
+        foreach ($key in (Sort-Ordinal -Items $keys)) {
+            $rendered = ConvertTo-CanonicalJson -Value $byKey[$key] -Indent ($Indent + 2)
+            $parts.Add($padInner + (ConvertTo-JsonString $key) + ': ' + [string]$rendered)
         }
         return "{`n" + [string]::Join(",`n", $parts) + "`n" + $pad + '}'
     }
@@ -9309,6 +9324,65 @@ function Expand-VsCodeUser {
         $out.Add([string]::Join('/', $parts))
     }
     return ,$out
+}
+
+function Get-PatternRootRank {
+    <#
+    .SYNOPSIS
+        How well this collector can say where a pattern's root is. Higher is better.
+    .DESCRIPTION
+        Mirrors collect.py's root_rank, and the two must agree: a bundle and a directly read
+        tree attributing one file differently cost a whole chat transcript once.
+
+        2  a directory this collector can name: ~, a Windows placeholder, an absolute path.
+        1  a working copy, whose location is not in the catalogue but is recorded in the
+           agent's own state and substituted here.
+        0  a root nothing locates: a plugin or marketplace directory, or a tree relocated by
+           a variable.
+
+        The middle and the bottom are both substituted with the same recorded working
+        copies, which is why they are told apart: a pattern written for a plugin root and
+        matched at a working copy root was matched somewhere it was not written for.
+    #>
+    param([string] $Pattern)
+
+    $head = ($Pattern -replace '\\', '/').Split('/')[0]
+    if ($head.StartsWith('<')) {
+        if ($head -ceq '<project>' -or $head -ceq '<repo-root>' -or $head -ceq '<repo_root>') {
+            return 1
+        }
+        return 0
+    }
+    if ($head.StartsWith('$')) { return 0 }
+    return 2
+}
+
+function Get-PatternLiteralLength {
+    <#
+    .SYNOPSIS
+        How many literal characters a catalogue pattern spells below its root.
+    .DESCRIPTION
+        Mirrors collect.py's pattern_specificity. The count is over the part below the root,
+        because the root is a placeholder in one entry and a literal in another and counting
+        it would compare two different things. A '**' segment counts nothing, and inside a
+        segment a placeholder and a wildcard count nothing.
+    #>
+    param([string] $Pattern)
+
+    $text = $Pattern -replace '\\', '/'
+    $head = $text.Split('/')[0]
+    $body = $text
+    if ($head.StartsWith('<') -or $head.StartsWith('$') -or $head -ceq '~' -or
+        ($head.StartsWith('%') -and $head.EndsWith('%'))) {
+        $index = $text.IndexOf('/')
+        if ($index -lt 0) { $body = '' } else { $body = $text.Substring($index + 1) }
+    }
+    $literal = 0
+    foreach ($segment in $body.Split('/')) {
+        if ($segment -ceq '' -or $segment -ceq '**') { continue }
+        $literal += ([regex]::Replace($segment, '<[^>]*>|\*', '')).Length
+    }
+    return $literal
 }
 
 function Expand-CataloguePath {
@@ -10297,7 +10371,13 @@ function Invoke-Collection {
                                 if (-not $matches.Contains($target)) {
                                     $matches[$target] = [System.Collections.Generic.List[object]]::new()
                                 }
-                                [void]([System.Collections.Generic.List[object]]$matches[$target]).Add($artifact)
+                                # The catalogue pattern travels with the claim, because a
+                                # claim's specificity is a property of the pattern that
+                                # matched and not of the entry that holds it.
+                                $claim = [ordered]@{}
+                                $claim['artifact'] = $artifact
+                                $claim['pattern'] = [string]$pattern
+                                [void]([System.Collections.Generic.List[object]]$matches[$target]).Add($claim)
                             }
                         }
                     }
@@ -10311,16 +10391,24 @@ function Invoke-Collection {
             if (-not $seenPaths.Add([string]$target)) { continue }
             $claimants = [System.Collections.Generic.List[object]]$matches[[string]$target]
 
-            # Attributed to the most specific claim, the artifact with the fewest path
-            # patterns, so a file is reported under the entry that names it rather than
-            # under a directory glob that happened to include it.
-            $primary = ($claimants | Sort-Object -Property `
-                @{ Expression = { @($_.paths).Count } }, `
-                @{ Expression = { [string]$_.id } })[0]
+            # Attributed to the most specific claim, so a file is reported under the entry
+            # that names it rather than under a directory glob that happened to include it.
+            #
+            # This was the artifact with the fewest path patterns, which is a proxy and the
+            # wrong way round: an entry holding one broad glob over a directory has fewer
+            # patterns than an entry whose pattern names the file. Mirrors collect.py's
+            # claim_order, including the id being the last key rather than the second. See
+            # ADR 0025.
+            $ranked = $claimants | Sort-Object -CaseSensitive -Property `
+                @{ Expression = { -(Get-PatternLiteralLength ([string]$_['pattern'])) } }, `
+                @{ Expression = { -(Get-PatternRootRank ([string]$_['pattern'])) } }, `
+                @{ Expression = { [string]$_['artifact'].id } }
+            $primary = @($ranked)[0]['artifact']
 
             $withhold = $false
             $claimantIds = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::Ordinal)
-            foreach ($claimant in $claimants) {
+            foreach ($claim in $claimants) {
+                $claimant = $claim['artifact']
                 if ([string]$claimant.sensitivity -ceq 'secret') { $withhold = $true }
                 [void]$claimantIds.Add([string]$claimant.id)
             }
@@ -10749,6 +10837,34 @@ function Invoke-SelfTest {
     [void]$nulls.Add('x')
     [void]$nulls.Add($null)
     $cases['nulls_in_list'] = $nulls
+
+    # The claimant-ranking rule, computed by this file's own functions. The Python side
+    # computes the same patterns with collect.py's and compares, so this is the two
+    # implementations checked against each other rather than both against a constant.
+    #
+    # The rule decides which catalogue entry a file is reported under, and that decides
+    # whether the analyzer finds a parser for it. The two collectors disagreeing here would
+    # be a bundle that reads differently depending on which one took it, which is the same
+    # class of failure as the serializer parity above. See ADR 0025.
+    $specificity = [ordered]@{}
+    foreach ($pattern in @(
+        '~/.claude/CLAUDE.md',
+        '<project>/.claude/CLAUDE.md',
+        '<project>/**/CLAUDE.md',
+        '<project>/.mcp.json',
+        '<plugin-root>/.mcp.json',
+        '~/.gemini/',
+        '~/.gemini/tmp/<hash>/chats/*.jsonl',
+        '$CLAUDE_CONFIG_DIR/.claude.json',
+        '%APPDATA%\Block\goose\data\sessions\sessions.db',
+        '/etc/claude-code/managed-settings.json'
+    )) {
+        $pair = [System.Collections.Generic.List[object]]::new()
+        [void]$pair.Add([int](Get-PatternLiteralLength -Pattern $pattern))
+        [void]$pair.Add([int](Get-PatternRootRank -Pattern $pattern))
+        $specificity[[string]$pattern] = $pair
+    }
+    $cases['pattern_specificity'] = $specificity
 
     # Written to the console rather than to the output stream. A function that both emits
     # with Write-Output and returns a value returns all of it as one collection, and the

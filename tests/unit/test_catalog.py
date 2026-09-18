@@ -643,3 +643,73 @@ def test_the_parser_field_says_what_actually_reads_the_artifact() -> None:
             )
 
     assert not wrong, wrong
+
+
+# ------------------------------------------- the rule that picks a file's primary claimant
+
+
+def test_the_two_specificity_rules_agree_on_every_catalogue_path() -> None:
+    """The collector and the analyzer rank claimants by one rule implemented twice.
+
+    They have to agree on every path in the catalogue, because the winner decides which
+    entry a file is reported under and that decides whether a parser is found for it. The
+    two disagreeing cost one agent's whole chat transcript, in a bundle where the winning
+    entry had no parser behind it. See ADR 0025.
+
+    Asserted over the catalogue rather than over a handful of examples, so a new path shape
+    that the two read differently fails here rather than in a case.
+    """
+    from agentforensics.ingest.match import _root_rank
+
+    collect = _load_collector()
+    catalogue = load_catalogue(CATALOG_DIR)
+    checked = 0
+    for artifact in catalogue.artifacts:
+        for path in artifact.paths:
+            assert collect.root_rank(path) == _root_rank(path), path
+            checked += 1
+    assert checked > 1000, "the whole catalogue, not a sample"
+
+
+def test_a_pattern_that_names_a_file_beats_one_that_names_its_directory() -> None:
+    """The defect the rule replaced.
+
+    The primary claimant used to be the artifact with the fewest path patterns, which is
+    the wrong way round: an entry holding one broad glob over a directory has fewer
+    patterns than an entry whose pattern names the file. A chat transcript was therefore
+    reported under the home tree that contains it, with category config.
+    """
+    collect = _load_collector()
+    tree = collect.pattern_specificity("~/.gemini/")
+    chats = collect.pattern_specificity("~/.gemini/tmp/<hash>/chats/*.jsonl")
+    assert chats > tree, "the pattern that names the file is the more specific claim"
+
+
+def test_a_placeholder_root_loses_to_a_root_that_can_be_named() -> None:
+    """Literal characters alone cannot tell these apart, and they are not the same claim.
+
+    `~/.claude/CLAUDE.md` and `<project>/.claude/CLAUDE.md` both spell sixteen literal
+    characters. The first names one directory; the second matches any directory on the
+    disk. Ranking them equal left the tie to the artifact id, so the user's own instruction
+    file came out at project scope.
+    """
+    collect = _load_collector()
+    user = collect.pattern_specificity("~/.claude/CLAUDE.md")
+    project = collect.pattern_specificity("<project>/.claude/CLAUDE.md")
+    assert user[0] == project[0], "the same literal length, which is the whole problem"
+    assert user > project
+
+
+def test_a_plugin_root_loses_to_a_working_copy_root() -> None:
+    """Both are substituted with the recorded working copies, and they are not the same.
+
+    A pattern written for a plugin root and matched at a working copy root was matched
+    somewhere it was not written for. Without this, a project's own MCP server
+    configuration was reported as a plugin manifest: `<project>/.mcp.json` and
+    `<plugin-root>/.mcp.json` spell the same nine characters and only the root separates
+    them.
+    """
+    collect = _load_collector()
+    assert collect.pattern_specificity("<project>/.mcp.json") > collect.pattern_specificity(
+        "<plugin-root>/.mcp.json"
+    )

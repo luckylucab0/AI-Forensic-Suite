@@ -67,16 +67,30 @@ The costs, named:
   treats as a defect. It is made visible rather than avoided: the report lists every one and
   the case carries the record. If that list is ever long, the answer is to fix the catalogue
   entry whose claim is too broad, not to grow the fallback.
-- **The collector still uses its own rule,** so a manifest can still name a container entry
-  as the attribution and give a transcript the category `config`. The fallback keeps that
-  from costing evidence, but it does not make the manifest right, and a manifest is what a
-  second tool reads. One rule, specified once and implemented in both, is still outstanding.
+- **The rule is implemented three times,** in `collector/collect.py`, in
+  `collector/collect.ps1` and in `src/agentforensics/ingest/match.py`, because the two
+  collectors are single dependency-free files by design and cannot import the analyzer. The
+  price is drift, and it is paid for with two checks rather than with hope: a unit test
+  compares the collector's root ranking against the analyzer's over every path in the
+  catalogue, and the collectors' self-test parity case compares the two collectors' own
+  answers for the pattern shapes that have actually decided an attribution.
 - **The ranking change moves attribution for files nobody has looked at yet.** Both
   claimants are still recorded and the fallback still applies, so the exposure is a label
   rather than a loss, but a tie broken differently is a different answer.
 
 We revisit this if the fallback starts carrying real traffic. A handful of files means a
 few catalogue entries to tighten. A hundred means the specificity rule is wrong.
+
+## What it found on the way
+
+Adding the parity case to the collectors' self test failed immediately, on key order rather
+than on the rule: the PowerShell serializer sorted object keys with
+`Sort-Object -CaseSensitive`, under a comment claiming that is an ordinal sort. It is not,
+it is a case-sensitive culture-aware sort, which the same file states correctly further down
+in its own `Sort-Ordinal` helper. Every key in the manifest is alphanumeric, so the two
+orders agreed and eleven parity cases never saw it. A key beginning with punctuation is
+where they part. A manifest whose key order depends on the machine's locale is not the same
+document taken twice from one host, so the serializer sorts by code point now.
 
 ## Alternatives considered
 
