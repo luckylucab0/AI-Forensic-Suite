@@ -27,6 +27,7 @@ same events from the same content written both ways.
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -339,10 +340,13 @@ def test_the_windows_newline_switch_is_doing_something(
     """
     translated = tmp_path / "translated.txt"
     translated.write_text("one\ntwo\n", encoding="utf-8")
-    if request.config.getoption("--windows-newlines"):
-        assert translated.read_bytes() == b"one\r\ntwo\r\n"
-    else:
-        assert translated.read_bytes() == b"one\ntwo\n"
+    # On Windows a text-mode write already translates, which is the behaviour the flag
+    # reproduces everywhere else, so CRLF is the right expectation there in both modes.
+    # The first version of this test asserted LF whenever the flag was off and therefore
+    # failed on the one runner it was written to protect, which is the same platform
+    # assumption it exists to catch.
+    translating = request.config.getoption("--windows-newlines") or os.name == "nt"
+    assert translated.read_bytes() == (b"one\r\ntwo\r\n" if translating else b"one\ntwo\n")
 
     # A caller that says what it wants gets it, on every platform and in both modes. This
     # is the spelling every fixture that is later compared byte for byte has to use.
