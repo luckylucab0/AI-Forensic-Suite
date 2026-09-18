@@ -116,7 +116,11 @@ it cannot be rewritten *quietly*.
   a time or as text, and every event it produces states that this is an uninterpreted
   reading. So a chat database nobody has a verified schema for is visible evidence somebody
   still has to look at, instead of a file the case merely says existed. A verified
-  per-agent parser placed ahead of it takes an artifact over, one schema at a time. Beside
+  per-agent parser placed ahead of it takes an artifact over, one schema at a time, and
+  opencode is the first: its module maps the three tables whose schema was read against the
+  vendor's own generated migration and hands every other table, including the older message
+  pair, back to the uninterpreted reading, so a store is never half read with the other half
+  silently absent. Beside
   it sits a second format-shaped module, `instructions/`, for the instruction surface: the
   sixty-three catalogue artifacts that hold skills, commands, output styles, rules, steering
   files and hook scripts. It reads each file whole, tells the scope apart from the working

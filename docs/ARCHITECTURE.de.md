@@ -125,7 +125,11 @@ ist, dass das nicht *unbemerkt* geht.
   uninterpretierte Lesung ist. Damit ist eine Chat-Datenbank, für die es noch kein
   geprüftes Schema gibt, sichtbares Material, das jemand noch ansehen muss, und nicht bloß
   eine Datei, deren Existenz der Fall vermerkt. Ein geprüfter Parser für einen einzelnen
-  Agenten, der davor eingeordnet wird, übernimmt ein Artefakt, ein Schema auf einmal.
+  Agenten, der davor eingeordnet wird, übernimmt ein Artefakt, ein Schema auf einmal, und
+  opencode ist das erste: dessen Modul bildet die drei Tabellen ab, deren Schema gegen die
+  generierte Migration des Herstellers gelesen wurde, und gibt jede andere Tabelle, auch das
+  ältere Message-Paar, an die uninterpretierte Lesung zurück. Ein Speicher ist damit nie halb
+  gelesen, während die andere Hälfte stillschweigend fehlt.
   Daneben liegt ein zweites formatbezogenes Modul, `instructions/`, für den
   Anweisungsbestand: die dreiundsechzig Katalogartefakte mit Skills, Commands, Output
   Styles, Regeln, Steering-Dateien und Hook-Skripten. Es liest jede Datei ganz, unterscheidet

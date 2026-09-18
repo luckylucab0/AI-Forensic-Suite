@@ -183,27 +183,39 @@ class SqliteGenericParser:
     def _rows(
         self, context: ParseContext, connection: sqlite3.Connection, table: Table
     ) -> Iterator[Event]:
-        for locator, values, problem in rows_of(connection, table):
-            ts, precision, source, note = literal_time(values)
-            problems = [problem or _UNINTERPRETED]
-            if note:
-                problems.append(note)
-            yield unparsed(
-                context.provenance(locator),
-                context.agent,
-                values or None,
-                " ".join(problems),
-                ts_utc=ts,
-                ts_precision=precision,
-                # Named so the difference between the agent's own clock and a column that
-                # merely looks like a time stays visible in the case.
-                ts_source=f"the column named {source}" if ts and source else None,
-                user=context.user,
-                host=context.host,
-                session_id=_literal(values, _SESSION_COLUMNS),
-                project_path=_literal(values, _PROJECT_COLUMNS),
-                payload={"table": table.name, "text": literal_text(values)},
-            )
+        yield from rows_as_events(context, connection, table)
+
+
+def rows_as_events(
+    context: ParseContext, connection: sqlite3.Connection, table: Table
+) -> Iterator[Event]:
+    """One table, uninterpreted, as events.
+
+    Module level rather than a method because an agent-specific parser needs it too: it maps
+    the tables whose schema somebody verified and hands every other table here, so a store
+    is never half read with the other half silently absent.
+    """
+    for locator, values, problem in rows_of(connection, table):
+        ts, precision, source, note = literal_time(values)
+        problems = [problem or _UNINTERPRETED]
+        if note:
+            problems.append(note)
+        yield unparsed(
+            context.provenance(locator),
+            context.agent,
+            values or None,
+            " ".join(problems),
+            ts_utc=ts,
+            ts_precision=precision,
+            # Named so the difference between the agent's own clock and a column that
+            # merely looks like a time stays visible in the case.
+            ts_source=f"the column named {source}" if ts and source else None,
+            user=context.user,
+            host=context.host,
+            session_id=_literal(values, _SESSION_COLUMNS),
+            project_path=_literal(values, _PROJECT_COLUMNS),
+            payload={"table": table.name, "text": literal_text(values)},
+        )
 
 
 def _literal(values: dict[str, Any], columns: tuple[str, ...]) -> str | None:
@@ -217,4 +229,4 @@ def _literal(values: dict[str, Any], columns: tuple[str, ...]) -> str | None:
     return None
 
 
-__all__ = ["INVENTORY_ONLY", "STORES", "SqliteGenericParser"]
+__all__ = ["INVENTORY_ONLY", "STORES", "SqliteGenericParser", "rows_as_events"]

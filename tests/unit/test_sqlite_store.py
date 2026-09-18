@@ -28,7 +28,7 @@ from pathlib import Path
 import pytest
 
 from agentforensics.catalog import load_catalogue
-from agentforensics.parsers import for_artifact
+from agentforensics.parsers import PARSERS, for_artifact
 from agentforensics.parsers.base import ParseContext
 from agentforensics.parsers.sqlite_generic import INVENTORY_ONLY, STORES
 from agentforensics.parsers.sqlite_store import (
@@ -53,19 +53,19 @@ def store(path: Path, statements: list[str]) -> Path:
     return path
 
 
-def context(path: Path, artifact_id: str = "opencode.db") -> ParseContext:
+def context(path: Path, artifact_id: str = "goose.sessions_db") -> ParseContext:
     return ParseContext(
         bundle_uuid="b1",
-        original_path="/home/alice/.local/share/opencode/opencode.db",
+        original_path="/home/alice/.local/share/goose/sessions.db",
         local_path=path,
         sha256="aa",
         artifact_id=artifact_id,
-        agent="opencode",
+        agent="goose",
         user="alice",
     )
 
 
-def parse(path: Path, artifact_id: str = "opencode.db") -> list:
+def parse(path: Path, artifact_id: str = "goose.sessions_db") -> list:
     parser = for_artifact(artifact_id)
     assert parser is not None, artifact_id
     return list(parser.parse(context(path, artifact_id)))
@@ -429,9 +429,19 @@ def test_every_inventory_only_store_is_one_of_the_claimed_ones() -> None:
 
 
 @pytest.mark.parametrize("artifact_id", sorted(STORES))
-def test_each_claimed_store_resolves_to_the_generic_parser(artifact_id: str) -> None:
-    """Placed last in PARSERS, so a verified schema parser can take one over later without
-    this set having to change."""
+def test_every_claimed_store_is_read_by_something(artifact_id: str) -> None:
+    """Either by the generic reader or by a parser with a verified schema placed ahead of it.
+
+    The set does not shrink when one is taken over, and that is the point: the generic
+    reader goes on claiming every SQLite artifact, so the drift test above keeps working,
+    while a verified parser decides what a store's rows mean. What must never happen is a
+    store that neither reads.
+    """
     parser = for_artifact(artifact_id)
     assert parser is not None
-    assert parser.name == "sqlite_generic"
+    if parser.name != "sqlite_generic":
+        generic = next(p for p in PARSERS if p.name == "sqlite_generic")
+        assert generic.handles(artifact_id), (
+            f"{artifact_id} was taken over by {parser.name} and dropped out of the generic "
+            "reader's set, so adding a SQLite store to the catalogue would stop failing here"
+        )

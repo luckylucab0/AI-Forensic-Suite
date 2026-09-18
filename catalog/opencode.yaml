@@ -280,7 +280,7 @@ artifacts:
     Windows path correction from the source verification pass, same cause as the log entry: the data directory has no LOCALAPPDATA branch, so the database sits under the profile's .local/share on Windows too. Re-sourced at the same time: the page previously cited holds only the table definitions and constructs no path, while the database module joins the data directory with opencode.db and with the channel-suffixed spelling. The -wal and -shm sidecars are named in no vendor source and follow from the journal mode, so they are marked unsourced.
 
     The tables and the credential columns are the generated schema the agent creates the database from, at https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/database/schema.gen.ts. Four of them answer most questions: session carries the working directory, the agent, the model, the token counts and the archive time; session_input holds the user's prompt verbatim with the time it was admitted; message and part hold the turns, each with a JSON data column. The credential columns are named so an export can redact them, and the file is still collected in full: the conversations and the tokens live in one container, and withholding it to protect the tokens would throw away the evidence.
-  parser: sqlite_generic
+  parser: opencode
 - id: opencode.legacy_json_storage
   category: transcript
   root: user_profile
