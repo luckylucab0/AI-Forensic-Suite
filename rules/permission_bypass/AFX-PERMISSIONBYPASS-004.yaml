@@ -1,0 +1,97 @@
+id: AFX-PERMISSIONBYPASS-004
+pack: permission_bypass
+title: An instruction document granted itself the right to run commands
+severity: medium
+description: >
+  A skill, command, workflow or agent definition on the endpoint declares the tools it may
+  use in its own front matter, and the declared set includes command execution or a
+  wildcard. The vendors spell this key allowed-tools, allowedTools, tools or permissions
+  depending on the product; the parser lifts whichever is present onto the event.
+rationale: >
+  This is a permission change written as a document rather than as a setting, which is why
+  it is easy to miss: an analyst checking what the agent was allowed to do reads the
+  settings files, and a skill that grants itself a shell is not in them. It also travels.
+  A skill file arrives with a checkout or with an installed plugin, so whoever could write
+  to that repository or publish that plugin decided what the agent may run, and the person
+  operating the agent was never asked.
+applies_to:
+  kinds: [instruction.source]
+match:
+  any:
+    # Command execution, under the names the products actually use for it.
+    - field: payload.declared_tools[]
+      regex_any:
+        - '(?i)^(bash|shell|sh|zsh|powershell|cmd|terminal)\b'
+        - '(?i)^(execute|exec|run)(_|-)?(command|shell|bash|script)?$'
+        - '(?i)^(kill)(_|-)?(bash|shell)$'
+    # Everything, however the document spells it.
+    - field: payload.declared_tools[]
+      equals_any: ["*", "all", "any", "Bash(*)", "*:*"]
+tags:
+  - permission-bypass
+  - T1059
+  - supply-chain
+false_positives:
+  - >-
+    A deploy or build skill the team wrote on purpose, which needs a shell to do its job and
+    declares it honestly. This is the common case, which is why the rule is medium: the
+    finding says a document holds the grant, not that the grant is wrong.
+  - >-
+    A skill shipped by the vendor's own marketplace, where the grant was reviewed by whoever
+    published it rather than by the user.
+tests:
+  - name: a skill that grants itself a shell
+    match: true
+    event:
+      kind: instruction.source
+      agent: claude_code
+      payload:
+        scope: project
+        declared_name: deploy
+        declared_tools: [Bash, Write]
+        text: "Run the deploy script."
+  - name: a document that grants itself everything
+    match: true
+    event:
+      kind: instruction.source
+      agent: windsurf
+      payload:
+        scope: user
+        declared_tools: ["*"]
+        text: "Do as asked."
+  - name: a wildcard written the way a settings file spells it
+    match: true
+    event:
+      kind: instruction.source
+      agent: cline
+      payload:
+        scope: project
+        declared_tools: ["Bash(*)"]
+        text: "Ship it."
+  - name: a skill that only reads
+    match: false
+    event:
+      kind: instruction.source
+      agent: claude_code
+      payload:
+        scope: project
+        declared_name: summarise
+        declared_tools: [Read, Grep]
+        text: "Summarise the file."
+  - name: an instruction file that declares no tools at all
+    match: false
+    event:
+      kind: instruction.source
+      agent: claude_code
+      payload:
+        scope: project
+        text: "When asked to build, run make."
+  - name: a tool whose name merely contains the word bash
+    match: false
+    event:
+      kind: instruction.source
+      agent: claude_code
+      payload:
+        scope: user
+        declared_tools: [NotebookBashless]
+        text: "Read the notebook."

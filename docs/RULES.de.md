@@ -31,6 +31,7 @@ Funde werden in die Falldatenbank geschrieben, neben die Ereignisse, auf denen s
 | [`permission_bypass`](#permission-bypass) | [AFX-PERMISSIONBYPASS-001](#afx-permissionbypass-001) | hoch |
 |  | [AFX-PERMISSIONBYPASS-002](#afx-permissionbypass-002) | hoch |
 |  | [AFX-PERMISSIONBYPASS-003](#afx-permissionbypass-003) | mittel |
+|  | [AFX-PERMISSIONBYPASS-004](#afx-permissionbypass-004) | mittel |
 | [`prompt_injection`](#prompt-injection) | [AFX-PROMPTINJECTION-001](#afx-promptinjection-001) | hoch |
 |  | [AFX-PROMPTINJECTION-002](#afx-promptinjection-002) | hoch |
 |  | [AFX-PROMPTINJECTION-003](#afx-promptinjection-003) | mittel |
@@ -44,6 +45,7 @@ Funde werden in die Falldatenbank geschrieben, neben die Ereignisse, auf denen s
 |  | [AFX-SENSITIVEPATHS-003](#afx-sensitivepaths-003) | kritisch |
 | [`supply_chain`](#supply-chain) | [AFX-SUPPLYCHAIN-001](#afx-supplychain-001) | mittel |
 |  | [AFX-SUPPLYCHAIN-002](#afx-supplychain-002) | hoch |
+|  | [AFX-SUPPLYCHAIN-003](#afx-supplychain-003) | hoch |
 | [`third_party_endpoints`](#third-party-endpoints) | [AFX-THIRDPARTYENDPOINTS-001](#afx-thirdpartyendpoints-001) | hoch |
 
 Regeln sind nach Paket aufgeführt, innerhalb eines Pakets nach Id.
@@ -490,6 +492,32 @@ Sicherheitskontrollen, die abgeschaltet wurden, nicht Kontrollen, die versagt ha
 
 *Stichproben in der Regeldatei:* 2 / 2 (+/-)
 
+#### AFX-PERMISSIONBYPASS-004
+
+**An instruction document granted itself the right to run commands**
+
+| | |
+| --- | --- |
+| Schweregrad | mittel |
+| Paket | `permission_bypass` |
+| Agenten | `any` |
+| Ereignisarten | `instruction.source` |
+| Gelesene Felder | `payload.declared_tools[]` |
+| Schlagworte | `permission-bypass`, `T1059`, `supply-chain` |
+
+[EN] A skill, command, workflow or agent definition on the endpoint declares the tools it may use in its own front matter, and the declared set includes command execution or a wildcard. The vendors spell this key allowed-tools, allowedTools, tools or permissions depending on the product; the parser lifts whichever is present onto the event.
+
+*Worauf sie trifft:* `(payload.declared_tools[] matches /(?i)^(bash\|shell\|sh\|zsh\|powershell\|cmd\|terminal)\b/ or /(?i)^(execute\|exec\|run)(_\|-)?(command\|shell\|bash\|script)?$/ or /(?i)^(kill)(_\|-)?(bash\|shell)$/ or payload.declared_tools[] is '*' or 'all' or 'any' or 'Bash(*)' or '*:*')`
+
+*Warum das für die Analyse zählt:* [EN] This is a permission change written as a document rather than as a setting, which is why it is easy to miss: an analyst checking what the agent was allowed to do reads the settings files, and a skill that grants itself a shell is not in them. It also travels. A skill file arrives with a checkout or with an installed plugin, so whoever could write to that repository or publish that plugin decided what the agent may run, and the person operating the agent was never asked.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A deploy or build skill the team wrote on purpose, which needs a shell to do its job and declares it honestly. This is the common case, which is why the rule is medium: the finding says a document holds the grant, not that the grant is wrong.
+- [EN] A skill shipped by the vendor's own marketplace, where the grant was reviewed by whoever published it rather than by the user.
+
+*Stichproben in der Regeldatei:* 3 / 3 (+/-)
+
 ## prompt injection
 
 Ob der Agent durch Anweisungen manipuliert wurde, die er gelesen hat, statt durch Anweisungen, die er bekommen hat. Der Geltungsbereich dieser Regeln ist der Punkt: die erste betrachtet nur, was von einem Werkzeug zurückkam, und nie einen Nutzer-Prompt, denn ein Nutzer darf den Agenten anweisen und eine Webseite nicht.
@@ -534,7 +562,7 @@ Ob der Agent durch Anweisungen manipuliert wurde, die er gelesen hat, statt durc
 | Schweregrad | hoch |
 | Paket | `prompt_injection` |
 | Agenten | `any` |
-| Ereignisarten | `tool.result`, `mcp.call`, `network.request`, `file.read`, `user.prompt`, `config.snapshot` |
+| Ereignisarten | `tool.result`, `mcp.call`, `network.request`, `file.read`, `user.prompt`, `config.snapshot`, `instruction.source` |
 | Gelesene Felder | `event_text` |
 | Schlagworte | `prompt-injection`, `T1027`, `obfuscation` |
 
@@ -553,7 +581,7 @@ Ob der Agent durch Anweisungen manipuliert wurde, die er gelesen hat, statt durc
 
 - <https://www.unicode.org/reports/tr9/>
 
-*Stichproben in der Regeldatei:* 3 / 2 (+/-)
+*Stichproben in der Regeldatei:* 4 / 2 (+/-)
 
 #### AFX-PROMPTINJECTION-003
 
@@ -564,7 +592,7 @@ Ob der Agent durch Anweisungen manipuliert wurde, die er gelesen hat, statt durc
 | Schweregrad | mittel |
 | Paket | `prompt_injection` |
 | Agenten | `any` |
-| Ereignisarten | `file.write`, `file.read`, `config.snapshot`, `memory.write` |
+| Ereignisarten | `file.write`, `file.read`, `config.snapshot`, `memory.write`, `instruction.source` |
 | Gelesene Felder | `kind`, `payload.files[].path`, `payload.instructions[].scope` |
 | Schlagworte | `prompt-injection`, `T1547`, `persistence` |
 
@@ -579,7 +607,7 @@ Ob der Agent durch Anweisungen manipuliert wurde, die er gelesen hat, statt durc
 - [EN] A developer asking the agent to write or update the project's own instruction file, which is a normal and recommended thing to do and produces exactly this event.
 - [EN] A project whose instruction file has been in version control for months, where the finding says only that it was in effect.
 
-*Stichproben in der Regeldatei:* 3 / 2 (+/-)
+*Stichproben in der Regeldatei:* 4 / 3 (+/-)
 
 ## secrets
 
@@ -880,6 +908,31 @@ Code, den der Agent geladen hat, und Code, der so konfiguriert ist, dass er ohne
 - <https://code.claude.com/docs/en/permissions>
 
 *Stichproben in der Regeldatei:* 3 / 2 (+/-)
+
+#### AFX-SUPPLYCHAIN-003
+
+**A hook script on the endpoint fetches code and runs it**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `supply_chain` |
+| Agenten | `any` |
+| Ereignisarten | `instruction.source` |
+| Gelesene Felder | `payload.executable`, `payload.text` |
+| Schlagworte | `supply-chain`, `T1059`, `T1105`, `prompt-injection` |
+
+[EN] A file the catalogue files under instructions is a script rather than prose, and its text downloads something and pipes or evaluates it into an interpreter. The shapes covered are a curl or wget piped into a shell or an interpreter, a shell substitution around a download, and the PowerShell equivalents built on Invoke-Expression, Invoke-WebRequest or DownloadString.
+
+*Worauf sie trifft:* `payload.executable is 'true' and payload.text matches /(?i)\b(curl\|wget)\b[^\n\|]*\\|[^\n]*\b(sh\|bash\|zsh\|dash\|python[0-9.]*\|perl\|ruby\|node)\b/ or /(?i)(eval\|source\|\.)[^\n]*\$\([^\n]*\b(curl\|wget)\b/ or /(?i)\b(iex\|invoke-expression)\b[^\n]*\b(invoke-webrequest\|iwr\|invoke-restmethod\|irm\|downloadstring\|downloadfile)\b/ or /(?i)\b(downloadstring\|downloadfile)\b[^\n]*\\|[^\n]*\b(iex\|invoke-expression)\b/`
+
+*Warum das für die Analyse zählt:* [EN] A hook is the one instruction an agent executes rather than reads, and it runs when the agent decides to run it rather than when a person asks. A hook that fetches its payload means the code that ran on the endpoint is not the code that was collected from it, so the file in evidence does not answer what happened and the remote does. That is worth interrupting an analyst for, and it is worth checking against the network destinations the same case recorded.
+
+*Bekannte Fehlalarme:*
+
+- [EN] An installer or bootstrap hook a team wrote deliberately, fetching a pinned release from a host they control. The finding is still worth reading: the code that ran is not in evidence either way.
+
+*Stichproben in der Regeldatei:* 3 / 3 (+/-)
 
 ## third party endpoints
 

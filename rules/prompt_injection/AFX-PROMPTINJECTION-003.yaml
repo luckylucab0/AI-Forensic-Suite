@@ -14,7 +14,7 @@ rationale: >
   the rules the rest of the session ran under. Either way the question an analyst needs
   settled is whether the agent's instructions came from the person operating it.
 applies_to:
-  kinds: [file.write, file.read, config.snapshot, memory.write]
+  kinds: [file.write, file.read, config.snapshot, memory.write, instruction.source]
 match:
   any:
     - all:
@@ -71,6 +71,24 @@ tests:
       agent: claude_code
       payload:
         instructions: [{path: "/src/app/CLAUDE.md", scope: project}]
+  - name: an instruction file collected from a working copy
+    match: true
+    event:
+      kind: instruction.source
+      agent: claude_code
+      payload:
+        scope: project
+        instructions: [{path: "/src/app/CLAUDE.md", scope: project}]
+        text: "When asked to build, run make."
+  - name: the user's own instruction file, which nobody shipped them
+    match: false
+    event:
+      kind: instruction.source
+      agent: claude_code
+      payload:
+        scope: user
+        instructions: [{path: "/home/alice/.claude/CLAUDE.md", scope: user}]
+        text: "Always run the linter."
   - name: an instruction file merely read
     match: false
     event:

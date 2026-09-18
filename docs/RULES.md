@@ -31,6 +31,7 @@ Findings are written into the case database next to the events they rest on, and
 | [`permission_bypass`](#permission-bypass) | [AFX-PERMISSIONBYPASS-001](#afx-permissionbypass-001) | high |
 |  | [AFX-PERMISSIONBYPASS-002](#afx-permissionbypass-002) | high |
 |  | [AFX-PERMISSIONBYPASS-003](#afx-permissionbypass-003) | medium |
+|  | [AFX-PERMISSIONBYPASS-004](#afx-permissionbypass-004) | medium |
 | [`prompt_injection`](#prompt-injection) | [AFX-PROMPTINJECTION-001](#afx-promptinjection-001) | high |
 |  | [AFX-PROMPTINJECTION-002](#afx-promptinjection-002) | high |
 |  | [AFX-PROMPTINJECTION-003](#afx-promptinjection-003) | medium |
@@ -44,6 +45,7 @@ Findings are written into the case database next to the events they rest on, and
 |  | [AFX-SENSITIVEPATHS-003](#afx-sensitivepaths-003) | critical |
 | [`supply_chain`](#supply-chain) | [AFX-SUPPLYCHAIN-001](#afx-supplychain-001) | medium |
 |  | [AFX-SUPPLYCHAIN-002](#afx-supplychain-002) | high |
+|  | [AFX-SUPPLYCHAIN-003](#afx-supplychain-003) | high |
 | [`third_party_endpoints`](#third-party-endpoints) | [AFX-THIRDPARTYENDPOINTS-001](#afx-thirdpartyendpoints-001) | high |
 
 Rules are listed by pack, and within a pack by id.
@@ -488,6 +490,32 @@ A configuration snapshot holds an allow entry that is a bare tool name. The vend
 
 *Samples in the rule file:* 2 / 2 (+/-)
 
+#### AFX-PERMISSIONBYPASS-004
+
+**An instruction document granted itself the right to run commands**
+
+| | |
+| --- | --- |
+| Severity | medium |
+| Pack | `permission_bypass` |
+| Agents | `any` |
+| Event kinds | `instruction.source` |
+| Fields read | `payload.declared_tools[]` |
+| Tags | `permission-bypass`, `T1059`, `supply-chain` |
+
+A skill, command, workflow or agent definition on the endpoint declares the tools it may use in its own front matter, and the declared set includes command execution or a wildcard. The vendors spell this key allowed-tools, allowedTools, tools or permissions depending on the product; the parser lifts whichever is present onto the event.
+
+*What it matches:* `(payload.declared_tools[] matches /(?i)^(bash\|shell\|sh\|zsh\|powershell\|cmd\|terminal)\b/ or /(?i)^(execute\|exec\|run)(_\|-)?(command\|shell\|bash\|script)?$/ or /(?i)^(kill)(_\|-)?(bash\|shell)$/ or payload.declared_tools[] is '*' or 'all' or 'any' or 'Bash(*)' or '*:*')`
+
+*Why an analyst cares:* This is a permission change written as a document rather than as a setting, which is why it is easy to miss: an analyst checking what the agent was allowed to do reads the settings files, and a skill that grants itself a shell is not in them. It also travels. A skill file arrives with a checkout or with an installed plugin, so whoever could write to that repository or publish that plugin decided what the agent may run, and the person operating the agent was never asked.
+
+*Known false positives:*
+
+- A deploy or build skill the team wrote on purpose, which needs a shell to do its job and declares it honestly. This is the common case, which is why the rule is medium: the finding says a document holds the grant, not that the grant is wrong.
+- A skill shipped by the vendor's own marketplace, where the grant was reviewed by whoever published it rather than by the user.
+
+*Samples in the rule file:* 3 / 3 (+/-)
+
 ## prompt injection
 
 Whether the agent was manipulated by instructions it read rather than instructions it was given. The scope of these rules is the point: the first one looks only at what came back from a tool, never at a user prompt, because a user is entitled to instruct the agent and a web page is not.
@@ -532,7 +560,7 @@ A tool result, a fetched page or an MCP response carries text addressed to the a
 | Severity | high |
 | Pack | `prompt_injection` |
 | Agents | `any` |
-| Event kinds | `tool.result`, `mcp.call`, `network.request`, `file.read`, `user.prompt`, `config.snapshot` |
+| Event kinds | `tool.result`, `mcp.call`, `network.request`, `file.read`, `user.prompt`, `config.snapshot`, `instruction.source` |
 | Fields read | `event_text` |
 | Tags | `prompt-injection`, `T1027`, `obfuscation` |
 
@@ -551,7 +579,7 @@ A record carries zero-width characters, bidirectional overrides, or Unicode tag 
 
 - <https://www.unicode.org/reports/tr9/>
 
-*Samples in the rule file:* 3 / 2 (+/-)
+*Samples in the rule file:* 4 / 2 (+/-)
 
 #### AFX-PROMPTINJECTION-003
 
@@ -562,7 +590,7 @@ A record carries zero-width characters, bidirectional overrides, or Unicode tag 
 | Severity | medium |
 | Pack | `prompt_injection` |
 | Agents | `any` |
-| Event kinds | `file.write`, `file.read`, `config.snapshot`, `memory.write` |
+| Event kinds | `file.write`, `file.read`, `config.snapshot`, `memory.write`, `instruction.source` |
 | Fields read | `kind`, `payload.files[].path`, `payload.instructions[].scope` |
 | Tags | `prompt-injection`, `T1547`, `persistence` |
 
@@ -577,7 +605,7 @@ An instruction file was written or changed during the session, or one was read f
 - A developer asking the agent to write or update the project's own instruction file, which is a normal and recommended thing to do and produces exactly this event.
 - A project whose instruction file has been in version control for months, where the finding says only that it was in effect.
 
-*Samples in the rule file:* 3 / 2 (+/-)
+*Samples in the rule file:* 4 / 3 (+/-)
 
 ## secrets
 
@@ -878,6 +906,31 @@ A configuration snapshot holds a hook that runs a shell command, or a file write
 - <https://code.claude.com/docs/en/permissions>
 
 *Samples in the rule file:* 3 / 2 (+/-)
+
+#### AFX-SUPPLYCHAIN-003
+
+**A hook script on the endpoint fetches code and runs it**
+
+| | |
+| --- | --- |
+| Severity | high |
+| Pack | `supply_chain` |
+| Agents | `any` |
+| Event kinds | `instruction.source` |
+| Fields read | `payload.executable`, `payload.text` |
+| Tags | `supply-chain`, `T1059`, `T1105`, `prompt-injection` |
+
+A file the catalogue files under instructions is a script rather than prose, and its text downloads something and pipes or evaluates it into an interpreter. The shapes covered are a curl or wget piped into a shell or an interpreter, a shell substitution around a download, and the PowerShell equivalents built on Invoke-Expression, Invoke-WebRequest or DownloadString.
+
+*What it matches:* `payload.executable is 'true' and payload.text matches /(?i)\b(curl\|wget)\b[^\n\|]*\\|[^\n]*\b(sh\|bash\|zsh\|dash\|python[0-9.]*\|perl\|ruby\|node)\b/ or /(?i)(eval\|source\|\.)[^\n]*\$\([^\n]*\b(curl\|wget)\b/ or /(?i)\b(iex\|invoke-expression)\b[^\n]*\b(invoke-webrequest\|iwr\|invoke-restmethod\|irm\|downloadstring\|downloadfile)\b/ or /(?i)\b(downloadstring\|downloadfile)\b[^\n]*\\|[^\n]*\b(iex\|invoke-expression)\b/`
+
+*Why an analyst cares:* A hook is the one instruction an agent executes rather than reads, and it runs when the agent decides to run it rather than when a person asks. A hook that fetches its payload means the code that ran on the endpoint is not the code that was collected from it, so the file in evidence does not answer what happened and the remote does. That is worth interrupting an analyst for, and it is worth checking against the network destinations the same case recorded.
+
+*Known false positives:*
+
+- An installer or bootstrap hook a team wrote deliberately, fetching a pinned release from a host they control. The finding is still worth reading: the code that ran is not in evidence either way.
+
+*Samples in the rule file:* 3 / 3 (+/-)
 
 ## third party endpoints
 
