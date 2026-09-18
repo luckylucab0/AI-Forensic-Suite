@@ -33,6 +33,7 @@ from agentforensics.parsers.instructions import InstructionsParser
 from agentforensics.parsers.opencode import OpencodeParser
 from agentforensics.parsers.pi import PiParser
 from agentforensics.parsers.sqlite_generic import SqliteGenericParser
+from agentforensics.parsers.zed import ZedParser
 
 # Order matters only in that the first parser to claim an artifact wins, so a more specific
 # parser has to come before a general one. Kept as a tuple rather than a registry decorator
@@ -49,6 +50,7 @@ PARSERS: tuple[Parser, ...] = (
     # this one has a verified schema, so it claims opencode.db and the reader does not.
     OpencodeParser(),
     PiParser(),
+    ZedParser(),
     # Last, and it has to stay last: it claims every SQLite store in the catalogue, so a
     # verified schema parser placed after it would never be reached.
     SqliteGenericParser(),

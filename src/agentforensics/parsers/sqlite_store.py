@@ -34,6 +34,7 @@ guessing a schema would produce a case that looks answered.
 
 from __future__ import annotations
 
+import compression.zstd as zstd
 import hashlib
 import shutil
 import sqlite3
@@ -62,6 +63,18 @@ MAX_ROWS = 50_000
 # table and the rowid, so the bytes are one `sqlite3` away, and a fifty megabyte blob copied
 # into a case database would cost more than it tells anybody.
 BLOB_NOTE = "__blob__"
+
+# The first four bytes of a zstd frame, from RFC 8878 section 3.1.1. An agent that
+# compresses its transcripts this way, and at least one does, leaves a BLOB that `strings`
+# finds nothing in and a keyword search never matches. Recognising the frame is not a guess
+# about the column: the magic number says what the bytes are.
+ZSTD_MAGIC = b"\x28\xb5\x2f\xfd"
+
+# How much one compressed column is allowed to expand to. A zstd frame can be a few hundred
+# bytes and expand without limit, so a cap is not caution for its own sake: a case database
+# should not be fillable by one row of a collected file. Reaching it is reported on the
+# value rather than silently truncating what an analyst then reads as the whole thing.
+MAX_DECOMPRESSED = 64 * 1024 * 1024
 
 # The column names a row is allowed to be read for. Literal, short, and not extended by
 # guesswork: a mapping invented for a schema nobody verified produces output that looks
@@ -224,21 +237,68 @@ def _value(value: Any) -> Any:
     """One column value, as something a case can hold.
 
     Bytes that decode as UTF-8 become text, because a great many of these stores keep JSON
-    in a BLOB column and an analyst wants to read it. Bytes that do not are described by
-    hash and length instead of being carried along.
+    in a BLOB column and an analyst wants to read it. A zstd frame is decompressed first,
+    for the same reason and a stronger one: compressed content is invisible to every other
+    method an examiner has, so a store that keeps its transcripts this way reads as a store
+    with nothing in it. Bytes that are neither are described by hash and length.
     """
     if not isinstance(value, bytes):
         return value
+    if value.startswith(ZSTD_MAGIC):
+        return _unzstd(value)
     try:
         return value.decode("utf-8")
     except UnicodeDecodeError:
+        return _opaque(value, "binary column, not carried into the case")
+
+
+def _unzstd(value: bytes) -> Any:
+    """A zstd frame, decompressed, or an honest description of why it is not."""
+    try:
+        decompressor = zstd.ZstdDecompressor()
+        out = decompressor.decompress(value, max_length=MAX_DECOMPRESSED)
+    except zstd.ZstdError as exc:
+        # A frame that will not decompress is evidence of its own: a truncated file, or a
+        # column that only begins like one.
+        return _opaque(value, f"a zstd frame that could not be decompressed: {exc}")
+    if not decompressor.eof and len(out) < MAX_DECOMPRESSED:
+        # The frame ended before the frame did. A column cut short, or four bytes that only
+        # look like a frame. Told apart from hitting the cap below, because one is damaged
+        # evidence and the other is this reader's own limit, and reporting either as the
+        # other would send an analyst after the wrong thing.
+        return _opaque(
+            value,
+            "an incomplete zstd frame: it decompressed without error and stopped before "
+            "the end of the frame, so the column is truncated or is not a frame at all",
+        )
+    try:
+        text = out.decode("utf-8")
+    except UnicodeDecodeError:
+        return _opaque(
+            value,
+            "a zstd frame whose contents are not UTF-8, so the compressed bytes are "
+            "recorded rather than their expansion",
+        )
+    if not decompressor.eof:
         return {
             BLOB_NOTE: True,
             "bytes": len(value),
             "sha256": hashlib.sha256(value).hexdigest(),
-            "note": "binary column, not carried into the case. The row's provenance names "
-            "the file, the table and the rowid.",
+            "note": f"a zstd frame that expands past the ingest limit of "
+            f"{MAX_DECOMPRESSED} bytes. The first part of it is in text; the rest has not "
+            "been read",
+            "text": text,
         }
+    return text
+
+
+def _opaque(value: bytes, why: str) -> dict[str, Any]:
+    return {
+        BLOB_NOTE: True,
+        "bytes": len(value),
+        "sha256": hashlib.sha256(value).hexdigest(),
+        "note": f"{why}. The row's provenance names the file, the table and the rowid.",
+    }
 
 
 def literal_time(
@@ -278,8 +338,10 @@ def describe(context: ParseContext, store_problem: str) -> Event:
 
 __all__ = [
     "BLOB_NOTE",
+    "MAX_DECOMPRESSED",
     "MAX_ROWS",
     "SIBLINGS",
+    "ZSTD_MAGIC",
     "StoreError",
     "Table",
     "describe",

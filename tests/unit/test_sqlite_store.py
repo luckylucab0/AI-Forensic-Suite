@@ -445,3 +445,86 @@ def test_every_claimed_store_is_read_by_something(artifact_id: str) -> None:
             f"{artifact_id} was taken over by {parser.name} and dropped out of the generic "
             "reader's set, so adding a SQLite store to the catalogue would stop failing here"
         )
+
+
+# ------------------------------------------------------- compressed content
+
+
+def test_a_zstd_column_is_decompressed(tmp_path: Path) -> None:
+    """The worst shape a store can have for this tool, and one agent uses it.
+
+    Compressed content is invisible to every other method an examiner has: strings finds
+    nothing, a keyword search matches nothing, and a generic reader that recorded a hash
+    would leave the case saying the store held one opaque blob. Recognising the frame is
+    not a guess about the column, the magic number says what the bytes are.
+    """
+    import compression.zstd as zstd
+
+    body = '{"title": "fix the build", "messages": [{"User": {"content": [{"Text": "hi"}]}}]}'
+    path = tmp_path / "threads.db"
+    connection = sqlite3.connect(path)
+    connection.execute("CREATE TABLE threads (id TEXT PRIMARY KEY, data BLOB)")
+    connection.execute("INSERT INTO threads VALUES (?, ?)", ("t1", zstd.compress(body.encode())))
+    connection.commit()
+    connection.close()
+
+    with open_store(path) as reader:
+        listed = tables(reader)
+        values = [row for _, row, _ in rows_of(reader, listed[0])]
+
+    assert values[0]["data"] == body
+
+
+def test_something_that_only_begins_like_a_frame_is_described_and_not_dropped(
+    tmp_path: Path,
+) -> None:
+    """A truncated file, or a column that happens to start with those four bytes. Either
+    way the bytes are evidence and the failure is a record of its own."""
+    path = tmp_path / "threads.db"
+    connection = sqlite3.connect(path)
+    connection.execute("CREATE TABLE threads (id TEXT PRIMARY KEY, data BLOB)")
+    connection.execute(
+        "INSERT INTO threads VALUES (?, ?)", ("t1", b"\x28\xb5\x2f\xfd" + b"\x00" * 16)
+    )
+    connection.commit()
+    connection.close()
+
+    with open_store(path) as reader:
+        listed = tables(reader)
+        values = [row for _, row, _ in rows_of(reader, listed[0])]
+
+    blob = values[0]["data"]
+    assert blob[BLOB_NOTE] is True
+    assert "incomplete zstd frame" in blob["note"]
+    assert len(blob["sha256"]) == 64
+
+
+def test_a_frame_that_expands_past_the_limit_says_so(tmp_path: Path) -> None:
+    """Truncation that says nothing is the same defect as a dropped record, and a
+    compressed column is where it would be cheapest to hit: a few hundred bytes on disk
+    can expand without limit."""
+    import compression.zstd as zstd
+
+    from agentforensics.parsers import sqlite_store
+
+    path = tmp_path / "threads.db"
+    connection = sqlite3.connect(path)
+    connection.execute("CREATE TABLE threads (id TEXT PRIMARY KEY, data BLOB)")
+    connection.execute("INSERT INTO threads VALUES (?, ?)", ("t1", zstd.compress(b"x" * 4096)))
+    connection.commit()
+    connection.close()
+
+    original = sqlite_store.MAX_DECOMPRESSED
+    sqlite_store.MAX_DECOMPRESSED = 100
+    try:
+        with open_store(path) as reader:
+            listed = tables(reader)
+            values = [row for _, row, _ in rows_of(reader, listed[0])]
+    finally:
+        sqlite_store.MAX_DECOMPRESSED = original
+
+    blob = values[0]["data"]
+    assert blob[BLOB_NOTE] is True
+    assert "expands past the ingest limit" in blob["note"]
+    # The part that was read is still there, rather than the whole thing being withheld.
+    assert blob["text"] == "x" * 100

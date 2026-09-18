@@ -133,7 +133,12 @@ ist, dass das nicht *unbemerkt* geht.
   das zweite, und sein Store enthält, was kein anderes Artefakt hat: die
   conversations-Tabelle ist nach Arbeitsverzeichnis geschlüsselt, die history-Tabelle ist ein
   Shell-Kommandoprotokoll mit Exit-Codes, und der Conversation State hält fest, welche Züge
-  der Agent dem Modell nicht mehr schickt, während sie auf der Platte bleiben.
+  der Agent dem Modell nicht mehr schickt, während sie auf der Platte bleiben. Zed ist das
+  dritte und der Grund, aus dem die Python-Untergrenze gestiegen ist: es schreibt jeden
+  Thread als zstd-Frame in ein BLOB, also dekomprimiert der Speicherleser einen, bevor ein
+  Parser JSON sieht, und jeder andere SQLite-Speicher bekommt dieselbe Lesung dazu. Ein
+  Zed-Thread trägt eine Zeit für den ganzen Thread und keine für die Züge darin, was der
+  Parser sagt statt sie zu ergänzen.
   Daneben liegt ein zweites formatbezogenes Modul, `instructions/`, für den
   Anweisungsbestand: die dreiundsechzig Katalogartefakte mit Skills, Commands, Output
   Styles, Regeln, Steering-Dateien und Hook-Skripten. Es liest jede Datei ganz, unterscheidet

@@ -123,7 +123,12 @@ it cannot be rewritten *quietly*.
   silently absent. Amazon Q's CLI store is the second, and it is the one whose store holds
   what no other artifact does: its conversations table is keyed by the working directory,
   its history table is a shell command log with exit codes, and its conversation state
-  records which turns the agent has stopped sending to the model while keeping them on disk. Beside
+  records which turns the agent has stopped sending to the model while keeping them on disk.
+  Zed is the third, and it is the reason the Python floor moved: it writes each thread as a
+  zstd frame in a BLOB, so the store reader decompresses one before any parser sees it, and
+  every other SQLite store gains the same reading. A Zed thread carries one time for the
+  whole thread and none for the turns inside it, which the parser states rather than filling
+  in. Beside
   it sits a second format-shaped module, `instructions/`, for the instruction surface: the
   sixty-three catalogue artifacts that hold skills, commands, output styles, rules, steering
   files and hook scripts. It reads each file whole, tells the scope apart from the working
