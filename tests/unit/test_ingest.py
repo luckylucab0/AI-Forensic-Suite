@@ -59,6 +59,36 @@ def test_a_more_specific_claim_wins(matcher: Matcher) -> None:
     assert "vscode.user_data_roots" in found, "the directory-level claim is still reported"
 
 
+def test_a_claim_anchored_at_a_known_root_beats_one_that_could_be_anywhere(
+    matcher: Matcher,
+) -> None:
+    """Two claims with the same literal length are not equally specific.
+
+    A placeholder contributes no literal characters, so `~/.claude/CLAUDE.md` and
+    `<project>/.claude/CLAUDE.md` both count sixteen. The first names one directory; the
+    second compiles to a claim that matches at any depth anywhere on the disk. The tie was
+    broken by artifact id, so the user's own instruction file came out as the project entry,
+    and scope is exactly what an analyst reads off the instruction surface: a rule that
+    applied to every project looked like one that applied to one.
+    """
+    assert ids(matcher, "~/.claude/CLAUDE.md")[0] == "claude_code.user_claude_md"
+    assert ids(matcher, "~/.claude/settings.json")[0] == "claude_code.user_settings"
+    # Both entries still claim it, because both do. Only the order changed.
+    assert "claude_code.project_claude_md" in ids(matcher, "~/.claude/CLAUDE.md")
+
+
+def test_a_project_file_still_goes_to_the_project_entry(matcher: Matcher) -> None:
+    """The other direction of the same rule, so the fix cannot be a blanket preference for
+    the user profile: a file that is genuinely inside a working copy belongs to the project
+    entry, which is the only claimant that matches it at all."""
+    assert ids(matcher, "~/src/app/CLAUDE.md")[0] == "claude_code.project_claude_md"
+    assert ids(matcher, "~/src/app/.claude/CLAUDE.md")[0] == "claude_code.project_claude_md"
+    assert (
+        ids(matcher, "~/src/app/.claude/settings.local.json")[0]
+        == "claude_code.project_settings_local"
+    )
+
+
 def test_a_relocated_tree_does_not_claim_every_file(matcher: Matcher) -> None:
     """The regression this check exists for.
 

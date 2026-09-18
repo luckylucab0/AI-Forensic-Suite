@@ -80,6 +80,14 @@ class Match:
     # directory-level entry and a file-level one belongs to the file-level one, and this is
     # how that is decided: the more literal the pattern, the more specific the claim.
     specificity: int
+    # Whether the pattern was anchored at a root this module knows, as against one that can
+    # match at any depth anywhere on the disk. Literal characters alone cannot tell those
+    # apart, because a placeholder contributes none of them: `~/.claude/CLAUDE.md` and
+    # `<project>/.claude/CLAUDE.md` both count sixteen. They are not equally specific
+    # claims though, and the tie was being broken alphabetically, so the user's own
+    # instruction file was attributed to the project entry and an analyst reading the
+    # instruction surface saw it at project scope. A profile-anchored claim wins.
+    anchored: bool = True
 
 
 def _segment_regex(segment: str) -> str:
@@ -240,6 +248,11 @@ class _Compiled:
     regex: re.Pattern[str]
     literal: int
     artifact: Artifact
+    # See Match.anchored. Read off the compiled body rather than threaded through every
+    # return in _pattern_regexes, because the bodies that can match anywhere are exactly
+    # the ones that begin with `.*/`: a working copy whose location the catalogue cannot
+    # state, and a tree relocated by a variable.
+    anchored: bool = True
 
 
 class Matcher:
@@ -265,7 +278,9 @@ class Matcher:
                         # is skipped here rather than raised so that one malformed entry
                         # cannot stop an ingest that is otherwise fine.
                         continue
-                    self._compiled.append(_Compiled(regex, literal, artifact))
+                    self._compiled.append(
+                        _Compiled(regex, literal, artifact, not body.startswith(".*/"))
+                    )
 
     def __len__(self) -> int:
         return len(self._compiled)
@@ -278,10 +293,16 @@ class Matcher:
             if not entry.regex.match(normalised):
                 continue
             previous = found.get(entry.artifact.id)
-            if previous is None or entry.literal > previous.specificity:
-                found[entry.artifact.id] = Match(entry.artifact, entry.literal)
-        # Most specific first, then by id so two equally specific claims order stably.
-        return tuple(sorted(found.values(), key=lambda m: (-m.specificity, m.artifact.id)))
+            rank = (entry.literal, entry.anchored)
+            if previous is None or rank > (previous.specificity, previous.anchored):
+                found[entry.artifact.id] = Match(entry.artifact, entry.literal, entry.anchored)
+        # Most literal first, then a claim anchored at a known root ahead of one that could
+        # match anywhere, then by id so two claims that really are equally specific order
+        # stably. The id is the last key and not the second, because deciding which
+        # catalogue entry a file belongs to by alphabet is deciding it by accident.
+        return tuple(
+            sorted(found.values(), key=lambda m: (-m.specificity, not m.anchored, m.artifact.id))
+        )
 
     def matches(self, path: str) -> tuple[Match, ...]:
         """Every catalogue entry that claims this path, most specific first.
