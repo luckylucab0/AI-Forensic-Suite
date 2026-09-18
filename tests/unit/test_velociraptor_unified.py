@@ -458,3 +458,59 @@ def test_the_query_text_is_balanced(artifact: dict) -> None:
             assert stripped.count(opener) == stripped.count(closer), (
                 f"{name}: unbalanced {opener}{closer}"
             )
+
+
+def test_codex_event_msg_is_read_the_same_way_by_both_producers(
+    artifact: dict, tmp_path: Path
+) -> None:
+    """One format, two producers, and they have to agree on which records exist.
+
+    A Codex event_msg record mirrors a response_item, so neither producer maps it as a turn
+    of the conversation, and both keep it as one config.snapshot row per line with the line
+    itself in raw. Making the same choice in both is the point: the CI job that runs this
+    query against a synthetic profile compares its reading with the analyzer's record for
+    record, and a record only one of them emits surfaces there as a disagreement between
+    the two. That is how this was found, with the analyzer counting these records by subtype
+    and discarding their content while the query kept every one of them.
+    """
+    import json
+
+    from agentforensics.parsers import for_artifact
+    from agentforensics.parsers.base import ParseContext
+
+    query = code(queries(artifact)["linux"])
+    assert "Rec_.type = 'event_msg'" in query
+    assert "mirrored_event_msg=Rec.type = 'event_msg'" in query
+
+    rollout = tmp_path / "rollout-2026-01-01T00-00-00-s1.jsonl"
+    rollout.write_text(
+        json.dumps({"timestamp": "2026-01-01T00:00:00Z", "type": "session_meta", "payload": {}})
+        + "\n"
+        + json.dumps(
+            {
+                "timestamp": "2026-01-01T00:00:01Z",
+                "type": "event_msg",
+                "payload": {"type": "agent_message", "message": "x"},
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    parser = for_artifact("codex.rollouts")
+    assert parser is not None
+    events = list(
+        parser.parse(
+            ParseContext(
+                bundle_uuid="b1",
+                original_path="/home/alice/.codex/sessions/" + rollout.name,
+                local_path=rollout,
+                sha256="aa",
+                artifact_id="codex.rollouts",
+                agent="codex",
+                user="alice",
+            )
+        )
+    )
+    mirrors = [event for event in events if event.payload.get("mirrored_event_msg")]
+    assert [event.kind for event in mirrors] == ["config.snapshot"]
+    assert mirrors[0].provenance.locator == "line:2"

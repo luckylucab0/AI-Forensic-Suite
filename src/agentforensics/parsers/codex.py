@@ -2,9 +2,10 @@
 
 One record per line, each `{timestamp, type, payload}`. Four record types carry the
 conversation and two carry context, and the shape of the fifth is the reason this parser
-needs explaining: `event_msg` mirrors `response_item`, so mapping both would double every
-turn in the timeline. They are counted by subtype and reported once per file as a single
-event instead, which keeps the record visible without inflating the conversation.
+needs explaining: `event_msg` mirrors `response_item`, so mapping both as turns would show
+every turn of the conversation twice. Each one becomes an event of its own anyway, at a
+kind the conversation views do not read from, so the record keeps its line and its bytes in
+the case without inflating the conversation.
 
 Two other things the format does that a reader has to know about. A `compacted` record
 means the conversation was rewritten to fit a context window, which is the usual
@@ -56,9 +57,6 @@ class CodexParser:
         # Session-wide facts arrive in their own records and apply to everything after
         # them, so they are carried forward rather than looked up per event.
         state: dict[str, Any] = {"cwd": None, "branch": None, "model": None, "session_id": None}
-        mirrored: dict[str, int] = {}
-        last_ts: str | None = None
-        last_precision = "absent"
 
         for line in iter_lines(context.local_path):
             if not line.ok:
@@ -73,8 +71,6 @@ class CodexParser:
                 continue
             record = line.value
             ts, precision, note = normalise_ts(record.get("timestamp"))
-            if ts:
-                last_ts, last_precision = ts, precision
             record_type = record.get("type")
             payload = _mapping(record.get("payload"))
 
@@ -113,8 +109,44 @@ class CodexParser:
                 )
                 continue
             if record_type == "event_msg":
-                mirrored[str(payload.get("type") or "(no subtype)")] = (
-                    mirrored.get(str(payload.get("type") or "(no subtype)"), 0) + 1
+                # A mirror of a response_item, so mapping it as a turn would show every
+                # turn of the conversation twice. It is still a line on disk, and a record
+                # is never dropped, so it becomes one event of its own at a kind the
+                # conversation views do not read from: the record stays in the case with
+                # its line and its bytes, and the conversation stays honest. The subtype
+                # goes into the payload because a subtype nobody has seen before is how a
+                # format change announces itself.
+                #
+                # The generated Velociraptor artifact maps this record exactly the same
+                # way, one row per line marked mirrored_event_msg. That is deliberate:
+                # scripts/check_velociraptor_vql.py compares the two readings record for
+                # record, and the two producers of this one format have to agree on which
+                # records exist.
+                subtype = str(payload.get("type") or "(no subtype)")
+                yield Event(
+                    kind="config.snapshot",
+                    provenance=context.provenance(line.locator),
+                    agent=self.name,
+                    raw=record,
+                    ts_utc=ts,
+                    ts_precision=precision,
+                    ts_source="timestamp" if ts else None,
+                    actor="system",
+                    client="codex-cli",
+                    user=context.user,
+                    host=context.host,
+                    session_id=state["session_id"],
+                    project_path=state["cwd"],
+                    git_branch=state["branch"],
+                    payload={
+                        "text": f"an event_msg record of subtype {subtype}, which mirrors "
+                        "a response_item and is therefore kept as a record rather than "
+                        "mapped as a turn: " + text_of(payload),
+                        "mirrored_event_msg": True,
+                        "item_type": subtype,
+                        "models": [{"model": state["model"]}] if state["model"] else [],
+                    },
+                    parse_problem=note,
                 )
                 continue
             if record_type == "response_item":
@@ -134,33 +166,6 @@ class CodexParser:
                 user=context.user,
                 session_id=state["session_id"],
                 project_path=state["cwd"],
-            )
-
-        if mirrored:
-            # One event for the whole file, so the records are accounted for without
-            # doubling the conversation. The subtypes are kept because a new one appearing
-            # is how a format change shows up.
-            total = sum(mirrored.values())
-            yield Event(
-                kind="config.snapshot",
-                provenance=context.provenance("event_msg-summary"),
-                agent=self.name,
-                raw={"event_msg_counts": mirrored},
-                ts_utc=last_ts,
-                ts_precision=last_precision if last_ts else "absent",  # type: ignore[arg-type]
-                ts_source="the last timestamp in the file" if last_ts else None,
-                actor="system",
-                user=context.user,
-                host=context.host,
-                session_id=state["session_id"],
-                project_path=state["cwd"],
-                payload={
-                    "text": f"{total} event_msg record(s) in this file mirror the "
-                    "response_item records and are counted rather than mapped, so the "
-                    "conversation is not doubled: "
-                    + ", ".join(f"{key} x{mirrored[key]}" for key in sorted(mirrored)),
-                    "event_msg_counts": mirrored,
-                },
             )
 
     def _session_meta(

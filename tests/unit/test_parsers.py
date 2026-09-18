@@ -442,28 +442,45 @@ def test_codex_session_metadata_sets_the_context_for_the_rest(tmp_path: Path) ->
     assert events[1].payload["models"] == [{"model": "m"}]
 
 
-def test_codex_event_msg_is_counted_not_mapped(tmp_path: Path) -> None:
-    """It mirrors response_item, so mapping both would double every turn.
+def test_codex_event_msg_is_kept_as_a_record_not_as_a_turn(tmp_path: Path) -> None:
+    """It mirrors response_item, so mapping it as a turn would double every turn.
 
-    Counted and reported once per file instead, which keeps the records accounted for
-    without inflating the conversation.
+    It is still a line on disk, so it gets an event of its own at a kind the conversation
+    views do not read from. One event per record, with the line in raw: an earlier version
+    of this parser counted the records and threw their content away, which the differential
+    against the endpoint query in scripts/check_velociraptor_vql.py is what caught.
     """
     events = parse_codex(
         codex(
             tmp_path,
             [
                 SESSION_META,
-                {**CODEX_BASE, "type": "event_msg", "payload": {"type": "agent_message"}},
-                {**CODEX_BASE, "type": "event_msg", "payload": {"type": "agent_message"}},
+                {
+                    **CODEX_BASE,
+                    "type": "event_msg",
+                    "payload": {"type": "agent_message", "message": "the mirrored text"},
+                },
+                {**CODEX_BASE, "type": "event_msg", "payload": {"type": "token_count"}},
             ],
         )
     )
     kinds = [e.kind for e in events]
     assert kinds.count("assistant.text") == 0, "the mirror must not become a turn"
-    summary = [e for e in events if e.payload.get("event_msg_counts")]
-    assert len(summary) == 1
-    assert summary[0].payload["event_msg_counts"] == {"agent_message": 2}
-    assert "not doubled" in summary[0].payload["text"]
+
+    mirrors = [e for e in events if e.payload.get("mirrored_event_msg")]
+    assert len(mirrors) == 2, "one event per record, so nothing is only counted"
+    assert [e.kind for e in mirrors] == ["config.snapshot", "config.snapshot"]
+    assert [e.provenance.locator for e in mirrors] == ["line:2", "line:3"]
+    assert [e.payload["item_type"] for e in mirrors] == ["agent_message", "token_count"]
+    # The content has to survive, not just the tally. A subtype that mirrors nothing would
+    # otherwise exist in the case as a number and nowhere as evidence.
+    assert "the mirrored text" in mirrors[0].payload["text"]
+    assert mirrors[0].raw == {
+        **CODEX_BASE,
+        "type": "event_msg",
+        "payload": {"type": "agent_message", "message": "the mirrored text"},
+    }
+    assert mirrors[1].session_id == SESSION_META["payload"]["id"]
 
 
 def test_codex_compaction_is_an_event_not_a_gap(tmp_path: Path) -> None:

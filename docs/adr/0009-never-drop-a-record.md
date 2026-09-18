@@ -33,8 +33,16 @@ Nothing that exists in a log may be absent from the view or from the model.
 - Unknown record types and unknown event types are preserved as `unknown-record` and
   rendered, with the original record available in full.
 - Assistant records without an id get a turn of their own.
-- Records that are intentionally not rendered as turns are counted and reported rather than
-  skipped, which is how the Codex `event_msg` mirrors of `response_item` are handled.
+- A record that is deliberately not shown as a turn still exists, and where it is kept
+  depends on what the reader is for. The viewer reads one transcript as a conversation, so
+  it may fold such records into one visibly marked row naming their number and their
+  subtypes, which is how it handles the Codex `event_msg` mirrors of `response_item`. The
+  analyzer and the exported endpoint queries may not, because they are the evidence path:
+  each of those records becomes an event of its own, at a kind the conversation views do not
+  read from, carrying its line number and its content. A case holding a count where it
+  should hold the record is the same wrong answer this decision is about, one level deeper,
+  and the Codex parser held one until the differential against the endpoint query in
+  `scripts/check_velociraptor_vql.py` named the line.
 - The session header counts unparsed lines, so a transcript that did not read cleanly
   cannot look clean.
 - In the analyzer, every event carries `raw`, the original record kept verbatim, so a
