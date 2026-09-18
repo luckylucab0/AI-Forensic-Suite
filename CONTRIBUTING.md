@@ -130,7 +130,18 @@ uv run ruff check .                   # lint
 uv run ruff format --check .          # formatting
 uv run mypy src                       # type check, src only
 uv run pytest                         # tests
+uv run pytest --windows-newlines      # the same suite, with text-mode writes behaving
+                                      # the way they do on Windows
 ```
+
+That last one is worth a sentence. Three Windows-only defects reached CI in three
+consecutive commits, and every one of them was found by the single runner nobody watches
+while the other five stayed green. One was a fixture written in text mode, where Windows
+turns a newline into CRLF on disk and a test that compares text or bytes exactly then
+fails there and nowhere else. `--windows-newlines` makes every text-mode write in the
+suite behave that way, so the failure happens on your machine in under a minute. CI runs
+it as its own job. A fixture that is later compared byte for byte should pass
+`newline=""` and say what it wants.
 
 Generated artifacts. Each of these has a `--check` mode that CI uses to fail on drift, so
 run the generator whenever you change its input:
@@ -143,7 +154,7 @@ uv run python scripts/check_viewer.py        # viewer structure and JavaScript p
 uv run python scripts/opsec_check.py --mode both
 ```
 
-A rule documentation generator will join that list when the rule engine lands in phase 4.
+uv run python scripts/gen_rule_docs.py is in that list too, for docs/RULES{,.de}.md.
 
 The CLI itself is `agentforensics`, with `afx` as a shorter alias:
 

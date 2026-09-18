@@ -226,6 +226,26 @@ jobs:
           AFX_POWERSHELL: powershell.exe
         run: uv run pytest tests/conformance -q
 
+  windows-newlines:
+    # Its own job rather than a second run inside the matrix, so it costs wall clock only
+    # in parallel. Three Windows-only defects reached CI in three consecutive commits and
+    # each was found by the one runner nobody watches; this one reproduces that class on
+    # Linux in under a minute, and the same flag works on a developer's machine.
+    name: Windows newline behaviour, simulated
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --all-extras --dev
+
+      - name: Tests with Windows text-mode writes
+        run: uv run pytest -q --windows-newlines
+
   opsec:
     name: OpSec guard
     runs-on: ubuntu-latest

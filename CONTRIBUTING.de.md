@@ -148,7 +148,19 @@ uv run ruff check .                   # Linting
 uv run ruff format --check .          # Formatierung
 uv run mypy src                       # Typprüfung, nur src
 uv run pytest                         # Tests
+uv run pytest --windows-newlines      # dieselbe Suite, mit Textmodus-Schreibvorgängen,
+                                      # die sich verhalten wie unter Windows
 ```
+
+Der letzte verdient einen Satz. Drei Defekte, die es nur unter Windows gab, sind in drei
+aufeinanderfolgenden Commits in die CI gelangt, und jeder davon wurde vom einzigen Runner
+gefunden, auf den niemand schaut, während die anderen fünf grün blieben. Einer war ein
+Fixture, das im Textmodus geschrieben wurde: Windows macht aus einem Zeilenumbruch CRLF
+auf der Platte, und ein Test, der Text oder Bytes genau vergleicht, scheitert dann dort
+und sonst nirgends. `--windows-newlines` lässt jeden Textmodus-Schreibvorgang der Suite
+sich so verhalten, sodass der Fehlschlag in unter einer Minute auf dem eigenen Rechner
+passiert. Die CI führt das als eigenen Job aus. Ein Fixture, das später byteweise
+verglichen wird, sollte `newline=""` übergeben und damit sagen, was es will.
 
 Generierte Artefakte. Jedes davon hat einen `--check`-Modus, mit dem die CI bei Abweichung
 fehlschlägt, also den Generator ausführen, sobald sich seine Eingabe ändert:
@@ -161,8 +173,7 @@ uv run python scripts/check_viewer.py        # Viewer-Struktur und JavaScript-Sy
 uv run python scripts/opsec_check.py --mode both
 ```
 
-Ein Generator für die Regeldokumentation kommt dazu, wenn die Regel-Engine in Phase 4
-entsteht.
+uv run python scripts/gen_rule_docs.py gehört ebenfalls dazu, für docs/RULES{,.de}.md.
 
 Das Kommandozeilenwerkzeug selbst heisst `agentforensics`, mit `afx` als Kurzform:
 

@@ -1,7 +1,7 @@
 {
   "_comment": "sha256 of each English document whose German sibling was confirmed current. Refresh with scripts/check_translations.py --update after updating a translation, or after an English edit that needs none.",
   "english_hashes": {
-    "CONTRIBUTING.md": "7352b4b8bba94ee02e3ad5fa362b02caf5df82afc956360673e69fc01cd0d2b5",
+    "CONTRIBUTING.md": "3eef7d7e87af50508954fb502f7bc0217446e5fcbb47234db5e9853591613549",
     "README.md": "19a8e411b77a9ea70e9347b632c0bb60f6090ea99b588ab0aa15fab32ac8f882",
     "SECURITY.md": "d762c856c43ffe27dab58d6f00918c2e0fb47f1f2dcea722e64c6259c2eb0041",
     "docs/ARCHITECTURE.md": "ca6bad84173e8248f438bbd11bc5f447871e6be91f2ccd9f37bf6c3796bca925",
