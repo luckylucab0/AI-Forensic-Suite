@@ -50,6 +50,10 @@ ARTIFACT = (
 )
 SCHEMA = REPO / "src" / "agentforensics" / "unified" / "agentlog.v1.schema.json"
 
+# One source record, as both producers name it: the file it came from and the line inside
+# it. The comparisons below are set operations over this, so it is spelled once.
+Record = tuple[str, str]
+
 EXIT_OK = 0
 EXIT_FAILED = 1
 EXIT_ERROR = 2
@@ -240,20 +244,13 @@ def check(rows: list[dict[str, Any]], sandbox: Path, problems: list[str]) -> Non
         )
 
 
-def differential(rows: list[dict[str, Any]], sandbox: Path, problems: list[str]) -> str:
-    """Compare the query's reading against the analyzer's, record for record.
+def readings(rows: list[dict[str, Any]], sandbox: Path) -> tuple[set[Record], set[Record]]:
+    """What each of the two producers read, as a set of source records.
 
-    The strongest claim this script can make, and the one worth making: the endpoint query
-    and the analyzer read the same files, and for the artifacts both of them understand they
-    must agree on which records exist. The two disagree about interpretation on purpose,
-    because the query emits one row per record where the analyzer splits a turn into its
-    parts, so what is compared is the set of source records each one reached, keyed by the
-    file and the line it came from. A record the analyzer read and the query did not is a
-    hole in the collection.
-
-    This is the same shape of test the two collectors have, for the same reason: two
-    implementations of one reading will eventually differ, and the difference has to be
-    visible rather than discovered in a case.
+    Keyed by the file and the line it came from, because the two disagree about
+    interpretation on purpose: the query emits one row per record where the analyzer splits
+    a turn into its parts. What has to agree is which records exist, not how many events
+    each one becomes.
     """
     from agentforensics.catalog import load_catalogue
     from agentforensics.exporters.velociraptor_unified import MAPPERS
@@ -298,29 +295,69 @@ def differential(rows: list[dict[str, Any]], sandbox: Path, problems: list[str])
         and str(row.get("provenance", {}).get("original_path", "")).startswith(str(sandbox))
     }
 
-    missing = sorted(mine - theirs)
+    return mine, theirs
+
+
+def _named(records: set[Record]) -> str:
+    """A few records by file name and line.
+
+    Counted is not enough. The first run of this check against a real engine reported one
+    record the analyzer had not read and there was no way to find out which, so a count on
+    its own tells nobody where to go and look.
+    """
+    return ", ".join(
+        f"{path.rsplit('/', 1)[-1]} {locator}" for path, locator in sorted(records)[:5]
+    )
+
+
+def differential(
+    rows: list[dict[str, Any]], sandbox: Path, problems: list[str], note: str = ""
+) -> str:
+    """Compare the query's reading against the analyzer's, record for record.
+
+    The strongest claim this script can make, and the one worth making: the endpoint query
+    and the analyzer read the same files, and for the artifacts both of them understand they
+    must agree on which records exist. A record the analyzer read and the query did not is a
+    hole in the collection.
+
+    This is the same shape of test the two collectors have, for the same reason: two
+    implementations of one reading will eventually differ, and the difference has to be
+    visible rather than discovered in a case.
+
+    `note` is appended to the failure, for a source that has a known way of producing this
+    result without the query being at fault. See MISSING_NOTES.
+    """
+    mine, theirs = readings(rows, sandbox)
+    missing = mine - theirs
     if missing:
         problems.append(
             f"{len(missing)} record(s) the analyzer read did not come back from the query, "
             "which means the collection returned less than was on disk. First few: "
-            f"{missing[:5]}"
+            f"{_named(missing)}.{note}"
         )
-    extra = sorted(theirs - mine)
-    # Named, not just counted. This direction is not a hole in a collection, so it does not
-    # fail the run, but it is the analyzer reading less than the endpoint query did, and a
-    # count on its own tells nobody which record to go and look at. The first run of this
-    # check against a real engine reported one such record and there was no way to find out
-    # what it was.
-    detail = ""
-    if extra:
-        detail = ". The query saw: " + ", ".join(
-            f"{path.rsplit('/', 1)[-1]} {locator}" for path, locator in extra[:5]
-        )
+    extra = theirs - mine
+    # This direction is not a hole in a collection, so it does not fail the run: it is the
+    # analyzer reading less than the endpoint query did.
+    detail = f". The query saw: {_named(extra)}" if extra else ""
     return (
         f"{len(mine)} record(s) read by the analyzer, {len(theirs)} by the query, "
         f"{len(missing)} missing from the query, {len(extra)} the query saw and the "
         f"analyzer did not{detail}"
     )
+
+
+# What a "missing from the query" result can mean on one source besides a real hole in a
+# collection. The Windows globs are Windows-shaped while build_home writes one POSIX-shaped
+# profile, so an artifact that only exists under AppData would come back missing here
+# without the query being at fault. Today every file the analyzer reads is reached by all
+# three sources, which is why the full comparison runs for all three; if that changes, the
+# note says where to look before anybody edits the exporter.
+MISSING_NOTES = {
+    "windows": " This source's globs are Windows-shaped and the synthetic profile is "
+    "POSIX-shaped, so a record only reachable under a Windows application-data path is "
+    "this harness's shape rather than a hole in the query. Check the paths above before "
+    "changing the exporter; the fix is a Windows-shaped profile in the fixture generator.",
+}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -431,19 +468,20 @@ def main(argv: list[str] | None = None) -> int:
             )
             print(f"check-velociraptor-vql:   {placement}: {under} row(s)")
 
-        # Only where the sandbox's profile sits at a path the analyzer also reads as a
-        # profile root, which is the POSIX placements. The Windows drive-letter placement is
-        # a device of this harness and not a shape the analyzer expects.
-        #
-        # Both POSIX sources, not only linux. The comment here said POSIX and the code said
-        # linux, so the macOS query's records were never compared against the analyzer at
-        # all: the one source whose profile roots differ most from the analyzer's had the
-        # weakest check behind it.
-        if args.os_name in ("linux", "macos"):
-            print(
-                "check-velociraptor-vql: "
-                + differential(rows, sandbox / PROFILE_PLACEMENTS[args.os_name][0], problems)
+        # All three sources, with no condition in front of it. The one defect this has
+        # already had was a source with no comparison behind it: the comment said POSIX and
+        # the code said linux, so the macOS query's records were never compared at all, and
+        # that is the source whose profile roots differ most from the analyzer's. A branch
+        # here is how that happens, so there is no branch.
+        print(
+            "check-velociraptor-vql: "
+            + differential(
+                rows,
+                sandbox / PROFILE_PLACEMENTS[args.os_name][0],
+                problems,
+                MISSING_NOTES.get(args.os_name, ""),
             )
+        )
 
         if problems:
             for problem in problems:

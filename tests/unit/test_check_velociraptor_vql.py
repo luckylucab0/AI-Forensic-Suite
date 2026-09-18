@@ -298,3 +298,37 @@ def test_a_query_that_matched_everything_reports_no_difference(script, profile) 
     assert not problems
     assert "0 missing from the query" in line
     assert "0 the query saw and the analyzer did not" in line
+
+
+# ----------------------------------------------- every source gets the same comparison
+
+
+def test_the_windows_failure_carries_the_reason_it_can_be_a_false_alarm(script, profile) -> None:
+    """One source has a known way of producing this result without the query being at fault.
+
+    The Windows globs are Windows-shaped and this harness builds one POSIX-shaped profile,
+    so an artifact reachable only under a Windows application-data path would come back as
+    missing. Today the Windows query reaches every file the analyzer reads, measured against
+    a real engine, which is why it gets the same full comparison as the other two. The note
+    exists so that if that ever changes, the failure says where to look instead of sending
+    somebody to edit the exporter.
+    """
+    rows = rows_for(script, profile)
+    problems: list[str] = []
+
+    script.differential(
+        rows[1:], profile / "home" / "alice", problems, script.MISSING_NOTES["windows"]
+    )
+
+    assert problems
+    assert "returned less than was on disk" in problems[0]
+    assert "Windows-shaped" in problems[0], "the reason has to travel with the failure"
+
+    plain: list[str] = []
+    script.differential(rows[1:], profile / "home" / "alice", plain)
+    assert "Windows-shaped" not in plain[0], "and only on the source it applies to"
+
+
+def test_a_note_cannot_sit_on_a_source_that_does_not_exist(script) -> None:
+    """A typo in the table would be a comment nobody reads rather than a note anybody sees."""
+    assert set(script.MISSING_NOTES) <= set(script.PROFILE_PLACEMENTS)
