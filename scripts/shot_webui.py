@@ -23,9 +23,9 @@ from pathlib import Path
 
 from agentforensics.webui import server as webui
 
-# The four case views, each photographed after its tab is clicked. The session view is
+# The five case views, each photographed after its tab is clicked. The session view is
 # handled separately because it needs a session opened first.
-VIEWS = ("case", "timeline", "findings", "artifacts")
+VIEWS = ("case", "timeline", "findings", "instructions", "artifacts")
 
 # Where Playwright's Chromium usually sits when the browsers are installed outside the
 # package, which is how a sandbox or a CI image normally does it.
@@ -104,6 +104,15 @@ def main(argv=None):
             for view in VIEWS:
                 page.locator('.tab[data-view="%s"]' % view).click()
                 page.wait_for_timeout(1400)
+                if view == "instructions":
+                    # Filtered to the files that grant tools, hide characters or are
+                    # executed rather than read, which is what an analyst opens this for.
+                    chips = page.locator("#instructions-filters .tfilter")
+                    for index in range(chips.count()):
+                        if chips.nth(index).inner_text().startswith("worth a look"):
+                            chips.nth(index).click()
+                            page.wait_for_timeout(600)
+                            break
                 if view == "artifacts":
                     # Filtered to the files a parser did not understand, which is the
                     # distinction this view exists for.

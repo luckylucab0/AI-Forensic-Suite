@@ -9,7 +9,7 @@ Der Viewer selbst bleibt unverändert. Er ist weiter die einzelne HTML-Datei, di
 Analystin auf einem USB-Stick mitnehmen und auf einem Rechner öffnen kann, auf dem nichts
 installiert werden darf, und er liest weiter ein Verzeichnis voller Transcripts oder ein
 einzelnes vereinheitlichtes Log ganz ohne Server. Von `afx serve` ausgeliefert bekommt er
-eine dritte Datenquelle und vier zusätzliche Ansichten, und sonst verschiebt sich nichts.
+eine dritte Datenquelle und fünf zusätzliche Ansichten, und sonst verschiebt sich nichts.
 
 ## Der Weg dorthin
 
@@ -79,7 +79,7 @@ Die drei Ansichten des eigenständigen Viewers bleiben unverändert: **Sessions*
 Konversation, **Tools** listet jeden Tool-Aufruf über alle hinweg, und **Security** ist der
 eingebaute Regex-Scan nach Zugangsdaten im Transcript-Text.
 
-Ein ausgelieferter Fall ergänzt vier weitere, und das sind Fragen an einen Fall, nicht an
+Ein ausgelieferter Fall ergänzt fünf weitere, und das sind Fragen an einen Fall, nicht an
 ein Transcript:
 
 **Case** zeigt, was der Fall enthält und was ihm fehlt. Zuerst die Zahlen, die eine
@@ -100,6 +100,25 @@ die Ansicht das ausdrücklich, denn sonst sehen ein ungescannter und ein saubere
 aus, und das sind entgegengesetzte Schlüsse. Jeder Fund nennt seine Regel, sein Paket, was
 gematcht hat und die Ereignisse, auf denen er beruht; ein Klick darauf öffnet das Ereignis.
 
+**Instructions** ist der Anweisungsbestand: alles, dem die Agenten folgen sollten, so wie es
+auf dem Endpunkt stand. Eine Zeile pro Datei, mit dem Scope, in dem sie galt, den Werkzeugen,
+die ein Skill sich selbst zuspricht, der Angabe, ob sie ausgeführt statt gelesen wird, und
+einer Zählung der Zeichen, die ein Prüfer nicht sehen konnte. Ein Klick zeigt den Text, und
+bei einer Datei mit unsichtbaren Zeichen wird er mit jedem davon markiert angezeigt, denn
+genau darum geht es: ein Mensch hat einen Text genehmigt und das Modell hat einen anderen
+gelesen. Eine Aussage lässt die Ansicht niemanden übersehen: das ist kein Systemprompt. Jeder
+Agent hier baut seinen Prompt zur Laufzeit aus einem Basisprompt, der ins Produkt kompiliert
+ist oder vom Hersteller geholt wird, und dieser Teil berührt den Endpunkt nie, liegt also
+nicht im Fall. Im Fall liegt alles, was hineininjiziert wird.
+
+Die Scope-Spalte liest man zuerst. `managed` ist die Datei einer Administration und gilt für
+jeden Benutzer. `project` kam mit einem Checkout, was heisst: wer einen Pull Request öffnen
+kann, konnte sie dort ablegen. `local` ist die dokumentierte persönliche Übersteuerung
+innerhalb einer Arbeitskopie. `user` ist die des Profils selbst. `unknown` heisst, dass die
+Sammlung keine Arbeitskopien festgehalten hat, eine Projektdatei also nicht von einer
+Profildatei zu unterscheiden ist, und die Zeile sagt das, statt zu raten: das sind
+entgegengesetzte Befunde darüber, wer den Agenten angewiesen hat.
+
 **Artifacts** ist jede Datei, die die Sammlung mitgebracht hat, gelesen oder nicht. Das ist
 die Ansicht, die alle anderen relativiert, und der Unterschied, für den sie existiert, ist
 der zwischen einer Datei, die niemand gesammelt hat, und einer, die gesammelt und nie
@@ -109,7 +128,7 @@ Agenten aus.
 
 ## Filter
 
-Drei der Ansichten filtern, und alle drei folgen einer Regel: ein Filter darf Zeilen vom
+Vier der Ansichten filtern, und alle folgen einer Regel: ein Filter darf Zeilen vom
 Schirm nehmen, weil jemand danach gefragt hat, und er darf sie niemals abwesend aussehen
 lassen. Jede gefilterte Ansicht sagt deshalb, wie viele Zeilen ausserhalb des Blickfelds
 sind, und der Filter innerhalb eines Chats hält Zahl und Rücknahme sichtbar, solange er
@@ -128,13 +147,15 @@ Bereichsschalter: alle Sitzungen oder die geöffnete. "This session" erscheint n
 Sitzung offen ist, denn ein Bereich, der stillschweigend "alle" bedeutet, wäre ein Filter,
 der über seinen eigenen Inhalt täuscht. Die Werkzeugansicht filtert danach nach Werkzeug,
 nach nur Fehlschlägen und nach freiem Text über Werkzeugname, Zusammenfassung und Sitzung.
-Die Sicherheitsansicht filtert nach Schweregrad und Regel.
+Die Sicherheitsansicht filtert nach Schweregrad und Regel. Die Anweisungsansicht filtert nach
+Scope und nach "worth a look", also nach jeder Datei, die Werkzeuge zuspricht, Zeichen
+verbirgt, ausgeführt statt gelesen wird oder ihren Prompt in einem JSON-Feld hält.
 
 ![Ein Chat, gefiltert auf die Züge mit Werkzeugaufruf, mit der Zahl der ausgeblendeten Zeilen](images/webui-filter.png)
 
 ## Die API
 
-Zehn Routen, alle `GET`, alle unter dem Token des Laufs. Sie stehen hier, weil eine
+Elf Routen, alle `GET`, alle unter dem Token des Laufs. Sie stehen hier, weil eine
 Analystin, die gegen einen bereits offenen Fall skriptet, nicht den Quellcode lesen sollte.
 
 | Pfad | Antwortet mit |
@@ -146,6 +167,7 @@ Analystin, die gegen einen bereits offenen Fall skriptet, nicht den Quellcode le
 | `/api/events/<event_id>` | einem Ereignis, als vereinheitlichtem Datensatz |
 | `/api/timeline` | einer Seite der geräteweiten Timeline, in der Zeilenform des Exports |
 | `/api/findings` | den Funden, und der Tatsache, dass ein Scan gelaufen ist |
+| `/api/instructions` | dem Anweisungsbestand, mit seinen Scopes und dem, was einen Blick wert ist |
 | `/api/artifacts` | jeder Datei, die die Sammlung mitgebracht hat, und den Lücken |
 | `/api/health` | dass dies ein `afx serve` ist |
 
@@ -206,3 +228,7 @@ Die Artefakte, gefiltert auf die Dateien, die ein Parser nicht verstanden hat. D
 entscheidet, wie viel die anderen Ansichten wert sind.
 
 ![Die Artefaktliste](images/webui-artifacts.png)
+
+Der Anweisungsbestand, gefiltert auf die Dateien, die einen Blick wert sind:
+
+![Der Anweisungsbestand](images/webui-instructions.png)

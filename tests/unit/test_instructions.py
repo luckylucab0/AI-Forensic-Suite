@@ -365,3 +365,21 @@ def test_each_claimed_artifact_resolves_to_this_parser(artifact_id: str) -> None
     parser = for_artifact(artifact_id)
     assert parser is not None
     assert parser.name == "instructions"
+
+
+def test_a_shebang_is_not_a_heading(tmp_path: Path) -> None:
+    """`#!/bin/sh` starts with a hash and is not a title. Reported once as the name of a
+    hook file, which is how a listing of the instruction surface starts looking unreliable."""
+    path = tmp_path / "pre-commit.sh"
+    path.write_text("#!/bin/sh\n# a comment\necho hi\n", encoding="utf-8")
+
+    payload = one(path, artifact_id="crosscutting.hook_scripts").payload  # type: ignore[attr-defined]
+
+    assert "title" not in payload
+
+
+def test_a_hash_with_a_space_is_a_heading(tmp_path: Path) -> None:
+    path = tmp_path / "CLAUDE.md"
+    path.write_text("### Deep heading\n\nbody\n", encoding="utf-8")
+
+    assert one(path).payload["title"] == "Deep heading"  # type: ignore[attr-defined]

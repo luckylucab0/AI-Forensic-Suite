@@ -40,6 +40,7 @@ a scan having been run.
 from __future__ import annotations
 
 import json
+import re
 import unicodedata
 from collections.abc import Iterator
 from pathlib import Path
@@ -268,7 +269,12 @@ class InstructionsParser:
             "lines": text.count("\n") + 1 if text else 0,
         }
 
-        title = _title(text)
+        # A script's `#` lines are comments, not Markdown headings, and the two are
+        # syntactically identical. Reading one as a title showed `!/bin/sh` as the name of a
+        # hook file, which is the kind of small wrongness that makes an analyst stop
+        # trusting a listing.
+        executable = path.name.lower().endswith(_EXECUTABLE_SUFFIXES)
+        title = None if executable else _title(text)
         if title:
             payload["title"] = title
 
@@ -300,7 +306,7 @@ class InstructionsParser:
                     payload["prompt_field"] = prompt_key
                     payload["document_text"] = text
 
-        if path.name.lower().endswith(_EXECUTABLE_SUFFIXES):
+        if executable:
             # Not "probably a hook": the catalogue filed this path under instructions, and a
             # script there is an instruction the agent executes. Flagged rather than
             # interpreted, because what it does is a question for the analyst.
@@ -368,14 +374,18 @@ def _project_of(original_path: str, project_roots: tuple[str, ...]) -> str | Non
     return None
 
 
+# An ATX heading: one to six hashes, then whitespace, then something. The whitespace is the
+# part that matters here, because without it a shell script's `#!/bin/sh` was read as the
+# heading of a hook file and shown as its title.
+_HEADING = re.compile(r"^#{1,6}\s+(\S.*)$")
+
+
 def _title(text: str) -> str | None:
     """The first Markdown heading, which is what a person calls the file."""
     for line in text.splitlines()[:40]:
-        stripped = line.strip()
-        if stripped.startswith("#"):
-            heading = stripped.lstrip("#").strip()
-            if heading:
-                return heading
+        found = _HEADING.match(line.strip())
+        if found:
+            return found.group(1).strip()
     return None
 
 

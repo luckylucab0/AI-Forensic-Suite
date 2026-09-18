@@ -43,6 +43,10 @@ Für ein Gerät und eine Benutzerin oder einen Benutzer:
   überschriebene verwaltete Einstellungen
 - Wurden anti-forensische Schritte unternommen: verkürzte Aufbewahrung, unterdrückte
   Historie, gelöschter Projektzustand
+- Was dem Agenten vorgegeben war: die Anweisungsdateien, Skills, Commands, Output Styles,
+  Regeln und Hook-Skripte, die in Kraft waren, in welchem Scope, und welche davon Zeichen
+  verbergen, die ein Prüfer nicht sehen kann. Nicht der Basisprompt des Herstellers, der
+  zur Laufzeit gebaut wird und den Endpunkt nie berührt
 - Wurde der Agent durch eingeschleuste Anweisungen manipuliert
 
 Jede Antwort ist auf eine Quelldatei, einen Hash und eine Zeilen- oder Byte-Position
@@ -192,6 +196,7 @@ Einzige, was der Viewer irgendwo schreibt, ist die Themenwahl in `localStorage`.
 ```bash
 uv run afx ingest /evidence/bundle-2026-09-17 --case case.db   # eine Sammlung einlesen
 uv run afx scan --case case.db                                 # die Regelpakete laufen lassen
+uv run afx instructions --case case.db                        # was die Agenten befolgen sollten
 uv run afx serve --case case.db                                # im Browser öffnen
 ```
 

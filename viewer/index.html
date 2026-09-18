@@ -103,7 +103,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .empty-state .folder-btn{margin-top:4px;}
 
 /* ---- tabs ---- */
-.tabs{display:flex;gap:2px;margin-bottom:10px;border-bottom:1px solid var(--border-soft);}
+/* Wrapping, because the case tab bar grows as the case views do and a fifth tab ran off
+   the end of the sidebar, where the main panel sits on top of it: the tab was on screen
+   and not clickable. */
+.tabs{display:flex;flex-wrap:wrap;gap:2px;margin-bottom:10px;border-bottom:1px solid var(--border-soft);}
 .tabs.hidden{display:none;}
 .tab{padding:5px 8px;font-size:11.5px;color:var(--text-faint);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;}
 .tab:hover{color:var(--text-dim);}
@@ -255,6 +258,24 @@ mark.hl.hl-current{background:var(--coral);color:#fff;}
 .art-row .pth{color:var(--text-dim);flex:1;overflow-wrap:anywhere;}
 .art-row .n{color:var(--text-faint);flex:none;width:112px;text-align:right;}
 
+/* instruction surface. The scope is colour-coded because it is the column an analyst reads
+   first: a project file arrived with a checkout and is reachable by anyone who can open a
+   pull request, and an unknown scope is a question rather than an answer. */
+.ins-row{display:flex;gap:12px;align-items:baseline;padding:6px 8px;border-bottom:1px solid var(--border-soft);font-family:var(--mono);font-size:11.5px;cursor:pointer;}
+.ins-row:hover{background:var(--bg-elev-2);}
+.ins-row .sc{flex:none;width:78px;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--text-faint);}
+.ins-row .sc.managed{color:var(--blue);}
+.ins-row .sc.project{color:var(--yellow);}
+.ins-row .sc.local{color:var(--coral);}
+.ins-row .sc.unknown{color:var(--red);}
+.ins-row .ag{color:var(--text-faint);flex:none;width:94px;}
+.ins-row .pth{color:var(--text-dim);flex:1;overflow-wrap:anywhere;}
+.ins-row .mk{color:var(--yellow);flex:none;}
+.ins-row .n{color:var(--text-faint);flex:none;width:96px;text-align:right;}
+.ins-detail{margin:0 0 10px 14px;border-left:1px solid var(--border);padding-left:12px;}
+.ins-detail.hidden{display:none;}
+.ins-body{background:var(--bg-elev);border:1px solid var(--border-soft);border-radius:var(--radius);padding:8px 10px;white-space:pre-wrap;word-break:break-word;max-height:420px;overflow:auto;font-size:11.5px;color:var(--text-dim);}
+
 /* findings */
 .flag-row{border-left:2px solid var(--red);padding:10px 0 12px 14px;margin-bottom:14px;cursor:pointer;}
 .flag-row:hover{background:var(--bg-elev-2);}
@@ -327,6 +348,7 @@ mark.hl.hl-current{background:var(--coral);color:#fff;}
         <div class="tab" data-view="case">Case</div>
         <div class="tab" data-view="timeline">Timeline</div>
         <div class="tab" data-view="findings">Findings<span id="find-badge" class="tab-badge" style="display:none">0</span></div>
+        <div class="tab" data-view="instructions">Instructions</div>
         <div class="tab" data-view="artifacts">Artifacts</div>
       </div>
       <input id="search" type="text" placeholder="Filter sessions…" autocomplete="off" />
@@ -391,6 +413,13 @@ mark.hl.hl-current{background:var(--coral);color:#fff;}
       <div class="panel-sub">What the YAML rule packs found in this case. Run <code>afx scan --case &lt;db&gt;</code> to produce them.</div>
       <div id="findings-body"></div>
     </div>
+    <div id="instructions-panel" class="view-panel hidden">
+      <div class="panel-h">Instruction surface <span class="panel-sub" id="instructions-count" style="margin:0"></span></div>
+      <div class="panel-sub">Everything the agents were told to obey, as collected from this endpoint: instruction files, skills, commands, output styles, rules, steering files and hook scripts. Click a row for the text.</div>
+      <div id="instructions-note" class="notice"></div>
+      <div id="instructions-filters" class="tool-filters"></div>
+      <div id="instructions-body"></div>
+    </div>
     <div id="artifacts-panel" class="view-panel hidden">
       <div class="panel-h">Artifacts <span class="panel-sub" id="artifacts-count" style="margin:0"></span></div>
       <div class="panel-sub">Every file the collection carried, whether or not a parser read it. This is the view that qualifies all the others.</div>
@@ -410,8 +439,9 @@ mark.hl.hl-current{background:var(--coral);color:#fff;}
 const state = { projects: [], current: null, cache: {}, normCache: {}, view: 'sessions', allTools: [], findings: [], toolFilter: 'all',
   // Set only when this page is served by `afx serve` and there is a case behind it.
   // Null in the two standalone modes, which is what the case tabs key off.
-  caseApi: null, caseFindings: null, caseArtifacts: null,
+  caseApi: null, caseFindings: null, caseArtifacts: null, caseInstructions: null,
   timeline: null, timelineAgent: 'all', timelineNoFs: false, artifactFilter: 'all',
+  insScope: 'all',
   // Whether the two cross-session views show the whole log or only the open session.
   // One setting for both, so switching tabs does not change what is being looked at.
   scope: 'all',
@@ -1040,7 +1070,8 @@ function resetData(){
   // The case-backed state as well, and the tabs that read it. Switching from a served case
   // to a file the user picked would otherwise leave four tabs pointing at a case that is no
   // longer the one on screen.
-  state.caseApi=null; state.caseFindings=null; state.caseArtifacts=null; state.timeline=null;
+  state.caseApi=null; state.caseFindings=null; state.caseArtifacts=null;
+  state.caseInstructions=null; state.timeline=null;
   const caseTabs=document.getElementById('case-tabs');
   if(caseTabs) caseTabs.classList.add('hidden');
   document.getElementById('transcript').innerHTML=
@@ -1054,7 +1085,7 @@ function resetData(){
   renderSidebar();
   if(typeof updateSecBadge==='function') updateSecBadge();
   if(typeof updateFindBadge==='function') updateFindBadge();
-  if(['case','timeline','findings','artifacts'].indexOf(state.view)>=0) switchView('sessions');
+  if(['case','timeline','findings','instructions','artifacts'].indexOf(state.view)>=0) switchView('sessions');
   else if(state.view==='tools') renderToolsPanel();
   else if(state.view==='security') renderSecurityPanel();
 }
@@ -1644,6 +1675,160 @@ function renderFindingsPanel(){
       events,
     ]));
   }
+}
+
+// ---------- the Instruction surface view ----------
+// The answer to "what was this agent told to do", off the disk rather than out of a
+// transcript. Deliberately not called a system prompt anywhere in here: the vendor's base
+// prompt is built at runtime and never touches the endpoint, so the note from the API is
+// rendered above the list rather than left for a reader to know already.
+async function renderInstructionsPanel(){
+  const body=document.getElementById('instructions-body');
+  const filters=document.getElementById('instructions-filters');
+  const note=document.getElementById('instructions-note');
+  if(!state.caseApi){
+    filters.innerHTML=''; body.innerHTML=''; note.textContent='';
+    body.appendChild(el('div',{class:'agg-empty',text:'No case is being served to this page.'}));
+    return;
+  }
+  if(!state.caseInstructions){
+    body.innerHTML='';
+    body.appendChild(el('div',{class:'agg-empty',text:'Loading…'}));
+    try{
+      const res=await fetch('api/instructions',{headers:{Accept:'application/json'}});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      state.caseInstructions=await res.json();
+    }catch(e){
+      state.caseInstructions={error:String((e&&e.message)||e),instructions:[],counts:{},note:''};
+    }
+    if(state.view!=='instructions') return;
+  }
+  drawInstructions();
+}
+
+// The one-word marks a row carries. Each is a question an analyst would otherwise have to
+// open every file to ask: did this document grant itself tools, does it contain characters
+// a reviewer cannot see, is it executed rather than read.
+function instructionMarks(row){
+  const marks=[];
+  if((row.declared_tools||[]).length) marks.push('grants '+row.declared_tools.join(', '));
+  if((row.hidden_characters||[]).length){
+    marks.push('invisible: '+row.hidden_characters.map(h=>h.count+'x '+h.codepoint).join(', '));
+  }
+  if(row.executable) marks.push('executed, not read');
+  if(row.prompt_field) marks.push('prompt in '+row.prompt_field);
+  return marks;
+}
+
+function drawInstructions(){
+  const body=document.getElementById('instructions-body');
+  const filters=document.getElementById('instructions-filters');
+  const note=document.getElementById('instructions-note');
+  const data=state.caseInstructions||{instructions:[]};
+  const all=data.instructions||[];
+  note.textContent=data.note||'';
+
+  const counts={};
+  for(const row of all) counts[row.scope]=(counts[row.scope]||0)+1;
+  const order=(data.scope_order||[]).filter(s=>counts[s]);
+  filters.innerHTML='';
+  filters.appendChild(el('div',{class:'tfilter'+(state.insScope==='all'?' active':''),
+    onclick:()=>{state.insScope='all';drawInstructions();}},
+    [document.createTextNode('all'),el('span',{class:'c',text:String(all.length)})]));
+  for(const name of order){
+    filters.appendChild(el('div',{class:'tfilter'+(state.insScope===name?' active':''),
+      onclick:()=>{state.insScope=name;drawInstructions();}},
+      [document.createTextNode(name),el('span',{class:'c',text:String(counts[name])})]));
+  }
+  const flagged=all.filter(r=>instructionMarks(r).length);
+  if(flagged.length){
+    filters.appendChild(el('div',{class:'tfilter'+(state.insScope==='flagged'?' active':''),
+      onclick:()=>{state.insScope='flagged';drawInstructions();}},
+      [document.createTextNode('worth a look'),el('span',{class:'c',text:String(flagged.length)})]));
+  }
+
+  body.innerHTML='';
+  if(data.error) body.appendChild(el('div',{class:'notice',text:'The instruction surface could not be read: '+data.error}));
+  const rows=all.filter(r=>state.insScope==='all'
+    ||(state.insScope==='flagged'?instructionMarks(r).length:r.scope===state.insScope));
+  // A filter that takes rows off the screen is only honest while it says how many, which
+  // is the same rule the transcript filters follow.
+  document.getElementById('instructions-count').textContent=rows.length===all.length
+    ? '· '+all.length+' file(s)'
+    : '· '+rows.length+' of '+all.length+' file(s), '+(all.length-rows.length)+' hidden by this filter';
+  if(!rows.length){
+    body.appendChild(el('div',{class:'agg-empty',text:'No instruction files in this case match this filter.'}));
+  }
+  for(const row of rows){
+    const marks=instructionMarks(row);
+    const detail=el('div',{class:'ins-detail hidden'});
+    const line=el('div',{class:'ins-row',onclick:()=>toggleInstruction(row,detail)},[
+      el('span',{class:'sc '+row.scope,text:row.scope}),
+      el('span',{class:'ag',text:row.agent||'unclaimed'}),
+      el('span',{class:'pth',text:row.original_path}),
+      marks.length?el('span',{class:'mk',text:marks.join(' · ')}):null,
+      el('span',{class:'n',text:row.chars+' chars'}),
+    ]);
+    body.appendChild(line);
+    body.appendChild(detail);
+  }
+}
+
+// The characters a reviewer cannot see, made visible. The point of the whole view is that
+// a human approved one text and the model read another, so the detail shows where: each
+// invisible character is replaced by its codepoint in brackets, and the label says the text
+// is being shown that way. The original bytes are untouched in the bundle and in `raw`.
+const HIDDEN_MARKS=['\u200b','\u200c','\u200d','\u2060','\ufeff','\u202a','\u202b',
+  '\u202c','\u202d','\u202e','\u2066','\u2067','\u2068','\u2069','\u00ad'];
+function markHidden(text){
+  let out='';
+  for(const ch of text){
+    const code=ch.codePointAt(0);
+    if(HIDDEN_MARKS.indexOf(ch)>=0||(code>=0xE0000&&code<=0xE007F)){
+      out+='\u27e6U+'+code.toString(16).toUpperCase().padStart(4,'0')+'\u27e7';
+    }else{
+      out+=ch;
+    }
+  }
+  return out;
+}
+
+// The text of one instruction file, fetched whole rather than shown from the preview when
+// the preview is not the whole thing. A half-shown instruction is the same defect as a
+// dropped record: the half nobody sees is where the planted sentence would be.
+async function toggleInstruction(row,detail){
+  if(!detail.classList.contains('hidden')){detail.classList.add('hidden');return;}
+  detail.classList.remove('hidden');
+  if(detail.dataset.loaded==='true') return;
+  detail.innerHTML='';
+  const head=[];
+  if(row.declared_name||row.title) head.push(row.declared_name||row.title);
+  if(row.declared_description) head.push(row.declared_description);
+  if(row.parse_problem) head.push('not fully read: '+row.parse_problem);
+  if(head.length) detail.appendChild(el('div',{class:'tool-io-label',text:head.join(' — ')}));
+  let text=row.preview;
+  if(!row.preview_is_whole_file){
+    detail.appendChild(el('div',{class:'ins-body',text:row.preview+'\n\nLoading the rest…'}));
+    try{
+      const res=await fetch('api/events/'+encodeURIComponent(row.event_id),{headers:{Accept:'application/json'}});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const record=await res.json();
+      text=(record.payload&&record.payload.text)||row.preview;
+    }catch(e){
+      text=row.preview+'\n\n[the rest of this file could not be loaded: '
+        +String((e&&e.message)||e)+'. It is in the bundle at the path above.]';
+    }
+    detail.innerHTML='';
+    if(head.length) detail.appendChild(el('div',{class:'tool-io-label',text:head.join(' — ')}));
+  }
+  if((row.hidden_characters||[]).length){
+    detail.appendChild(el('div',{class:'tool-io-label',
+      text:'shown with invisible characters marked, because that is what the reviewer did not see'}));
+    detail.appendChild(el('div',{class:'ins-body',text:markHidden(text)}));
+  }else{
+    detail.appendChild(el('div',{class:'ins-body',text:text}));
+  }
+  detail.dataset.loaded='true';
 }
 
 // ---------- the Artifacts view ----------
@@ -2248,7 +2433,8 @@ function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
 const VIEW_PANELS={
   tools:renderToolsPanel, security:renderSecurityPanel,
   case:renderCasePanel, timeline:renderTimelinePanel,
-  findings:renderFindingsPanel, artifacts:renderArtifactsPanel,
+  findings:renderFindingsPanel, instructions:renderInstructionsPanel,
+  artifacts:renderArtifactsPanel,
 };
 
 function switchView(view){

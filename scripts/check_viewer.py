@@ -84,13 +84,15 @@ def rules_for(css, selector):
 
 
 def style_problems(text):
-    """Two CSS mistakes that are invisible until somebody opens the page.
+    """Three CSS mistakes that are invisible until somebody opens the page.
 
-    Both of these happened. A <button> whose rule sets no background renders with the
+    All three happened. A <button> whose rule sets no background renders with the
     platform's button face, which on a dark page is a light grey slab where a label should
-    be. And a layout class that sets `display` overrides `.hidden` whenever it is written
-    later in the stylesheet, so an element with class="tabs hidden" is visible: equal
-    specificity, and the last rule wins.
+    be. A layout class that sets `display` overrides `.hidden` whenever it is written later
+    in the stylesheet, so an element with class="tabs hidden" is visible: equal
+    specificity, and the last rule wins. And the tab bar is a flex row inside a
+    fixed-width sidebar, so adding a tab without letting the row wrap pushed the last one
+    past the sidebar's edge, under the main panel: on screen, and not clickable.
     """
     css = style_block(text)
     problems = []
@@ -124,6 +126,16 @@ def style_problems(text):
                     "class %r sets display and is used together with .hidden, so it needs "
                     "a .%s.hidden rule or .hidden will not hide it" % (name, name)
                 )
+
+    # The tab bar specifically, because it is the one flex row that grows every time a view
+    # is added and it lives in a sidebar of fixed width.
+    for body in rules_for(css, ".tabs"):
+        if re.search(r"(^|;)\s*display\s*:\s*flex", body) and "flex-wrap" not in body:
+            problems.append(
+                ".tabs is a flex row without flex-wrap, so a tab that does not fit the "
+                "sidebar is rendered outside it, underneath the main panel, where it "
+                "cannot be clicked"
+            )
     return problems
 
 

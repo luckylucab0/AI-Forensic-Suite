@@ -39,6 +39,7 @@ from agentforensics.timeline import Filters, header_notes
 from agentforensics.timeline import write as write_timeline
 from agentforensics.unified import FORMAT_VERSION as UNIFIED_VERSION
 from agentforensics.unified import write_log as write_unified_log
+from agentforensics.webui import api
 from agentforensics.webui import serve as serve_case
 
 EXIT_OK = 0
@@ -371,6 +372,78 @@ def cmd_normalize(args: argparse.Namespace) -> int:
     if report.files == 0:
         return EXIT_NOTHING_FOUND
     return EXIT_FINDING if report.unclaimed_paths else EXIT_OK
+
+
+def cmd_instructions(args: argparse.Namespace) -> int:
+    """Show the instruction surface a case holds: what the agents were told to obey.
+
+    Not a system prompt, and the command says so every time. Every agent here assembles
+    its prompt at runtime from a base prompt that is compiled into the product or fetched
+    from the vendor, and that part never touches the endpoint. What is on the endpoint is
+    everything injected into it, which is what this lists: instruction files, skills,
+    commands, output styles, rules, steering files and hook scripts, with the scope they
+    applied at, the tools a skill granted itself and the characters a reviewer could not
+    see.
+    """
+    try:
+        case = Case.open(Path(args.case), create=False)
+    except CaseError as exc:
+        _write(sys.stderr, f"instructions: {exc}")
+        return EXIT_ERROR
+
+    try:
+        view = api.instructions(case)
+    finally:
+        case.close()
+
+    rows = view["instructions"]
+    if args.scope:
+        rows = [row for row in rows if row["scope"] in set(args.scope)]
+    if args.agent:
+        rows = [row for row in rows if row["agent"] in set(args.agent)]
+
+    if args.json:
+        _write(sys.stdout, json.dumps({**view, "instructions": rows}, indent=2, sort_keys=True))
+        return EXIT_OK
+
+    order = {scope: index for index, scope in enumerate(view["scope_order"])}
+    for row in sorted(
+        rows, key=lambda r: (order.get(r["scope"], 99), r["agent"], r["original_path"])
+    ):
+        marks = []
+        if row["declared_tools"]:
+            marks.append("tools: " + ", ".join(row["declared_tools"]))
+        if row["hidden_characters"]:
+            hidden = ", ".join(f"{e['count']}x {e['codepoint']}" for e in row["hidden_characters"])
+            marks.append(f"invisible characters: {hidden}")
+        if row["executable"]:
+            marks.append("executed, not read")
+        if row["prompt_field"]:
+            marks.append(f"prompt in the {row['prompt_field']} field")
+        _write(
+            sys.stdout,
+            f"[{row['scope']:<8}] {row['agent']:<16} {row['original_path']}"
+            + (f"  ({row['chars']} chars)" if row["chars"] else "  (empty)"),
+        )
+        if row["title"] or row["declared_name"]:
+            _write(sys.stdout, f"           {row['declared_name'] or row['title']}")
+        for mark in marks:
+            _write(sys.stdout, f"           {mark}")
+        if row["parse_problem"]:
+            _write(sys.stdout, f"           not fully read: {row['parse_problem']}")
+
+    counts = view["counts"]
+    _write(
+        sys.stdout,
+        f"total: {len(rows)} instruction file(s) of {counts['files']} in the case, "
+        f"{counts['with_declared_tools']} granting tools, "
+        f"{counts['with_hidden_characters']} with characters a reviewer cannot see",
+    )
+    # On stderr, so a piped listing stays clean and the limit is still said every time. An
+    # analyst who reads this as a system prompt would be quoting something the endpoint
+    # never held.
+    _write(sys.stderr, f"note: {view['note']}")
+    return EXIT_OK
 
 
 def cmd_case(args: argparse.Namespace) -> int:
@@ -807,6 +880,22 @@ def build_parser() -> argparse.ArgumentParser:
     case.add_argument("--case", required=True, help="case database")
     case.add_argument("--json", action="store_true")
     case.set_defaults(func=cmd_case)
+
+    instructions = sub.add_parser(
+        "instructions",
+        help="list the instruction surface a case holds: what the agents were told to obey",
+        description=cmd_instructions.__doc__,
+    )
+    instructions.add_argument("--case", required=True, help="case database")
+    instructions.add_argument(
+        "--scope",
+        action="append",
+        choices=["managed", "user", "project", "local", "session", "unknown"],
+        help="only this scope, repeatable",
+    )
+    instructions.add_argument("--agent", action="append", help="only this agent, repeatable")
+    instructions.add_argument("--json", action="store_true")
+    instructions.set_defaults(func=cmd_instructions)
 
     scan = sub.add_parser(
         "scan",

@@ -75,7 +75,7 @@ The three views the standalone viewer has are unchanged: **Sessions** renders on
 conversation, **Tools** lists every tool call across all of them, and **Security** is the
 built-in regex scan for credentials in transcript text.
 
-Serving a case adds four more, and they are questions about a case rather than about a
+Serving a case adds five more, and they are questions about a case rather than about a
 transcript:
 
 **Case** is what the case holds and what it is missing. The counts an analyst reads first,
@@ -95,6 +95,24 @@ because an unscanned case and a clean one look identical otherwise and those are
 conclusions. Each finding names its rule, its pack, what matched, and the events it rests
 on; clicking one of those opens the event.
 
+**Instructions** is the instruction surface: everything the agents were told to obey, as it
+stood on the endpoint. One row per file, with the scope it applied at, the tools a skill
+granted itself, whether it is executed rather than read, and a count of the characters a
+reviewer could not see. Clicking a row shows the text, and for a file with invisible
+characters it is shown with each of them marked, because the whole point is that a human
+approved one text and the model read another. The panel carries one statement it will not
+let a reader miss: this is not a system prompt. Every agent here assembles its prompt at
+runtime from a base prompt compiled into the product or fetched from the vendor, and that
+part never touches the endpoint, so it is not in the case. What is in the case is everything
+injected into it.
+
+The scope column is the one to read first. `managed` is an administrator's file and applies
+to every user. `project` arrived with a checkout, which means anyone who can open a pull
+request could put it there. `local` is the documented personal override inside a working
+copy. `user` is the profile's own. `unknown` means the collection recorded no working copies,
+so a project file cannot be told from a profile one, and the row says so rather than
+guessing: those are opposite findings about who instructed the agent.
+
 **Artifacts** is every file the collection carried, read or not. This is the view that
 qualifies all the others, and the one distinction it exists for is between a file nobody
 collected and a file that was collected and never read. Those are different gaps with
@@ -103,7 +121,7 @@ about the agent's use.
 
 ## Filters
 
-Three of the views filter, and they follow one rule: a filter may take rows off the screen
+Four of the views filter, and they follow one rule: a filter may take rows off the screen
 because somebody asked it to, and it may never leave them looking absent. So every filtered
 view says how many rows are out of view, and the per-chat filter keeps a count and an undo
 on screen for as long as it is set.
@@ -119,13 +137,15 @@ of those three chips, which is why the chip says "tool use" rather than "tool ca
 all sessions, or the one that is open. "This session" only appears when a session is open,
 because a scope that quietly meant "all" would be a filter that lies about what it shows.
 The tools view then filters by tool, by failures only, and by free text over the tool name,
-its summary and its session. The security view filters by severity and by rule.
+its summary and its session. The security view filters by severity and by rule. The instruction
+view filters by scope and by "worth a look", which is every file that grants tools, hides
+characters, is executed rather than read, or holds its prompt in a JSON field.
 
 ![One chat filtered to the turns that used a tool, with the hidden-row count](images/webui-filter.png)
 
 ## The API
 
-Ten routes, all `GET`, all under the run's token. They are listed here because an analyst
+Eleven routes, all `GET`, all under the run's token. They are listed here because an analyst
 scripting against a case they already have open should not have to read the source.
 
 | Path | Answers |
@@ -137,6 +157,7 @@ scripting against a case they already have open should not have to read the sour
 | `/api/events/<event_id>` | one event, as a unified record |
 | `/api/timeline` | a page of the device-wide timeline, in the export's row shape |
 | `/api/findings` | the findings, and the fact of a scan having run |
+| `/api/instructions` | the instruction surface, with its scopes and what is worth a look |
 | `/api/artifacts` | every file the collection carried, and the gaps |
 | `/api/health` | that this is an `afx serve` |
 
@@ -196,3 +217,7 @@ The artifacts, filtered to the files a parser did not understand. This is the li
 decides how much the other views are worth.
 
 ![The artifact list](images/webui-artifacts.png)
+
+The instruction surface, filtered to the files worth a look:
+
+![The instruction surface](images/webui-instructions.png)

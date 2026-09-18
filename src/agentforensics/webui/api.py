@@ -472,6 +472,111 @@ def findings(case: Case) -> dict[str, Any]:
 # ------------------------------------------------------------------------ artifacts
 
 
+# The scopes in the order an analyst reads them: whose instruction won. Managed policy is
+# an administrator's and applies to everybody, a project file arrives with a checkout and is
+# reachable by anyone who can open a pull request, and the local override is the one person
+# working in that directory. The order is presentation only; no agent's real precedence is
+# claimed here, because that is the agent's runtime behaviour and not a fact on disk.
+_SCOPE_ORDER = ("managed", "user", "project", "local", "session", "unknown")
+
+# How much of one instruction file this view carries inline. The whole text is one request
+# away at /api/events/<event_id>, which the view says in its own note, so nothing is hidden
+# and an overview of two hundred files does not ship a megabyte of prose to draw a table.
+PREVIEW = 400
+
+
+def instructions(case: Case) -> dict[str, Any]:
+    """Everything the agents were told to obey, as collected from the endpoint.
+
+    The view an analyst opens to answer what standing instructions were in force and
+    whether any of them were planted. One row per instruction file, grouped by scope, with
+    the tools a skill granted itself and the characters a reviewer could not see.
+
+    The note is part of the answer and not decoration. For nearly every agent the vendor's
+    base prompt is compiled into the binary or arrives from its server, so it is not on the
+    endpoint at all. A view that showed this as "the system prompt" would answer a question
+    the evidence cannot, and an analyst would quote it.
+    """
+    rows = [
+        dict(row)
+        for row in case.query(
+            "SELECT e.event_id, e.agent, e.artifact_id, e.original_path, e.project_path, "
+            "       e.payload, e.parse_problem, e.file_sha256, "
+            "       h.name AS host, u.name AS user, "
+            "       a.status AS catalogue_status, a.mtime_utc, a.size "
+            "  FROM events e "
+            "  LEFT JOIN hosts h ON h.host_id = e.host_id "
+            "  LEFT JOIN users u ON u.user_id = e.user_id "
+            "  LEFT JOIN artifacts a ON a.bundle_uuid = e.bundle_uuid "
+            "                       AND a.original_path = e.original_path "
+            " WHERE e.kind = 'instruction.source' "
+            " ORDER BY e.agent, e.original_path"
+        )
+    ]
+
+    out = []
+    for row in rows:
+        decoded = _decode(row.pop("payload"))
+        payload = decoded if isinstance(decoded, dict) else {}
+        if not isinstance(decoded, dict):
+            # Kept rather than dropped. A payload column that will not decode is evidence
+            # that something went wrong at ingest, and an empty row standing where an
+            # instruction file was is the one reading this view must never produce.
+            row["payload_problem"] = f"the stored payload is not an object: {decoded!r}"
+        text = payload.get("text") or ""
+        row.update(
+            {
+                "scope": payload.get("scope") or "unknown",
+                "title": payload.get("title"),
+                "declared_name": payload.get("declared_name"),
+                "declared_description": payload.get("declared_description"),
+                # A skill naming its own tools has widened what the agent may do, in a
+                # document rather than in a settings file. It is the one field here that is
+                # a permission question, so it travels with the instruction.
+                "declared_tools": payload.get("declared_tools") or [],
+                "executable": bool(payload.get("executable")),
+                "prompt_field": payload.get("prompt_field"),
+                "hidden_characters": payload.get("hidden_characters") or [],
+                "bytes": payload.get("bytes"),
+                "lines": payload.get("lines"),
+                "chars": len(text),
+                "preview": text[:PREVIEW],
+                # Said explicitly rather than left for the reader to work out from a length,
+                # because a preview mistaken for a whole file is a wrong reading of evidence.
+                "preview_is_whole_file": len(text) <= PREVIEW,
+            }
+        )
+        out.append(row)
+
+    by_scope = {
+        scope: sum(1 for row in out if row["scope"] == scope)
+        for scope in _SCOPE_ORDER
+        if any(row["scope"] == scope for row in out)
+    }
+    return {
+        "afx_api": API_VERSION,
+        "instructions": out,
+        "scope_order": list(_SCOPE_ORDER),
+        "by_scope": by_scope,
+        "counts": {
+            "files": len(out),
+            "with_declared_tools": sum(1 for row in out if row["declared_tools"]),
+            "with_hidden_characters": sum(1 for row in out if row["hidden_characters"]),
+            "executable": sum(1 for row in out if row["executable"]),
+            "unreadable": sum(1 for row in out if row["parse_problem"]),
+        },
+        "note": (
+            "This is the instruction surface that was on the endpoint: instruction files, "
+            "skills, commands, output styles, rules, steering files and hook scripts. It is "
+            "not a system prompt. Every agent here builds its prompt at runtime from a base "
+            "prompt that is compiled into the product or fetched from the vendor, and that "
+            "part is not on the endpoint and is not in this case. Assembly order is the "
+            "agent's own behaviour, so the grouping below is presentation and not a claim "
+            "about which file won. Each row's whole text is at /api/events/<event_id>."
+        ),
+    }
+
+
 def artifacts(case: Case) -> dict[str, Any]:
     """Every file the collection carried, read or not, plus the holes it reported.
 
@@ -515,11 +620,13 @@ __all__ = [
     "API_VERSION",
     "DEFAULT_PAGE",
     "MAX_PAGE",
+    "PREVIEW",
     "ApiError",
     "artifacts",
     "case_summary",
     "event_record",
     "findings",
+    "instructions",
     "projects",
     "session_records",
     "sessions",

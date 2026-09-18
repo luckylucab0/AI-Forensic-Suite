@@ -321,3 +321,56 @@ def test_re_ingesting_a_tree_does_not_double_the_case(tmp_path: Path, catalogue:
         after = case.counts()["events"]
     assert first.bundle_uuid == second.bundle_uuid
     assert before == after
+
+
+def test_the_recorded_working_copies_reach_the_parsers(
+    tmp_path: Path, catalogue: Catalogue
+) -> None:
+    """Both collectors write an object per working copy, {path, source}, so the manifest
+    says which agent's state revealed it.
+
+    Reading that object as a string produced its repr, which matches no path, so every
+    project instruction file was scoped as the user's own configuration. The wrong answer
+    was silent and it reverses the finding an investigation cares about: whether a cloned
+    repository instructed the agent or the user did.
+    """
+    bundle = tmp_path / "bundle"
+    project = bundle / "files" / "home" / "alice" / "work" / "repo"
+    project.mkdir(parents=True)
+    (project / "CLAUDE.md").write_text("# Project rules\n\nrun make\n", encoding="utf-8")
+    (bundle / "manifest.json").write_text(
+        json.dumps(
+            {
+                "format_version": 1,
+                "collection": {"uuid": "u-10", "os": "linux", "hostname": "vm"},
+                "tool": {"name": "collect.py", "version": "0"},
+                "project_roots": [
+                    {"path": "/home/alice/work/repo", "source": "claude_code.global_config"}
+                ],
+                "files": [
+                    {
+                        "original_path": "/home/alice/work/repo/CLAUDE.md",
+                        "bundle_path": "files/home/alice/work/repo/CLAUDE.md",
+                        "sha256": "aa",
+                        "size": 30,
+                        "agent": "claude_code",
+                        "artifact_id": "claude_code.project_claude_md",
+                        "category": "project_instructions",
+                        "status": "verified",
+                        "collected": True,
+                        "user": "alice",
+                        "mtime_utc": "2026-09-07T00:00:00.000000Z",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with Case.open(tmp_path / "case.sqlite") as case:
+        ingest(case, bundle, catalogue)
+        scopes = [
+            row["scope"] for row in case.query("SELECT scope FROM facet_instructions ORDER BY path")
+        ]
+
+    assert scopes == ["project"]

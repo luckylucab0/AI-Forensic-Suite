@@ -40,6 +40,10 @@ For one device and one user:
   managed settings overrides
 - Whether anti-forensic steps were taken: retention lowered, history suppressed, a
   project purged
+- What the agent was told to obey: the instruction files, skills, commands, output styles,
+  rules and hook scripts that were in force, at which scope, and which of them hide
+  characters a reviewer cannot see. Not the vendor's base prompt, which is built at runtime
+  and never touches the endpoint
 - Whether the agent was manipulated by injected instructions
 
 Every answer is traceable to a source file, a hash and a line or byte offset, so it
@@ -171,6 +175,7 @@ thing the viewer writes anywhere is your theme choice, in `localStorage`.
 ```bash
 uv run afx ingest /evidence/bundle-2026-09-17 --case case.db   # read a collection in
 uv run afx scan --case case.db                                 # run the rule packs
+uv run afx instructions --case case.db                        # what the agents were told to obey
 uv run afx serve --case case.db                                # open it in a browser
 ```
 

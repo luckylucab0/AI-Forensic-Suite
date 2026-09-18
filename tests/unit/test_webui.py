@@ -268,6 +268,61 @@ def test_an_event_a_finding_rests_on_can_be_fetched(case: Case) -> None:
     assert record["provenance"]["original_path"]
 
 
+def test_the_instruction_view_lists_what_the_agents_were_told_to_obey(case: Case) -> None:
+    view = api.instructions(case)
+
+    assert view["instructions"], "the synthetic profile carries several instruction files"
+    paths = {row["original_path"] for row in view["instructions"]}
+    assert any(path.endswith("SKILL.md") for path in paths)
+    skill = next(row for row in view["instructions"] if row["original_path"].endswith("SKILL.md"))
+    # A skill that grants itself a shell is a permission change written as a document, so it
+    # has to be readable from the instruction view and not only from the permissions one.
+    assert skill["declared_tools"] == ["Bash", "Write"]
+    hidden = next(row for row in view["instructions"] if row["hidden_characters"])
+    assert any(entry["codepoint"] == "U+200B" for entry in hidden["hidden_characters"])
+    assert view["counts"]["files"] == len(view["instructions"])
+
+
+def test_the_instruction_view_says_it_is_not_a_system_prompt(case: Case) -> None:
+    """The honesty guarantee of the whole view, pinned as a test because it is the one thing
+    a reader would otherwise assume. The base prompt is compiled into the product or comes
+    from the vendor's server, so it is not on the endpoint and not in the case, and a view
+    that let somebody quote this as the system prompt would be worse than no view."""
+    note = api.instructions(case)["note"]
+
+    assert "not a system prompt" in note
+    assert "not on the endpoint" in note
+
+
+def test_a_scope_nothing_could_decide_is_unknown_and_says_why(case: Case) -> None:
+    """This case is ingested from a plain tree, which records no working copies, so a
+    project instruction file cannot be told from a profile one. The honest answer is unknown
+    with the reason on the event, because the alternative reverses the finding about who
+    instructed the agent."""
+    rows = api.instructions(case)["instructions"]
+
+    unknown = [row for row in rows if row["scope"] == "unknown"]
+    assert unknown, "a tree source records no working copies, so nothing here is decidable"
+    assert all("unknown rather than assumed" in (row["parse_problem"] or "") for row in unknown)
+
+
+def test_a_preview_says_whether_it_is_the_whole_file(case: Case) -> None:
+    """A preview mistaken for a whole file is a wrong reading of evidence, so the row says
+    which it is rather than leaving it to be inferred from a length."""
+    for row in api.instructions(case)["instructions"]:
+        assert row["preview_is_whole_file"] == (row["chars"] <= api.PREVIEW)
+
+
+def test_the_instruction_endpoint_is_served(client: Client) -> None:
+    """Routed explicitly, because the route table has no fallback: an endpoint nobody added
+    to it answers 404 however well the projection behind it works."""
+    served = client.json("/api/instructions")
+
+    assert served["afx_api"] == api.API_VERSION
+    assert served["instructions"]
+    assert "not a system prompt" in served["note"]
+
+
 def test_the_artifact_list_separates_not_collected_from_not_read(case: Case) -> None:
     """The distinction the reliability of every other view depends on."""
     listed = api.artifacts(case)

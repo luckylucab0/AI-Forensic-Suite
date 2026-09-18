@@ -134,8 +134,20 @@ class NativeBundle:
         which directories the user actually had open, which is what the project-anchored
         half of the catalogue depends on.
         """
-        roots = self._manifest.get("project_roots") or []
-        return [str(r) for r in roots]
+        out = []
+        for root in self._manifest.get("project_roots") or []:
+            # Both collectors write an object per root, {path, source}, so that the manifest
+            # says which agent's state file revealed it. Reading the object as a string
+            # produced its repr, which matched nothing and silently turned every project
+            # file into a profile one. A bare string is accepted as well, because an older
+            # bundle or another producer may write one.
+            if isinstance(root, dict):
+                path = root.get("path")
+                if path:
+                    out.append(str(path))
+            elif root:
+                out.append(str(root))
+        return out
 
 
 __all__ = ["NativeBundle"]
