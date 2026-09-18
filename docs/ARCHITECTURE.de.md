@@ -126,6 +126,15 @@ ist, dass das nicht *unbemerkt* geht.
   geprüftes Schema gibt, sichtbares Material, das jemand noch ansehen muss, und nicht bloß
   eine Datei, deren Existenz der Fall vermerkt. Ein geprüfter Parser für einen einzelnen
   Agenten, der davor eingeordnet wird, übernimmt ein Artefakt, ein Schema auf einmal.
+  Daneben liegt ein zweites formatbezogenes Modul, `instructions/`, für den
+  Anweisungsbestand: die dreiundsechzig Katalogartefakte mit Skills, Commands, Output
+  Styles, Regeln, Steering-Dateien und Hook-Skripten. Es liest jede Datei ganz, unterscheidet
+  den Scope anhand der von der Sammlung festgehaltenen Arbeitskopien statt anhand der Form
+  des Pfades, holt das Front Matter eines Skills heraus samt der Werkzeuge, die es sich
+  selbst zuspricht, und zählt die Zeichen, die ein Prüfer nicht sehen kann. Es behauptet
+  nicht, einen Systemprompt zu zeigen: der Basisprompt des Herstellers liegt nicht auf dem
+  Endpunkt, und das Gegenteil zu sagen würde eine Frage beantworten, die das Material nicht
+  beantworten kann.
 - `model/` das einheitliche Ereignismodell und das SQLite-Fallschema
 - `unified/` das Ereignismodell als Datenstrom: das JSON-Lines-Format und sein Schema,
   dazu der Normalisierer, der eine Sammlung ohne Falldatenbank in ein Log überführt
@@ -157,15 +166,25 @@ Die Ereignisarten sind absichtlich agentenneutral: `session.start`, `session.end
 `user.prompt`, `assistant.text`, `assistant.thinking`, `tool.call`, `tool.result`,
 `file.read`, `file.write`, `file.snapshot`, `command.exec`, `network.request`, `mcp.call`,
 `permission.decision`, `permission.change`, `safety.refusal`, `config.snapshot`,
-`memory.write`, `plan.write`, `prompt.history` und `artifact.fs`.
+`instruction.source`, `memory.write`, `plan.write`, `prompt.history` und `artifact.fs`.
 
-Drei davon verdienen einen Satz. `permission.decision` ist eine Anfrage, entschieden nach
+Vier davon verdienen einen Satz. `permission.decision` ist eine Anfrage, entschieden nach
 den geltenden Regeln, und `permission.change` ist eine Änderung der Regeln selbst: die
 Umgehungsfrage braucht beide, denn das eine sagt, was mit einer Anfrage passiert ist, und
 das andere, wer die Torpfosten verschoben hat und wann. `safety.refusal` ist das Modell, das
 ablehnt, und das ist nicht dasselbe wie eine von der Umgebung verweigerte Berechtigung. Nur
 manche Agenten halten es fest, sein Fehlen ist also nie ein Beweis, dass nichts abgelehnt
 wurde.
+
+`instruction.source` ist eine Anweisung, die auf dem Endpunkt in Kraft war: eine CLAUDE.md,
+ein Skill, ein Output Style, eine Regel- oder Steering-Datei, ein Hook-Skript. Sie gehört
+nicht zu `config.snapshot`, weil die beiden verschiedene Fragen beantworten und eine
+Zeitachse sie auseinanderhalten muss. Eine Einstellung sagt, wie der Agent konfiguriert war;
+eine Anweisung ist Text, dem das Modell folgen sollte, und ob der Agent durch eingeschleuste
+Anweisungen manipuliert wurde, betrifft nur das Zweite. Der Name sagt absichtlich source und
+nicht prompt: der Basisprompt des Herstellers ist in den Agenten kompiliert oder kommt von
+dessen Server, liegt also gar nicht auf dem Endpunkt. Diese Art trägt den Teil eines
+Systemprompts, der Beweis sein kann, und nie das Ganze.
 
 `artifact.fs` braucht eine Erklärung: diese Art trägt die Dateisystem-Zeitstempel der
 Artefaktdatei selbst. Manche Artefakte enthalten überhaupt keine eigenen Zeitstempel, und

@@ -956,6 +956,13 @@ function unifiedEvent(r, derived, model){
                  +(unifiedText(r)?': '+unifiedText(r):''));
     case 'config.snapshot':
       return sys('config: '+(unifiedText(r)||JSON.stringify(pl)));
+    case 'instruction.source':{
+      // What the agent was told to obey, as it stood on disk. Its own row rather than
+      // folded into config: a poisoned instruction file and a changed setting are
+      // different findings, and only one of them is read by the model as an order.
+      const i=(pl.instructions||[])[0]||{};
+      return sys('instruction'+(i.scope?' ('+i.scope+')':'')+': '+(i.path||unifiedText(r)));
+    }
     case 'artifact.fs':
       // A file, not a turn. Grouped into its own project rather than dropped, because the
       // difference between an agent that left nothing and a store nobody has read is the

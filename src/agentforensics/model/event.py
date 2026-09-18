@@ -55,6 +55,16 @@ EVENT_KINDS = (
     # analyst asking whether controls were bypassed needs to tell them apart.
     "safety.refusal",
     "config.snapshot",
+    # An instruction that was in force on the endpoint: a CLAUDE.md, a skill, an output
+    # style, a rules or steering file, a hook script. Its own kind rather than part of
+    # config.snapshot because the two answer different questions and a timeline has to keep
+    # them apart. A setting says how the agent was configured; an instruction is text the
+    # model was told to obey, and the question of whether the agent was manipulated by
+    # injected instructions is only about the second. The name says source rather than
+    # prompt on purpose: the vendor's own base prompt is compiled into the agent or comes
+    # from its server and is not on the endpoint at all, so this kind is the part of a
+    # system prompt that can be evidence, never the whole of one.
+    "instruction.source",
     "memory.write",
     "plan.write",
     "prompt.history",

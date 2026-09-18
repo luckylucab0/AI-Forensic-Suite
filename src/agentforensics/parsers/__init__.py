@@ -28,6 +28,7 @@ from agentforensics.parsers.cline import ClineParser
 from agentforensics.parsers.codex import CodexParser
 from agentforensics.parsers.copilot import CopilotParser
 from agentforensics.parsers.gemini import GeminiParser
+from agentforensics.parsers.instructions import InstructionsParser
 from agentforensics.parsers.pi import PiParser
 from agentforensics.parsers.sqlite_generic import SqliteGenericParser
 
@@ -40,6 +41,7 @@ PARSERS: tuple[Parser, ...] = (
     CodexParser(),
     CopilotParser(),
     GeminiParser(),
+    InstructionsParser(),
     PiParser(),
     # Last, and it has to stay last: it claims every SQLite store in the catalogue, so a
     # verified schema parser placed after it would never be reached.

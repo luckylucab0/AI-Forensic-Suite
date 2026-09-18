@@ -342,7 +342,7 @@ artifacts:
     Ordinary project files, normally under version control, so superseded content is usually recoverable from git.
   notes: |-
     The vendor states project rules are Markdown files in {{project-root}}/.amazonq/rules and that Amazon Q 'will automatically use them as context whenever a developer chats with Amazon Q within your project'. Subdirectories are supported. The vendor's default agent configuration lists file://.amazonq/rules/**/*.md alongside file://AmazonQ.md, file://AGENTS.md and file://README.md as default resources, which is why those root files are included here. Forensically this is the main injected-instruction surface for the IDE and the CLI: anything a contributor can commit under .amazonq/rules becomes standing instructions for every developer on the project. Note the rules can be toggled per chat session through the Rules button in the IDE, so a rule file being present does not prove it was active for a given conversation; the transcript is the arbiter.
-  parser: null
+  parser: instructions
 - id: amazonq.memory_bank
   title: Amazon Q Developer memory bank
   category: memory
@@ -388,7 +388,7 @@ artifacts:
     User-edited. Content was copied (not moved) into ~/.kiro/steering by the Kiro CLI install migration, so both copies commonly exist.
   notes: |-
     The user-scope equivalent of project rules, which the product's own documentation barely mentions. Sourced from the vendor's Kiro migration page, whose configuration table maps 'Rules / Steering, User' to ~/.aws/amazonq/rules on the Q Developer CLI side and ~/.kiro/steering on the Kiro side, and whose migration steps state 'Files from rules folder in ~/.aws/amazonq folder are copied to ~/.kiro/steering folder with the same names'. These are per-user standing instructions that apply across every project, which makes them a higher-impact injection target than any single project's rules and an easy thing to miss because the main Amazon Q user guide documents only the project-level .amazonq/rules folder.
-  parser: null
+  parser: instructions
 - id: amazonq.prompt_library
   title: Amazon Q Developer saved prompt library
   category: instructions
@@ -411,7 +411,7 @@ artifacts:
     User-managed. Copied into ~/.kiro/prompts by the Kiro CLI install migration.
   notes: |-
     The vendor states 'Prompts are saved in the ~/.aws/amazonq/prompts folder' and that creating a prompt named for example Create_sequence_diagram produces Create_sequence_diagram.md there; prompt names cannot contain spaces. Saved prompts are invoked in chat with @<name>, so a transcript line containing @something is a pointer into this directory, and resolving it is often necessary to know what was actually sent to the model. The source constructs the same paths from the constants PROMPTS_DIR = ".aws/amazonq/prompts" (global) and ".amazonq/prompts" (workspace).
-  parser: null
+  parser: instructions
 - id: amazonq.cli_todo_lists
   title: Amazon Q Developer CLI todo lists
   category: project_instructions
@@ -438,7 +438,7 @@ artifacts:
     Updated in place as tasks complete, so intermediate states are lost. Persist in the project directory and can be resumed across sessions.
   notes: |-
     The vendor documentation states these are stored in .amazonq/cli-todo-lists/ in the current working directory, one JSON file per list, and explicitly lists 'Modified file paths' among the recorded fields. That makes them a compact, independent record of which files an agent task touched, tied to a timestamp-based id, which is valuable when the conversation for that directory has since been overwritten in the database. Also confirmed by the built-in tools reference.
-  parser: null
+  parser: instructions
 - id: amazonq.cli_subagent_executions
   title: Amazon Q Developer CLI sub-agent execution records
   category: log

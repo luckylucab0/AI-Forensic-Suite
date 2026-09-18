@@ -308,7 +308,7 @@ artifacts:
     Executable bits and mtimes matter as much as the content - record mode, owner and timestamps, not just the script text.
   notes: |-
     THE SHARPEST INJECTION SURFACE IN THIS WHOLE FAMILY, and the one most likely to be missed. A hook is arbitrary code that the agent runs automatically on tool use or prompt submission, and a workspace hook arrives with the repository - so cloning a hostile repo plus enabling hooks is remote code execution by design. Collect the script bodies verbatim (they are evidence, not secrets), plus mode/owner/mtime, and diff workspace hooks against the repo's git history to spot ones that were never committed. Cline's own docs even ship a PreToolUse guard example (docs/customization/clineignore.mdx) showing the copy-and-chmod workflow, which is what to grep shell history for.
-  parser: null
+  parser: instructions
 - id: crosscutting.mcp_config_files
   category: mcp_config
   root: project
@@ -357,7 +357,7 @@ artifacts:
     CONFIRMED AS THE EMERGING CROSS-VENDOR STANDARD, described by its own project as "A simple, open format for guiding coding agents" providing "a dedicated, predictable place to provide context and instructions to help AI coding agents work on your project". Independent corroboration of multi-vendor adoption: GitHub's official docs list `AGENTS.md` as a first-class instruction source for both Copilot coding agent and Copilot CLI ("In Git root and cwd") and describe it as "Cross-tool / agent-agnostic" and "Always-on rules shared across AI agents"; Cursor and Cline read it too. Canonical repo is agentsmd/agents.md (the agents.md site itself is egress-blocked here). PRIMARY INJECTION SURFACE: a repo-supplied AGENTS.md is untrusted input that every major agent loads automatically without the user seeing it.
 
     Record structure: NESTED AND HIERARCHICAL - do not stop at the repo root. Verbatim from the agents.md site source: "Large monorepo? Use nested AGENTS.md files for subprojects... Place another AGENTS.md inside each package. Agents automatically read the nearest file in the directory tree, so the closest one takes precedence and every subproject can ship tailored instructions. For example, at time of writing the main OpenAI repo has 88 AGENTS.md files." So collect every AGENTS.md in the tree with its depth, and reconstruct precedence nearest-first.
-  parser: null
+  parser: instructions
 - id: crosscutting.instructions_claude_md
   category: project_instructions
   root: project
@@ -389,7 +389,7 @@ artifacts:
     CROSS-VENDOR READ - worth stressing. GitHub's own Copilot CLI reference table lists `CLAUDE.md` as an instruction source it loads "In Git root and cwd", and adds "Copilot CLI also uses .claude/CLAUDE.md"; Copilot's cloud agent lists `/CLAUDE.md` among its supported custom-instruction files; Cline reads .claude/skills/. So a CLAUDE.md is NOT evidence that Claude Code specifically was used - several agents consume it. Anthropic's own uninstall docs confirm the surrounding config: `rm -rf ~/.claude`, `rm ~/.claude.json`, project `rm -rf .claude` and `rm -f .mcp.json`, and note that "The VS Code extension, the JetBrains plugin, and the Desktop app also write to ~/.claude/".
 
     Record structure: Two tiers: user-global ~/.claude/CLAUDE.md and per-project CLAUDE.md discovered up and down the tree, plus the .claude/CLAUDE.md spelling. Collect all of them with paths, and treat the union as the effective prompt.
-  parser: null
+  parser: instructions
 - id: crosscutting.instructions_clinerules
   category: project_instructions
   root: project
@@ -430,7 +430,7 @@ artifacts:
     Confirmed via GitHub code search content matches across cline/cline docs and source. THE REMOTE-CONFIG PATH IS THE STANDOUT FINDING: instructions, skills and workflows can be pushed to the workstation from a remote config server and land on disk under .cline/remote-config/ - that is a centrally-administered injection channel with no repo history to audit, and aafs should collect it and flag its provenance explicitly.
 
     The verification pass confirmed the rule file and rule directory on the cited pages and none of the seven paths above, which cover skills, workflows, remote configuration and the ignore file. The agent's own catalogue file carries sourced entries for several of them.
-  parser: null
+  parser: instructions
 - id: crosscutting.instructions_copilot_instructions
   category: project_instructions
   root: project
@@ -466,7 +466,7 @@ artifacts:
     THE ENV VAR MATTERS: COPILOT_CUSTOM_INSTRUCTIONS_DIRS can point at arbitrary directories outside the repo, so a purely repo-relative sweep can miss the instructions that actually shaped a run - read the environment. Copilot CLI's own state lives under $HOME/.copilot/ (settings.json, mcp-config.json, providers.json for BYOK providers/models, logs/ relocatable via COPILOT_LOG_DIR), with COPILOT_HOME overriding the whole directory. Repository-level settings: .github/copilot/settings.json and .github/copilot/settings.local.json. Custom agents can also be defined org-wide in a .github or .github-private repository at /agents/AGENT-NAME.md, i.e. instructions can arrive from outside the repo entirely.
 
     The verification pass confirmed the repository and user instruction files and the instructions glob for both scopes, and found the prompt, agent and skill directories and the two settings files absent from the cited page.
-  parser: null
+  parser: instructions
 - id: crosscutting.instructions_cursor_rules
   category: project_instructions
   root: project
@@ -491,7 +491,7 @@ artifacts:
     MARKED UNVERIFIED DELIBERATELY: docs.cursor.com is egress-blocked from this environment, so I could not reach the vendor documentation and my only source is a community reference repo - recollection-adjacent, needs verification against docs.cursor.com. The RULE.md-vs-.mdc question in particular is unresolved and is the kind of layout change that is itself forensically interesting (it dates the install). What IS well corroborated across several independent sources: Cursor now also reads AGENTS.md from the project root and any subdirectory with more specific paths taking precedence. Note the alwaysApply and glob-triggered rule types mean a rule can enter the model's context with no user action at all - an injection vector.
 
     Record structure: COLLECT BOTH SPELLINGS AND DO NOT ASSUME WHICH IS CURRENT. Legacy: a single .cursorrules file at the repo root (deprecated around Cursor 0.43 but still read). Then .cursor/rules/ with per-rule .mdc files carrying YAML frontmatter fields description, globs and alwaysApply. The community reference I fetched states the CURRENT shape is a folder per rule containing a RULE.md, with .mdc described as "legacy format with metadata" that is "functional but superseded". Rule application types: Always Apply, Apply Intelligently (agent decides from `description`), Apply to Specific Files (glob match), Apply Manually (@-mention). Stated precedence: Team Rules -> Project Rules -> User Rules. Nested .cursor/rules directories apply to their subtree. User and Team rules live in Cursor Settings / the Cursor dashboard, i.e. partly off-disk.
-  parser: null
+  parser: instructions
 - id: crosscutting.instructions_gemini_md
   category: project_instructions
   root: project
@@ -518,7 +518,7 @@ artifacts:
     Confirmed via GitHub code search content match against google-gemini/gemini-cli docs. Also read by Copilot CLI ("GEMINI.md | In Git root and cwd"), so again not vendor-exclusive. Two high-value neighbours spotted in the same repo and worth flagging to the Gemini family owner: ~/.gemini/tmp/<project>/chats/ holds session transcripts (docs/cli/auto-memory.md: "The service indexes recent sessions from ~/.gemini/tmp/<project>/chats/"), and an Auto Memory feature can REWRITE ~/.gemini/GEMINI.md on its own - meaning the instruction file's contents may be machine-authored rather than user-authored, which matters for any injection finding. Plans dir: .gemini/plans.
 
     The verification pass confirmed the instruction file locations and found that the cited page states nothing about the settings file, which has its own sourced entry in that agent's catalogue file.
-  parser: null
+  parser: instructions
 - id: crosscutting.instructions_junie_guidelines
   category: project_instructions
   root: project
@@ -539,7 +539,7 @@ artifacts:
     Confirmed by fetching a real file in a JETBRAINS-OWNED repository, which is decent corroboration for a JetBrains product convention, plus GitHub code search showing 2,140 files at that exact path across repos including jodconverter/jodconverter, bytechefhq/bytechef and pestphp/pest-plugin-browser. Marked medium because I could not reach JetBrains' own documentation to confirm whether other files live under .junie/ (a user-global tier, MCP config, or per-directory guidelines) - that gap should be closed. Relevant to aafs because Junie runs inside the JetBrains IDEs and its on-disk footprint is otherwise poorly documented.
 
     Record structure: Single markdown file of project guidelines at .junie/guidelines.md. The JetBrains/Rplugin copy I fetched opens "It is an IntelliJ plugin for support of R language and RMarkdown." followed by a Code structure section and coding-convention guidance - i.e. free-form prose, no frontmatter, no schema to key off.
-  parser: null
+  parser: instructions
 - id: crosscutting.instructions_kiro_steering
   category: project_instructions
   root: project
@@ -561,7 +561,7 @@ artifacts:
     Confirmed EMPIRICALLY: GitHub code search returns 3,888 files matching path:.kiro/steering with extension md, including ossrs/srs, ironplc/ironplc, terraphim/terraphim-ai and fivexl/* repos. kiro.dev is egress-blocked from this environment, so the vendor-documented inclusion modes (the frontmatter that controls whether a steering file is always-on, conditional on a file glob, or manual) are NOT confirmed here and should be filled in from kiro.dev/docs/steering. That frontmatter is precisely what decides whether a steering file auto-enters context, so it matters for injection analysis.
 
     Record structure: Directory of .md steering documents. The conventional trio product.md / tech.md / structure.md is clearly visible in the wild (e.g. cremich/promptz and joshuakatt/Bob-The-Builder each carry all three), but repos also add arbitrary names (glossary.md, doc-standards.md, adr-index.md, roadmap.md) and at least one ships .kiro/steering/AGENTS.md - so glob the directory, do not enumerate fixed filenames. Sibling .kiro/specs/ holds the spec-driven-development artifacts.
-  parser: null
+  parser: instructions
 - id: crosscutting.instructions_windsurf_rules
   category: project_instructions
   root: project
@@ -583,7 +583,7 @@ artifacts:
     Confirmed EMPIRICALLY rather than from vendor docs: GitHub code search returns 3,232 files matching path:.windsurf/rules with extension md, across substantial repos including Adyen/adyen-web, dxos/dxos, aws/modern-data-architecture-accelerator and tmforum-oda/oda-canvas. docs.windsurf.com was not reachable from this environment, so the directory convention is verified by widespread real-world usage but the precedence rules, any frontmatter schema, and the global/user-level rules location are all unconfirmed. Marked medium; needs a vendor-doc pass.
 
     Record structure: Two generations, same as Cursor: a legacy single .windsurfrules file at the repo root, superseded by a .windsurf/rules/ directory of .md files. Collect both.
-  parser: null
+  parser: instructions
 - id: crosscutting.shell_bash_history
   category: shell_history
   root: user_profile

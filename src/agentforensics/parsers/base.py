@@ -42,6 +42,14 @@ class ParseContext:
     agent: str
     user: str | None = None
     host: str | None = None
+    # The working copies the collection recorded, where it recorded any. Carried because it
+    # is the only non-guessing way to tell a project-scoped instruction file from a
+    # profile-scoped one: both are absolute paths under the same home directory, and the
+    # difference decides whether a poisoned CLAUDE.md came from the repository or from the
+    # user's own configuration. An empty tuple means the source did not record them, which
+    # is a different answer from "there were none" and is reported as an unknown scope
+    # rather than filled in.
+    project_roots: tuple[str, ...] = ()
 
     def provenance(self, locator: str | None) -> Provenance:
         return Provenance(

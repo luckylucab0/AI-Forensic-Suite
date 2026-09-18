@@ -655,7 +655,7 @@ artifacts:
     Created on first plugin install. Re-synced from a marketplace when version.json changes or the directory mtime changes; a plugin removed from a marketplace is unregistered and uninstalled on the next sync, so the on-disk copy can vanish without user action.
   notes: |-
     The vendor states cowork_plugins/ holds 'user-installed and org-provisioned plugins'. This is where the injected-instruction question is answered for the Cowork and Chat surfaces: a plugin carries skills, slash commands, sub-agents, hooks and MCP servers, all of which are instructions or execution the agent obeys. Desktop extensions (.mcpb bundles, zip archives containing a local MCP server and a manifest.json) are installed here too when allowed; Anthropic's extensions page says 'user-added extensions are stored in the user's local data directory'. Note the surface split the vendor documents: Cowork sessions run hooks from marketplace plugins, org-plugins and user plugins, while Code sessions do not load org-plugins hooks or skills. Cowork does NOT read the Claude Code CLI's ~/.claude directory for skills and plugins; those come from the claude.ai account and are synced at session start, which means a skill that only exists server-side may leave no on-disk copy at all.
-  parser: null
+  parser: instructions
 - id: claude_desktop.org_plugins
   title: Administrator-provisioned plugin directory (org-plugins)
   category: instructions
@@ -683,7 +683,7 @@ artifacts:
     Replaced by software distribution. version.json changing by any string triggers a re-sync into each user's copy.
   notes: |-
     Both paths are stated verbatim by the vendor, and these are standard Claude directory names, not the third-party Claude-3p ones. Each subdirectory is one plugin and the directory name is the plugin's canonical name; a directory without .claude-plugin/plugin.json or a top-level SKILL.md is ignored. The vendor notes Windows uses Program Files rather than ProgramData so only administrators can write it, and that Claude Desktop treats the presence of this directory as an admin-provisioned source. Symlinks inside a plugin are followed only when the target resolves inside the plugin directory, but a symlinked top-level plugin directory is followed, which is a path worth checking for an instruction planted outside the collected tree.
-  parser: null
+  parser: instructions
 - id: claude_desktop.user_output_folder
   title: User-visible output folder (~/Claude)
   category: file_snapshot
@@ -836,7 +836,7 @@ artifacts:
     The vendor states deleting a task archives all sessions it created, and an 'Also delete files on disk' checkbox additionally removes the task's SKILL.md and associated data. Schedule, folder, model and enabled state are NOT in this file and are held elsewhere, so the file alone does not tell you whether the task was active.
   notes: |-
     Directly stated: 'To edit a task's prompt on disk, open ~/.claude/scheduled-tasks/<task-name>/SKILL.md (or under CLAUDE_CONFIG_DIR if set)'. Forensically this is a standing, unattended instruction that runs Claude on a schedule with a permission mode and a folder, so it is a prime place for a persistence mechanism or an injected instruction. It sits inside the shared ~/.claude directory even though it is a desktop-app feature, which is exactly the attribution problem this catalogue has to flag: a finding here cannot be attributed to the CLI. Allow rules from ~/.claude/settings.json also apply to scheduled task sessions.
-  parser: null
+  parser: instructions
 - id: claude_desktop.code_launch_config
   title: Preview server configuration written into the project (.claude/launch.json)
   category: config

@@ -104,7 +104,7 @@ artifacts:
     Partially unverified: skills/ is corroborated, droids/ and commands/ are recollection, needs verification. Custom droid definitions are user-authored agent personas with their own tool grants and are a common vector for privilege widening.
 
     Record structure: ~/.factory/skills was observed in a code-search content fragment. droids/ and commands/ come only from a WebSearch summary of the Factory docs, which I could not fetch (docs.factory.ai is blocked from this environment) - treat those two as unconfirmed. Custom droid definitions carry their own instructions and tool sets.
-  parser: null
+  parser: instructions
 - id: factory_droid.logs
   category: log
   root: user_profile

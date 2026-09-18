@@ -525,7 +525,7 @@ artifacts:
     Appended to by /memory add under the '## Qwen Added Memories' heading. Not expired.
   notes: |-
     The default context filename list in this fork is BOTH QWEN.md and AGENTS.md (QWEN.md first, for backward compatibility), and context.fileName in settings can replace the list entirely - so read that setting before deciding the file is absent. The documentation states the global slot is '~/.qwen/<configured-context-filename>'. This is where injected or user-planted standing instructions would persist across every project, so it is the first place to look for a durable prompt-injection foothold. memory.md has a path helper (Storage.getGlobalMemoryFilePath()) but no caller in the fork; collect it if present, draw nothing from its absence.
-  parser: null
+  parser: instructions
 - id: qwen_code.project_instructions
   title: Project level agent instructions, project summary and team memory
   category: project_instructions
@@ -555,7 +555,7 @@ artifacts:
     Tracked in git in the normal case, so prior versions are recoverable from the repository. team-memory is git-tracked by design and, with memory.enableTeamMemorySync on, is automatically committed, pulled and pushed at session start.
   notes: |-
     Context files are discovered by walking UP from the cwd to the git root or the home directory, and downward through the workspace, so a QWEN.md far from the project root can still be in the prompt; the /memory dialog shows the actual concatenation. QWEN.local.md is loaded from one fixed slot, <projectRoot>/.qwen/, after all other project context, and is intended to be gitignored, which makes it the most likely place for instructions that are NOT in the repository history. Instruction files support @path/to/file.md imports, so the effective prompt can pull in content from files that are not themselves context files - follow the imports. PROJECT_SUMMARY.md is stated by the settings documentation (ui.enableWelcomeBack) and written by /summary; its path is cited from the summary command source rather than the constants module linked here.
-  parser: null
+  parser: instructions
 - id: qwen_code.ignore_files
   title: Ignore files controlling what the agent may read
   category: project_instructions
@@ -578,7 +578,7 @@ artifacts:
     Part of the working copy.
   notes: |-
     gitignore syntax. .agentignore and .aiignore are the documented DEFAULT compatibility names and context.fileFiltering.customIgnoreFiles can add or replace them, so read that setting rather than assuming the three names are exhaustive. Relevant twice over: it bounds what the agent could have read, and a late edit that un-ignores a sensitive directory is a meaningful event.
-  parser: null
+  parser: instructions
 - id: qwen_code.auto_memory
   title: Managed auto-memory (project and user tiers)
   category: memory

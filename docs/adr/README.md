@@ -30,3 +30,4 @@ Add one with the next free number, using [0000-template.md](0000-template.md).
 | [0020](0020-the-case-is-read-as-a-unified-log.md) | The local UI reads a case as a unified log, under a per-run token |
 | [0021](0021-source-available-licence.md) | The licence is the Elastic License 2.0, not MIT |
 | [0022](0022-an-unknown-sqlite-store-is-read-uninterpreted.md) | A SQLite store with no verified schema is read uninterpreted, never guessed |
+| [0023](0023-the-instruction-surface-is-its-own-event-kind.md) | The instruction surface is read into its own event kind, and is never called a system prompt |

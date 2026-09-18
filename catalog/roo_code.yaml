@@ -97,7 +97,7 @@ artifacts:
     getGlobalRooDirectory() = path.join(os.homedir(), ".roo") with the doc comment giving the per-OS examples verbatim ('macOS/Linux: ~/.roo/ ... Windows: %USERPROFILE%\.roo\'). getProjectRooDirectoryForCwd(cwd) = path.join(cwd, ".roo"). The same file also resolves a global '.agents' directory (the emerging cross-agent convention). Global rules apply to every project and are therefore the best single source for 'what standing instructions did this user give their agent'.
 
     The verification pass found the only per-mode rules example on the cited page sitting under a project subfolder rather than under the user's global directory.
-  parser: null
+  parser: instructions
 - id: roo_code.settings
   category: mcp_config
   root: user_profile
@@ -154,7 +154,7 @@ artifacts:
     Precedence verified from custom-instructions.ts: it first checks '.roo/rules/ directories in order (global, project-local, and optionally subfolders)' and returns them under the header 'Rules from .roo directories'; only if none are found does it 'Fall back to existing behavior for legacy .roorules/.clinerules files' with `const ruleFiles = [".roorules", ".clinerules"]`. Mode-specific equivalents: `.roo/rules-${mode}/` then `.roorules-${mode}` then `.clinerules-${mode}`. Separately it loads agent rules files with `const filenames = ["AGENTS.md", "AGENT.md"]` plus "AGENTS.local.md" for 'personal overrides (not checked in to version control)' - AGENTS.local.md is therefore a high-value uncommitted artifact that will NOT be in git history. .rooignore appears as options.rooIgnoreInstructions (a user-authored file-access boundary). In a monorepo, .roo dirs in SUBDIRECTORIES are also discovered - glob recursively, not just at the repo root.
 
     The verification pass found only a pre-rendered instruction string on the cited page. The ignore controller builds the project-relative pattern, so the path is real but unsourced where this entry points.
-  parser: null
+  parser: instructions
 - id: roo_code.tasks
   category: transcript
   root: user_profile

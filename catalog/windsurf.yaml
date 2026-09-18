@@ -108,7 +108,7 @@ artifacts:
     Added by the vendor verification pass. An administrator can deploy rules, workflows, skills and hooks machine-wide, read-only to the user, and the vendor states that the hooks here run first in the merge order. That makes this the answer to a specific and otherwise unanswerable question: agent behaviour that nothing in the user's own directories accounts for. A blocking hook here can also stop an action the analyst would otherwise expect to see attempted, so an absent action is not proof the agent never tried.
 
     Collect it even when the user's own directories look complete, and read it before concluding that an instruction the agent followed came from the user.
-  parser: null
+  parser: instructions
 - id: windsurf.worktrees
   title: Agent-created git worktrees
   category: file_snapshot
@@ -288,7 +288,7 @@ artifacts:
     Single file, overwritten in place, no history. A 6,000-character cap is enforced, so content is truncated rather than rotated.
   notes: |-
     TWO LOCATIONS, BOTH LIVE: ~/.codeium/windsurf/memories/global_rules.md is current; ~/.codeium/windsurf/global_rules.md is the pre-1.8.3 location that one rules-adapter still probes as a fallback. Collect both. The %APPDATA%\Codeium\windsurf\... form is from a single source that explicitly labelled its own non-macOS paths as unverified — prefer %USERPROFILE%\.codeium\windsurf\.
-  parser: null
+  parser: instructions
 - id: windsurf.embedding_database
   category: cache
   root: user_profile
@@ -535,7 +535,7 @@ artifacts:
     Newer convention than .windsurfrules and frequently missed. ~/.codeium/windsurf/skills/ and <repo>/.windsurf/skills/ independently confirmed by a community host inspection (both present but empty) and a cross-agent skills registry.
 
     Confirmed by the vendor verification pass against the storage-location tables on the workflows and skills pages. One thing those pages add that matters more than the paths: the product also discovers skills in the cross-vendor .agents/skills directories and, when reading another vendor's configuration is switched on, in that vendor's skills directories as well. So an instruction that steered a session here can physically live in a directory nobody would attribute to this agent.
-  parser: null
+  parser: instructions
 - id: windsurf.mcp_config
   category: mcp_config
   root: project
@@ -613,7 +613,7 @@ artifacts:
     .windsurfrules is explicitly labelled a PROMPT-INJECTION SURFACE by a DFIR catalogue; .windsurf/settings.json in the repo controls INDEXER SCOPE, i.e. which of the victim's files get uploaded for indexing — both are attacker-plantable via a pull request. Corroborated by a rules-sync research doc, three independent multi-agent rule adapters, and a migration guide.
 
     One path moved here from the global rules entry: the vendor's configuration-import reference states a global rules file at the workspace root and in subdirectories, alongside the per-rule directory. That is a project instruction, whatever its filename says.
-  parser: null
+  parser: instructions
 - id: windsurf.cascade_trajectories
   category: transcript
   root: user_profile

@@ -195,7 +195,7 @@ artifacts:
     Version-controlled in the project case, so git history gives authorship and timing. The user-level and plugin cache directories are untracked and carry only their mtimes.
   notes: |-
     Found by the source verification pass while re-sourcing the settings entry, and missing from this catalogue until then. This agent reads skills out of another vendor's directories as well as its own, including that vendor's plugin cache, which makes those directories an injection surface for this agent too. Two consequences for an investigation: a skill file under another agent's directory is not evidence that the other agent ran, and a finding about this agent's behaviour may have its cause in a directory nobody would think to attribute to it.
-  parser: null
+  parser: instructions
 - id: amp.threads
   category: transcript
   root: user_profile

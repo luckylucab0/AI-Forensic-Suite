@@ -197,7 +197,7 @@ artifacts:
     JetBrains' own junie-guidelines repo README states guidelines 'can be stored in two places: .junie/AGENTS.md [or] AGENTS.md' and that a custom guidelines path can be set in 'Settings | Tools | Junie | Project Settings' - so the path may be OVERRIDDEN per project and .junie/ absence is not proof of no guidelines. CORRECTION TO THE BRIEF: .junie/guidelines.md is the LEGACY form; the current form is .junie/AGENTS.md then root AGENTS.md, with discovery order .junie/AGENTS.md -> AGENTS.md -> legacy .junie/guidelines.md or .junie/guidelines/. The legacy form is nonetheless extremely common in the wild - GitHub code search returns 432 repositories with a committed .junie/guidelines.md - so keep globbing for it. playbook.md, rules/*.md and .aiignore are reported by community sources citing vendor docs I could not fetch; .aiignore is a user-authored file-access boundary (gitignore syntax) and is worth collecting as a permissions-adjacent artifact.
 
     Re-sourced by the verification pass: the guidelines README states the agent instruction files and nothing else, while the vendor's own guide states the project guidelines file at the project root. The pass found no reachable vendor source for the remaining five paths, so they are marked unsourced. The ignore file in particular: its only hit in the vendor's code base is an unrelated list of risky file extensions, which does not support a project-root location.
-  parser: null
+  parser: instructions
 - id: junie.cli_sessions
   category: transcript
   root: user_profile

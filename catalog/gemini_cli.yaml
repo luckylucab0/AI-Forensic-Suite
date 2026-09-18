@@ -280,4 +280,4 @@ artifacts:
     This is the prompt-injection surface, and it travels with a checkout: cloning a repository can change the agent's configuration, add MCP servers, point it at a different model endpoint and give it standing instructions, all without the user seeing a prompt. GEMINI.md is the default name and context.fileName renames it, so read the settings before concluding a repository carried no instructions.
 
     sandbox.Dockerfile defines the container the agent's commands run in, so it decides what the sandbox could reach.
-  parser: null
+  parser: instructions

@@ -116,7 +116,14 @@ it cannot be rewritten *quietly*.
   a time or as text, and every event it produces states that this is an uninterpreted
   reading. So a chat database nobody has a verified schema for is visible evidence somebody
   still has to look at, instead of a file the case merely says existed. A verified
-  per-agent parser placed ahead of it takes an artifact over, one schema at a time.
+  per-agent parser placed ahead of it takes an artifact over, one schema at a time. Beside
+  it sits a second format-shaped module, `instructions/`, for the instruction surface: the
+  sixty-three catalogue artifacts that hold skills, commands, output styles, rules, steering
+  files and hook scripts. It reads each file whole, tells the scope apart from the working
+  copies the collection recorded rather than from the path's shape, lifts a skill's front
+  matter including the tools it grants itself, and counts the characters a reviewer cannot
+  see. It does not claim to show a system prompt: the vendor's base prompt is not on the
+  endpoint, and saying otherwise would answer a question the evidence cannot.
 - `model/` the unified event model and the SQLite case schema
 - `unified/` the event model on the wire: the JSON Lines format and its schema, plus
   the normalizer that turns a collection into one log without building a case
@@ -145,14 +152,24 @@ Event kinds are deliberately agent-neutral: `session.start`, `session.end`, `use
 `assistant.text`, `assistant.thinking`, `tool.call`, `tool.result`, `file.read`,
 `file.write`, `file.snapshot`, `command.exec`, `network.request`, `mcp.call`,
 `permission.decision`, `permission.change`, `safety.refusal`, `config.snapshot`,
-`memory.write`, `plan.write`, `prompt.history` and `artifact.fs`.
+`instruction.source`, `memory.write`, `plan.write`, `prompt.history` and `artifact.fs`.
 
-Three of those are worth a sentence. `permission.decision` is one request answered under the
+Four of those are worth a sentence. `permission.decision` is one request answered under the
 rules in force, and `permission.change` is a change to the rules themselves: the bypass
 question needs both, because one says what happened to a request and the other says who
 moved the goalposts and when. `safety.refusal` is the model declining, which is not the same
 as the harness denying a permission, and only some agents record it, so its absence is never
 evidence that nothing was refused.
+
+`instruction.source` is an instruction that was in force on the endpoint: a CLAUDE.md, a
+skill, an output style, a rules or steering file, a hook script. It is not part of
+`config.snapshot` because the two answer different questions and a timeline has to keep them
+apart. A setting says how the agent was configured; an instruction is text the model was
+told to obey, and whether the agent was manipulated by injected instructions is only about
+the second. The name says source rather than prompt on purpose. The vendor's own base prompt
+is compiled into the agent or comes from its server, so it is not on the endpoint at all,
+and this kind carries the part of a system prompt that can be evidence rather than the whole
+of one.
 
 `artifact.fs` is the one that needs explaining: it carries the filesystem timestamps of an
 artifact file itself. Some artifacts have no internal timestamps at all, and for those the

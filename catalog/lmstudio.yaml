@@ -47,7 +47,7 @@ artifacts:
   volatility: Persists until the user deletes the preset.
   notes: |-
     A preset IS an instruction file by another name, because it carries the system prompt. Split out of a combined presets-and-hub entry by the source verification pass, which found that no single vendor page states both directories.
-  parser: null
+  parser: instructions
 - id: lmstudio.hub_downloads
   title: Presets downloaded from the hub
   category: instructions
@@ -70,7 +70,7 @@ artifacts:
     The vendor's own import page says presets downloaded from the hub or shared by the user are stored here. That provenance is the point: anything in this directory carries a system prompt that came from a remote source, which makes it the same class of evidence as an instruction file pulled out of a repository, and part of the prompt-injection surface rather than a record of what the user wrote.
 
     Split out of a combined presets-and-hub entry by the source verification pass, which found the presets directory and the hub directory stated on two different vendor pages.
-  parser: null
+  parser: instructions
 - id: lmstudio.cli_and_server
   category: install_evidence
   root: user_profile

@@ -337,7 +337,7 @@ artifacts:
     "Personal custom instructions that apply to all your sessions", plus additional *.instructions.md files under instructions/ organised by topic.
 
     Read these before reading a transcript. They are prepended to every session, so an instruction here explains agent behaviour that otherwise looks unprompted, and they are the first place to look when the question is whether the agent was manipulated.
-  parser: null
+  parser: instructions
 - id: copilot.agents_skills_hooks
   category: instructions
   root: user_profile
@@ -363,7 +363,7 @@ artifacts:
     "Personal custom agent definitions", "User-level hook scripts" and "Personal custom skill definitions". Grouped because they answer one question: what ran, or was injected, that the transcript does not show.
 
     hooks/ is the sharp end. A hook is a script the agent executes on an event, so this directory is arbitrary code that runs without appearing as a tool call. Collect the scripts and hash them.
-  parser: null
+  parser: instructions
 - id: copilot.extensions_and_plugins
   category: install_evidence
   root: user_profile
@@ -429,7 +429,7 @@ artifacts:
   volatility: Lives and dies with the working copy, and is usually under version control.
   notes: |-
     The repository-level counterpart of lsp-config.json. It travels with a checkout, which makes it reachable by anyone who can open a pull request: cloning a repository can configure which processes the agent starts.
-  parser: null
+  parser: instructions
 - id: copilot.providers
   category: config
   root: user_profile

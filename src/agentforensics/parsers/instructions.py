@@ -1,0 +1,483 @@
+"""Read the instruction surface: everything the agent was told to obey, off the disk.
+
+This is the module behind the question the brief puts last and an investigation usually
+asks first: was the agent manipulated by instructions somebody planted. Until this module
+that question could only be answered from the transcript side, where a rule can spot an
+injection arriving in a tool result. The other half, the standing instructions the agent
+ran under, was collected and never read: sixty-three catalogue artifacts, skills and
+commands and output styles and rules and steering files and hook scripts, produced exactly
+one `artifact.fs` event each. The case knew the file names and nothing about what they said,
+so a poisoned CLAUDE.md, a skill quietly granting itself every tool, and a rules file with
+an instruction hidden in zero-width characters were all invisible.
+
+What it does not do is claim to show a system prompt. For nearly every agent here the
+vendor's base prompt is compiled into the binary or arrives from the vendor's server, and it
+is not on the endpoint at all. Presenting a reconstruction as "the system prompt" would be
+the same defect as an invented catalogue path: an analyst would read a confident answer to a
+question the evidence cannot answer. So the events say `instruction.source`, one per file,
+and what an analyst gets is the part of the prompt that was on the machine, complete and
+attributable, plus the honest statement that the base prompt was not.
+
+Three things in here are worth knowing.
+
+**Scope comes from recorded data, not from a guess.** Whether a CLAUDE.md was the user's own
+or came out of a cloned repository is often the whole finding, and both are absolute paths
+under the same home directory. The collector records the working copies it found, those
+travel in the manifest, and this module matches against them. Where a collection did not
+record them, the scope is `unknown` and says why, because "we could not tell" and "it was
+the user's own" are different answers.
+
+**A hook script is an instruction too.** It is the one kind the agent executes rather than
+reads, which makes it the most direct form of the same thing, and the catalogue files it
+under instructions for that reason. It is read as text like the rest, with a flag.
+
+**Invisible characters are counted per file.** A reviewer approving a pull request sees one
+thing and the agent reads another, and that gap is the entire technique. A rule pack matches
+on the text as well, but the count travels on the event so the overview can show it without
+a scan having been run.
+"""
+
+from __future__ import annotations
+
+import json
+import unicodedata
+from collections.abc import Iterator
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+from agentforensics.model import Event, unparsed
+from agentforensics.parsers.base import ParseContext, read_json
+
+# Every catalogue artifact filed under instructions or project_instructions. Written out
+# rather than derived at runtime, because a parser is handed an artifact id and not the
+# catalogue entry, and because a new instruction surface should be read because somebody
+# decided it should be. tests/unit/test_instructions.py compares this against the catalogue,
+# so adding an entry there fails CI until it is listed here.
+SOURCES = frozenset(
+    {
+        "amazonq.cli_todo_lists",
+        "amazonq.cli_user_rules",
+        "amazonq.project_rules",
+        "amazonq.prompt_library",
+        "amp.skills",
+        "claude_code.commands",
+        "claude_code.loop_instructions",
+        "claude_code.managed_claude_md",
+        "claude_code.output_styles",
+        "claude_code.plans",
+        "claude_code.project_claude_local_md",
+        "claude_code.project_claude_md",
+        "claude_code.project_rules",
+        "claude_code.skills",
+        "claude_code.skills_trash",
+        "claude_code.synced_skills",
+        "claude_code.user_claude_md",
+        "claude_code.user_rules",
+        "claude_desktop.org_plugins",
+        "claude_desktop.scheduled_tasks",
+        "claude_desktop.user_plugins",
+        "cline.rules_global",
+        "cline.rules_project",
+        "copilot.agents_skills_hooks",
+        "copilot.instructions",
+        "copilot.lsp_config_repo",
+        "crosscutting.hook_scripts",
+        "crosscutting.instructions_agents_md",
+        "crosscutting.instructions_claude_md",
+        "crosscutting.instructions_clinerules",
+        "crosscutting.instructions_copilot_instructions",
+        "crosscutting.instructions_cursor_rules",
+        "crosscutting.instructions_gemini_md",
+        "crosscutting.instructions_junie_guidelines",
+        "crosscutting.instructions_kiro_steering",
+        "crosscutting.instructions_windsurf_rules",
+        "cursor.project_instructions",
+        "factory_droid.skills_and_droids",
+        "gemini_cli.project_config",
+        "goose.hints",
+        "goose.prompts",
+        "hermes.skills",
+        "hermes.soul",
+        "junie.project_dir",
+        "kiro.kiroignore",
+        "kiro.prompt_library",
+        "kiro.skills_powers",
+        "kiro.specs",
+        "kiro.steering_project",
+        "kiro.steering_user",
+        "lmstudio.hub_downloads",
+        "lmstudio.presets",
+        "opencode.agents_commands",
+        "pi.prompts",
+        "qwen_code.ignore_files",
+        "qwen_code.project_instructions",
+        "qwen_code.user_instructions",
+        "roo_code.global_dirs",
+        "roo_code.rules",
+        "windsurf.global_rules",
+        "windsurf.project_instructions",
+        "windsurf.system_config",
+        "windsurf.workflows_and_skills",
+    }
+)
+
+# Absolute prefixes that are machine-wide rather than somebody's profile, so a file under
+# one of them was placed by an administrator and applies to every user. Taken from the
+# catalogue's own spelling of its managed entries rather than invented: these are the roots
+# the vendors document for managed policy and system-wide configuration. Compared
+# lowercased and with forward slashes, so the user's own ~/Library/Application Support does
+# not match, because that path does not begin here.
+_MANAGED_PREFIXES = (
+    "/etc/",
+    "/library/application support/",
+    "/library/managed preferences/",
+    "/opt/",
+    "/usr/",
+    "c:/program files",
+    "c:/programdata/",
+    "c:/windows/",
+    "/programdata/",
+)
+
+# A file name that marks the personal, usually git-ignored override of a project
+# instruction file. The vendors document the convention, and it is the difference between
+# "the repository told the agent this" and "this user told the agent this in the
+# repository", which are different findings about the same directory.
+_LOCAL_MARKER = ".local."
+
+# Extensions of an instruction the agent runs instead of reading. A hook is the most direct
+# form of an injected instruction there is, so it is worth a flag on the event.
+_EXECUTABLE_SUFFIXES = (
+    ".sh",
+    ".bash",
+    ".zsh",
+    ".ps1",
+    ".psm1",
+    ".cmd",
+    ".bat",
+    ".py",
+    ".js",
+    ".ts",
+)
+
+# Keys that literally hold an instruction inside a JSON document. Short and exact: a preset
+# or a settings file is read for the field that carries a prompt, and nothing else in it is
+# turned into instruction text, because guessing which key of a settings file is an order to
+# the model would produce a confident wrong reading.
+_PROMPT_KEYS = (
+    "systemPrompt",
+    "system_prompt",
+    "instructions",
+    "prompt",
+    "customInstructions",
+    "custom_instructions",
+)
+
+# Front matter keys through which a skill widens what the agent may do without the user
+# being asked. Surfaced on the event because a skill that grants itself a shell is a
+# permission change written as a document.
+_TOOL_KEYS = ("allowed-tools", "allowedTools", "allowed_tools", "tools", "permissions")
+
+# The characters a human reviewer cannot see and the model reads anyway. Zero-width joiners
+# and spaces render as nothing; the bidirectional overrides make stored text display in a
+# different order than it is stored in; the Unicode tag block renders as nothing at all and
+# is wide enough to smuggle a whole sentence.
+_HIDDEN = (
+    "\u200b",
+    "\u200c",
+    "\u200d",
+    "\u2060",
+    "\ufeff",
+    "\u202a",
+    "\u202b",
+    "\u202c",
+    "\u202d",
+    "\u202e",
+    "\u2066",
+    "\u2067",
+    "\u2068",
+    "\u2069",
+    "\u00ad",
+)
+
+# How much of one file's text is carried into an event. An instruction file is prose a
+# person wrote, so this is generous by design and the limit exists only to stop a generated
+# file of several megabytes from filling a case. Reaching it is reported on the event, never
+# applied quietly.
+MAX_TEXT = 1_000_000
+
+
+class InstructionsParser:
+    """One module for the whole instruction surface, because it is a format and not an agent.
+
+    Every agent here writes the same three shapes: prose in Markdown or plain text, a
+    document with YAML front matter, and a JSON settings file with a prompt in one field.
+    A module per agent would be twenty copies of one reader, and the copy that was forgotten
+    would be the silent gap.
+    """
+
+    name = "instructions"
+
+    def handles(self, artifact_id: str | None) -> bool:
+        return artifact_id in SOURCES
+
+    def parse(self, context: ParseContext) -> Iterator[Event]:
+        path = context.local_path
+        try:
+            raw_bytes = path.read_bytes()
+        except OSError as exc:
+            yield unparsed(
+                context.provenance("file"),
+                context.agent,
+                {"file": path.name},
+                f"this instruction file could not be read: {exc}",
+                user=context.user,
+                host=context.host,
+            )
+            return
+
+        text = raw_bytes.decode("utf-8", "replace")
+        problems: list[str] = []
+        if "\ufffd" in text:
+            problems.append(
+                "the file did not decode as UTF-8 and was read with replacement characters, "
+                "so its content is not exact"
+            )
+        if len(text) > MAX_TEXT:
+            problems.append(
+                f"the text is longer than the ingest limit of {MAX_TEXT} characters and is "
+                "carried truncated. The whole file is in the bundle, at the path in this "
+                "event's provenance"
+            )
+            text = text[:MAX_TEXT]
+
+        scope, scope_note = scope_of(context.original_path, context.project_roots)
+        if scope_note:
+            problems.append(scope_note)
+
+        payload: dict[str, Any] = {
+            "text": text,
+            # The facet the case indexes, and the join the injected-instruction question
+            # needs: which instruction files were in force, at which scope.
+            "instructions": [{"path": context.original_path, "scope": scope}],
+            "scope": scope,
+            "file": path.name,
+            "bytes": len(raw_bytes),
+            "lines": text.count("\n") + 1 if text else 0,
+        }
+
+        title = _title(text)
+        if title:
+            payload["title"] = title
+
+        front, front_problem = _front_matter(text)
+        if front_problem:
+            problems.append(front_problem)
+        if front:
+            payload["front_matter"] = front
+            for key in ("name", "description"):
+                value = front.get(key)
+                if isinstance(value, str) and value.strip():
+                    payload[f"declared_{key}"] = value.strip()
+            tools = _declared_tools(front)
+            if tools:
+                # A skill that names its own tools has widened what the agent may do, in a
+                # document rather than in a settings file, which is why it belongs next to
+                # the instruction text and not only in the permissions view.
+                payload["declared_tools"] = tools
+
+        if path.name.lower().endswith(".json"):
+            document, json_problem = read_json(path)
+            if json_problem:
+                problems.append(f"the file has a .json name but {json_problem}")
+            else:
+                payload["document"] = document
+                prompt, prompt_key = _prompt_in(document)
+                if prompt:
+                    payload["text"] = prompt
+                    payload["prompt_field"] = prompt_key
+                    payload["document_text"] = text
+
+        if path.name.lower().endswith(_EXECUTABLE_SUFFIXES):
+            # Not "probably a hook": the catalogue filed this path under instructions, and a
+            # script there is an instruction the agent executes. Flagged rather than
+            # interpreted, because what it does is a question for the analyst.
+            payload["executable"] = True
+
+        hidden = _hidden_characters(text)
+        if hidden:
+            payload["hidden_characters"] = hidden
+
+        yield Event(
+            kind="instruction.source",
+            provenance=context.provenance("file"),
+            agent=context.agent,
+            raw={"file": path.name, "text": text, "front_matter": front or None},
+            # No timestamp. The file carries no time of its own, and the artifact.fs event
+            # for the same path already carries the filesystem's, attributed to the
+            # filesystem. Repeating an mtime here would present it as the instruction's own
+            # time, which is exactly what the model forbids.
+            ts_utc=None,
+            ts_precision="absent",
+            # The instruction is part of the environment the agent ran in rather than a turn
+            # somebody took. Who wrote the file is a question the file cannot answer, and
+            # the answer is in version control or in the filesystem timestamps.
+            actor="system",
+            user=context.user,
+            host=context.host,
+            project_path=_project_of(context.original_path, context.project_roots),
+            payload=payload,
+            parse_problem=" ".join(problems) if problems else None,
+        )
+
+
+def scope_of(original_path: str, project_roots: tuple[str, ...]) -> tuple[str, str | None]:
+    """Whose instruction this was: managed, local, project, user, or honestly unknown.
+
+    Returns the scope and a note when something could not be decided. The order matters. A
+    machine-wide path is an administrator's file whatever else is true of it; a `.local.`
+    name is the documented personal override; after that only the recorded working copies
+    can tell a repository's file from the user's own.
+    """
+    path = original_path.replace("\\", "/").lower()
+    if any(path.startswith(prefix) for prefix in _MANAGED_PREFIXES):
+        return "managed", None
+    if _LOCAL_MARKER in Path(path).name:
+        return "local", None
+    for root in project_roots:
+        normalised = root.replace("\\", "/").lower().rstrip("/")
+        if normalised and (path == normalised or path.startswith(normalised + "/")):
+            return "project", None
+    if not project_roots:
+        return "unknown", (
+            "the collection recorded no working copies, so this file cannot be told apart "
+            "from one inside a project. The scope is unknown rather than assumed"
+        )
+    return "user", None
+
+
+def _project_of(original_path: str, project_roots: tuple[str, ...]) -> str | None:
+    """The working copy this file sits in, where a recorded one contains it."""
+    path = original_path.replace("\\", "/").lower()
+    for root in project_roots:
+        normalised = root.replace("\\", "/").lower().rstrip("/")
+        if normalised and path.startswith(normalised + "/"):
+            return root
+    return None
+
+
+def _title(text: str) -> str | None:
+    """The first Markdown heading, which is what a person calls the file."""
+    for line in text.splitlines()[:40]:
+        stripped = line.strip()
+        if stripped.startswith("#"):
+            heading = stripped.lstrip("#").strip()
+            if heading:
+                return heading
+    return None
+
+
+def _front_matter(text: str) -> tuple[dict[str, Any] | None, str | None]:
+    """The YAML block a skill or a rules file opens with, or the reason it did not parse.
+
+    Parsed with safe_load and inside a guard. A malformed block is a finding of its own,
+    since the agent would not have loaded the skill either, and it must not cost the file:
+    the text is the evidence and it is returned regardless.
+    """
+    if not text.startswith("---"):
+        return None, None
+    lines = text.splitlines()
+    end = None
+    for number, line in enumerate(lines[1:], start=1):
+        if line.strip() in ("---", "..."):
+            end = number
+            break
+    if end is None:
+        return None, "the file opens a YAML front matter block that is never closed"
+    block = "\n".join(lines[1:end])
+    try:
+        parsed = yaml.safe_load(block)
+    except yaml.YAMLError as exc:
+        return None, f"the front matter is not valid YAML: {exc}"
+    if parsed is None:
+        return None, None
+    if not isinstance(parsed, dict):
+        return (
+            None,
+            f"the front matter is a YAML {type(parsed).__name__} where a mapping was expected",
+        )
+    # Rendered through JSON so that a date or a custom tag cannot reach the case as a Python
+    # object the serializer would then have to guess at.
+    return json.loads(json.dumps(parsed, default=str)), None
+
+
+def _declared_tools(front: dict[str, Any]) -> list[str]:
+    """Tools a document grants itself, from the keys the vendors document for it."""
+    out: list[str] = []
+    for key in _TOOL_KEYS:
+        value = front.get(key)
+        if isinstance(value, str) and value.strip():
+            out.extend(part.strip() for part in value.split(",") if part.strip())
+        elif isinstance(value, list):
+            out.extend(str(item).strip() for item in value if str(item).strip())
+        elif isinstance(value, dict):
+            out.extend(str(name) for name in value)
+    # Ordered and de-duplicated, so two reads of one file produce the same event.
+    return sorted(set(out))
+
+
+def _prompt_in(document: Any) -> tuple[str | None, str | None]:
+    """An instruction inside a JSON document, only from a key that names one."""
+    if not isinstance(document, dict):
+        return None, None
+    for key in _PROMPT_KEYS:
+        value = document.get(key)
+        if isinstance(value, str) and value.strip():
+            return value, key
+        if isinstance(value, list):
+            parts = [str(item) for item in value if isinstance(item, (str, int, float))]
+            if parts:
+                return "\n".join(parts), key
+    # One level down, because several of these formats wrap the prompt in a fields or a
+    # config object. Deeper than that is searching rather than reading.
+    for holder in document.values():
+        if isinstance(holder, dict):
+            for key in _PROMPT_KEYS:
+                value = holder.get(key)
+                if isinstance(value, str) and value.strip():
+                    return value, key
+    return None, None
+
+
+def _hidden_characters(text: str) -> list[dict[str, Any]]:
+    """Characters a reviewer cannot see, counted.
+
+    The tag block is counted as a range rather than per character: it exists only to carry
+    smuggled text, so how many of them there are matters and which ones do not.
+    """
+    out = []
+    for character in _HIDDEN:
+        count = text.count(character)
+        if count:
+            out.append(
+                {
+                    "codepoint": f"U+{ord(character):04X}",
+                    "name": unicodedata.name(character, "unnamed"),
+                    "count": count,
+                }
+            )
+    tags = sum(1 for character in text if 0xE0000 <= ord(character) <= 0xE007F)
+    if tags:
+        out.append(
+            {
+                "codepoint": "U+E0000..U+E007F",
+                "name": "UNICODE TAG CHARACTERS",
+                "count": tags,
+            }
+        )
+    return out
+
+
+__all__ = ["MAX_TEXT", "SOURCES", "InstructionsParser", "scope_of"]

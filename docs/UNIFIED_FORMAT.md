@@ -125,6 +125,7 @@ happened in, so one query works across all of them.
 | `permission.change` | A change to the rules themselves. Separate because it answers the other half of the bypass question: who moved the goalposts and when. |
 | `safety.refusal` | The model declining. Distinct from a permission denial: a denial is the harness saying no, a refusal is the model saying no. |
 | `config.snapshot` | Configuration as it stood, including model changes mid-session. |
+| `instruction.source` | An instruction that was in force on the endpoint: a CLAUDE.md, a skill, an output style, a rules file, a hook script. Separate from `config.snapshot` because a setting and a text the model was told to obey are different claims, and only the second one answers the injected-instruction question. Source, not prompt: the vendor's base prompt is not on the endpoint, so this is the part of a system prompt that can be evidence and never the whole of one. |
 | `memory.write`, `plan.write` | The agent writing to its own persistent state. |
 | `prompt.history` | A prompt from a history file rather than from a transcript. These outlive transcripts, so a prompt with no matching session is one of the more interesting things a collection can hold. |
 | `artifact.fs` | The filesystem timestamps of an artifact file itself. For an artifact with no internal timestamps this is the only temporal evidence there is, and it is also what puts a collected file that no parser understands on the timeline. |

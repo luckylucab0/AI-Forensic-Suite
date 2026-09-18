@@ -195,7 +195,7 @@ artifacts:
     Custom agent definitions can carry their own system prompts and tool allowances - i.e. a user-authored privilege escalation. Diff against defaults.
 
     The verification pass confirmed everything except the cross-vendor instruction file, which the vendor states on its rules page rather than on the configuration page cited here.
-  parser: null
+  parser: instructions
 - id: opencode.log
   category: log
   root: user_profile

@@ -37,6 +37,7 @@
         "permission.change",
         "safety.refusal",
         "config.snapshot",
+        "instruction.source",
         "memory.write",
         "plan.write",
         "prompt.history",

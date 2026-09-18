@@ -391,7 +391,7 @@ artifacts:
     User-edited plain files. Nothing rotates them.
   notes: |-
     Steering files are markdown instructions applied to every session. Global ones live here and workspace ones override them on conflict; all scopes are merged rather than replaced. Forensically these are injected-instruction candidates: whoever can write this directory can steer every session the user runs in every project. The vendor also supports the AGENTS.md standard here, which is always included and does not support inclusion modes, so an AGENTS.md is unconditional context. Collect the file content verbatim including front matter, since the inclusion mode (always, fileMatch with a glob, or manual) decides whether the text actually reached the model for a given turn.
-  parser: null
+  parser: instructions
 - id: kiro.steering_project
   title: Kiro project steering and AGENTS.md
   category: project_instructions
@@ -418,7 +418,7 @@ artifacts:
     Tracked in version control in most projects, so superseded content is usually recoverable from git even after the working-tree file changes.
   notes: |-
     The highest-value prompt-injection surface in a Kiro engagement. The vendor states AGENTS.md files are discovered in subdirectories throughout the workspace, not just at the root, and are always included with no inclusion-mode control. That means a single AGENTS.md dropped deep in a dependency directory or a vendored subtree silently becomes agent instructions for anyone who opens the project. Enumerate every AGENTS.md at every depth and diff it against the repository history, then correlate its mtime with session timestamps. The vendor's suggested foundation files are product.md, tech.md and structure.md under .kiro/steering/.
-  parser: null
+  parser: instructions
 - id: kiro.specs
   title: Kiro specs
   category: project_instructions
@@ -448,7 +448,7 @@ artifacts:
     Rewritten by the agent as work progresses; tasks.md in particular carries live status that is updated in place, so intermediate states are lost unless the repository has them.
   notes: |-
     Specs are the plan the agent worked from and are project-scope only, with no global equivalent. The directory is stated by the vendor's configuration-scopes table (.kiro/specs/) and the three-or-four file names by the specs page. Because tasks.md tracks status in real time, an abandoned spec with half-completed tasks is a good pointer at which session to read next. Treat the content as agent-authored narrative, not ground truth, but it is the cheapest way to recover intent for a long engagement.
-  parser: null
+  parser: instructions
 - id: kiro.agents
   title: Kiro custom agent definitions
   category: config
@@ -538,7 +538,7 @@ artifacts:
     Installed and updated as packages; powers are installed from a marketplace or from GitHub repositories, so content can change under the user without an explicit edit.
   notes: |-
     Skills are reusable instruction packages loaded as SKILL.md; powers are packaged MCP servers plus documentation that activate on demand and are global-scope only (no project powers). Both are merged across scopes. Because powers are installed from a marketplace or straight from a GitHub repository, they are a third-party code and instruction supply chain: enumerate what is installed and where it came from. A skill or power directory can also carry executable payloads beyond the SKILL.md, so collect the whole subtree, not just the markdown.
-  parser: null
+  parser: instructions
 - id: kiro.prompt_library
   title: Kiro saved prompt library
   category: instructions
@@ -562,7 +562,7 @@ artifacts:
     User-managed files. The vendor states that new project-level prompts are written to .kiro and not to the legacy .amazonq folder.
   notes: |-
     Reusable prompts the user saved deliberately, user scope and workspace scope. This is NOT the arrow-up recall history: it is a library of prompts the user chose to keep, which makes it good evidence of intent and of repeated workflows. The same vendor page states these were copied out of ~/.aws/amazonq/prompts during the one-time Amazon Q Developer CLI to Kiro CLI migration, so matching content in both trees dates the migration rather than indicating two separate activities.
-  parser: null
+  parser: instructions
 - id: kiro.kiroignore
   title: Kiroignore files
   category: project_instructions
@@ -586,7 +586,7 @@ artifacts:
     Writes to .kiroignore are vendor-stated always-ask and the file is also a vendor-stated protected path in the IDE, so any modification implies an explicit approval.
   notes: |-
     Gitignore-syntax patterns that stop Kiro reading matching files, placeable in the project root or any subdirectory with subdirectory patterns taking precedence. Two forensic uses. It tells you what the agent could not see, which bounds what it could have exfiltrated. And it is an anti-forensic and evasion indicator: patterns added shortly before or during an engagement, or patterns covering exactly the material under investigation, are worth flagging. Note the coverage is uneven by surface, which the vendor states plainly: the IDE enforces it across supported agent tools, CLI V3 enforces it only when filtering content-search and filename-search results, and Web does not enforce it at all. So a .kiroignore is not proof a file was unreadable, and in Web it is no protection whatsoever. The IDE also reads the ignore filename list from the kiroAgent.agentIgnoreFiles setting, so other ignore file names may be in force.
-  parser: null
+  parser: instructions
 - id: kiro.cli_log
   title: Kiro CLI chat log
   category: log

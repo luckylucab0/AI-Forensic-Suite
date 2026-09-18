@@ -99,6 +99,9 @@ def normalize(
     """
     source = open_source(path, catalogue, kind)
     record = source.bundle()
+    # Same source of truth as the case path, so a log and a case built from one collection
+    # agree about the scope of an instruction file rather than disagreeing quietly.
+    roots = tuple(getattr(source, "project_roots", ()) or ())
     report = NormalizeReport(
         bundle_uuid=record.bundle_uuid,
         source_kind=record.source_kind,
@@ -110,7 +113,7 @@ def normalize(
         report.files += 1
         if entry.attribution == "none" and entry.collected:
             report.unclaimed_paths.append(entry.original_path)
-        read = events_for(record.bundle_uuid, entry)
+        read = events_for(record.bundle_uuid, entry, roots)
         if entry.collected and entry.local_path is not None:
             if read.parser is None:
                 report.files_unsupported += 1

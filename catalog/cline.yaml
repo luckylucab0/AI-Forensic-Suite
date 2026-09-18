@@ -378,7 +378,7 @@ artifacts:
     disk.ts helper functions resolve 'Cline/Rules', 'Cline/Workflows', 'Cline/MCP' and 'Cline/Hooks' inside the user's Documents folder - an unusual choice that a home-directory-dotfile-only collector will miss entirely. docs/customization/cline-rules.mdx adds: 'Linux/WSL users: If you don't find global rules in ~/Documents/Cline/Rules, check ~/Cline/Rules.' The CHANGELOG 4.1.16 entry explains why: the VS Code Rules tab resolves Documents with `xdg-user-dir DOCUMENTS`, which prints bare $HOME on WSL and headless installs. Collect BOTH. On macOS/Windows also account for a redirected/iCloud Documents folder.
 
     Re-sourced by the verification pass: the documents-directory rules path is absent from the disk module cited before and present in the path resolver.
-  parser: null
+  parser: instructions
 - id: cline.connector_settings_and_logs
   category: log
   root: user_profile
@@ -452,7 +452,7 @@ artifacts:
     from git history.
   notes: |-
     Both forms exist and both are verified from GlobalFileNames verbatim: clineRules=".clinerules" (single file) and workflows=".clinerules/workflows", hooksDir=".clinerules/hooks", clineruleSkillsDir=".clinerules/skills" (directory form). docs/customization/cline-rules.mdx shows the directory form with per-concern .md files. docs/customization/skills.mdx lists the skill search order '.cline/skills/ (recommended), .clinerules/skills/, .claude/skills/'. NOTABLE CROSS-CONTAMINATION: Cline deliberately also ingests other agents' rule files - cursorRulesDir=".cursor/rules", cursorRulesFile=".cursorrules", windsurfRules=".windsurfrules", agentsRulesFile="AGENTS.md". So the presence of .cursorrules is NOT by itself evidence that Cursor was used. .clinerules/hooks is the highest-risk sub-artifact: it holds user-authored scripts Cline executes (CHANGELOG 3.56.0: 'Hook scripts now run from the workspace repository root instead of filesystem root').
-  parser: null
+  parser: instructions
 - id: cline.cli_sessions
   category: transcript
   root: user_profile

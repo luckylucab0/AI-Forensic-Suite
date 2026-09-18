@@ -455,7 +455,7 @@ artifacts:
     PRIMARY PROMPT-INJECTION SURFACE — labelled as such by a DFIR catalogue. An attacker who lands a .mdc file in a repo gets persistent instruction injection for every contributor who opens it in Cursor. Collect the full text, not just filenames.
 
     Record structure: .mdc = markdown with YAML frontmatter; frontmatter keys include alwaysApply (boolean), description (drives agent-requested activation) and globs (path-scoped attachment). Legacy flat `.cursorrules` in the repo root is still read by older builds but is deprecated in favour of .cursor/rules/ and AGENTS.md.
-  parser: null
+  parser: instructions
 - id: cursor.chat_session_prompt_history
   category: prompt_history
   root: user_profile

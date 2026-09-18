@@ -164,7 +164,7 @@ artifacts:
     Prompt templates; compare mtimes to session timestamps to see which template version was in force.
 
     Record structure: config.ts getPromptsDir() = join(getAgentDir(), 'prompts').
-  parser: null
+  parser: instructions
 - id: pi.debug_log
   category: log
   root: user_profile

@@ -1228,7 +1228,7 @@ artifacts:
     Check for !`...` inline shell in command bodies - that is command execution triggered by typing a slash command.
 
     Record structure: Single-file reusable prompts invoked as /<name>. The docs state commands and skills are now the same mechanism and steer new work to skills/, so commands/ is the legacy shape - its presence is a rough age indicator for the configuration. Can contain shell interpolation (!`command`) and argument substitution.
-  parser: null
+  parser: instructions
 - id: claude_code.loop_instructions
   category: instructions
   root: project
@@ -1250,7 +1250,7 @@ artifacts:
     Autonomy evidence: this is the standing instruction a repeating, unattended task executes. Worth collecting because scheduled-task definitions themselves have no dedicated on-disk store - the transcript is the record.
 
     Record structure: Instructions used by the /loop recurring-task feature. The user-level file applies in any project that does not define its own. Recurring tasks created with CronCreate are session-scoped and restored on --resume (subject to a seven-day expiry), so they live in the transcript rather than in a separate file; a self-paced /loop is NOT restored on resume.
-  parser: null
+  parser: instructions
 - id: claude_code.managed_claude_md
   category: instructions
   root: system
@@ -1273,7 +1273,7 @@ artifacts:
     Not in the starting brief. Confirms org-managed deployment and sets the compliance baseline the agent was told to follow.
 
     Record structure: Organization-wide instructions, loaded FIRST (broadest scope) so user and project instructions appear after it in context. Same system directories as managed-settings.json.
-  parser: null
+  parser: instructions
 - id: claude_code.output_styles
   category: instructions
   root: project
@@ -1295,7 +1295,7 @@ artifacts:
     An output style can materially change agent behaviour (e.g. suppress explanations, alter what it reports) - relevant when assessing whether a user could see what the agent did.
 
     Record structure: Custom instruction sets that adjust how Claude works. Selected via the `outputStyle` setting key.
-  parser: null
+  parser: instructions
 - id: claude_code.plans
   category: instructions
   root: user_profile
@@ -1317,7 +1317,7 @@ artifacts:
     Agent-authored work product: the proposed change set before any edit was made. Not project-scoped in the filename, so plan files from every project sit in one flat directory - useful for cross-project triage. Categorized as `instructions` because the plan is what the agent then executes; it is really agent output.
 
     Record structure: Markdown plan documents written during plan mode. Hook payloads expose the path as `planFilePath`, with the vendor example "/Users/.../plans/refactor-auth.md", so filenames are slugs. Changelog v2.1.154 ('Fixed plan file names including [Image #N] / [Pasted text #N] placeholders when a plan-mode prompt starts with pasted images or text') shows the filename is derived from the plan-mode PROMPT TEXT - so the directory listing alone leaks what the user asked for, even after the plan body is gone. A randomly generated word-plus-hex slug form has also been observed (unverified, needs verification); handle both.
-  parser: null
+  parser: instructions
 - id: claude_code.skills
   category: instructions
   root: project
@@ -1342,7 +1342,7 @@ artifacts:
     Highest-risk extension surface after hooks: markdown that can pre-approve tools and ship executable payloads. Enumerate the enterprise location too - it lives under the managed settings directory, not ~/.claude.
 
     Record structure: SKILL.md YAML frontmatter fields (exact names): `name`, `description`, `argument-hint`, `arguments`, `disable-model-invocation`, `user-invocable`, `allowed-tools`, `disallowed-tools`, `model`, `effort`, `context` (set to `fork`), `agent`, `background`, `hooks`, `paths`, `shell` (`bash`|`powershell`), `metadata`, `license`, `compatibility`. `allowed-tools` PRE-APPROVES tools for the invoking turn without a permission prompt - treat it as a permission-granting artifact. A skill directory may bundle arbitrary supporting files including scripts (e.g. scripts/*.py) which the skill can execute; `disableSkillShellExecution` and `disableBundledSkills` gate that. A skill entry can be a SYMLINK to a directory elsewhere on disk - resolve and hash targets. Precedence on name collision: enterprise > personal > project. Reserved folder name `synced` (any capitalisation) is skipped in these three locations.
-  parser: null
+  parser: instructions
 - id: claude_code.skills_trash
   category: instructions
   root: user_profile
@@ -1364,7 +1364,7 @@ artifacts:
     Recovery goldmine: skills that were turned off are still on disk here in full. Not in the starting brief.
 
     Record structure: Holds synced skills that were hidden rather than deleted.
-  parser: null
+  parser: instructions
 - id: claude_code.synced_skills
   category: instructions
   root: user_profile
@@ -1386,7 +1386,7 @@ artifacts:
     Cloud-to-endpoint data flow: proves account-level skill content reached this machine, and names the claude.ai account that carried it. Related env vars: CLAUDE_CODE_SYNC_SKILLS, CLAUDE_CODE_SYNC_SKILLS_WAIT_TIMEOUT_MS, CLAUDE_CODE_SYNC_SKILLS_INSTALL_TIMEOUT_MS.
 
     Record structure: Skills downloaded from the user's claude.ai account. Loaded by every later local session using the same claude.ai sign-in. Listed under a "claude.ai sync" heading in /skills.
-  parser: null
+  parser: instructions
 - id: claude_code.user_claude_md
   category: instructions
   root: user_profile
@@ -1407,7 +1407,7 @@ artifacts:
     Primary standing-instruction artifact: this is where a user (or an attacker with file write) durably changes agent behaviour across every project. Always diff against a known-clean baseline.
 
     Record structure: Loaded into context at the start of every session in every project, alongside the project CLAUDE.md; project instructions take priority on conflict. Supports @-style imports of other files. In Cowork desktop sessions, Claude Code skips imports resolving outside the working directory and skips a ~/.claude/CLAUDE.md that is itself a symlink or hard link. Gated by the `claudeMd` setting; individual files can be excluded with `claudeMdExcludes`; CLAUDE_CODE_DISABLE_CLAUDE_MDS turns the mechanism off.
-  parser: null
+  parser: instructions
 - id: claude_code.user_rules
   category: instructions
   root: user_profile
@@ -1428,7 +1428,7 @@ artifacts:
     Path-gated rules are easy to miss in review because they only appear in context when a matching file is touched - correlate `paths` globs against the files actually read in the transcript.
 
     Record structure: User-level topic-scoped instructions applying to every project. Optional YAML frontmatter `paths:` (string or YAML list of globs) gates loading to sessions touching matching files; rules without `paths` load unconditionally. All .md files discovered recursively. InstructionsLoaded hook fires when one is loaded. In Cowork desktop sessions a symlinked rules directory or rule file pointing outside the working directory is skipped.
-  parser: null
+  parser: instructions
 - id: claude_code.daemon_state
   category: log
   root: user_profile
@@ -1905,7 +1905,7 @@ artifacts:
     Higher evidential value than CLAUDE.md precisely because it is gitignored and unreviewed: no teammate ever saw it.
 
     Record structure: Personal per-project instructions, loaded alongside CLAUDE.md and treated the same way, appended after it at each directory level. Skipped when `local` is excluded from --setting-sources. In a git worktree it exists only in the worktree where it was created.
-  parser: null
+  parser: instructions
 - id: claude_code.project_claude_md
   category: project_instructions
   root: project
@@ -1928,7 +1928,7 @@ artifacts:
     For prompt-injection investigations, walk the full parent chain from the session cwd to /, not just the repo root - a CLAUDE.md in a parent directory of the checkout also loads.
 
     Record structure: Loaded from the working directory and EVERY directory above it at launch; files in subdirectories load on demand when Claude reads files there. All discovered files are concatenated, ordered filesystem-root-down, so the file closest to the launch directory is read last. Within a directory, CLAUDE.local.md is appended after CLAUDE.md.
-  parser: null
+  parser: instructions
 - id: claude_code.project_rules
   category: project_instructions
   root: project
@@ -1949,7 +1949,7 @@ artifacts:
     Also loaded from directories added with --add-dir (which pulls CLAUDE.md, .claude/CLAUDE.md, .claude/rules/*.md and CLAUDE.local.md from that directory) - enumerate added directories from the transcript or session-env.
 
     Record structure: Same frontmatter `paths:` gating as user rules; discovered recursively so subdirectories like frontend/ and backend/ are supported. Skipped when `project` is excluded from --setting-sources (before v2.1.211 on-demand rules loaded even then). As of v2.1.198 path matching also works through a symlinked path to the project directory.
-  parser: null
+  parser: instructions
 - id: claude_code.history_jsonl
   category: prompt_history
   root: user_profile

@@ -107,7 +107,9 @@ class EntryEvents:
         return "parsed"
 
 
-def events_for(bundle_uuid: str, entry: SourceEntry) -> EntryEvents:
+def events_for(
+    bundle_uuid: str, entry: SourceEntry, project_roots: tuple[str, ...] = ()
+) -> EntryEvents:
     """Read one collected file: its filesystem event, then whatever a parser makes of it.
 
     The filesystem event comes first and comes always. For an artifact with no internal
@@ -115,7 +117,7 @@ def events_for(bundle_uuid: str, entry: SourceEntry) -> EntryEvents:
     still has to appear on a timeline.
     """
     events = list(_filesystem_events(bundle_uuid, entry))
-    parsed, unreadable, parser_name, detail = _parse(bundle_uuid, entry)
+    parsed, unreadable, parser_name, detail = _parse(bundle_uuid, entry, project_roots)
     events.extend(parsed)
     return EntryEvents(
         events=events,
@@ -151,6 +153,9 @@ def ingest(
     """Read one source into a case, and report what came of it."""
     source = open_source(path, catalogue, kind)
     record = source.bundle()
+    # Only a native bundle carries them: no adapter over a plain tree can recover which
+    # directories the user had open. Absent is passed on as absent.
+    roots = tuple(getattr(source, "project_roots", ()) or ())
     report = IngestReport(
         bundle_uuid=record.bundle_uuid,
         source_kind=record.source_kind,
@@ -173,7 +178,7 @@ def ingest(
                 if entry.collected:
                     report.unclaimed_paths.append(entry.original_path)
 
-            read = events_for(record.bundle_uuid, entry)
+            read = events_for(record.bundle_uuid, entry, roots)
             report.events += case.add_events(read.events)
             report.parsed_records += read.parser_events - read.unparsed_records
             report.unparsed_records += read.unparsed_records
@@ -213,7 +218,9 @@ def ingest(
     return report
 
 
-def _parse(bundle_uuid: str, entry: SourceEntry) -> tuple[list[Event], int, str | None, str | None]:
+def _parse(
+    bundle_uuid: str, entry: SourceEntry, project_roots: tuple[str, ...] = ()
+) -> tuple[list[Event], int, str | None, str | None]:
     """Run the parser for one file, if there is one.
 
     Returns its events, how many of them are unreadable records, the parser's name and a
@@ -234,6 +241,7 @@ def _parse(bundle_uuid: str, entry: SourceEntry) -> tuple[list[Event], int, str 
         artifact_id=entry.artifact_id,
         agent=entry.agent or parser.name,
         user=entry.user,
+        project_roots=project_roots,
     )
     try:
         events = list(parser.parse(context))

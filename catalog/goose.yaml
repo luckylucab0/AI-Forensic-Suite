@@ -115,7 +115,7 @@ artifacts:
     Custom prompts are where jailbreak or policy-evasion instructions are usually planted; compare mtimes against session times.
 
     Record structure: Custom prompt templates.
-  parser: null
+  parser: instructions
 - id: goose.cli_logs
   category: log
   root: user_profile
@@ -251,7 +251,7 @@ artifacts:
     Project-scoped standing instructions to the agent. Because they are usually committed, git history gives an authenticated timeline of who changed the agent's marching orders and when.
 
     Re-sourced by the verification pass: the page cited before lists the two filenames as the default of a context-file setting, with no directory and no statement that they are project-level. The hints guide states the project root and the per-level lookup.
-  parser: null
+  parser: instructions
 - id: goose.sessions_db
   category: transcript
   root: user_profile

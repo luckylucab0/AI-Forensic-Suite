@@ -184,7 +184,7 @@ artifacts:
     These are AGENT-AUTHORED, not user-authored. A skill the agent wrote for itself is direct evidence of self-directed capability acquisition, with an mtime that dates it.
 
     Record structure: Agent-created skills, managed via the skill_manage tool. Skills may declare config under the skills.config namespace in config.yaml.
-  parser: null
+  parser: instructions
 - id: hermes.soul
   category: instructions
   root: user_profile
@@ -206,7 +206,7 @@ artifacts:
     This is the top-priority system-prompt slot: whatever is here shaped every single session. Compare it against sessions.system_prompt in state.db to detect whether it was edited mid-history.
 
     Record structure: Documented as 'Primary agent identity (slot #1 in system prompt)'.
-  parser: null
+  parser: instructions
 - id: hermes.logs
   category: log
   root: user_profile
