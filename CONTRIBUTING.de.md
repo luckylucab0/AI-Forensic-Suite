@@ -80,8 +80,12 @@ Danach scheitert ein Commit lokal, der eine gelistete Zeichenkette einführen w�
 - **Es gibt berechtigte Ausnahmen.** Ein Test, der beweist, dass der Wächter funktioniert,
   muss eine verbotene Zeichenkette enthalten. Dann `opsec-check: allow-line` an diese Zeile
   schreiben, oder den Pfad in `.opsec-allowlist` aufnehmen, die ebenfalls ignoriert wird.
-- **Die Prüfung sieht nur die Gegenwart.** Sie durchsucht die Historie nicht. Das ist die
-  wesentliche Einschränkung, und der Grund für die Prozedur weiter unten.
+- **Die Hook-Modi sehen nur die Gegenwart.** `--mode history` ist der Modus, der das
+  bereits Geschriebene liest, und er hängt absichtlich in keinem Hook: er geht jedes
+  Objekt durch, das von irgendeinem Ref erreichbar ist, was pro Commit der falsche und
+  einmal vor der Veröffentlichung der richtige Aufwand ist. Er ist Punkt 1 der Prozedur
+  weiter unten, und die Prozedur existiert, weil die übrigen Punkte menschliche Prüfung
+  sind, die kein Skript leisten kann.
 
 Die CI führt dasselbe Skript aus, liest die Denylist aus einem Repository-Secret, wenn
 eines konfiguriert ist, und überspringt die Prüfung sonst sauber. Mit konfiguriertem Secret
@@ -100,9 +104,18 @@ Historie läuft.
 Der Pre-Commit-Hook genügt nicht, weil er die Historie nie angesehen hat. Der Reihe nach,
 mit der echten Denylist zur Hand:
 
-1. `git log -p --all | grep -i -f .opsec-denylist` ausführen und bestätigen, dass nichts
-   ausgegeben wird. Beachte `--all`, damit Tags und alle Branches eingeschlossen sind und
-   nicht nur der aktuelle.
+1. `uv run python scripts/opsec_check.py --mode history` ausführen und bestätigen, dass
+   es mit 0 endet. Der Modus liest jedes Objekt, das von irgendeinem Ref erreichbar ist,
+   also jede Version jeder Datei einschliesslich der später gelöschten, dazu jede
+   Commit-Nachricht, jede Autoren- und Committer-Identität und jeden Branch- und
+   Tag-Namen. Binärdateien liest er mit, was die Hook-Modi überspringen, denn ein vor
+   Monaten committeter Screenshot kann einen Hostnamen in einem Textchunk des Bildes
+   tragen. Ausgegeben werden Objekt-ID und Pfad eines Treffers, nie der getroffene Text.
+
+   Der frühere Weg war `git log -p --all | grep -i -f .opsec-denylist` und bleibt eine
+   nützliche Gegenprobe. Zwei Lücken davon sollte man kennen, bevor man sich allein darauf
+   verlässt: ein Patch lässt Binärdateien ganz aus, und der Inhalt eines Merge-Commits
+   kommt darin überhaupt nicht vor.
 2. `git log --format='%an <%ae> | %cn <%ce>' | sort -u` ausführen und jede Identität
    prüfen. Autor und Committer sind getrennte Felder und beide werden veröffentlicht.
 3. `git branch -a` und `git tag` ausführen und die Namen prüfen.

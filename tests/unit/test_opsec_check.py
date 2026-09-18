@@ -198,9 +198,136 @@ def test_outside_a_git_repository(tmp_path: Path) -> None:
     assert result.returncode == EXIT_ERROR
 
 
-@pytest.mark.parametrize("mode", ["tracked", "staged", "both", "none"])
+@pytest.mark.parametrize("mode", ["tracked", "staged", "both", "history", "none"])
 def test_every_mode_is_accepted(git_repo: Path, mode: str) -> None:
     write_denylist(git_repo, DENIED)
     (git_repo / "a.txt").write_text("fine\n", encoding="utf-8")
     commit(git_repo)
     assert run(git_repo, "--mode", mode).returncode == EXIT_CLEAN
+
+
+# ---------------------------------------------------------------- the history mode
+#
+# The mode exists for one situation the hook modes cannot reach: a string that was
+# committed once and taken out again. Every test here checks a different route by which
+# such a string stays in a repository after the working tree looks clean.
+
+
+def test_a_string_removed_from_the_working_tree_is_still_in_history(git_repo: Path) -> None:
+    """The case the whole mode is for. The hook passes, and the clone still carries it."""
+    write_denylist(git_repo, DENIED)
+    secret = git_repo / "notes.md"
+    secret.write_text(f"see {DENIED}\n", encoding="utf-8")
+    commit(git_repo, "add notes")
+    secret.unlink()
+    commit(git_repo, "remove notes")
+
+    assert run(git_repo, "--mode", "both").returncode == EXIT_CLEAN, (
+        "the working tree is clean, which is exactly why the hook cannot be the last word"
+    )
+    result = run(git_repo, "--mode", "history")
+    assert result.returncode == EXIT_HIT
+    assert "notes.md" in result.stderr
+
+
+def test_a_denied_string_in_a_commit_message_is_found(git_repo: Path) -> None:
+    write_denylist(git_repo, DENIED)
+    (git_repo / "a.txt").write_text("harmless\n", encoding="utf-8")
+    commit(git_repo, f"work for {DENIED}")
+    result = run(git_repo, "--mode", "history")
+    assert result.returncode == EXIT_HIT
+    assert ":message" in result.stderr
+
+
+def test_a_denied_string_in_an_identity_is_found(git_repo: Path) -> None:
+    """Author and committer are separate published fields, and a name that was only ever a
+    git config value is still a name in the history."""
+    write_denylist(git_repo, DENIED)
+    (git_repo / "a.txt").write_text("harmless\n", encoding="utf-8")
+    subprocess.run(["git", "add", "-A"], cwd=git_repo, check=True)
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "core.hooksPath=/dev/null",
+            "-c",
+            f"user.name={DENIED}",
+            "commit",
+            "-q",
+            "-m",
+            "fine",
+        ],
+        cwd=git_repo,
+        check=True,
+    )
+    result = run(git_repo, "--mode", "history")
+    assert result.returncode == EXIT_HIT
+    assert ":identity" in result.stderr
+
+
+def test_a_denied_string_in_a_branch_name_is_found(git_repo: Path) -> None:
+    """A branch named after a customer is as public as a file is."""
+    write_denylist(git_repo, DENIED)
+    (git_repo / "a.txt").write_text("harmless\n", encoding="utf-8")
+    commit(git_repo)
+    subprocess.run(["git", "branch", f"feature/{DENIED}"], cwd=git_repo, check=True)
+    result = run(git_repo, "--mode", "history")
+    assert result.returncode == EXIT_HIT
+    assert "history:refs" in result.stderr
+
+
+def test_history_reads_binary_files_and_the_hook_does_not(git_repo: Path) -> None:
+    """A screenshot committed months ago can carry a hostname in a PNG text chunk. A hook
+    has no reason to decode every binary on every commit; a scan before publishing does."""
+    write_denylist(git_repo, DENIED)
+    blob = b"\x89PNG\r\n\x1a\n\x00\x00tEXtComment\x00" + DENIED.encode() + b"\x00\xff\xfe"
+    (git_repo / "shot.png").write_bytes(blob)
+    commit(git_repo)
+
+    hook = run(git_repo, "--mode", "tracked")
+    assert hook.returncode == EXIT_CLEAN
+    assert "binary" in hook.stderr, "and it says it skipped it rather than staying quiet"
+
+    result = run(git_repo, "--mode", "history")
+    assert result.returncode == EXIT_HIT
+    assert "shot.png" in result.stderr
+
+
+def test_history_never_prints_the_matched_string(git_repo: Path) -> None:
+    """The output of this check ends up in terminals, CI logs and screenshots."""
+    write_denylist(git_repo, DENIED)
+    (git_repo / "notes.md").write_text(f"see {DENIED}\n", encoding="utf-8")
+    commit(git_repo, f"about {DENIED}")
+    result = run(git_repo, "--mode", "history")
+    assert result.returncode == EXIT_HIT
+    assert DENIED not in result.stdout
+    assert DENIED not in result.stderr
+
+
+def test_history_reports_what_it_read_and_that_it_is_not_a_clearance(git_repo: Path) -> None:
+    """A green run here is the easiest thing in this project to mistake for permission to
+    publish, so it says out loud that it is one item of seven."""
+    write_denylist(git_repo, DENIED)
+    (git_repo / "a.txt").write_text("harmless\n", encoding="utf-8")
+    commit(git_repo)
+    result = run(git_repo, "--mode", "history")
+    assert result.returncode == EXIT_CLEAN
+    assert "blob(s)" in result.stderr and "commit(s)" in result.stderr
+    assert "item 1 of the pre-publication checklist" in result.stderr
+    assert "human review" in result.stderr
+
+
+def test_the_allowlist_still_exempts_a_path_in_history(git_repo: Path) -> None:
+    write_denylist(git_repo, DENIED)
+    (git_repo / ".opsec-allowlist").write_text("vendor/*\n", encoding="utf-8")
+    (git_repo / "vendor").mkdir()
+    (git_repo / "vendor" / "third-party.txt").write_text(f"{DENIED}\n", encoding="utf-8")
+    commit(git_repo)
+    assert run(git_repo, "--mode", "history").returncode == EXIT_CLEAN
+
+
+def test_history_in_a_repository_with_no_commits(git_repo: Path) -> None:
+    """A fresh repository has no objects and no refs. It must pass, not crash."""
+    write_denylist(git_repo, DENIED)
+    result = run(git_repo, "--mode", "history")
+    assert result.returncode == EXIT_CLEAN

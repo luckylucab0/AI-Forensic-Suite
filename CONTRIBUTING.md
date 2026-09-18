@@ -71,8 +71,11 @@ knowing:
 - **Legitimate exceptions exist.** A test that proves the guard works has to contain a
   denied string. Put `opsec-check: allow-line` on that line, or add the path to
   `.opsec-allowlist`, which is gitignored as well.
-- **The check only sees the present.** It does not scan history. This is the important
-  limitation, and it is why the procedure below exists.
+- **The hook modes only see the present.** `--mode history` is the one that reads what is
+  already written, and it is deliberately not wired into a hook: it walks every object
+  reachable from every ref, which is the wrong cost per commit and the right one once,
+  before publishing. It is item 1 of the procedure below, and the procedure exists because
+  the other items are human review that no script can do.
 
 CI runs the same script, reading the denylist from a repository secret when one is
 configured and skipping cleanly otherwise. With a secret configured it goes one step
@@ -90,8 +93,16 @@ history is where it earns its time.
 The pre-commit hook is not sufficient, because it never looked at history. Run this in
 order, with the real denylist present:
 
-1. `git log -p --all | grep -i -f .opsec-denylist` and confirm it produces nothing. Note
-   `--all`, so tags and every branch are included, not just the current one.
+1. `uv run python scripts/opsec_check.py --mode history` and confirm it exits 0. It reads
+   every object reachable from every ref, so every version of every file including the ones
+   later deleted, plus every commit message, every author and committer identity, and every
+   branch and tag name. It reads binary files as well, which the hook modes skip, because a
+   screenshot committed months ago can carry a hostname in an image text chunk. It prints
+   the object id and path of a hit and never the matched string.
+
+   The older way to do this was `git log -p --all | grep -i -f .opsec-denylist`, and it is
+   still a useful cross-check. Know its two holes before trusting it alone: a patch omits
+   binary files entirely, and a merge commit's content does not appear in one at all.
 2. `git log --format='%an <%ae> | %cn <%ce>'  | sort -u` and review every identity. Author
    and committer are separate fields and both are published.
 3. `git branch -a` and `git tag`, and review the names.
