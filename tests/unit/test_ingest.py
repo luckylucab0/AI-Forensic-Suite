@@ -374,3 +374,149 @@ def test_the_recorded_working_copies_reach_the_parsers(
         ]
 
     assert scopes == ["project"]
+
+
+# ----------------------------------------- the attribution is a hint, not a verdict
+
+
+def _bundle_with(tmp_path: Path, entry: dict, content: str, relative: str) -> Path:
+    """A one-file native bundle carrying the manifest entry the caller wants tested."""
+    bundle = tmp_path / "bundle"
+    target = bundle / "files" / relative
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(content, encoding="utf-8")
+    (bundle / "manifest.json").write_text(
+        json.dumps(
+            {
+                "format_version": 1,
+                "collection": {"uuid": "u-1", "os": "linux", "hostname": "vm"},
+                "tool": {"name": "collect.py", "version": "0"},
+                "files": [{**entry, "bundle_path": f"files/{relative}", "collected": True}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    return bundle
+
+
+def test_a_file_attributed_to_an_entry_with_no_parser_is_still_read(
+    tmp_path: Path, catalogue: Catalogue
+) -> None:
+    """The defect this was written for, and it cost a whole transcript.
+
+    A file can be claimed by a directory-level catalogue entry and a file-level one. The
+    collector attributes it to the entry with the fewest path patterns, which is a proxy for
+    specificity rather than the thing itself: one broad glob over a directory beats a
+    pattern that names the file. So a Gemini CLI chat transcript arrived attributed to the
+    tree that contains it, that entry has no parser, and the transcript sat in the case as
+    an inventory row with its content never read. Measured on the synthetic profile before
+    this: 37 parsed events reading the tree directly, 0 of those 37 from the same files via
+    a bundle.
+    """
+    bundle = _bundle_with(
+        tmp_path,
+        {
+            "original_path": "~/.gemini/tmp/7f3a9c2e1b8d4f60/chats/session-1.jsonl",
+            "sha256": "aa",
+            "size": 1,
+            "agent": "gemini_cli",
+            "artifact_id": "gemini_cli.home_tree",
+            "artifact_ids": ["gemini_cli.chats", "gemini_cli.home_tree"],
+            "category": "config",
+            "status": "verified",
+            "user": "alice",
+        },
+        '{"type":"user","content":"check the lockfile"}\n',
+        "home/alice/.gemini/tmp/7f3a9c2e1b8d4f60/chats/session-1.jsonl",
+    )
+    with Case.open(tmp_path / "case.sqlite") as case:
+        report = ingest(case, bundle, catalogue)
+        parsed = case.query("SELECT artifact_id, kind FROM events WHERE kind != 'artifact.fs'")
+        gap_kinds = [row["kind"] for row in case.query("SELECT kind FROM collection_gaps")]
+        artifact = case.query("SELECT artifact_id FROM artifacts")[0]
+
+    assert parsed, "the content has to be read rather than left as an inventory row"
+    assert {row["artifact_id"] for row in parsed} == {"gemini_cli.chats"}, (
+        "the events name the entry whose parser read them"
+    )
+    assert len(report.reattributed) == 1
+    assert "read as gemini_cli.chats" in report.reattributed[0]
+    assert "attribution_disagreement" in gap_kinds, (
+        "durable in the case, not only in a report printed once"
+    )
+    assert artifact["artifact_id"] == "gemini_cli.home_tree", (
+        "the manifest's own attribution is left alone, so the two can be compared"
+    )
+
+
+def test_an_attribution_that_has_a_parser_is_never_second_guessed(
+    tmp_path: Path, catalogue: Catalogue
+) -> None:
+    """A source that attributed a file well has to be taken at its word.
+
+    The fallback exists for the case where the alternative is leaving content unread. Using
+    it whenever another claimant looked more specific would overrule the one record of what
+    the endpoint knew, which is the whole reason a native bundle beats a tree reading.
+    """
+    bundle = _bundle_with(
+        tmp_path,
+        {
+            "original_path": "~/.claude/CLAUDE.md",
+            "sha256": "aa",
+            "size": 1,
+            "agent": "claude_code",
+            "artifact_id": "claude_code.user_claude_md",
+            "artifact_ids": [
+                "claude_code.user_claude_md",
+                "crosscutting.instructions_claude_md",
+            ],
+            "category": "instructions",
+            "status": "verified",
+            "user": "alice",
+        },
+        "# house rules\n",
+        "home/alice/.claude/CLAUDE.md",
+    )
+    with Case.open(tmp_path / "case.sqlite") as case:
+        report = ingest(case, bundle, catalogue)
+        parsed = case.query("SELECT DISTINCT artifact_id FROM events WHERE kind != 'artifact.fs'")
+
+    assert not report.reattributed
+    assert [row["artifact_id"] for row in parsed] == ["claude_code.user_claude_md"]
+
+
+def test_the_other_claimants_are_tried_in_a_stable_order(
+    catalogue: Catalogue, matcher: Matcher
+) -> None:
+    """Which claimant is tried first has to be decided the same way every time.
+
+    With a matcher the order is its specificity ranking, the same rule the tree adapter
+    attributes by, so the two readings of one catalogue agree about which claim is more
+    precise. Without one, or for a path no pattern recognises, it is the ids in sorted
+    order: that decides nothing, but it decides it reproducibly, and a case whose contents
+    depend on dictionary order is not evidence.
+    """
+    from agentforensics.ingest.ingest import _other_claimants
+    from agentforensics.ingest.source import SourceEntry
+
+    entry = SourceEntry(
+        original_path="~/.gemini/tmp/7f3a9c2e1b8d4f60/chats/session-1.jsonl",
+        local_path=None,
+        artifact_id="gemini_cli.home_tree",
+        also_claimed_by=("gemini_cli.home_tree", "gemini_cli.chats"),
+    )
+    assert _other_claimants(entry, matcher) == ["gemini_cli.chats"], (
+        "the attributed entry is never among the alternatives"
+    )
+    assert _other_claimants(entry, None) == ["gemini_cli.chats"]
+
+    # A path from a bundle taken with --root carries the analyst workstation's absolute
+    # path, which matches no catalogue pattern. The matcher then ranks nothing and the
+    # sorted order has to carry the decision.
+    off_tree = SourceEntry(
+        original_path="/mnt/image/home/alice/.gemini/tmp/x/chats/session-1.jsonl",
+        local_path=None,
+        artifact_id="gemini_cli.home_tree",
+        also_claimed_by=("gemini_cli.chats", "gemini_cli.home_tree", "aider.tags_cache"),
+    )
+    assert _other_claimants(off_tree, matcher) == ["aider.tags_cache", "gemini_cli.chats"]

@@ -23,6 +23,7 @@ from typing import TextIO
 
 from agentforensics.catalog import Catalogue
 from agentforensics.ingest import events_for, open_source
+from agentforensics.ingest.match import Matcher
 from agentforensics.model import Event
 from agentforensics.unified.format import PRODUCER, write
 
@@ -97,7 +98,8 @@ def normalize(
     ordered, and ordering needs all of them. A collection large enough for that to hurt is
     one that wants a case database instead, which is what `afx ingest` is for.
     """
-    source = open_source(path, catalogue, kind)
+    matcher = Matcher(catalogue)
+    source = open_source(path, catalogue, kind, matcher)
     record = source.bundle()
     # Same source of truth as the case path, so a log and a case built from one collection
     # agree about the scope of an instruction file rather than disagreeing quietly.
@@ -113,7 +115,12 @@ def normalize(
         report.files += 1
         if entry.attribution == "none" and entry.collected:
             report.unclaimed_paths.append(entry.original_path)
-        read = events_for(record.bundle_uuid, entry, roots)
+        # The matcher goes in for the same reason it does on the case path: a file the
+        # source attributed to a catalogue entry no parser handles is still read, under
+        # another entry that claims it. A log that skipped those and a case that did not
+        # would disagree about one collection, and this is the log the endpoint query is
+        # compared against.
+        read = events_for(record.bundle_uuid, entry, roots, matcher)
         if entry.collected and entry.local_path is not None:
             if read.parser is None:
                 report.files_unsupported += 1
