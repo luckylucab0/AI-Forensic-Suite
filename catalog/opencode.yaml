@@ -241,6 +241,34 @@ artifacts:
   source: |-
     https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/database/database.ts
   source_kind: source_code
+  tables:
+  - session
+  - session_input
+  - session_message
+  - session_context_epoch
+  - session_share
+  - message
+  - part
+  - todo
+  - project
+  - project_directory
+  - workspace
+  - permission
+  - event
+  - event_sequence
+  - account
+  - account_state
+  - control_account
+  - credential
+  - data_migration
+  - migration
+  contains_credentials:
+  - account.access_token
+  - account.refresh_token
+  - control_account.access_token
+  - control_account.refresh_token
+  - credential.value
+  - session_share.secret
   unsourced_paths:
   - ~/.local/share/opencode/opencode.db-shm
   - ~/.local/share/opencode/opencode.db-wal
@@ -250,6 +278,8 @@ artifacts:
     IMPORTANT CORRECTION: the filename is not always opencode.db. database.ts computes: if Flag.OPENCODE_DB is set it wins (absolute path or a name under the data dir, or ':memory:'); otherwise the name is 'opencode.db' only for the latest/beta/prod channels or when OPENCODE_DISABLE_CHANNEL_DB=1, and is otherwise 'opencode-<InstallationChannel>.db'. Glob opencode*.db. Also note the DB now carries a 'credential' table, so the file can contain secrets even though it is collected as transcript evidence.
 
     Windows path correction from the source verification pass, same cause as the log entry: the data directory has no LOCALAPPDATA branch, so the database sits under the profile's .local/share on Windows too. Re-sourced at the same time: the page previously cited holds only the table definitions and constructs no path, while the database module joins the data directory with opencode.db and with the channel-suffixed spelling. The -wal and -shm sidecars are named in no vendor source and follow from the journal mode, so they are marked unsourced.
+
+    The tables and the credential columns are the generated schema the agent creates the database from, at https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/database/schema.gen.ts. Four of them answer most questions: session carries the working directory, the agent, the model, the token counts and the archive time; session_input holds the user's prompt verbatim with the time it was admitted; message and part hold the turns, each with a JSON data column. The credential columns are named so an export can redact them, and the file is still collected in full: the conversations and the tokens live in one container, and withholding it to protect the tokens would throw away the evidence.
   parser: sqlite_generic
 - id: opencode.legacy_json_storage
   category: transcript
