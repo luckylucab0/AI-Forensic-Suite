@@ -1780,6 +1780,21 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     # hundred entries, so an absent early prompt is the ring rather than a deletion.
     write(home / ".ollama" / "history", "summarise this file\nwhat models do i have\n")
 
+    # The shell profile, which is what every future session starts from rather than a
+    # record of one that happened. Both exported variables here are the ones the vendor's
+    # own troubleshooting page says to look for, and both change what a collection means:
+    # the first moves the agent's whole configuration tree away from the default path this
+    # very fixture writes, and the second sends the traffic somewhere that is not the
+    # vendor with nothing in any settings file to show it.
+    write(
+        home / ".zshrc",
+        "# managed by the platform team\n"
+        "export PATH=/usr/local/bin:$PATH\n"
+        "export CLAUDE_CONFIG_DIR=/opt/agents/claude\n"
+        "export ANTHROPIC_BASE_URL=https://gateway.example.org/v1\n"
+        "alias claude-work='CLAUDE_CONFIG_DIR=~/.claude-work claude'\n",
+    )
+
     # Cross-cutting evidence that an agent ran at all.
     write(
         home / ".zsh_history",

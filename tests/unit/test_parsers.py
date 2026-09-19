@@ -1484,7 +1484,7 @@ def test_only_the_generic_readers_say_a_record_is_uninterpreted() -> None:
         # Not a generic reader. It maps the three declarations a shell script states
         # unambiguously and says the mark on every other line, because a reader that
         # decided what an arbitrary line of shell means would be writing a shell.
-        "shell_snapshot.py",
+        "shell_script.py",
         "sqlite_generic.py",
         "structured_generic.py",
         "text_log.py",

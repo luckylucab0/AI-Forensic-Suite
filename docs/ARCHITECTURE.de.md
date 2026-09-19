@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 34 Module lesen 366 der 473
+  zählt diese Dateien und sagt, welche es sind. 34 Module lesen 367 der 473
   Katalogartefakte; der Rest sind die Anmeldedatenspeicher, die absichtlich niemand liest,
   die Installationsspuren, die das Dateisystem-Ereignis beantwortet, und die Binärspeicher,
   die noch eigene Formate brauchen.
@@ -188,10 +188,18 @@ ist, dass das nicht *unbemerkt* geht.
   - **Shell-History.** Vier Shells und die Recall-Datei des Agenten selbst, jede so gelesen,
     wie ihr eigener Schreiber sie schreibt. Hier steht die Startzeile eines Agenten, also
     die erste Frage des Briefings über einen Agenten, und sie steht fast nie im Agenten.
-  - **Die kopierte Shell-Umgebung.** Ein Agent kopiert die Shell der Nutzenden in ein
-    Skript, bevor er irgendetwas ausführt, und diese Datei ist die Umgebung, in der seine
-    Befehle tatsächlich liefen, statt einer Aufzeichnung, dass jemand einmal eine Zeile
-    getippt hat. Nur die drei Deklarationen, die eine Shell eindeutig ausspricht, werden
+  - **Shell-Skripte, die über eine Umgebung entscheiden.** Zwei Artefakte, ein Format,
+    entgegengesetzte Aussagen. Ein Agent kopiert die Shell der Nutzenden in ein Skript,
+    bevor er irgendetwas ausführt, und diese Datei ist die Umgebung, in der seine Befehle
+    tatsächlich liefen, statt einer Aufzeichnung, dass jemand einmal eine Zeile getippt
+    hat. Das andere ist das Shell-Profil selbst, von dem jede künftige Sitzung ausgeht, und
+    dort kann eine Sammlung entwertet werden, bevor sie beginnt: eine exportierte Variable,
+    die das Zuhause eines Agenten verlagert, heisst, dass der vom Standardpfad genommene
+    Baum der falsche sein kann oder gar nicht existiert, und eine exportierte Basis-URL
+    heisst, dass der Verkehr woanders hinging als zum Hersteller, ohne dass irgendeine
+    Einstellungsdatei das zeigt. Beide Schreibweisen eines Exports werden gelesen, auch die
+    von fish, das kein export kennt und wo ein verlagertes Agenten-Zuhause am wenigsten
+    nach einem Export aussieht. Nur die drei Deklarationen, die eine Shell eindeutig ausspricht, werden
     als solche gelesen: ein Export, ein Alias und eine Funktion samt Rumpf. Jede andere
     Zeile bleibt mit der Uninterpretiert-Marke stehen, denn ein Leser, der entschiede, was
     eine beliebige Shell-Zeile bedeutet, würde eine Shell schreiben. Das Lesen lohnt

@@ -12,7 +12,7 @@ from pathlib import Path
 
 from agentforensics.model import is_uninterpreted
 from agentforensics.parsers import ParseContext, for_artifact
-from agentforensics.parsers.shell_snapshot import SURVIVED
+from agentforensics.parsers.shell_script import PRESENT
 
 ARTIFACT = "claude_code.shell_snapshots"
 
@@ -128,7 +128,7 @@ def test_the_file_being_there_at_all_is_an_event(tmp_path: Path) -> None:
     rather than about its contents."""
     path = write(tmp_path / "snapshot-8.sh", "export A=1\n")
     events = parse(path)
-    assert events[0].payload["text"] == SURVIVED
+    assert events[0].payload["text"] == PRESENT[ARTIFACT]
     assert events[0].kind == "config.snapshot"
 
 
@@ -140,3 +140,70 @@ def test_a_file_that_is_not_text_is_recorded_rather_than_shown_as_noise(
     events = parse(path)
     assert len(events) == 1
     assert "not the shell script" in (events[0].parse_problem or "")
+
+
+# ------------------------------------------------------- the shell profile
+
+
+PROFILE = "claude_code.shell_profile_evidence"
+
+
+def profile(path: Path) -> list:
+    parser = for_artifact(PROFILE)
+    assert parser is not None
+    return list(
+        parser.parse(
+            ParseContext(
+                bundle_uuid="b1",
+                original_path=f"/home/alice/{path.name}",
+                local_path=path,
+                sha256="aa",
+                artifact_id=PROFILE,
+                agent="claude_code",
+                user="alice",
+            )
+        )
+    )
+
+
+def test_a_profile_is_read_by_the_same_reader_and_said_to_be_a_different_thing(
+    tmp_path: Path,
+) -> None:
+    """Same format, opposite claim. A snapshot is a record of one session that happened; a
+    profile is what every future session starts from, and it is on an imaged machine
+    whether or not the agent was ever run."""
+    path = write(tmp_path / ".zshrc", "export CLAUDE_CONFIG_DIR=/opt/agents/claude\n")
+    events = profile(path)
+    assert events[0].payload["text"] == PRESENT[PROFILE]
+    assert "every session on this account starts from" in events[0].payload["text"]
+    assert settings(events)["export:CLAUDE_CONFIG_DIR"] == "/opt/agents/claude"
+
+
+def test_a_profile_does_not_claim_to_date_the_line(tmp_path: Path) -> None:
+    """The file says what is in force, not when it was put there, and the filesystem dates
+    the last write to the whole of it and nothing finer."""
+    path = write(tmp_path / ".bashrc", "export ANTHROPIC_BASE_URL=https://gw.example.org/v1\n")
+    events = profile(path)
+    assert all(event.ts_utc is None for event in events)
+    assert "nothing finer" in events[0].payload["text"]
+
+
+def test_the_fish_spelling_of_an_export_is_read(tmp_path: Path) -> None:
+    """One of the profile files this reader is pointed at is a fish configuration, and fish
+    has no export: it sets an exported variable with a flag on its own set builtin. Without
+    this the variables that matter most would have been kept as unmapped lines."""
+    path = write(
+        tmp_path / "config.fish",
+        "set -gx CLAUDE_CONFIG_DIR /opt/agents/claude\n"
+        "set --export ANTHROPIC_BASE_URL https://gw.example.org/v1\n",
+    )
+    found = settings(profile(path))
+    assert found["export:CLAUDE_CONFIG_DIR"] == "/opt/agents/claude"
+    assert found["export:ANTHROPIC_BASE_URL"] == "https://gw.example.org/v1"
+
+
+def test_a_fish_variable_that_is_not_exported_is_not_reported_as_one(tmp_path: Path) -> None:
+    """-g is global scope and does not export. Reporting it as an export would say a
+    variable reached a child process when it did not."""
+    path = write(tmp_path / "config.fish", "set -g fish_greeting ''\nset -l tmp value\n")
+    assert settings(profile(path)) == {}

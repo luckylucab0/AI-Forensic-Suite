@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  Thirty-four modules read 366 of the catalogue's 473 artifacts; the rest are the credential
+  Thirty-four modules read 367 of the catalogue's 473 artifacts; the rest are the credential
   stores nothing reads on purpose, the install evidence the filesystem event answers, and
   the binary stores that still need their own formats.
 
@@ -172,9 +172,16 @@ it cannot be rewritten *quietly*.
   - **Shell history.** Four shells and the agent's own recall file, each read the way its
     own writer writes it. This is where an agent's start line is, which is the brief's first
     question about an agent and is almost never inside the agent.
-  - **The captured shell environment.** One agent copies the user's shell to a script before
-    it runs anything, and that file is the environment its commands actually ran in rather
-    than a record that somebody once typed a line. Only the three declarations a shell
+  - **Shell scripts that decide an environment.** Two artifacts, one format, opposite
+    claims. One agent copies the user's shell to a script before it runs anything, and that
+    file is the environment its commands actually ran in rather than a record that somebody
+    once typed a line. The other is the shell profile itself, which is what every future
+    session starts from, and it is where a collection can be invalidated before it begins:
+    an exported variable that relocates an agent's home means the tree taken from the
+    default path may be the wrong one or may not exist, and an exported base URL means the
+    traffic went somewhere other than the vendor with nothing in any settings file to show
+    it. Both spellings of an export are read, including fish's, which has no export
+    keyword and is where a relocated agent home looks least like one. Only the three declarations a shell
     states unambiguously are read as such, an export, an alias and a function with its body;
     every other line is kept with the uninterpreted mark, because a reader that decided what
     an arbitrary line of shell means would be writing a shell. It is worth the reading twice
