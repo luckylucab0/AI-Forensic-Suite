@@ -27,7 +27,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "tests" / "fixtures"))
 
-from generate import build_home  # noqa: E402
+from generate import build_home, build_windows_home  # noqa: E402
 from selftest_cases import compare  # noqa: E402
 
 from agentforensics.bundle import verify_bundle  # noqa: E402
@@ -158,6 +158,19 @@ def synthetic_home(tmp_path_factory: pytest.TempPathFactory) -> Path:
     home = tmp_path_factory.mktemp("profile") / "home"
     build_home(home)
     return home
+
+
+@pytest.fixture(scope="module")
+def windows_image(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """A mounted Windows image, as a collection with --root expects to find one.
+
+    A second tree rather than a second profile in the first one: the Windows patterns hang
+    off application-data roots that the POSIX tree has no counterpart for, and collecting a
+    Windows image is a different run with a different --os.
+    """
+    root = tmp_path_factory.mktemp("windows-image")
+    build_windows_home(root / "Users" / "alice")
+    return root
 
 
 @pytest.fixture(scope="module")
@@ -544,27 +557,15 @@ def test_collector_produces_a_verifiable_bundle(
     assert report.ok, report.summary()
 
 
-def test_the_two_collectors_agree_on_the_same_tree(synthetic_home: Path, tmp_path: Path) -> None:
-    """The differential test, and the reason the bundle format is written down.
+def assert_the_collectors_agree(tree: Path, os_name: str, tmp_path: Path) -> None:
+    """Run both collectors over one tree and compare their manifests field by field.
 
-    Two implementations of one format drift silently: each is self-consistent, each
-    verifies, and an analyst comparing a Windows bundle with a macOS one sees differences
-    that are artefacts of the collector rather than facts about the endpoints. So the two
-    are run over the same tree and their manifests compared field by field, with only the
-    fields docs/BUNDLE_FORMAT.md lists as allowed to differ normalized away.
-
-    Every real bug this found was of that kind: a culture-aware sort putting a
-    case-collision suffix on the other file of a pair, a case-insensitive dictionary losing
-    one of two names differing only in case, and a symlink described by its own metadata
-    instead of its target's.
+    Only the fields docs/BUNDLE_FORMAT.md lists as allowed to differ are normalized away.
     """
-    if POWERSHELL is None:
-        pytest.skip("no PowerShell interpreter available")
-
     py_out = tmp_path / "differential-py"
     ps_out = tmp_path / "differential-ps1"
     for runner, out in ((run_collect_py, py_out), (run_collect_ps1, ps_out)):
-        result = runner(["--out", str(out), "--root", str(synthetic_home), "--os", "linux"])
+        result = runner(["--out", str(out), "--root", str(tree), "--os", os_name])
         assert result.returncode == 0, describe_run(out, result)
 
     py_manifest = json.loads((py_out / "manifest.json").read_text(encoding="utf-8"))
@@ -574,6 +575,10 @@ def test_the_two_collectors_agree_on_the_same_tree(synthetic_home: Path, tmp_pat
     per_file_allowed = {"birthtime_utc", "ctime_utc", "atime_utc"}
     py_files = {e["original_path"]: e for e in py_manifest["files"]}
     ps_files = {e["original_path"]: e for e in ps_manifest["files"]}
+    # Two collections that both found nothing agree perfectly, and a comparison that
+    # accepts that proves nothing at all. It is the exact shape of the defect that made
+    # --all-users return an empty bundle from a live Windows host for months.
+    assert py_files, f"the collection over {tree} found no files, so nothing is compared"
     assert set(py_files) == set(ps_files), (
         "the collectors found different files.\n"
         f"only python={sorted(set(py_files) - set(ps_files))}\n"
@@ -609,6 +614,40 @@ def test_the_two_collectors_agree_on_the_same_tree(synthetic_home: Path, tmp_pat
     for out in (py_out, ps_out):
         report = verify_bundle(out)
         assert report.ok, report.summary()
+
+
+def test_the_two_collectors_agree_on_the_same_tree(synthetic_home: Path, tmp_path: Path) -> None:
+    """The differential test, and the reason the bundle format is written down.
+
+    Two implementations of one format drift silently: each is self-consistent, each
+    verifies, and an analyst comparing a Windows bundle with a macOS one sees differences
+    that are artefacts of the collector rather than facts about the endpoints.
+
+    Every real bug this found was of that kind: a culture-aware sort putting a
+    case-collision suffix on the other file of a pair, a case-insensitive dictionary losing
+    one of two names differing only in case, and a symlink described by its own metadata
+    instead of its target's.
+    """
+    if POWERSHELL is None:
+        pytest.skip("no PowerShell interpreter available")
+    assert_the_collectors_agree(synthetic_home, "linux", tmp_path)
+
+
+def test_the_two_collectors_agree_on_a_windows_application_data_tree(
+    windows_image: Path, tmp_path: Path
+) -> None:
+    """The same differential where the two collectors have the most reason to disagree.
+
+    The POSIX tree above exercises neither of the Windows application-data roots, and
+    between the two collectors those roots are the place where one reads a value the other
+    does not: %APPDATA% and %LOCALAPPDATA% are expanded by two separate implementations of
+    the same table, one of which also has the live environment in reach. A difference there
+    is a difference in which files a Windows collection returns, which is the answer this
+    tool is for.
+    """
+    if POWERSHELL is None:
+        pytest.skip("no PowerShell interpreter available")
+    assert_the_collectors_agree(windows_image, "windows", tmp_path)
 
 
 def test_the_powershell_serializer_matches_python_byte_for_byte() -> None:

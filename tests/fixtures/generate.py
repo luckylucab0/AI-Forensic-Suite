@@ -21,9 +21,15 @@ them.
 from __future__ import annotations
 
 import argparse
+
+# Standard library from Python 3.14, which is this package's floor (ADR 0024) precisely
+# because one agent compresses its transcripts with it. The collectors never import this
+# module, so their own 3.8 floor is untouched.
+import compression.zstd as zstd
 import json
 import os
 import re
+import sqlite3
 import sys
 from pathlib import Path
 
@@ -743,6 +749,229 @@ def cline_ui_messages() -> str:
     )
 
 
+# The Windows profile a thread store lives in, as one thread. Separate from the POSIX
+# fixture's content because Zed is the only agent in the fixture that compresses what it
+# stores, and the point of putting it in the Windows tree is that a reader which found the
+# file by a Windows path still has to decompress it to see anything at all.
+WINDOWS_THREAD = "01H0000000000000000000"
+
+# The table as the vendor's migration leaves it, copied from the same source the parser was
+# written against so the fixture cannot drift into a schema nothing reads:
+# https://raw.githubusercontent.com/zed-industries/zed/main/crates/agent/src/db.rs
+ZED_SCHEMA = """CREATE TABLE threads (
+    id TEXT PRIMARY KEY,
+    summary TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    data_type TEXT NOT NULL,
+    data BLOB NOT NULL,
+    parent_id TEXT,
+    folder_paths TEXT,
+    folder_paths_order TEXT,
+    created_at TEXT
+)"""
+
+
+def zed_thread() -> str:
+    """One Zed thread document, in the external tagging serde gives these types."""
+    return json.dumps(
+        {
+            "title": "fix the build",
+            "messages": [
+                # The vendor's enum names the second one Agent, not Assistant. Serde's
+                # default external tagging means the tag is the key, so a wrong name here
+                # would make the fixture exercise the parser's unknown-shape branch while
+                # looking like a normal turn.
+                {"User": {"content": [{"Text": "why is the pipeline red"}]}},
+                {"Agent": {"content": [{"Text": "the lockfile is stale"}]}},
+            ],
+            "updated_at": "2026-09-06T09:30:00Z",
+            "detailed_summary": None,
+            "model": {"provider": "example", "model": "model-1"},
+            "profile": "write",
+        },
+        sort_keys=True,
+    )
+
+
+def write_zed_store(path: Path, folder: str, mtime: int = RECENT) -> Path:
+    """A Zed thread store, with the thread compressed the way the product writes it.
+
+    sqlite3 and zstd are both standard library, so this stays a dependency-free generator.
+    zstd is standard library from Python 3.14, which is the floor this package already has
+    for that reason (ADR 0024); the collectors never import this file.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        path.unlink()
+    connection = sqlite3.connect(path)
+    try:
+        connection.execute(ZED_SCHEMA)
+        connection.execute(
+            "INSERT INTO threads (id, summary, updated_at, data_type, data, parent_id, "
+            "folder_paths, folder_paths_order, created_at) VALUES (?,?,?,?,?,?,?,?,?)",
+            (
+                WINDOWS_THREAD,
+                "fix the build",
+                "2026-09-06T09:30:00Z",
+                "zstd",
+                zstd.compress(zed_thread().encode("utf-8")),
+                None,
+                json.dumps([folder]),
+                "0",
+                "2026-09-06T09:00:00Z",
+            ),
+        )
+        connection.commit()
+    finally:
+        connection.close()
+    os.utime(path, (mtime, mtime))
+    return path
+
+
+# What build_windows_home writes, as {catalogue artifact id: why it is in the fixture}.
+# Named here rather than only in a test, because the value of this tree is that each file
+# is reached by a Windows application-data pattern from the catalogue and nothing else, and
+# a file nobody can name the claimant of would quietly become decoration.
+WINDOWS_ARTIFACTS = {
+    "kilo_code.extension_id_legacy_tree": (
+        "a task tree under the editor's roaming data, the same three files and the same "
+        "bytes as the POSIX fixture's Cline task, so a difference in what comes out of "
+        "them can only be the path"
+    ),
+    "zed.threads_db": "a compressed thread store under the local data root",
+    "goose.secrets": "a credential file, so the withholding rule is exercised on a "
+    "Windows path rather than only on a POSIX one",
+    "goose.config": "its non-secret sibling in the same directory",
+    "crosscutting.shell_psreadline_history": (
+        "the Windows counterpart of the shell history, which is the evidence that a CLI "
+        "agent was invoked at all"
+    ),
+    "claude_code.mcp_logs": (
+        "a log under a cache directory named after the working copy, so the encoding of a "
+        "Windows path into a single directory component is exercised end to end"
+    ),
+}
+
+
+def build_windows_home(home: Path) -> dict:
+    """Create a synthetic Windows profile under a mounted-image root. Returns a summary.
+
+    `home` is the profile directory itself, so an image collected with `--root <image>`
+    finds it as `<image>/Users/alice`.
+
+    Why this exists at all: 134 catalogue paths hang off %APPDATA% and %LOCALAPPDATA%, and
+    until this tree there was no end to end test that any of them collects. The expansion
+    of the two variables was unit tested, which is not the same thing: between the expanded
+    pattern and an event in a case sit the glob, the claim order, the bundle path mapping
+    for a path with a drive letter in it, and a parser reading a file that arrived by a
+    Windows path. Every Windows defect this project has had was silent, and a silent one in
+    that chain means a Windows collection comes back thin and nobody can tell.
+
+    Deliberately not here: the project tier and the awkward filenames. Both are covered by
+    the POSIX fixture, both are platform independent, and repeating them would make this
+    tree about something other than the application-data roots.
+
+    The content is the same content the POSIX fixture writes wherever an agent appears in
+    both, so the two trees can be compared and only the paths differ.
+    """
+    roaming = home / "AppData" / "Roaming"
+    local = home / "AppData" / "Local"
+    # Where the working copy is, as a Windows path. It is not created: what the fixture
+    # needs from it is the name a cache directory is derived from, and a collection of an
+    # image does not need the working copy to exist to find the cache.
+    project = r"C:\Users\alice\src\app"
+
+    # The editor's roaming data, holding a task tree an agent extension wrote. Same
+    # generators as the POSIX fixture's Cline task: one catalogue entry per extension id,
+    # one parser for all of them.
+    task = roaming / "Code" / "User" / "globalStorage" / "kilocode.kilo-code" / "tasks" / SESSION_A
+    write(task / "api_conversation_history.json", cline_api_history(), RECENT)
+    write(task / "ui_messages.json", cline_ui_messages(), RECENT)
+    write(task / "task_metadata.json", cline_task_metadata(), RECENT)
+    # Truncated here as in the POSIX tree, so the two hold the same four files. A whole
+    # JSON document costs the file rather than its last record when a write is killed, and
+    # the two readings have to agree about that on both shapes.
+    write(task / "context_history.json", '{"truncated": ', RECENT)
+
+    write_zed_store(local / "Zed" / "threads" / "threads.db", project.replace("\\", "/"))
+
+    goose_config = roaming / "Block" / "goose" / "config"
+    write(
+        goose_config / "config.yaml",
+        "GOOSE_PROVIDER: example\nGOOSE_MODEL: model-1\nextensions:\n  developer:\n"
+        "    enabled: true\n",
+    )
+    # Never copied by default, and the conformance suite asserts that on this path as well
+    # as on the POSIX one. The value is invented and says so.
+    write(goose_config / "secrets.yaml", "EXAMPLE_API_KEY: example-not-a-real-key\n")
+
+    # PSReadLine keeps one line per command with no timestamps at all, which is why the
+    # fixture carries the invocation and nothing else: a parser that dated these from the
+    # file would date a month of commands to one moment.
+    write(
+        roaming / "Microsoft" / "Windows" / "PowerShell" / "PSReadLine" / "ConsoleHost_history.txt",
+        "claude --dangerously-skip-permissions\n$env:CLAUDE_CODE_SKIP_PROMPT_HISTORY=1\n",
+    )
+
+    # The cache directory is named after the working copy with every non-alphanumeric
+    # character replaced by a dash, which is what turns a path holding a drive colon and
+    # backslashes into one legal directory component.
+    encoded = re.sub(r"[^A-Za-z0-9]", "-", project)
+    write(
+        local
+        / "claude-cli-nodejs"
+        / "Cache"
+        / encoded
+        / "mcp-logs-example-tracker"
+        / "2026-09-08T10-00-00-000Z.jsonl",
+        jsonl(
+            [
+                {
+                    "debug": "connecting",
+                    "timestamp": "2026-09-08T10:00:00.000Z",
+                    "sessionId": SESSION_A,
+                },
+                {
+                    "error": "server exited",
+                    "timestamp": "2026-09-08T10:00:02.000Z",
+                    "sessionId": SESSION_A,
+                },
+            ]
+        ),
+    )
+
+    return {
+        "home": str(home),
+        "project": project,
+        "roaming": str(roaming),
+        "local": str(local),
+        "encoded_project_dir": encoded,
+        "artifacts": sorted(WINDOWS_ARTIFACTS),
+        "secret_path": str(goose_config / "secrets.yaml"),
+        "session": SESSION_A,
+    }
+
+
+def cline_task_metadata() -> str:
+    """A Cline task's metadata file.
+
+    Shared by the POSIX and the Windows fixtures on purpose: the two trees hold the same
+    task at the two locations the catalogue declares for it, so a test can compare what the
+    analyzer makes of them and know that any difference comes from the path.
+    """
+    return json.dumps(
+        {
+            "files_in_context": [
+                {"path": "src/app/index.js", "record_state": "active"},
+                {"path": "src/app/util.js", "record_state": "stale"},
+            ],
+            "model_usage": {"example-model-6": {"requests": 3}},
+            "environment_history": [],
+        },
+        indent=2,
+    )
+
+
 def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     """Create the synthetic profile. Returns a summary for assertions."""
     project = home / "src" / "app"
@@ -990,21 +1219,7 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     )
     write(task / "api_conversation_history.json", cline_api_history(), RECENT)
     write(task / "ui_messages.json", cline_ui_messages(), RECENT)
-    write(
-        task / "task_metadata.json",
-        json.dumps(
-            {
-                "files_in_context": [
-                    {"path": "src/app/index.js", "record_state": "active"},
-                    {"path": "src/app/util.js", "record_state": "stale"},
-                ],
-                "model_usage": {"example-model-6": {"requests": 3}},
-                "environment_history": [],
-            },
-            indent=2,
-        ),
-        RECENT,
-    )
+    write(task / "task_metadata.json", cline_task_metadata(), RECENT)
     # Present and deliberately truncated: these files are whole JSON documents, so a
     # killed write costs the file rather than its last record, and that has to be visible.
     write(task / "context_history.json", '{"truncated": ', RECENT)
@@ -1088,11 +1303,23 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="skip the awkward filenames and symlinks, for a platform that cannot hold them",
     )
+    parser.add_argument(
+        "--shape",
+        choices=("posix", "windows"),
+        default="posix",
+        help="posix builds the profile as a POSIX host holds it; windows builds a Windows "
+        "profile with the agent data under the two application-data roots. The Windows "
+        "tree is meant to be collected as a mounted image, so --out is the profile "
+        "directory and the collector is pointed at its grandparent with --root",
+    )
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
 
     home = Path(args.out).resolve()
-    summary = build_home(home, with_edge_cases=not args.no_edge_cases)
+    if args.shape == "windows":
+        summary = build_windows_home(home)
+    else:
+        summary = build_home(home, with_edge_cases=not args.no_edge_cases)
     if args.json:
         print(json.dumps(summary, indent=2, sort_keys=True))
     else:
