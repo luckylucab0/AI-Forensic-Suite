@@ -14,7 +14,7 @@ rationale: >
   reviewer by construction, which is why a tool has to be the thing that finds it.
 applies_to:
   kinds: [tool.result, mcp.call, network.request, file.read, user.prompt,
-          config.snapshot, instruction.source]
+          config.snapshot, instruction.source, memory.write]
 match:
   field: event_text
   regex_any:

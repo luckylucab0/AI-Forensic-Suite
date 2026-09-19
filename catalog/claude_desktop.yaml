@@ -231,7 +231,7 @@ artifacts:
     Written and updated by Claude during sessions. Users can delete individual entries or pause memory (existing files kept but not read or updated). The vendor states memory survives the automatic idle-session deletion that removes sessions. Project memory lives under spaces/<projectId>/memory/ and is kept when a project is archived only in the sense that archiving deletes project metadata; check both.
   notes: |-
     High value for the injected-instruction question: the CLAUDE.md here is included in every session, so text planted in it steers every later run, and the memory notes are Markdown Claude wrote about the user's preferences, projects and feedback. A Chat conversation inside a project can read project memory but cannot change it; Cowork sessions inside a project read and update the project memory instead of the global one. Vendor text is the third-party mode page; standard-mode spellings are unsourced.
-  parser: null
+  parser: memory
 - id: claude_desktop.cowork_session_files
   title: Session uploads and outputs (attached files and files Claude created)
   category: file_snapshot

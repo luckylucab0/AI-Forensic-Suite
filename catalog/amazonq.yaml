@@ -366,7 +366,7 @@ artifacts:
     Regenerated wholesale by the Regenerate Memory Bank action, which overwrites the previous analysis with no history kept.
   notes: |-
     Agent-authored summaries of the project that are automatically used as context. The vendor states Amazon Q creates a memory-bank subfolder under .amazonq/rules containing product.md, structure.md, tech.md and guidelines.md. Two forensic uses. They are a dated, agent-written description of the codebase as it existed when they were generated, which is useful when the codebase has since changed or been removed. And because they sit under .amazonq/rules, they are loaded as rules, so anything written into them becomes standing instructions: a memory bank that was hand-edited after generation is an injection vector wearing a generated-file disguise. Compare against the repository history to spot that.
-  parser: null
+  parser: memory
 - id: amazonq.cli_user_rules
   title: Amazon Q Developer CLI user-level rules
   category: instructions

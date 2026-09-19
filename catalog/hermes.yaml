@@ -252,7 +252,7 @@ artifacts:
     USER.md is often the single most personally identifying file in the whole Hermes tree, and it survives prune_sessions(). Where transcripts have been pruned, this is your best remaining summary of what the agent knew about the operator.
 
     Record structure: MEMORY.md holds general facts; USER.md holds user-specific information.
-  parser: null
+  parser: memory
 - id: hermes.sessions_dir
   category: transcript
   root: user_profile

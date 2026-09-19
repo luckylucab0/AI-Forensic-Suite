@@ -1693,7 +1693,7 @@ artifacts:
     Record structure: Persistent per-subagent memory, keyed by subagent name. Three scopes with distinct paths: `user` -> ~/.claude/agent-memory/<name>/, `project` -> .claude/agent-memory/<name>/ (intended to be committed to version control), `local` -> .claude/agent-memory-local/<name>/ (deliberately not committed). Content is subagent-authored markdown, separate from the main conversation's auto memory.
 
     Persistent per-subagent memory, written and maintained by the subagent itself, separate from main-session auto memory. Enabled by the `memory` frontmatter field on an agent definition, whose value (`user`|`project`|`local`) selects which of these locations is used.
-  parser: null
+  parser: memory
 - id: claude_code.auto_memory
   category: memory
   root: user_profile
@@ -1723,7 +1723,7 @@ artifacts:
     Record structure: MEMORY.md is an index, one line per memory, typically markdown links to sibling topic files. Topic files carry YAML frontmatter with `name`, `description`, `type` (e.g. "reference") followed by markdown notes. Only the first 200 lines or 25KB of MEMORY.md (whichever comes first) is loaded at session start; topic files are read on demand.
 
     On by default; toggled with /memory or the `autoMemoryEnabled` setting, relocated with `autoMemoryDirectory`, disabled with CLAUDE_CODE_DISABLE_AUTO_MEMORY. MEMORY.md is an index loaded at session start - only the first 200 lines or 25KB, whichever comes first. Topic files (debugging.md, architecture.md, build-commands.md and similar; Claude picks the name) are read on demand and carry YAML frontmatter with `name`, `description`, `type`. <project> is a directory name derived from the repository path; CLAUDE_CODE_PROJECT_DIR_NAME (v2.1.234+, launch environment only, requires CLAUDE_CONFIG_DIR set) overrides that derivation.
-  parser: null
+  parser: memory
 - id: claude_code.task_lists
   category: memory
   root: user_profile

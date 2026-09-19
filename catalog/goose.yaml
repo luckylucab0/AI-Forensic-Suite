@@ -204,7 +204,7 @@ artifacts:
     Survives session deletion. Facts the agent chose to remember often summarise work whose transcript has since been purged - a reliable secondary source when sessions are missing.
 
     Record structure: Two scopes: global under the goose config dir, and local under .goose/memory/ in the working directory.
-  parser: null
+  parser: memory
 - id: goose.permissions
   category: permissions
   root: user_profile

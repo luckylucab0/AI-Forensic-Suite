@@ -37,6 +37,7 @@ from agentforensics.parsers.hermes import HermesParser
 from agentforensics.parsers.instructions import InstructionsParser
 from agentforensics.parsers.json_generic import JsonGenericParser
 from agentforensics.parsers.jsonl_generic import JsonlGenericParser
+from agentforensics.parsers.memory import MemoryParser
 from agentforensics.parsers.opencode import OpencodeParser
 from agentforensics.parsers.pi import PiParser
 from agentforensics.parsers.prompt_history import PromptHistoryParser
@@ -71,6 +72,11 @@ PARSERS: tuple[Parser, ...] = (
     GeminiParser(),
     HermesParser(),
     InstructionsParser(),
+    # The same reading as the instruction files, for the notes the agent wrote itself.
+    # A separate kind, because the instruction surface answers what the agent was told to
+    # obey and these are not that, and a separate parser, because a memory outlives every
+    # transcript store in this catalogue and is read for retention rather than for scope.
+    MemoryParser(),
     # Ahead of the generic SQLite reader, which is what taking a store over looks like:
     # this one has a verified schema, so it claims opencode.db and the reader does not.
     OpencodeParser(),

@@ -661,7 +661,7 @@ A tool result, a fetched page or an MCP response carries text addressed to the a
 | Severity | high |
 | Pack | `prompt_injection` |
 | Agents | `any` |
-| Event kinds | `tool.result`, `mcp.call`, `network.request`, `file.read`, `user.prompt`, `config.snapshot`, `instruction.source` |
+| Event kinds | `tool.result`, `mcp.call`, `network.request`, `file.read`, `user.prompt`, `config.snapshot`, `instruction.source`, `memory.write` |
 | Fields read | `event_text` |
 | Tags | `prompt-injection`, `T1027`, `obfuscation` |
 

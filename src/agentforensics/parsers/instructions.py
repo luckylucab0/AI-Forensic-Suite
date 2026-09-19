@@ -228,123 +228,143 @@ class InstructionsParser:
         return artifact_id in SOURCES
 
     def parse(self, context: ParseContext) -> Iterator[Event]:
-        path = context.local_path
-        try:
-            raw_bytes = path.read_bytes()
-        except OSError as exc:
-            yield unparsed(
-                context.provenance("file"),
-                context.agent,
-                {"file": path.name},
-                f"this instruction file could not be read: {exc}",
-                user=context.user,
-                host=context.host,
-            )
-            return
+        yield from read_document(context, kind="instruction.source")
 
-        text = raw_bytes.decode("utf-8", "replace")
-        problems: list[str] = []
-        if "\ufffd" in text:
-            problems.append(
-                "the file did not decode as UTF-8 and was read with replacement characters, "
-                "so its content is not exact"
-            )
-        if len(text) > MAX_TEXT:
-            problems.append(
-                f"the text is longer than the ingest limit of {MAX_TEXT} characters and is "
-                "carried truncated. The whole file is in the bundle, at the path in this "
-                "event's provenance"
-            )
-            text = text[:MAX_TEXT]
 
-        scope, scope_note = scope_of(context.original_path, context.project_roots)
+def read_document(
+    context: ParseContext, *, kind: str, extra: dict[str, Any] | None = None
+) -> Iterator[Event]:
+    """One event for one file of agent-facing prose, whatever the case calls that file.
 
-        payload: dict[str, Any] = {
-            "text": text,
-            # The facet the case indexes, and the join the injected-instruction question
-            # needs: which instruction files were in force, at which scope.
-            "instructions": [{"path": context.original_path, "scope": scope}],
-            "scope": scope,
-            "file": path.name,
-            "bytes": len(raw_bytes),
-            "lines": text.count("\n") + 1 if text else 0,
-        }
-        if scope_note:
-            # Beside the scope and not in parse_problem. The file was read completely; what
-            # is not known is which tier it applied at. Carrying that as a parse problem
-            # made every view say the file had not been fully read, and a tool that reports
-            # sound evidence as unreadable teaches an analyst to distrust the one case
-            # where it means it.
-            payload["scope_problem"] = scope_note
-
-        # A script's `#` lines are comments, not Markdown headings, and the two are
-        # syntactically identical. Reading one as a title showed `!/bin/sh` as the name of a
-        # hook file, which is the kind of small wrongness that makes an analyst stop
-        # trusting a listing.
-        executable = path.name.lower().endswith(_EXECUTABLE_SUFFIXES)
-        title = None if executable else _title(text)
-        if title:
-            payload["title"] = title
-
-        front, front_problem = _front_matter(text)
-        if front_problem:
-            problems.append(front_problem)
-        if front:
-            payload["front_matter"] = front
-            for key in ("name", "description"):
-                value = front.get(key)
-                if isinstance(value, str) and value.strip():
-                    payload[f"declared_{key}"] = value.strip()
-            tools = _declared_tools(front)
-            if tools:
-                # A skill that names its own tools has widened what the agent may do, in a
-                # document rather than in a settings file, which is why it belongs next to
-                # the instruction text and not only in the permissions view.
-                payload["declared_tools"] = tools
-
-        if path.name.lower().endswith(".json"):
-            document, json_problem = read_json(path)
-            if json_problem:
-                problems.append(f"the file has a .json name but {json_problem}")
-            else:
-                payload["document"] = document
-                prompt, prompt_key = _prompt_in(document)
-                if prompt:
-                    payload["text"] = prompt
-                    payload["prompt_field"] = prompt_key
-                    payload["document_text"] = text
-
-        if executable:
-            # Not "probably a hook": the catalogue filed this path under instructions, and a
-            # script there is an instruction the agent executes. Flagged rather than
-            # interpreted, because what it does is a question for the analyst.
-            payload["executable"] = True
-
-        hidden = hidden_characters(text)
-        if hidden:
-            payload["hidden_characters"] = hidden
-
-        yield Event(
-            kind="instruction.source",
-            provenance=context.provenance("file"),
-            agent=context.agent,
-            raw={"file": path.name, "text": text, "front_matter": front or None},
-            # No timestamp. The file carries no time of its own, and the artifact.fs event
-            # for the same path already carries the filesystem's, attributed to the
-            # filesystem. Repeating an mtime here would present it as the instruction's own
-            # time, which is exactly what the model forbids.
-            ts_utc=None,
-            ts_precision="absent",
-            # The instruction is part of the environment the agent ran in rather than a turn
-            # somebody took. Who wrote the file is a question the file cannot answer, and
-            # the answer is in version control or in the filesystem timestamps.
-            actor="system",
+    The reading is the same for an instruction and for a memory the agent wrote itself:
+    both are Markdown or plain text, both can carry front matter, both can carry characters
+    a reviewer cannot see, and for both the question is what the model was going to read.
+    What differs is the kind, and the kind is what keeps them apart in a case: the
+    instruction surface view is the answer to what the agent was told to obey, and an
+    agent's own notes are not that, however much they steer the next session.
+    """
+    path = context.local_path
+    try:
+        raw_bytes = path.read_bytes()
+    except OSError as exc:
+        yield unparsed(
+            context.provenance("file"),
+            context.agent,
+            {"file": path.name},
+            f"this instruction file could not be read: {exc}",
             user=context.user,
             host=context.host,
-            project_path=_project_of(context.original_path, context.project_roots),
-            payload=payload,
-            parse_problem=" ".join(problems) if problems else None,
         )
+        return
+
+    text = raw_bytes.decode("utf-8", "replace")
+    problems: list[str] = []
+    if "\ufffd" in text:
+        problems.append(
+            "the file did not decode as UTF-8 and was read with replacement characters, "
+            "so its content is not exact"
+        )
+    if len(text) > MAX_TEXT:
+        problems.append(
+            f"the text is longer than the ingest limit of {MAX_TEXT} characters and is "
+            "carried truncated. The whole file is in the bundle, at the path in this "
+            "event's provenance"
+        )
+        text = text[:MAX_TEXT]
+
+    scope, scope_note = scope_of(context.original_path, context.project_roots)
+
+    payload: dict[str, Any] = {
+        "text": text,
+        "scope": scope,
+        "file": path.name,
+        "bytes": len(raw_bytes),
+        "lines": text.count("\n") + 1 if text else 0,
+    }
+    if scope_note:
+        # Beside the scope and not in parse_problem. The file was read completely; what
+        # is not known is which tier it applied at. Carrying that as a parse problem
+        # made every view say the file had not been fully read, and a tool that reports
+        # sound evidence as unreadable teaches an analyst to distrust the one case
+        # where it means it.
+        payload["scope_problem"] = scope_note
+
+    # A script's `#` lines are comments, not Markdown headings, and the two are
+    # syntactically identical. Reading one as a title showed `!/bin/sh` as the name of a
+    # hook file, which is the kind of small wrongness that makes an analyst stop
+    # trusting a listing.
+    executable = path.name.lower().endswith(_EXECUTABLE_SUFFIXES)
+    title = None if executable else _title(text)
+    if title:
+        payload["title"] = title
+
+    front, front_problem = _front_matter(text)
+    if front_problem:
+        problems.append(front_problem)
+    if front:
+        payload["front_matter"] = front
+        for key in ("name", "description"):
+            value = front.get(key)
+            if isinstance(value, str) and value.strip():
+                payload[f"declared_{key}"] = value.strip()
+        tools = _declared_tools(front)
+        if tools:
+            # A skill that names its own tools has widened what the agent may do, in a
+            # document rather than in a settings file, which is why it belongs next to
+            # the instruction text and not only in the permissions view.
+            payload["declared_tools"] = tools
+
+    if path.name.lower().endswith(".json"):
+        document, json_problem = read_json(path)
+        if json_problem:
+            problems.append(f"the file has a .json name but {json_problem}")
+        else:
+            payload["document"] = document
+            prompt, prompt_key = _prompt_in(document)
+            if prompt:
+                payload["text"] = prompt
+                payload["prompt_field"] = prompt_key
+                payload["document_text"] = text
+
+    if executable:
+        # Not "probably a hook": the catalogue filed this path under instructions, and a
+        # script there is an instruction the agent executes. Flagged rather than
+        # interpreted, because what it does is a question for the analyst.
+        payload["executable"] = True
+
+    hidden = hidden_characters(text)
+    if hidden:
+        payload["hidden_characters"] = hidden
+
+    if kind == "instruction.source":
+        # The facet the case indexes, and the join the injected-instruction question
+        # needs: which instruction files were in force, at which scope. It is not written
+        # for an agent's own notes: the instruction surface answers what the agent was
+        # told to obey, and a file it wrote to itself is a different question that the
+        # kind keeps separate.
+        payload["instructions"] = [{"path": context.original_path, "scope": scope}]
+    payload.update(extra or {})
+    yield Event(
+        kind=kind,
+        provenance=context.provenance("file"),
+        agent=context.agent,
+        raw={"file": path.name, "text": text, "front_matter": front or None},
+        # No timestamp. The file carries no time of its own, and the artifact.fs event
+        # for the same path already carries the filesystem's, attributed to the
+        # filesystem. Repeating an mtime here would present it as the instruction's own
+        # time, which is exactly what the model forbids.
+        ts_utc=None,
+        ts_precision="absent",
+        # The instruction is part of the environment the agent ran in rather than a turn
+        # somebody took. Who wrote the file is a question the file cannot answer, and
+        # the answer is in version control or in the filesystem timestamps.
+        actor="system",
+        user=context.user,
+        host=context.host,
+        project_path=_project_of(context.original_path, context.project_roots),
+        payload=payload,
+        parse_problem=" ".join(problems) if problems else None,
+    )
 
 
 def scope_of(original_path: str, project_roots: tuple[str, ...]) -> tuple[str, str | None]:

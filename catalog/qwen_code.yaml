@@ -607,7 +607,7 @@ artifacts:
     Written by the extraction and consolidation agents during and after sessions; consolidation rewrites the index, so earlier wording is lost. Not swept by housekeeping.
   notes: |-
     Model-written durable memory, which makes it both intelligence about the user and a prompt-injection persistence surface: content extracted from a session (potentially from injected text) is replayed into later system prompts. The project tier is keyed on the nearest GIT ROOT by default, not the cwd, so it will not line up with the transcripts' projects/ leaf for a session started in a subdirectory; QWEN_CODE_MEMORY_PROJECT_SCOPE=workspace switches it to the workspace dir and QWEN_CODE_MEMORY_LOCAL=1 moves the whole project tier into <project>/.qwen/memory. The user tier at ~/.qwen/memories is cross-project.
-  parser: null
+  parser: memory
 - id: qwen_code.file_history_backups
   title: Pre-edit file backups for /rewind
   category: file_snapshot

@@ -663,7 +663,7 @@ Ob der Agent durch Anweisungen manipuliert wurde, die er gelesen hat, statt durc
 | Schweregrad | hoch |
 | Paket | `prompt_injection` |
 | Agenten | `any` |
-| Ereignisarten | `tool.result`, `mcp.call`, `network.request`, `file.read`, `user.prompt`, `config.snapshot`, `instruction.source` |
+| Ereignisarten | `tool.result`, `mcp.call`, `network.request`, `file.read`, `user.prompt`, `config.snapshot`, `instruction.source`, `memory.write` |
 | Gelesene Felder | `event_text` |
 | Schlagworte | `prompt-injection`, `T1027`, `obfuscation` |
 
