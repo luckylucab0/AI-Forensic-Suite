@@ -416,9 +416,9 @@ Sicherheitskontrollen, die abgeschaltet wurden, nicht Kontrollen, die versagt ha
 | Gelesene Felder | `event_text` |
 | Schlagworte | `T1562.001`, `permission-bypass` |
 
-[EN] A command line starts an agent with the flag that skips permission prompts, or with the permission mode that does the same. For Claude Code these are --dangerously-skip-permissions and --permission-mode bypassPermissions, which the vendor documents as equivalent.
+[EN] A command line starts an agent with the flag that skips permission prompts, or with the permission mode that does the same. For Claude Code these are --dangerously-skip-permissions and --permission-mode bypassPermissions, which the vendor documents as equivalent. Cursor's command line product spells it --force, documented as allowing direct file changes without confirmation, with --yolo as its documented alternative spelling.
 
-*Worauf sie trifft:* `(event_text matches /--dangerously-skip-permissions/ or event_text matches /--permission-mode[= ]+bypassPermissions/)`
+*Worauf sie trifft:* `(event_text matches /--dangerously-skip-permissions/ or event_text matches /--permission-mode[= ]+bypassPermissions/ or event_text matches /(?m)\bcursor-agent\b[^\n]*[^\S\n]--force\b/ or event_text matches /(?m)(?:^\|[^\S\n])--yolo\b/)`
 
 *Warum das für die Analyse zählt:* [EN] This is the single clearest answer to the question whether safety controls were bypassed, because it is not a control that failed, it is a control somebody turned off and had to type a word like dangerously to turn off. In this mode the agent writes without asking, including to the paths the vendor protects by default such as the repository's own git directory and the agent's own configuration, so anything found afterwards has to be read knowing that nobody was asked.
 
@@ -431,8 +431,9 @@ Sicherheitskontrollen, die abgeschaltet wurden, nicht Kontrollen, die versagt ha
 
 - <https://code.claude.com/docs/en/cli-reference>
 - <https://code.claude.com/docs/en/permissions>
+- <https://cursor.com/docs/cli/headless>
 
-*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+*Stichproben in der Regeldatei:* 4 / 3 (+/-)
 
 #### AFX-PERMISSIONBYPASS-002
 
@@ -530,12 +531,12 @@ Sicherheitskontrollen, die abgeschaltet wurden, nicht Kontrollen, die versagt ha
 | Paket | `permission_bypass` |
 | Agenten | `any` |
 | Ereignisarten | `config.snapshot` |
-| Gelesene Felder | `raw.permissions.defaultMode`, `raw.defaultMode`, `payload.defaultMode`, `event_text` |
+| Gelesene Felder | `raw.permissions.defaultMode`, `raw.defaultMode`, `payload.defaultMode`, `event_text`, `raw.approvalMode`, `payload.approvalMode` |
 | Schlagworte | `T1562.001`, `permission-bypass` |
 
 [EN] A configuration sets the mode a session starts in to one that approves tool calls without asking. Claude Code spells this defaultMode bypassPermissions in its settings files, and Cline calls the equivalent mode yolo, which its own preset code describes as guaranteeing that tool policies are enabled and auto-approved.
 
-*Worauf sie trifft:* `(raw.permissions.defaultMode is 'bypassPermissions' or raw.defaultMode is 'bypassPermissions' or payload.defaultMode is 'bypassPermissions' or event_text matches /(?m)^[^\S\n]*defaultMode[^\S\n]*=[^\S\n]*bypassPermissions[^\S\n]*$/ or event_text matches /(?m)^[^\S\n]*mode[^\S\n]*=[^\S\n]*yolo[^\S\n]*$/)`
+*Worauf sie trifft:* `(raw.permissions.defaultMode is 'bypassPermissions' or raw.defaultMode is 'bypassPermissions' or payload.defaultMode is 'bypassPermissions' or event_text matches /(?m)^[^\S\n]*defaultMode[^\S\n]*=[^\S\n]*bypassPermissions[^\S\n]*$/ or event_text matches /(?m)^[^\S\n]*mode[^\S\n]*=[^\S\n]*yolo[^\S\n]*$/ or raw.approvalMode is 'unrestricted' or payload.approvalMode is 'unrestricted' or event_text matches /(?m)^[^\S\n]*approvalMode[^\S\n]*=[^\S\n]*unrestricted[^\S\n]*$/)`
 
 *Warum das für die Analyse zählt:* [EN] The two rules beside this one find a bypass somebody typed: a flag on a command line, or a mode changed part way through a session. This one is the version that needs typing once. A line in a settings file or in a schedule the agent wrote for itself means every session from then on starts with the prompt already answered, including the sessions nobody is present for. It also explains an absence twice over. A transcript with no approvals in it reads differently once this is known, and for Cline it removes evidence rather than only approvals: the vendor's own hook documentation states that hooks are disabled in yolo mode, and the hook log is the artifact that dates this agent's prompts. So a scheduled run in yolo mode approves everything and writes no audit line about any of it, and the vendor's cron documentation lists yolo as the default mode for a scheduled run.
 
@@ -547,11 +548,12 @@ Sicherheitskontrollen, die abgeschaltet wurden, nicht Kontrollen, die versagt ha
 *Quellen:*
 
 - <https://code.claude.com/docs/en/permissions>
+- <https://cursor.com/docs/cli/reference/configuration>
 - <https://raw.githubusercontent.com/cline/cline/main/sdk/packages/core/src/extensions/tools/presets.ts>
 - <https://raw.githubusercontent.com/cline/cline/main/sdk/examples/hooks/README.md>
 - <https://raw.githubusercontent.com/cline/cline/main/sdk/examples/cron/README.md>
 
-*Stichproben in der Regeldatei:* 3 / 3 (+/-)
+*Stichproben in der Regeldatei:* 4 / 4 (+/-)
 
 #### AFX-PERMISSIONBYPASS-006
 

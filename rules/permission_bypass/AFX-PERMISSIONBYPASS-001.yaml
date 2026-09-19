@@ -6,7 +6,9 @@ description: >
   A command line starts an agent with the flag that skips permission prompts, or with the
   permission mode that does the same. For Claude Code these are
   --dangerously-skip-permissions and --permission-mode bypassPermissions, which the vendor
-  documents as equivalent.
+  documents as equivalent. Cursor's command line product spells it --force, documented as
+  allowing direct file changes without confirmation, with --yolo as its documented
+  alternative spelling.
 rationale: >
   This is the single clearest answer to the question whether safety controls were bypassed,
   because it is not a control that failed, it is a control somebody turned off and had to
@@ -22,6 +24,14 @@ match:
       regex: '--dangerously-skip-permissions'
     - field: event_text
       regex: '--permission-mode[= ]+bypassPermissions'
+    # --force means too many things on a command line to match on its own: it is git's,
+    # rm's and every package manager's flag as well. So it is matched only next to the
+    # binary whose vendor documents it as the confirmation bypass, while --yolo is matched
+    # anywhere, because no product uses that word for anything else.
+    - field: event_text
+      regex: '(?m)\bcursor-agent\b[^\n]*[^\S\n]--force\b'
+    - field: event_text
+      regex: '(?m)(?:^|[^\S\n])--yolo\b'
 tags:
   - T1562.001
   - permission-bypass
@@ -36,6 +46,7 @@ false_positives:
 references:
   - https://code.claude.com/docs/en/cli-reference
   - https://code.claude.com/docs/en/permissions
+  - https://cursor.com/docs/cli/headless
 tests:
   - name: the flag on a command line
     match: true
@@ -51,6 +62,29 @@ tests:
       agent: claude_code
       payload:
         commands: [{command: "claude --permission-mode bypassPermissions"}]
+  - name: the other product's flag, next to the binary that documents it
+    match: true
+    event:
+      kind: command.exec
+      agent: cursor
+      payload:
+        commands: [{command: "cursor-agent -p --force 'refactor this module'"}]
+  - name: the same product's other spelling for it
+    match: true
+    event:
+      kind: command.exec
+      agent: cursor
+      payload:
+        commands: [{command: "cursor-agent --yolo -p 'add the tests'"}]
+  - name: the same word on a command line that is not an agent
+    match: false
+    event:
+      kind: command.exec
+      agent: claude_code
+      # git push --force is the commonest line in any shell history that carries the word,
+      # and matching it would teach an analyst to ignore this rule.
+      payload:
+        commands: [{command: "git push --force origin main"}]
   - name: a mode that does not skip prompts
     match: false
     event:

@@ -40,6 +40,16 @@ match:
     # Cline's equivalent, in a settings document or in a schedule the agent wrote itself.
     - field: event_text
       regex: '(?m)^[^\S\n]*mode[^\S\n]*=[^\S\n]*yolo[^\S\n]*$'
+    # Cursor's command line product, whose configuration takes allowlist, auto-review or
+    # unrestricted. Only the last is matched: the vendor names the three values and defines
+    # none of them, and a rule that guessed what auto-review approves would be asserting
+    # something nobody has stated.
+    - field: raw.approvalMode
+      equals: unrestricted
+    - field: payload.approvalMode
+      equals: unrestricted
+    - field: event_text
+      regex: '(?m)^[^\S\n]*approvalMode[^\S\n]*=[^\S\n]*unrestricted[^\S\n]*$'
 tags:
   - T1562.001
   - permission-bypass
@@ -54,6 +64,7 @@ false_positives:
     is why the finding names the file it came from.
 references:
   - https://code.claude.com/docs/en/permissions
+  - https://cursor.com/docs/cli/reference/configuration
   - https://raw.githubusercontent.com/cline/cline/main/sdk/packages/core/src/extensions/tools/presets.ts
   - https://raw.githubusercontent.com/cline/cline/main/sdk/examples/hooks/README.md
   - https://raw.githubusercontent.com/cline/cline/main/sdk/examples/cron/README.md
@@ -84,6 +95,24 @@ tests:
         schedule: "0 3 * * *"
         mode: yolo
         enabled: true
+  - name: the command line product's configuration with approvals switched off
+    match: true
+    event:
+      kind: config.snapshot
+      agent: cursor
+      raw:
+        version: 1
+        approvalMode: unrestricted
+  - name: the middle setting of the same field, which nobody has defined
+    match: false
+    event:
+      kind: config.snapshot
+      agent: cursor
+      # Deliberately not matched: the vendor lists the value and says nothing about what it
+      # approves, and a finding has to rest on a statement rather than on the word.
+      raw:
+        version: 1
+        approvalMode: auto-review
   - name: a schedule that runs in the ordinary mode
     match: false
     event:

@@ -4784,12 +4784,14 @@ $EmbeddedCatalogueJson = @'
                     "paths": [
                         "$XDG_CONFIG_HOME/cursor/cli-config.json",
                         "%USERPROFILE%\\.cursor\\cli-config.json",
+                        "%USERPROFILE%\\.cursor\\cli-config.json.bad",
                         "<project>/.cursor/cli.json",
-                        "~/.cursor/cli-config.json"
+                        "~/.cursor/cli-config.json",
+                        "~/.cursor/cli-config.json.bad"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "project_instructions",
@@ -8875,7 +8877,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "431f60872d04f7009a3e8f3625b3c97bb5f0ef10e724f5fc6785985c51588449"
+    "sha256": "0e365a21fcae64c9429b069d526229e701e1dcfc147604b701e1ad751c914717"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

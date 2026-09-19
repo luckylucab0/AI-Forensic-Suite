@@ -28,6 +28,7 @@ vendor_sources:
 description: |-
   A closed-source editor derived from VS Code, whose agent keeps its data in two trees: the editor's own user data directory, which follows the layout it inherited, and a per-user agent directory under the home directory. The vendor documents the second tree's configuration files thoroughly and documents nothing at all about where conversations are stored, which is why the transcript entries here rest on independent research and are marked unverified. Two negative findings from the vendor's own pages are worth knowing before an acquisition. There is no first-party statement that privacy mode changes what is written to local disk: it is documented as a control over cloud training and retention, so a privacy-mode user's conversations should still be expected on the endpoint. And there is no documented way to export or delete local conversation history, with account deletion explicitly leaving local data in place, so material can outlive the account it belongs to.
 references:
+- https://cursor.com/docs/cli/reference/permissions
 - |-
   https://github.com/AltimateAI/vscode-dbt-power-user/blob/5fc912ee821cf1e42feb826ad48f9a01e2e98a80/documentation/docs/setup/cursor_installation_workaround.md
 - |-
@@ -404,27 +405,28 @@ artifacts:
   paths:
   - $XDG_CONFIG_HOME/cursor/cli-config.json
   - '%USERPROFILE%\.cursor\cli-config.json'
+  - '%USERPROFILE%\.cursor\cli-config.json.bad'
   - <project>/.cursor/cli.json
   - ~/.cursor/cli-config.json
+  - ~/.cursor/cli-config.json.bad
   format: json
   sensitivity: normal
   collect_priority: normal
-  status: unverified
-  source: |-
-    https://raw.githubusercontent.com/poe-platform/poe-code/77505a0e76b178ef7fde1fd3089dbf5d3b4fbcfb/docs/research/cursor-agent-research.md
-  source_kind: community
+  status: verified
+  source: https://cursor.com/docs/cli/reference/configuration
+  source_kind: official
   contains_credentials:
   - auth_credentials
   volatility: |-
-    Allowlist entries accumulate as the user approves commands — this file grows into a de-facto record of every tool class ever permitted. One reported bug wrote project-scoped approvals into the global file instead of <project>/.cursor/cli.json.
+    Allowlist entries accumulate as the user approves commands, so this file grows into a de-facto record of every tool class ever permitted. One reported bug wrote project-scoped approvals into the global file instead of <project>/.cursor/cli.json. The vendor states the CLI repairs missing fields by itself and that a corrupted file is backed up as .bad and recreated, so the .bad copy is an earlier configuration the product preserved and the live file may be younger than the behaviour it is being read to explain.
   notes: |-
-    Location override precedence: CURSOR_CONFIG_DIR wins; else $XDG_CONFIG_HOME/cursor on Linux/BSD; else ~/.cursor. Two independent DFIR catalogues list this path as a primary collection target (family=config).
+    THE PERMISSION RECORD FOR THE COMMAND LINE PRODUCT, and the file to read before any transcript from it. The vendor documents the four locations, the precedence CURSOR_CONFIG_DIR, then $XDG_CONFIG_HOME/cursor on Linux and BSD, then ~/.cursor, and states that only permissions can be set per project while every other setting is global.
 
-    This file also holds credential material. That is recorded here rather than as a separate entry, because a separate entry marked secret would stop the collector copying a file that is itself the evidence. Folded in from cursor.auth_credentials: RECORD HASH AND METADATA ONLY, never copy contents. Also note CURSOR_API_KEY / CURSOR_AUTH_TOKEN environment variables as a non-file credential path.
+    Two fields decide how much of a session was ever shown to anybody. approvalMode takes allowlist, auto-review or unrestricted, and the page names the values without defining them, so treat anything other than allowlist as a question for the transcript rather than as a proven bypass. sandbox.mode and sandbox.networkAccess decide whether the agent ran confined and whether it could reach the network at all.
 
-    The catalogued path had an explanation appended to it, kept here: ~/.cursor/cli-config.json  (key: authInfo)
+    The permission grammar has four kinds and is exact-string matched: Shell(commandBase) where commandBase is the first token of the command line and where the vendor documents a Shell(curl:*) form for arguments, Read(pathOrGlob), Write(pathOrGlob), and WebFetch(domainOrPattern) where the page states that a fetch prompts unless a domain is allowed and shows WebFetch(*) as the entry that allows every domain. An allow list is therefore also an egress record: the domains in it are the ones the agent could reach without asking.
 
-    Record structure: Permission grammar uses four rule kinds: Shell(commandBase) where commandBase is the first token of the command line, Read(pathOrGlob), Write(pathOrGlob), WebFetch(domainOrPattern). Only permissions are configurable at project level; all other CLI settings are global. Newer cursor-agent builds ALSO store credentials in this same file under the top-level "authInfo" key — treat that subtree as secret and hash it rather than exporting it, but still collect the file for the permission evidence.
+    This file also holds credential material, which is recorded here rather than as a separate entry, because a separate entry marked secret would stop the collector copying a file that is itself the evidence. Folded in from cursor.auth_credentials: RECORD HASH AND METADATA ONLY, never copy contents. The credential claim rests on third-party research rather than on the vendor page: newer builds are reported to store them in this same file under a top-level authInfo key. Also note CURSOR_API_KEY and CURSOR_AUTH_TOKEN as a non-file credential path.
   parser: json_generic
 - id: cursor.project_instructions
   category: project_instructions
