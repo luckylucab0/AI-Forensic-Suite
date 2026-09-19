@@ -34,6 +34,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import base64
 import errno
 import fnmatch
 import getpass
@@ -1565,6 +1566,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "HKLM\\SOFTWARE\\Policies\\ClaudeCode",
                         "HKCU\\SOFTWARE\\Policies\\ClaudeCode"
                     ],
+                    "read_registry": true,
                     "root": "registry",
                     "sensitivity": "normal",
                     "status": "verified"
@@ -2719,6 +2721,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "HKCU\\SOFTWARE\\Policies\\Claude",
                         "HKLM\\SOFTWARE\\Policies\\Claude"
                     ],
+                    "read_registry": true,
                     "root": "registry",
                     "sensitivity": "normal",
                     "status": "verified"
@@ -7070,6 +7073,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "HKEY_CURRENT_USER\\Environment"
                     ],
+                    "read_registry": true,
                     "root": "registry",
                     "sensitivity": "normal",
                     "status": "unverified"
@@ -8499,6 +8503,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "HKCU\\Software\\Policies\\Windsurf\\<ProductName>",
                         "HKLM\\Software\\Policies\\Windsurf\\<ProductName>"
                     ],
+                    "read_registry": true,
                     "root": "registry",
                     "sensitivity": "normal",
                     "status": "unverified"
@@ -9038,7 +9043,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "a394b4a373b6941ba0087f2181bbd5250bfcceaba9d8753832e92b377c13e551"
+    "sha256": "73ec1b2c7a93c4c5d6c9a051c383bf06b0cdc07767c186978616562711d1b622"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)
@@ -9628,9 +9633,10 @@ def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> l
             # of evidence was never collected. Two of these keys are the managed policy
             # that says what an agent was allowed to do, so reading the refusal correctly
             # is the difference between "no policy was in force" and "nobody looked".
-            # Nothing in this suite reads the registry either: not the other collector
-            # and not one of the five collection-rule exporters, each of which names
-            # these keys in its own header as something it does not cover.
+            # The file pass cannot search a key, and the four entries the registry pass
+            # does read never reach here: they are skipped before expansion so a collected
+            # key is not also reported as a refusal. What is left are the registry entries
+            # this collector does not read at all, and naming them is the answer for them.
             return refuse_pattern(pattern, text, "registry_key")
         if text.startswith("$"):
             if variable_name(text) in _POSIX_ONLY_VARIABLES:
@@ -10225,6 +10231,165 @@ def walk_regular_files(base: str, limit: int) -> tuple[list, bool]:
     return found, truncated
 
 
+# The registry's own type names, by the winreg constant each one has. Written out because a
+# document carrying Python's constant name would name a type that does not exist on the
+# platform it came from, and because docs/BUNDLE_FORMAT.md and the analyzer promise these.
+REGISTRY_TYPE_NAMES = {
+    0: "REG_NONE",
+    1: "REG_SZ",
+    2: "REG_EXPAND_SZ",
+    3: "REG_BINARY",
+    4: "REG_DWORD",
+    7: "REG_MULTI_SZ",
+    11: "REG_QWORD",
+}
+
+# The hive a key name starts with, in both spellings the catalogue uses. Mapped to the
+# winreg root rather than to a string, so an unknown head is a key this collector declines
+# rather than one it guesses a hive for.
+_REGISTRY_HIVES = {
+    "HKLM": "HKEY_LOCAL_MACHINE",
+    "HKEY_LOCAL_MACHINE": "HKEY_LOCAL_MACHINE",
+    "HKCU": "HKEY_CURRENT_USER",
+    "HKEY_CURRENT_USER": "HKEY_CURRENT_USER",
+    "HKCR": "HKEY_CLASSES_ROOT",
+    "HKEY_CLASSES_ROOT": "HKEY_CLASSES_ROOT",
+    "HKU": "HKEY_USERS",
+    "HKEY_USERS": "HKEY_USERS",
+}
+
+# The registry stores times as 100 nanosecond intervals since 1601. This is the offset to
+# the epoch every other timestamp in a bundle is counted from.
+_FILETIME_EPOCH = 11644473600
+
+
+def read_registry_key(key: str) -> dict:
+    """One registry key as the document docs/BUNDLE_FORMAT.md specifies, or None.
+
+    Only four catalogue entries are read this way and which four is decided by
+    scripts/build_collectors.py, which marks them in the embedded catalogue and says why
+    there. They are the managed policy keys and one relocation key: agent-specific things
+    no general purpose registry tool knows to look at.
+
+    Read on the host and never from a mounted image, because a hive file needs a parser
+    this suite does not have. Evidence stays read-only: the key is opened for reading and
+    nothing is written back.
+
+    This collector records the key's last-write time and the PowerShell one cannot. The
+    difference is real and is documented rather than papered over: reaching that time from
+    PowerShell 5.1 needs RegQueryInfoKey through P/Invoke, which means compiling code on a
+    machine under investigation, and here it is one stdlib call.
+    """
+    try:
+        # Windows only, and this function is the only caller.
+        import winreg
+    except ImportError:
+        return None
+
+    normalised = key.replace("/", "\\")
+    at = normalised.find("\\")
+    if at < 1:
+        return None
+    hive = _REGISTRY_HIVES.get(normalised[:at].upper())
+    if hive is None:
+        return None
+    try:
+        handle = winreg.OpenKey(getattr(winreg, hive), normalised[at + 1 :], 0, winreg.KEY_READ)
+    except OSError:
+        return None
+
+    try:
+        subkey_count, value_count, written = winreg.QueryInfoKey(handle)
+        values = []
+        for index in range(value_count):
+            name, data, kind = winreg.EnumValue(handle, index)
+            entry = {"name": name, "type": REGISTRY_TYPE_NAMES.get(kind, "REG_UNKNOWN")}
+            if kind == winreg.REG_BINARY:
+                # Bytes put through a text encoding stop being the bytes that were there.
+                entry["data_base64"] = base64.b64encode(bytes(data)).decode("ascii")
+            elif kind == winreg.REG_MULTI_SZ:
+                entry["data"] = [str(one) for one in data]
+            elif kind in (winreg.REG_DWORD, winreg.REG_QWORD):
+                entry["data"] = int(data)
+            else:
+                entry["data"] = str(data)
+            values.append(entry)
+        subkeys = [winreg.EnumKey(handle, index) for index in range(subkey_count)]
+    except OSError:
+        return None
+    finally:
+        winreg.CloseKey(handle)
+
+    values.sort(key=lambda entry: entry["name"])
+    subkeys.sort()
+    return {
+        "format_version": FORMAT_VERSION,
+        "key": key,
+        "last_write_utc": utc(written / 10000000.0 - _FILETIME_EPOCH),
+        "subkeys": subkeys,
+        "values": values,
+    }
+
+
+def collect_registry_keys(entries: list, files_dir: str, root: str, dry_run: bool) -> None:
+    """Read every catalogue key marked for it and append one manifest entry each.
+
+    A key that is not there gets an entry with collected false and no document, the same
+    shape a missing file gets. That distinction is the point for a policy key: an empty
+    document means the policy was not set, a missing one means the key was never created,
+    and both are different from nobody having looked.
+    """
+    for agent in EMBEDDED_CATALOGUE.get("agents", []):
+        for artifact in agent.get("artifacts", []):
+            if not artifact.get("read_registry"):
+                continue
+            for key in artifact.get("paths", []):
+                entry = {
+                    "agent": agent["agent"],
+                    "artifact_id": artifact["id"],
+                    "bundle_path": None,
+                    "category": artifact.get("category"),
+                    "collected": False,
+                    "mtime_utc": None,
+                    "original_path": key,
+                    "reason": "not_present",
+                    "sha256": None,
+                    "size": None,
+                    "source_kind": "registry",
+                    "status": artifact.get("status"),
+                    "user": _current_user(),
+                }
+                document = None if root else read_registry_key(key)
+                if document is None:
+                    # Said rather than left as a plain absence: a mounted image and a
+                    # non-Windows host both have no live registry, and an entry that looked
+                    # the same as an absent key would read as a policy that was not set.
+                    if root or os.name != "nt":
+                        entry["reason"] = "registry_needs_a_live_host"
+                    entries.append(entry)
+                    continue
+                text = canonical_json(document)
+                data = text.encode("utf-8")
+                relative = "registry/" + key.replace("\\", "/") + ".json"
+                entry["bundle_path"] = "files/" + relative
+                entry["collected"] = True
+                entry["mtime_utc"] = document["last_write_utc"]
+                entry["reason"] = None
+                entry["sha256"] = sha256_bytes(data)
+                entry["size"] = len(data)
+                if not dry_run:
+                    destination = os.path.join(files_dir, *relative.split("/"))
+                    os.makedirs(os.path.dirname(destination), exist_ok=True)
+                    # O_BINARY, for the reason write_text_file gives at length: on Windows
+                    # os.open defaults to text mode, the bytes on disk would then differ
+                    # from the bytes that were hashed, and the bundle would fail its own
+                    # verification in the way tampering looks.
+                    flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, "O_BINARY", 0)
+                    with os.fdopen(os.open(destination, flags), "wb") as handle:
+                        handle.write(data)
+                entries.append(entry)
+
+
 def run(args: argparse.Namespace) -> dict:
     """Collect everything the catalogue describes for this platform."""
     started = time.time()
@@ -10305,6 +10470,13 @@ def run(args: argparse.Namespace) -> dict:
         # deciding makes "secret wins" a property of the file instead.
         matches = {}
         for artifact in artifacts:
+            if artifact.get("read_registry"):
+                # Collected by the registry pass instead, so expanding its patterns here
+                # would refuse each key as unsearchable and put a refusal in the manifest
+                # next to the entry that carries the key's contents. The registry keys
+                # this collector does not read still go through the expander and are
+                # refused by name, which is the answer for them.
+                continue
             is_project = artifact.get("root") in ("project", "repo_root", "plugin")
             anchors = [home]
             if is_project:
@@ -10378,6 +10550,12 @@ def run(args: argparse.Namespace) -> dict:
                         "detail": entry["artifact_id"],
                     }
                 )
+    # The registry pass, once per collection rather than once per profile: a machine key
+    # is not a property of a user, and the user hive this reads is the collecting account's
+    # own. It runs only on a live host, and with --root it records that instead.
+    if target_os == "windows":
+        collect_registry_keys(entries, files_dir, args.root, args.dry_run)
+
     errors.extend(STATE_READ_PROBLEMS)
     entries.sort(key=lambda e: (e["artifact_id"], e["original_path"]))
 

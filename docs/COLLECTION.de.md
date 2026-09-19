@@ -273,19 +273,23 @@ wiederkehrenden Gründe:
 - **Plattformumfang.** KAPE und das Live-Response-Paket sind nur Windows, und sie sagen,
   wie viel des Katalogs damit außer Reichweite liegt.
 
-Der Collector liest drei dieser vier. Eine Arbeitskopie, eine Verlagerungsvariable und ein
-nur unter Windows existierender Pfad sind alle Dateisystemfragen, und die beantwortet er.
-Ein Registry-Schlüssel ist keine: beide Collectors lesen das Dateisystem und keiner liest
-die Registry, also wird ein katalogisierter Schlüssel namentlich abgelehnt und erscheint in
-`refused_patterns` des Bundles als `registry_key`. Sechs Katalogeinträge sind
-Registry-Schlüssel, und zwei davon sind die verwaltete Richtlinie, die sagt, was ein Agent
-durfte. Auch sonst holt sie in dieser Suite nichts: jeder der fünf Exporter kann die
-Registry in seiner eigenen Sprache ansprechen, und keine der generierten Regeln tut es, was
-jede von ihnen im eigenen Kopf sagt. Ein Schlüssel in diesem Katalog ist also
-Beweismaterial, das jemand von Hand holen muss, mit der Registry-Fähigkeit des Werkzeugs,
-das er ohnehin schon laufen hat. Unter Windows kann diese Richtlinie allein in der Registry
-stehen, ganz ohne Datei, und ein Fall, der darüber schwiege, läse sich als Host ohne
-Richtlinie statt als Host, auf dem niemand nachgesehen hat.
+Der Collector liest alle vier, den vierten nur zum Teil. Eine Arbeitskopie, eine
+Verlagerungsvariable und ein nur unter Windows existierender Pfad sind Dateisystemfragen,
+die er ganz beantwortet. Ein Registry-Schlüssel ist kein Pfad, und er wird von einem
+eigenen Durchgang beantwortet: auf einem laufenden Windows-Host lesen beide Collectors vier
+der sechs Registry-Einträge des Katalogs und schreiben jeden Schlüssel als JSON-Dokument
+ins Bundle (ADR 0033). Das sind die vier, nach denen kein allgemeines Registry-Werkzeug zu
+suchen weiss, darunter die verwaltete Richtlinie, die sagt, was ein Agent durfte, und die
+unter Windows allein in der Registry stehen kann, ganz ohne Datei. Die anderen beiden sind
+die Ausführungsspuren der Plattform selbst und die Persistenzschlüssel eines Installers:
+sie werden namentlich abgelehnt, erscheinen in `refused_patterns` als `registry_key` und
+bleiben Beweismaterial, das jemand mit der Registry-Fähigkeit des ohnehin laufenden
+Werkzeugs holt, das diese Arbeit besser macht als dieses hier.
+
+Aus einem gemounteten Abbild wird nichts davon gelesen, denn ein Hive braucht einen Parser,
+den diese Suite nicht hat, und die Einträge sagen `registry_needs_a_live_host`, statt wie
+fehlende Schlüssel auszusehen. Keine generierte Sammelregel deckt einen Registry-Schlüssel
+ab, was jede von ihnen im eigenen Kopf sagt.
 
 Für die anderen drei ist das die ehrliche Arbeitsteilung: eine generierte Regel findet die
 Hosts, die man ansehen muss, der Collector holt die Beweise.

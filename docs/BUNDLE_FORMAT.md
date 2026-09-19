@@ -18,6 +18,7 @@ what one program happens to do.
   files/                   collected content, mirroring original paths
     C/Users/alice/.claude/settings.json
     Users/alice/.claude/settings.json
+    registry/HKLM/SOFTWARE/Policies/ClaudeCode.json
 ```
 
 Optionally the whole directory is zipped to `<bundle>.zip`, with `<bundle>.zip.sha256`
@@ -26,6 +27,50 @@ beside it holding the hash and the file name in the format `sha256sum` reads.
 Mirroring original paths is the reason ingest is uniform. A native bundle, a KAPE output
 tree and a Velociraptor offline collection are all a root plus original paths, so one
 adapter shape reads all three, plus a mounted image and an exported profile.
+
+## A registry key, as a document
+
+Only the PowerShell collector writes these and only when it is running on the host itself,
+because a key cannot be read from a mounted image without a hive parser and this suite has
+none. Four catalogue entries are carried this way, and which four is not a property of the
+format: it is in `scripts/build_collectors.py` with the reason, and a test binds it to the
+catalogue. The two registry entries left out are the platform's own execution evidence and
+an installer's persistence keys, which every general purpose registry tool reads better
+than this one would and which are not about an agent's behaviour.
+
+A key becomes one JSON document:
+
+```json
+{
+  "format_version": 1,
+  "key": "HKLM\\SOFTWARE\\Policies\\ClaudeCode",
+  "last_write_utc": "2026-09-14T09:02:11.000000Z",
+  "values": [
+    { "name": "Settings", "type": "REG_SZ", "data": "{\"permissions\": {\"allow\": []}}" },
+    { "name": "Enabled", "type": "REG_DWORD", "data": 1 },
+    { "name": "Paths", "type": "REG_MULTI_SZ", "data": ["C:\\one", "C:\\two"] },
+    { "name": "Blob", "type": "REG_BINARY", "data_base64": "AAEC" }
+  ],
+  "subkeys": ["Managed"]
+}
+```
+
+Field notes:
+
+- `name` is the value's name exactly as the registry holds it, so the unnamed default value
+  is the empty string. The analyzer shows it as `(default)`; the document does not rename
+  it, because a document that renamed it could not be compared against the registry.
+- `type` is the registry type name. A string, a number and a list of strings are carried as
+  themselves; anything else is carried as `data_base64` instead of `data`, because bytes
+  put through a text encoding stop being the bytes that were there.
+- `last_write_utc` belongs to the key. The registry keeps no time per value, so every value
+  of one key shares it and every event the analyzer makes out of them says so.
+- `subkeys` is the names only. A subkey that is itself catalogued is collected as its own
+  entry; one that is not is recorded here so a case says it existed.
+- A key that does not exist is a manifest entry with `collected: false` and no document,
+  the same as a file that was not there. That distinction is the point: for a policy key,
+  an empty document means the policy was not set and a missing one means the key was never
+  created, and both are different from nobody having looked.
 
 ## manifest.json
 
@@ -126,17 +171,24 @@ Field notes that are not obvious:
   the flag says the source was live.
 - `symlink` holds the link target when the entry was a symlink inside the profile, and the
   entry is skipped with `skipped_symlink` when the target lies outside it.
+- `source_kind` is present only on an entry that is not a file, and its only value is
+  `registry`. Such an entry's `original_path` is the key as the catalogue spells it, its
+  `bundle_path` names a JSON document written by the collector rather than bytes copied off
+  the disk, and its `mtime_utc` is the key's last-write time, which is the only timestamp
+  the registry keeps. There is no `ctime_utc`, `atime_utc` or `birthtime_utc`: a key has
+  none. The `sha256` is of the document as written, so it verifies like every other entry.
 - `refused_patterns` lists the catalogue patterns the collector declined to search, with
   the pattern as written, how far it got expanding it, and one of `not_absolute`,
   `wildcard_too_broad`, `wildcard_only`, `malformed_variable`,
   `environment_unreadable_offline`, `environment_unreadable_other_user`,
   `profile_is_a_symlink` or `registry_key`. The last one is a whole class rather than a
-  defect in one pattern: both collectors read the filesystem and neither reads the
-  registry, so a catalogued key is declined by name. Two of those keys are the managed
-  policy that says what an agent was allowed to do, and no generated rule covers them
-  either: each one names these keys in its own header as something it does not do. A key
-  in this catalogue is evidence somebody has to go and get with the tool's own registry
-  facility. It exists because a pattern nobody searched is a hole in the
+  defect in one pattern: the file pass reads the filesystem and a key is not a path in it,
+  so a catalogued key it cannot search is declined by name. It appears only for the
+  registry entries this collector does not read at all, since the four it does read are
+  collected by the registry pass above and would otherwise be reported twice, once as a
+  refusal and once as the entry holding their contents. The two declined are the platform's
+  own execution evidence and an installer's persistence keys, and they stay evidence
+  somebody goes and gets with the registry facility of whichever tool they are running. It exists because a pattern nobody searched is a hole in the
   coverage, and a bundle that is silent about it looks exactly like a bundle from a host
   where the artifact was absent.
 

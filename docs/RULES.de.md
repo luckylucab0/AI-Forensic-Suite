@@ -39,6 +39,7 @@ Funde werden in die Falldatenbank geschrieben, neben die Ereignisse, auf denen s
 |  | [AFX-PERMISSIONBYPASS-006](#afx-permissionbypass-006) | mittel |
 |  | [AFX-PERMISSIONBYPASS-007](#afx-permissionbypass-007) | hoch |
 |  | [AFX-PERMISSIONBYPASS-008](#afx-permissionbypass-008) | mittel |
+|  | [AFX-PERMISSIONBYPASS-009](#afx-permissionbypass-009) | hoch |
 | [`prompt_injection`](#prompt-injection) | [AFX-PROMPTINJECTION-001](#afx-promptinjection-001) | hoch |
 |  | [AFX-PROMPTINJECTION-002](#afx-promptinjection-002) | hoch |
 |  | [AFX-PROMPTINJECTION-003](#afx-promptinjection-003) | mittel |
@@ -751,6 +752,37 @@ Sicherheitskontrollen, die abgeschaltet wurden, nicht Kontrollen, die versagt ha
 - <https://developers.openai.com/codex/config-advanced>
 
 *Stichproben in der Regeldatei:* 1 / 2 (+/-)
+
+#### AFX-PERMISSIONBYPASS-009
+
+**A managed policy sits in a hive a non-administrator can write**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `permission_bypass` |
+| Agenten | `any` |
+| Ereignisarten | `config.snapshot` |
+| Gelesene Felder | `raw.hive`, `raw.key` |
+| Schlagworte | `T1112`, `policy-in-user-hive` |
+
+[EN] A managed policy for an agent was found under the current user's registry hive rather than under the machine's. The user hive needs no administrative rights, so a policy there was not necessarily set by whoever administers this machine.
+
+*Worauf sie trifft:* `raw.hive is 'user' and raw.key matches /(?i)\\Policies\\/`
+
+*Warum das für die Analyse zählt:* [EN] The managed settings of one of these products are documented as being read from both hives, and the vendor's own guidance is to check both and compare. That is the whole finding. An organisation that deploys a policy deploys it to the machine hive, which needs rights an ordinary account does not have. A policy in the user hive is one the account under investigation could have written, and if the machine hive holds no policy at all then what looks like a corporate control is a setting the user chose for themselves. It is the registry's version of a project-level settings file overriding what an administrator meant to enforce, and unlike a file it leaves nothing in a working copy for anybody to notice.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A machine administered per user, or a test deployment, where a policy in the user hive is deliberate. The finding says who could have written it, not who did.
+- [EN] An account that is itself an administrator, where the distinction between the two hives says nothing about rights. Whether the account was elevated is in the manifest of the collection rather than in this event.
+- [EN] A policy present in both hives with the same content, which is what a deployment that writes both looks like.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/settings>
+
+*Stichproben in der Regeldatei:* 1 / 3 (+/-)
 
 ## prompt injection
 

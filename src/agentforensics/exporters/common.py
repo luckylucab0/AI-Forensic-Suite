@@ -107,22 +107,29 @@ def is_registry(artifact: Artifact) -> bool:
 # The text each exporter carried before this said, in three different ways, that something
 # else picks the key up: that this artifact reads it through a separate source, that it is a
 # KAPE registry target, that osquery has a registry table. The first was simply untrue, and
-# the other two were true about the tool and read as true about the generated file. Nothing
-# in this suite reads the registry, in any of its five exporters or either of its
-# collectors, and six catalogue entries across four products are registry keys. Two of them
-# are the managed policy that says what an agent was allowed to do, and on Windows that
-# policy can exist only there, with no file at all. A reader who believed any of the three
-# sentences would conclude that no policy was in force, when the truth is that nobody
-# looked. That is the one confusion this project exists to prevent.
+# the other two were true about the tool and read as true about the generated file. None of
+# these five exporters emits anything that addresses the registry, and six catalogue entries
+# across four products are registry keys. Two of them are the managed policy that says what
+# an agent was allowed to do, and on Windows that policy can exist only there, with no file
+# at all. A reader who believed any of the three sentences would conclude that no policy was
+# in force, when the truth is that nobody looked. That is the one confusion this project
+# exists to prevent.
+#
+# The collectors do read four of those entries now, on a live Windows host, and write each
+# key as a document in the bundle (ADR 0033). That is said here too, because a reader of a
+# generated rule is deciding what else they have to go and get.
 #
 # `tool` names what the person running the rule has to reach for, since each of these
 # formats can address the registry even though the generator writes nothing that does.
 def registry_reason(tool: str) -> str:
     """The reason line for a registry key, naming what the reader has to do instead."""
     return (
-        f"a registry key, and this rule addresses files. Nothing in this suite reads the "
-        f"registry, so it is not collected anywhere else either: query these keys with "
-        f"{tool}. docs/ARTIFACTS.md names them"
+        f"a registry key, and this rule addresses files. No rule generated here covers one: "
+        f"query these keys with {tool}. The suite's own collectors read four of the "
+        f"catalogue's registry entries on a live Windows host and write each as a document "
+        f"in the bundle, so a collection from a live host already carries those; this is "
+        f"the answer for a rule and for the entries the collectors decline. "
+        f"docs/ARTIFACTS.md names them"
     )
 
 

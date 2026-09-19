@@ -432,10 +432,11 @@ def test_every_artifact_resolves_to_at_least_one_pattern_per_declared_os(
     for agent in collect.EMBEDDED_CATALOGUE["agents"]:
         for entry in agent["artifacts"]:
             if entry.get("root") == "registry":
-                # A registry key is not a filesystem path and neither collector reads one.
-                # It is skipped here and declined by name where it applies, which is what
-                # the test below holds. The comment that used to stand here said collect.ps1
-                # read these, and it was wrong in the direction that hides a gap.
+                # A registry key is not a filesystem path, so the file pass cannot resolve
+                # one and this test is not about it. Four of these entries are read by the
+                # registry pass instead (ADR 0033) and the rest are declined by name, which
+                # the tests below hold. The comment that used to stand here said collect.ps1
+                # read all of them, and it was wrong in the direction that hides a gap.
                 continue
             if all(is_bare_variable(p) for p in entry["paths"]):
                 # An artifact that exists only where a variable points has no default
@@ -1303,14 +1304,18 @@ def test_every_database_has_its_write_ahead_log_claimed() -> None:
 
 
 def test_a_registry_key_is_declined_by_name_rather_than_as_a_broken_pattern() -> None:
-    """Neither collector reads the registry, and the manifest has to say which it is.
+    """The file pass cannot search a key, and the manifest has to say which it is.
 
     A key used to fall through to the end of the expander, fail the absolute-path test and
     be refused as `not_absolute`. That reads as a malformed catalogue entry. It is not one:
-    it is a whole class of evidence that this collector cannot reach, and two of the six
-    entries in that class are the managed policy saying what an agent was allowed to do.
-    The difference between the two readings is the difference between "no policy was in
-    force" and "nobody looked", which is the question a collection exists to answer.
+    it is a whole class the file pass cannot reach, and two of the six entries in that
+    class are the managed policy saying what an agent was allowed to do. The difference
+    between the two readings is the difference between "no policy was in force" and "nobody
+    looked", which is the question a collection exists to answer.
+
+    Those four are read by the registry pass now and never reach the expander, so what this
+    holds is the answer for the two the collectors decline. The expander itself still has
+    to give it, because it is what a key reaches when nothing else claims it.
     """
     collect = _load_collector()
     collect.PATTERN_REFUSALS.clear()

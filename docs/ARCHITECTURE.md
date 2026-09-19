@@ -159,6 +159,17 @@ it cannot be rewritten *quietly*.
     original path, another documents the directory and not the naming inside it, and a
     third keeps both sides of an edit with nothing to say which is which. What the path
     states is read; what it does not state is said rather than inferred.
+  - **Registry keys.** Four catalogue entries are read from the registry on a live Windows
+    host and written into the bundle as JSON documents, with the key as the entry's
+    original path (ADR 0033). Two of them are the managed policy that says what an agent
+    was allowed to do, which on Windows can exist in the registry alone with no file
+    anywhere, so a case that stayed quiet would read as a host with no policy rather than
+    as one where nobody looked. One event per value; a key that exists and is empty gets an
+    event of its own, because for a policy key that means the policy was not set and it is
+    a different answer from a key that was never created. The time is the key's and never
+    the value's, since the registry keeps none per value. The hive is a field rather than
+    part of the path, because a policy under the user's own hive is one a non-administrator
+    could have written.
   - **Text configuration.** The small files that say how an agent was set up, read whole,
     and two that are read a line at a time because a line is what an analyst compares
     against a path. An ignore file is the inverse of every other artifact here: it records

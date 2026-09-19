@@ -14,7 +14,7 @@
 # endpoint use the Velociraptor artifact or this suite's own collector.
 #
 # Not covered by this rule:
-#   a registry key, and this rule addresses files. Nothing in this suite reads the registry, so it is not collected anywhere else either: query these keys with a KAPE registry target of your own. docs/ARTIFACTS.md names them
+#   a registry key, and this rule addresses files. No rule generated here covers one: query these keys with a KAPE registry target of your own. The suite's own collectors read four of the catalogue's registry entries on a live Windows host and write each as a document in the bundle, so a collection from a live host already carries those; this is the answer for a rule and for the entries the collectors decline. docs/ARTIFACTS.md names them
 #     claude_code.managed_settings_registry
 #   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
 #     claude_code.agent_memory

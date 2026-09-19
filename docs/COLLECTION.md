@@ -258,18 +258,22 @@ the reason for each. Read that section before you read the results. The recurrin
 - **Platform scope.** KAPE and the live response package are Windows only, and they say how
   much of the catalogue that puts out of reach.
 
-The collector reads three of those four. A working copy, a relocation variable and a
-Windows-only path are all filesystem questions and it answers them. A registry key is not:
-both collectors read the filesystem and neither reads the registry, so a catalogued key is
-declined by name and appears in the bundle's `refused_patterns` as `registry_key`. Six
-catalogue entries are registry keys, and two of them are the managed policy that says what
-an agent was allowed to do. Nothing else in this suite gets them either: every one of the
-five exporters can address the registry in its own language, and not one of the generated
-rules does, which each of them says in its own header. So a key in this catalogue is
-evidence somebody has to go and get by hand, with the registry facility of whichever tool
-they are already running. On Windows that policy can exist in the registry alone, with no
-file anywhere, and a case that stayed quiet about it would read as a host where no policy
-was in force rather than as one where nobody looked.
+The collector reads all four, and the fourth only in part. A working copy, a relocation
+variable and a Windows-only path are filesystem questions and it answers them whole. A
+registry key is not a path, and it is answered by a pass of its own: on a live Windows host
+both collectors read four of the catalogue's six registry entries and write each key as a
+JSON document into the bundle (ADR 0033). Those four are the ones no general purpose
+registry tool knows to look at, among them the managed policy that says what an agent was
+allowed to do, which on Windows can exist in the registry alone with no file anywhere. The
+other two are the platform's own execution evidence and an installer's persistence keys:
+they are declined by name, appear in `refused_patterns` as `registry_key`, and stay
+evidence somebody goes and gets with the registry facility of whichever tool they are
+already running, which does that job better than this would.
+
+From a mounted image none of it is read, because a hive needs a parser this suite does not
+have, and the entries say `registry_needs_a_live_host` rather than looking like absent
+keys. No generated collection rule covers a registry key at all, which each of them says in
+its own header.
 
 For the other three that is the honest division of labour: a generated rule finds the hosts
 worth looking at, the collector gets the evidence.

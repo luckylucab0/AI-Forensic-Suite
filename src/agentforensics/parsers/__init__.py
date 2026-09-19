@@ -46,6 +46,7 @@ from agentforensics.parsers.pi import PiParser
 from agentforensics.parsers.plist_generic import PlistGenericParser
 from agentforensics.parsers.prompt_history import PromptHistoryParser
 from agentforensics.parsers.prose_document import ProseDocumentParser
+from agentforensics.parsers.registry import RegistryParser
 from agentforensics.parsers.shell_history import ShellHistoryParser
 from agentforensics.parsers.shell_script import ShellScriptParser
 from agentforensics.parsers.sqlite_generic import SqliteGenericParser
@@ -110,6 +111,10 @@ PARSERS: tuple[Parser, ...] = (
     # The shell's own record of what was typed, which is where the flag that switched
     # the approvals off is written down. Four files, four formats, and until this parser
     # all four were collected and none was read.
+    # The registry keys a Windows collection carried as documents. Two of them are the
+    # managed policy that says what an agent was allowed to do, and on Windows that policy
+    # can exist in the registry alone with no file anywhere.
+    RegistryParser(),
     ShellHistoryParser(),
     # The copy one agent takes of the user's shell before it runs anything, which is the
     # environment its commands actually ran in rather than a record that somebody once

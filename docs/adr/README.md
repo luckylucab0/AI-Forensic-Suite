@@ -40,3 +40,4 @@ Add one with the next free number, using [0000-template.md](0000-template.md).
 | [0030](0030-a-record-nobody-mapped-is-still-looked-at-by-every-rule.md) | A rule that names a kind still looks at a record nobody has mapped, and the finding says the kind is unknown |
 | [0031](0031-the-browser-engines-store-is-implemented-rather-than-depended-on.md) | The browser engine's key-value store and the Snappy its blocks use are implemented here, with no new dependency |
 | [0032](0032-a-database-without-its-log-is-a-gap-not-a-silence.md) | Every catalogued database claims the siblings holding its newest records, and a store without them is a gap rather than a silence |
+| [0033](0033-a-registry-key-is-collected-as-a-document.md) | A registry key is collected as a JSON document with its own manifest entry, from a live host only, for four catalogue entries |

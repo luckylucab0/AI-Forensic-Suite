@@ -610,7 +610,7 @@ artifacts:
     Retrieved as a code-search snippet from a research-audit log inside a DFIR toolkit repo that quotes the vendor's enterprise-policies page verbatim; the vendor page itself was unreachable, which is why this is community and unverified.
 
     Record structure: <ProductName> is the channel name, for example Software\Policies\Windsurf\Windsurf or Software\Policies\Windsurf\WindsurfInsiders, deliberately contrasted with the editor it forked, whose keys sit under Software\Policies\Microsoft\<ProductName>.
-  parser: null
+  parser: registry
 - id: windsurf.enterprise_policy_json
   category: permissions
   root: system

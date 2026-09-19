@@ -29,6 +29,41 @@ kann. Ein eigenes Bundle, ein KAPE-Ausgabebaum und eine Velociraptor-Offline-Sam
 alle eine Wurzel plus Originalpfade, also liest eine Adapterform alle drei, dazu ein
 eingebundenes Abbild und ein exportiertes Profil.
 
+## Ein Registry-Schlüssel als Dokument
+
+Nur der PowerShell-Collector und der Python-Collector auf dem Host selbst schreiben diese,
+denn ein Hive lässt sich ohne Hive-Parser nicht aus einem gemounteten Abbild lesen, und
+einen solchen hat diese Suite nicht. Vier Katalogeinträge werden so getragen, und welche
+vier ist keine Eigenschaft des Formats: das steht mit Begründung in
+`scripts/build_collectors.py`, und ein Test bindet es an den Katalog. Die beiden
+ausgelassenen Registry-Einträge sind die Ausführungsspuren der Plattform selbst und die
+Persistenzschlüssel eines Installers, die jedes allgemeine Registry-Werkzeug besser liest
+als dieses und die nicht vom Verhalten eines Agenten handeln.
+
+Ein Schlüssel wird zu einem JSON-Dokument, dessen Form im englischen Dokument steht.
+Anmerkungen dazu:
+
+- `name` ist der Wertname genau so, wie die Registry ihn hält, der unbenannte Standardwert
+  also die leere Zeichenkette. Der Analyzer zeigt ihn als `(default)`; das Dokument
+  benennt ihn nicht um, denn ein umbenanntes Dokument liesse sich nicht mehr gegen die
+  Registry halten.
+- `type` ist der Registry-Typname. Zeichenkette, Zahl und Zeichenkettenliste werden als
+  sie selbst getragen; alles andere als `data_base64` statt `data`, denn Bytes durch eine
+  Textkodierung sind nicht mehr die Bytes, die dort standen.
+- `last_write_utc` gehört dem Schlüssel. Die Registry führt keine Zeit pro Wert, also
+  teilen alle Werte eines Schlüssels sie, und jedes Ereignis des Analyzers sagt das. Der
+  Python-Collector liest sie, der PowerShell-Collector kann es nicht: dafür bräuchte es
+  RegQueryInfoKey über P/Invoke, also das Kompilieren von Code auf einer Maschine unter
+  Untersuchung. Siehe ADR 0033.
+- `subkeys` sind nur die Namen. Ein selbst katalogisierter Unterschlüssel wird als eigener
+  Eintrag gesammelt; einer, der es nicht ist, steht hier, damit der Fall sagt, dass es ihn
+  gab.
+- Ein Schlüssel, den es nicht gibt, ist ein Manifest-Eintrag mit `collected: false` und
+  ohne Dokument, genau wie eine nicht vorhandene Datei. Genau darauf kommt es an: bei einem
+  Richtlinienschlüssel heisst ein leeres Dokument, dass die Richtlinie nicht gesetzt war,
+  ein fehlendes, dass der Schlüssel nie angelegt wurde, und beides ist etwas anderes, als
+  wenn niemand nachgesehen hat.
+
 ## manifest.json
 
 Der vollständige Feldaufbau steht im [englischen Dokument](BUNDLE_FORMAT.md#manifestjson);
@@ -69,12 +104,14 @@ Fassungen nicht auseinanderlaufen. Die Felder, die nicht selbsterklärend sind:
   `not_absolute`, `wildcard_too_broad`, `wildcard_only`, `malformed_variable`,
   `environment_unreadable_offline`, `environment_unreadable_other_user`,
   `profile_is_a_symlink` oder `registry_key`. Der letzte ist eine ganze Klasse und kein
-  Defekt an einem einzelnen Muster: beide Collectors lesen das Dateisystem und keiner
-  liest die Registry, also wird ein katalogisierter Schlüssel namentlich abgelehnt. Zwei
-  dieser Schlüssel sind die verwaltete Richtlinie, die sagt, was ein Agent durfte, und
-  auch keine generierte Regel deckt sie ab: jede nennt diese Schlüssel im eigenen Kopf als
-  etwas, das sie nicht tut. Ein Schlüssel in diesem Katalog ist also Beweismaterial, das
-  jemand mit der Registry-Fähigkeit des jeweiligen Werkzeugs selbst holen muss. Das Feld gibt es, weil ein nicht durchsuchtes Muster
+  Defekt an einem einzelnen Muster: der Dateidurchgang liest das Dateisystem, und ein
+  Schlüssel ist darin kein Pfad, also wird ein katalogisierter Schlüssel, den er nicht
+  durchsuchen kann, namentlich abgelehnt. Er erscheint nur für die Registry-Einträge, die
+  dieser Collector gar nicht liest, denn die vier, die er liest, werden vom
+  Registry-Durchgang oben gesammelt und stünden sonst zweimal da: einmal als Ablehnung und
+  einmal als Eintrag mit ihrem Inhalt. Die beiden abgelehnten sind die Ausführungsspuren
+  der Plattform selbst und die Persistenzschlüssel eines Installers, und sie bleiben
+  Beweismaterial, das jemand mit der Registry-Fähigkeit seines Werkzeugs selbst holt. Das Feld gibt es, weil ein nicht durchsuchtes Muster
   eine Lücke in der Abdeckung ist und ein Bundle, das darüber schweigt, genauso aussieht
   wie ein Bundle von einem Host, auf dem das Artefakt gar nicht vorhanden war.
 

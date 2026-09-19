@@ -521,7 +521,7 @@ artifacts:
     Group policy refresh overwrites values. The machine key needs administrator rights; the user key does not, which makes HKCU a place a user could plausibly loosen their own configuration.
   notes: |-
     The vendor states machine-level settings override user-level ones. Critical naming trap for a catalogue that already carries Claude Code: SOFTWARE\Policies\Claude is the Claude Desktop policy key and SOFTWARE\Policies\ClaudeCode is the separate Claude Code managed-settings key. Anthropic's own admin documentation says exactly this: the disableWslSessions value 'sits under the Claude Desktop policy key, separate from the ClaudeCode key that carries managed settings'. A collector that globs Policies\Claude* will pick up both and must attribute them separately. Claude Code's managed settings are carried in a Settings value under the ClaudeCode key, and that key is also read by Desktop's Code and Cowork sessions.
-  parser: null
+  parser: registry
 - id: claude_desktop.managed_policy_linux
   title: Managed configuration (Linux managed-settings.json)
   category: permissions

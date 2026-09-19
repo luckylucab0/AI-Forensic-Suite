@@ -31,6 +31,34 @@ from agentforensics.catalog import CatalogueError, load_catalogue  # noqa: E402
 
 CATALOG_DIR = REPO_ROOT / "catalog"
 
+# The registry keys a collection carries, with the reason each one is worth the trouble.
+# Four of the catalogue's six, and the two left out are left out on purpose.
+#
+# Reading the registry is something only the PowerShell collector can do and only on the
+# host itself: a key cannot be read from a mounted image without a hive parser and this
+# suite has none. It is worth doing for these four because they are agent-specific and no
+# other tool knows to look at them. It is not worth doing for the platform's own execution
+# evidence or an installer's persistence keys, which every general purpose registry tool
+# reads better than this one would, and duplicating those would put a second, worse answer
+# next to an examiner's existing one.
+#
+# The list is here rather than in the catalogue because it is a statement about this
+# collector's reach and not about where an agent keeps its data. The analyzer's reader for
+# these documents holds the same four, and tests/unit/test_registry.py binds the two.
+REGISTRY_KEYS = {
+    "claude_code.managed_settings_registry": "the managed settings document, which on "
+    "Windows can exist here and in no file at all. The user hive is the tamper path: a "
+    "non-administrator can put a policy there when no real one exists, so both hives are "
+    "read and the difference is the finding",
+    "claude_desktop.managed_policy_windows": "the desktop product's own policy key, which "
+    "the vendor documents as separate from the one above and which a collector globbing "
+    "the policies branch would conflate with it",
+    "ollama.env_overrides_registry": "where this product's relocation variables live on "
+    "Windows, so an empty model directory can be told from a moved one",
+    "windsurf.enterprise_policy": "the policy branch this product reads, where an "
+    "administrator can enable hooks and rules for every user on the machine",
+}
+
 PY_BEGIN = "# --- BEGIN EMBEDDED CATALOGUE ---"
 PY_END = "# --- END EMBEDDED CATALOGUE ---"
 PS1_BEGIN = "# --- BEGIN EMBEDDED CATALOGUE ---"
@@ -65,6 +93,12 @@ def catalogue_payload() -> dict:
                     "status": artifact.status,
                 }
             )
+            if artifact.id in REGISTRY_KEYS:
+                # Computed rather than catalogued: which keys this collector reaches is a
+                # property of the collector. Only the entries carrying this are read from
+                # the registry, so a key added to the catalogue is collected by nobody
+                # until somebody decides it should be and says why above.
+                artifacts[-1]["read_registry"] = True
         agents.append({"agent": agent.agent, "artifacts": artifacts})
 
     payload = {"agents": agents}

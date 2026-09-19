@@ -259,6 +259,11 @@ def test_no_generated_rule_claims_something_else_collects_the_registry(
     A reader who believed any of the three sentences would conclude that no policy was in
     force when the truth is that nobody looked, which is the confusion this project exists
     to prevent. So the rules say it plainly, and this holds them to it.
+
+    The collectors read four of those entries now (ADR 0033) and the generated text says
+    so, which is the same requirement from the other side: a reader of one of these rules
+    is deciding what they still have to go and get, and both halves of that answer have to
+    be true at once.
     """
     rendered = "\n".join(one.text for one in render(catalogue)).lower()
     for claim in (
@@ -267,7 +272,9 @@ def test_no_generated_rule_claims_something_else_collects_the_registry(
         "which osquery reads through its own registry table",
     ):
         assert claim not in rendered, f"a generated rule still says: {claim}"
-    assert "nothing in this suite reads the registry" in rendered
+    # What replaced them has to keep saying the part that matters: no rule generated here
+    # addresses a key, and the reader has to go and get it with the tool's own facility.
+    assert "no rule generated here covers one" in rendered
 
 
 def test_every_registry_entry_is_named_as_uncovered_somewhere(catalogue: Catalogue) -> None:

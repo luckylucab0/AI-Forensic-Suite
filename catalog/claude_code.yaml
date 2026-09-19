@@ -1840,7 +1840,7 @@ artifacts:
     HKCU is the tamper path: a non-admin user can plant policy there when no real policy exists. Check both hives and compare. Registry LastWrite gives you a timestamp the JSON files do not.
 
     Record structure: The whole managed settings JSON document is stored as a single REG_SZ or REG_EXPAND_SZ value named `Settings`. HKLM is an "admin source" and ranks above the managed settings files; HKCU is user-writable, is explicitly NOT an admin source, and is read only when no higher source delivers a policy key and no host-supplied parent settings supply a restrictive key. On WSL, HKCU is read only once HKLM or the Windows managed settings file turns on `wslInheritsWindowsSettings` and the HKCU value also sets it.
-  parser: null
+  parser: registry
 - id: claude_code.project_settings_local
   category: permissions
   root: project

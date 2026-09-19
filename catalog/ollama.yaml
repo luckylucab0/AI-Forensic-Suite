@@ -174,7 +174,7 @@ artifacts:
     Unverified on purpose. Ollama's own source names the variables, which is what the sibling entry cites, but it does not say where Windows stores them. That this key holds a user's environment variables is a property of Windows rather than of ollama, so it is recorded as community knowledge instead of borrowing the vendor's confidence.
 
     Read it before concluding anything from an absent artifact: OLLAMA_MODELS set here moves the manifests and blobs somewhere this catalogue does not name, and OLLAMA_NOHISTORY explains a missing history file without implying that anyone covered their tracks.
-  parser: null
+  parser: registry
 - id: ollama.macos_app_container
   category: config
   root: user_profile

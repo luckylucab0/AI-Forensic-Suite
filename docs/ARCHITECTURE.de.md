@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 34 Module lesen 376 der 473
+  zählt diese Dateien und sagt, welche es sind. 35 Module lesen 380 der 473
   Katalogartefakte, und was der Rest ist, wird behauptet und nicht angenommen: jeder Eintrag
   in einem Format, das diese Suite liest, wird entweder gelesen oder trägt einen
   aufgeschriebenen Grund, warum nicht, und die Anmeldedatenspeicher sind als Klasse
@@ -177,6 +177,18 @@ ist, dass das nicht *unbemerkt* geht.
     zweites dokumentiert das Verzeichnis und nicht die Benennung darin, ein drittes hält
     beide Seiten einer Änderung, ohne zu sagen, welche welche ist. Was der Pfad aussagt,
     wird gelesen; was er nicht aussagt, wird gesagt statt erschlossen.
+  - **Registry-Schlüssel.** Vier Katalogeinträge werden auf einem laufenden Windows-Host
+    aus der Registry gelesen und als JSON-Dokumente ins Bundle geschrieben, mit dem
+    Schlüssel als Originalpfad des Eintrags (ADR 0033). Zwei davon sind die verwaltete
+    Richtlinie, die sagt, was ein Agent durfte, und die unter Windows allein in der
+    Registry stehen kann, ganz ohne Datei: ein Fall, der schwiege, läse sich als Host ohne
+    Richtlinie statt als Host, auf dem niemand nachgesehen hat. Ein Ereignis pro Wert; ein
+    Schlüssel, den es gibt und der leer ist, bekommt ein eigenes, denn bei einem
+    Richtlinienschlüssel heisst das, die Richtlinie war nicht gesetzt, und das ist etwas
+    anderes als ein nie angelegter Schlüssel. Die Zeit gehört dem Schlüssel und nie dem
+    Wert, denn die Registry führt keine pro Wert. Der Hive ist ein Feld und kein Teil des
+    Pfades, denn eine Richtlinie unter dem eigenen Hive der Nutzenden ist eine, die auch
+    jemand ohne Administratorrechte dort hingelegt haben kann.
   - **Textkonfiguration.** Die kleinen Dateien, die sagen, wie ein Agent eingerichtet war,
     am Stück gelesen, und zwei, die Zeile für Zeile gelesen werden, weil eine Zeile das
     ist, was eine Untersuchende gegen einen Pfad hält. Eine Ignore-Datei ist die Umkehrung

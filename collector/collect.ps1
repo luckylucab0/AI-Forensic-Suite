@@ -1620,6 +1620,7 @@ $EmbeddedCatalogueJson = @'
                         "HKLM\\SOFTWARE\\Policies\\ClaudeCode",
                         "HKCU\\SOFTWARE\\Policies\\ClaudeCode"
                     ],
+                    "read_registry": true,
                     "root": "registry",
                     "sensitivity": "normal",
                     "status": "verified"
@@ -2774,6 +2775,7 @@ $EmbeddedCatalogueJson = @'
                         "HKCU\\SOFTWARE\\Policies\\Claude",
                         "HKLM\\SOFTWARE\\Policies\\Claude"
                     ],
+                    "read_registry": true,
                     "root": "registry",
                     "sensitivity": "normal",
                     "status": "verified"
@@ -7125,6 +7127,7 @@ $EmbeddedCatalogueJson = @'
                     "paths": [
                         "HKEY_CURRENT_USER\\Environment"
                     ],
+                    "read_registry": true,
                     "root": "registry",
                     "sensitivity": "normal",
                     "status": "unverified"
@@ -8554,6 +8557,7 @@ $EmbeddedCatalogueJson = @'
                         "HKCU\\Software\\Policies\\Windsurf\\<ProductName>",
                         "HKLM\\Software\\Policies\\Windsurf\\<ProductName>"
                     ],
+                    "read_registry": true,
                     "root": "registry",
                     "sensitivity": "normal",
                     "status": "unverified"
@@ -9093,7 +9097,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "a394b4a373b6941ba0087f2181bbd5250bfcceaba9d8753832e92b377c13e551"
+    "sha256": "73ec1b2c7a93c4c5d6c9a051c383bf06b0cdc07767c186978616562711d1b622"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json
@@ -9920,9 +9924,10 @@ function Expand-CataloguePath {
             # of evidence was never collected. Two of these keys are the managed policy
             # that says what an agent was allowed to do, so reading the refusal correctly
             # is the difference between "no policy was in force" and "nobody looked".
-            # Nothing in this suite reads the registry either: not the other collector
-            # and not one of the five collection-rule exporters, each of which names
-            # these keys in its own header as something it does not cover.
+            # The file pass cannot search a key, and the four entries the registry pass
+            # does read never reach here: they are skipped before expansion so a collected
+            # key is not also reported as a refusal. What is left are the registry entries
+            # this collector does not read at all, and naming them is the answer for them.
             Add-PatternRefusal -Pattern $Pattern -Expanded $text -Reason 'registry_key'
             return ,$results
         }
@@ -10883,6 +10888,200 @@ function Sort-DictionaryList {
     return ,$out
 }
 
+# The registry's own type names, which the .NET enum does not spell. Written out because a
+# document carrying REG_STRING would name a type that does not exist on the platform it
+# came from, and because the analyzer and docs/BUNDLE_FORMAT.md promise these.
+$script:RegistryTypeNames = @{
+    'String' = 'REG_SZ'
+    'ExpandString' = 'REG_EXPAND_SZ'
+    'Binary' = 'REG_BINARY'
+    'DWord' = 'REG_DWORD'
+    'MultiString' = 'REG_MULTI_SZ'
+    'QWord' = 'REG_QWORD'
+    'None' = 'REG_NONE'
+    'Unknown' = 'REG_UNKNOWN'
+}
+
+
+function Read-RegistryKey {
+    <#
+    .SYNOPSIS
+        One registry key as the JSON document docs/BUNDLE_FORMAT.md specifies, or $null
+        when the key is not there.
+    .DESCRIPTION
+        Only four catalogue entries are read this way and which four is decided by
+        scripts/build_collectors.py, which marks them in the embedded catalogue and says
+        why there. They are the managed policy keys and one relocation key: agent-specific
+        things no general purpose registry tool knows to look at. The platform's own
+        execution evidence is deliberately not duplicated here.
+
+        Read on the host and never from a mounted image. A hive file needs a parser this
+        suite does not have, so with -Root set this pass does not run at all and says so
+        rather than returning an empty answer that reads like an absent policy.
+
+        NO LAST-WRITE TIME, and this is the one thing to know about these documents. The
+        registry keeps a last-write timestamp per key and PowerShell 5.1 cannot reach it:
+        it needs RegQueryInfoKey through P/Invoke, which means compiling code on the
+        endpoint with Add-Type. A collector that writes a temporary assembly to a machine
+        under investigation, and that application control is entitled to block, is a worse
+        trade than a document with no timestamp in it. So last_write_utc is null, the
+        analyzer says so on every event it makes, and an examiner who needs key times takes
+        the hive with a tool built to parse one.
+
+        Evidence is read-only here as everywhere: the key is opened for reading and
+        nothing is written back.
+    #>
+    param([string] $Key)
+
+    $normalised = $Key.Replace('/', '\')
+    # IndexOf and Substring rather than Split: String.Split with a single-character string
+    # and a count has no overload that binds the way it reads, and which one PowerShell
+    # picks is not something a collector should depend on.
+    $at = $normalised.IndexOf('\')
+    if ($at -lt 1) { return $null }
+    $head = $normalised.Substring(0, $at)
+    $rest = $normalised.Substring($at + 1)
+    $hive = $null
+    switch ($head.ToUpperInvariant()) {
+        'HKLM' { $hive = 'HKEY_LOCAL_MACHINE' }
+        'HKEY_LOCAL_MACHINE' { $hive = 'HKEY_LOCAL_MACHINE' }
+        'HKCU' { $hive = 'HKEY_CURRENT_USER' }
+        'HKEY_CURRENT_USER' { $hive = 'HKEY_CURRENT_USER' }
+        'HKCR' { $hive = 'HKEY_CLASSES_ROOT' }
+        'HKEY_CLASSES_ROOT' { $hive = 'HKEY_CLASSES_ROOT' }
+        'HKU' { $hive = 'HKEY_USERS' }
+        'HKEY_USERS' { $hive = 'HKEY_USERS' }
+        default { return $null }
+    }
+
+    $provider = 'Registry::{0}\{1}' -f $hive, $rest
+    $item = Get-Item -LiteralPath $provider -ErrorAction SilentlyContinue
+    if ($null -eq $item) { return $null }
+
+    $valueNames = [System.Collections.Generic.List[string]]::new()
+    foreach ($name in $item.GetValueNames()) { $valueNames.Add([string]$name) }
+    $values = [System.Collections.Generic.List[object]]::new()
+    foreach ($name in (Sort-Ordinal $valueNames)) {
+        $entry = [ordered]@{}
+        $entry['name'] = [string]$name
+        # DoNotExpandEnvironmentNames: an expandable string is evidence as it was written.
+        # Expanding it here would record this collector's environment as the endpoint's.
+        $data = $item.GetValue($name, $null, [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+        $kind = $item.GetValueKind($name)
+        # The enum's names are not the registry's: String is REG_SZ and MultiString is
+        # REG_MULTI_SZ, so an uppercased enum name would have put a type in the document
+        # that nothing on Windows calls a registry type.
+        $entry['type'] = $script:RegistryTypeNames[$kind.ToString()]
+        if (-not $entry['type']) { $entry['type'] = 'REG_UNKNOWN' }
+        if ($kind -eq [Microsoft.Win32.RegistryValueKind]::Binary) {
+            # Bytes put through a text encoding stop being the bytes that were there.
+            $entry['data_base64'] = [System.Convert]::ToBase64String([byte[]]$data)
+        } elseif ($kind -eq [Microsoft.Win32.RegistryValueKind]::MultiString) {
+            $items = [System.Collections.Generic.List[object]]::new()
+            foreach ($one in [string[]]$data) { [void]$items.Add([string]$one) }
+            $entry['data'] = $items
+        } elseif ($kind -eq [Microsoft.Win32.RegistryValueKind]::DWord -or
+                  $kind -eq [Microsoft.Win32.RegistryValueKind]::QWord) {
+            $entry['data'] = [long]$data
+        } else {
+            $entry['data'] = [string]$data
+        }
+        [void]$values.Add($entry)
+    }
+
+    $subkeyNames = [System.Collections.Generic.List[string]]::new()
+    foreach ($name in $item.GetSubKeyNames()) { $subkeyNames.Add([string]$name) }
+    $subkeys = [System.Collections.Generic.List[object]]::new()
+    foreach ($name in (Sort-Ordinal $subkeyNames)) { [void]$subkeys.Add([string]$name) }
+
+    $document = [ordered]@{}
+    $document['format_version'] = 1
+    $document['key'] = $Key
+    $document['last_write_utc'] = $null
+    $document['subkeys'] = $subkeys
+    $document['values'] = $values
+    return $document
+}
+
+
+function Copy-RegistryKeys {
+    <#
+    .SYNOPSIS
+        Read every catalogue key marked for it and append one manifest entry each.
+    .DESCRIPTION
+        A key that is not there gets an entry with collected false and no document, the
+        same shape a missing file gets. That distinction is the whole point for a policy
+        key: an empty document means the policy was not set, a missing one means the key
+        was never created, and both are different from nobody having looked.
+    #>
+    param(
+        [System.Collections.Generic.List[object]] $Entries,
+        [string] $FilesDir,
+        [string] $Root,
+        [bool] $DryRun
+    )
+
+    foreach ($agent in $script:EmbeddedCatalogue.agents) {
+        foreach ($artifact in $agent.artifacts) {
+            # Asked of the property list rather than by reading the property: strict
+            # mode makes a missing property an error, and only four of the catalogue's
+            # entries carry this one.
+            if (-not ($artifact.PSObject.Properties.Name -ccontains 'read_registry')) { continue }
+            if (-not $artifact.read_registry) { continue }
+            foreach ($key in $artifact.paths) {
+                $entry = [ordered]@{}
+                $entry['agent'] = [string]$agent.agent
+                $entry['artifact_id'] = [string]$artifact.id
+                $entry['bundle_path'] = $null
+                $entry['category'] = [string]$artifact.category
+                $entry['collected'] = $false
+                $entry['mtime_utc'] = $null
+                $entry['original_path'] = [string]$key
+                $entry['reason'] = 'unreadable'
+                $entry['sha256'] = $null
+                $entry['size'] = $null
+                $entry['source_kind'] = 'registry'
+                $entry['status'] = [string]$artifact.status
+                $entry['user'] = (Get-CollectorUser)
+
+                $document = $null
+                if (-not $Root) { $document = Read-RegistryKey -Key ([string]$key) }
+                if ($null -eq $document) {
+                    if ($Root) {
+                        # Said rather than left as a plain absence: a mounted image has no
+                        # live registry, and an entry that looked the same as an absent key
+                        # would read as a policy that was not set.
+                        $entry['reason'] = 'registry_needs_a_live_host'
+                    } else {
+                        $entry['reason'] = 'not_present'
+                    }
+                    [void]$Entries.Add($entry)
+                    continue
+                }
+
+                # The same serializer the manifest uses, so a registry document in a
+                # bundle is byte-identical whichever collector wrote it and verifies the
+                # same way.
+                $text = ConvertTo-CanonicalJson -Value $document
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes($text)
+                $relative = 'registry/{0}.json' -f ([string]$key).Replace('\', '/')
+                $entry['bundle_path'] = 'files/{0}' -f $relative
+                $entry['collected'] = $true
+                $entry['reason'] = $null
+                $entry['sha256'] = (Get-Sha256OfString $text)
+                $entry['size'] = $bytes.Length
+                if (-not $DryRun) {
+                    $destination = Join-BundlePath $FilesDir $relative
+                    [void][System.IO.Directory]::CreateDirectory([System.IO.Path]::GetDirectoryName($destination))
+                    [System.IO.File]::WriteAllBytes($destination, $bytes)
+                }
+                [void]$Entries.Add($entry)
+            }
+        }
+    }
+}
+
+
 function Invoke-Collection {
     <#
     .SYNOPSIS
@@ -10995,6 +11194,11 @@ function Invoke-Collection {
         # See ADR 0014.
         $matches = [System.Collections.Specialized.OrderedDictionary]::new([System.StringComparer]::Ordinal)
         foreach ($artifact in $ordered) {
+            # Collected by the registry pass instead, so expanding its patterns here would
+            # refuse each key as unsearchable and put a refusal in the manifest next to the
+            # entry that carries the key's contents. The registry keys this collector does
+            # not read still go through the expander and are refused by name.
+            if (($artifact.PSObject.Properties.Name -ccontains 'read_registry') -and $artifact.read_registry) { continue }
             $anchors = [System.Collections.Generic.List[string]]::new()
             if (@('project', 'repo_root', 'plugin') -ccontains [string]$artifact.root) {
                 foreach ($anchorItem in $projectRoots) {
@@ -11117,6 +11321,13 @@ function Invoke-Collection {
                 [void]$errors.Add($problem)
             }
         }
+    }
+
+    # The registry pass, once per collection rather than once per profile: a machine key
+    # is not a property of a user, and the user hive this reads is the collecting account's
+    # own. It runs only on a live host, and with -Root it records that instead.
+    if ($TargetOs -ceq 'windows') {
+        Copy-RegistryKeys -Entries $entries -FilesDir $filesDir -Root $Root -DryRun $DryRun
     }
 
     $sortedEntries = Sort-DictionaryList -Items $entries -Fields @('artifact_id', 'original_path')
