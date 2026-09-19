@@ -117,3 +117,31 @@ def test_every_memory_in_the_catalogue_is_read_by_something() -> None:
     for artifact in catalogue.artifacts:
         if artifact.category == "memory":
             assert for_artifact(artifact.id) is not None, artifact.id
+
+
+def test_a_memory_store_that_is_not_text_is_not_shown_as_text(tmp_path: Path) -> None:
+    """One product keeps its memories as an encrypted container. Rendering those bytes as
+    text produces a page of replacement characters, and a page of replacement characters in
+    a field called text reads as the memory. The file is recorded by size and hash instead,
+    which says what it is and leaves the bytes in the bundle for a reader that knows the
+    format."""
+    path = tmp_path / "memory.pb"
+    path.write_bytes(b"\x0a\x00\xff\xfe" + bytes(range(256)) * 4)
+    events = parse(path)
+    assert len(events) == 1
+    assert events[0].payload["binary"] is True
+    assert "text" not in events[0].payload
+    assert events[0].payload["bytes"] == len(path.read_bytes())
+    assert "not text" in (events[0].parse_problem or "")
+
+
+def test_a_memory_with_a_few_odd_bytes_is_still_read_as_text(tmp_path: Path) -> None:
+    """The other direction of the same rule. A note written on a machine with another code
+    page has a handful of characters that do not decode, and losing the note over them
+    would be the same mistake."""
+    path = tmp_path / "MEMORY.md"
+    # A single byte from another code page, which is what such a file really holds.
+    path.write_bytes(b"# Notes\n\n- the caf\xe9 build needs node 22\n")
+    events = parse(path)
+    assert "node 22" in events[0].payload["text"]
+    assert "not exact" in (events[0].parse_problem or "")

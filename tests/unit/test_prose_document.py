@@ -121,3 +121,15 @@ def test_the_reader_claims_every_prose_transcript_in_the_catalogue() -> None:
     # a format somebody read against its source, and a floor under it would be a step back.
     assert prose - claimed == {"aider.chat_history"}
     assert claimed <= prose
+
+
+def test_a_spill_that_is_not_prose_is_recorded_as_bytes(tmp_path: Path) -> None:
+    """A tool result can be a downloaded archive, and a page of replacement characters in
+    a field called text reads as what the agent saw."""
+    path = tmp_path / "spill.bin"
+    path.write_bytes(b"PK\x03\x04\x00\x00" + bytes(range(256)) * 4)
+    events = parse(path, "claude_code.tool_result_spills")
+    assert len(events) == 1
+    assert events[0].kind == "unparsed.record"
+    assert "not text" in (events[0].parse_problem or "")
+    assert "text" not in events[0].payload

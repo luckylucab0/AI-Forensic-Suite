@@ -24,11 +24,12 @@ fetched page and a case should not be fillable by one of them.
 
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Iterator
 
 from agentforensics.model import UNINTERPRETED_MARK, Event, unparsed
-from agentforensics.parsers.base import ParseContext
-from agentforensics.parsers.instructions import MAX_TEXT
+from agentforensics.parsers.base import ParseContext, looks_binary
+from agentforensics.parsers.instructions import BINARY_FILE, MAX_TEXT
 
 # Which artifact is read as what. Written out rather than derived from the catalogue at
 # runtime, for the reason the other readers' sets are: a parser is handed an artifact id
@@ -75,6 +76,24 @@ class ProseDocumentParser:
                 context.agent,
                 None,
                 f"this file could not be read: {error}",
+                user=context.user,
+                host=context.host,
+            )
+            return
+
+        if looks_binary(raw_bytes):
+            # Not prose at all. A spilled tool result can be a downloaded archive and a
+            # session file can be a container format, and a page of replacement characters
+            # reads as what the agent saw, which is worse than saying nothing.
+            yield unparsed(
+                context.provenance("file"),
+                context.agent,
+                {
+                    "file": context.local_path.name,
+                    "bytes": len(raw_bytes),
+                    "sha256": hashlib.sha256(raw_bytes).hexdigest(),
+                },
+                BINARY_FILE,
                 user=context.user,
                 host=context.host,
             )

@@ -39,6 +39,7 @@ a scan having been run.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import unicodedata
@@ -49,7 +50,7 @@ from typing import Any
 import yaml
 
 from agentforensics.model import Event, unparsed
-from agentforensics.parsers.base import ParseContext, read_json
+from agentforensics.parsers.base import ParseContext, looks_binary, read_json
 
 # Every catalogue artifact filed under instructions or project_instructions. Written out
 # rather than derived at runtime, because a parser is handed an artifact id and not the
@@ -218,6 +219,20 @@ _HIDDEN = (
 # applied quietly.
 MAX_TEXT = 1_000_000
 
+# Said instead of the text, where the file is not text. The file itself is in the bundle
+# under this hash, so nothing is lost: what the event refuses to do is show an analyst a
+# page of replacement characters that reads as the content of a document.
+BINARY_FILE = (
+    "this file is not text: most of it did not decode, so it is recorded by size and hash "
+    "rather than as content. It is in the bundle at the path in this event's provenance, "
+    "and reading it needs a reader for whatever format it actually is"
+)
+
+
+def _digest(raw_bytes: bytes) -> str:
+    """The file's own hash, so a binary document is still identifiable in the case."""
+    return hashlib.sha256(raw_bytes).hexdigest()
+
 
 class InstructionsParser:
     """One module for the whole instruction surface, because it is a format and not an agent.
@@ -265,6 +280,31 @@ def read_document(
 
     text = raw_bytes.decode("utf-8", "replace")
     problems: list[str] = []
+    if looks_binary(raw_bytes):
+        # Not text at all: an encrypted store, a protocol buffer, a compiled thing that
+        # landed in a directory of documents. Carried as bytes rather than as a page of
+        # replacement characters, because that page reads as the content of the file and
+        # one of the memory stores in this catalogue is exactly this shape.
+        yield Event(
+            kind=kind,
+            provenance=context.provenance("file"),
+            agent=context.agent,
+            raw={"file": path.name, "bytes": len(raw_bytes), "sha256": _digest(raw_bytes)},
+            ts_utc=None,
+            ts_precision="absent",
+            actor="system",
+            user=context.user,
+            host=context.host,
+            payload={
+                "file": path.name,
+                "bytes": len(raw_bytes),
+                "sha256": _digest(raw_bytes),
+                "binary": True,
+                **(extra or {}),
+            },
+            parse_problem=BINARY_FILE,
+        )
+        return
     if "\ufffd" in text:
         problems.append(
             "the file did not decode as UTF-8 and was read with replacement characters, "

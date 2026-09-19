@@ -95,6 +95,33 @@ class Line:
         return f"line:{self.number}"
 
 
+# What makes a file bytes rather than text, in two signals that are cheap and explainable.
+#
+# A NUL byte in the first few kilobytes is the test git itself uses to call a file binary,
+# and nothing that is prose contains one. The share of characters that failed to decode is
+# the second signal, and the threshold is high on purpose: a document written on a machine
+# with another code page has a few of them, and losing that document over them would be the
+# same kind of mistake in the other direction.
+#
+# It matters because an encrypted store or a protocol buffer decodes into a page of
+# replacement characters, and that page reads as the content of the file. One agent in this
+# catalogue keeps its memories exactly that way, so this is the difference between a case
+# that says "this is a store we cannot read" and a case that shows somebody noise and calls
+# it a memory.
+BINARY_SNIFF_BYTES = 8000
+BINARY_SHARE = 0.30
+
+
+def looks_binary(raw_bytes: bytes) -> bool:
+    """Whether a file is bytes wearing a text file's name."""
+    if not raw_bytes:
+        return False
+    if b"\x00" in raw_bytes[:BINARY_SNIFF_BYTES]:
+        return True
+    text = raw_bytes.decode("utf-8", "replace")
+    return bool(text) and text.count("\ufffd") / len(text) > BINARY_SHARE
+
+
 @dataclass(frozen=True, slots=True)
 class TextLine:
     """One line of a plain text file, with what was odd about reading it."""
@@ -341,12 +368,15 @@ def text_of(value: Any) -> str:
 
 
 __all__ = [
+    "BINARY_SHARE",
+    "BINARY_SNIFF_BYTES",
     "Line",
     "ParseContext",
     "Parser",
     "TextLine",
     "first_word",
     "iter_lines",
+    "looks_binary",
     "normalise_ts",
     "read_json",
     "text_lines",
