@@ -84,10 +84,15 @@ ein Transcript:
 
 **Case** zeigt, was der Fall enthält und was ihm fehlt. Zuerst die Zahlen, die eine
 Analystin zuerst liest, dann die, die sie relativieren: gesammelte Dateien, die kein Parser
-gelesen hat, Datensätze, die niemand parsen konnte, Ereignisse ohne Zeitstempel und Lücken,
-die die Sammlung selbst gemeldet hat. Danach ein Block pro Sammlung mit Endpunkt, Sammler,
-Zeiten, der eigenen Zeitzone des Endpunkts und dem Manifest-Hash, und zuletzt die Herkunft
-der Seite selbst, samt Hash des ausgelieferten Viewer-HTML.
+gelesen hat, Datensätze, die niemand parsen konnte, Datensätze, die aus einem Format
+stammen, das niemand gemappt hat, Ereignisse ohne Zeitstempel und Lücken, die die Sammlung
+selbst gemeldet hat. Darunter dieselben zwei Datensatzzahlen pro Artefakt, mit der Anzahl
+Dateien dahinter, denn eine Gesamtzahl allein ist nicht handlungsfähig: ein Debug-Log und
+sämtliche Transkripte der Maschine ergeben dieselbe Zahl und verlangen entgegengesetzte
+nächste Schritte. Die Liste ist begrenzt und sagt, wie viele Artefakte sie nicht aufgeführt
+hat. Danach ein Block pro Sammlung mit Endpunkt, Sammler, Zeiten, der eigenen Zeitzone des
+Endpunkts und dem Manifest-Hash, und zuletzt die Herkunft der Seite selbst, samt Hash des
+ausgelieferten Viewer-HTML.
 
 **Timeline** ist jedes Ereignis des Falls in einer Folge, über alle Agenten hinweg.
 Ereignisse ohne Zeitstempel stehen vorn statt zu fehlen: ihre Position ist unbekannt, nicht

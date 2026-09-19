@@ -215,7 +215,7 @@ data appears anywhere in this repository.
 | 0 | Repository hygiene, sanitized viewer, tooling, CI, OpSec guard | done |
 | 1 | Artifact catalogue, both collectors, evidence bundle format, `verify`, synthetic fixtures | done |
 | 2 | Collection rules generated for Velociraptor, KAPE, Defender live response, KQL, osquery | done |
-| 3 | Analyzer core: ingest adapters, per-agent parsers, unified event model, SQLite case database, unified log format, timeline exports | in progress |
+| 3 | Analyzer core: ingest adapters, per-agent parsers, unified event model, SQLite case database, unified log format, timeline exports | done |
 | 4 | Declarative YAML rule engine and the starter rule packs | done |
 | 5 | Local web UI: read-only API, viewer API source, case, timeline, findings and artifact views | done |
 

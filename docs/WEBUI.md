@@ -80,7 +80,11 @@ transcript:
 
 **Case** is what the case holds and what it is missing. The counts an analyst reads first,
 then the ones that qualify them: files collected that no parser read, records nothing could
-parse, events with no timestamp, and gaps the collection itself reported. Then one block
+parse, records read out of a format nobody has mapped, events with no timestamp, and gaps
+the collection itself reported. Under those, the same two record counts per artifact, with
+the number of files behind them, because a total on its own cannot be acted on: one debug
+log and every transcript on the machine produce the same number and call for opposite next
+steps. The listing is limited and says how many artifacts it did not list. Then one block
 per collection with the endpoint, the collector, the times, the endpoint's own timezone and
 the manifest hash, and last the provenance of the page itself, including the hash of the
 viewer HTML that was served.
