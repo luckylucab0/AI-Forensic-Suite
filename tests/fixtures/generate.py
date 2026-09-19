@@ -46,6 +46,10 @@ SESSION_B = "4f8c1e2a-0000-4000-8000-000000000002"
 # directory per session holding a versioned messages file and a manifest, with the hook
 # audit log beside it under the data directory.
 CLI_SESSION = "4f8c1e2a-0000-4000-8000-000000000003"
+# Continue keeps one file per session named by its id, and an index beside them. The index
+# is the only thing in that store with a clock in it.
+CONTINUE_SESSION = "4f8c1e2a-0000-4000-8000-000000000004"
+CONTINUE_HIDDEN = "4f8c1e2a-0000-4000-8000-000000000005"
 
 
 def write(path: Path, content: str | bytes, mtime: int = RECENT) -> Path:
@@ -1220,6 +1224,132 @@ def cline_hook_audit() -> str:
     )
 
 
+def continue_session() -> str:
+    """One Continue session, in the shapes the vendor's own type declaration states.
+
+    Written with the three things that store carries and most transcripts do not: a tool
+    call left in a status the product records, the context items that were put in front of
+    the model, and the rule files the product says applied to the turn. And with no
+    timestamp anywhere, because there is none in the vendor's type.
+    """
+    return json.dumps(
+        {
+            "sessionId": CONTINUE_SESSION,
+            "title": "remove the debug logging",
+            "workspaceDirectory": "/home/alice/src/app",
+            "mode": "agent",
+            "chatModelTitle": "example-model-6",
+            "usage": {"promptTokens": 210, "completionTokens": 48, "totalCost": 0.0},
+            "history": [
+                {
+                    "message": {
+                        "role": "system",
+                        "content": "You are a coding agent. Stay inside the workspace.",
+                    },
+                    "contextItems": [],
+                },
+                {
+                    "message": {"role": "user", "content": "remove the debug logging"},
+                    "contextItems": [
+                        {
+                            "name": "index.js",
+                            "description": "the file in the editor",
+                            "content": "console.log('debug');",
+                            "uri": {"type": "file", "value": "/home/alice/src/app/index.js"},
+                            "id": {"providerTitle": "file", "itemId": "1"},
+                        },
+                        {
+                            "name": "an example page",
+                            "description": "fetched for context",
+                            "content": "...",
+                            "uri": {"type": "url", "value": "https://example.org/style-guide"},
+                            "id": {"providerTitle": "url", "itemId": "2"},
+                        },
+                    ],
+                    "appliedRules": [
+                        {
+                            "name": "repository rules",
+                            "source": ".continuerules",
+                            "sourceFile": "/home/alice/src/app/.continuerules",
+                            "alwaysApply": True,
+                        }
+                    ],
+                },
+                {
+                    "message": {
+                        "role": "thinking",
+                        "content": "I should read the file first.",
+                    },
+                    "contextItems": [],
+                    "reasoning": {
+                        "active": False,
+                        "text": "I should read the file first.",
+                        # The one clock in a session file, and it is epoch milliseconds.
+                        "startAt": 1788772501000,
+                        "endAt": 1788772501800,
+                    },
+                },
+                {
+                    "message": {"role": "assistant", "content": "I will edit it."},
+                    "contextItems": [],
+                    "toolCallStates": [
+                        {
+                            "toolCallId": "call-1",
+                            "toolCall": {
+                                "id": "call-1",
+                                "type": "function",
+                                "function": {
+                                    "name": "edit_file",
+                                    "arguments": '{"path": "/home/alice/src/app/index.js"}',
+                                },
+                            },
+                            "status": "canceled",
+                            "parsedArgs": {"path": "/home/alice/src/app/index.js"},
+                        }
+                    ],
+                },
+                {
+                    "message": {
+                        "role": "tool",
+                        "content": "edit canceled",
+                        "toolCallId": "call-1",
+                    },
+                    "contextItems": [],
+                },
+            ],
+        },
+        indent=2,
+    )
+
+
+def continue_index() -> str:
+    """The session index, with one entry the product's own reader hides.
+
+    The second entry names its session under session_id rather than sessionId, which is the
+    old format the vendor filters out of the list it shows. Its file is in the store and the
+    product does not offer it.
+    """
+    return json.dumps(
+        [
+            {
+                "sessionId": CONTINUE_SESSION,
+                "title": "remove the debug logging",
+                # String(Date.now()): epoch milliseconds in a string, not a date.
+                "dateCreated": "1788772500000",
+                "workspaceDirectory": "/home/alice/src/app",
+                "messageCount": 1,
+            },
+            {
+                "session_id": CONTINUE_HIDDEN,
+                "title": "an older conversation",
+                "dateCreated": "1785000000000",
+                "workspaceDirectory": "/home/alice/src/app",
+            },
+        ],
+        indent=2,
+    )
+
+
 def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     """Create the synthetic profile. Returns a summary for assertions."""
     project = home / "src" / "app"
@@ -1351,6 +1481,12 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     write(cli_session / f"{CLI_SESSION}.messages.json", cline_cli_messages(), RECENT)
     write(cli_session / f"{CLI_SESSION}.json", cline_cli_manifest(), RECENT)
     write(cline_data / "logs" / "hooks.jsonl", cline_hook_audit(), RECENT)
+
+    # Continue's store: one file per session, an index beside them, and a session the index
+    # lists in the format the product's own reader filters out of its list.
+    continue_sessions = home / ".continue" / "sessions"
+    write(continue_sessions / f"{CONTINUE_SESSION}.json", continue_session(), RECENT)
+    write(continue_sessions / "sessions.json", continue_index(), RECENT)
 
     write(claude / "CLAUDE.md", "# User instructions\n\nAlways run the linter.\n")
     write(claude / "shell-snapshots" / "snapshot-1.sh", "alias gs='git status'\n")
@@ -1559,6 +1695,7 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
             "claude_code",
             "cline",
             "codex",
+            "continue",
             "copilot",
             "crosscutting",
             "gemini_cli",

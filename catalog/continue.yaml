@@ -216,4 +216,4 @@ artifacts:
     sessions.json is an index - compare it against the actual *.json files present. An id listed in the index with no corresponding file, or a file not in the index, is a direct indicator of selective deletion.
 
     Record structure: paths.ts: sessions folder = join(getContinueGlobalPath(), 'sessions'); per-session file = join(getSessionsFolderPath(), `${sessionId}.json`); index/list file = join(getSessionsFolderPath(), 'sessions.json'). The CLI also treats a session file as a transcript_path (see extensions/cli). CONTINUE_GLOBAL_DIR relocates the whole tree (absolute, or resolved against cwd).
-  parser: json_generic
+  parser: continue_sessions

@@ -30,6 +30,7 @@ from agentforensics.parsers.cline import ClineParser
 from agentforensics.parsers.cline_cli import ClineCliParser
 from agentforensics.parsers.codex import CodexParser
 from agentforensics.parsers.codex_state import CodexStateParser
+from agentforensics.parsers.continue_sessions import ContinueSessionsParser
 from agentforensics.parsers.copilot import CopilotParser
 from agentforensics.parsers.gemini import GeminiParser
 from agentforensics.parsers.hermes import HermesParser
@@ -60,6 +61,9 @@ PARSERS: tuple[Parser, ...] = (
     # The projection of those rollouts into rows, which is where a conversation still is
     # after its rollout file has gone.
     CodexStateParser(),
+    # Continue's session store, which is the one transcript in this catalogue with no
+    # timestamp anywhere in it: the only clock is the index beside it.
+    ContinueSessionsParser(),
     CopilotParser(),
     GeminiParser(),
     HermesParser(),
