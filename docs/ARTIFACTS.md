@@ -6,7 +6,7 @@ English | [Deutsch](ARTIFACTS.de.md)
 
 Generated from catalog/ by scripts/gen_artifact_docs.py. Do not edit by hand: CI regenerates this file and fails if it differs.
 
-460 artifacts across 31 agent(s), 360 of them resting on a fetched vendor source.
+461 artifacts across 31 agent(s), 361 of them resting on a fetched vendor source.
 
 Entries marked unverified are collected anyway, but no vendor source confirms the path. Treat the absence of such an artifact as inconclusive rather than as evidence that the agent was not used.
 
@@ -384,6 +384,7 @@ Vendor: Cline
 - `CLINE_TASKS_DB_PATH`: Moves the task database, one of the two transcript stores, on its own.
 - `CLINE_CRON_DB_PATH`: Moves the cron database on its own. That database is the record of scheduled autonomous runs, so losing it loses the explanation for a session nobody started by hand.
 - `CLINE_CONNECTORS_DB_PATH`: Moves the connector database on its own.
+- `CLINE_HOOKS_LOG_PATH`: Moves the hook audit log, the one artifact that dates a prompt, to any path at all rather than to a directory under the data root. A collection that searches only the data directory finds nothing on such a host, and the absence looks exactly like an agent that ran without hooks. Read by the audit writer, by the session manifest store and by the team child session manager, all three of which fall back to the data directory's logs folder when it is unset.
 - `CLINE_GLOBAL_SETTINGS_PATH`: Moves the global settings file, which is where an approval or a permission relaxation would be recorded.
 - `CLINE_MCP_SETTINGS_PATH`: Moves the MCP server inventory, which is the list of external tools the agent could reach and often carries their credentials inline.
 - `CLINE_PROVIDER_SETTINGS_PATH`: Moves the provider settings file, which records which model endpoint the agent was talking to.
@@ -424,6 +425,14 @@ Vendor: Cline
 | `cline.team_data` | team data | config | macOS, Linux, Windows | `~/.cline/data/teams/` | json | normal | Persists until the shared configuration is removed. | verified | [source_code](https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts) |
 | `cline.vscode_task_transcripts` | vscode task transcripts | transcript | macOS, Windows, Linux | `<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/api_conversation_history.json`<br>`<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/context_history.json`<br>`<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/task_metadata.json`<br>`<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/ui_messages.json` | json | normal | Deleted when the user deletes a task or clears history from the Cline UI. No automatic age-based expiry found. | verified | [source_code](https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts) |
 | `cline.workspace_specs` | workspace specs | config | macOS, Windows, Linux | `<project>/.cline/cron/`<br>`<project>/.cline/tasks/` | text | normal |  | verified | [source_code](https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts) |
+
+### durable
+
+**Usually still there.** Not covered by the retention sweep, so these routinely outlive the transcripts they describe. When the transcripts are already gone, this group is what is left, and it is often enough to establish that an agent ran, what it was allowed to do, and what the user asked.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `cline.hooks_audit_log` | hooks audit log | transcript | macOS, Windows, Linux | `~/.cline/data/logs/hooks.jsonl` | jsonl | normal | No rotation or pruning of this file appears in the sources read. It is opened with appendFileSync on every event, so it grows across sessions and holds runs whose session directory may be long gone. | verified | [source_code](https://raw.githubusercontent.com/cline/cline/main/sdk/packages/core/src/hooks/hook-file-hooks.ts) |
 
 ### Legacy paths
 

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 65f5a975ba29
+# Catalogue digest: 631820f9d33f
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -364,6 +364,7 @@ $targets = @(
     @{ Agent = 'cline'; Id = 'cline.home_config_tree'; Path = '$profile\.cline\skills' }
     @{ Agent = 'cline'; Id = 'cline.home_config_tree'; Path = '$profile\.cline\tasks' }
     @{ Agent = 'cline'; Id = 'cline.home_config_tree'; Path = '$profile\.cline\workflows' }
+    @{ Agent = 'cline'; Id = 'cline.hooks_audit_log'; Path = '$profile\.cline\data\logs\hooks.jsonl' }
     @{ Agent = 'cline'; Id = 'cline.mcp_settings'; Path = '$profile\.cline\data\settings\cline_mcp_settings.json' }
     @{ Agent = 'cline'; Id = 'cline.mcp_settings'; Path = '$profile\AppData\Roaming\Code - Insiders\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json' }
     @{ Agent = 'cline'; Id = 'cline.mcp_settings'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json' }

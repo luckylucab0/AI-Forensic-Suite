@@ -57,6 +57,7 @@ LOGS = frozenset(
         "claude_code.transcripts_set_aside",
         "claude_code.workflow_runs",
         "claude_desktop.cowork_audit_log",
+        "cline.hooks_audit_log",
         "codex.archived_sessions",
         "codex.prompt_history",
         "codex.rollouts",

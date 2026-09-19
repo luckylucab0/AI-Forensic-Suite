@@ -3181,6 +3181,22 @@ $EmbeddedCatalogueJson = @'
                     "status": "verified"
                 },
                 {
+                    "category": "transcript",
+                    "collect_priority": "durable",
+                    "id": "cline.hooks_audit_log",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cline/data/logs/hooks.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "mcp_config",
                     "collect_priority": "normal",
                     "id": "cline.mcp_settings",
@@ -8752,7 +8768,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "d921d2e54a96538f3153a7e1e0f770e52042575900cb12acac3310fe9aacd73b"
+    "sha256": "7ab83c05bc8bd9d1da4dfa10ae0acf2d412516d0513dc4da029ad1ba00bfb145"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

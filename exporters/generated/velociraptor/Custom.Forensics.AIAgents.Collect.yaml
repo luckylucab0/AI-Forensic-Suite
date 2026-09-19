@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 65f5a975ba29
+# Catalogue digest: 631820f9d33f
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -399,6 +399,7 @@ sources:
     cline,cline.home_config_tree,C:/Users/*/.cline/skills/**
     cline,cline.home_config_tree,C:/Users/*/.cline/tasks/**
     cline,cline.home_config_tree,C:/Users/*/.cline/workflows/**
+    cline,cline.hooks_audit_log,C:/Users/*/.cline/data/logs/hooks.jsonl
     cline,cline.mcp_settings,C:/Users/*/.cline/data/settings/cline_mcp_settings.json
     cline,cline.mcp_settings,C:/Users/*/AppData/Roaming/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
     cline,cline.mcp_settings,C:/Users/*/AppData/Roaming/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
@@ -1539,6 +1540,8 @@ sources:
     cline,cline.home_config_tree,/var/root/.cline/skills/**
     cline,cline.home_config_tree,/var/root/.cline/tasks/**
     cline,cline.home_config_tree,/var/root/.cline/workflows/**
+    cline,cline.hooks_audit_log,/Users/*/.cline/data/logs/hooks.jsonl
+    cline,cline.hooks_audit_log,/var/root/.cline/data/logs/hooks.jsonl
     cline,cline.mcp_settings,/Users/*/.cline/data/settings/cline_mcp_settings.json
     cline,cline.mcp_settings,/Users/*/Documents/Cline/MCP/**
     cline,cline.mcp_settings,/Users/*/Library/Application Support/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
@@ -3328,6 +3331,8 @@ sources:
     cline,cline.home_config_tree,/root/.cline/skills/**
     cline,cline.home_config_tree,/root/.cline/tasks/**
     cline,cline.home_config_tree,/root/.cline/workflows/**
+    cline,cline.hooks_audit_log,/home/*/.cline/data/logs/hooks.jsonl
+    cline,cline.hooks_audit_log,/root/.cline/data/logs/hooks.jsonl
     cline,cline.mcp_settings,/home/*/.cline/data/settings/cline_mcp_settings.json
     cline,cline.mcp_settings,/home/*/.config/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
     cline,cline.mcp_settings,/home/*/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
