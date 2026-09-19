@@ -782,7 +782,7 @@ artifacts:
     Rewritten constantly while the app runs; LevelDB keeps deleted records in .log and .ldb files until compaction, so recently removed entries are often still recoverable. Destroyed when the app recreates the Electron profile, which community reports document happening across an update sequence.
   notes: |-
     The vendor describes these as 'renderer-side UI state (window layout, recent folders, preferences)', which understates their forensic value: recent folders is a list of directories the user pointed the agent at, and LevelDB tombstones frequently retain entries the UI no longer shows. This is an Electron application (Electron 44 / Chromium 152 as of the September 2026 release notes), so expect the usual Chromium siblings next to these: Cache, Code Cache, GPUCache, Network, Cookies, Preferences, Crashpad. The vendor does not enumerate those and I did not source them, so they must be collected by enumerating the application-data directory rather than by a fixed list.
-  parser: null
+  parser: leveldb_store
 - id: claude_desktop.device_identifier
   title: Per-device identifier (ant-did)
   category: config

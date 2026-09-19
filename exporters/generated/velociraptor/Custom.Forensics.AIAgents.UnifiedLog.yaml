@@ -30,6 +30,7 @@
 #   - aider.input_history: a line editor's history file whose entries span several lines, which this query reads one line at a time
 #   - amazonq.cli_prompt_history: a line editor's history file whose entries are escaped, so a line of it is not the text that was typed
 #   - chatgpt_desktop.macos_codex_home: a profile directory this artifact will not narrow to an extension
+#   - chatgpt_desktop.windows_msix_localcache: an application-data tree whose conversations are in a browser engine's key-value store, which is a set of binary table files and a write-ahead log rather than records this query can read a line at a time. The analyzer opens one key by key, so collect the tree and ingest it
 #   - claude_code.tool_result_spills: the bulk output of one tool call in one file, which is prose rather than records: a line of it is a fragment of what the agent saw
 #   - cline.cli_sessions: a session directory of whole JSON documents. The hook log that dates this agent's prompts is a separate artifact and does come back record by record
 #   - cline.data_tasks: a task directory of whole JSON documents
@@ -97,7 +98,7 @@ description: |
       read rather than as an agent that left nothing behind.
 
     - Some of what the suite's own analyzer reads is not read here, or is read
-      only in part: 22 artifacts, named in the notes below. Where
+      only in part: 23 artifacts, named in the notes below. Where
       one of them is not read, a row says the file was there, with its hash and its
       timestamps, and nothing about the conversation in it. Collect those files
       with the Collect artifact and ingest them.

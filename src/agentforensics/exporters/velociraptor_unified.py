@@ -124,6 +124,10 @@ UNINTERPRETED: dict[str, str] = {
     "so a line of it is not the text that was typed",
     "chatgpt_desktop.macos_codex_home": "a profile directory this artifact will not narrow "
     "to an extension",
+    "chatgpt_desktop.windows_msix_localcache": "an application-data tree whose conversations "
+    "are in a browser engine's key-value store, which is a set of binary table files and a "
+    "write-ahead log rather than records this query can read a line at a time. The analyzer "
+    "opens one key by key, so collect the tree and ingest it",
     "codex.rollouts_compressed": "a transcript compressed in place after seven days, which "
     "this query cannot expand on the endpoint. Everything older than a week is in these "
     "files, so collect them and ingest them: the analyzer reads them line by line exactly "

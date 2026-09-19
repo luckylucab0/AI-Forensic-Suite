@@ -41,6 +41,12 @@ REFERENCE_NOW = 1789000000  # 2026-09-10T00:26:40Z
 RECENT = REFERENCE_NOW - 3 * 86400
 OLD = REFERENCE_NOW - 45 * 86400
 
+# The last eight bytes of a LevelDB table file, which is how a reader knows it is one.
+# Repeated here rather than imported because this generator builds the fixture the analyzer
+# is tested against, and a fixture that took its constants from the code under test could
+# not catch that code changing them.
+LEVELDB_TABLE_MAGIC = 0xDB4775248B80FB57
+
 SESSION_A = "4f8c1e2a-0000-4000-8000-000000000001"
 SESSION_B = "4f8c1e2a-0000-4000-8000-000000000002"
 # The SDK session, which is a different store from the editor extension's task tree: a
@@ -850,6 +856,88 @@ VSCODE_SCHEMA = (
 )
 
 
+def write_leveldb_store(directory: Path, mtime: int = RECENT) -> Path:
+    """A browser engine's key-value store, which is what an Electron agent's window state is.
+
+    Built to the format's own specification rather than by a library, for the same reason
+    the reader was: there is no dependency here that writes one. The set is the four files
+    a real store has, because the parser dispatches on the name and a fixture with only the
+    table would never exercise the write-ahead log, which is where the newest records of a
+    running application are.
+
+    The record in the log is the one that matters forensically. A folder the user pointed
+    the agent at is exactly the evidence the vendor's own description of this store as "UI
+    state" understates.
+    """
+
+    def varint(value: int) -> bytes:
+        out = bytearray()
+        while True:
+            byte = value & 0x7F
+            value >>= 7
+            out.append(byte | (0x80 if value else 0))
+            if not value:
+                return bytes(out)
+
+    def block(entries: list[tuple[bytes, bytes]]) -> bytes:
+        out = bytearray()
+        restarts = []
+        for key, value in entries:
+            restarts.append(len(out))
+            out += varint(0) + varint(len(key)) + varint(len(value)) + key + value
+        for offset in restarts:
+            out += offset.to_bytes(4, "little")
+        return bytes(out + len(restarts).to_bytes(4, "little"))
+
+    def table(entries: list[tuple[bytes, bytes]]) -> bytes:
+        # The checksum after each block is left at zero: it is a CRC32C, the reader
+        # documents why it does not verify one, and a fixture carrying a fake checksum
+        # would look like a file whose checksums mean something.
+        data = block(entries)
+        out = bytearray(data + bytes([0]) + bytes(4))
+        index_offset = len(out)
+        index = block([(entries[-1][0], varint(0) + varint(len(data)))])
+        out += index + bytes([0]) + bytes(4)
+        footer = bytearray(varint(0) + varint(0) + varint(index_offset) + varint(len(index)))
+        footer += bytes(40 - len(footer)) + LEVELDB_TABLE_MAGIC.to_bytes(8, "little")
+        return bytes(out + footer)
+
+    def log(records: list[tuple[bytes, bytes | None]], sequence: int) -> bytes:
+        batch = bytearray(sequence.to_bytes(8, "little") + len(records).to_bytes(4, "little"))
+        for key, value in records:
+            if value is None:
+                batch += bytes([0]) + varint(len(key)) + key
+            else:
+                batch += bytes([1]) + varint(len(key)) + key + varint(len(value)) + value
+        return bytes(bytes(4) + len(batch).to_bytes(2, "little") + bytes([1]) + batch)
+
+    # A Local Storage value is a one byte encoding tag and then the string, and the tag
+    # this fixture uses is the UTF-16 one, which is the case a reader aligned to byte zero
+    # turns into characters that are printable and are not the string.
+    def wide(text: str) -> bytes:
+        return b"\x00" + text.encode("utf-16-le")
+
+    write(directory / "CURRENT", b"MANIFEST-000001\n", mtime)
+    write(directory / "MANIFEST-000001", log([(b"version-edit", b"comparator")], 1), mtime)
+    write(
+        directory / "000005.ldb",
+        table(
+            [
+                (b"_https://example.org\x00\x01recentFolders", wide("C:/Users/alice/src/app")),
+                (b"_https://example.org\x00\x01windowBounds", wide('{"width":1280}')),
+            ]
+        ),
+        mtime,
+    )
+    write(
+        directory / "000003.log",
+        log([(b"_https://example.org\x00\x01lastProject", wide("C:/Users/alice/src/app"))], 42),
+        mtime,
+    )
+    # The lock file a running application leaves, which is empty by design.
+    return write(directory / "LOCK", b"", mtime)
+
+
 def write_vscode_state(path: Path, mtime: int = RECENT) -> Path:
     """The editor's key/value state store, holding what an agent extension left in it.
 
@@ -906,6 +994,12 @@ WINDOWS_ARTIFACTS = {
         "the Windows counterpart of the shell history, which is the evidence that a CLI "
         "agent was invoked at all"
     ),
+    "claude_desktop.renderer_state": (
+        "a browser engine's key-value store, which is where an Electron agent's window "
+        "keeps its state and, for one of the two desktop products, its prompts. Windows "
+        "only in this fixture because that is where the desktop products are collected "
+        "from an image"
+    ),
     "claude_code.mcp_logs": (
         "a log under a cache directory named after the working copy, so the encoding of a "
         "Windows path into a single directory component is exercised end to end"
@@ -954,6 +1048,7 @@ def build_windows_home(home: Path) -> dict:
     write(task / "context_history.json", '{"truncated": ', RECENT)
 
     write_zed_store(local / "Zed" / "threads" / "threads.db", project.replace("\\", "/"))
+    write_leveldb_store(roaming / "Claude" / "Local Storage" / "leveldb")
     write_vscode_state(roaming / "Code" / "User" / "globalStorage" / "state.vscdb")
 
     goose_config = roaming / "Block" / "goose" / "config"

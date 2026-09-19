@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 29 Module lesen 344 der 466
+  zählt diese Dateien und sagt, welche es sind. 31 Module lesen 349 der 466
   Katalogartefakte; der Rest sind die Anmeldedatenspeicher, die absichtlich niemand liest,
   die Installationsspuren, die das Dateisystem-Ereignis beantwortet, und die Binärspeicher,
   die noch eigene Formate brauchen.
@@ -167,6 +167,17 @@ ist, dass das nicht *unbemerkt* geht.
     Untersuchende mitgibt, unter der Rahmung, die sich authentifiziert, und der Klartext
     wird über das Wire-Format gelaufen, also sind seine Felder Nummern statt Namen, und
     jeder Datensatz sagt das (ADR 0029).
+  - **Schlüssel-Wert-Speicher.** Die beiden Electron-Desktop-Produkte legen den Zustand
+    ihres Fensters, und bei einem von beiden die Prompts, dort ab, wo eine Browser-Engine
+    ihn ablegt: in einer LevelDB aus unveränderlichen Tabellendateien und einem
+    Write-Ahead-Log. Beides wird gelesen, und das Log zählt am meisten, denn dort steht,
+    was eine laufende Anwendung zuletzt geschrieben und noch nicht in eine Tabelle
+    gefaltet hat. Das Lesen hört bei den Datensätzen auf: was die Bytes in einem Wert
+    bedeuten, ist die eigene Serialisierung der Engine, dafür hat hier niemand eine
+    Quelle, und der Text neben einem Datensatz sagt, dass er extrahiert und nicht
+    dekodiert wurde. Das Format ist in diesem Paket implementiert statt aus einer
+    Abhängigkeit genommen, zusammen mit dem Snappy, mit dem seine Blöcke komprimiert
+    sind (ADR 0031).
 
   **Die Instruktionsfläche** hat ihr eigenes formatförmiges Modul für die Artefakte, die
   Skills, Commands, Output Styles, Rules, Steering-Dateien, Subagent-Definitionen und

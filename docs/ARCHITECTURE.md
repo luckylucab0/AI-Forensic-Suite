@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  Twenty-nine modules read 344 of the catalogue's 466 artifacts; the rest are the credential
+  Thirty-one modules read 349 of the catalogue's 466 artifacts; the rest are the credential
   stores nothing reads on purpose, the install evidence the filesystem event answers, and
   the binary stores that still need their own formats.
 
@@ -152,6 +152,15 @@ it cannot be rewritten *quietly*.
     a protocol buffer. The container is opened only with a key the examiner supplies, under
     whichever framing authenticates, and the plaintext is walked by the wire format, so its
     fields are numbers rather than names and every record says so (ADR 0029).
+  - **Key-value stores.** The two Electron desktop products keep their windows' state, and
+    for one of them the prompts, where a browser engine keeps its: a LevelDB of immutable
+    table files and a write-ahead log. Both are read, and the log matters most, because it
+    holds what a running application wrote last and has not folded into a table yet. The
+    reading stops at the records: what the bytes inside a value mean is the engine's own
+    serialisation, nobody here has a source for it, and the text offered beside a record
+    says it was extracted rather than decoded. The format is implemented in this package
+    rather than taken from a dependency, together with the Snappy its blocks are
+    compressed with (ADR 0031).
 
   **The instruction surface** has its own format-shaped module for the artifacts that hold
   skills, commands, output styles, rules, steering files, subagent definitions and hook

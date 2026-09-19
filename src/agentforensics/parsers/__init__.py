@@ -38,6 +38,7 @@ from agentforensics.parsers.hermes import HermesParser
 from agentforensics.parsers.instructions import InstructionsParser
 from agentforensics.parsers.json_generic import JsonGenericParser
 from agentforensics.parsers.jsonl_generic import JsonlGenericParser
+from agentforensics.parsers.leveldb_store import LevelDbStoreParser
 from agentforensics.parsers.memory import MemoryParser
 from agentforensics.parsers.opencode import OpencodeParser
 from agentforensics.parsers.pi import PiParser
@@ -105,6 +106,11 @@ PARSERS: tuple[Parser, ...] = (
     # here rather than by the generic reader, which had the key in raw and the value in
     # text and said nobody had read the store.
     VscodeStateParser(),
+    # The key-value stores the two Electron desktop products keep their windows' state
+    # in, which for one of them is where the prompts are. A browser engine's format, so
+    # one module for both, and the records come out with nobody claiming to know what the
+    # bytes inside them mean.
+    LevelDbStoreParser(),
     # The encrypted trajectory store, which is the whole conversation record of one
     # product. Read only when the analyst supplies the product's key, and reported as an
     # encrypted store otherwise. See ADR 0029.

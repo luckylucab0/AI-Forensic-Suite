@@ -243,6 +243,30 @@ def test_the_editors_state_store_is_read_by_the_key_it_is_stored_under(
     assert "aiService.prompts" in keys
 
 
+def test_the_electron_key_value_store_gives_up_its_records(
+    windows_case: list[dict[str, Any]],
+) -> None:
+    """The store an Electron agent's window keeps its state in, read key by key.
+
+    Its files are a browser engine's own format, so before the reader for it a collection
+    of this directory reached a case as four file names and nothing else. Two things are
+    asserted: that the records are there, and that the one in the write-ahead log is among
+    them. The log is where a running application's newest writes sit until a compaction
+    folds them into a table, so a reader that took only the tables would return a store's
+    whole history except the part of it that happened last.
+    """
+    texts = [
+        json.loads(row["payload"]).get("text", "")
+        for row in windows_case
+        if row["artifact_id"] == "claude_desktop.renderer_state"
+    ]
+    # The folder the user pointed the agent at, which the vendor's description of this
+    # store as UI state understates, written the way this store writes a string: behind an
+    # encoding tag, in sixteen bit units.
+    assert any("recentFolders" in text for text in texts)
+    assert any("lastProject" in text and "C:/Users/alice/src/app" in text for text in texts)
+
+
 def test_a_file_with_no_parser_is_carried_rather_than_dropped(
     windows_case: list[dict[str, Any]],
 ) -> None:
@@ -321,13 +345,14 @@ def test_the_same_task_reads_the_same_from_both_shapes(
 def test_the_fixture_declares_why_each_artifact_is_in_it() -> None:
     """The fixture names its own coverage, so a gap is a sentence rather than an absence.
 
-    Seven artifacts out of the eighty-four the catalogue has under the two application-data
+    Eight artifacts out of the eighty-four the catalogue has under the two application-data
     roots. The number is not the point and raising it is not automatically an improvement:
     what this pins is that the chain works for every shape in the fixture, and that
     somebody said out loud which shapes those are.
     """
     assert set(WINDOWS_ARTIFACTS) == {
         "claude_code.mcp_logs",
+        "claude_desktop.renderer_state",
         "crosscutting.shell_psreadline_history",
         "goose.config",
         "goose.secrets",

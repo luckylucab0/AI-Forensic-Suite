@@ -38,3 +38,4 @@ Add one with the next free number, using [0000-template.md](0000-template.md).
 | [0028](0028-yaml-and-toml-are-read-the-way-json-is.md) | The YAML and TOML documents are read by the same rule, from one shared reader |
 | [0029](0029-an-encrypted-store-is-read-only-with-the-analysts-key.md) | An encrypted store is opened only with a key the examiner supplies, and the cipher is an optional extra |
 | [0030](0030-a-record-nobody-mapped-is-still-looked-at-by-every-rule.md) | A rule that names a kind still looks at a record nobody has mapped, and the finding says the kind is unknown |
+| [0031](0031-the-browser-engines-store-is-implemented-rather-than-depended-on.md) | The browser engine's key-value store and the Snappy its blocks use are implemented here, with no new dependency |
