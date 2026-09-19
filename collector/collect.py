@@ -8863,6 +8863,21 @@ _XDG_DEFAULTS = {
     "XDG_STATE_HOME": ".local/state",
 }
 
+# Variables the operating system owns rather than an agent. On a Windows target these are
+# another platform's spelling of the same artifact, the catalogue entry carries a Windows
+# sibling for it, and dropping them there is deliberate: that is the cross-platform case the
+# comment in expand_paths describes.
+#
+# An agent's own relocation variable is a different thing and was being treated the same
+# way. CLAUDE_CONFIG_DIR, HERMES_HOME, KIRO_HOME and nine more are the same variable on
+# every platform, and the Windows branch dropped every pattern rooted at one and recorded no
+# refusal: 43 catalogue paths, including a credential store and two session databases. The
+# default location was still searched through the entry's `~` sibling, so the failure was
+# narrow and completely silent, which is the combination this project exists to prevent.
+_POSIX_ONLY_VARIABLES = frozenset(
+    {"HOME", "HISTFILE", "ZDOTDIR", "TMPDIR", "XDG_RUNTIME_DIR"}
+) | frozenset(_XDG_DEFAULTS)
+
 # The user directory of VS Code and of the forks that inherit its storage layout. A dozen
 # agentic extensions keep their conversations under it, so <vscode-user> in the catalogue
 # expands to all of these rather than to a wildcard: a wildcard would match one directory
@@ -8923,6 +8938,15 @@ _WIN_SYSTEM_PLACEHOLDERS = {
 }
 
 
+def variable_name(text):
+    """The leading variable's name, or "" when the text does not start with one.
+
+    Both spellings the catalogue uses: `$NAME` and the shell default form `${NAME:-...}`.
+    """
+    found = re.match(r"^\$\{?([A-Za-z_][A-Za-z0-9_]*)", text)
+    return found.group(1) if found else ""
+
+
 def resolve_env_prefix(text, home, root):
     """Resolve a leading environment variable in a catalogue path.
 
@@ -8975,7 +8999,9 @@ def resolve_env_prefix(text, home, root):
     value = os.environ.get(name)
     if not value:
         return text, "unset"
-    return value.rstrip("/") + tail, "ok"
+    # Either separator: a Windows value can end in a backslash, and joining that to a tail
+    # that starts with one produces a path no glob matches.
+    return value.rstrip("/\\") + tail, "ok"
 
 
 def _expand_vscode_user(pattern: str, home: str, target_os: str) -> list[str]:
@@ -9125,27 +9151,46 @@ def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> l
     # for.
     if target_os == "windows":
         if text.startswith("$"):
-            return []  # a freedesktop variable, meaningless on Windows
-        for placeholder, relative in _WIN_PLACEHOLDERS.items():
-            if text.upper().startswith(placeholder):
-                tail = text[len(placeholder) :].lstrip("\\/")
-                text = "/".join(x for x in (home, relative, tail) if x)
-                break
+            if variable_name(text) in _POSIX_ONLY_VARIABLES:
+                # Another platform's spelling of the same artifact. The entry carries a
+                # Windows sibling and that one is being searched, so this is the
+                # cross-platform case above and not a refusal.
+                return []
+            # An agent's own relocation variable, which is the same variable here as it is
+            # on POSIX, so it is resolved the same way and has the same three outcomes. It
+            # used to be dropped with the freedesktop ones: a relocated tree was never
+            # searched on a Windows target and nothing said so.
+            resolved, outcome = resolve_env_prefix(text, home, root)
+            if outcome == "unset":
+                return []
+            if outcome != "ok":
+                return refuse_pattern(pattern, text, outcome)
+            text = resolved
         else:
-            upper = text.upper()
-            for placeholder, absolute in _WIN_SYSTEM_PLACEHOLDERS.items():
-                if upper.startswith(placeholder):
-                    text = absolute + text[len(placeholder) :]
+            for placeholder, relative in _WIN_PLACEHOLDERS.items():
+                if text.upper().startswith(placeholder):
+                    tail = text[len(placeholder) :].lstrip("\\/")
+                    text = "/".join(x for x in (home, relative, tail) if x)
                     break
-            if text.startswith("~"):
-                # ~ is the catalogue's ordinary spelling for the user profile and many
-                # entries give no other. Leaving it unexpanded here meant the pattern was
-                # globbed against the process working directory, so on Windows those
-                # artifacts were never found and the manifest reported a clean host.
-                text = home.rstrip("/") + text[1:]
+            else:
+                upper = text.upper()
+                for placeholder, absolute in _WIN_SYSTEM_PLACEHOLDERS.items():
+                    if upper.startswith(placeholder):
+                        text = absolute + text[len(placeholder) :]
+                        break
+                if text.startswith("~"):
+                    # ~ is the catalogue's ordinary spelling for the user profile and many
+                    # entries give no other. Leaving it unexpanded here meant the pattern
+                    # was globbed against the process working directory, so on Windows
+                    # those artifacts were never found and the manifest reported a clean
+                    # host.
+                    text = home.rstrip("/") + text[1:]
         text = text.replace("\\", "/")
     else:
-        if re.match(r"^%[A-Za-z_]+%|^[A-Za-z]:\\|^HKEY_", text):
+        # `[^%]+` rather than `[A-Za-z_]+`: %PROGRAMFILES(X86)% holds a parenthesis and a
+        # digit, so the narrower class did not recognise it as a Windows spelling and the
+        # pattern was refused as not absolute instead of skipped as another platform's.
+        if re.match(r"^%[^%]+%|^[A-Za-z]:\\|^HKEY_", text):
             return []  # a Windows spelling or a registry key, meaningless here
         if text.startswith("$"):
             resolved, outcome = resolve_env_prefix(text, home, root)

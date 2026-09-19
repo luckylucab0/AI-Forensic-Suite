@@ -9183,6 +9183,23 @@ $script:XdgDefaults = [ordered]@{
     'XDG_STATE_HOME'  = '.local/state'
 }
 
+# Variables the operating system owns rather than an agent. On a Windows target these are
+# another platform's spelling of the same artifact, the catalogue entry carries a Windows
+# sibling for it, and dropping them there is deliberate.
+#
+# An agent's own relocation variable is a different thing and was being treated the same
+# way. CLAUDE_CONFIG_DIR, HERMES_HOME, KIRO_HOME and nine more are the same variable on
+# every platform, and the Windows branch dropped every pattern rooted at one and recorded
+# no refusal: 43 catalogue paths, including a credential store and two session databases.
+# The default location was still searched through the entry's `~` sibling, so the failure
+# was narrow and completely silent.
+#
+# Kept in step with the same set in collect.py by the conformance suite.
+$script:PosixOnlyVariables = [System.Collections.Generic.HashSet[string]]::new(
+    [string[]]@('HOME', 'HISTFILE', 'ZDOTDIR', 'TMPDIR', 'XDG_RUNTIME_DIR',
+        'XDG_DATA_HOME', 'XDG_CONFIG_HOME', 'XDG_CACHE_HOME', 'XDG_STATE_HOME'),
+    [System.StringComparer]::Ordinal)
+
 # The user directory of VS Code and of the forks that inherit its storage layout. A dozen
 # agentic extensions keep their conversations under it, so <vscode-user> expands to all of
 # these rather than to a wildcard: a wildcard matches one directory level and finds
@@ -9225,6 +9242,21 @@ function Add-PatternRefusal {
     $record['pattern'] = $Pattern
     $record['reason'] = $Reason
     [void]$script:PatternRefusals.Add($record)
+}
+
+function Get-VariableName {
+    <#
+    .SYNOPSIS
+        The leading variable's name, or an empty string when the text does not start with one.
+    .DESCRIPTION
+        Mirrors collect.py's variable_name. Both spellings the catalogue uses: $NAME and the
+        shell default form ${NAME:-...}.
+    #>
+    param([string] $Text)
+
+    $found = [regex]::Match($Text, '^\$\{?([A-Za-z_][A-Za-z0-9_]*)')
+    if ($found.Success) { return $found.Groups[1].Value }
+    return ''
 }
 
 function Resolve-EnvPrefix {
@@ -9300,7 +9332,9 @@ function Resolve-EnvPrefix {
         $result['outcome'] = 'unset'
         return $result
     }
-    $result['text'] = $value.TrimEnd('/') + $tail
+    # Either separator: a Windows value can end in a backslash, and joining that to a tail
+    # that starts with one produces a path no glob matches.
+    $result['text'] = $value.TrimEnd('/', '\') + $tail
     $result['outcome'] = 'ok'
     return $result
 }
@@ -9417,40 +9451,63 @@ function Expand-CataloguePath {
     # not a refusal. What must never be quiet is a pattern that applies here and still
     # cannot be resolved, which is what the refusals at the end are for.
     if ($TargetOs -eq 'windows') {
-        if ($text.StartsWith('$')) { return $results }  # freedesktop variable
-        $upper = $text.ToUpperInvariant()
-        $matched = $false
-        foreach ($key in $script:WinPlaceholders.Keys) {
-            if ($upper.StartsWith($key)) {
-                $tail = $text.Substring(([string]$key).Length).TrimStart('\', '/')
-                $parts = [System.Collections.Generic.List[string]]::new()
-                foreach ($piece in @($ProfileHome, [string]$script:WinPlaceholders[$key], $tail)) {
-                    if ($piece) { $parts.Add($piece) }
-                }
-                $text = [string]::Join('/', $parts)
-                $matched = $true
-                break
+        if ($text.StartsWith('$')) {
+            if ($script:PosixOnlyVariables.Contains((Get-VariableName -Text $text))) {
+                # Another platform's spelling of the same artifact. The entry carries a
+                # Windows sibling and that one is being searched, so this is the
+                # cross-platform case above and not a refusal.
+                return $results
             }
-        }
-        if (-not $matched) {
-            foreach ($key in $script:WinSystemPlaceholders.Keys) {
+            # An agent's own relocation variable, which is the same variable here as it is
+            # on POSIX, so it is resolved the same way and has the same three outcomes. It
+            # used to be dropped with the freedesktop ones: a relocated tree was never
+            # searched on a Windows target and nothing said so.
+            $resolved = Resolve-EnvPrefix -Text $text -ProfileHome $ProfileHome -Root $Root
+            $outcome = [string]$resolved['outcome']
+            if ($outcome -ceq 'unset') { return $results }
+            if ($outcome -cne 'ok') {
+                Add-PatternRefusal -Pattern $Pattern -Expanded $text -Reason $outcome
+                return ,$results
+            }
+            $text = ([string]$resolved['text']).Replace('\', '/')
+        } else {
+            $upper = $text.ToUpperInvariant()
+            $matched = $false
+            foreach ($key in $script:WinPlaceholders.Keys) {
                 if ($upper.StartsWith($key)) {
-                    $text = [string]$script:WinSystemPlaceholders[$key] + $text.Substring(([string]$key).Length)
+                    $tail = $text.Substring(([string]$key).Length).TrimStart('\', '/')
+                    $parts = [System.Collections.Generic.List[string]]::new()
+                    foreach ($piece in @($ProfileHome, [string]$script:WinPlaceholders[$key], $tail)) {
+                        if ($piece) { $parts.Add($piece) }
+                    }
+                    $text = [string]::Join('/', $parts)
                     $matched = $true
                     break
                 }
             }
-            if (-not $matched -and $text.StartsWith('~')) {
-                # ~ is the catalogue's ordinary spelling for the user profile and many
-                # entries give no other. Leaving it unexpanded meant the pattern was
-                # searched relative to the working directory, so on Windows those
-                # artifacts were never found and the manifest reported a clean profile.
-                $text = $ProfileHome.TrimEnd('/') + $text.Substring(1)
+            if (-not $matched) {
+                foreach ($key in $script:WinSystemPlaceholders.Keys) {
+                    if ($upper.StartsWith($key)) {
+                        $text = [string]$script:WinSystemPlaceholders[$key] + $text.Substring(([string]$key).Length)
+                        $matched = $true
+                        break
+                    }
+                }
+                if (-not $matched -and $text.StartsWith('~')) {
+                    # ~ is the catalogue's ordinary spelling for the user profile and many
+                    # entries give no other. Leaving it unexpanded meant the pattern was
+                    # searched relative to the working directory, so on Windows those
+                    # artifacts were never found and the manifest reported a clean profile.
+                    $text = $ProfileHome.TrimEnd('/') + $text.Substring(1)
+                }
             }
         }
         $text = $text.Replace('\', '/')
     } else {
-        if ($text -match '^%[A-Za-z_]+%' -or $text -match '^[A-Za-z]:\\' -or $text.StartsWith('HKEY_')) {
+        # '[^%]+' rather than '[A-Za-z_]+': %PROGRAMFILES(X86)% holds a parenthesis and a
+        # digit, so the narrower class did not recognise it as a Windows spelling and the
+        # pattern was refused as not absolute instead of skipped as another platform's.
+        if ($text -match '^%[^%]+%' -or $text -match '^[A-Za-z]:\\' -or $text.StartsWith('HKEY_')) {
             return $results  # a Windows spelling or a registry key, meaningless here
         }
         if ($text.StartsWith('$')) {
@@ -10865,6 +10922,46 @@ function Invoke-SelfTest {
         $specificity[[string]$pattern] = $pair
     }
     $cases['pattern_specificity'] = $specificity
+
+    # The Windows target's own expansion. No differential reached this branch before: every
+    # conformance invocation of both collectors passes the linux target, and the only other
+    # exercise of the Windows one never touched a filesystem. So the branch that decides
+    # whether a relocated agent tree is searched, refused or silently dropped was checked by
+    # nothing, and it was dropping it.
+    #
+    # A root is passed, so no environment variable is read and the answer is the same on
+    # every machine: a mounted image is exactly the case where the endpoint's variables
+    # cannot be consulted, which is the outcome that has to be reported rather than
+    # swallowed. Kept in step with WINDOWS_PATTERNS in tests/conformance/selftest_cases.py.
+    $windows = [ordered]@{}
+    foreach ($pattern in @(
+        '$HERMES_HOME/state.db',
+        '$CLAUDE_CONFIG_DIR/.credentials.json',
+        '$XDG_DATA_HOME/zed/db/0-stable/db.sqlite',
+        '${XDG_STATE_HOME:-~/.local/state}/agent/x',
+        '~/.hermes/state.db',
+        '%APPDATA%\Block\goose\data\sessions\sessions.db',
+        '%LOCALAPPDATA%\amazon-q\data.sqlite3',
+        '%TEMP%\qlog\*.log',
+        '%SystemRoot%\Prefetch\*.pf'
+    )) {
+        $script:PatternRefusals.Clear()
+        $expanded = [System.Collections.Generic.List[string]]::new()
+        foreach ($one in (Expand-CataloguePath -Pattern $pattern `
+                -ProfileHome '/mnt/img/Users/alice' -TargetOs 'windows' -Root '/mnt/img')) {
+            $expanded.Add([string]$one)
+        }
+        $reasons = [System.Collections.Generic.List[string]]::new()
+        foreach ($record in $script:PatternRefusals) {
+            $reasons.Add([string]([System.Collections.IDictionary]$record)['reason'])
+        }
+        $entry = [ordered]@{}
+        $entry['patterns'] = $expanded
+        $entry['refusals'] = $reasons
+        $windows[[string]$pattern] = $entry
+    }
+    $script:PatternRefusals.Clear()
+    $cases['windows_expansion'] = $windows
 
     # Written to the console rather than to the output stream. A function that both emits
     # with Write-Output and returns a value returns all of it as one collection, and the

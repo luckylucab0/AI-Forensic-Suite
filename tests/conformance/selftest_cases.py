@@ -51,6 +51,56 @@ def _collect_py() -> object:
     return module
 
 
+# The Windows target's own expansion, which no differential reached until this case
+# existed: every conformance invocation of both collectors passes --os linux, and the only
+# other exercise of the Windows target never touched a filesystem. The patterns are the
+# shapes that decide whether a relocated agent tree is searched, refused or silently
+# dropped, one of each.
+#
+# A root is passed, so nothing here reads an environment variable and the answer is the same
+# on every machine: a mounted image is exactly the case where the endpoint's variables
+# cannot be consulted, which is the outcome that has to be reported rather than swallowed.
+WINDOWS_HOME = "/mnt/img/Users/alice"
+WINDOWS_ROOT = "/mnt/img"
+WINDOWS_PATTERNS = (
+    # An agent's own relocation variable. Unresolvable from an image, so a refusal.
+    "$HERMES_HOME/state.db",
+    "$CLAUDE_CONFIG_DIR/.credentials.json",
+    # A freedesktop variable: another platform's spelling, dropped without a refusal
+    # because the entry's Windows sibling is being searched.
+    "$XDG_DATA_HOME/zed/db/0-stable/db.sqlite",
+    "${XDG_STATE_HOME:-~/.local/state}/agent/x",
+    # The ordinary spellings, which have to keep working.
+    "~/.hermes/state.db",
+    "%APPDATA%\\Block\\goose\\data\\sessions\\sessions.db",
+    "%LOCALAPPDATA%\\amazon-q\\data.sqlite3",
+    "%TEMP%\\qlog\\*.log",
+    "%SystemRoot%\\Prefetch\\*.pf",
+)
+
+
+def _windows_expansion_case() -> dict[str, object]:
+    """What the Python collector expands each pattern to on a Windows target.
+
+    The PowerShell collector computes the same list with its own code and the two are
+    compared, so a branch that only one of them takes shows up here rather than in a bundle
+    taken from somebody's endpoint.
+    """
+    collect = _collect_py()
+    out: dict[str, object] = {}
+    for pattern in WINDOWS_PATTERNS:
+        collect.PATTERN_REFUSALS.clear()  # type: ignore[attr-defined]
+        expanded = collect.expand_paths(  # type: ignore[attr-defined]
+            pattern, WINDOWS_HOME, "windows", WINDOWS_ROOT
+        )
+        out[pattern] = {
+            "patterns": list(expanded),
+            "refusals": [record["reason"] for record in collect.PATTERN_REFUSALS],  # type: ignore[attr-defined]
+        }
+    collect.PATTERN_REFUSALS.clear()  # type: ignore[attr-defined]
+    return out
+
+
 def _specificity_case() -> dict[str, object]:
     """The Python collector's own answer for each pattern, which the PowerShell one must
     reproduce exactly.
@@ -81,6 +131,7 @@ CASES: dict[str, object] = {
     "bools": [True, False],
     "nulls_in_list": [None, "x", None],
     "pattern_specificity": _specificity_case(),
+    "windows_expansion": _windows_expansion_case(),
 }
 
 

@@ -713,3 +713,100 @@ def test_a_plugin_root_loses_to_a_working_copy_root() -> None:
     assert collect.pattern_specificity("<project>/.mcp.json") > collect.pattern_specificity(
         "<plugin-root>/.mcp.json"
     )
+
+
+# --------------------------------------- what the Windows target does with a variable
+
+
+def test_no_relocation_variable_is_dropped_without_a_word_on_a_windows_target(
+    catalogue: Catalogue,
+) -> None:
+    """The defect this test exists for was silent, narrow and in the worst place.
+
+    The Windows branch dropped every pattern beginning with a variable, under a comment
+    calling them freedesktop variables. Most are, and dropping those is right: the entry
+    carries a Windows sibling and it is being searched. But twelve of them are the agents'
+    own relocation variables, which are the same variable on Windows as on POSIX, and 43
+    catalogue paths were rooted at one, among them a credential store and two session
+    databases. The default location was still found through the entry's `~` sibling, so a
+    relocated tree was the only thing missing and nothing in the manifest said so.
+
+    Asserted over the catalogue rather than over examples, so a variable somebody adds
+    tomorrow is covered without anybody remembering this.
+    """
+    collect = _load_collector()
+    home, root = "/mnt/img/Users/alice", "/mnt/img"
+    silent: list[str] = []
+    for agent in catalogue:
+        for artifact in agent.artifacts:
+            if "windows" not in artifact.os:
+                continue
+            for path in artifact.paths:
+                if not path.startswith("$"):
+                    continue
+                if collect.variable_name(path) in collect._POSIX_ONLY_VARIABLES:
+                    continue
+                collect.PATTERN_REFUSALS.clear()
+                resolved = collect.expand_paths(path, home, "windows", root)
+                if not resolved and not collect.PATTERN_REFUSALS:
+                    silent.append(f"{artifact.id}: {path}")
+    collect.PATTERN_REFUSALS.clear()
+    assert not silent, (
+        "these patterns are rooted at an agent's own relocation variable and a Windows "
+        f"collection would search nothing for them and report nothing: {sorted(silent)}"
+    )
+
+
+def test_a_freedesktop_variable_on_a_windows_target_is_not_a_refusal() -> None:
+    """The other half of the same rule, and the reason it is a set and not a guess.
+
+    A pattern rooted at XDG_DATA_HOME is another platform's spelling of an artifact whose
+    entry carries a Windows sibling, so it does not apply here and reporting it would fill
+    the manifest's refusal list with the cross-platform case. That list is meant to be read.
+    """
+    collect = _load_collector()
+    collect.PATTERN_REFUSALS.clear()
+    resolved = collect.expand_paths(
+        "$XDG_DATA_HOME/zed/db/0-stable/db.sqlite", "/mnt/img/Users/alice", "windows", "/mnt/img"
+    )
+    assert resolved == []
+    assert not collect.PATTERN_REFUSALS
+    collect.PATTERN_REFUSALS.clear()
+
+
+def test_a_relocated_tree_is_found_on_a_live_windows_host(monkeypatch) -> None:
+    """With no image root there is an environment to read, and it is the endpoint's.
+
+    A trailing separator is part of the case: a Windows value can end in a backslash, and
+    joining that onto a tail that starts with one produced a path no glob would match.
+    """
+    collect = _load_collector()
+    monkeypatch.setenv("HERMES_HOME", "D:\\agents\\hermes\\")
+    collect.PATTERN_REFUSALS.clear()
+    resolved = collect.expand_paths("$HERMES_HOME/state.db", "C:/Users/alice", "windows", None)
+    assert resolved == ["D:/agents/hermes/state.db"]
+    assert not collect.PATTERN_REFUSALS
+
+    monkeypatch.delenv("HERMES_HOME")
+    resolved = collect.expand_paths("$HERMES_HOME/state.db", "C:/Users/alice", "windows", None)
+    assert resolved == [], "unset means the entry's default sibling covers it"
+    assert not collect.PATTERN_REFUSALS, "and unset is not a refusal"
+    collect.PATTERN_REFUSALS.clear()
+
+
+def test_a_percent_variable_with_a_digit_is_recognised_as_a_windows_spelling() -> None:
+    """Latent until a catalogue entry uses one, and wrong in the reportable direction.
+
+    The test for another platform's spelling was `^%[A-Za-z_]+%`, which does not match
+    %PROGRAMFILES(X86)%. On a POSIX target that pattern fell through to the end of the
+    function and was refused as not absolute, so the refusal list, which an analyst reads
+    as holes in the evidence, would have carried an entry that is not a hole at all.
+    """
+    collect = _load_collector()
+    collect.PATTERN_REFUSALS.clear()
+    assert (
+        collect.expand_paths("%PROGRAMFILES(X86)%\\Agent\\x.json", "/home/alice", "linux", None)
+        == []
+    )
+    assert not collect.PATTERN_REFUSALS
+    collect.PATTERN_REFUSALS.clear()
