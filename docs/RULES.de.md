@@ -28,6 +28,7 @@ Funde werden in die Falldatenbank geschrieben, neben die Ereignisse, auf denen s
 | [`exfil_indicators`](#exfil-indicators) | [AFX-EXFILINDICATORS-001](#afx-exfilindicators-001) | hoch |
 |  | [AFX-EXFILINDICATORS-002](#afx-exfilindicators-002) | mittel |
 |  | [AFX-EXFILINDICATORS-003](#afx-exfilindicators-003) | mittel |
+|  | [AFX-EXFILINDICATORS-004](#afx-exfilindicators-004) | hoch |
 | [`permission_bypass`](#permission-bypass) | [AFX-PERMISSIONBYPASS-001](#afx-permissionbypass-001) | hoch |
 |  | [AFX-PERMISSIONBYPASS-002](#afx-permissionbypass-002) | hoch |
 |  | [AFX-PERMISSIONBYPASS-003](#afx-permissionbypass-003) | mittel |
@@ -38,6 +39,7 @@ Funde werden in die Falldatenbank geschrieben, neben die Ereignisse, auf denen s
 | [`prompt_injection`](#prompt-injection) | [AFX-PROMPTINJECTION-001](#afx-promptinjection-001) | hoch |
 |  | [AFX-PROMPTINJECTION-002](#afx-promptinjection-002) | hoch |
 |  | [AFX-PROMPTINJECTION-003](#afx-promptinjection-003) | mittel |
+|  | [AFX-PROMPTINJECTION-004](#afx-promptinjection-004) | hoch |
 | [`secrets`](#secrets) | [AFX-SECRETS-001](#afx-secrets-001) | hoch |
 |  | [AFX-SECRETS-002](#afx-secrets-002) | kritisch |
 |  | [AFX-SECRETS-003](#afx-secrets-003) | hoch |
@@ -51,6 +53,7 @@ Funde werden in die Falldatenbank geschrieben, neben die Ereignisse, auf denen s
 |  | [AFX-SUPPLYCHAIN-002](#afx-supplychain-002) | hoch |
 |  | [AFX-SUPPLYCHAIN-003](#afx-supplychain-003) | hoch |
 | [`third_party_endpoints`](#third-party-endpoints) | [AFX-THIRDPARTYENDPOINTS-001](#afx-thirdpartyendpoints-001) | hoch |
+|  | [AFX-THIRDPARTYENDPOINTS-002](#afx-thirdpartyendpoints-002) | mittel |
 
 Regeln sind nach Paket aufgeführt, innerhalb eines Pakets nach Id.
 
@@ -166,7 +169,7 @@ Schritte, die den Nachweis verkürzen oder entfernen. Der ergiebigste Fund in di
 
 [EN] A shell command deletes or truncates a path that holds agent history or shell history: an agent's configuration directory, a transcript store, or one of the shell history files a command invocation would be recorded in.
 
-*Worauf sie trifft:* `event_text matches /(?:\brm\b(?:\s+-[a-zA-Z]+)*\s\|\bshred\b\|\bunlink\b\|\btruncate\b\|>\s*)/ and event_text matches /\.claude(?:\.json)?\b/ or /\.codex\b/ or /\.copilot\b/ or /\.gemini\b/ or /\.cursor\b/ or /(?:bash\|zsh)_history\b/ or /fish_history\b/ or /ConsoleHost_history\.txt/`
+*Worauf sie trifft:* `event_text matches /(?:\brm\b(?:\s+-[a-zA-Z]+)*\s\|\bshred\b\|\bunlink\b\|\btruncate\b\|>\s*)/ and event_text matches /\.claude(?:\.json)?\b/ or /\.agents\b/ or /\.aider[a-z.]*\b/ or /\.amp\b/ or /\.cline(?:rules)?\b/ or /\.codeium\b/ or /\.codex\b/ or /\.continue\b/ or /\.copilot\b/ or /\.cursor(?:-server)?\b/ or /\.devin\b/ or /\.factory\b/ or /\.gemini\b/ or /\.hermes\b/ or /\.junie\b/ or /\.kilocode\b/ or /\.kiro\b/ or /\.lmstudio\b/ or /\.ollama\b/ or /\.pi\b/ or /\.qwen\b/ or /\.roo\b/ or /\.windsurf(?:-next\|-server)?\b/ or /(?:bash\|zsh)_history\b/ or /fish_history\b/ or /ConsoleHost_history\.txt/`
 
 *Warum das für die Analyse zählt:* [EN] Unlike a purge command this leaves nothing behind that names itself, so the deletion has to be read out of the command that did it. It is also the version that reaches the artifacts an agent's own purge does not touch. A shell history removed in the same session as agent work is the specific pattern worth escalating: it removes the record of how the agent was invoked, which is where the flags that answer the bypass question live.
 
@@ -176,7 +179,7 @@ Schritte, die den Nachweis verkürzen oder entfernen. Der ergiebigste Fund in di
 - [EN] An installer or an uninstaller doing what it is for.
 - [EN] A redirection into an unrelated file whose path merely mentions one of these directories, since the two halves of this rule are matched over the whole record rather than against each other.
 
-*Stichproben in der Regeldatei:* 3 / 2 (+/-)
+*Stichproben in der Regeldatei:* 4 / 2 (+/-)
 
 ## dangerous commands
 
@@ -401,6 +404,33 @@ Daten, die das Gerät verlassen. Diese Regeln melden die Form einer Übertragung
 - [EN] A setup script that configures a remote and pushes an initial commit, which is exactly this shape and entirely routine.
 
 *Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-EXFILINDICATORS-004
+
+**A command uploaded a local file to a remote destination**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `exfil_indicators` |
+| Agenten | `any` |
+| Ereignisarten | `command.exec`, `tool.call` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1567`, `T1048`, `exfiltration` |
+
+[EN] A command line sends a file off the machine by name: curl with an upload flag or a file form field, scp or rsync to a host, a cloud storage copy to a bucket, or a sync tool copying to a configured remote.
+
+*Worauf sie trifft:* `(event_text matches /(?i)\bcurl\b[^\n]*(?:\s-T\s\|\s--upload-file\s\|\s-F\s+[^\n]*@)/ or event_text matches /(?i)\bwget\b[^\n]*\s--post-file[=\s]/ or event_text matches /(?i)\bscp\b[^\n]*\s[A-Za-z0-9._-]+@[A-Za-z0-9._-]+:/ or event_text matches /(?i)\brsync\b[^\n]*\s[A-Za-z0-9._-]+@[A-Za-z0-9._-]+:/ or event_text matches /(?i)\baws\s+s3\s+(?:cp\|sync\|mv)\b[^\n]*\ss3:/// or event_text matches /(?i)\bgsutil\s+(?:cp\|rsync)\b[^\n]*\sgs:/// or event_text matches /(?i)\baz\s+storage\s+blob\s+upload\b/ or event_text matches /(?i)\brclone\s+(?:copy\|sync\|move\|copyto)\b/)`
+
+*Warum das für die Analyse zählt:* [EN] The other rules in this pack are about the shapes that hide an upload: a paste site, an encoding step, a git remote added moments earlier. This one is the plain case, and it was missing. It is also the one an agent produces most readily, because uploading a file is a reasonable thing to ask for and the command for it is one line. What makes it a finding rather than a note is that the file is named on the line. An analyst reading it knows which data left, which is the question this whole pack exists for, and can say so without reconstructing anything.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A deployment, a backup or a release step, which is what most of these commands are for. The finding says a file left the device, not that it should not have.
+- [EN] A command the agent wrote into a script rather than ran. A line in a file the agent was editing reaches this rule through the record that quotes it, and the kind of that record is what tells the two apart.
+- [EN] A sync tool's remote that is another directory on the same machine, which is a configured destination this rule cannot resolve from the command line alone.
+
+*Stichproben in der Regeldatei:* 3 / 2 (+/-)
 
 ## permission bypass
 
@@ -710,6 +740,36 @@ Ob der Agent durch Anweisungen manipuliert wurde, die er gelesen hat, statt durc
 - [EN] A project whose instruction file has been in version control for months, where the finding says only that it was in effect.
 
 *Stichproben in der Regeldatei:* 4 / 3 (+/-)
+
+#### AFX-PROMPTINJECTION-004
+
+**An instruction that overrides the agent's behaviour is stored in its memory**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `prompt_injection` |
+| Agenten | `any` |
+| Ereignisarten | `memory.write` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `prompt-injection`, `T1204`, `persistence` |
+
+[EN] A memory the agent wrote for itself carries the language of an instruction rather than of a note: ignore the previous instructions, from now on you, do not tell the user, act without asking.
+
+*Worauf sie trifft:* `(event_text matches /(?i)ignore\s+(?:all\s+)?(?:the\s+)?(?:previous\|prior\|above\|earlier)\s+(?:instructions?\|prompts?\|rules?\|context)/ or event_text matches /(?i)disregard\s+(?:all\s+)?(?:previous\|prior\|the\s+above\|your)\s+(?:instructions?\|rules?\|system\s+prompt)/ or event_text matches /(?i)\b(?:you\s+are\s+now\|from\s+now\s+on\s+you\|new\s+instructions?\s*:\|system\s+override)\b/ or event_text matches /(?i)\bdo\s+not\s+(?:tell\|mention\|inform\|ask)\s+the\s+user\b/ or event_text matches /(?i)\b(?:always\|never)\b[^\n]{0,60}\bwithout\s+(?:asking\|confirmation\|approval\|permission)\b/ or event_text matches /(?i)\b(?:skip\|bypass\|suppress)\b[^\n]{0,40}\b(?:confirmation\|approval\|permission\|prompt)s?\b/)`
+
+*Warum das für die Analyse zählt:* [EN] A memory is the one piece of agent-written text with no retention policy against it. Every transcript store in this catalogue is swept, rotated or deleted by something and none of the memory directories is, and the content is written back into the context of later sessions. So an instruction that reaches the agent once and is remembered reaches it again in every session afterwards, with no file in the repository and no line in a settings file to show for it, and the conversation that planted it may be long gone. That is what makes this worth its own rule rather than a note on the injection rule beside it. That one catches the instruction arriving, in a tool result or a fetched page, and it can only catch it while the transcript that carried it still exists. This one catches what the instruction became.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A memory the user asked for in as many words. "Always run the tests without asking" is a preference somebody may well have stated, and the finding is the place to check whether they did: the conversation that wrote the memory is the evidence, where it still exists.
+- [EN] A note about prompt injection written while working on the problem, which quotes this language for the same reason the rule matches it.
+
+*Quellen:*
+
+- <https://owasp.org/www-project-top-10-for-large-language-model-applications/>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
 
 ## secrets
 
@@ -1102,3 +1162,34 @@ Wohin die Konversation tatsächlich ging. Eine Endpunkt-Umleitung ändert die An
 - <https://code.claude.com/docs/en/llm-gateway>
 
 *Stichproben in der Regeldatei:* 3 / 2 (+/-)
+
+#### AFX-THIRDPARTYENDPOINTS-002
+
+**A tool server the agent used runs somewhere else**
+
+| | |
+| --- | --- |
+| Schweregrad | mittel |
+| Paket | `third_party_endpoints` |
+| Agenten | `any` |
+| Ereignisarten | `config.snapshot`, `mcp.call` |
+| Gelesene Felder | `event_text`, `raw.mcpServers[].url` |
+| Schlagworte | `T1071`, `third-party-endpoint`, `mcp` |
+
+[EN] An MCP server is configured with a remote transport: an entry carrying a url together with a type of http, streamable-http, sse or ws, rather than a command the agent starts on the endpoint.
+
+*Worauf sie trifft:* `(event_text matches /(?i)"?(?:type\|transport)"?[^\S\n]*[:=][^\S\n]*"?(?:streamable[-_]?http\|http\|sse\|ws)"?/ and event_text matches /(?i)"?(?:url\|serverUrl\|httpUrl\|endpoint)"?[^\S\n]*[:=][^\S\n]*"?(?:https?\|wss?):/// or raw.mcpServers[].url matches /(?i)^(?:https?\|wss?):///)`
+
+*Warum das für die Analyse zählt:* [EN] This is the other half of the question the rule before it answers. That one says where the conversation went; this one says where the agent's tools ran. Every call to a remote server, and every argument of every call, left the device: a file path, a file's contents where the tool takes them, a query, a token. The transcript records that a tool was called and not that the call went off the machine, so the configuration is the only place that fact exists. It stays at medium because a remote server is an ordinary, documented way to use this protocol, and most of them are services somebody chose deliberately. What the finding buys is the list: an analyst answering "which data left the device" needs the servers as much as the model endpoint, and a project-scoped configuration file is checked into a repository, so anyone who can commit to it can add one.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A service the organization chose and approved. The finding says a tool server was off the device, not that it should not have been.
+- [EN] A server on the loopback address or on the local network, which matches because the entry is an http transport. The host in the finding is what tells those apart, and a server on localhost is still a second process the transcript does not describe.
+- [EN] An entry that was configured and never connected. The vendor documents that a project scoped server waits for approval and that an entry with a url but no type is skipped, so a configuration is evidence of intent and the transcript is evidence of use.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/mcp>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)

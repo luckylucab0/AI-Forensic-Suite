@@ -19,12 +19,36 @@ match:
     - field: event_text
       regex: '(?:\brm\b(?:\s+-[a-zA-Z]+)*\s|\bshred\b|\bunlink\b|\btruncate\b|>\s*)'
     - field: event_text
+      # The agent home directories the catalogue knows, rather than the four this rule
+      # started with. The list is derived from the catalogue's own paths: every directory
+      # an agent keeps its state in is a directory whose removal destroys a conversation
+      # record, and a rule that knew four of them said nothing about the rest.
       regex_any:
         - '\.claude(?:\.json)?\b'
+        - '\.agents\b'
+        - '\.aider[a-z.]*\b'
+        - '\.amp\b'
+        - '\.cline(?:rules)?\b'
+        # The directory one vendor's own troubleshooting page tells a stuck user to delete,
+        # which is where that product keeps every conversation it has had.
+        - '\.codeium\b'
         - '\.codex\b'
+        - '\.continue\b'
         - '\.copilot\b'
+        - '\.cursor(?:-server)?\b'
+        - '\.devin\b'
+        - '\.factory\b'
         - '\.gemini\b'
-        - '\.cursor\b'
+        - '\.hermes\b'
+        - '\.junie\b'
+        - '\.kilocode\b'
+        - '\.kiro\b'
+        - '\.lmstudio\b'
+        - '\.ollama\b'
+        - '\.pi\b'
+        - '\.qwen\b'
+        - '\.roo\b'
+        - '\.windsurf(?:-next|-server)?\b'
         - '(?:bash|zsh)_history\b'
         - 'fish_history\b'
         - 'ConsoleHost_history\.txt'
@@ -43,6 +67,13 @@ false_positives:
     directories, since the two halves of this rule are matched over the whole record
     rather than against each other.
 tests:
+  - name: the directory one vendor's own troubleshooting advice tells a user to delete
+    match: true
+    event:
+      kind: command.exec
+      agent: crosscutting
+      payload:
+        commands: [{command: "rm -rf ~/.codeium/windsurf/cascade"}]
   - name: a shell history removed
     match: true
     event:

@@ -1,0 +1,95 @@
+id: AFX-THIRDPARTYENDPOINTS-002
+pack: third_party_endpoints
+title: A tool server the agent used runs somewhere else
+severity: medium
+description: >
+  An MCP server is configured with a remote transport: an entry carrying a url together
+  with a type of http, streamable-http, sse or ws, rather than a command the agent starts
+  on the endpoint.
+rationale: >
+  This is the other half of the question the rule before it answers. That one says where
+  the conversation went; this one says where the agent's tools ran. Every call to a remote
+  server, and every argument of every call, left the device: a file path, a file's contents
+  where the tool takes them, a query, a token. The transcript records that a tool was
+  called and not that the call went off the machine, so the configuration is the only place
+  that fact exists.
+
+  It stays at medium because a remote server is an ordinary, documented way to use this
+  protocol, and most of them are services somebody chose deliberately. What the finding
+  buys is the list: an analyst answering "which data left the device" needs the servers as
+  much as the model endpoint, and a project-scoped configuration file is checked into a
+  repository, so anyone who can commit to it can add one.
+applies_to:
+  kinds: [config.snapshot, mcp.call]
+match:
+  any:
+    # The shapes the vendor documents for a remote entry. The type is what decides it: the
+    # same page states that an entry with a url and no type is a configuration error the
+    # product skips, so a url alone is not evidence that anything ran.
+    - all:
+        - field: event_text
+          regex: '(?i)"?(?:type|transport)"?[^\S\n]*[:=][^\S\n]*"?(?:streamable[-_]?http|http|sse|ws)"?'
+        - field: event_text
+          regex: '(?i)"?(?:url|serverUrl|httpUrl|endpoint)"?[^\S\n]*[:=][^\S\n]*"?(?:https?|wss?)://'
+    - field: raw.mcpServers[].url
+      regex: '(?i)^(?:https?|wss?)://'
+tags:
+  - T1071
+  - third-party-endpoint
+  - mcp
+false_positives:
+  - >-
+    A service the organization chose and approved. The finding says a tool server was off
+    the device, not that it should not have been.
+  - >-
+    A server on the loopback address or on the local network, which matches because the
+    entry is an http transport. The host in the finding is what tells those apart, and a
+    server on localhost is still a second process the transcript does not describe.
+  - >-
+    An entry that was configured and never connected. The vendor documents that a project
+    scoped server waits for approval and that an entry with a url but no type is skipped,
+    so a configuration is evidence of intent and the transcript is evidence of use.
+references:
+  - https://code.claude.com/docs/en/mcp
+tests:
+  - name: a remote server in a project configuration
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        mcpServers:
+          notes:
+            type: http
+            url: https://mcp.example.org/mcp
+  - name: the transport the specification calls streamable http
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        mcpServers:
+          notes:
+            type: streamable-http
+            url: https://mcp.example.org/mcp
+  - name: a server the agent starts on the endpoint
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      # A stdio server is a local process. It is a supply chain question, which the pack
+      # for that answers, and not an egress one.
+      raw:
+        mcpServers:
+          notes:
+            command: npx
+            args: ["-y", "@example/mcp-notes"]
+  - name: a documentation link in a settings file
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      # A url with no transport beside it is not a server entry, and the vendor states
+      # that such an entry is skipped rather than connected.
+      raw:
+        docs: https://example.org/how-to-configure

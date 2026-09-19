@@ -45,6 +45,7 @@ EXPECTED = {
     "AFX-ANTIFORENSICS-002": "~/.zsh_history holds the export that stops the prompt history "
     "being written",
     "AFX-DANGEROUSCOMMANDS-002": "a transcript holds a command that pipes a download into a shell",
+    "AFX-EXFILINDICATORS-004": "~/.zsh_history holds a command that uploaded a named file",
     "AFX-PERMISSIONBYPASS-001": "~/.zsh_history holds the start line that skips the prompts",
     "AFX-PERMISSIONBYPASS-002": "a transcript holds a mid-session switch to an approval mode "
     "that stops asking",
@@ -56,12 +57,16 @@ EXPECTED = {
     "AFX-PERMISSIONBYPASS-007": "~/.codex/config.toml disables the sandbox entirely",
     "AFX-PROMPTINJECTION-002": "a rules file carries invisible characters",
     "AFX-PROMPTINJECTION-003": "a project instruction file arrived with the work",
+    "AFX-PROMPTINJECTION-004": "a memory holds a standing permission the user is never asked "
+    "for again",
     "AFX-SECRETS-001": "a transcript holds a cloud provider access key",
     "AFX-SECRETS-006": "~/.zsh_history holds a command that carried an API key as a flag",
     "AFX-SUPPLYCHAIN-001": "~/src/app/.mcp.json starts a server through uvx",
     "AFX-SUPPLYCHAIN-002": "~/.claude/settings.json configures a PreToolUse hook",
     "AFX-SUPPLYCHAIN-003": "a hook script on the endpoint fetches code and runs it",
     "AFX-THIRDPARTYENDPOINTS-001": "~/.claude/settings.json points the model endpoint at a gateway",
+    "AFX-THIRDPARTYENDPOINTS-002": "~/src/app/.mcp.json also configures a server that runs "
+    "somewhere else",
 }
 
 
