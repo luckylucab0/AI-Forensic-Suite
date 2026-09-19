@@ -268,7 +268,7 @@ artifacts:
     Pre-edit copies of every file Claude changed, taken before each prompt that starts a turn - i.e. the ORIGINAL content of files the agent modified or destroyed, which may not exist anywhere else if the change was never committed. Highest-value artifact for 'what did this agent overwrite'. Because each file's FIRST snapshot is deliberately never deleted, a baseline copy often survives long after the rest of the session's snapshots are pruned. Note the persistence asymmetry an analyst can exploit: checkpoints are saved with the conversation so /rewind survives a resume, but if the snapshots have been swept the restore fails with 'No files were restored'.
 
     Record structure: Internal layout and file naming are NOT documented publicly - needs verification on a test system. The transcript contains matching `type: "file-history-snapshot"` lines (described in a third-party parser as 'internal file backup metadata'), which is the documented-adjacent route to map a snapshot to a checkpoint and a timestamp.
-  parser: null
+  parser: file_snapshot
 - id: claude_code.feedback_drafts
   category: log
   root: user_profile
@@ -495,7 +495,7 @@ artifacts:
     Recovers the actual text behind '[Pasted text #1]' placeholders - frequently credentials, config blobs, log extracts or third-party source the user pasted in rather than committed. Deleting it loses pasted text in recalled prompts.
 
     Record structure: Holds the contents of large pastes. File naming not documented - needs verification. The transcript and prompt history refer to pastes by an `[Pasted text #N]` placeholder; user transcript entries carry `imagePasteIds` for image blocks, where the N in the placeholder is a paste COUNTER, not a position - it resets when the CLI restarts inside a long-lived session and increments on delete-and-repaste, so the same N can name different content within one file. Do not assume N is a stable key.
-  parser: null
+  parser: prose_document
 - id: claude_code.plugin_cache
   category: cache
   root: user_profile

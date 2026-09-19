@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 32 Module lesen 353 der 473
+  zählt diese Dateien und sagt, welche es sind. 33 Module lesen 357 der 473
   Katalogartefakte; der Rest sind die Anmeldedatenspeicher, die absichtlich niemand liest,
   die Installationsspuren, die das Dateisystem-Ereignis beantwortet, und die Binärspeicher,
   die noch eigene Formate brauchen.
@@ -162,9 +162,18 @@ ist, dass das nicht *unbemerkt* geht.
     die damals passiert ist. Die Lesung stoppt nach einer festen Zeilenzahl und sagt das in
     einem eigenen Ereignis.
   - **Prosa.** Ein Chat-Export, eine ausgelagerte Werkzeugausgabe, die Ausgabe eines
-    Hintergrund-Subagenten, ein geschriebener Plan: am Stück gelesen, ein Ereignis pro
-    Datei, denn ein halber Prompt liest sich in einem Bericht wie das, was jemand gefragt
-    hat.
+    Hintergrund-Subagenten, ein geschriebener Plan und der Text hinter einem Platzhalter
+    für eingefügten Inhalt: am Stück gelesen, ein Ereignis pro Datei, denn ein halber
+    Prompt liest sich in einem Bericht wie das, was jemand gefragt hat.
+  - **Datei-Momentaufnahmen.** Die Kopie, die drei Agenten von einer Datei anlegen, bevor
+    sie sie ändern, und damit bei einer nie eingecheckten Änderung der einzige Ort, an dem
+    der ursprüngliche Text noch steht. Gelesen wird der Inhalt, denn danach muss eine Regel
+    über ein Credential oder eine eingeschleuste Anweisung suchen, und ausgesprochen wird,
+    dass eine Momentaufnahme meist nicht sagt, von welcher Datei sie stammt: ein Produkt
+    benennt seine Sicherungen nach einem Einweg-Digest des ursprünglichen Pfades, ein
+    zweites dokumentiert das Verzeichnis und nicht die Benennung darin, ein drittes hält
+    beide Seiten einer Änderung, ohne zu sagen, welche welche ist. Was der Pfad aussagt,
+    wird gelesen; was er nicht aussagt, wird gesagt statt erschlossen.
   - **Shell-History.** Vier Shells und die Recall-Datei des Agenten selbst, jede so gelesen,
     wie ihr eigener Schreiber sie schreibt. Hier steht die Startzeile eines Agenten, also
     die erste Frage des Briefings über einen Agenten, und sie steht fast nie im Agenten.

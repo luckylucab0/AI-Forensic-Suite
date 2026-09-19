@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  Thirty-two modules read 353 of the catalogue's 473 artifacts; the rest are the credential
+  Thirty-three modules read 357 of the catalogue's 473 artifacts; the rest are the credential
   stores nothing reads on purpose, the install evidence the filesystem event answers, and
   the binary stores that still need their own formats.
 
@@ -149,8 +149,16 @@ it cannot be rewritten *quietly*.
     timestamp, because a line that mentions a date is not a line that happened then. The
     reading stops after a set number of lines and says so in an event of its own.
   - **Prose.** A chat export, a spilled tool result, a background subagent's output, a
-    written plan: read whole, one event per file, because half a prompt reads in a report as
-    what somebody asked.
+    written plan, and the text behind a pasted-content placeholder: read whole, one event
+    per file, because half a prompt reads in a report as what somebody asked.
+  - **File snapshots.** The copy three agents keep of a file before they change it, which
+    for a change that was never committed is the only place the original text exists. Read
+    for its content, because that is what a rule about a credential or an injected
+    instruction has to search, and explicit about the fact that a snapshot usually does not
+    name the file it came from: one product's backups are named by a one-way digest of the
+    original path, another documents the directory and not the naming inside it, and a
+    third keeps both sides of an edit with nothing to say which is which. What the path
+    states is read; what it does not state is said rather than inferred.
   - **Shell history.** Four shells and the agent's own recall file, each read the way its
     own writer writes it. This is where an agent's start line is, which is the brief's first
     question about an agent and is almost never inside the agent.

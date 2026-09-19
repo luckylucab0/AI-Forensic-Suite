@@ -947,7 +947,7 @@ Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein
 
 [EN] A variable or key whose name says it holds a credential, assigned a value of plausible length, appears in this record. This is the shape that catches the credentials no vendor prefix identifies: a database password, an internal service token, a signing key.
 
-*Worauf sie trifft:* `event_text matches /(?i)\b(?:api[_-]?key\|secret\|passwd\|password\|client[_-]?secret\|access[_-]?token\|auth[_-]?token\|private[_-]?key)\b[^\S\n]*[:=][^\S\n]*["']?[A-Za-z0-9_\-/+.]{8,}/`
+*Worauf sie trifft:* `event_text matches /(?i)(?<![A-Za-z0-9])(?:api[_-]?key\|secret\|passwd\|password\|client[_-]?secret\|access[_-]?token\|auth[_-]?token\|private[_-]?key)(?:_[A-Za-z0-9]+)*[^\S\n]*[:=][^\S\n]*["']?[A-Za-z0-9_\-/+.]{8,}/`
 
 Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein Zugangsdatum, und ein Fund wird exportiert und in Berichte kopiert, deshalb bleibt der Wert in dem Ereignis, aus dem er kommt.
 
@@ -958,8 +958,9 @@ Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein
 - [EN] A placeholder, which this rule cannot tell from a value. Both password=changeme and password=REDACTED match, and both are common in documentation and in templates.
 - [EN] A configuration file the agent read that holds an environment variable name rather than a value, such as password=$DB_PASSWORD.
 - [EN] A key name in a schema or a type definition, where the value is a type rather than a secret.
+- [EN] A setting whose name merely contains one of these words, such as SECRET_MANAGER_ENDPOINT or PASSWORD_MIN_LENGTH, since the name is matched with its surrounding words rather than on its own. The length floor keeps the numeric ones out and not the rest, which is part of why this rule is medium.
 
-*Stichproben in der Regeldatei:* 2 / 2 (+/-)
+*Stichproben in der Regeldatei:* 4 / 2 (+/-)
 
 #### AFX-SECRETS-006
 
@@ -1008,7 +1009,7 @@ Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein
 
 [EN] An HTTP authorization header with a value appears in this record: a bearer token, a basic-auth blob, or an API key header. The header names itself, so unlike a bare string this is a credential in a request rather than a string that looks like one.
 
-*Worauf sie trifft:* `event_text matches /(?i)\bauthorization[^\S\n]*[:=][^\S\n]*["']?(?:bearer\|token\|basic\|apikey)[^\S\n]+[A-Za-z0-9_\-./+=]{12,}/ or /(?i)\b(?:x-api-key\|x-auth-token\|api-key\|proxy-authorization)[^\S\n]*[:=][^\S\n]*["']?[A-Za-z0-9_\-./+=]{12,}/`
+*Worauf sie trifft:* `event_text matches /(?i)\bauthorization["']?[^\S\n]*[:=][^\S\n]*["']?(?:bearer\|token\|basic\|apikey)[^\S\n]+[A-Za-z0-9_\-./+=]{12,}/ or /(?i)\b(?:x-api-key\|x-auth-token\|api-key\|proxy-authorization)["']?[^\S\n]*[:=][^\S\n]*["']?[A-Za-z0-9_\-./+=]{12,}/`
 
 Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein Zugangsdatum, und ein Fund wird exportiert und in Berichte kopiert, deshalb bleibt der Wert in dem Ereignis, aus dem er kommt.
 
@@ -1024,7 +1025,7 @@ Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein
 
 - <https://datatracker.ietf.org/doc/html/rfc9110#name-authorization>
 
-*Stichproben in der Regeldatei:* 3 / 2 (+/-)
+*Stichproben in der Regeldatei:* 4 / 2 (+/-)
 
 ## sensitive paths
 

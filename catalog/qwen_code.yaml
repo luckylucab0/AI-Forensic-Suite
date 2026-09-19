@@ -631,7 +631,7 @@ artifacts:
     THIS is what expires. A background housekeeping pass, running at most once per day, deletes every <session-id> directory whose mtime is older than general.cleanupPeriodDays (default 30 days), excluding the currently active session. Also unlinked outright when its session is deleted.
   notes: |-
     Verbatim copies of each file as it was BEFORE the agent edited it, so this is the only place the pre-modification content of a file the agent overwrote can be recovered. The filename is the first 16 hex characters of sha256(absolute file path) followed by '@v<version>', which means the backups themselves do NOT name the file they came from: the mapping lives in the system/file_history_snapshot records inside the session transcript, which are not expired. An analyst who collects the transcripts but not this directory keeps the index and loses the content; one who collects this directory without the transcripts keeps content that cannot be attributed to a path. Collect both. On a 30-day-old case expect these to be gone while the transcripts remain.
-  parser: null
+  parser: file_snapshot
 - id: qwen_code.subagent_transcripts
   title: Background subagent transcripts
   category: transcript

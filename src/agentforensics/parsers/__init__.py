@@ -32,6 +32,7 @@ from agentforensics.parsers.codex import CodexParser
 from agentforensics.parsers.codex_state import CodexStateParser
 from agentforensics.parsers.continue_sessions import ContinueSessionsParser
 from agentforensics.parsers.copilot import CopilotParser
+from agentforensics.parsers.file_snapshot import FileSnapshotParser
 from agentforensics.parsers.gemini import GeminiParser
 from agentforensics.parsers.git_checkpoints import GitCheckpointsParser
 from agentforensics.parsers.hermes import HermesParser
@@ -76,6 +77,12 @@ PARSERS: tuple[Parser, ...] = (
     # timestamp anywhere in it: the only clock is the index beside it.
     ContinueSessionsParser(),
     CopilotParser(),
+    # The copy an agent kept of a file before it changed it, which for a change that was
+    # never committed is the only place the original text exists. Read for its content,
+    # because that is what a rule about a credential or an injected instruction has to
+    # search, and honest about the fact that a snapshot usually does not name the file it
+    # came from.
+    FileSnapshotParser(),
     GeminiParser(),
     # The checkpoint references two agents write into a repository, which are the only
     # record on an endpoint that dates an agent's edits and survive the conversation.

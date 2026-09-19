@@ -17,6 +17,13 @@ nothing read it, so every rule about a start line, an exported variable or a cre
 a command line had nothing to match in a collection while passing its own samples. The
 parser for those four files closed it, and the three rules are held here.
 
+Two more came from the copies an agent keeps of the files it changes. The credential in a
+pre-edit copy of a settings file is written the way a settings file writes one, behind a
+quote, and the rule expected a colon to follow the header name directly; the password in a
+pasted configuration blob is named DATABASE_PASSWORD, and an underscore is a word character,
+so the rule's leading word boundary put none between the prefix and the name. Both rules
+passed their own samples throughout, because a sample is written by whoever wrote the rule.
+
 So this is a floor under the packs: the fixture holds the evidence each of these rules is
 about, and the rule has to find it. It is not a test of how many findings the fixture
 produces, because that number changes whenever the fixture grows.
@@ -62,9 +69,12 @@ EXPECTED = {
     "AFX-PROMPTINJECTION-004": "a memory holds a standing permission the user is never asked "
     "for again",
     "AFX-SECRETS-001": "a transcript holds a cloud provider access key",
+    "AFX-SECRETS-005": "~/.claude/paste-cache holds the configuration somebody pasted "
+    "instead of committing, with a password named the way a configuration file names one",
     "AFX-SECRETS-006": "~/.zsh_history holds a command that carried an API key as a flag",
     "AFX-SECRETS-007": "a wrapper function in the captured shell environment adds an "
-    "authorization header the transcript never shows",
+    "authorization header the transcript never shows, and the pre-edit copy of a settings "
+    "file holds the same header as JSON",
     "AFX-SUPPLYCHAIN-001": "~/src/app/.mcp.json starts a server through uvx",
     "AFX-SUPPLYCHAIN-002": "~/.claude/settings.json configures a PreToolUse hook",
     "AFX-SUPPLYCHAIN-003": "a hook script on the endpoint fetches code and runs it",

@@ -183,7 +183,7 @@ artifacts:
     One of the most valuable artifacts in this whole family: it holds the pre-edit and proposed-edit file contents used by the apply flow. That can recover the ORIGINAL text of a file the agent overwrote, and the exact text of a change that was never committed - neither of which exists in git or in the transcript.
 
     Record structure: paths.ts getDiffsDirectoryPath() returns the '.diffs' directory under the Continue global dir.
-  parser: null
+  parser: file_snapshot
 - id: continue.dev_data
   category: log
   root: user_profile

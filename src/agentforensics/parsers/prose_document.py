@@ -37,6 +37,15 @@ from agentforensics.parsers.instructions import BINARY_FILE, MAX_TEXT
 # catalogue, so a prose transcript added there fails CI until it is listed here.
 SOURCES = {
     "amazonq.ide_chat_export": "unparsed.record",
+    # The text behind a [Pasted text #N] placeholder. The transcript and the prompt history
+    # carry the placeholder and not the text, and the vendor's own changelog notes that a
+    # recalled paste can have aged out of here while the prompt that refers to it is still
+    # in the transcript. So this is the only place what the user actually handed the agent
+    # exists, and its entry says the commonest thing to find is a credential, a
+    # configuration blob or third-party source somebody pasted rather than committed.
+    # Filed as a prompt because that is what it is: text the user put in front of the
+    # model. Which prompt is not knowable from this file, and the event says so.
+    "claude_code.paste_cache": "user.prompt",
     "claude_code.tool_result_spills": "unparsed.record",
     "cursor.subagent_output": "unparsed.record",
     "jetbrains_ai.aia_task_history": "unparsed.record",
@@ -51,6 +60,14 @@ UNINTERPRETED = (
     "this is a conversation in prose that no parser has mapped, so the record "
     f"{UNINTERPRETED_MARK}. The whole file is in raw. Re-read it once a parser for this "
     "product's export exists."
+)
+
+PASTED = (
+    "this is the text behind a [Pasted text #N] placeholder in a prompt. Which prompt is "
+    "not knowable from this file: the transcript refers to a paste by a number and this "
+    "store is swept on its own schedule, so a paste can outlive its conversation or be "
+    "gone while the prompt that used it is still there. It is filed as a prompt because "
+    "that is what the user put in front of the model, and not as a prompt at a time"
 )
 
 TRUNCATED = (
@@ -113,6 +130,8 @@ class ProseDocumentParser:
         kind = SOURCES[str(context.artifact_id)]
         if kind == "unparsed.record":
             problems.append(UNINTERPRETED)
+        elif kind == "user.prompt":
+            problems.append(PASTED)
         yield Event(
             kind=kind,
             provenance=context.provenance("file"),
@@ -136,4 +155,4 @@ class ProseDocumentParser:
         )
 
 
-__all__ = ["SOURCES", "TRUNCATED", "UNINTERPRETED", "ProseDocumentParser"]
+__all__ = ["PASTED", "SOURCES", "TRUNCATED", "UNINTERPRETED", "ProseDocumentParser"]

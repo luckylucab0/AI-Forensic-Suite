@@ -1648,6 +1648,24 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     write(claude / "plans" / "plan-1.md", "# Plan\n\n1. Read the log\n")
     write(claude / "image-cache" / SESSION_A / "pasted-1.png", b"\x89PNG\r\n\x1a\n" + b"\x00" * 64)
     write(claude / "file-history" / SESSION_A / "build.log.0", "old build log\n")
+    # The pre-edit copy of a file the agent rewrote, which is the whole point of this store:
+    # the credential was in the file until the agent took it out, so it is in no transcript
+    # and in no git history, and before this reader it was in nothing at all. The value is
+    # invented. The snapshot deliberately does not say which file it is a copy of, because
+    # the vendor documents the directory and not the naming inside it.
+    write(
+        claude / "file-history" / SESSION_A / "settings.json.0",
+        '{"endpoint": "https://api.example.org", '
+        '"authorization": "Bearer sk_live_examplekey0123456789"}\n',
+    )
+    # The text behind a [Pasted text #1] placeholder. Its own catalogue entry says the
+    # commonest thing to find here is a credential or a configuration blob somebody pasted
+    # rather than committed, and the transcript carries the placeholder and not this.
+    write(
+        claude / "paste-cache" / "paste-1.txt",
+        "here is the staging config, fix the timeout\n"
+        "DATABASE_PASSWORD=example-not-a-real-password\n",
+    )
     write(claude / "sessions" / (SESSION_A + ".marker"), "{}\n")
     write(claude / "backups" / ".claude.json.1", "{}\n")
     write(

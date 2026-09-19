@@ -120,7 +120,11 @@ def test_the_reader_claims_every_prose_transcript_in_the_catalogue() -> None:
     # One of them has a verified parser of its own and keeps it: that product's chat log is
     # a format somebody read against its source, and a floor under it would be a step back.
     assert prose - claimed == {"aider.chat_history"}
-    assert claimed <= prose
+    # The paste cache is read here too and is not a transcript. It is the text behind a
+    # placeholder in a prompt, filed under cache because that is what its product sweeps it
+    # as, and it belongs to this reader for the same reason the others do: it is one file
+    # holding text that has to stay in one piece.
+    assert claimed - prose == {"claude_code.paste_cache"}
 
 
 def test_a_spill_that_is_not_prose_is_recorded_as_bytes(tmp_path: Path) -> None:
