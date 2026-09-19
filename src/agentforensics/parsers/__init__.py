@@ -33,6 +33,7 @@ from agentforensics.parsers.codex_state import CodexStateParser
 from agentforensics.parsers.continue_sessions import ContinueSessionsParser
 from agentforensics.parsers.copilot import CopilotParser
 from agentforensics.parsers.gemini import GeminiParser
+from agentforensics.parsers.git_checkpoints import GitCheckpointsParser
 from agentforensics.parsers.hermes import HermesParser
 from agentforensics.parsers.instructions import InstructionsParser
 from agentforensics.parsers.json_generic import JsonGenericParser
@@ -74,6 +75,9 @@ PARSERS: tuple[Parser, ...] = (
     ContinueSessionsParser(),
     CopilotParser(),
     GeminiParser(),
+    # The checkpoint references two agents write into a repository, which are the only
+    # record on an endpoint that dates an agent's edits and survive the conversation.
+    GitCheckpointsParser(),
     HermesParser(),
     InstructionsParser(),
     # The same reading as the instruction files, for the notes the agent wrote itself.

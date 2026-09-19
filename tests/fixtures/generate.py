@@ -1701,6 +1701,31 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     write(cascade / "cascade-0001.pb", CASCADE_TRAJECTORY, RECENT)
     write(cascade / "cascade-0002.pb.archived", b"", OLD)
 
+    # The checkpoint references one agent writes into the user's own repository: a private
+    # namespace, one reference per run, and the log beside it that dates them. The commits
+    # they name are in the repository's object store, which a collection of these paths
+    # does not carry, and that is the point the reading has to make.
+    workspace_git = project / ".git"
+    write(
+        workspace_git / "refs" / "cline" / "checkpoints" / SESSION_A / "3",
+        "4b825dc642cb6eb9a060e54bf8d69288fbee4904\n",
+        RECENT,
+    )
+    write(
+        workspace_git / "logs" / "refs" / "cline" / "checkpoints" / SESSION_A / "3",
+        "0000000000000000000000000000000000000000 "
+        "4b825dc642cb6eb9a060e54bf8d69288fbee4904 "
+        "Alice <alice@example.org> 1788912300 +0000\tcline checkpoint: run 3\n",
+        RECENT,
+    )
+    write(
+        workspace_git / "packed-refs",
+        "# pack-refs with: peeled fully-peeled sorted\n"
+        "4b825dc642cb6eb9a060e54bf8d69288fbee4904 refs/heads/main\n"
+        "4b825dc642cb6eb9a060e54bf8d69288fbee4904 refs/cline/checkpoints/" + SESSION_B + "/1\n",
+        OLD,
+    )
+
     copilot = home / ".copilot"
     write(
         copilot / "session-state" / SESSION_A / "events.jsonl",

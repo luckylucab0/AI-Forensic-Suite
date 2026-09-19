@@ -292,7 +292,7 @@ artifacts:
     CLINE 4.x MECHANISM CHANGE - this is the single biggest correction to the brief's checkpoint model. There is no longer a shadow repo in globalStorage. Cline runs `git stash create` in the USER'S OWN workspace and then `git update-ref refs/cline/checkpoints/<sessionId>/<runCount> <sha>` in that same repo. The source comment states the intent: 'Store the stash commit under a private ref namespace so it is invisible to the user's normal git stash list workflow. refs/stash is what populates that list; writing to any other ref path keeps the object reachable (GC-safe) without surfacing it to the user.' Consequences for us: (a) per-tool-use workspace snapshots live inside the evidence repo itself, so a repo-only acquisition already contains them; (b) `git stash list` will NOT show them - you must enumerate refs/cline/**; (c) untracked-at-snapshot files are captured as a THIRD PARENT of the stash commit (createUntrackedParentCommit / createWorktreeStashCommit), so a naive two-parent stash read misses them; (d) checkpoints only exist if the workspace is a git repo - SdkController.ts surfaces 'Checkpoints require the workspace to be a git repository.'
 
     The verification pass confirmed the private ref namespace the extension writes and found nothing in the cited source about the repository layout the refs land in: packed-refs and the reflog are properties of the version control system, so those two paths are marked unsourced here.
-  parser: null
+  parser: git_checkpoints
 - id: cline.checkpoint_scratch
   category: file_snapshot
   root: user_profile
@@ -337,7 +337,7 @@ artifacts:
     CLINE 3.x MECHANISM. CheckpointUtils.ts getShadowGitPath() documents the layout verbatim as 'globalStorage/ checkpoints/ {cwdHash}/ .git/'. hashWorkingDir() is NOT a cryptographic hash: it iterates the cwd characters multiplying by 31 and accumulating char codes, then renders a 13-character numeric string - which means an analyst can BRUTE-FORCE / precompute the hash for candidate workspace paths to attribute a checkpoint dir to a project. Exclusions are written by writeExcludesFile() from src/integrations/checkpoints/CheckpointExclusions.ts into the shadow repo's info/exclude. Related known bug: the feature has renamed real .git dirs to .git_disabled in monorepos (issue #9590), and the 4.x CHANGELOG has an entry 'Retry nested git restore and prevent silent .git_disabled leftovers in checkpoints' - so look for stray .git_disabled directories in the workspace as checkpoint-activity evidence.
 
     Record structure: A bare git repo: every checkpoint is a commit whose tree is the full workspace state at that tool call. `git log` / `git cat-file` recovers per-tool-use file snapshots with timestamps.
-  parser: null
+  parser: git_checkpoints
 - id: cline.extension_id
   category: install_evidence
   root: user_profile
