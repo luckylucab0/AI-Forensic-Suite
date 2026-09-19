@@ -112,7 +112,7 @@ def _threads(
 
 def _thread(context: ParseContext, locator: str, values: dict[str, Any]) -> Iterator[Event]:
     session_id = _text(values.get("id")) or None
-    folders = _folders(values.get("folder_paths"), values.get("folder_paths_order"))
+    opened = folders(values.get("folder_paths"), values.get("folder_paths_order"))
     common: dict[str, Any] = {
         "user": context.user,
         "host": context.host,
@@ -120,7 +120,7 @@ def _thread(context: ParseContext, locator: str, values: dict[str, Any]) -> Iter
         # The first of the workspace folders in the order the person opened them, which the
         # second column restores. All of them are in the payload: a thread opened against
         # two folders belongs to both, and the event model has one project_path.
-        "project_path": folders[0] if folders else None,
+        "project_path": opened[0] if opened else None,
     }
 
     created, created_precision, created_note = normalise_ts(values.get("created_at"))
@@ -165,7 +165,7 @@ def _thread(context: ParseContext, locator: str, values: dict[str, Any]) -> Iter
         payload={
             "text": _text(values.get("summary")) or _text((document or {}).get("title")),
             "updated_at": updated,
-            "folder_paths": folders or None,
+            "folder_paths": opened or None,
             # A fork, or a subagent thread: its turns continue from another row.
             "parent_session": _text(values.get("parent_id")) or None,
             "models": _models(document),
@@ -434,7 +434,9 @@ def _document(value: Any) -> tuple[dict[str, Any] | None, str | None]:
     return parsed, None
 
 
-def _folders(value: Any, order: Any = None) -> list[str]:
+def folders(value: Any, order: Any = None) -> list[str]:
+    # Public because the sidebar store writes its two path columns the same way and reads
+    # them with this. A copy in the other module would be a second place to fix.
     """The workspace folders, in the order the person opened them.
 
     Two columns, and reading only the first one gets the answer wrong twice. The vendor

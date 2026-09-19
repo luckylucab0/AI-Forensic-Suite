@@ -174,4 +174,4 @@ artifacts:
     Newly discovered and NOT in the starting brief: Zed has moved thread metadata into a sidebar_threads store separate from threads.db. It is the only place agent_id, remote_connection and interacted_at live - i.e. WHICH agent (native or an external ACP agent) ran a thread, and whether it ran over a remote connection. It also carries an archived flag, so archived threads are hidden in the UI but fully present on disk. A known bug class is old threads remaining in threads.db but never reaching sidebar_threads, so the two stores must be reconciled rather than either being trusted alone.
 
     Re-sourced by the verification pass: the store cited before opens the shared database through a macro and names no path. This file holds the database filename and the release-channel directory name, and the path crate supplies the per-platform database directory.
-  parser: sqlite_generic
+  parser: zed_sidebar

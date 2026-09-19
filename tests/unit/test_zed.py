@@ -206,13 +206,13 @@ def test_the_folder_paths_are_read_the_way_the_vendor_writes_them() -> None:
     and the first of them became the thread's project path, which is a truncated path
     presented as an answer.
     """
-    from agentforensics.parsers.zed import _folders
+    from agentforensics.parsers.zed import folders
 
-    assert _folders("/a\n/b") == ["/a", "/b"]
-    assert _folders("/a\n/b", "1,0") == ["/b", "/a"], "the order the person opened them in"
-    assert _folders("/home/alice/one, two") == ["/home/alice/one, two"], "one path, not two"
-    assert _folders("") == []
-    assert _folders(None) == []
+    assert folders("/a\n/b") == ["/a", "/b"]
+    assert folders("/a\n/b", "1,0") == ["/b", "/a"], "the order the person opened them in"
+    assert folders("/home/alice/one, two") == ["/home/alice/one, two"], "one path, not two"
+    assert folders("") == []
+    assert folders(None) == []
 
 
 def test_an_order_that_does_not_describe_the_paths_is_discarded() -> None:
@@ -222,11 +222,11 @@ def test_an_order_that_does_not_describe_the_paths_is_discarded() -> None:
     lexicographic order the column is already in rather than guessing, and a reader that
     guessed would reorder somebody's working copies in the case.
     """
-    from agentforensics.parsers.zed import _folders
+    from agentforensics.parsers.zed import folders
 
-    assert _folders("/a\n/b", "0") == ["/a", "/b"]
-    assert _folders("/a\n/b", "3,4") == ["/a", "/b"]
-    assert _folders("/a\n/b", "not an order") == ["/a", "/b"]
+    assert folders("/a\n/b", "0") == ["/a", "/b"]
+    assert folders("/a\n/b", "3,4") == ["/a", "/b"]
+    assert folders("/a\n/b", "not an order") == ["/a", "/b"]
 
 
 # ------------------------------------------------------------------- the turns

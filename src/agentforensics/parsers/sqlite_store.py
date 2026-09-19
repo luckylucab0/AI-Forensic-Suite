@@ -292,13 +292,25 @@ def _unzstd(value: bytes) -> Any:
     return text
 
 
+# How short a binary column has to be for its bytes to be written out in full. A blob this
+# size is an identifier and not content: a primary key, a UUID, a hash. Recording only its
+# length and a digest of it loses the one thing it is for, which is joining this row to a
+# row somewhere else, and an identifier nobody can read is a join nobody can make. Zed's
+# sidebar store is the case in point: its thread_id is sixteen raw bytes of a UUID and it is
+# the only link between a thread's metadata and the thread itself.
+SHORT_BLOB = 64
+
+
 def _opaque(value: bytes, why: str) -> dict[str, Any]:
-    return {
+    described: dict[str, Any] = {
         BLOB_NOTE: True,
         "bytes": len(value),
         "sha256": hashlib.sha256(value).hexdigest(),
         "note": f"{why}. The row's provenance names the file, the table and the rowid.",
     }
+    if len(value) <= SHORT_BLOB:
+        described["hex"] = value.hex()
+    return described
 
 
 def literal_time(

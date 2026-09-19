@@ -36,6 +36,7 @@ from agentforensics.parsers.pi import PiParser
 from agentforensics.parsers.sqlite_generic import SqliteGenericParser
 from agentforensics.parsers.vscode_state import VscodeStateParser
 from agentforensics.parsers.zed import ZedParser
+from agentforensics.parsers.zed_sidebar import ZedSidebarParser
 
 # Order matters only in that the first parser to claim an artifact wins, so a more specific
 # parser has to come before a general one. Kept as a tuple rather than a registry decorator
@@ -58,6 +59,10 @@ PARSERS: tuple[Parser, ...] = (
     # text and said nobody had read the store.
     VscodeStateParser(),
     ZedParser(),
+    # The other half of Zed on disk: threads.db holds the conversations and this store
+    # holds which agent ran them, which of them were archived out of the sidebar, and what
+    # each one was left doing to a git worktree.
+    ZedSidebarParser(),
     # Last, and it has to stay last: it claims every SQLite store in the catalogue, so a
     # verified schema parser placed after it would never be reached.
     SqliteGenericParser(),

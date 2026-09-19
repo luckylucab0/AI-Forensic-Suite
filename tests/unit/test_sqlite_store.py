@@ -33,6 +33,7 @@ from agentforensics.parsers.base import ParseContext
 from agentforensics.parsers.sqlite_generic import INVENTORY_ONLY, STORES
 from agentforensics.parsers.sqlite_store import (
     BLOB_NOTE,
+    SHORT_BLOB,
     open_store,
     rows_of,
     tables,
@@ -528,3 +529,40 @@ def test_a_frame_that_expands_past_the_limit_says_so(tmp_path: Path) -> None:
     assert "expands past the ingest limit" in blob["note"]
     # The part that was read is still there, rather than the whole thing being withheld.
     assert blob["text"] == "x" * 100
+
+
+def test_a_short_binary_column_keeps_its_bytes(tmp_path: Path) -> None:
+    """A blob this size is an identifier, and an identifier nobody can read is a lost join.
+
+    Sixteen raw bytes of a UUID is how Zed's sidebar store names a thread, and it is the
+    only link between a thread's metadata and the thread itself. Described by length and
+    digest alone, the row says a thread existed and refuses to say which one.
+
+    Both shapes are asserted because a sixteen byte identifier arrives as either one. The
+    reader turns bytes into text whenever they decode as UTF-8, and some UUIDs do, so a
+    parser that wants the bytes back has to encode the text again rather than expecting a
+    description every time. Encoding is the exact inverse of that decode, so nothing is
+    lost either way.
+    """
+    path = tmp_path / "store.db"
+    connection = sqlite3.connect(path)
+    connection.execute("CREATE TABLE rows_ (id BLOB, big BLOB)")
+    binary = bytes([0xFF, 0xFE]) + bytes(range(14))
+    decodable = bytes(range(16))
+    connection.executemany(
+        "INSERT INTO rows_ VALUES (?, ?)",
+        [(binary, bytes([0xFF]) * (SHORT_BLOB + 1)), (decodable, None)],
+    )
+    connection.commit()
+    connection.close()
+
+    with open_store(path) as reader:
+        listed = tables(reader)
+        values = [row for _, row, _ in rows_of(reader, listed[0])]
+
+    assert bytes.fromhex(values[0]["id"]["hex"]) == binary
+    assert values[1]["id"].encode("utf-8") == decodable
+    # And a blob past the threshold is still described rather than copied: a case database
+    # should not be fillable by one column.
+    assert "hex" not in values[0]["big"]
+    assert values[0]["big"]["bytes"] == SHORT_BLOB + 1
