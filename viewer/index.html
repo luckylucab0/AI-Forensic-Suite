@@ -1504,7 +1504,11 @@ function renderCasePanel(){
   body.appendChild(el('div',{class:'panel-sub',text:'Shown every time rather than only when it looks bad. A summary of what was understood, with nothing said about the rest, reads as completeness.'}));
   body.appendChild(el('div',{class:'case-grid'},[
     caseNum(counts.artifacts_unparsed||0,'collected, no parser',true),
-    caseNum(counts.events_unparsed||0,'records unreadable',true),
+    // Two numbers, because they are opposite answers. A record nothing could read is a
+    // defect in the evidence; a record read out of a format nobody has mapped is intact
+    // evidence with no reading yet, and one store can hold a hundred thousand of them.
+    caseNum((counts.events_unparsed||0)-(counts.events_uninterpreted||0),'records unreadable',true),
+    caseNum(counts.events_uninterpreted||0,'records not yet mapped',true),
     caseNum(counts.events_without_timestamp||0,'events with no time',true),
     caseNum(counts.collection_gaps||0,'gaps in collection',true),
   ]));
@@ -1534,7 +1538,8 @@ function renderCasePanel(){
     body.appendChild(el('div',{class:'case-block',text:'Agents'}));
     for(const agent of summary.agents){
       body.appendChild(kv(agent.agent,agent.events+' event(s)'
-        +(agent.unparsed?', '+agent.unparsed+' unreadable':'')
+        +((agent.unparsed-(agent.uninterpreted||0))?', '+(agent.unparsed-(agent.uninterpreted||0))+' unreadable':'')
+        +(agent.uninterpreted?', '+agent.uninterpreted+' not yet mapped':'')
         +' · '+(agent.first_ts||'no earliest timestamp')+' to '+(agent.last_ts||'no latest timestamp')));
     }
   }
@@ -2310,19 +2315,28 @@ function ioToString(content){
 // Sidebar
 // ============================================================================
 function fmtTime(ts){if(!ts)return '';const d=new Date(ts);if(isNaN(d))return '';return d.toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
-// Which sessions a chip keeps. Both questions are about the case's own reliability rather
-// than about its content: where did a rule find something, and where did a parser fail to
-// read a line. The second one matters most on a large case, where a handful of unreadable
-// records is invisible in a total and is exactly what an analyst has to look at before
-// quoting the rest.
+// Which sessions a chip keeps. All three questions are about the case's own reliability
+// rather than about its content: where did a rule find something, where did a parser fail
+// to read a line, and where is there evidence nobody has a reading for yet.
+//
+// The last two are kept apart because they are opposite answers. A line that would not
+// decode is a defect in the evidence and is what an analyst has to look at before quoting
+// the rest. A record read out of a store or a log nobody has mapped is intact, and there
+// can be a hundred thousand of those in one file. Counted together, the one line that
+// matters is invisible among the rows that do not.
 function sessionMarks(session){
   const info=session.caseSession;
   if(!info) return [];
   const marks=[];
   if(findingSessions().has(info.session_id||'')) marks.push('findings');
-  if(info.unparsed) marks.push('unreadable');
+  if(unreadableCount(info)) marks.push('unreadable');
+  if(info.uninterpreted) marks.push('unmapped');
   return marks;
 }
+
+// The records nothing could read: the rest of the unparsed ones were read and are only
+// waiting for somebody to map their format.
+function unreadableCount(info){return (info.unparsed||0)-(info.uninterpreted||0);}
 
 // The session ids a rule fired in. A finding with no session id belongs to no session and
 // is reachable in the Findings tab; it is not attached to an arbitrary one here.
@@ -2336,15 +2350,17 @@ function findingSessions(){
 const SESSION_FILTERS=[
   ['all','all',''],
   ['findings','findings','Sessions a rule found something in'],
-  ['unreadable','unreadable lines','Sessions holding a record no parser could read. Worth '
+  ['unreadable','unreadable lines','Sessions holding a record nothing could read. Worth '
     +'opening before quoting the rest of the case.'],
+  ['unmapped','not yet mapped','Sessions holding a record that was read and is in a format '
+    +'nobody has mapped yet. The content is in the case, with no reading of it.'],
 ];
 
 function renderSessionFilters(total,shown){
   const bar=document.getElementById('session-filters');
   if(!bar) return;
   if(!state.caseApi){bar.classList.add('hidden');bar.innerHTML='';return;}
-  const counts={findings:0,unreadable:0};
+  const counts={findings:0,unreadable:0,unmapped:0};
   for(const project of state.projects)for(const session of project.sessions){
     for(const mark of sessionMarks(session)) counts[mark]+=1;
   }
@@ -2392,8 +2408,12 @@ function renderSidebar(){
             ? el('span',{class:'dot smark find',text:'findings',title:'A rule found something in this session'}):null,
           sessionMarks(s).indexOf('unreadable')>=0
             ? el('span',{class:'dot smark bad',
-                text:(s.caseSession.unparsed)+' unreadable',
-                title:'Records in this session that no parser could read. They are in the case, kept with their original text.'}):null,
+                text:unreadableCount(s.caseSession)+' unreadable',
+                title:'Records in this session that nothing could read. They are in the case, kept with their original text.'}):null,
+          sessionMarks(s).indexOf('unmapped')>=0
+            ? el('span',{class:'dot smark',
+                text:(s.caseSession.uninterpreted)+' not yet mapped',
+                title:'Records in this session that were read and are in a format nobody has mapped yet. Their content is in the case, with no reading of it.'}):null,
         ]),
       ]));
     }

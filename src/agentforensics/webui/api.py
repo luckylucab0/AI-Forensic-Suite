@@ -32,7 +32,7 @@ from itertools import islice
 from typing import Any
 
 from agentforensics import __version__
-from agentforensics.model import Case
+from agentforensics.model import UNINTERPRETED_MARK, Case
 from agentforensics.model.schema import SCHEMA_VERSION
 from agentforensics.timeline import Filters, record, rows
 from agentforensics.unified import FORMAT_NAME, FORMAT_VERSION
@@ -81,8 +81,15 @@ def case_summary(case: Case) -> dict[str, Any]:
         for row in case.query(
             "SELECT agent, count(*) AS events, "
             "       sum(CASE WHEN kind = 'unparsed.record' THEN 1 ELSE 0 END) AS unparsed, "
+            # The part of that which was read and has no mapping yet, so a screen can say
+            # which of the two it is showing. One is a defect in the evidence and the other
+            # is evidence nobody has read.
+            "       sum(CASE WHEN kind = 'unparsed.record' "
+            "                 AND parse_problem LIKE '%' || ? || '%' "
+            "            THEN 1 ELSE 0 END) AS uninterpreted, "
             "       min(ts_utc) AS first_ts, max(ts_utc) AS last_ts "
-            "  FROM events GROUP BY agent ORDER BY events DESC, agent"
+            "  FROM events GROUP BY agent ORDER BY events DESC, agent",
+            (UNINTERPRETED_MARK,),
         )
     ]
     kinds = [
@@ -142,6 +149,9 @@ SELECT e.agent                                                             AS ag
        min(e.ts_utc)                                                       AS first_ts,
        max(e.ts_utc)                                                       AS last_ts,
        sum(CASE WHEN e.kind = 'unparsed.record' THEN 1 ELSE 0 END)         AS unparsed,
+       sum(CASE WHEN e.kind = 'unparsed.record'
+                 AND e.parse_problem LIKE '%' || :mark || '%'
+            THEN 1 ELSE 0 END)                                             AS uninterpreted,
        sum(CASE WHEN e.ts_utc IS NULL THEN 1 ELSE 0 END)                   AS undated,
        group_concat(DISTINCT e.kind)                                       AS kinds
   FROM events e
@@ -179,7 +189,7 @@ def _group_key(row: sqlite3.Row) -> str:
 def sessions(case: Case) -> list[dict[str, Any]]:
     """Every derived session in the case, with the counts a sidebar shows."""
     out = []
-    for row in case.query(_GROUPS_SQL):
+    for row in case.query(_GROUPS_SQL, {"mark": UNINTERPRETED_MARK}):
         key = _group_key(row)
         out.append(
             {
@@ -196,6 +206,7 @@ def sessions(case: Case) -> list[dict[str, Any]]:
                 "files": bool(row["files"]),
                 "events": int(row["events"]),
                 "unparsed": int(row["unparsed"] or 0),
+                "uninterpreted": int(row["uninterpreted"] or 0),
                 "undated": int(row["undated"] or 0),
                 "first_ts": row["first_ts"],
                 "last_ts": row["last_ts"],

@@ -164,13 +164,17 @@ also what explains a window that looks like it did nothing. The timeline applies
 in the case database rather than in the browser, so a long timeline is narrowed before it is
 paged and the screen agrees with `afx timeline --since --until`.
 
-**The session list** filters to the sessions a rule found something in, and to the sessions
-holding a record no parser could read. Both are questions about the case's own reliability
-rather than about its content, and the second one is the reason it is there: on a large case
-a handful of unreadable records disappears into a total, and it is exactly what an analyst
-has to look at before quoting the rest. Each session row carries the same two marks, so the
-chip's claim is checkable without clicking it. The chips appear only when a case is being
-served, because a directory of transcripts knows nothing about findings.
+**The session list** filters to the sessions a rule found something in, to the sessions
+holding a record nothing could read, and to the sessions holding a record that was read and
+is in a format nobody has mapped yet. All three are questions about the case's own
+reliability rather than about its content, and the last two are kept apart because they are
+opposite answers. A line that would not decode is a defect in the evidence and is what an
+analyst has to look at before quoting the rest. A record out of a store or a log nobody has
+a reading for is intact, and one file can hold a hundred thousand of them. Counted together,
+the one line that matters would be invisible among the rows that do not. Each session row
+carries the same marks, so a chip's claim is checkable without clicking it. The chips appear
+only when a case is being served, because a directory of transcripts knows nothing about
+findings.
 
 **Across sessions**, the tools view and the security view both start with a scope switch:
 all sessions, or the one that is open. "This session" only appears when a session is open,

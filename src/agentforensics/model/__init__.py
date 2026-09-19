@@ -15,10 +15,12 @@ from __future__ import annotations
 from agentforensics.model.case import BundleRecord, Case, CaseError
 from agentforensics.model.event import (
     EVENT_KINDS,
+    UNINTERPRETED_MARK,
     Actor,
     Event,
     Provenance,
     TsPrecision,
+    is_uninterpreted,
     unparsed,
 )
 from agentforensics.model.schema import SCHEMA, SCHEMA_VERSION, apply_schema
@@ -27,6 +29,7 @@ __all__ = [
     "EVENT_KINDS",
     "SCHEMA",
     "SCHEMA_VERSION",
+    "UNINTERPRETED_MARK",
     "Actor",
     "BundleRecord",
     "Case",
@@ -35,5 +38,6 @@ __all__ = [
     "Provenance",
     "TsPrecision",
     "apply_schema",
+    "is_uninterpreted",
     "unparsed",
 ]

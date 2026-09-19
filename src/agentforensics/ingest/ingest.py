@@ -34,7 +34,7 @@ from agentforensics.ingest.match import Matcher
 from agentforensics.ingest.native import NativeBundle
 from agentforensics.ingest.source import Source, SourceEntry
 from agentforensics.ingest.tree import CollectedTree
-from agentforensics.model import Case, Event, Provenance
+from agentforensics.model import Case, Event, Provenance, is_uninterpreted
 from agentforensics.parsers import ParseContext, for_artifact
 
 
@@ -52,11 +52,16 @@ class IngestReport:
     unattributed: int = 0
     events: int = 0
     parsed_records: int = 0
-    # Records a parser reached and could not read. Reported separately from the events
+    # Records a parser reached and did not read. Reported separately from the events
     # because it is the number that qualifies everything else: a case with a thousand
     # events and two hundred unreadable records is a different case from one with a
     # thousand events and none.
     unparsed_records: int = 0
+    # The part of that number which was read and has no verified mapping yet, so the two
+    # opposite answers under one kind stay apart: a line that would not decode is a defect
+    # in the evidence, and a row of a store nobody has read a schema for is intact evidence
+    # with no reading yet.
+    uninterpreted_records: int = 0
     gaps: int = 0
     # Files parsed under a claimant other than the source's own attribution. Reported
     # because it is a disagreement between two readings of the catalogue, and a case that
@@ -76,10 +81,16 @@ class IngestReport:
             f"{self.attributed_by_path} matched from the path, {self.unattributed} unclaimed",
             f"  {self.events} event(s)",
         ]
-        if self.unparsed_records:
+        unreadable = self.unparsed_records - self.uninterpreted_records
+        if unreadable:
             lines.append(
-                f"  {self.unparsed_records} record(s) no parser could read, kept in the "
-                "case as unparsed events"
+                f"  {unreadable} record(s) nothing could read, kept in the case as "
+                "unparsed events with their original text"
+            )
+        if self.uninterpreted_records:
+            lines.append(
+                f"  {self.uninterpreted_records} record(s) read but in a format nobody has "
+                "mapped, kept in the case with their content in raw and no reading of it"
             )
         if self.reattributed:
             shown = self.reattributed[:5]
@@ -121,6 +132,7 @@ class EntryEvents:
     # own log, and the one artifact.fs event per file is not one of them.
     parser_events: int
     unparsed_records: int
+    uninterpreted_records: int
     parser: str | None
     detail: str | None
     # The catalogue entry whose parser read the file, when that is not the entry the source
@@ -162,6 +174,7 @@ def events_for(
         events=events,
         parser_events=len(parsed),
         unparsed_records=unreadable,
+        uninterpreted_records=sum(1 for event in parsed if is_uninterpreted(event)),
         parser=parser_name,
         detail=detail,
         parsed_as=parsed_as,
@@ -233,6 +246,7 @@ def ingest(
             report.events += case.add_events(read.events)
             report.parsed_records += read.parser_events - read.unparsed_records
             report.unparsed_records += read.unparsed_records
+            report.uninterpreted_records += read.uninterpreted_records
 
             status, detail = read.status, read.detail
             if not entry.collected or entry.local_path is None:

@@ -170,7 +170,10 @@ normalize: directory source /evidence/host-1
 normalize:   39 file(s): 9 parsed, 30 with no parser, 0 that failed
 normalize:   112 record(s) written
 normalize:   by agent: claude_code 81, cline 2, codex 14, copilot 11
-normalize:   15 record(s) no parser could read, written to the log as unparsed.record
+normalize:   4 record(s) nothing could read, written to the log as unparsed.record
+normalize:   rather than dropped
+normalize:   11 record(s) read but in a format nobody has mapped, written to the log as
+normalize:   unparsed.record with their content in raw
 normalize:   30 file(s) were collected and have no parser. They are in the log as one
 normalize:   artifact.fs record each, which says the file was there and when it was
 normalize:   written, and nothing about its content.

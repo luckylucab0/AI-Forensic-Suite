@@ -15,14 +15,14 @@ to discard the file.
 from __future__ import annotations
 
 import sqlite3
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from agentforensics.model.event import Event
+from agentforensics.model.event import UNINTERPRETED_MARK, Event
 from agentforensics.model.schema import SCHEMA_VERSION, apply_schema
 
 
@@ -471,6 +471,18 @@ class Case:
             "events_unparsed": query(
                 "SELECT count(*) AS n FROM events WHERE kind = 'unparsed.record'"
             ).fetchone()["n"],
+            # The part of that total which was read fine and has no verified mapping yet,
+            # so the two opposite answers under one kind can be told apart. A line that did
+            # not decode is a defect in the evidence; a row of a store nobody has read a
+            # schema for is intact evidence with no reading yet, and there can be an
+            # enormous number of those. Reported as one number, the first disappears into
+            # the second and the word unreadable in front of the total is wrong about
+            # nearly all of it.
+            "events_uninterpreted": query(
+                "SELECT count(*) AS n FROM events WHERE kind = 'unparsed.record' "
+                "   AND parse_problem LIKE '%' || ? || '%'",
+                (UNINTERPRETED_MARK,),
+            ).fetchone()["n"],
             "events_without_timestamp": query(
                 "SELECT count(*) AS n FROM events WHERE ts_utc IS NULL"
             ).fetchone()["n"],
@@ -478,7 +490,10 @@ class Case:
         }
         return {key: int(value) for key, value in out.items()}
 
-    def query(self, sql: str, parameters: Sequence[Any] = ()) -> list[sqlite3.Row]:
+    def query(
+        self, sql: str, parameters: Sequence[Any] | Mapping[str, Any] = ()
+    ) -> list[sqlite3.Row]:
+        """Read the case. Values are bound, never formatted into the statement."""
         return list(self._connection.execute(sql, parameters))
 
 

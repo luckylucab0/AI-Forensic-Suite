@@ -101,6 +101,10 @@ def test_an_unparsed_record_is_an_event_and_is_counted(case: Case) -> None:
     row = case.query("SELECT raw, parse_problem FROM events")[0]
     assert "not json" in row["raw"], "the record itself has to be kept, not just the failure"
     assert row["parse_problem"] == "invalid json"
+    assert counts["events_uninterpreted"] == 0, (
+        "nothing read this record, which is a different answer from a record that was read "
+        "and is in a format nobody has mapped"
+    )
 
 
 def test_the_original_record_is_always_kept(case: Case) -> None:

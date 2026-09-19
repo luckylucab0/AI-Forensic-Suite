@@ -33,7 +33,7 @@ import sqlite3
 from collections.abc import Iterator
 from typing import Any
 
-from agentforensics.model import Event, unparsed
+from agentforensics.model import UNINTERPRETED_MARK, Event, unparsed
 from agentforensics.parsers.base import ParseContext
 from agentforensics.parsers.sqlite_store import (
     StoreError,
@@ -115,9 +115,8 @@ _PROJECT_COLUMNS = ("cwd", "workspace", "project_path", "projectPath", "workspac
 # What every event out of this parser says about itself. Second person to the analyst
 # rather than to the developer, because this is the text that appears in the case.
 _UNINTERPRETED = (
-    "this collection has no verified schema for this store, so the row is returned "
-    "uninterpreted. Everything it contained is in raw. Re-read this store once a parser "
-    "for it exists."
+    f"this collection has no verified schema for this store, so the row {UNINTERPRETED_MARK}. "
+    "Everything it contained is in raw. Re-read this store once a parser for it exists."
 )
 
 
@@ -174,7 +173,14 @@ class SqliteGenericParser:
                     for table in listed
                 ]
             },
-            _UNINTERPRETED if not reason else f"the rows of this store are not ingested: {reason}",
+            _UNINTERPRETED
+            if not reason
+            # Still carries the mark, because this event is the store's table list and
+            # nobody has read the store: counted as a record that could not be read, it
+            # would show up in a case as a defect in the evidence rather than as a reading
+            # nobody has made yet.
+            else f"the rows of this store are not ingested: {reason}. The table list "
+            f"{UNINTERPRETED_MARK}.",
             user=context.user,
             host=context.host,
             payload={"text": text},

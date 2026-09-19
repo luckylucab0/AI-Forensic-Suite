@@ -316,10 +316,18 @@ def header_notes(case: Case, written: int, undated: int, fmt: str) -> list[str]:
             f"{undated} event(s) have no timestamp and are listed first, because their "
             "position in the sequence is unknown rather than early"
         )
-    if counts["events_unparsed"]:
+    unreadable = counts["events_unparsed"] - counts["events_uninterpreted"]
+    if unreadable:
         notes.append(
-            f"{counts['events_unparsed']} record(s) in this case could not be parsed and "
-            "appear as unreadable rows, with the original text kept"
+            f"{unreadable} record(s) in this case could not be read and appear as rows "
+            "carrying the original text and the reason"
+        )
+    if counts["events_uninterpreted"]:
+        notes.append(
+            f"{counts['events_uninterpreted']} record(s) were read and are in a format "
+            "nobody has mapped yet, so they appear with their content in raw and no "
+            "reading of it. They are evidence somebody still has to look at, which is a "
+            "different thing from a record that could not be read"
         )
     if counts["artifacts_unparsed"]:
         notes.append(

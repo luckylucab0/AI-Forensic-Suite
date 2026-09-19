@@ -18,6 +18,7 @@ from pathlib import Path
 import pytest
 
 from agentforensics.catalog import load_catalogue
+from agentforensics.model import BundleRecord, Case
 from agentforensics.parsers import PARSERS, for_artifact
 from agentforensics.parsers.base import ParseContext
 from agentforensics.parsers.jsonl_generic import (
@@ -298,3 +299,24 @@ def test_the_fields_read_here_are_the_ones_the_endpoint_query_reads() -> None:
 
     for name in TIME_FIELDS + SESSION_FIELDS + PROJECT_FIELDS + TEXT_FIELDS:
         assert f"Rec.{name}" in block, name
+
+
+def test_a_case_counts_these_apart_from_the_records_nothing_could_read(tmp_path: Path) -> None:
+    """The end of the chain, and the reason the events say what they say.
+
+    Both populations are `unparsed.record`, and a case that reported one number would call
+    a log of intact records unreadable. That matters as soon as a case holds a store nobody
+    has a schema for: the handful of genuinely broken lines, which is what an analyst has
+    to look at before quoting anything, disappears among rows that are perfectly fine and
+    merely unread.
+    """
+    path = write(tmp_path / "cascade.jsonl", {"text": "fine"}, '{"text": "cut off')
+
+    case = Case.open(tmp_path / "case.sqlite")
+    with case.transaction():
+        case.add_bundle(BundleRecord("b", "native", "/tmp/b"))
+        case.add_events(parse(path))
+    counts = case.counts()
+
+    assert counts["events_unparsed"] == 2
+    assert counts["events_uninterpreted"] == 1

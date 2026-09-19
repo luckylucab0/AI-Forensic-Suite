@@ -191,7 +191,7 @@ def test_the_notes_qualify_the_timeline(case: Case) -> None:
     """They travel with the export rather than living in another command's output."""
     notes = " ".join(header_notes(case, 5, 1, "csv"))
     assert "no timestamp" in notes
-    assert "could not be parsed" in notes
+    assert "could not be read" in notes
 
 
 def test_two_exports_produce_identical_bytes(case: Case) -> None:

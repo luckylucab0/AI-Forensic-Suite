@@ -587,7 +587,12 @@ def cmd_case(args: argparse.Namespace) -> int:
     _write(
         sys.stderr,
         f"qualifications: {counts['artifacts_unparsed']} collected file(s) no parser read, "
-        f"{counts['events_unparsed']} record(s) that could not be parsed, "
+        # Two numbers rather than one, because they are opposite answers: a record nothing
+        # could read is a defect in the evidence, and a record in a format nobody has
+        # mapped is intact evidence with no reading yet.
+        f"{counts['events_unparsed'] - counts['events_uninterpreted']} record(s) nothing "
+        f"could read, {counts['events_uninterpreted']} record(s) read but in a format "
+        "nobody has mapped, "
         f"{counts['events_without_timestamp']} event(s) with no timestamp, "
         f"{counts['collection_gaps']} gap(s) reported by the collection itself",
     )

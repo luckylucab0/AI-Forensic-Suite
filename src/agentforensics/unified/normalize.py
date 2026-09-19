@@ -47,6 +47,11 @@ class NormalizeReport:
     files_failed: int = 0
     events: int = 0
     unparsed_records: int = 0
+    # The part of that number which was read and has no verified mapping yet. Separate
+    # because the endpoint query this log is compared against makes the same distinction:
+    # a record it could not decode and a record it returned uninterpreted are different
+    # answers, and a log summary that merged them would not match the hunt's.
+    uninterpreted_records: int = 0
     agents: dict[str, int] = field(default_factory=dict)
     # Paths no catalogue entry claims. Each one is a lead: an agent nobody has catalogued,
     # or a gap in the catalogue. Kept in full rather than counted.
@@ -63,10 +68,16 @@ class NormalizeReport:
         if self.agents:
             named = ", ".join(f"{name} {count}" for name, count in sorted(self.agents.items()))
             lines.append(f"  by agent: {named}")
-        if self.unparsed_records:
+        unreadable = self.unparsed_records - self.uninterpreted_records
+        if unreadable:
             lines.append(
-                f"  {self.unparsed_records} record(s) no parser could read, written to the "
-                "log as unparsed.record rather than dropped"
+                f"  {unreadable} record(s) nothing could read, written to the log as "
+                "unparsed.record rather than dropped"
+            )
+        if self.uninterpreted_records:
+            lines.append(
+                f"  {self.uninterpreted_records} record(s) read but in a format nobody has "
+                "mapped, written to the log as unparsed.record with their content in raw"
             )
         if self.files_unsupported:
             lines.append(
@@ -129,6 +140,7 @@ def normalize(
             else:
                 report.files_parsed += 1
         report.unparsed_records += read.unparsed_records
+        report.uninterpreted_records += read.uninterpreted_records
         events.extend(read.events)
 
     # A source can carry the same file twice, and re-reading a collection must not double a

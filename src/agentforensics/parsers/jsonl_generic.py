@@ -37,7 +37,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from typing import Any
 
-from agentforensics.model import Event, unparsed
+from agentforensics.model import UNINTERPRETED_MARK, Event, unparsed
 from agentforensics.parsers.base import ParseContext, iter_lines, normalise_ts
 
 # Every line-delimited artifact in the catalogue, written out rather than derived from the
@@ -98,8 +98,8 @@ TEXT_FIELDS = ("text", "content")
 # developer, and it ends with what to do about it, because a reader who does not know a
 # parser is missing reads an uninterpreted record as an empty one.
 UNINTERPRETED = (
-    "this collection has no verified mapping for this agent log format, so the record is "
-    "returned uninterpreted. Everything it contained is in raw. Re-read this log once a "
+    "this collection has no verified mapping for this agent log format, so the record "
+    f"{UNINTERPRETED_MARK}. Everything it contained is in raw. Re-read this log once a "
     "parser for it exists."
 )
 

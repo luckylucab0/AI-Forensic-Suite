@@ -129,6 +129,10 @@ def test_the_case_summary_carries_the_counts_that_qualify_it(case: Case) -> None
     for key in (
         "artifacts_unparsed",
         "events_unparsed",
+        # The part of the unparsed records that was read and has no mapping yet. Without it
+        # a screen can only call all of them unreadable, which on a case holding a store
+        # nobody has a schema for is wrong about nearly every one of them.
+        "events_uninterpreted",
         "events_without_timestamp",
         "collection_gaps",
     ):

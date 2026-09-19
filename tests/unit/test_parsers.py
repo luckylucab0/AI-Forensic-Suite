@@ -13,8 +13,10 @@ from pathlib import Path
 
 import pytest
 
+from agentforensics.model import UNINTERPRETED_MARK
 from agentforensics.parsers import for_artifact
 from agentforensics.parsers.base import ParseContext, iter_lines, normalise_ts, text_of
+from agentforensics.parsers.jsonl_generic import UNINTERPRETED as JSONL_UNINTERPRETED
 
 
 def context(path: Path, artifact_id: str = "claude_code.transcripts") -> ParseContext:
@@ -1444,3 +1446,26 @@ def test_the_agent_of_an_event_is_the_catalogues_not_the_parsers(tmp_path: Path)
         agent="roo_code",
     )
     assert events[0].agent == "roo_code"
+
+
+def test_only_the_two_generic_readers_say_a_record_is_uninterpreted() -> None:
+    """The mark is what tells the two populations of `unparsed.record` apart.
+
+    One is a record nothing could read, which is a defect in the evidence. The other is a
+    record that was read out of a store or a log nobody has mapped, which is intact evidence
+    with no reading yet. The case counts them separately by looking for this phrase, so a
+    parser that used the words for a record it actually failed on would file a broken line
+    among the hundred thousand rows an analyst is not expected to open.
+    """
+    package = Path(__file__).resolve().parents[2] / "src" / "agentforensics" / "parsers"
+    # By the name rather than by the phrase, because both readers build their sentence out
+    # of the constant, which is the point: one place says the words and everything else
+    # that has to recognise them, the case counts included, reads them from there.
+    writers = sorted(
+        module.name
+        for module in package.glob("*.py")
+        if "UNINTERPRETED_MARK" in module.read_text(encoding="utf-8")
+    )
+
+    assert writers == ["jsonl_generic.py", "sqlite_generic.py"], writers
+    assert UNINTERPRETED_MARK in JSONL_UNINTERPRETED

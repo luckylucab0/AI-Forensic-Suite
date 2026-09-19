@@ -17,7 +17,7 @@ import pytest
 
 from agentforensics.catalog import Catalogue, load_catalogue
 from agentforensics.model import Case
-from agentforensics.unified import normalize, validator, write_log
+from agentforensics.unified import NormalizeReport, normalize, validator, write_log
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "tests" / "fixtures"))
@@ -148,15 +148,41 @@ def test_undated_records_sort_first_rather_than_being_dropped(
 def test_the_report_names_what_it_could_not_read(tree: Path, catalogue: Catalogue) -> None:
     """The numbers that qualify the log travel with it. A log of ten thousand events from a
     collection that also held forty unreadable files is a different piece of evidence from
-    one that read cleanly."""
+    one that read cleanly.
+
+    """
     _, report = normalize(tree, catalogue)
     text = report.summary()
     assert report.unparsed_records > 0
-    assert "no parser could read" in text
+    assert "nothing could read" in text
     assert report.files_unsupported > 0
     assert "have no parser" in text
     assert report.unclaimed_paths
     assert "no catalogue entry claims" in text
+
+
+def test_a_record_read_out_of_an_unmapped_format_is_not_called_unreadable() -> None:
+    """The two populations under `unparsed.record` are opposite answers, so the summary
+    gives two numbers.
+
+    A record nothing could read is a defect in the evidence, worth opening before the rest
+    of the log is quoted. A record read out of a format nobody has mapped is intact evidence
+    with no reading yet, and one store can hold a hundred thousand of them. Added up under
+    the word unreadable, the one line that matters disappears into the rows that do not, and
+    the total is wrong about almost all of what it counts.
+    """
+    report = NormalizeReport(
+        bundle_uuid="b",
+        source_kind="directory",
+        source_path="/tmp/x",
+        unparsed_records=5,
+        uninterpreted_records=4,
+    )
+
+    text = report.summary()
+
+    assert "1 record(s) nothing could read" in text
+    assert "4 record(s) read but in a format nobody has mapped" in text
 
 
 def test_the_log_and_a_case_hold_the_same_events(

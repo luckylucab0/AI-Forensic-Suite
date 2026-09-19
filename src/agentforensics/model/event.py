@@ -183,6 +183,35 @@ class Event:
         return json.dumps(self.payload, sort_keys=True, ensure_ascii=False, default=str)
 
 
+# The words every record carries that was read fine and that nobody has a verified mapping
+# for. Both generic readers, the one for SQLite stores and the one for line-delimited logs,
+# build their sentence out of it, and the case counts with it.
+#
+# It exists because the two populations under `unparsed.record` are opposite answers to the
+# question an analyst asks of them. A line that would not decode, or a half-written record
+# from a process that was killed, is a defect in the evidence and is worth opening before
+# anything in the case is quoted. A row of a chat database nobody has read a schema for is
+# intact evidence that simply has no reading yet, and there can be hundreds of thousands of
+# those. Counted as one number the first disappears into the second, and the word
+# "unreadable" in front of the total is then wrong about almost all of it.
+#
+# A phrase rather than a column because the alternative is a change to the event model and
+# to the format on the wire, which is a heavier thing than the problem needs. A test asserts
+# that only the two generic readers write it.
+UNINTERPRETED_MARK = "is returned uninterpreted"
+
+
+def is_uninterpreted(event: Event) -> bool:
+    """Whether this record was read and is only waiting for somebody to map its format.
+
+    The other kind of `unparsed.record` is a record nothing could read at all. Both are in
+    the case, and a reader counting them as one number would call a whole store of intact
+    evidence unreadable, or lose one broken line among a hundred thousand rows nobody has
+    a schema for.
+    """
+    return event.kind == "unparsed.record" and UNINTERPRETED_MARK in (event.parse_problem or "")
+
+
 def unparsed(
     provenance: Provenance,
     agent: str,
@@ -215,9 +244,11 @@ def unparsed(
 
 __all__ = [
     "EVENT_KINDS",
+    "UNINTERPRETED_MARK",
     "Actor",
     "Event",
     "Provenance",
     "TsPrecision",
+    "is_uninterpreted",
     "unparsed",
 ]
