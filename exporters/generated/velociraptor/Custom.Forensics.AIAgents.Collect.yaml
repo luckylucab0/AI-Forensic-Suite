@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 631820f9d33f
+# Catalogue digest: 14c3e1cb3932
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -289,18 +289,26 @@ sources:
     claude_desktop,claude_desktop.app_logs,C:/Users/*/AppData/Local/Claude-3p/logs/main.log
     claude_desktop,claude_desktop.app_logs,C:/Users/*/AppData/Local/Claude/Logs/main.log
     claude_desktop,claude_desktop.app_logs,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/logs/**
+    claude_desktop,claude_desktop.app_logs,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/logs/main.log
     claude_desktop,claude_desktop.app_logs,C:/Users/*/AppData/Roaming/Claude/logs/main.log
     claude_desktop,claude_desktop.code_session_index,C:/Users/*/AppData/Local/Claude-3p/claude-code-sessions/**
     claude_desktop,claude_desktop.code_session_index,C:/Users/*/AppData/Local/Claude/claude-code-sessions/*/*/local_*.json
+    claude_desktop,claude_desktop.code_session_index,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/claude-code-sessions/*/*/local_*.json
     claude_desktop,claude_desktop.code_session_index,C:/Users/*/AppData/Roaming/Claude/claude-code-sessions/*/*/local_*.json
     claude_desktop,claude_desktop.cowork_account_settings,C:/Users/*/AppData/Local/Claude-3p/local-agent-mode-sessions/*/*/cowork_account_settings.json
+    claude_desktop,claude_desktop.cowork_account_settings,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/*/*/cowork_account_settings.json
     claude_desktop,claude_desktop.cowork_account_settings,C:/Users/*/AppData/Roaming/Claude/local-agent-mode-sessions/*/*/cowork_account_settings.json
     claude_desktop,claude_desktop.cowork_audit_key,C:/Users/*/AppData/Local/Claude-3p/local-agent-mode-sessions/*/*/*/.audit-key
+    claude_desktop,claude_desktop.cowork_audit_key,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/*/*/*/.audit-key
     claude_desktop,claude_desktop.cowork_audit_key,C:/Users/*/AppData/Roaming/Claude/local-agent-mode-sessions/*/*/*/.audit-key
     claude_desktop,claude_desktop.cowork_audit_log,C:/Users/*/AppData/Local/Claude-3p/local-agent-mode-sessions/*/*/*/audit.jsonl
+    claude_desktop,claude_desktop.cowork_audit_log,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/*/*/*/audit.jsonl
     claude_desktop,claude_desktop.cowork_audit_log,C:/Users/*/AppData/Roaming/Claude/local-agent-mode-sessions/*/*/*/audit.jsonl
     claude_desktop,claude_desktop.cowork_memory,C:/Users/*/AppData/Local/Claude-3p/local-agent-mode-sessions/*/*/memory/memory/*.md
+    claude_desktop,claude_desktop.cowork_memory,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/*/*/memory/memory/*.md
     claude_desktop,claude_desktop.cowork_memory,C:/Users/*/AppData/Roaming/Claude/local-agent-mode-sessions/*/*/memory/memory/*.md
+    claude_desktop,claude_desktop.cowork_session_files,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/*/*/local_*/outputs/**
+    claude_desktop,claude_desktop.cowork_session_files,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/*/*/local_*/uploads/**
     claude_desktop,claude_desktop.cowork_session_files,C:/Users/*/AppData/Roaming/Claude/local-agent-mode-sessions/*/*/local_*/outputs/**
     claude_desktop,claude_desktop.cowork_session_files,C:/Users/*/AppData/Roaming/Claude/local-agent-mode-sessions/*/*/local_*/uploads/**
     claude_desktop,claude_desktop.cowork_session_store,C:/Users/*/AppData/Local/Claude-3p/local-agent-mode-sessions/*/*/local_*/**
@@ -308,10 +316,12 @@ sources:
     claude_desktop,claude_desktop.cowork_session_store,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/*/*/local_*/**
     claude_desktop,claude_desktop.cowork_session_store,C:/Users/*/AppData/Roaming/Claude/local-agent-mode-sessions/*/*/local_*/**
     claude_desktop,claude_desktop.cowork_vm_bundle,C:/Users/*/AppData/Local/Claude-3p/vm_bundles/**
+    claude_desktop,claude_desktop.cowork_vm_bundle,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/vm_bundles/claudevm.bundle/**
     claude_desktop,claude_desktop.cowork_vm_bundle,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/vm_bundles/claudevm.bundle/sessiondata.vhdx
     claude_desktop,claude_desktop.cowork_vm_bundle,C:/Users/*/AppData/Roaming/Claude/vm_bundles/claudevm.bundle/**
     claude_desktop,claude_desktop.device_identifier,C:/Users/*/AppData/Local/Claude-3p/ant-did
     claude_desktop,claude_desktop.embedded_claude_code,C:/Users/*/AppData/Local/Claude-3p/claude-code/*/**
+    claude_desktop,claude_desktop.embedded_claude_code,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/claude-code/*/claude.exe
     claude_desktop,claude_desktop.embedded_claude_code,C:/Users/*/AppData/Roaming/Claude/claude-code/*/claude.exe
     claude_desktop,claude_desktop.install_evidence_windows,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/**
     claude_desktop,claude_desktop.local_config_library,C:/Users/*/AppData/Local/Claude-3p/configLibrary/**
@@ -320,6 +330,8 @@ sources:
     claude_desktop,claude_desktop.oauth_and_signin_tokens,C:/Users/*/AppData/Local/Microsoft/Credentials/**
     claude_desktop,claude_desktop.renderer_state,C:/Users/*/AppData/Local/Claude-3p/IndexedDB/**
     claude_desktop,claude_desktop.renderer_state,C:/Users/*/AppData/Local/Claude/IndexedDB/**
+    claude_desktop,claude_desktop.renderer_state,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/IndexedDB/**
+    claude_desktop,claude_desktop.renderer_state,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/Local Storage/**
     claude_desktop,claude_desktop.renderer_state,C:/Users/*/AppData/Roaming/Claude/IndexedDB/**
     claude_desktop,claude_desktop.renderer_state,C:/Users/*/AppData/Roaming/Claude/Local Storage/**
     claude_desktop,claude_desktop.scheduled_tasks,C:/Users/*/.claude/scheduled-tasks/*/SKILL.md
@@ -327,11 +339,14 @@ sources:
     claude_desktop,claude_desktop.ssh_remote_artifacts,C:/Users/*/.claude/remote/plugins/*/**
     claude_desktop,claude_desktop.ssh_remote_artifacts,C:/Users/*/.claude/remote/run/*/**
     claude_desktop,claude_desktop.ssh_remote_artifacts,C:/Users/*/.claude/remote/srv/*/**
+    claude_desktop,claude_desktop.transient_session_credentials,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/ccd-session-secrets/*/**
+    claude_desktop,claude_desktop.transient_session_credentials,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/host-creds-*.json
     claude_desktop,claude_desktop.transient_session_credentials,C:/Users/*/AppData/Roaming/Claude/ccd-session-secrets/*/**
     claude_desktop,claude_desktop.transient_session_credentials,C:/Users/*/AppData/Roaming/Claude/host-creds-*.json
     claude_desktop,claude_desktop.user_output_folder,C:/Users/*/Claude/**
     claude_desktop,claude_desktop.user_output_folder,C:/Users/*/Claude/Projects/*/**
     claude_desktop,claude_desktop.user_plugins,C:/Users/*/AppData/Local/Claude-3p/cowork_plugins/**
+    claude_desktop,claude_desktop.user_plugins,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/cowork_plugins/**
     claude_desktop,claude_desktop.user_plugins,C:/Users/*/AppData/Roaming/Claude/cowork_plugins/**
     cline,cline.agent_schedules,C:/Users/*/.cline/schedules/**
     cline,cline.cache_and_remote_config,C:/Users/*/AppData/Roaming/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/cache/**

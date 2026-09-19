@@ -2347,6 +2347,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "%LOCALAPPDATA%\\Claude-3p\\logs\\main.log",
                         "%LOCALAPPDATA%\\Claude\\Logs\\main.log",
                         "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\logs\\",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\logs\\main.log",
                         "~/.config/Claude-3p/logs/main.log",
                         "~/.config/Claude/logs/main.log",
                         "~/Library/Logs/Claude-3p/main.log",
@@ -2389,6 +2390,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "%APPDATA%\\Claude\\claude-code-sessions\\<uuid>\\<uuid>\\local_<session-id>.json",
                         "%LOCALAPPDATA%\\Claude-3p\\claude-code-sessions\\",
                         "%LOCALAPPDATA%\\Claude\\claude-code-sessions\\<uuid>\\<uuid>\\local_<session-id>.json",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\claude-code-sessions\\<uuid>\\<uuid>\\local_<session-id>.json",
                         "~/Library/Application Support/Claude-3p/claude-code-sessions/",
                         "~/Library/Application Support/Claude/claude-code-sessions/<uuid>/<uuid>/local_<session-id>.json"
                     ],
@@ -2408,6 +2410,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "%APPDATA%\\Claude\\local-agent-mode-sessions\\*\\*\\cowork_account_settings.json",
                         "%LOCALAPPDATA%\\Claude-3p\\local-agent-mode-sessions\\*\\*\\cowork_account_settings.json",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\local-agent-mode-sessions\\*\\*\\cowork_account_settings.json",
                         "~/Library/Application Support/Claude-3p/local-agent-mode-sessions/*/*/cowork_account_settings.json",
                         "~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/cowork_account_settings.json"
                     ],
@@ -2427,6 +2430,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "%APPDATA%\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\<session-id>\\.audit-key",
                         "%LOCALAPPDATA%\\Claude-3p\\local-agent-mode-sessions\\<uuid>\\<uuid>\\<session-id>\\.audit-key",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\<session-id>\\.audit-key",
                         "~/Library/Application Support/Claude-3p/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/.audit-key",
                         "~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/.audit-key"
                     ],
@@ -2446,6 +2450,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "%APPDATA%\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\<session-id>\\audit.jsonl",
                         "%LOCALAPPDATA%\\Claude-3p\\local-agent-mode-sessions\\<uuid>\\<uuid>\\<session-id>\\audit.jsonl",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\<session-id>\\audit.jsonl",
                         "~/Library/Application Support/Claude-3p/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/audit.jsonl",
                         "~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/<session-id>/audit.jsonl"
                     ],
@@ -2465,6 +2470,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "%APPDATA%\\Claude\\local-agent-mode-sessions\\*\\*\\memory\\memory\\*.md",
                         "%LOCALAPPDATA%\\Claude-3p\\local-agent-mode-sessions\\*\\*\\memory\\memory\\*.md",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\local-agent-mode-sessions\\*\\*\\memory\\memory\\*.md",
                         "~/Library/Application Support/Claude-3p/local-agent-mode-sessions/*/*/memory/memory/*.md",
                         "~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/memory/CLAUDE.md",
                         "~/Library/Application Support/Claude/local-agent-mode-sessions/*/*/memory/memory/*.md",
@@ -2486,6 +2492,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "%APPDATA%\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\local_<uuid>\\outputs\\",
                         "%APPDATA%\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\local_<uuid>\\uploads\\",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\local_<uuid>\\outputs\\",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\local-agent-mode-sessions\\<uuid>\\<uuid>\\local_<uuid>\\uploads\\",
                         "~/Library/Application Support/Claude-3p/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/outputs/",
                         "~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/outputs/",
                         "~/Library/Application Support/Claude/local-agent-mode-sessions/<uuid>/<uuid>/local_<uuid>/uploads/"
@@ -2530,6 +2538,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "%APPDATA%\\Claude\\vm_bundles\\claudevm.bundle\\",
                         "%LOCALAPPDATA%\\Claude-3p\\vm_bundles\\",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\vm_bundles\\claudevm.bundle\\",
                         "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\vm_bundles\\claudevm.bundle\\sessiondata.vhdx",
                         "~/Library/Application Support/Claude-3p/vm_bundles/",
                         "~/Library/Application Support/Claude/vm_bundles/"
@@ -2584,6 +2593,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "%APPDATA%\\Claude\\claude-code\\<version>\\claude.exe",
                         "%LOCALAPPDATA%\\Claude-3p\\claude-code\\<version>\\",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\claude-code\\<version>\\claude.exe",
                         "~/Library/Application Support/Claude-3p/claude-code/<version>/claude.app/Contents/MacOS/claude",
                         "~/Library/Application Support/Claude/claude-code-vm/",
                         "~/Library/Application Support/Claude/claude-code/<version>/claude.app/Contents/MacOS/claude"
@@ -2769,6 +2779,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "%APPDATA%\\Claude\\Local Storage\\",
                         "%LOCALAPPDATA%\\Claude-3p\\IndexedDB\\",
                         "%LOCALAPPDATA%\\Claude\\IndexedDB\\",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\IndexedDB\\",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\Local Storage\\",
                         "~/Library/Application Support/Claude-3p/IndexedDB/",
                         "~/Library/Application Support/Claude/IndexedDB/",
                         "~/Library/Application Support/Claude/Local Storage/",
@@ -2826,6 +2838,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "%APPDATA%\\Claude\\ccd-session-secrets\\<session-id>\\",
                         "%APPDATA%\\Claude\\host-creds-<hash>.json",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\ccd-session-secrets\\<session-id>\\",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\host-creds-<hash>.json",
                         "~/Library/Application Support/Claude-3p/ccd-session-secrets/<session-id>/",
                         "~/Library/Application Support/Claude-3p/host-creds-<hash>.json",
                         "~/Library/Application Support/Claude/ccd-session-secrets/<session-id>/",
@@ -2867,6 +2881,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "%APPDATA%\\Claude\\cowork_plugins\\",
                         "%LOCALAPPDATA%\\Claude-3p\\cowork_plugins\\",
+                        "%LOCALAPPDATA%\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\cowork_plugins\\",
                         "~/.config/Claude/cowork_plugins/",
                         "~/Library/Application Support/Claude-3p/cowork_plugins/",
                         "~/Library/Application Support/Claude/cowork_plugins/"
@@ -8713,7 +8728,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "7ab83c05bc8bd9d1da4dfa10ae0acf2d412516d0513dc4da029ad1ba00bfb145"
+    "sha256": "f1acc43690449c8ffad68fbe7d682c8cd35b40ae97d4869eade63bc1ffa23113"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

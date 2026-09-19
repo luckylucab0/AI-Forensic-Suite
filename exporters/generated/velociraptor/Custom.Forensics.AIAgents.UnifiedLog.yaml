@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 631820f9d33f
+# Catalogue digest: 14c3e1cb3932
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -163,6 +163,7 @@ sources:
       claude_code,claude_code.workflow_runs,claude_transcript,C:/Users/*/.claude/projects/*/*/workflows/*.json
       claude_desktop,claude_desktop.code_session_index,file_only,C:/Users/*/AppData/Local/Claude-3p/claude-code-sessions/**
       claude_desktop,claude_desktop.code_session_index,file_only,C:/Users/*/AppData/Local/Claude/claude-code-sessions/*/*/local_*.json
+      claude_desktop,claude_desktop.code_session_index,file_only,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/claude-code-sessions/*/*/local_*.json
       claude_desktop,claude_desktop.code_session_index,file_only,C:/Users/*/AppData/Roaming/Claude/claude-code-sessions/*/*/local_*.json
       claude_desktop,claude_desktop.cowork_session_store,file_only,C:/Users/*/AppData/Local/Claude-3p/local-agent-mode-sessions/*/*/local_*/**
       claude_desktop,claude_desktop.cowork_session_store,file_only,C:/Users/*/AppData/Local/Claude/local-agent-mode-sessions/*/*/local_*/**

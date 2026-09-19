@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 631820f9d33f
+# Catalogue digest: 14c3e1cb3932
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -256,29 +256,38 @@ $targets = @(
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.app_logs'; Path = '$profile\AppData\Local\Claude-3p\logs\main.log' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.app_logs'; Path = '$profile\AppData\Local\Claude\Logs\main.log' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.app_logs'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\logs' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.app_logs'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\logs\main.log' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.app_logs'; Path = '$profile\AppData\Roaming\Claude\logs\main.log' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.code_session_index'; Path = '$profile\AppData\Local\Claude-3p\claude-code-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.code_session_index'; Path = '$profile\AppData\Local\Claude\claude-code-sessions' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.code_session_index'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\claude-code-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.code_session_index'; Path = '$profile\AppData\Roaming\Claude\claude-code-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_account_settings'; Path = '$profile\AppData\Local\Claude-3p\local-agent-mode-sessions' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_account_settings'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\local-agent-mode-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_account_settings'; Path = '$profile\AppData\Roaming\Claude\local-agent-mode-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_audit_key'; Path = '$profile\AppData\Local\Claude-3p\local-agent-mode-sessions' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_audit_key'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\local-agent-mode-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_audit_key'; Path = '$profile\AppData\Roaming\Claude\local-agent-mode-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_audit_log'; Path = '$profile\AppData\Local\Claude-3p\local-agent-mode-sessions' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_audit_log'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\local-agent-mode-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_audit_log'; Path = '$profile\AppData\Roaming\Claude\local-agent-mode-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_memory'; Path = '$profile\AppData\Local\Claude-3p\local-agent-mode-sessions' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_memory'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\local-agent-mode-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_memory'; Path = '$profile\AppData\Roaming\Claude\local-agent-mode-sessions' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_session_files'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\local-agent-mode-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_session_files'; Path = '$profile\AppData\Roaming\Claude\local-agent-mode-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_session_store'; Path = '$profile\AppData\Local\Claude-3p\local-agent-mode-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_session_store'; Path = '$profile\AppData\Local\Claude\local-agent-mode-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_session_store'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\local-agent-mode-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_session_store'; Path = '$profile\AppData\Roaming\Claude\local-agent-mode-sessions' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_vm_bundle'; Path = '$profile\AppData\Local\Claude-3p\vm_bundles' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_vm_bundle'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\vm_bundles\claudevm.bundle' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_vm_bundle'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\vm_bundles\claudevm.bundle\sessiondata.vhdx' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.cowork_vm_bundle'; Path = '$profile\AppData\Roaming\Claude\vm_bundles\claudevm.bundle' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.coworkd_service_log'; Path = 'C:\ProgramData\Claude\Logs\coworkd\user-' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.device_identifier'; Path = '$profile\AppData\Local\Claude-3p\ant-did' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.embedded_claude_code'; Path = '$profile\AppData\Local\Claude-3p\claude-code' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.embedded_claude_code'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\claude-code' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.embedded_claude_code'; Path = '$profile\AppData\Roaming\Claude\claude-code' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.install_evidence_windows'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.install_evidence_windows'; Path = 'C:\Program Files\WindowsApps\Claude_' }
@@ -289,6 +298,8 @@ $targets = @(
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.org_plugins'; Path = 'C:\Program Files\Claude\org-plugins' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.renderer_state'; Path = '$profile\AppData\Local\Claude-3p\IndexedDB' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.renderer_state'; Path = '$profile\AppData\Local\Claude\IndexedDB' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.renderer_state'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\IndexedDB' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.renderer_state'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\Local Storage' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.renderer_state'; Path = '$profile\AppData\Roaming\Claude\IndexedDB' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.renderer_state'; Path = '$profile\AppData\Roaming\Claude\Local Storage' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.scheduled_tasks'; Path = '$profile\.claude\scheduled-tasks' }
@@ -296,11 +307,14 @@ $targets = @(
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.ssh_remote_artifacts'; Path = '$profile\.claude\remote\plugins' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.ssh_remote_artifacts'; Path = '$profile\.claude\remote\run' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.ssh_remote_artifacts'; Path = '$profile\.claude\remote\srv' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.transient_session_credentials'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\ccd-session-secrets' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.transient_session_credentials'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\host-creds-' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.transient_session_credentials'; Path = '$profile\AppData\Roaming\Claude\ccd-session-secrets' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.transient_session_credentials'; Path = '$profile\AppData\Roaming\Claude\host-creds-' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.user_output_folder'; Path = '$profile\Claude' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.user_output_folder'; Path = '$profile\Claude\Projects' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.user_plugins'; Path = '$profile\AppData\Local\Claude-3p\cowork_plugins' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.user_plugins'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\cowork_plugins' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.user_plugins'; Path = '$profile\AppData\Roaming\Claude\cowork_plugins' }
     @{ Agent = 'cline'; Id = 'cline.agent_schedules'; Path = '$profile\.cline\schedules' }
     @{ Agent = 'cline'; Id = 'cline.cache_and_remote_config'; Path = '$profile\AppData\Roaming\Code - Insiders\User\globalStorage\saoudrizwan.claude-dev\cache' }

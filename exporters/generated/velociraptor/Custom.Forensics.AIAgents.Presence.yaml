@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 631820f9d33f
+# Catalogue digest: 14c3e1cb3932
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -350,9 +350,16 @@ sources:
     claude_desktop,C:/Users/*/AppData/Local/Claude/Logs/main.log
     claude_desktop,C:/Users/*/AppData/Local/Claude/claude-code-sessions/*/*/local_*.json
     claude_desktop,C:/Users/*/AppData/Local/Claude/local-agent-mode-sessions/*/*/local_*/**
+    claude_desktop,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/claude-code-sessions/*/*/local_*.json
     claude_desktop,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/claude_desktop_config.json
+    claude_desktop,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/cowork_plugins/**
+    claude_desktop,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/*/*/*/audit.jsonl
     claude_desktop,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/*/*/local_*/**
+    claude_desktop,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/*/*/local_*/outputs/**
+    claude_desktop,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/*/*/local_*/uploads/**
+    claude_desktop,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/*/*/memory/memory/*.md
     claude_desktop,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/logs/**
+    claude_desktop,C:/Users/*/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/logs/main.log
     claude_desktop,C:/Users/*/AppData/Roaming/Claude/claude-code-sessions/*/*/local_*.json
     claude_desktop,C:/Users/*/AppData/Roaming/Claude/claude_desktop_config.json
     claude_desktop,C:/Users/*/AppData/Roaming/Claude/cowork_plugins/**

@@ -1227,3 +1227,45 @@ def test_the_manifest_does_not_claim_a_windows_run_was_unelevated(monkeypatch) -
     )
     assert '"elevated": running_elevated(),' in source
     assert '"elevated": hasattr(os, "geteuid")' not in source
+
+
+def test_a_windows_roaming_path_is_also_searched_where_the_package_puts_it(
+    catalogue: Catalogue,
+) -> None:
+    """The store install writes somewhere else, and the entry has to look there too.
+
+    A Microsoft Store package redirects a program's writes into its own container, so a
+    file the vendor documents at %APPDATA%\\<product>\\x is at
+    %LOCALAPPDATA%\\Packages\\<family>\\LocalCache\\Roaming\\<product>\\x on such a host.
+    The two can both exist with different contents, and the catalogue's own note for this
+    product says the copy the application actually reads is the virtualized one while the
+    %APPDATA% copy may be dead.
+
+    This was true of three of twenty entries and false of the rest, which is the worst
+    shape for it: the paths looked complete, a store install returned nothing for the audit
+    log, the session files and the memory, and nothing said the collection had looked in
+    one place out of two. The mapping is the package virtualization itself rather than a
+    guess, so it holds for every path under that root.
+    """
+    missing = []
+    for agent in catalogue.agents:
+        containers = {
+            path.split("\\LocalCache\\", 1)[0] + "\\LocalCache\\Roaming\\"
+            for artifact in agent.artifacts
+            for path in artifact.paths
+            if "\\LocalCache\\Roaming\\" in path
+        }
+        if not containers:
+            continue
+        for artifact in agent.artifacts:
+            for path in artifact.paths:
+                if not path.startswith("%APPDATA%\\"):
+                    continue
+                tail = path[len("%APPDATA%\\") :]
+                if not any(container + tail in artifact.paths for container in containers):
+                    missing.append(f"{artifact.id}: {path}")
+    assert not missing, (
+        "these entries search the roaming path and not the one a packaged install "
+        "redirects it to, so a store install reads as an agent that left nothing: "
+        f"{missing}"
+    )
