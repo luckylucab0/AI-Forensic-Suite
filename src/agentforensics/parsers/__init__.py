@@ -27,6 +27,7 @@ from agentforensics.parsers.base import (
 )
 from agentforensics.parsers.claude_code import ClaudeCodeParser
 from agentforensics.parsers.cline import ClineParser
+from agentforensics.parsers.cline_cli import ClineCliParser
 from agentforensics.parsers.codex import CodexParser
 from agentforensics.parsers.codex_state import CodexStateParser
 from agentforensics.parsers.copilot import CopilotParser
@@ -50,6 +51,10 @@ PARSERS: tuple[Parser, ...] = (
     AmazonQParser(),
     ClaudeCodeParser(),
     ClineParser(),
+    # The SDK's own session store, which is a different product on disk from the editor
+    # extension above: a directory per session with a versioned messages file, a manifest
+    # that records how the run was started, and the hook log that dates a prompt.
+    ClineCliParser(),
     CodexParser(),
     # The projection of those rollouts into rows, which is where a conversation still is
     # after its rollout file has gone.

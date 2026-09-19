@@ -42,6 +42,10 @@ OLD = REFERENCE_NOW - 45 * 86400
 
 SESSION_A = "4f8c1e2a-0000-4000-8000-000000000001"
 SESSION_B = "4f8c1e2a-0000-4000-8000-000000000002"
+# The SDK session, which is a different store from the editor extension's task tree: a
+# directory per session holding a versioned messages file and a manifest, with the hook
+# audit log beside it under the data directory.
+CLI_SESSION = "4f8c1e2a-0000-4000-8000-000000000003"
 
 
 def write(path: Path, content: str | bytes, mtime: int = RECENT) -> Path:
@@ -1024,6 +1028,198 @@ def cline_task_metadata() -> str:
     )
 
 
+def cline_cli_messages() -> str:
+    """A v1 messages file, in the shapes the vendor's own contract states.
+
+    One turn with reasoning, a tool call, its result and a final answer, which is the shape
+    the contract's golden example describes. The times matter more than the content: `ts` is
+    on the assistant messages and on nothing else, so a reader that dated the prompt from
+    the answer beside it would be visibly wrong here.
+    """
+    return json.dumps(
+        {
+            "version": 1,
+            "updated_at": "2026-09-07T09:15:02.500Z",
+            "agent": "lead",
+            "sessionId": CLI_SESSION,
+            "origin": {"source": "cli", "mode": "user", "sessionId": CLI_SESSION},
+            "system_prompt": "You are a coding agent. Never edit files outside the workspace.",
+            "messages": [
+                {
+                    "id": "msg_user_1",
+                    "role": "user",
+                    "content": [{"type": "text", "text": "remove the debug logging"}],
+                },
+                {
+                    "id": "msg_assistant_1",
+                    "role": "assistant",
+                    "ts": 1788772501000,  # 2026-09-07T09:15:01Z, the same clock the manifest uses
+                    "modelInfo": {"id": "example-model-6", "provider": "example-provider"},
+                    "content": [
+                        {"type": "thinking", "thinking": "I should read the file first."},
+                        {
+                            "type": "tool_use",
+                            "id": "call-1",
+                            "name": "read_files",
+                            "input": {"files": [{"path": "/home/alice/src/app/index.js"}]},
+                        },
+                        {
+                            "type": "tool_use",
+                            "id": "call-2",
+                            "name": "run_commands",
+                            "input": {"commands": ["npm run lint"]},
+                        },
+                    ],
+                },
+                {
+                    "id": "msg_user_2",
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": "call-1",
+                            "content": "console.log('debug');\n",
+                            "is_error": False,
+                        }
+                    ],
+                },
+                {
+                    "id": "msg_assistant_2",
+                    "role": "assistant",
+                    "ts": 1788772502500,  # 2026-09-07T09:15:02.5Z
+                    "modelInfo": {"id": "example-model-6", "provider": "example-provider"},
+                    "metrics": {
+                        "inputTokens": 21,
+                        "outputTokens": 8,
+                        "cacheReadTokens": 0,
+                        "cacheWriteTokens": 0,
+                        "cost": 0.0,
+                    },
+                    "content": [{"type": "text", "text": "Removed the debug logging."}],
+                },
+            ],
+        },
+        indent=2,
+    )
+
+
+def cline_cli_manifest() -> str:
+    """The session manifest, in the fields the vendor's zod schema requires.
+
+    Written as a non-interactive run with a prompt, which is the shape that says a session
+    was automated rather than typed, and which no transcript states on its own.
+    """
+    return json.dumps(
+        {
+            "version": 1,
+            "session_id": CLI_SESSION,
+            "source": "cli",
+            "pid": 4242,
+            "started_at": "2026-09-07T09:15:00.000Z",
+            "ended_at": "2026-09-07T09:15:03.000Z",
+            "exit_code": 0,
+            "status": "completed",
+            "interactive": False,
+            "provider": "example-provider",
+            "model": "example-model-6",
+            "cwd": "/home/alice/src/app",
+            "workspace_root": "/home/alice/src/app",
+            "enable_tools": True,
+            "enable_spawn": False,
+            "enable_teams": False,
+            "prompt": "remove the debug logging",
+            "messages_path": f"/home/alice/.cline/data/sessions/{CLI_SESSION}/{CLI_SESSION}.messages.json",
+        },
+        indent=2,
+    )
+
+
+def cline_hook_audit() -> str:
+    """The hook audit log: one object per line, in the writer's own shapes.
+
+    It carries what the messages file cannot. Every line is dated, so the prompt has a
+    clock; the tool result carries its duration and whether it failed; and the last line is
+    written by a different writer than the rest, which is why one file holds both.
+    """
+    return jsonl(
+        [
+            {
+                "ts": "2026-09-07T09:15:00.100Z",
+                "hookName": "agent_start",
+                "clineVersion": "1.0.0",
+                "taskId": CLI_SESSION,
+                "sessionContext": {"rootSessionId": CLI_SESSION},
+                "workspaceRoots": ["/home/alice/src/app"],
+                "userId": "alice",
+                "taskStart": {"taskMetadata": {}},
+            },
+            {
+                "ts": "2026-09-07T09:15:00.400Z",
+                "hookName": "prompt_submit",
+                "taskId": CLI_SESSION,
+                "sessionContext": {"rootSessionId": CLI_SESSION},
+                "workspaceRoots": ["/home/alice/src/app"],
+                "userId": "alice",
+                "userPromptSubmit": {"prompt": "remove the debug logging", "attachments": []},
+            },
+            {
+                "ts": "2026-09-07T09:15:01.000Z",
+                "hookName": "tool_call",
+                "taskId": CLI_SESSION,
+                "iteration": 1,
+                "workspaceRoots": ["/home/alice/src/app"],
+                "tool_call": {
+                    "id": "call-2",
+                    "name": "run_commands",
+                    "input": {"commands": ["npm run lint"]},
+                },
+                "preToolUse": {"toolName": "run_commands", "parameters": {}},
+            },
+            {
+                "ts": "2026-09-07T09:15:02.000Z",
+                "hookName": "tool_result",
+                "taskId": CLI_SESSION,
+                "iteration": 1,
+                "workspaceRoots": ["/home/alice/src/app"],
+                "tool_result": {"id": "call-2", "name": "run_commands", "durationMs": 940},
+                "postToolUse": {
+                    "toolName": "run_commands",
+                    "parameters": {},
+                    "result": "1 problem found",
+                    "success": False,
+                    "executionTimeMs": 940,
+                },
+            },
+            {
+                "ts": "2026-09-07T09:15:03.000Z",
+                "hookName": "agent_end",
+                "taskId": CLI_SESSION,
+                "workspaceRoots": ["/home/alice/src/app"],
+                "turn": {"outputText": "Removed the debug logging.", "status": "completed"},
+                "taskComplete": {"taskMetadata": {}},
+            },
+            # Appended by the session manifest store rather than by the hook writer, with a
+            # shape of its own. One file, two writers, which is why a reader that assumed
+            # the payload base was always there would drop this line.
+            {
+                "ts": "2026-09-07T09:20:00.000Z",
+                "hookName": "session_shutdown",
+                "reason": "stale process",
+                "sessionId": CLI_SESSION,
+                "pid": 4242,
+                "source": "cli",
+            },
+            # A hook this parser does not know. The writer gains them over time and the case
+            # has to show one rather than read it as one of the nine.
+            {
+                "ts": "2026-09-07T09:20:01.000Z",
+                "hookName": "example_future_hook",
+                "taskId": CLI_SESSION,
+            },
+        ]
+    )
+
+
 def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     """Create the synthetic profile. Returns a summary for assertions."""
     project = home / "src" / "app"
@@ -1147,6 +1343,14 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     )
     os.chmod(cline_data / "secrets.json", 0o600)
     write(cline_data / "globalState.json", json.dumps({"mode": "act"}, sort_keys=True))
+
+    # The SDK's own session store and the hook audit log beside it. The log is under
+    # data/logs rather than in the session directory, which is where the writers put it and
+    # is the one artifact that dates a prompt.
+    cli_session = cline_data / "sessions" / CLI_SESSION
+    write(cli_session / f"{CLI_SESSION}.messages.json", cline_cli_messages(), RECENT)
+    write(cli_session / f"{CLI_SESSION}.json", cline_cli_manifest(), RECENT)
+    write(cline_data / "logs" / "hooks.jsonl", cline_hook_audit(), RECENT)
 
     write(claude / "CLAUDE.md", "# User instructions\n\nAlways run the linter.\n")
     write(claude / "shell-snapshots" / "snapshot-1.sh", "alias gs='git status'\n")

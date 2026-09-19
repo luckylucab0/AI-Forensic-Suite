@@ -228,8 +228,21 @@ def test_the_synthetic_profile_corroborates_without_anything_staged(tmp_path: Pa
     codex = next(pair for pair in agents["codex"]["pairs"])
     assert {codex["left"], codex["right"]} == {"codex.prompt_history", "codex.rollouts"}
     assert codex["overlap"] == "complete"
-    assert view["counts"]["in_one_store"] == 0
     assert view["counts"]["corroborated"] >= 2
+
+    # Cline is in the fixture twice, as two products that share a name and nothing else: the
+    # editor extension's task tree and the SDK's session store with its hook log beside it.
+    # The two SDK stores agree completely, and neither knows the editor's task, which is the
+    # case the third property of ADR 0026 exists for. The pair line has to say it looks like
+    # two id spaces rather than leaving an analyst to read a deletion out of a zero.
+    cline = {frozenset({pair["left"], pair["right"]}): pair for pair in agents["cline"]["pairs"]}
+    assert cline[frozenset({"cline.cli_sessions", "cline.hooks_audit_log"})]["overlap"] == (
+        "complete"
+    )
+    assert (
+        cline[frozenset({"cline.cli_sessions", "cline.vscode_task_transcripts"})]["overlap"]
+        == "none"
+    )
 
 
 def test_the_note_says_that_silence_is_a_lead(tmp_path: Path) -> None:

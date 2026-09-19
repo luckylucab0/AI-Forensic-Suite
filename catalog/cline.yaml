@@ -429,7 +429,7 @@ artifacts:
     It matters most for the times. In the canonical messages file a timestamp is present on assistant turn messages only, so a prompt there cannot be placed on a clock. Every line here is dated, which makes this the one artifact that dates what a person asked.
 
     The path is resolved by ensureHookLogDir() = join(resolveClineDataDir(), "logs") in sdk/packages/shared/src/storage/paths.ts, so it moves with CLINE_DIR and CLINE_DATA_DIR, and CLINE_HOOKS_LOG_PATH moves this file on its own to any path at all. One file per data directory rather than one per session: it is appended to by the CLI, the desktop sidecar and the team child session manager alike.
-  parser: jsonl_generic
+  parser: cline_cli
 - id: cline.mcp_settings
   category: mcp_config
   root: user_profile
@@ -513,7 +513,7 @@ artifacts:
     The hooks file named here is the one path on this entry that a writer contradicts. The README of the vendor's own desktop example lists <sessionId>.hooks.jsonl among the session artifacts, and the only writers of a hooks log in the SDK append to one shared file under the data directory's logs folder, which is catalogued separately as cline.hooks_audit_log. Both are collected and neither is dropped: a file the documentation names is worth looking for even when the code reads otherwise, and concluding there was no hook trace because one of the two places is empty is the mistake this entry exists to prevent.
 
     The verification pass confirmed the sessions directory and none of the file layout inside it: the resolver states the directory, and the three filenames and the subagents directory appear nowhere on that page. This is a transcript artifact, so treat a session directory that contains none of these filenames as a layout this catalogue has wrong rather than as an empty session, and collect the directory whole.
-  parser: null
+  parser: cline_cli
 - id: cline.data_tasks
   category: transcript
   root: user_profile

@@ -124,6 +124,8 @@ UNINTERPRETED: dict[str, str] = {
     "so a line of it is not the text that was typed",
     "chatgpt_desktop.macos_codex_home": "a profile directory this artifact will not narrow "
     "to an extension",
+    "cline.cli_sessions": "a session directory of whole JSON documents. The hook log that "
+    "dates this agent's prompts is a separate artifact and does come back record by record",
     "cline.data_tasks": "a task directory of whole JSON documents",
     "cline.vscode_task_transcripts": "a task directory of whole JSON documents",
     "gemini_cli.chats": "a chats directory this artifact will not narrow to an extension",
