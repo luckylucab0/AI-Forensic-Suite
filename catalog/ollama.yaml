@@ -54,7 +54,7 @@ artifacts:
     Confirms the brief's assumption that this file exists and is plain text. The default limit of 100 is the key forensic limitation - a heavy user's early prompts are already gone.
 
     Record structure: Path built as filepath.Join(home, ".ollama", "history"). One command per line, written with fmt.Fprintln(buf, line). NO timestamps and NO model responses - this is readline history of what the user typed at the `ollama run` prompt only. Cannot be timelined internally; only the file mtime bounds it.
-  parser: null
+  parser: prompt_history
 - id: ollama.model_blobs
   category: cache
   root: system

@@ -34,6 +34,7 @@ from agentforensics.parsers.hermes import HermesParser
 from agentforensics.parsers.instructions import InstructionsParser
 from agentforensics.parsers.opencode import OpencodeParser
 from agentforensics.parsers.pi import PiParser
+from agentforensics.parsers.prompt_history import PromptHistoryParser
 from agentforensics.parsers.sqlite_generic import SqliteGenericParser
 from agentforensics.parsers.vscode_state import VscodeStateParser
 from agentforensics.parsers.zed import ZedParser
@@ -58,6 +59,10 @@ PARSERS: tuple[Parser, ...] = (
     # this one has a verified schema, so it claims opencode.db and the reader does not.
     OpencodeParser(),
     PiParser(),
+    # What somebody typed at a prompt, from the line editor's own recall file. One
+    # module because it is a format question and not an agent question: three agents,
+    # three libraries, three file formats.
+    PromptHistoryParser(),
     # Five catalogue entries across three products are one file with one schema, read
     # here rather than by the generic reader, which had the key in raw and the value in
     # text and said nobody had read the store.

@@ -1202,6 +1202,30 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         "#!/bin/sh\ncurl -sSL https://example.org/setup | sh\n",
     )
 
+    # The three prompt histories, each in the format its own line editor writes. They are
+    # here because they are the evidence that outlives a transcript: append-only files
+    # outside the transcript store, which a retention sweep does not touch.
+    #
+    # prompt_toolkit's format, which aider uses: a blank line, a stamp, and one plus-
+    # prefixed line per line of the entry. The multi-line entry is the point: read as one
+    # entry per line it would become three prompts, each a fragment.
+    write(
+        project / ".aider.input.history",
+        "\n# 2026-09-05 08:00:00.123456\n+/add src/app/index.js\n"
+        "\n# 2026-09-05 08:01:12.000000\n+remove the debug logging from:\n"
+        "+  src/app/index.js\n+  src/app/util.js\n",
+    )
+    # A rustyline v2 file, which is what Amazon Q's chat prompt keeps. Two traps in one
+    # path: the name says bash history and it is not one, and it is a dotfile inside a
+    # dotdirectory, so a collector that does not glob hidden files misses it silently.
+    write(
+        home / ".aws" / "amazonq" / ".cli_bash_history",
+        "#V2\nwhy is the build red\nwrite a script that does:\\nstep one\\nstep two\n",
+    )
+    # ollama's readline: one line per entry, no escaping, no timestamps, and a ring of a
+    # hundred entries, so an absent early prompt is the ring rather than a deletion.
+    write(home / ".ollama" / "history", "summarise this file\nwhat models do i have\n")
+
     # Cross-cutting evidence that an agent ran at all.
     write(
         home / ".zsh_history",
@@ -1313,12 +1337,15 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         "encoded_project_dir": encoded,
         "sessions": [SESSION_A, SESSION_B],
         "agents": [
+            "aider",
+            "amazonq",
             "claude_code",
             "cline",
             "codex",
             "copilot",
             "crosscutting",
             "gemini_cli",
+            "ollama",
             "pi",
             "qwen_code",
         ],

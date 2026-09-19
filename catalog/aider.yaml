@@ -202,7 +202,7 @@ artifacts:
     Contains every line the operator typed at the aider prompt, including slash commands (/add, /run, /undo). Survives even when the chat history file has been deleted, so it is a good cross-check for tampering.
 
     Record structure: args.py default_input_history_file = os.path.join(git_root, '.aider.input.history'). Override: --input-history-file / AIDER_INPUT_HISTORY_FILE / 'input-history-file:' key. prompt_toolkit FileHistory format: lines prefixed '+' grouped under '# <timestamp>' headers.
-  parser: null
+  parser: prompt_history
 - id: aider.chat_history
   category: transcript
   root: project

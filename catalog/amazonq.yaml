@@ -134,7 +134,7 @@ artifacts:
     Appended, not rewritten: the code calls rl.append_history(&history_path) from InputSource::save_history, which runs on Drop of the input source, so entries survive even when the conversation itself is deleted from the database. Entries are only added when should_append_history returns true, which drops empty lines and the bare answers y, n and t; rustyline is configured with history_ignore_space(true), so a prompt typed with a leading space is never recorded.
   notes: |-
     This is the arrow-up recall file for q chat and it is the best answer to 'what did the user actually ask'. It is a plain rustyline history file, so it is trivially parseable and readable even when the SQLite conversation for that directory has been overwritten. The path is built from the constant CLI_BASH_HISTORY = ".aws/amazonq/.cli_bash_history" joined to the home directory in GlobalPaths::cli_bash_history(), and is used as the rustyline history path in the chat prompt setup. TWO TRAPS. The name says bash_history, which invites an analyst to dismiss it as an ordinary shell history or to skip it as duplicate of ~/.bash_history: it is neither, it is the Amazon Q chat prompt history. And it is a dotfile inside a dotdirectory, so a collector that does not glob hidden files inside ~/.aws/amazonq will silently miss it. Because the file is append-only while conversations are keyed by directory and overwritten, the history file frequently contains prompts whose conversations no longer exist, which makes it the right place to start when a transcript looks suspiciously short.
-  parser: null
+  parser: prompt_history
 - id: amazonq.cli_checkpoints
   title: Amazon Q Developer CLI checkpoint shadow repositories
   category: file_snapshot
