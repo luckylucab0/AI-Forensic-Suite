@@ -152,6 +152,11 @@ UNINTERPRETED: dict[str, str] = {
     "qwen_code.prompt_history_log": "one JSON document rewritten whole on every append",
     "qwen_code.subagent_transcripts": "a directory with no stated file format",
     "roo_code.tasks": "a task directory of whole JSON documents",
+    "windsurf.cascade_trajectories": "an encrypted container around a protocol buffer. "
+    "The analyzer opens one when the examiner supplies the product's key; this query does "
+    "not carry a key and does not try, so it returns the files to be collected and read",
+    "windsurf.implicit_trajectories": "the same encrypted container as the entry above, "
+    "for the background work of the same agent",
 }
 
 # Whole formats this query returns as files rather than as records, with the reason.

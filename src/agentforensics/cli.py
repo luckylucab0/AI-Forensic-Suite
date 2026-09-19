@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from collections.abc import Iterable, Sequence
 from pathlib import Path
@@ -255,6 +256,27 @@ def cmd_export_collection(args: argparse.Namespace) -> int:
     return EXIT_FINDING if skipped else EXIT_OK
 
 
+def _keys(given: list[str] | None) -> dict[str, str]:
+    """The decryption keys for this run, from the command line and the environment.
+
+    The command line wins over the environment, so an analyst can override a key that is
+    set for a whole shell without unsetting it. A malformed argument is refused rather
+    than ignored: a key that silently did not apply would produce a case that says the
+    store could not be opened, which is the same output as a wrong key and a different
+    fact.
+    """
+    keys: dict[str, str] = {}
+    for name, value in os.environ.items():
+        if name.startswith("AFX_KEY_") and value:
+            keys[name[len("AFX_KEY_") :].lower()] = value
+    for item in given or ():
+        agent, separator, value = item.partition("=")
+        if not separator or not agent.strip() or not value.strip():
+            raise ValueError(f"--key expects AGENT=KEY, not {item!r}")
+        keys[agent.strip().lower()] = value.strip()
+    return keys
+
+
 def cmd_ingest(args: argparse.Namespace) -> int:
     """Read a bundle, a collected tree or an exported profile into a case.
 
@@ -285,7 +307,14 @@ def cmd_ingest(args: argparse.Namespace) -> int:
         return EXIT_ERROR
 
     try:
-        report = ingest_source(case, source, catalogue, kind=args.kind)
+        keys = _keys(getattr(args, "key", None))
+    except ValueError as exc:
+        case.close()
+        _write(sys.stderr, f"ingest: {exc}")
+        return EXIT_ERROR
+
+    try:
+        report = ingest_source(case, source, catalogue, kind=args.kind, keys=keys)
     except (BundleError, OSError) as exc:
         _write(sys.stderr, f"ingest: {exc}")
         return EXIT_ERROR
@@ -957,6 +986,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="override the detected source kind. A bundle with a manifest is always read "
         "as native whatever this says, because the manifest is the only record of what "
         "the endpoint knew.",
+    )
+    ingest.add_argument(
+        "--key",
+        action="append",
+        metavar="AGENT=KEY",
+        help="decryption key for one agent's encrypted store, as hexadecimal or base64. "
+        "One product keeps its conversations in an encrypted container and the key is the "
+        "product's, not the user's; this tool ships none. May be given more than once, "
+        "and may also be set as AFX_KEY_<AGENT> in the environment.",
     )
     ingest.add_argument("--json", action="store_true", help="machine-readable report")
     ingest.set_defaults(func=cmd_ingest)

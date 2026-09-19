@@ -180,6 +180,19 @@ uv run afx sessions --case case.db                            # conversations on
 uv run afx serve --case case.db                                # open it in a browser
 ```
 
+One agent keeps its conversations in an encrypted container. The key is the product's
+rather than the user's and this repository ships none, so those files are read only when
+you supply it:
+
+```bash
+uv pip install 'agentforensics[encrypted]'                     # the cipher, an optional extra
+uv run afx ingest /evidence/bundle --case case.db --key windsurf=<key>
+```
+
+Without the key the files are still collected and hashed, and the case says they are an
+encrypted store and what it would take to read them rather than saying nothing. See
+[ADR 0029](docs/adr/0029-an-encrypted-store-is-read-only-with-the-analysts-key.md).
+
 `serve` binds `127.0.0.1` only, opens the case read-only so SQLite itself refuses a write,
 and puts every URL under a token generated for that run and printed on the console. No
 telemetry, no update check, and a content security policy that forbids the page from

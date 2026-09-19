@@ -48,6 +48,7 @@ from agentforensics.parsers.sqlite_generic import SqliteGenericParser
 from agentforensics.parsers.text_log import TextLogParser
 from agentforensics.parsers.toml_generic import TomlGenericParser
 from agentforensics.parsers.vscode_state import VscodeStateParser
+from agentforensics.parsers.windsurf_cascade import WindsurfCascadeParser
 from agentforensics.parsers.yaml_generic import YamlGenericParser
 from agentforensics.parsers.zed import ZedParser
 from agentforensics.parsers.zed_sidebar import ZedSidebarParser
@@ -100,6 +101,10 @@ PARSERS: tuple[Parser, ...] = (
     # here rather than by the generic reader, which had the key in raw and the value in
     # text and said nobody had read the store.
     VscodeStateParser(),
+    # The encrypted trajectory store, which is the whole conversation record of one
+    # product. Read only when the analyst supplies the product's key, and reported as an
+    # encrypted store otherwise. See ADR 0029.
+    WindsurfCascadeParser(),
     ZedParser(),
     # The other half of Zed on disk: threads.db holds the conversations and this store
     # holds which agent ran them, which of them were archived out of the sidebar, and what

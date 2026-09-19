@@ -26,6 +26,7 @@ claimants are tried, and the case records that it happened.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -159,6 +160,7 @@ def events_for(
     entry: SourceEntry,
     project_roots: tuple[str, ...] = (),
     matcher: Matcher | None = None,
+    keys: Mapping[str, str] | None = None,
 ) -> EntryEvents:
     """Read one collected file: its filesystem event, then whatever a parser makes of it.
 
@@ -172,7 +174,7 @@ def events_for(
     """
     events = list(_filesystem_events(bundle_uuid, entry))
     parsed, unreadable, parser_name, detail, parsed_as = _parse(
-        bundle_uuid, entry, project_roots, matcher
+        bundle_uuid, entry, project_roots, matcher, keys
     )
     events.extend(parsed)
     return EntryEvents(
@@ -215,8 +217,15 @@ def ingest(
     catalogue: Catalogue,
     *,
     kind: str | None = None,
+    keys: Mapping[str, str] | None = None,
 ) -> IngestReport:
-    """Read one source into a case, and report what came of it."""
+    """Read one source into a case, and report what came of it.
+
+    `keys` are the decryption keys the analyst supplied, by agent. One product keeps its
+    conversations in an encrypted container whose key is the vendor's rather than the
+    user's, and this tool ships none: without a key those files are recorded as an
+    encrypted store rather than read. See ADR 0029.
+    """
     matcher = Matcher(catalogue)
     source = open_source(path, catalogue, kind, matcher)
     record = source.bundle()
@@ -245,7 +254,7 @@ def ingest(
                 if entry.collected:
                     report.unclaimed_paths.append(entry.original_path)
 
-            read = events_for(record.bundle_uuid, entry, roots, matcher)
+            read = events_for(record.bundle_uuid, entry, roots, matcher, keys)
             if read.parsed_as:
                 report.reattributed.append(
                     f"{entry.original_path}: attributed to {entry.artifact_id}, "
@@ -333,6 +342,7 @@ def _parse(
     entry: SourceEntry,
     project_roots: tuple[str, ...] = (),
     matcher: Matcher | None = None,
+    keys: Mapping[str, str] | None = None,
 ) -> tuple[list[Event], int, str | None, str | None, str | None]:
     """Run the parser for one file, if there is one.
 
@@ -369,6 +379,7 @@ def _parse(
         agent=entry.agent or parser.name,
         user=entry.user,
         project_roots=project_roots,
+        keys=dict(keys or {}),
     )
     try:
         events = list(parser.parse(context))

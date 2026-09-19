@@ -35,6 +35,16 @@ dependencies = [
   "fastjsonschema>=2.19",
 ]
 
+# One agent stores its conversations in an encrypted container, and reading those needs a
+# cipher the standard library does not have. It is an extra rather than a dependency
+# because the reason for the two above still holds: an analyst workstation may be
+# air-gapped, this wheel is not pure Python and it brings one of its own, and a case that
+# never meets that agent should not have to vendor either. Without the extra the files are
+# still collected, still hashed, and reported as an encrypted store rather than read.
+# See docs/adr/0029-an-encrypted-store-is-read-only-with-the-analysts-key.md.
+[project.optional-dependencies]
+encrypted = ["cryptography>=42"]
+
 [project.urls]
 Repository = "https://github.com/luckylucab0/AI-Forensic-Suite"
 Issues = "https://github.com/luckylucab0/AI-Forensic-Suite/issues"

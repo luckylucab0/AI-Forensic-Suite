@@ -378,8 +378,14 @@ def test_every_transcript_artifact_the_catalogue_has_is_claimed() -> None:
 
 
 def test_a_file_with_no_parser_returns_none() -> None:
-    """Which is recorded as unsupported rather than hidden."""
-    assert for_artifact("windsurf.cascade_trajectories") is None
+    """Which is recorded as unsupported rather than hidden.
+
+    The artifact used here is a credential store, which nothing reads on purpose: the
+    collector does not copy its content by default and a token in an event payload is not
+    what --include-secrets was for. It is a stable example precisely because the narrowing
+    is deliberate rather than a gap somebody will close.
+    """
+    assert for_artifact("windsurf.auth_credentials") is None
     assert for_artifact(None) is None
 
 
@@ -1477,5 +1483,6 @@ def test_only_the_generic_readers_say_a_record_is_uninterpreted() -> None:
         "sqlite_generic.py",
         "structured_generic.py",
         "text_log.py",
+        "windsurf_cascade.py",
     ], writers
     assert UNINTERPRETED_MARK in JSONL_UNINTERPRETED

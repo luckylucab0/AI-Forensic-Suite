@@ -645,8 +645,10 @@ artifacts:
   notes: |-
     THIS IS THE CORRECTION THAT MATTERS MOST FOR WINDSURF: Cascade conversations are NOT in state.vscdb and are NOT SQLite or JSON. Because the key is global and hardcoded, the encryption is obfuscation, not a security boundary — anyone holding the .pb files can decrypt them, which is what makes this collectable. Corroborated by four independent repositories (a dedicated key-recovery/decryption toolkit, a session-export SDK, a collector architecture doc, and an Antigravity adapter — Google's Antigravity shares the same Codeium language-server lineage AND the same key). Validated against Windsurf 1.110.1 (macOS arm64) on 2026-05-13. Files are named by cascade_id (UUID v4). THE SAME DIRECTORY IS SHARED between Windsurf and the rebranded Devin Desktop, so one acquisition covers both products.
 
+    READ WITH A KEY THE EXAMINER SUPPLIES. The analyzer opens these files when the product's key is passed with --key and the optional cipher is installed, and reports them as an encrypted store otherwise, saying which of the two is missing. Nothing about the key is in this repository: it belongs to the product, not to the user. The container's layout is not published anywhere, so the reader tries a small set of framings and lets the authentication tag decide which one is right, and the event records the framing that worked so the reading can be repeated. The plaintext is walked as a protocol buffer with no schema, so its fields are numbers rather than names and every record says so. See ADR 0029.
+
     Confirmed as a directory by the vendor verification pass, from the vendor's own troubleshooting instruction to delete it, which warns that doing so removes the conversation history and local settings. That warning is the confirmation: this is where the conversations are, and the vendor's own advice to a stuck user destroys them. Nothing the vendor publishes names the files inside, so the extension and the archived suffix are inferences and are marked unsourced; glob the directory. The parseable record of the same conversations is the transcript entry, which is a separate tree and is capped at a hundred files.
-  parser: null
+  parser: windsurf_cascade
 - id: windsurf.implicit_trajectories
   category: transcript
   root: user_profile
@@ -668,8 +670,10 @@ artifacts:
   notes: |-
     Background and implicit (non-Cascade-panel) agent activity — inline completions, background trajectories, short auto-invocations. Two independent sources name this directory. Often overlooked because analysts stop at cascade/, yet this is where low-ceremony agent actions land.
 
+    Read by the same reader as the entry above, under the same conditions: a key from the examiner and the optional cipher.
+
     Record structure: Same AES-256-GCM envelope and hardcoded key as cascade/*.pb; plaintext is a trajectory protobuf of the same family. Described as 'shorter conversations' / 'background trajectory' files.
-  parser: null
+  parser: windsurf_cascade
 - id: windsurf.memories
   category: memory
   root: user_profile

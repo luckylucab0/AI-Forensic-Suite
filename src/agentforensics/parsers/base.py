@@ -21,8 +21,8 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Iterator
-from dataclasses import dataclass
+from collections.abc import Iterator, Mapping
+from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Protocol
@@ -50,6 +50,15 @@ class ParseContext:
     # is a different answer from "there were none" and is reported as an unknown scope
     # rather than filled in.
     project_roots: tuple[str, ...] = ()
+    # Keys the analyst supplied on the command line, by agent. One product keeps its
+    # conversations in an encrypted container whose key belongs to the vendor rather than
+    # to the user, and this tool ships none: without a key such a file is reported as an
+    # encrypted store rather than read. See ADR 0029 and parsers/encrypted.py.
+    keys: Mapping[str, str] = field(default_factory=dict)
+
+    def key_for(self, agent: str | None = None) -> str | None:
+        """The key for this file's agent, if the analyst gave one."""
+        return self.keys.get(agent or self.agent)
 
     def provenance(self, locator: str | None) -> Provenance:
         return Provenance(

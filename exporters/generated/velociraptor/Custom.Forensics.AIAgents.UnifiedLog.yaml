@@ -46,6 +46,8 @@
 #   - qwen_code.prompt_history_log: one JSON document rewritten whole on every append
 #   - qwen_code.subagent_transcripts: a directory with no stated file format
 #   - roo_code.tasks: a task directory of whole JSON documents
+#   - windsurf.cascade_trajectories: an encrypted container around a protocol buffer. The analyzer opens one when the examiner supplies the product's key; this query does not carry a key and does not try, so it returns the files to be collected and read
+#   - windsurf.implicit_trajectories: the same encrypted container as the entry above, for the background work of the same agent
 #   - every artifact the catalogue records as json: a whole document, which this query does not read: it reads a file line by line and a document is one value. The suite analyzer splits one by its structure, so collect the file and ingest it
 #   - every artifact the catalogue records as sqlite: a database, which this query does not open. The suite analyzer reads every table of one, so collect the file and ingest it
 #
@@ -95,7 +97,7 @@ description: |
       read rather than as an agent that left nothing behind.
 
     - Some of what the suite's own analyzer reads is not read here, or is read
-      only in part: 20 artifacts, named in the notes below. Where
+      only in part: 22 artifacts, named in the notes below. Where
       one of them is not read, a row says the file was there, with its hash and its
       timestamps, and nothing about the conversation in it. Collect those files
       with the Collect artifact and ingest them.

@@ -201,6 +201,19 @@ uv run afx sessions --case case.db                            # Konversationen, 
 uv run afx serve --case case.db                                # im Browser öffnen
 ```
 
+Ein Agent legt seine Gespräche in einem verschlüsselten Container ab. Der Schlüssel gehört
+dem Produkt und nicht dem Benutzer, und dieses Repository liefert keinen mit, also werden
+diese Dateien nur gelesen, wenn Sie ihn mitgeben:
+
+```bash
+uv pip install 'agentforensics[encrypted]'                     # die Chiffre, ein optionales Extra
+uv run afx ingest /evidence/bundle --case case.db --key windsurf=<key>
+```
+
+Ohne Schlüssel werden die Dateien trotzdem gesammelt und gehasht, und der Fall sagt, dass
+es ein verschlüsselter Speicher ist und was es bräuchte, ihn zu lesen, statt zu schweigen.
+Siehe [ADR 0029](docs/adr/0029-an-encrypted-store-is-read-only-with-the-analysts-key.md).
+
 `serve` bindet ausschliesslich an `127.0.0.1`, öffnet den Fall nur lesend, sodass SQLite
 selbst das Schreiben verweigert, und legt jede URL unter ein Token, das für diesen Lauf
 erzeugt und auf der Konsole ausgegeben wird. Keine Telemetrie, kein Update-Check, und eine
