@@ -412,7 +412,7 @@ def test_posix_paths_are_present_for_profile_anchored_posix_artifacts(
 
 
 def test_every_artifact_resolves_to_at_least_one_pattern_per_declared_os(
-    catalogue: Catalogue,
+    catalogue: Catalogue, monkeypatch
 ) -> None:
     """Run the collector's own expansion, rather than trusting a regex about it.
 
@@ -422,6 +422,12 @@ def test_every_artifact_resolves_to_at_least_one_pattern_per_declared_os(
     bare wildcard or to nothing, and either way the evidence is missing with no error.
     """
     collect = _load_collector()
+    # This test is about the platform spellings, so it asks what the collector would search
+    # for a profile whose environment it can speak for. The homes below belong to nobody on
+    # the machine running the test, and a relocation variable is refused for a profile that
+    # is not the process's own: that guard is right and has its own test, and leaving it in
+    # here would make every $VAR pattern look like a refusal about the catalogue.
+    monkeypatch.setattr(collect, "environment_applies_to", lambda home, root: not root)
     homes = {"linux": "/home/alice", "macos": "/Users/alice", "windows": "C:/Users/alice"}
     for agent in collect.EMBEDDED_CATALOGUE["agents"]:
         for entry in agent["artifacts"]:
@@ -783,6 +789,8 @@ def test_a_relocated_tree_is_found_on_a_live_windows_host(monkeypatch) -> None:
     joining that onto a tail that starts with one produced a path no glob would match.
     """
     collect = _load_collector()
+    # The process's own profile, because the environment is only read for that one.
+    monkeypatch.setattr(collect.os.path, "expanduser", lambda _: "C:/Users/alice")
     monkeypatch.setenv("HERMES_HOME", "D:\\agents\\hermes\\")
     collect.PATTERN_REFUSALS.clear()
     resolved = collect.expand_paths("$HERMES_HOME/state.db", "C:/Users/alice", "windows", None)
@@ -1085,3 +1093,122 @@ def test_all_users_finds_the_profiles_on_a_live_windows_host() -> None:
         assert re.match(r"^[A-Za-z]:/", user["home"]), user
         assert "\\" not in user["home"], user
         assert user["name"].lower() not in collect._PSEUDO_PROFILES
+
+
+# ------------------------- the fixes that had reached only one of the two collectors
+
+
+def test_a_named_user_is_looked_up_where_the_platform_keeps_profiles(monkeypatch) -> None:
+    """The sibling branch of the one that was fixed, which kept the hardcoded POSIX pair.
+
+    --all-users and --user answer the same question about the same host, and only one of
+    them was taught where Windows keeps profiles. `--user alice` there looked under a
+    directory that does not hold profiles and found nobody, with nothing said.
+    """
+    collect = _load_collector()
+    asked: list[str] = []
+
+    def parents() -> list[str]:
+        asked.append("called")
+        return ["Z:/Users"]
+
+    monkeypatch.setattr(collect, "live_profile_parents", parents)
+    monkeypatch.setattr(collect.os.path, "isdir", lambda path: path == "Z:/Users/alice")
+
+    found = collect.discover_users(None, False, ["alice"])
+
+    assert asked, "the named branch has to ask the same question --all-users asks"
+    assert found == [{"name": "alice", "home": "Z:/Users/alice"}]
+
+
+def test_a_symlinked_profile_is_recorded_rather_than_dropped(tmp_path) -> None:
+    """Skipping it is right. Skipping it silently is not, and that was a regression.
+
+    Where a linked profile points is not known to be inside the tree being collected: on a
+    live host it can leave the profile directory, and in an image it can carry the original
+    machine's absolute path and land on the analyst's own disk. The image branch never
+    checked for links until it was routed through the shared helper, so a relocated home in
+    an image went from collected to absent with nothing said.
+    """
+    collect = _load_collector()
+    (tmp_path / "Users" / "alice").mkdir(parents=True)
+    (tmp_path / "elsewhere" / "bob").mkdir(parents=True)
+    (tmp_path / "Users" / "bob").symlink_to(tmp_path / "elsewhere" / "bob")
+    collect.PATTERN_REFUSALS.clear()
+
+    found = collect.discover_users(str(tmp_path), False, [])
+
+    assert [user["name"] for user in found] == ["alice"]
+    reasons = [record["reason"] for record in collect.PATTERN_REFUSALS]
+    assert reasons == ["profile_is_a_symlink"]
+    assert collect.PATTERN_REFUSALS[0]["pattern"].endswith("/Users/bob")
+    collect.PATTERN_REFUSALS.clear()
+
+
+def test_this_process_s_variables_are_not_another_user_s(monkeypatch, tmp_path) -> None:
+    """A collector walking every profile on a live host has one environment, its own.
+
+    Applying this user's CLAUDE_CONFIG_DIR to somebody else's profile searches this user's
+    directory and files what it finds under that user's name. A wrong answer under
+    somebody's name is worse than no answer, so it is refused and reported instead. The
+    guard existed for the Windows placeholders and not for the variables.
+    """
+    collect = _load_collector()
+    mine = (tmp_path / "mine").as_posix()
+    monkeypatch.setattr(collect.os.path, "expanduser", lambda _: mine)
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", "/mine/claude")
+    monkeypatch.setenv("XDG_DATA_HOME", "/mine/share")
+    collect.PATTERN_REFUSALS.clear()
+
+    assert collect.expand_paths("$CLAUDE_CONFIG_DIR/.credentials.json", mine, "linux", None) == [
+        "/mine/claude/.credentials.json"
+    ]
+    assert not collect.PATTERN_REFUSALS
+
+    theirs = collect.expand_paths(
+        "$CLAUDE_CONFIG_DIR/.credentials.json", "/home/bob", "linux", None
+    )
+    assert theirs == []
+    assert [record["reason"] for record in collect.PATTERN_REFUSALS] == [
+        "environment_unreadable_other_user"
+    ]
+
+    # And a base-directory variable falls back to that user's own default rather than to
+    # this one's, because the default is where the agent looks when it is unset.
+    collect.PATTERN_REFUSALS.clear()
+    assert collect.expand_paths("$XDG_DATA_HOME/zed/db", "/home/bob", "linux", None) == [
+        "/home/bob/.local/share/zed/db"
+    ]
+    collect.PATTERN_REFUSALS.clear()
+
+
+def test_a_short_registry_hive_name_is_not_a_directory(tmp_path) -> None:
+    """The catalogue spells a registry key both ways and only one was recognised.
+
+    With HKEY_ alone, `HKCU\\Software\\...` fell through to the end of expand_paths: under
+    --root it was re-anchored and globbed, so a registry key was searched as a directory
+    under the image root and would have been collected as a file if one had been there.
+    """
+    collect = _load_collector()
+    collect.PATTERN_REFUSALS.clear()
+    for pattern in ("HKCU\\Software\\Example", "HKLM\\SOFTWARE\\Example", "HKU\\.DEFAULT\\X"):
+        assert collect.expand_paths(pattern, "/mnt/img/home/alice", "linux", "/mnt/img") == []
+    assert not collect.PATTERN_REFUSALS
+    collect.PATTERN_REFUSALS.clear()
+
+
+def test_the_manifest_does_not_claim_a_windows_run_was_unelevated(monkeypatch) -> None:
+    """The custody record's own field, which was a POSIX-only test.
+
+    hasattr(os, "geteuid") is False on Windows, so the manifest said this run was not
+    elevated on every Windows collection whether it was or not. What the collection could
+    see is exactly what that field is for.
+    """
+    collect = _load_collector()
+    monkeypatch.delattr(collect.os, "geteuid", raising=False)
+    monkeypatch.setattr(collect, "running_elevated", lambda: None)
+    source = (Path(__file__).resolve().parents[2] / "collector" / "collect.py").read_text(
+        encoding="utf-8"
+    )
+    assert '"elevated": running_elevated(),' in source
+    assert '"elevated": hasattr(os, "geteuid")' not in source

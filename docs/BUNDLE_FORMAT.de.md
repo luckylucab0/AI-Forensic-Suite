@@ -66,8 +66,9 @@ Fassungen nicht auseinanderlaufen. Die Felder, die nicht selbsterklärend sind:
   der Eintrag wird mit `skipped_symlink` übersprungen, wenn das Ziel ausserhalb liegt.
 - `refused_patterns` führt die Katalogmuster auf, die der Collector nicht durchsucht hat,
   jeweils mit dem Muster wie geschrieben, dem Stand der Auflösung und einem der Gründe
-  `not_absolute`, `wildcard_too_broad`, `wildcard_only`, `malformed_variable` oder
-  `environment_unreadable_offline`. Das Feld gibt es, weil ein nicht durchsuchtes Muster
+  `not_absolute`, `wildcard_too_broad`, `wildcard_only`, `malformed_variable`,
+  `environment_unreadable_offline`, `environment_unreadable_other_user` oder
+  `profile_is_a_symlink`. Das Feld gibt es, weil ein nicht durchsuchtes Muster
   eine Lücke in der Abdeckung ist und ein Bundle, das darüber schweigt, genauso aussieht
   wie ein Bundle von einem Host, auf dem das Artefakt gar nicht vorhanden war.
 
@@ -79,6 +80,22 @@ Fassungen nicht auseinanderlaufen. Die Felder, die nicht selbsterklärend sind:
   Endgeräts. Das Muster wird deshalb gemeldet statt geraten: Suchen Sie die Variable in
   den Shell-Profilen des Abbilds und sammeln Sie gegebenenfalls in einem zweiten Durchgang
   nach.
+
+  `environment_unreadable_other_user` ist dieselbe Antwort aus demselben Grund, nur auf
+  einem laufenden Host. Eine Sammlung über alle Profile hat genau eine Umgebung, nämlich
+  die des Collectors selbst, und das `CLAUDE_CONFIG_DIR` dieses Benutzers auf ein fremdes
+  Profil anzuwenden würde das Verzeichnis dieses Benutzers durchsuchen und das Gefundene
+  unter dem Namen des anderen ablegen. Die Variable der anderen Person gehört ihr: Suchen
+  Sie sie in deren Shell-Profil oder deren Registry und sammeln Sie dieses Profil aus
+  deren Sitzung heraus erneut.
+
+  `profile_is_a_symlink` hält ein Profilverzeichnis fest, in das der Collector nicht
+  hineingelaufen ist. Wohin ein solcher Link zeigt, ist nicht bekanntermassen innerhalb
+  des gesammelten Baums: Auf einem laufenden Host kann er aus dem Profilverzeichnis
+  herausführen, und in einem eingebundenen Abbild kann er den absoluten Pfad der
+  ursprünglichen Maschine tragen und auf der eigenen Platte der Analystin landen. Der
+  Eintrag benennt das Profil, damit ein verschobenes Heimatverzeichnis eine Spur ist und
+  keine Abwesenheit.
 
   Ein Muster, das hier einfach nicht zutrifft, steht nicht in dieser Liste. Ein
   Windows-Pfad auf einem Linux-Host, eine freedesktop-Variable unter Windows oder eine
@@ -185,7 +202,7 @@ normalisiert genau diese und nichts sonst.
 | Trenner in `original_path` | So, wie die Plattform sie meldet, unter Windows also `\` |
 | Gross- und Kleinschreibung in Pfaden | Eine Quelle ohne Unterscheidung meldet die Schreibweise, die das Dateisystem gespeichert hat, und die muss nicht der Schreibweise des Globs entsprechen |
 | `users[].home` | Je Plattform anderer Aufbau |
-| `collection.elevated` | Administrator unter Windows, uid 0 unter Unix. Nur der Collector, der auf der jeweiligen Plattform läuft, kann das beantworten, ein plattformübergreifender Vergleich dieses Feldes vergleicht also zwei verschiedene Fragen |
+| `collection.elevated` | Administrator unter Windows, uid 0 unter Unix, und `null`, wo die Plattform keine Auskunft gibt. Null ist mit Absicht eine dritte Antwort: "nicht erhöht" und "nicht feststellbar" führen eine Analystin zu unterschiedlichen Schlüssen darüber, warum eine Sammlung dünn ausfällt, und das Feld darf nicht das erste behaupten, wenn es das zweite meint |
 | `collection.local_timezone_name` | Der Name, den das Betriebssystem der Zone gibt. Für dieselbe Zone `UTC` unter Unix und `Coordinated Universal Time` unter Windows; zum Abgleich von Zeitstempeln dient `collection.local_timezone`, der Offset |
 
 ## Rückgabewerte

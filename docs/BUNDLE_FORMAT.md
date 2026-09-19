@@ -128,10 +128,11 @@ Field notes that are not obvious:
   entry is skipped with `skipped_symlink` when the target lies outside it.
 - `refused_patterns` lists the catalogue patterns the collector declined to search, with
   the pattern as written, how far it got expanding it, and one of `not_absolute`,
-  `wildcard_too_broad`, `wildcard_only`, `malformed_variable` or
-  `environment_unreadable_offline`. It exists because a pattern nobody searched is a hole
-  in the coverage, and a bundle that is silent about it looks exactly like a bundle from a
-  host where the artifact was absent.
+  `wildcard_too_broad`, `wildcard_only`, `malformed_variable`,
+  `environment_unreadable_offline`, `environment_unreadable_other_user` or
+  `profile_is_a_symlink`. It exists because a pattern nobody searched is a hole in the
+  coverage, and a bundle that is silent about it looks exactly like a bundle from a host
+  where the artifact was absent.
 
   `environment_unreadable_offline` is the one an analyst will normally see, and it is not
   a defect. Several agents relocate their whole data tree with an environment variable of
@@ -140,6 +141,19 @@ Field notes that are not obvious:
   such environment to read, and the analyst's own is not the endpoint's, so the pattern is
   reported instead of guessed at: look for the variable in the image's shell profiles and
   collect again with `--project-root` or a second pass if it was set.
+
+  `environment_unreadable_other_user` is the same answer for the same reason, on a live
+  host. A collection that walks every profile has one environment, the collector's own, and
+  applying this user's `CLAUDE_CONFIG_DIR` to somebody else's profile would search this
+  user's directory and file what it found under that user's name. Their variable is theirs
+  to read: look in their shell profile or their registry, and collect that profile again
+  from their session.
+
+  `profile_is_a_symlink` records a profile directory the collector did not descend into.
+  Where such a link points is not known to be inside the tree being collected: on a live
+  host it can leave the profile directory, and in a mounted image it can carry the original
+  machine's absolute path and land on the analyst's own disk. The entry names the profile,
+  so a relocated home is a lead rather than an absence.
 
   A pattern that simply does not apply is not listed here. A Windows path on a Linux host,
   a freedesktop variable on Windows, or a relocation variable that is genuinely unset are
@@ -248,7 +262,7 @@ these and nothing else.
 | `original_path` separators | As the platform reports them, so `\` on Windows |
 | Path case | A case-insensitive source reports the case the filesystem stores, which need not match the case a glob used |
 | `users[].home` | Different layouts per platform |
-| `collection.elevated` | Administrator on Windows, uid 0 on Unix. Only the collector running on the platform can answer it, so a cross-platform comparison of this field compares two different questions |
+| `collection.elevated` | Administrator on Windows, uid 0 on Unix, and `null` where the platform would not say. Null is a third answer on purpose: "not elevated" and "could not find out" lead an analyst to different conclusions about why a collection is thin, and the field must not state the first when it means the second |
 | `collection.local_timezone_name` | The operating system's own name for the zone. `UTC` on Unix and `Coordinated Universal Time` on Windows for the same zone; `collection.local_timezone`, the offset, is the field to reconcile timestamps with |
 
 ## Exit codes

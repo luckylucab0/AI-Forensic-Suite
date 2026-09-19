@@ -8999,6 +8999,20 @@ def windows_redirect_target(text, home, value):
     return ""
 
 
+def environment_applies_to(home, root):
+    """Whether this process's environment says anything about the profile being collected.
+
+    Not for a mounted image: the analyst workstation's variables are not the endpoint's.
+
+    And not for another user's profile, which is the half this was missing. A collector
+    walking every profile on a live host has one environment, its own, so applying this
+    user's CLAUDE_CONFIG_DIR to somebody else's profile searches this user's directory and
+    files what it finds under that user's name. A wrong answer under somebody's name is
+    worse than no answer, so the pattern is refused and reported instead.
+    """
+    return not root and _own_profile(home)
+
+
 def _windows_redirected(text, home, root):
     """Where a Windows placeholder actually points, when that is not the default. Or "".
 
@@ -9013,7 +9027,7 @@ def _windows_redirected(text, home, root):
     environment to ask, and another user's profile has one this process cannot see: using
     this user's value there would attribute one person's files to another.
     """
-    if root or not _own_profile(home):
+    if not environment_applies_to(home, root):
         return ""
     upper = text.upper()
     for placeholder in _WIN_PLACEHOLDERS:
@@ -9060,7 +9074,7 @@ def resolve_env_prefix(text, home, root):
     braced = re.match(r"^\$\{([A-Za-z_][A-Za-z0-9_]*):-([^}]*)\}(.*)$", text)
     if braced:
         name, fallback, tail = braced.group(1), braced.group(2), braced.group(3)
-        value = None if root else os.environ.get(name)
+        value = os.environ.get(name) if environment_applies_to(home, root) else None
         base = value if value else fallback
         if base.startswith("~"):
             base = home + base[1:]
@@ -9071,12 +9085,16 @@ def resolve_env_prefix(text, home, root):
         return text, "malformed_variable"
     name, tail = plain.group(1), plain.group(2)
 
+    mine = environment_applies_to(home, root)
     if name == "HOME":
         return home.rstrip("/") + tail, "ok"
     if name in _XDG_DEFAULTS:
         # Also a literal separator rather than os.path.join, for the reason given at the
         # re-anchoring below: this string is a pattern that every consumer splits on "/".
-        base = (None if root else os.environ.get(name)) or (
+        # The documented default for a profile whose environment this process cannot speak
+        # for, which is every profile but its own. The default is where the agent looks
+        # when the variable is unset, so it is a real location rather than a guess.
+        base = (os.environ.get(name) if mine else None) or (
             home.rstrip("/") + "/" + _XDG_DEFAULTS[name]
         )
         return base.rstrip("/") + tail, "ok"
@@ -9084,6 +9102,11 @@ def resolve_env_prefix(text, home, root):
     if root:
         # A mounted image. The variable belongs to the endpoint, not to this workstation.
         return text, "environment_unreadable_offline"
+    if not mine:
+        # Another user's profile on a live host. Their variable is not in this process's
+        # environment, and using this one's would search the wrong tree and file the result
+        # under their name.
+        return text, "environment_unreadable_other_user"
     value = os.environ.get(name)
     if not value:
         return text, "unset"
@@ -9298,7 +9321,13 @@ def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> l
         # `[^%]+` rather than `[A-Za-z_]+`: %PROGRAMFILES(X86)% holds a parenthesis and a
         # digit, so the narrower class did not recognise it as a Windows spelling and the
         # pattern was refused as not absolute instead of skipped as another platform's.
-        if re.match(r"^%[^%]+%|^[A-Za-z]:\\|^HKEY_", text):
+        #
+        # The short registry hive names as well as HKEY_. The catalogue uses both spellings,
+        # and with only the long one a pattern like `HKCU\Software\...` fell through: under
+        # --root it was re-anchored and globbed, so a registry key was searched as a
+        # directory under the image root and would have been collected as a file if one
+        # happened to be there.
+        if re.match(r"^%[^%]+%|^[A-Za-z]:\\|^HK(EY_[A-Z_]+|CU|LM|U|CR|CC)\\", text):
             return []  # a Windows spelling or a registry key, meaningless here
         if text.startswith("$"):
             resolved, outcome = resolve_env_prefix(text, home, root)
@@ -9484,7 +9513,17 @@ def live_profile_parents() -> list:
 
 
 def _profiles_under(parent: str, skip_pseudo: bool) -> list:
-    """The profile directories directly under one parent."""
+    """The profile directories directly under one parent.
+
+    A profile that is a symbolic link is not followed, because where it points is not known
+    to be inside the tree being collected: on a live host it can leave the machine's own
+    profile directory, and in a mounted image it can carry the original machine's absolute
+    path and land on the analyst's own disk. It is recorded rather than passed over, which
+    is the part this was missing. Routing the image branch through this function was meant
+    to remove a duplicate loop and it also applied the link check there for the first time,
+    so a relocated home in an image went from collected to absent with nothing said. Absent
+    and unsearched are different answers and a bundle has to be able to tell them apart.
+    """
     found = []
     try:
         names = sorted(os.listdir(parent))
@@ -9494,8 +9533,12 @@ def _profiles_under(parent: str, skip_pseudo: bool) -> list:
         if skip_pseudo and name.lower() in _PSEUDO_PROFILES:
             continue
         home = os.path.join(parent, name)
-        if os.path.isdir(home) and not os.path.islink(home):
-            found.append({"name": name, "home": as_posix(home)})
+        if not os.path.isdir(home):
+            continue
+        if os.path.islink(home):
+            refuse_pattern(as_posix(home), as_posix(home), "profile_is_a_symlink")
+            continue
+        found.append({"name": name, "home": as_posix(home)})
     return found
 
 
@@ -9545,9 +9588,12 @@ def discover_users(root: str | None, all_users: bool, named: list) -> list:
         return found
 
     if named:
+        # The same parents --all-users uses. This branch kept the hardcoded POSIX pair when
+        # that one was fixed, so `--user alice` on a live Windows host looked under a
+        # directory that is not where Windows keeps profiles and found nobody.
         out = []
         for name in named:
-            for parent in ("/Users", "/home"):
+            for parent in live_profile_parents():
                 home = os.path.join(parent, name)
                 if os.path.isdir(home):
                     out.append({"name": name, "home": as_posix(home)})
@@ -9995,7 +10041,11 @@ def run(args: argparse.Namespace) -> dict:
             "os_version": platform.release(),
             "architecture": platform.machine(),
             "collector_user": _current_user(),
-            "elevated": hasattr(os, "geteuid") and os.geteuid() == 0,
+            # running_elevated, not a geteuid test: hasattr(os, "geteuid") is False on
+            # Windows, so the custody record said this run was not elevated on every
+            # Windows collection whether it was or not. It answers None where it cannot
+            # tell, which is a third thing and not the same as false.
+            "elevated": running_elevated(),
             "argv": [os.path.basename(sys.argv[0]), *sys.argv[1:]],
             "include_secrets": bool(args.include_secrets),
             "max_file_size": args.max_file_size,

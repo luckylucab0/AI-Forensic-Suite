@@ -9323,8 +9323,7 @@ function Get-WindowsRedirected {
     #>
     param([string] $Text, [string] $ProfileHome, [string] $Root)
 
-    if ($Root) { return '' }
-    if (-not (Test-OwnProfile -ProfileHome $ProfileHome)) { return '' }
+    if (-not (Test-EnvironmentApplies -ProfileHome $ProfileHome -Root $Root)) { return '' }
     $upper = $Text.ToUpperInvariant()
     foreach ($key in $script:WinPlaceholders.Keys) {
         if ($upper.StartsWith($key)) {
@@ -9348,6 +9347,23 @@ function Get-VariableName {
     $found = [regex]::Match($Text, '^\$\{?([A-Za-z_][A-Za-z0-9_]*)')
     if ($found.Success) { return $found.Groups[1].Value }
     return ''
+}
+
+function Test-EnvironmentApplies {
+    <#
+    .SYNOPSIS
+        Whether this process's environment says anything about the profile being collected.
+    .DESCRIPTION
+        Mirrors collect.py's environment_applies_to. Not for a mounted image: the analyst
+        workstation's variables are not the endpoint's. And not for another user's profile,
+        because a collector walking every profile on a live host has one environment, its
+        own, so applying this user's CLAUDE_CONFIG_DIR to somebody else's profile searches
+        this user's directory and files what it finds under that user's name.
+    #>
+    param([string] $ProfileHome, [string] $Root)
+
+    if ($Root) { return $false }
+    return (Test-OwnProfile -ProfileHome $ProfileHome)
 }
 
 function Resolve-EnvPrefix {
@@ -9378,7 +9394,9 @@ function Resolve-EnvPrefix {
         $fallback = $braced.Groups[2].Value
         $tail = $braced.Groups[3].Value
         $value = $null
-        if (-not $Root) { $value = [System.Environment]::GetEnvironmentVariable($name) }
+        if (Test-EnvironmentApplies -ProfileHome $ProfileHome -Root $Root) {
+            $value = [System.Environment]::GetEnvironmentVariable($name)
+        }
         $base = $fallback
         if ($value) { $base = $value }
         if ($base.StartsWith('~')) { $base = $ProfileHome + $base.Substring(1) }
@@ -9403,7 +9421,9 @@ function Resolve-EnvPrefix {
     }
     if ($script:XdgDefaults.Contains($name)) {
         $value = $null
-        if (-not $Root) { $value = [System.Environment]::GetEnvironmentVariable($name) }
+        if (Test-EnvironmentApplies -ProfileHome $ProfileHome -Root $Root) {
+            $value = [System.Environment]::GetEnvironmentVariable($name)
+        }
         if (-not $value) {
             $value = $ProfileHome.TrimEnd('/') + '/' + [string]$script:XdgDefaults[$name]
         }
@@ -9415,6 +9435,14 @@ function Resolve-EnvPrefix {
     if ($Root) {
         $result['text'] = $Text
         $result['outcome'] = 'environment_unreadable_offline'
+        return $result
+    }
+    if (-not (Test-OwnProfile -ProfileHome $ProfileHome)) {
+        # Another user's profile on a live host. Their variable is not in this process's
+        # environment, and using this one's would search the wrong tree and file the result
+        # under their name.
+        $result['text'] = $Text
+        $result['outcome'] = 'environment_unreadable_other_user'
         return $result
     }
     $value = [System.Environment]::GetEnvironmentVariable($name)
@@ -9615,7 +9643,12 @@ function Expand-CataloguePath {
         # '[^%]+' rather than '[A-Za-z_]+': %PROGRAMFILES(X86)% holds a parenthesis and a
         # digit, so the narrower class did not recognise it as a Windows spelling and the
         # pattern was refused as not absolute instead of skipped as another platform's.
-        if ($text -match '^%[^%]+%' -or $text -match '^[A-Za-z]:\\' -or $text.StartsWith('HKEY_')) {
+        # The short registry hive names as well as HKEY_. The catalogue uses both spellings,
+        # and with only the long one a pattern like HKCU\Software\... fell through: under a
+        # root it was re-anchored and globbed, so a registry key was searched as a directory
+        # under the image root.
+        if ($text -match '^%[^%]+%' -or $text -match '^[A-Za-z]:\\' -or
+            $text -match '^HK(EY_[A-Z_]+|CU|LM|U|CR|CC)\\') {
             return $results  # a Windows spelling or a registry key, meaningless here
         }
         if ($text.StartsWith('$')) {
@@ -9935,6 +9968,75 @@ function Get-RegularFilesUnder {
     return $result
 }
 
+# Names under a Windows Users directory that are not users. Two of them, All Users and
+# Default User, are junctions, into ProgramData and into the default profile, so walking
+# them collects another tree under a user name nobody has. Keyed on the parent being named
+# Users rather than on the running platform, so an image of a Windows host collected from a
+# POSIX workstation is treated the same way. Kept in step with _PSEUDO_PROFILES in
+# collect.py by the conformance suite.
+$script:PseudoProfiles = [System.Collections.Generic.HashSet[string]]::new(
+    [string[]]@('public', 'default', 'default user', 'all users', 'defaultuser0'),
+    [System.StringComparer]::OrdinalIgnoreCase)
+
+
+function Get-LiveProfileParents {
+    <#
+    .SYNOPSIS
+        The directories this host keeps its user profiles in.
+    .DESCRIPTION
+        Mirrors collect.py's live_profile_parents. Windows keeps them on the system drive;
+        this file used to name C: literally, which is right on almost every host and wrong
+        on the one that matters. POSIX keeps them under /Users and /home.
+    #>
+    if ([System.Environment]::OSVersion.Platform -ceq 'Unix') {
+        return @('/Users', '/home')
+    }
+    $drive = [System.Environment]::GetEnvironmentVariable('SystemDrive')
+    if (-not $drive) { $drive = 'C:' }
+    return @(($drive.TrimEnd('/', '\')).Replace('\', '/') + '/Users')
+}
+
+
+function Get-ProfilesUnder {
+    <#
+    .SYNOPSIS
+        The profile directories directly under one parent, ordinally sorted.
+    .DESCRIPTION
+        Mirrors collect.py's _profiles_under, including the two things that are easy to
+        leave out. The order is ordinal, because Sort-Object is culture-aware and the order
+        decides which of two profiles differing only in case keeps the plain bundle path.
+        And a profile that is a symbolic link is skipped and recorded rather than passed
+        over: where it points is not known to be inside the tree being collected, and
+        absent and unsearched are different answers.
+    #>
+    param([string] $Parent, [bool] $SkipPseudo)
+
+    $found = [System.Collections.Generic.List[object]]::new()
+    $names = [System.Collections.Generic.List[string]]::new()
+    try {
+        foreach ($dir in [System.IO.Directory]::GetDirectories($Parent)) {
+            $names.Add([System.IO.Path]::GetFileName(([string]$dir).TrimEnd('/', '\')))
+        }
+    } catch {
+        return ,$found
+    }
+    foreach ($name in (Sort-Ordinal -Items $names)) {
+        if ($SkipPseudo -and $script:PseudoProfiles.Contains([string]$name)) { continue }
+        $profilePath = Join-BundlePath $Parent $name
+        if (Test-IsSymlink $profilePath) {
+            Add-PatternRefusal -Pattern $profilePath -Expanded $profilePath `
+                -Reason 'profile_is_a_symlink'
+            continue
+        }
+        $entry = [ordered]@{}
+        $entry['home'] = $profilePath
+        $entry['name'] = $name
+        [void]$found.Add($entry)
+    }
+    return ,$found
+}
+
+
 function Get-ProfilesToScan {
     <#
     .SYNOPSIS
@@ -9956,18 +10058,7 @@ function Get-ProfilesToScan {
                 [void]$found.Add($entry)
                 continue
             }
-            $names = [System.Collections.Generic.List[string]]::new()
-            try {
-                foreach ($dir in [System.IO.Directory]::GetDirectories($base)) {
-                    $names.Add([System.IO.Path]::GetFileName(([string]$dir).TrimEnd('/', '\')))
-                }
-            } catch {
-                continue
-            }
-            foreach ($name in ($names | Sort-Object -CaseSensitive)) {
-                $entry = [ordered]@{}
-                $entry['home'] = (Join-BundlePath $base $name)
-                $entry['name'] = $name
+            foreach ($entry in (Get-ProfilesUnder -Parent $base -SkipPseudo ($parent -ceq 'Users'))) {
                 [void]$found.Add($entry)
             }
         }
@@ -9978,26 +10069,40 @@ function Get-ProfilesToScan {
             [void]$found.Add($entry)
         }
     } elseif ($AllUsers) {
-        foreach ($parent in @('C:/Users', '/Users', '/home')) {
+        foreach ($parent in (Get-LiveProfileParents)) {
             if (-not [System.IO.Directory]::Exists($parent)) { continue }
-            $names = [System.Collections.Generic.List[string]]::new()
-            try {
-                foreach ($dir in [System.IO.Directory]::GetDirectories($parent)) {
-                    $names.Add([System.IO.Path]::GetFileName(([string]$dir).TrimEnd('/', '\')))
-                }
-            } catch {
-                continue
-            }
-            foreach ($name in ($names | Sort-Object -CaseSensitive)) {
-                # $profilePath, because $home is the automatic $HOME. Assigning it inside a
-                # function is legal and creates a local, which makes it a trap rather than
-                # an error for whoever edits this next.
-                $profilePath = Join-BundlePath $parent $name
-                if (Test-IsSymlink $profilePath) { continue }
-                $entry = [ordered]@{}; $entry['home'] = $profilePath; $entry['name'] = $name
+            $leafOfParent = [System.IO.Path]::GetFileName(([string]$parent).TrimEnd('/', '\'))
+            foreach ($entry in (Get-ProfilesUnder -Parent $parent -SkipPseudo ($leafOfParent -ceq 'Users'))) {
                 [void]$found.Add($entry)
             }
         }
+        # The superuser's own home, which is not under the profile parent on either POSIX
+        # platform. Windows has no equivalent: the administrator's profile is under Users
+        # like everybody else's. collect.py adds the same two and the two collectors have to
+        # return the same profiles from the same host.
+        foreach ($superuser in @('/var/root', '/root')) {
+            if ([System.IO.Directory]::Exists($superuser)) {
+                $entry = [ordered]@{}; $entry['home'] = $superuser; $entry['name'] = 'root'
+                [void]$found.Add($entry)
+                break
+            }
+        }
+    } elseif ($Named -and $Named.Count -gt 0) {
+        # A named user is looked up under the profile parents rather than filtered out of
+        # the one profile this process happens to be running as. collect.py has always done
+        # that, and this file filtered instead, so -User with somebody else's name returned
+        # nothing on a host where they exist and said nothing about why.
+        foreach ($name in $Named) {
+            foreach ($parent in (Get-LiveProfileParents)) {
+                $candidate = Join-BundlePath $parent $name
+                if ([System.IO.Directory]::Exists($candidate)) {
+                    $entry = [ordered]@{}; $entry['home'] = $candidate; $entry['name'] = $name
+                    [void]$found.Add($entry)
+                    break
+                }
+            }
+        }
+        return ,$found
     } else {
         $profilePath = [System.Environment]::GetEnvironmentVariable('USERPROFILE')
         if (-not $profilePath) { $profilePath = [System.Environment]::GetEnvironmentVariable('HOME') }
@@ -10336,6 +10441,25 @@ function Copy-ArtifactFile {
 
 # ===================================================================== the collection
 
+function Compare-ClaimKey {
+    <#
+    .SYNOPSIS
+        Compare two claim-order keys the way Python compares its tuple. Negative, zero or
+        positive, as a comparison function returns.
+    .DESCRIPTION
+        The first two elements are numbers and the third is an artifact id compared
+        ordinally, because that is what Python's sorted() does and the two collectors have
+        to attribute a file to the same catalogue entry.
+    #>
+    param([object[]] $Left, [object[]] $Right)
+
+    for ($index = 0; $index -lt 2; $index++) {
+        $difference = [int]$Left[$index] - [int]$Right[$index]
+        if ($difference -ne 0) { return $difference }
+    }
+    return [System.String]::CompareOrdinal([string]$Left[2], [string]$Right[2])
+}
+
 function Sort-Ordinal {
     <#
     .SYNOPSIS
@@ -10448,6 +10572,28 @@ function Invoke-Collection {
     $entries = [System.Collections.Generic.List[object]]::new()
     $errors = [System.Collections.Generic.List[object]]::new()
     $projectRoots = [System.Collections.Generic.List[object]]::new()
+
+    # A run that found no profile at all collects nothing, and an empty bundle has to say
+    # why it is empty. Without this, zero profiles, zero files and zero errors read exactly
+    # like a host with no user data on it. Mirrors collect.py.
+    if ($users.Count -eq 0) {
+        if ($AllUsers) {
+            $asked = '-AllUsers'
+        } elseif ($User -and $User.Count -gt 0) {
+            $asked = '-User ' + ($User -join ', ')
+        } else {
+            $asked = 'this run'
+        }
+        if ($Root) { $where = $Root } else { $where = ((Get-LiveProfileParents) -join ', ') }
+        $problem = [ordered]@{}
+        $problem['detail'] = ('{0} matched no user profile under {1}, so nothing was searched' -f $asked, $where)
+        $problem['error'] = 'no_profiles_found'
+        $problem['path'] = $where
+        [void]$errors.Add($problem)
+        [Console]::Error.Write(('{0}: no user profile was found under {1}. Nothing was searched, and the ' -f $script:ToolName, $where) +
+            "manifest records that as an error rather than as an empty host.`n")
+    }
+
     $projectRootPaths = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
     # Ordinal, not [ordered]@{}. A PowerShell ordered dictionary compares keys
     # case-insensitively, so Mixed.md and mixed.md were one entry and one of two real files
@@ -10564,11 +10710,26 @@ function Invoke-Collection {
             # patterns than an entry whose pattern names the file. Mirrors collect.py's
             # claim_order, including the id being the last key rather than the second. See
             # ADR 0025.
-            $ranked = $claimants | Sort-Object -CaseSensitive -Property `
-                @{ Expression = { -(Get-PatternLiteralLength ([string]$_['pattern'])) } }, `
-                @{ Expression = { -(Get-PatternRootRank ([string]$_['pattern'])) } }, `
-                @{ Expression = { [string]$_['artifact'].id } }
-            $primary = @($ranked)[0]['artifact']
+            # Sorted by hand rather than with Sort-Object, and the reason is the one this
+            # file gives in Sort-Ordinal: -CaseSensitive is culture-aware, so the id
+            # tiebreak would order two artifacts differently from Python's ordinal sorted().
+            # Today's 460 ids happen to sort the same either way, which is luck and not a
+            # property, and this key decides which catalogue entry a file is reported under.
+            $best = $null
+            $bestKey = $null
+            foreach ($claim in $claimants) {
+                $pattern = [string]$claim['pattern']
+                $key = @(
+                    -(Get-PatternLiteralLength $pattern),
+                    -(Get-PatternRootRank $pattern),
+                    [string]$claim['artifact'].id
+                )
+                if ($null -eq $bestKey -or (Compare-ClaimKey $key $bestKey) -lt 0) {
+                    $best = $claim
+                    $bestKey = $key
+                }
+            }
+            $primary = $best['artifact']
 
             $withhold = $false
             $claimantIds = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::Ordinal)
@@ -10724,14 +10885,26 @@ function Test-Elevated {
         non-elevated run cannot read another user's profile, and an empty result from one
         is not the same finding as an empty result from an elevated run.
     #>
+    if ([System.Environment]::OSVersion.Platform -ceq 'Unix') {
+        # collect.py answers this with geteuid() == 0, and the two collectors have to give
+        # the same answer about the same host. Running this file on a POSIX host happens in
+        # the differential test, where a blanket false disagreed with Python's true.
+        try {
+            return ([string][System.Environment]::UserName -ceq 'root')
+        } catch {
+            return $null
+        }
+    }
     try {
         $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
         $principal = [System.Security.Principal.WindowsPrincipal]::new($identity)
         return $principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
     } catch {
-        # Not Windows, or an identity the platform will not describe. Reported as false
-        # rather than null, because the manifest field means "known to be elevated".
-        return $false
+        # An identity the platform will not describe. Null rather than false: "not
+        # elevated" and "could not find out" lead an analyst to different conclusions
+        # about why a collection is thin, and the manifest must not state the first when it
+        # means the second.
+        return $null
     }
 }
 
@@ -11088,6 +11261,39 @@ function Invoke-SelfTest {
             -Value $case[2])
     }
     $cases['windows_redirect'] = $redirect
+
+    # Which claimant wins, which decides the catalogue entry a file is reported under. The
+    # ids are chosen so the last key decides and so that a culture-aware comparison would
+    # answer differently: a hyphen and an underscore order one way by code point and the
+    # other by culture. Kept in step with CLAIM_ORDER_CASES in
+    # tests/conformance/selftest_cases.py.
+    $claimOrder = [ordered]@{}
+    foreach ($case in @(
+        @(@('~/.x/y.json', 'claude-code.plans'), @('~/.x/y.json', 'claude_code.plans')),
+        @(@('~/.gemini/', 'a.tree'), @('~/.gemini/tmp/<hash>/chats/*.jsonl', 'z.chats')),
+        @(@('<project>/.claude/CLAUDE.md', 'a.project'), @('~/.claude/CLAUDE.md', 'z.user')),
+        @(@('<plugin-root>/.mcp.json', 'a.plugin'), @('<project>/.mcp.json', 'z.project'))
+    )) {
+        $best = $null
+        $bestKey = $null
+        $labels = [System.Collections.Generic.List[string]]::new()
+        foreach ($claim in $case) {
+            $pattern = [string]$claim[0]
+            $artifactId = [string]$claim[1]
+            $labels.Add(('{0}|{1}' -f $pattern, $artifactId))
+            $key = @(
+                -(Get-PatternLiteralLength $pattern),
+                -(Get-PatternRootRank $pattern),
+                $artifactId
+            )
+            if ($null -eq $bestKey -or (Compare-ClaimKey $key $bestKey) -lt 0) {
+                $best = $artifactId
+                $bestKey = $key
+            }
+        }
+        $claimOrder[[string]::Join(' vs ', $labels)] = $best
+    }
+    $cases['claim_order'] = $claimOrder
 
     # Written to the console rather than to the output stream. A function that both emits
     # with Write-Output and returns a value returns all of it as one collection, and the

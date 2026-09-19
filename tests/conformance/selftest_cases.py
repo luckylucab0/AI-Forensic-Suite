@@ -79,6 +79,33 @@ WINDOWS_PATTERNS = (
 )
 
 
+# Which claimant wins, which is what decides the catalogue entry a file is reported under
+# and therefore whether a parser is found for it. The ids are chosen so the last key is the
+# one that decides, and so that a culture-aware comparison would answer differently: a
+# hyphen and an underscore order one way by code point and the other way by culture, and
+# both characters are ordinary in an artifact id.
+CLAIM_ORDER_CASES = (
+    (("~/.x/y.json", "claude-code.plans"), ("~/.x/y.json", "claude_code.plans")),
+    (("~/.gemini/", "a.tree"), ("~/.gemini/tmp/<hash>/chats/*.jsonl", "z.chats")),
+    (("<project>/.claude/CLAUDE.md", "a.project"), ("~/.claude/CLAUDE.md", "z.user")),
+    (("<plugin-root>/.mcp.json", "a.plugin"), ("<project>/.mcp.json", "z.project")),
+)
+
+
+def _claim_order_case() -> dict[str, object]:
+    """Which of two claims on one file each collector reports it under."""
+    collect = _collect_py()
+    out: dict[str, object] = {}
+    for case in CLAIM_ORDER_CASES:
+        claims = [({"id": artifact_id}, pattern) for pattern, artifact_id in case]
+        winner = sorted(
+            claims,
+            key=lambda claim: collect.claim_order(claim[0], claim[1]),  # type: ignore[attr-defined]
+        )[0][0]["id"]
+        out[" vs ".join(f"{pattern}|{artifact_id}" for pattern, artifact_id in case)] = winner
+    return out
+
+
 def _windows_expansion_case() -> dict[str, object]:
     """What the Python collector expands each pattern to on a Windows target.
 
@@ -174,6 +201,7 @@ CASES: dict[str, object] = {
     "pattern_specificity": _specificity_case(),
     "windows_expansion": _windows_expansion_case(),
     "windows_redirect": _redirect_case(),
+    "claim_order": _claim_order_case(),
 }
 
 
