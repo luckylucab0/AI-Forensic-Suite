@@ -113,7 +113,7 @@ artifacts:
     One file per session, and the vendor calls the directory safe to delete because "log files are re-created each session". Treat what is here as the current and recent sessions only.
   notes: |-
     Documented as "Session log files" created one per session, plus extension-specific logs. A per-session log alongside a per-session state directory means two independent records of the same session, which is exactly what an analyst wants when one of them has been tampered with.
-  parser: null
+  parser: text_log
 - id: copilot.session_state
   category: transcript
   root: user_profile

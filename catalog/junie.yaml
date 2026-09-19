@@ -119,7 +119,7 @@ artifacts:
     Name implies a queued-for-upload buffer, i.e. contents are drained (deleted) once transmitted - so it is a narrow-window artifact.
   notes: |-
     The macOS path was directly observed on a live IntelliJ IDEA install by the aikill researcher (marked [verified] there, directory present but empty at inspection). Linux/Windows forms are extrapolation onto the confirmed system roots and are marked [inferred only] in that source - treat those two as unverified. Purpose is undocumented; 'jcp' is unexplained. Forensic value: a telemetry OUTBOX may retain event payloads that the durable stores have already rotated away, and its mere presence dates Junie usage.
-  parser: null
+  parser: text_log
 - id: junie.mcp_config
   category: mcp_config
   root: project

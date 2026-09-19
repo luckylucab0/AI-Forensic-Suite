@@ -44,11 +44,9 @@ anything is a question for the agent's own records.
 from __future__ import annotations
 
 from collections.abc import Iterator
-from dataclasses import dataclass
-from pathlib import Path
 
 from agentforensics.model import Event
-from agentforensics.parsers.base import ParseContext, normalise_ts
+from agentforensics.parsers.base import ParseContext, TextLine, normalise_ts, text_lines
 
 # rustyline writes this as the first line of a file whose entries are escaped.
 RUSTYLINE_V2 = "#V2"
@@ -70,46 +68,6 @@ SHAPES = {
 IN_THE_PROJECT = frozenset({"aider.input_history"})
 
 
-@dataclass(frozen=True, slots=True)
-class _Line:
-    """One line of a text file, with what was odd about reading it."""
-
-    number: int
-    text: str
-    problem: str | None = None
-
-
-def _lines(path: Path) -> list[_Line]:
-    """Every line of the file, including the blank ones.
-
-    Not `iter_lines`, which is for line-delimited JSON: it drops blank lines and marks
-    every line that is not an object as a problem. Both are wrong here. A blank line is a
-    record separator in one of these formats, so dropping it would join two prompts into
-    one, and a prompt is not JSON, so the note would appear on every event in the file and
-    mean nothing.
-
-    Decoded with replacement and the substitution reported, for the reason the JSON reader
-    gives: a file that will not decode is usually a partial write or another encoding, and
-    failing the read would lose the lines that are fine.
-    """
-    out: list[_Line] = []
-    with path.open("r", encoding="utf-8", errors="replace", newline="") as handle:
-        for number, raw in enumerate(handle, start=1):
-            text = raw.rstrip("\r\n")
-            if number == 1:
-                # A byte order mark from whatever wrote the file on Windows. Left in, the
-                # first entry of the file carries an invisible character.
-                text = text.lstrip("\ufeff")
-            problem = (
-                "the line did not decode as UTF-8 and was read with replacement "
-                "characters, so its content is not exact"
-                if "\ufffd" in text
-                else None
-            )
-            out.append(_Line(number, text, problem))
-    return out
-
-
 class PromptHistoryParser:
     """The line-editor recall files, each read the way its own library writes it."""
 
@@ -120,7 +78,7 @@ class PromptHistoryParser:
 
     def parse(self, context: ParseContext) -> Iterator[Event]:
         shape = SHAPES[str(context.artifact_id)]
-        lines = _lines(context.local_path)
+        lines = list(text_lines(context.local_path))
         if shape == "prompt_toolkit":
             yield from _prompt_toolkit(context, lines)
         elif shape == "rustyline":
@@ -172,7 +130,7 @@ def _event(
     )
 
 
-def _prompt_toolkit(context: ParseContext, lines: list[_Line]) -> Iterator[Event]:
+def _prompt_toolkit(context: ParseContext, lines: list[TextLine]) -> Iterator[Event]:
     """prompt_toolkit's FileHistory: `# <timestamp>` and then `+`-prefixed content lines.
 
     The entry is ended by any line that does not start with `+`, which is the library's own
@@ -220,7 +178,7 @@ def _prompt_toolkit(context: ParseContext, lines: list[_Line]) -> Iterator[Event
     yield from flush()
 
 
-def _rustyline(context: ParseContext, lines: list[_Line]) -> Iterator[Event]:
+def _rustyline(context: ParseContext, lines: list[TextLine]) -> Iterator[Event]:
     """A rustyline history, in whichever of its two formats this file is in."""
     v2 = bool(lines) and lines[0].text == RUSTYLINE_V2
     for index, line in enumerate(lines):
@@ -266,7 +224,7 @@ def _unescape(text: str) -> tuple[str, str | None]:
     return "".join(out), None
 
 
-def _plain(context: ParseContext, lines: list[_Line]) -> Iterator[Event]:
+def _plain(context: ParseContext, lines: list[TextLine]) -> Iterator[Event]:
     """One line, one entry, nothing escaped and no times anywhere in the file."""
     for line in lines:
         if not line.text.strip():

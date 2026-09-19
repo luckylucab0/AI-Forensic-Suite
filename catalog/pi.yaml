@@ -185,7 +185,7 @@ artifacts:
     When present, usually the only place raw request/response detail survives outside the session tree.
 
     Record structure: config.ts getDebugLogPath() = join(getAgentDir(), `${APP_NAME}-debug.log`), so the filename derives from APP_NAME (pi-debug.log for the pi build). Forks under a different APP_NAME will use a different filename.
-  parser: null
+  parser: text_log
 - id: pi.sessions
   category: transcript
   root: user_profile

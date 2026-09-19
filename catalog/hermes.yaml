@@ -229,7 +229,7 @@ artifacts:
     gateway.log records remote-channel activity (Telegram/Discord), corroborating sessions.source. The documented redaction means these are comparatively safe to review, but it also means absence of a token here is not evidence one was not used.
 
     Record structure: Documented as having 'secrets auto-redacted'.
-  parser: null
+  parser: text_log
 - id: hermes.memories
   category: memory
   root: user_profile

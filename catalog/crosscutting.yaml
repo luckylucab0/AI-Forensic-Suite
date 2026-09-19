@@ -114,7 +114,7 @@ artifacts:
     HIGH-VALUE and HIGHLY PERISHABLE. Directory is `_logs` inside the npm cache (verbatim: "The default location of the logs directory is a directory named _logs inside the npm cache"), and the cache is "~/.npm on Posix, or %LocalAppData%/npm-cache on Windows". Relocatable via the logs-dir config; --logs-max=0 turns logging off.
 
     The verification pass found the cited page states only that logs go in a directory named with an underscore prefix inside the cache, with neither the cache path nor the filename pattern. Both spellings of the glob are marked unsourced; the directory itself is what the page supports.
-  parser: null
+  parser: text_log
 - id: crosscutting.homebrew_prefixes
   category: install_evidence
   root: system

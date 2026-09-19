@@ -125,7 +125,7 @@ artifacts:
     The per-OS log roots are verified from JetBrains' own defaultLogsDirLocation map. The AI-specific value is verified by the aikill researcher grepping a live idea.log and finding Junie plugin-load lines plus internal matterhorn-namespaced module diagnostics (org.jetbrains.junie_$implicit) - i.e. idea.log dates AI-plugin activation and load even when the transcript stores are gone. acp.log is named by the junie-export README, which injects 'matching excerpts from the relevant idea*.log files and acp.log' into its debug output - ACP is the Agent Client Protocol layer that fronts Junie (agentId 'acp.registry.junie'), so acp.log is the agent-transport log. I did not confirm acp.log's exact directory; glob for it across the log root. Product-agnostic caveat: the executable-named log file is idea.log even in non-IntelliJ products in most versions, but confirm per product.
 
     Re-sourced by the verification pass: neither log filename appears in the file cited before. The logger factory resolves the main log file against the log directory. The agent protocol log has no source the pass could find, so it is marked unsourced.
-  parser: null
+  parser: text_log
 - id: jetbrains_ai.log_data
   category: log
   root: user_profile
@@ -146,7 +146,7 @@ artifacts:
   volatility: Explicitly enumerated as a deletion target by disk-cleanup scripts.
   notes: |-
     HONEST CAVEAT: I have exactly ONE attesting source for this path - a third-party PowerShell cleanup script that joins $env:LOCALAPPDATA "JetBrains\$WebStormVersion" with 'ai-assistant-log-data' (alongside aia-task-history under $env:APPDATA). The Windows form is therefore verified-as-observed; the macOS and Linux forms are my extrapolation onto the confirmed system/caches roots and should be treated as unverified. The directory's contents and format are NOT characterised anywhere I could reach. Worth globbing for and dumping wholesale, but do not document a format we have not seen.
-  parser: null
+  parser: text_log
 - id: jetbrains_ai.mcp_config
   category: mcp_config
   root: project

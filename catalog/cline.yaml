@@ -404,7 +404,7 @@ artifacts:
   volatility: Log rotation/retention not documented in the source read.
   notes: |-
     resolveConnectorDataDir() = join(dataDir,"connectors"); resolveConnectorSettingsPath() = join(that,"settings.json"); resolveConnectorLogPath(channel, instanceKey) = join(dataDir, "logs", "connectors", safeChannel, `${safeKey}.log`); ensureHookLogDir() = join(dataDir, "logs"). Hook logs are the record of what user-authored hook scripts did - a high-value execution-evidence artifact.
-  parser: null
+  parser: text_log
 - id: cline.hooks_audit_log
   category: transcript
   root: user_profile

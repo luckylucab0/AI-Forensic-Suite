@@ -107,7 +107,7 @@ artifacts:
     On macOS this is a THIRD top-level location (~/Library/Logs/Zed) separate from both the data and config dirs. Captures MCP/context-server startup and failures, which corroborates the settings.json inventory.
 
     Record structure: crates/paths/src/paths.rs logs_dir(): macOS home_dir().join('Library/Logs').join('Zed'); all other platforms data_dir().join('logs'). Filenames not enumerated - list the directory.
-  parser: null
+  parser: text_log
 - id: zed.settings
   category: mcp_config
   root: project

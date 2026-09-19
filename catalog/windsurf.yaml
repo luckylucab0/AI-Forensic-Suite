@@ -229,7 +229,7 @@ artifacts:
     Added by the vendor verification pass, from the vendor's own instructions for gathering logs. This is the log of the plugin surfaces rather than of the editor, so it is the artifact to look for when the agent was used from inside another development environment rather than from this vendor's own editor.
 
     The vendor also documents a diagnostics bundle the user can download from the agent panel, and states no output path for it. Ask the user or look in the download directory rather than expecting it somewhere predictable.
-  parser: null
+  parser: text_log
 - id: windsurf.ide_user_data
   title: Editor user data directory
   category: config

@@ -422,7 +422,7 @@ artifacts:
     Rotated and overwritten by the app; community log excerpts show only recent days. A profile recreation on update loses the whole folder. There is no documented retention.
   notes: |-
     Two first-party statements pin this down. code.claude.com/docs/en/admin-setup states the live file is at %APPDATA%\Claude\logs\main.log when Claude Desktop was installed with the .exe installer, and that Help > Troubleshooting > Show Logs in Explorer saves a copy of the log folder to the user's Downloads folder, which is itself a collectable artifact. claude.com/docs/third-party/claude-desktop/data-storage names the files in the folder: main.log, cowork_vm_node.log, claude.ai-web.log, mcp.log and mcp-server-<name>.log, and gives ~/Library/Logs/Claude-3p/ for macOS in third-party mode, from which the standard-mode ~/Library/Logs/Claude/ follows but is not stated. The Linux standard-mode folder ~/.config/Claude/logs/ IS stated directly on claude.com/docs/third-party/claude-desktop/configuration. Analyst value: main.log carries session load warnings naming session ids and transcript byte sizes, the WSL policy gate decisions, managed-settings parse failures, and the Electron profile boot lines that reveal a profile reset; mcp-server-<name>.log is the record of which MCP server started, with what, and what it said on stderr. Windows is genuinely ambiguous between %APPDATA%\Claude\logs and %LOCALAPPDATA%\Claude\Logs: the vendor documents the third-party build moving from Roaming to Local, and community reports from 2026 cite both for the standard build. Collect both, plus the MSIX virtualized copy.
-  parser: null
+  parser: text_log
 - id: claude_desktop.coworkd_service_log
   title: Cowork host service log (coworkd)
   category: log
@@ -445,7 +445,7 @@ artifacts:
     Community report states this log survived an Electron profile recreation that destroyed 22 local Cowork session directories, which makes it the most durable record of Cowork activity on Windows. No documented rotation.
   notes: |-
     Community only, and the single best corroborating artifact when the session store has been wiped. The reported line format records, per session, the human-readable session name, the uid, the read/write mode and the mapping from the host path to the in-VM /sessions/<name> mount, so it proves both that a session existed and which host folder the agent was pointed at, even with no transcript left. Under ProgramData on Windows it is outside the user profile, so a user-profile-only collection misses it. A Windows service named CoworkVMService is reported alongside it. The macOS filename is from a separate community report and is weaker.
-  parser: null
+  parser: text_log
 - id: claude_desktop.managed_policy_macos
   title: Managed configuration and approved folders (macOS preference domain)
   category: permissions

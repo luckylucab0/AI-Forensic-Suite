@@ -126,7 +126,7 @@ artifacts:
     recollection, needs verification. bug-reports/ is worth chasing if it exists: user-generated support bundles typically snapshot configuration and recent session state at a moment in time, which makes them an independent point-in-time copy of evidence.
 
     Record structure: Both directories come only from a WebSearch summary of the Factory docs directory listing; docs.factory.ai was unreachable and I found no code-search corroboration. Enumerate ~/.factory/ directly rather than globbing these names.
-  parser: null
+  parser: text_log
 - id: factory_droid.mcp_and_hooks
   category: mcp_config
   root: project

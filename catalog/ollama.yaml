@@ -295,7 +295,7 @@ artifacts:
     macOS app.log/server.log split confirmed separately in docs/macos.mdx ("app.log contains most recent logs from the GUI application / server.log contains the most recent server logs") and the Windows triple in docs/windows.mdx, both via GitHub code search content match. Linux systemd/journal guidance from the fetched docs/linux.mdx.
 
     Re-sourced by the verification pass: the troubleshooting page cited before states the server log and its rotation but not the application and upgrade logs, which the Windows page lists together. The POSIX spelling of the application log has no source, so it is marked unsourced.
-  parser: null
+  parser: text_log
 - id: ollama.app_chat_database
   category: transcript
   root: user_profile

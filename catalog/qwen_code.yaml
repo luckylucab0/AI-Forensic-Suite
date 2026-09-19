@@ -695,7 +695,7 @@ artifacts:
     Written only when debug logging is enabled (QWEN_DEBUG_LOG_FILE=1 or debug mode); not swept by housekeeping, so files persist once created.
   notes: |-
     Normally absent - almost every debugLogger call is a no-op unless QWEN_DEBUG_LOG_FILE is set, so absence is the expected state and carries no meaning. When present it holds internal diagnostics including resolved storage and session-writer lock paths, which is the reliable way to learn where a daemon-hosted session actually wrote (the project's own recovery documentation tells operators not to guess that path from the default home directory).
-  parser: null
+  parser: text_log
 - id: qwen_code.usage_history
   title: Per-session usage ledger
   category: log
@@ -739,7 +739,7 @@ artifacts:
     Not expired. Relocated into the project when the plansDirectory setting is used, in which case the path must stay inside the project root.
   notes: |-
     The plan the user approved before the agent acted, keyed by session id, which makes it directly comparable with what the transcript shows the agent then did. The settings documentation states the default is ~/.qwen/plans and that a configured plansDirectory resolves relative to the project root, so check settings.json before treating an empty ~/.qwen/plans as 'plan mode was never used'.
-  parser: null
+  parser: text_log
 - id: qwen_code.user_extension_points
   title: User level executable extension points (skills, commands, subagents, rules, workflows, extensions)
   category: config

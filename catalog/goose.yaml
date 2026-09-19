@@ -139,7 +139,7 @@ artifacts:
     Highest-volatility artifact in the Goose family. If the endpoint has been powered on for more than two weeks after the incident these are already gone.
 
     Record structure: Date-stamped subdirectories (e.g. cli/2025-11-13/). Note logs live under the XDG STATE dir (~/.local/state/goose) while sessions live under the DATA dir (~/.local/share/goose) - two different trees.
-  parser: null
+  parser: text_log
 - id: goose.desktop_log
   category: log
   root: user_profile
@@ -160,7 +160,7 @@ artifacts:
     Establishes Desktop app launch/quit times, which bracket session activity independently of the session store.
 
     Record structure: Note the macOS Desktop log uses ~/Library/Application Support/Goose/ (capital G, no 'Block' segment) - a third macOS directory distinct from both ~/.config/goose and ~/Library/Application Support/Block/goose.
-  parser: null
+  parser: text_log
 - id: goose.server_logs
   category: log
   root: user_profile
@@ -182,7 +182,7 @@ artifacts:
     The JSON-RPC capture is the best available record of actual MCP tool invocations and their arguments - often the only place the agent's side effects are logged verbatim. Two-week window: collect first.
 
     Record structure: Captures goosed daemon activity, JSON-RPC traffic and extension (MCP) initialisation.
-  parser: null
+  parser: text_log
 - id: goose.memory
   category: memory
   root: project

@@ -1475,5 +1475,6 @@ def test_only_the_generic_readers_say_a_record_is_uninterpreted() -> None:
         "jsonl_generic.py",
         "sqlite_generic.py",
         "structured_generic.py",
+        "text_log.py",
     ], writers
     assert UNINTERPRETED_MARK in JSONL_UNINTERPRETED

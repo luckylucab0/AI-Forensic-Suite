@@ -219,7 +219,7 @@ artifacts:
     Two log roots (XDG data and Electron userData) - collect both for desktop installs.
 
     Windows path correction from the source verification pass: the data directory comes from an XDG base directory helper whose data path is $XDG_DATA_HOME or else the home directory joined with .local/share, on every platform and with no branch for LOCALAPPDATA. This entry claimed a path under %LOCALAPPDATA%, where a collector would have found nothing.
-  parser: null
+  parser: text_log
 - id: opencode.db
   category: transcript
   root: user_profile

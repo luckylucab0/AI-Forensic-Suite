@@ -371,7 +371,7 @@ artifacts:
     Note the log directory is a SIBLING of User/, not inside it (…/Cursor/logs, not …/Cursor/User/logs) — the UAC artifact file collects both paths explicitly.
 
     Record structure: Per-launch subdirectories containing window, renderer, extension-host, terminal, Git, MCP, grep and indexing/retrieval logs. workbench.mcp.*.log records MCP connect/oauth/allowlist events — unstructured text but the only timeline of MCP server startup and authorisation. process-monitor/ holds 1.5 MB of timestamped process logs.
-  parser: null
+  parser: text_log
 - id: cursor.mcp_config
   category: mcp_config
   root: project

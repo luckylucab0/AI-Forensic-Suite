@@ -1487,7 +1487,7 @@ artifacts:
     Present only when the session was started with `--debug` or the user ran `/debug`, so its existence is itself evidence of troubleshooting activity. Because it logs hook execution, it is the best place to see hook-based automation (including hooks that exfiltrate or filter data) actually firing. Vendor docs elsewhere refer to 'the raw session log file from disk' being uploaded with a consented transcript share - likely this file.
 
     Shape correction from the source verification pass: the vendor's environment variable reference says of this variable, despite the name, that it is a file path and not a directory. This entry had it with a trailing slash.
-  parser: null
+  parser: text_log
 - id: claude_code.jobs
   category: log
   root: user_profile
@@ -1593,7 +1593,7 @@ artifacts:
     A pre-built, human-readable summary of the user's own activity, including per-session analysis derived from transcripts - it can preserve conclusions about sessions whose transcripts have since aged out.
 
     Record structure: report.html plus timestamped report copies written by /insights, and cached per-session analysis data used to build them.
-  parser: null
+  parser: text_log
 - id: claude_code.usage_reports
   category: log
   root: user_profile
@@ -1616,7 +1616,7 @@ artifacts:
     Excellent triage artifact: a rendered, human-readable summary of what the user worked on across up to 200 sessions, with friction points and behavioural observations - and the cached per-session metadata can survive as a skeletal index of sessions whose transcripts are gone. Only covers this machine; other devices and claude.ai sessions are excluded.
 
     Record structure: `report.html` is the latest `/insights` report; each run also saves a timestamped copy in the same directory, so earlier reports are not overwritten. The directory also holds CACHED PER-SESSION ANALYSIS DATA used to build the reports (changelog v2.1.149 and v2.1.136 call these 'cached session-meta files' with optional fields and tool-call inputs, so they are per-session JSON-ish metadata). One run analyzes up to 200 previously unseen sessions and skips very short ones; the report header shows analyzed/total (e.g. '200 sessions (412 total)').
-  parser: null
+  parser: text_log
 - id: claude_code.managed_mcp_json
   category: mcp_config
   root: system

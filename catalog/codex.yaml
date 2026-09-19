@@ -251,7 +251,7 @@ artifacts:
     Rewritten per run. The sources read do not state a rotation policy, and the field is only populated when logging is configured, so an empty directory says nothing about whether Codex ran.
   notes: |-
     log_dir defaults to $CODEX_HOME/log. Setting it explicitly also turns on the terminal UI text log, so the presence of content here can mean the user was debugging Codex, which is context worth having.
-  parser: null
+  parser: text_log
 - id: codex.config
   category: config
   root: user_profile

@@ -148,7 +148,7 @@ artifacts:
     The fallback that matters: for an in-progress or unsynced thread this may be the ONLY local record. Because it is under ~/.cache it is also the first thing lost to cleanup tools.
 
     Record structure: Referenced as the fallback record for a live thread when ~/.local/share/amp/threads/T-*.json is not present. AMP_LOG_LEVEL controls verbosity, so content varies greatly between hosts.
-  parser: null
+  parser: text_log
 - id: amp.continuations
   category: transcript
   root: user_profile

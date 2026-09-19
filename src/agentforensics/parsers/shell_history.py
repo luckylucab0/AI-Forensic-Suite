@@ -44,12 +44,16 @@ does not carry it either, so no event claims one.
 from __future__ import annotations
 
 from collections.abc import Iterator
-from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 from agentforensics.model import Event
-from agentforensics.parsers.base import ParseContext, first_word, normalise_ts
+from agentforensics.parsers.base import (
+    ParseContext,
+    TextLine,
+    first_word,
+    normalise_ts,
+    text_lines,
+)
 
 # Which reading each artifact gets. Named rather than sniffed, for the reason the prompt
 # history module gives: the format is a property of the program that wrote the file, the
@@ -71,38 +75,6 @@ NO_TIME = (
 )
 
 
-@dataclass(frozen=True, slots=True)
-class _Line:
-    """One line of a text file, with what was odd about reading it."""
-
-    number: int
-    text: str
-    problem: str | None = None
-
-
-def _lines(path: Path) -> list[_Line]:
-    """Every line of the file, blank ones included, decoded with replacement.
-
-    A history file is not line-delimited JSON, so `iter_lines` is wrong here twice over: it
-    drops blank lines, which a fish record can contain inside a command, and it marks every
-    line that is not an object, which would put the same meaningless note on every event.
-    """
-    out: list[_Line] = []
-    with path.open("r", encoding="utf-8", errors="replace", newline="") as handle:
-        for number, raw in enumerate(handle, start=1):
-            text = raw.rstrip("\r\n")
-            if number == 1:
-                text = text.lstrip("﻿")
-            problem = (
-                "the line did not decode as UTF-8 and was read with replacement characters, "
-                "so the command is not exact"
-                if "�" in text
-                else None
-            )
-            out.append(_Line(number, text, problem))
-    return out
-
-
 class ShellHistoryParser:
     """The four shell history files, each read the way its own shell writes it."""
 
@@ -113,7 +85,7 @@ class ShellHistoryParser:
 
     def parse(self, context: ParseContext) -> Iterator[Event]:
         shape = SHAPES[str(context.artifact_id)]
-        lines = _lines(context.local_path)
+        lines = list(text_lines(context.local_path))
         if shape == "zsh":
             yield from _zsh(context, lines)
         elif shape == "bash":
@@ -163,7 +135,7 @@ def _event(
     )
 
 
-def _zsh(context: ParseContext, lines: list[_Line]) -> Iterator[Event]:
+def _zsh(context: ParseContext, lines: list[TextLine]) -> Iterator[Event]:
     """Extended and plain entries in one file, with backslash continuation."""
     pending: list[str] = []
     problems: list[str] = []
@@ -231,7 +203,7 @@ def _zsh_fields(text: str) -> tuple[Any, Any, str]:
     return int(start.strip()), int(seconds.strip()), rest
 
 
-def _bash(context: ParseContext, lines: list[_Line]) -> Iterator[Event]:
+def _bash(context: ParseContext, lines: list[TextLine]) -> Iterator[Event]:
     """One command per line, dated only by a `#<epoch>` line in front of it."""
     stamp: int | None = None
     for line in lines:
@@ -258,7 +230,7 @@ def _bash(context: ParseContext, lines: list[_Line]) -> Iterator[Event]:
         stamp = None
 
 
-def _fish(context: ParseContext, lines: list[_Line]) -> Iterator[Event]:
+def _fish(context: ParseContext, lines: list[TextLine]) -> Iterator[Event]:
     """fish's own record shape, read by hand rather than as YAML."""
     command: str | None = None
     when: Any = None
@@ -350,7 +322,7 @@ def _fish_unescape(text: str) -> str:
     return "".join(out)
 
 
-def _plain(context: ParseContext, lines: list[_Line]) -> Iterator[Event]:
+def _plain(context: ParseContext, lines: list[TextLine]) -> Iterator[Event]:
     """PSReadLine: one line per entry, a trailing backtick continuing the entry."""
     pending: list[str] = []
     problems: list[str] = []

@@ -611,7 +611,7 @@ artifacts:
     Lives in the platform temp or runtime directory. On Linux $XDG_RUNTIME_DIR is normally a tmpfs under /run/user/<uid> destroyed at logout; on macOS $TMPDIR is a per-user /var/folders path subject to periodic cleanup; on Windows %TEMP% is cleaned by disk maintenance. Default verbosity is error, so the file is usually near-empty unless KIRO_LOG_LEVEL was raised.
   notes: |-
     Must be collected live: on a dead disk the resolved directory may not exist and on Linux a tmpfs leaves nothing at all. The vendor explicitly warns the log 'may contain sensitive information including file paths, code snippets, and command outputs', which is why it is marked secret and why it is worth having despite the default error level. Note the three per-platform spellings differ in shape, not just in prefix: the Windows path has an extra logs segment (%TEMP%\kiro-log\logs\kiro-chat.log). Always resolve $KIRO_CHAT_LOG_FILE from the live environment first; if it is set, the documented paths are empty and mean nothing.
-  parser: null
+  parser: text_log
 - id: kiro.acp_wire_record
   title: Kiro CLI ACP wire recording
   category: transcript

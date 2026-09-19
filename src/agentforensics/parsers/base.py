@@ -95,6 +95,48 @@ class Line:
         return f"line:{self.number}"
 
 
+@dataclass(frozen=True, slots=True)
+class TextLine:
+    """One line of a plain text file, with what was odd about reading it."""
+
+    number: int
+    text: str
+    problem: str | None = None
+
+    @property
+    def locator(self) -> str:
+        return f"line:{self.number}"
+
+
+def text_lines(path: Path) -> Iterator[TextLine]:
+    """Every line of a text file, blank ones included, decoded with replacement.
+
+    Not `iter_lines`, which is for line-delimited JSON: that one drops blank lines, which
+    are record separators in some of these formats, and marks every line that is not an
+    object, which would put the same meaningless note on every event of a file that was
+    never JSON. Three readers need the same thing instead, a history file, a recall file
+    and a log, so they read it here.
+
+    Decoded with replacement and the substitution reported, for the reason the JSON reader
+    gives: a file that will not decode is usually a partial write or another encoding, and
+    failing the read would lose the lines that are fine. A byte order mark on the first
+    line is removed, because left in it makes the first record carry an invisible
+    character.
+    """
+    with path.open("r", encoding="utf-8", errors="replace", newline="") as handle:
+        for number, raw in enumerate(handle, start=1):
+            text = raw.rstrip("\r\n")
+            if number == 1:
+                text = text.lstrip("\ufeff")
+            problem = (
+                "the line did not decode as UTF-8 and was read with replacement characters, "
+                "so its content is not exact"
+                if "\ufffd" in text
+                else None
+            )
+            yield TextLine(number, text, problem)
+
+
 def iter_lines(path: Path, *, limit: int | None = None) -> Iterator[Line]:
     """Every line of a line-delimited file, none of them skipped.
 
@@ -302,9 +344,11 @@ __all__ = [
     "Line",
     "ParseContext",
     "Parser",
+    "TextLine",
     "first_word",
     "iter_lines",
     "normalise_ts",
     "read_json",
+    "text_lines",
     "text_of",
 ]

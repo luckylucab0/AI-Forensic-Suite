@@ -136,7 +136,7 @@ artifacts:
     ~/Library/Logs/LM Studio is the timestamped counterpart to the untimestamped conversation JSON - use it to place model loads and server requests on a timeline. Note the vendor identifier is ai.elementlabs, not anything containing 'lmstudio.ai'.
 
     Record structure: Cask lm-studio version 0.4.24,1, app bundle "LM Studio.app", bundle identifiers ai.elementlabs.lmstudio and ai.elementlabs.lmstudio.helper.
-  parser: null
+  parser: text_log
 - id: lmstudio.mcp_config
   category: mcp_config
   root: user_profile
