@@ -32,6 +32,8 @@ Funde werden in die Falldatenbank geschrieben, neben die Ereignisse, auf denen s
 |  | [AFX-PERMISSIONBYPASS-002](#afx-permissionbypass-002) | hoch |
 |  | [AFX-PERMISSIONBYPASS-003](#afx-permissionbypass-003) | mittel |
 |  | [AFX-PERMISSIONBYPASS-004](#afx-permissionbypass-004) | mittel |
+|  | [AFX-PERMISSIONBYPASS-005](#afx-permissionbypass-005) | hoch |
+|  | [AFX-PERMISSIONBYPASS-006](#afx-permissionbypass-006) | mittel |
 | [`prompt_injection`](#prompt-injection) | [AFX-PROMPTINJECTION-001](#afx-promptinjection-001) | hoch |
 |  | [AFX-PROMPTINJECTION-002](#afx-promptinjection-002) | hoch |
 |  | [AFX-PROMPTINJECTION-003](#afx-promptinjection-003) | mittel |
@@ -517,6 +519,69 @@ Sicherheitskontrollen, die abgeschaltet wurden, nicht Kontrollen, die versagt ha
 - [EN] A skill shipped by the vendor's own marketplace, where the grant was reviewed by whoever published it rather than by the user.
 
 *Stichproben in der Regeldatei:* 3 / 3 (+/-)
+
+#### AFX-PERMISSIONBYPASS-005
+
+**A configuration starts every session in a mode that approves its own tool calls**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `permission_bypass` |
+| Agenten | `any` |
+| Ereignisarten | `config.snapshot` |
+| Gelesene Felder | `raw.permissions.defaultMode`, `raw.defaultMode`, `payload.defaultMode`, `event_text` |
+| Schlagworte | `T1562.001`, `permission-bypass` |
+
+[EN] A configuration sets the mode a session starts in to one that approves tool calls without asking. Claude Code spells this defaultMode bypassPermissions in its settings files, and Cline calls the equivalent mode yolo, which its own preset code describes as guaranteeing that tool policies are enabled and auto-approved.
+
+*Worauf sie trifft:* `(raw.permissions.defaultMode is 'bypassPermissions' or raw.defaultMode is 'bypassPermissions' or payload.defaultMode is 'bypassPermissions' or event_text matches /(?m)^[^\S\n]*defaultMode[^\S\n]*=[^\S\n]*bypassPermissions[^\S\n]*$/ or event_text matches /(?m)^[^\S\n]*mode[^\S\n]*=[^\S\n]*yolo[^\S\n]*$/)`
+
+*Warum das für die Analyse zählt:* [EN] The two rules beside this one find a bypass somebody typed: a flag on a command line, or a mode changed part way through a session. This one is the version that needs typing once. A line in a settings file or in a schedule the agent wrote for itself means every session from then on starts with the prompt already answered, including the sessions nobody is present for. It also explains an absence twice over. A transcript with no approvals in it reads differently once this is known, and for Cline it removes evidence rather than only approvals: the vendor's own hook documentation states that hooks are disabled in yolo mode, and the hook log is the artifact that dates this agent's prompts. So a scheduled run in yolo mode approves everything and writes no audit line about any of it, and the vendor's cron documentation lists yolo as the default mode for a scheduled run.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A machine that exists to run an agent unattended, in a container or a disposable virtual machine, which is what the vendors recommend these modes for. The finding is still correct: it says approvals were not asked for, not that asking was required.
+- [EN] A document that records the mode of a past run rather than setting it for future ones. Both are the same line in the same shape, and which one it is depends on the file, which is why the finding names the file it came from.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/permissions>
+- <https://raw.githubusercontent.com/cline/cline/main/sdk/packages/core/src/extensions/tools/presets.ts>
+- <https://raw.githubusercontent.com/cline/cline/main/sdk/examples/hooks/README.md>
+- <https://raw.githubusercontent.com/cline/cline/main/sdk/examples/cron/README.md>
+
+*Stichproben in der Regeldatei:* 3 / 3 (+/-)
+
+#### AFX-PERMISSIONBYPASS-006
+
+**A configuration starts every session in a mode that edits files without asking**
+
+| | |
+| --- | --- |
+| Schweregrad | mittel |
+| Paket | `permission_bypass` |
+| Agenten | `any` |
+| Ereignisarten | `config.snapshot` |
+| Gelesene Felder | `raw.permissions.defaultMode`, `raw.defaultMode`, `payload.defaultMode`, `event_text` |
+| Schlagworte | `T1562.001`, `permission-bypass` |
+
+[EN] A configuration sets the mode a session starts in to acceptEdits, which the vendor documents as automatically accepting file edits and common filesystem commands such as mkdir, touch, mv and cp inside the working directory, or to auto, which auto-approves tool calls subject to a background classifier.
+
+*Worauf sie trifft:* `(raw.permissions.defaultMode is 'acceptEdits' or 'auto' or raw.defaultMode is 'acceptEdits' or 'auto' or payload.defaultMode is 'acceptEdits' or 'auto' or event_text matches /(?m)^[^\S\n]*defaultMode[^\S\n]*=[^\S\n]*(?:acceptEdits\|auto)[^\S\n]*$/)`
+
+*Warum das für die Analyse zählt:* [EN] This is the weaker half of the setting the rule before it covers, and it is worth its own finding for one reason: it is the ordinary answer to "why are there no approvals in this transcript". An analyst who does not know the mode reads a session full of file writes with nothing asking about them and has to decide whether the prompts were answered, never shown, or removed. The mode says which, and it says it for every session on the endpoint rather than for the one being read. It stays at medium because it is a setting people turn on to get work done and because what it approves is bounded: the vendor documents it as edits and common filesystem commands inside the working directory, not as every tool call. A high severity here would teach an analyst to skip the pack.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A developer who turned it on deliberately for their own repository, which is most uses of it. The finding is context for reading the transcripts rather than a mistake on its own.
+- [EN] A document that records the mode a past session ran in rather than setting the mode for future ones. The finding names the file, which is what tells the two apart.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/permissions>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
 
 ## prompt injection
 

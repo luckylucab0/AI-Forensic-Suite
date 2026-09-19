@@ -1,0 +1,113 @@
+id: AFX-PERMISSIONBYPASS-005
+pack: permission_bypass
+title: A configuration starts every session in a mode that approves its own tool calls
+severity: high
+description: >
+  A configuration sets the mode a session starts in to one that approves tool calls without
+  asking. Claude Code spells this defaultMode bypassPermissions in its settings files, and
+  Cline calls the equivalent mode yolo, which its own preset code describes as guaranteeing
+  that tool policies are enabled and auto-approved.
+rationale: >
+  The two rules beside this one find a bypass somebody typed: a flag on a command line, or
+  a mode changed part way through a session. This one is the version that needs typing
+  once. A line in a settings file or in a schedule the agent wrote for itself means every
+  session from then on starts with the prompt already answered, including the sessions
+  nobody is present for.
+
+  It also explains an absence twice over. A transcript with no approvals in it reads
+  differently once this is known, and for Cline it removes evidence rather than only
+  approvals: the vendor's own hook documentation states that hooks are disabled in yolo
+  mode, and the hook log is the artifact that dates this agent's prompts. So a scheduled
+  run in yolo mode approves everything and writes no audit line about any of it, and the
+  vendor's cron documentation lists yolo as the default mode for a scheduled run.
+applies_to:
+  kinds: [config.snapshot]
+match:
+  any:
+    # Claude Code, where the mode sits under permissions in a settings file, and where a
+    # different product or version may put it at the top level of the same document.
+    - field: raw.permissions.defaultMode
+      equals: bypassPermissions
+    - field: raw.defaultMode
+      equals: bypassPermissions
+    - field: payload.defaultMode
+      equals: bypassPermissions
+    # The same document reaching a case as one nobody has a parser for: the text views
+    # render a mapping one leaf per line, so the setting is a `key = value` line and the
+    # pattern has to stay on it. See the schema's note on \s crossing a field boundary.
+    - field: event_text
+      regex: '(?m)^[^\S\n]*defaultMode[^\S\n]*=[^\S\n]*bypassPermissions[^\S\n]*$'
+    # Cline's equivalent, in a settings document or in a schedule the agent wrote itself.
+    - field: event_text
+      regex: '(?m)^[^\S\n]*mode[^\S\n]*=[^\S\n]*yolo[^\S\n]*$'
+tags:
+  - T1562.001
+  - permission-bypass
+false_positives:
+  - >-
+    A machine that exists to run an agent unattended, in a container or a disposable virtual
+    machine, which is what the vendors recommend these modes for. The finding is still
+    correct: it says approvals were not asked for, not that asking was required.
+  - >-
+    A document that records the mode of a past run rather than setting it for future ones.
+    Both are the same line in the same shape, and which one it is depends on the file, which
+    is why the finding names the file it came from.
+references:
+  - https://code.claude.com/docs/en/permissions
+  - https://raw.githubusercontent.com/cline/cline/main/sdk/packages/core/src/extensions/tools/presets.ts
+  - https://raw.githubusercontent.com/cline/cline/main/sdk/examples/hooks/README.md
+  - https://raw.githubusercontent.com/cline/cline/main/sdk/examples/cron/README.md
+tests:
+  - name: the start mode set in a settings file
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        permissions:
+          defaultMode: bypassPermissions
+          allow: ["Read(./src/**)"]
+  - name: the same file as a document nobody has mapped
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        permissions: {defaultMode: bypassPermissions}
+  - name: a schedule the agent wrote for itself, in the mode that approves everything
+    match: true
+    event:
+      kind: config.snapshot
+      agent: cline
+      raw:
+        id: nightly-review
+        schedule: "0 3 * * *"
+        mode: yolo
+        enabled: true
+  - name: a schedule that runs in the ordinary mode
+    match: false
+    event:
+      kind: config.snapshot
+      agent: cline
+      raw:
+        id: nightly-review
+        schedule: "0 3 * * *"
+        mode: act
+  - name: a settings file that leaves the prompt in place
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        permissions:
+          defaultMode: default
+          allow: ["Read(./src/**)"]
+  - name: the mode that denies rather than approves
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      # dontAsk auto-denies what would otherwise prompt, which is the opposite of this
+      # rule. A pattern that matched every mode with ask in the name would be wrong here.
+      raw:
+        permissions: {defaultMode: dontAsk}

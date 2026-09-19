@@ -42,6 +42,9 @@ EXPECTED = {
     "that stops asking",
     "AFX-PERMISSIONBYPASS-003": "~/.claude/settings.json allows Bash(*)",
     "AFX-PERMISSIONBYPASS-004": "an instruction file grants itself the right to run commands",
+    "AFX-PERMISSIONBYPASS-005": "~/.cline/schedules/nightly-review.json runs in the mode that "
+    "approves every tool",
+    "AFX-PERMISSIONBYPASS-006": "~/.claude/settings.json starts sessions in acceptEdits",
     "AFX-PROMPTINJECTION-002": "a rules file carries invisible characters",
     "AFX-PROMPTINJECTION-003": "a project instruction file arrived with the work",
     "AFX-SECRETS-001": "a transcript holds a cloud provider access key",

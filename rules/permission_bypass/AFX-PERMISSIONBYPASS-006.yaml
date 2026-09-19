@@ -1,0 +1,82 @@
+id: AFX-PERMISSIONBYPASS-006
+pack: permission_bypass
+title: A configuration starts every session in a mode that edits files without asking
+severity: medium
+description: >
+  A configuration sets the mode a session starts in to acceptEdits, which the vendor
+  documents as automatically accepting file edits and common filesystem commands such as
+  mkdir, touch, mv and cp inside the working directory, or to auto, which auto-approves
+  tool calls subject to a background classifier.
+rationale: >
+  This is the weaker half of the setting the rule before it covers, and it is worth its own
+  finding for one reason: it is the ordinary answer to "why are there no approvals in this
+  transcript". An analyst who does not know the mode reads a session full of file writes
+  with nothing asking about them and has to decide whether the prompts were answered, never
+  shown, or removed. The mode says which, and it says it for every session on the endpoint
+  rather than for the one being read.
+
+  It stays at medium because it is a setting people turn on to get work done and because
+  what it approves is bounded: the vendor documents it as edits and common filesystem
+  commands inside the working directory, not as every tool call. A high severity here would
+  teach an analyst to skip the pack.
+applies_to:
+  kinds: [config.snapshot]
+match:
+  any:
+    - field: raw.permissions.defaultMode
+      equals_any: [acceptEdits, auto]
+    - field: raw.defaultMode
+      equals_any: [acceptEdits, auto]
+    - field: payload.defaultMode
+      equals_any: [acceptEdits, auto]
+    # The same setting in a document nobody has a parser for, where the text views render
+    # a mapping one leaf per line. Kept on its own line, because \s would cross into the
+    # next field and match an unset mode followed by whatever came after it.
+    - field: event_text
+      regex: '(?m)^[^\S\n]*defaultMode[^\S\n]*=[^\S\n]*(?:acceptEdits|auto)[^\S\n]*$'
+tags:
+  - T1562.001
+  - permission-bypass
+false_positives:
+  - >-
+    A developer who turned it on deliberately for their own repository, which is most uses
+    of it. The finding is context for reading the transcripts rather than a mistake on its
+    own.
+  - >-
+    A document that records the mode a past session ran in rather than setting the mode for
+    future ones. The finding names the file, which is what tells the two apart.
+references:
+  - https://code.claude.com/docs/en/permissions
+tests:
+  - name: edits accepted automatically from the settings file
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        permissions:
+          defaultMode: acceptEdits
+          allow: ["Read(./src/**)"]
+  - name: the classifier-backed automatic mode
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        permissions: {defaultMode: auto}
+  - name: the planning mode, which edits nothing
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        permissions: {defaultMode: plan}
+  - name: the mode that skips every prompt, which is the rule before this one
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      # Deliberately not matched here: two severities for one setting would be one rule
+      # firing twice on the same line, and the stronger finding is the one to read.
+      raw:
+        permissions: {defaultMode: bypassPermissions}
