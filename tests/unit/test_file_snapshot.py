@@ -135,8 +135,6 @@ def test_a_snapshot_is_attributed_to_the_agent_rather_than_to_the_user(
 # Held against the catalogue below so that a snapshot store added there has to be decided
 # about rather than quietly left unread.
 NOT_CLAIMED = {
-    "amazonq.cli_checkpoints": "a bare git repository per conversation, so the content is "
-    "in an object store rather than in the files, and reading it needs a git reader",
     "claude_code.worktrees": "a whole working copy, not a copy of one file",
     "claude_desktop.cowork_session_files": "a session working directory of arbitrary files",
     "claude_desktop.cowork_vm_bundle": "a virtual machine disk image",

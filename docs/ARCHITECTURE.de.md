@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 33 Module lesen 357 der 473
+  zählt diese Dateien und sagt, welche es sind. 33 Module lesen 358 der 473
   Katalogartefakte; der Rest sind die Anmeldedatenspeicher, die absichtlich niemand liest,
   die Installationsspuren, die das Dateisystem-Ereignis beantwortet, und die Binärspeicher,
   die noch eigene Formate brauchen.
@@ -203,6 +203,19 @@ ist, dass das nicht *unbemerkt* geht.
     dekodiert wurde. Das Format ist in diesem Paket implementiert statt aus einer
     Abhängigkeit genommen, zusammen mit dem Snappy, mit dem seine Blöcke komprimiert
     sind (ADR 0031).
+
+  **Die Schatten-Repositories** sind ein eigener Teil der Antwort auf die Frage nach
+  Datei-Momentaufnahmen. Zwei Agenten sichern, was sie ändern wollen, indem sie es in ein
+  Repository committen, und wo dieses Repository dem Agenten gehört, sammelt der Katalog es
+  ganz. Also wird der git-Objektspeicher hier gelesen: ein loses Objekt ist zlib um einen
+  Typ, eine Länge und einen Rumpf, und die Commits, die Bäume und die Dateiinhalte hinter
+  jedem Checkpoint liegen im Bundle. Ein Commit trägt seine eigene Uhr, die den Zeitpunkt
+  der Aufnahme datiert, wo das Referenzlog nur den Schreibvorgang datiert. Ein gepacktes
+  Objekt wird benannt und nicht entpackt, denn eines aufzulösen braucht das Pack-Format und
+  seine beiden Delta-Kodierungen, und die rät diese Suite nicht; solche Repositories werden
+  normalerweise nie aufgeräumt, also ist ein Pack darin selbst einen Blick wert. Ein Hook,
+  der keine von gits abgeschalteten Vorlagen ist, wird als Instruktion abgelegt und nicht
+  als Konfiguration, denn er ist ein Skript, das der Endpunkt von sich aus ausführt.
 
   **Die Instruktionsfläche** hat ihr eigenes formatförmiges Modul für die Artefakte, die
   Skills, Commands, Output Styles, Rules, Steering-Dateien, Subagent-Definitionen und

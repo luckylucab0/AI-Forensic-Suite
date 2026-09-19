@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  Thirty-three modules read 357 of the catalogue's 473 artifacts; the rest are the credential
+  Thirty-three modules read 358 of the catalogue's 473 artifacts; the rest are the credential
   stores nothing reads on purpose, the install evidence the filesystem event answers, and
   the binary stores that still need their own formats.
 
@@ -184,6 +184,18 @@ it cannot be rewritten *quietly*.
     says it was extracted rather than decoded. The format is implemented in this package
     rather than taken from a dependency, together with the Snappy its blocks are
     compressed with (ADR 0031).
+
+  **The shadow repositories** are their own piece of the file-snapshot answer. Two agents
+  snapshot what they are about to change by committing it into a repository, and where that
+  repository is the agent's own the catalogue collects it whole. So the git object store is
+  read here: a loose object is zlib around a type, a length and a body, and the commits, the
+  trees and the file contents behind every checkpoint are in the bundle. A commit carries
+  its own clock, which dates the capture where the reference log dates only the write. A
+  packed object is named and not expanded, because resolving one needs the pack format and
+  its two delta encodings and this suite will not guess at them; these repositories are
+  normally never garbage collected, so a pack in one is itself worth a look. A hook that is
+  not one of git's disabled templates is filed as an instruction rather than as
+  configuration, because it is a script the endpoint runs on its own.
 
   **The instruction surface** has its own format-shaped module for the artifacts that hold
   skills, commands, output styles, rules, steering files, subagent definitions and hook

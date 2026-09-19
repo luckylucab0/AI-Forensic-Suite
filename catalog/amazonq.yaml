@@ -179,7 +179,7 @@ artifacts:
     Only created when checkpoints are enabled for a session (/checkpoint init, or automatically depending on version). Once written, git objects are immutable and are not garbage collected by Kiro or Q, so content survives even after the working tree is changed or deleted. Removing the directory is the only cleanup.
   notes: |-
     Probably the most under-appreciated artifact in this product. The code builds the path with PathResolver::new(os).global().shadow_repo_dir()?.join(session.conversation.conversation_id()) from the constant SHADOW_REPO_DIR = ".aws/amazonq/cli-checkouts", then runs run_git(path, None, &["init", "--bare", ...]) and later resets or checks out against a --work-tree. So each conversation gets a bare git repository under the user's home holding committed snapshots, tagged per checkpoint, of the user's working tree at each turn. For an analyst this means the content of files the agent created, modified or deleted is recoverable from git objects even when the files are gone from the working copy and even when the project directory no longer exists, and the commit and tag sequence gives an ordered timeline that ties to the conversation id in the conversations table. It also means source code left the project directory and now sits in a second location under the home directory, which matters for data-at-rest and scoping questions. Collect the whole directory; do not run git commands against the original, copy it first.
-  parser: null
+  parser: git_checkpoints
 - id: amazonq.ide_chat_history
   title: Amazon Q Developer IDE chat history database
   category: transcript
