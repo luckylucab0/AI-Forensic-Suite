@@ -299,11 +299,30 @@ def test_a_scope_nothing_could_decide_is_unknown_and_says_why(case: Case) -> Non
     project instruction file cannot be told from a profile one. The honest answer is unknown
     with the reason on the event, because the alternative reverses the finding about who
     instructed the agent."""
-    rows = api.instructions(case)["instructions"]
+    view = api.instructions(case)
+    rows = view["instructions"]
 
     unknown = [row for row in rows if row["scope"] == "unknown"]
     assert unknown, "a tree source records no working copies, so nothing here is decidable"
-    assert all("unknown rather than assumed" in (row["parse_problem"] or "") for row in unknown)
+    assert all("unknown rather than assumed" in (row["scope_problem"] or "") for row in unknown)
+    assert view["counts"]["scope_unknown"] == len(unknown)
+
+
+def test_a_file_whose_scope_is_unknown_is_not_counted_as_unreadable(case: Case) -> None:
+    """The two say opposite things about the same evidence.
+
+    A file whose tier nobody could settle was read completely; a file that is unreadable
+    was not. Carrying the first as a parse problem made every view in this project report
+    that all seven instruction files in the synthetic profile had not been fully read, which
+    is a statement about the quality of the evidence and it was false. A tool that reports
+    sound evidence as unreadable teaches an analyst to skip the one case where it means it.
+    """
+    view = api.instructions(case)
+
+    assert view["counts"]["scope_unknown"], "the fixture has files whose scope is unknown"
+    assert view["counts"]["unreadable"] == 0, [
+        row["parse_problem"] for row in view["instructions"] if row["parse_problem"]
+    ]
 
 
 def test_a_preview_says_whether_it_is_the_whole_file(case: Case) -> None:

@@ -527,6 +527,11 @@ def instructions(case: Case) -> dict[str, Any]:
         row.update(
             {
                 "scope": payload.get("scope") or "unknown",
+                # Why the scope is what it is, where the parser could not settle it. A
+                # separate field from parse_problem, because a file whose tier is unknown
+                # was still read: counting it as unreadable told an analyst the collection
+                # had failed when it had not.
+                "scope_problem": payload.get("scope_problem"),
                 "title": payload.get("title"),
                 "declared_name": payload.get("declared_name"),
                 "declared_description": payload.get("declared_description"),
@@ -564,6 +569,7 @@ def instructions(case: Case) -> dict[str, Any]:
             "with_hidden_characters": sum(1 for row in out if row["hidden_characters"]),
             "executable": sum(1 for row in out if row["executable"]),
             "unreadable": sum(1 for row in out if row["parse_problem"]),
+            "scope_unknown": sum(1 for row in out if row["scope"] == "unknown"),
         },
         "note": (
             "This is the instruction surface that was on the endpoint: instruction files, "

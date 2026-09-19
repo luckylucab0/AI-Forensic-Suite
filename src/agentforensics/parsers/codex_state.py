@@ -66,6 +66,7 @@ from typing import Any
 
 from agentforensics.model import Actor, Event, unparsed
 from agentforensics.parsers.base import ParseContext, text_of
+from agentforensics.parsers.instructions import hidden_characters
 from agentforensics.parsers.sqlite_generic import rows_as_events
 from agentforensics.parsers.sqlite_store import (
     StoreError,
@@ -231,7 +232,7 @@ def _item(context: ParseContext, locator: str, values: dict[str, Any], *, turns:
         else None
     )
 
-    kind, payload, mapping_problem = _map(item_type, document)
+    kind, payload, mapping_problem = _map(item_type, document, context.original_path)
     common: dict[str, Any] = {
         "user": context.user,
         "host": context.host,
@@ -302,7 +303,7 @@ def _document(value: Any) -> tuple[dict[str, Any] | None, str | None]:
 
 
 def _map(
-    item_type: str | None, document: dict[str, Any] | None
+    item_type: str | None, document: dict[str, Any] | None, where: str
 ) -> tuple[str, dict[str, Any], str | None]:
     """The kind and the payload for one item, from the vendor's published schema for it."""
     body = document or {}
@@ -331,18 +332,35 @@ def _map(
         )
     if item_type == "hookPrompt":
         fragments = body.get("fragments") or []
+        text = (
+            "\n".join(
+                text_of(part.get("text"))
+                for part in fragments
+                if isinstance(part, dict) and text_of(part.get("text"))
+            )
+            or None
+        )
+        hidden = hidden_characters(text or "")
         return (
             "instruction.source",
             {
-                "text": "\n".join(
-                    text_of(part.get("text"))
-                    for part in fragments
-                    if isinstance(part, dict) and text_of(part.get("text"))
-                )
-                or None,
-                # No instructions facet: that facet is a path to join against a collected
-                # file, and a hook's prompt has no path. What it has is the run that
-                # produced it.
+                "text": text,
+                # The facet the case indexes, with the store and the column as the path
+                # because that is where this instruction was found and there is no file to
+                # name. The same shape the other in-database instructions use.
+                "instructions": [{"path": f"{where}#thread_items.item_json", "scope": "session"}],
+                # In force for this conversation and not beyond it: a hook put it in front
+                # of the model at run time, and nothing on disk carries it into the next
+                # session.
+                "scope": "session",
+                "file": "thread_items.item_json",
+                "in_database": True,
+                "bytes": len((text or "").encode("utf-8", "surrogatepass")),
+                "lines": text.count("\n") + 1 if text else 0,
+                # The same check the instruction files get. A hook that injects characters
+                # a reviewer cannot see is the shape of this attack, and text that reached
+                # the model through a column deserves the check as much as text in a file.
+                "hidden_characters": hidden or None,
                 "hook_runs": sorted(
                     {
                         text_of(part.get("hookRunId"))

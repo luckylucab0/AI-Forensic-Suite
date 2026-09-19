@@ -255,8 +255,6 @@ class InstructionsParser:
             text = text[:MAX_TEXT]
 
         scope, scope_note = scope_of(context.original_path, context.project_roots)
-        if scope_note:
-            problems.append(scope_note)
 
         payload: dict[str, Any] = {
             "text": text,
@@ -268,6 +266,13 @@ class InstructionsParser:
             "bytes": len(raw_bytes),
             "lines": text.count("\n") + 1 if text else 0,
         }
+        if scope_note:
+            # Beside the scope and not in parse_problem. The file was read completely; what
+            # is not known is which tier it applied at. Carrying that as a parse problem
+            # made every view say the file had not been fully read, and a tool that reports
+            # sound evidence as unreadable teaches an analyst to distrust the one case
+            # where it means it.
+            payload["scope_problem"] = scope_note
 
         # A script's `#` lines are comments, not Markdown headings, and the two are
         # syntactically identical. Reading one as a title showed `!/bin/sh` as the name of a
@@ -312,7 +317,7 @@ class InstructionsParser:
             # interpreted, because what it does is a question for the analyst.
             payload["executable"] = True
 
-        hidden = _hidden_characters(text)
+        hidden = hidden_characters(text)
         if hidden:
             payload["hidden_characters"] = hidden
 
@@ -461,8 +466,12 @@ def _prompt_in(document: Any) -> tuple[str | None, str | None]:
     return None, None
 
 
-def _hidden_characters(text: str) -> list[dict[str, Any]]:
+def hidden_characters(text: str) -> list[dict[str, Any]]:
     """Characters a reviewer cannot see, counted.
+
+    Public because it is about text and not about files: an instruction that reached a model
+    from a database column or from a hook is exactly as worth checking as one in a file, and
+    a second copy of this list would be a second place to fix.
 
     The tag block is counted as a range rather than per character: it exists only to carry
     smuggled text, so how many of them there are matters and which ones do not.
@@ -490,4 +499,4 @@ def _hidden_characters(text: str) -> list[dict[str, Any]]:
     return out
 
 
-__all__ = ["MAX_TEXT", "SOURCES", "InstructionsParser", "scope_of"]
+__all__ = ["MAX_TEXT", "SOURCES", "InstructionsParser", "hidden_characters", "scope_of"]

@@ -429,6 +429,8 @@ def cmd_instructions(args: argparse.Namespace) -> int:
             _write(sys.stdout, f"           {row['declared_name'] or row['title']}")
         for mark in marks:
             _write(sys.stdout, f"           {mark}")
+        if row["scope_problem"]:
+            _write(sys.stdout, f"           scope not settled: {row['scope_problem']}")
         if row["parse_problem"]:
             _write(sys.stdout, f"           not fully read: {row['parse_problem']}")
 
@@ -437,7 +439,8 @@ def cmd_instructions(args: argparse.Namespace) -> int:
         sys.stdout,
         f"total: {len(rows)} instruction file(s) of {counts['files']} in the case, "
         f"{counts['with_declared_tools']} granting tools, "
-        f"{counts['with_hidden_characters']} with characters a reviewer cannot see",
+        f"{counts['with_hidden_characters']} with characters a reviewer cannot see, "
+        f"{counts['scope_unknown']} whose scope the collection could not settle",
     )
     # On stderr, so a piped listing stays clean and the limit is still said every time. An
     # analyst who reads this as a system prompt would be quoting something the endpoint
