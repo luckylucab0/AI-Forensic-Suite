@@ -9244,6 +9244,97 @@ function Add-PatternRefusal {
     [void]$script:PatternRefusals.Add($record)
 }
 
+function Test-OwnProfile {
+    <#
+    .SYNOPSIS
+        Whether this home is the one belonging to the process running the collector.
+    .DESCRIPTION
+        Mirrors collect.py's _own_profile. The question decides whether this process's
+        environment says anything about the profile being collected. It does for its own;
+        for anybody else's it does not, and applying this user's variables to another
+        user's profile would attribute one person's files to another. Compared
+        case-insensitively because Windows paths are.
+    #>
+    param([string] $ProfileHome)
+
+    $own = [System.Environment]::GetEnvironmentVariable('USERPROFILE')
+    if (-not $own) { $own = [System.Environment]::GetFolderPath('UserProfile') }
+    if (-not $own) { return $false }
+    $left = $own.Replace('\', '/').TrimEnd('/')
+    $right = $ProfileHome.Replace('\', '/').TrimEnd('/')
+    return [string]::Equals($left, $right, [System.StringComparison]::OrdinalIgnoreCase)
+}
+
+function Get-WindowsRedirectTarget {
+    <#
+    .SYNOPSIS
+        The extra pattern a placeholder's live value implies, or an empty string.
+    .DESCRIPTION
+        Mirrors collect.py's windows_redirect_target and reads no environment, so the
+        decision itself can be checked with fixed inputs on both collectors without either
+        depending on the machine it runs on. The self-test carries those inputs.
+
+        Returns '' when the value is empty, when it is where the default already points, or
+        when the text does not start with a placeholder this collector knows.
+    #>
+    param([string] $Text, [string] $ProfileHome, [string] $Value)
+
+    if (-not $Value) { return '' }
+    $upper = $Text.ToUpperInvariant()
+    foreach ($key in $script:WinPlaceholders.Keys) {
+        if (-not $upper.StartsWith($key)) { continue }
+        # A UNC value keeps its two leading separators: \\server\share is a host and a
+        # share, and collapsing it to one produces a path on this machine instead.
+        $moved = $Value.Replace('\', '/').TrimEnd('/')
+        $base = $ProfileHome.Replace('\', '/').TrimEnd('/')
+        $parts = [System.Collections.Generic.List[string]]::new()
+        foreach ($piece in @($base, [string]$script:WinPlaceholders[$key])) {
+            if ($piece) { $parts.Add($piece) }
+        }
+        $default = [string]::Join('/', $parts)
+        if ([string]::Equals($moved, $default, [System.StringComparison]::OrdinalIgnoreCase)) {
+            return ''
+        }
+        # The tail is normalised here rather than left to the caller, so this function's
+        # answer is one spelling of one path and can be compared against the other
+        # collector's byte for byte.
+        $tail = $Text.Substring(([string]$key).Length).TrimStart('\', '/').Replace('\', '/')
+        $out = [System.Collections.Generic.List[string]]::new()
+        foreach ($piece in @($moved, $tail)) { if ($piece) { $out.Add($piece) } }
+        return [string]::Join('/', $out)
+    }
+    return ''
+}
+
+function Get-WindowsRedirected {
+    <#
+    .SYNOPSIS
+        Where a Windows placeholder actually points, when that is not the default. Or ''.
+    .DESCRIPTION
+        Mirrors collect.py's _windows_redirected. Folder redirection is ordinary in a
+        managed fleet: %APPDATA% can be a network share and %TEMP% can be moved. The
+        documented default under the profile is then an empty directory, so a collection
+        finds none of the 134 catalogue paths rooted at one of these placeholders and
+        reports nothing wrong. Both locations are searched rather than one replacing the
+        other, because the default can still hold what was written before the redirection.
+
+        Only for a live host and only for the process's own profile. A mounted image has no
+        environment to ask, and another user's profile has one this process cannot see.
+    #>
+    param([string] $Text, [string] $ProfileHome, [string] $Root)
+
+    if ($Root) { return '' }
+    if (-not (Test-OwnProfile -ProfileHome $ProfileHome)) { return '' }
+    $upper = $Text.ToUpperInvariant()
+    foreach ($key in $script:WinPlaceholders.Keys) {
+        if ($upper.StartsWith($key)) {
+            $value = [System.Environment]::GetEnvironmentVariable(([string]$key).Trim('%'))
+            return (Get-WindowsRedirectTarget -Text $Text -ProfileHome $ProfileHome -Value $value)
+        }
+    }
+    return ''
+}
+
 function Get-VariableName {
     <#
     .SYNOPSIS
@@ -9471,6 +9562,8 @@ function Expand-CataloguePath {
             }
             $text = ([string]$resolved['text']).Replace('\', '/')
         } else {
+            # Asked before the substitution, while the placeholder is still there.
+            $redirected = Get-WindowsRedirected -Text $text -ProfileHome $ProfileHome -Root $Root
             $upper = $text.ToUpperInvariant()
             $matched = $false
             foreach ($key in $script:WinPlaceholders.Keys) {
@@ -9500,6 +9593,21 @@ function Expand-CataloguePath {
                     # artifacts were never found and the manifest reported a clean profile.
                     $text = $ProfileHome.TrimEnd('/') + $text.Substring(1)
                 }
+            }
+            if ($redirected) {
+                # Two locations, both evidence. Recursed rather than handled here so each
+                # one passes the guards at the end of this function: an absolute path
+                # matches no placeholder, so the recursion terminates at one level.
+                $both = [System.Collections.Generic.List[string]]::new()
+                foreach ($one in (Expand-CataloguePath -Pattern $text.Replace('\', '/') `
+                        -ProfileHome $ProfileHome -TargetOs $TargetOs -Root $Root)) {
+                    $both.Add([string]$one)
+                }
+                foreach ($one in (Expand-CataloguePath -Pattern $redirected `
+                        -ProfileHome $ProfileHome -TargetOs $TargetOs -Root $Root)) {
+                    $both.Add([string]$one)
+                }
+                return ,$both
             }
         }
         $text = $text.Replace('\', '/')
@@ -10962,6 +11070,24 @@ function Invoke-SelfTest {
     }
     $script:PatternRefusals.Clear()
     $cases['windows_expansion'] = $windows
+
+    # Folder redirection, as fixed inputs rather than as whatever this machine is set to.
+    # Kept in step with REDIRECT_CASES in tests/conformance/selftest_cases.py.
+    $redirect = [ordered]@{}
+    foreach ($case in @(
+        @('%APPDATA%\Block\goose\sessions.db', 'C:/Users/alice', '\\server\share\alice\AppData\Roaming'),
+        @('%LOCALAPPDATA%\amazon-q\data.sqlite3', 'C:/Users/alice', 'D:\local\'),
+        @('%TEMP%\qlog\*.log', 'C:/Users/alice', 'D:/tmp'),
+        @('%APPDATA%\Block\goose\sessions.db', 'C:/Users/alice', 'C:/Users/alice/AppData/Roaming'),
+        @('%APPDATA%\Block\goose\sessions.db', 'C:/Users/alice', 'C:\Users\Alice\AppData\Roaming'),
+        @('%APPDATA%\Block\goose\sessions.db', 'C:/Users/alice', ''),
+        @('~/.hermes/state.db', 'C:/Users/alice', 'D:/somewhere')
+    )) {
+        $key = ('{0} | {1} | {2}' -f $case[0], $case[1], $case[2])
+        $redirect[$key] = (Get-WindowsRedirectTarget -Text $case[0] -ProfileHome $case[1] `
+            -Value $case[2])
+    }
+    $cases['windows_redirect'] = $redirect
 
     # Written to the console rather than to the output stream. A function that both emits
     # with Write-Output and returns a value returns all of it as one collection, and the

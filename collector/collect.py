@@ -8912,8 +8912,8 @@ _WIN_PLACEHOLDERS = {
     # Per-user temporary directory. Three agents write their logs here and one writes its
     # chat log here, and without this the patterns were refused as not absolute, so the
     # logs of a crashed or failing agent run were never collected. Windows sets both names
-    # to the same place by default; a host that has moved them is the reason the live value
-    # is preferred over this default when the environment can be read.
+    # to the same place by default; a host that has moved them is why the live value is
+    # searched as well when it can be read, which _windows_redirected does.
     "%TEMP%": "AppData/Local/Temp",
     "%TMP%": "AppData/Local/Temp",
 }
@@ -8936,6 +8936,90 @@ _WIN_SYSTEM_PLACEHOLDERS = {
     "%ALLUSERSPROFILE%": "C:/ProgramData",
     "%PUBLIC%": "C:/Users/Public",
 }
+
+
+def target_os_for(system, requested):
+    """Which platform's catalogue spellings to search.
+
+    A named target wins: that is what --os is for, and a mounted image is collected from a
+    workstation whose own platform says nothing about it.
+
+    Otherwise it comes from this host. "Windows" was missing from this map and the fallback
+    was the linux target, so a live run of this collector on a Windows host searched POSIX
+    paths, skipped every %APPDATA% one as another platform's spelling, and reported a
+    collection that looked clean. collect.ps1 is the collector for Windows and the one that
+    belongs in live response, but the wrong answer has to be the one that cannot happen
+    rather than the one nobody meant.
+    """
+    return requested or {"Darwin": "macos", "Windows": "windows"}.get(system, "linux")
+
+
+def _own_profile(home):
+    """Whether this home is the one belonging to the process running the collector.
+
+    The question decides whether this process's environment says anything about the profile
+    being collected. It does for its own; for anybody else's it does not, and applying this
+    user's variables to another user's profile would attribute one person's files to
+    another. Compared case-insensitively because Windows paths are.
+    """
+    try:
+        own = os.path.expanduser("~")
+    except Exception:
+        return False
+    return own.replace("\\", "/").rstrip("/").lower() == home.replace("\\", "/").rstrip("/").lower()
+
+
+def windows_redirect_target(text, home, value):
+    """The extra pattern a placeholder's live value implies, or "". Reads no environment.
+
+    Separate from the lookup so the decision itself can be checked with fixed inputs, on
+    both collectors, without either of them depending on the machine it runs on.
+
+    Returns "" when the value is empty, when it is where the default already points, or when
+    the text does not start with a placeholder this collector knows.
+    """
+    if not value:
+        return ""
+    upper = text.upper()
+    for placeholder, relative in _WIN_PLACEHOLDERS.items():
+        if not upper.startswith(placeholder):
+            continue
+        # A UNC value keeps its two leading separators: `\\server\share` is a host and a
+        # share, and collapsing it to one produces a path on this machine instead.
+        moved = value.replace("\\", "/").rstrip("/")
+        base = home.replace("\\", "/").rstrip("/")
+        default = "/".join(x for x in (base, relative) if x)
+        if moved.lower() == default.lower():
+            return ""
+        # The tail is normalised here rather than left to the caller, so this function's
+        # answer is one spelling of one path and can be compared against the other
+        # collector's byte for byte.
+        tail = text[len(placeholder) :].lstrip("\\/").replace("\\", "/")
+        return "/".join(x for x in (moved, tail) if x)
+    return ""
+
+
+def _windows_redirected(text, home, root):
+    """Where a Windows placeholder actually points, when that is not the default. Or "".
+
+    Folder redirection is ordinary in a managed fleet: %APPDATA% can be a network share and
+    %TEMP% can be moved. The documented default under the profile is then an empty
+    directory, so a collection finds none of the 134 catalogue paths rooted at one of these
+    placeholders and reports nothing wrong, which is the failure this tool exists to
+    prevent. Both locations are searched rather than one replacing the other, because the
+    default can still hold what was written before the redirection.
+
+    Only for a live host and only for the process's own profile. A mounted image has no
+    environment to ask, and another user's profile has one this process cannot see: using
+    this user's value there would attribute one person's files to another.
+    """
+    if root or not _own_profile(home):
+        return ""
+    upper = text.upper()
+    for placeholder in _WIN_PLACEHOLDERS:
+        if upper.startswith(placeholder):
+            return windows_redirect_target(text, home, os.environ.get(placeholder.strip("%")))
+    return ""
 
 
 def variable_name(text):
@@ -9167,6 +9251,8 @@ def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> l
                 return refuse_pattern(pattern, text, outcome)
             text = resolved
         else:
+            # Asked before the substitution, while the placeholder is still there.
+            redirected = _windows_redirected(text, home, root)
             for placeholder, relative in _WIN_PLACEHOLDERS.items():
                 if text.upper().startswith(placeholder):
                     tail = text[len(placeholder) :].lstrip("\\/")
@@ -9185,6 +9271,13 @@ def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> l
                     # those artifacts were never found and the manifest reported a clean
                     # host.
                     text = home.rstrip("/") + text[1:]
+            if redirected:
+                # Two locations, both evidence. Recursed rather than handled here so each
+                # one passes the guards at the end of this function: an absolute path
+                # matches no placeholder, so the recursion terminates at one level.
+                default = expand_paths(text.replace("\\", "/"), home, target_os, root)
+                moved = expand_paths(redirected, home, target_os, root)
+                return default + moved
         text = text.replace("\\", "/")
     else:
         # `[^%]+` rather than `[A-Za-z_]+`: %PROGRAMFILES(X86)% holds a parenthesis and a
@@ -9640,7 +9733,7 @@ def walk_regular_files(base: str, limit: int) -> tuple[list, bool]:
 def run(args: argparse.Namespace) -> dict:
     """Collect everything the catalogue describes for this platform."""
     started = time.time()
-    target_os = args.os or {"Darwin": "macos", "Linux": "linux"}.get(platform.system(), "linux")
+    target_os = target_os_for(platform.system(), args.os)
 
     artifacts = []
     for agent in EMBEDDED_CATALOGUE.get("agents", []):

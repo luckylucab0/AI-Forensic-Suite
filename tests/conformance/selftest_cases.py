@@ -101,6 +101,47 @@ def _windows_expansion_case() -> dict[str, object]:
     return out
 
 
+# Folder redirection, as fixed inputs rather than as whatever this machine happens to be
+# set to. The decision is the tricky half of reading a redirected placeholder, and it is
+# the half that has to be identical in both collectors: the lookup around it is guarded by
+# a live host and by the profile being the process's own, neither of which is reproducible
+# in a test.
+REDIRECT_CASES = (
+    # Moved to a share. A UNC value keeps its two leading separators.
+    (
+        "%APPDATA%\\Block\\goose\\sessions.db",
+        "C:/Users/alice",
+        "\\\\server\\share\\alice\\AppData\\Roaming",
+    ),
+    # Moved to another drive, with a trailing separator on the value.
+    ("%LOCALAPPDATA%\\amazon-q\\data.sqlite3", "C:/Users/alice", "D:\\local\\"),
+    # A wildcard in the tail has to survive.
+    ("%TEMP%\\qlog\\*.log", "C:/Users/alice", "D:/tmp"),
+    # Where the default already points: one pattern is enough and a second would double
+    # every row of the manifest for these artifacts.
+    ("%APPDATA%\\Block\\goose\\sessions.db", "C:/Users/alice", "C:/Users/alice/AppData/Roaming"),
+    # The same, spelled the way Windows spells it, which is why the comparison ignores case
+    # and separators.
+    (
+        "%APPDATA%\\Block\\goose\\sessions.db",
+        "C:/Users/alice",
+        "C:\\Users\\Alice\\AppData\\Roaming",
+    ),
+    # Not set at all.
+    ("%APPDATA%\\Block\\goose\\sessions.db", "C:/Users/alice", ""),
+    # Not a placeholder this collector knows.
+    ("~/.hermes/state.db", "C:/Users/alice", "D:/somewhere"),
+)
+
+
+def _redirect_case() -> dict[str, object]:
+    collect = _collect_py()
+    return {
+        f"{text} | {home} | {value}": collect.windows_redirect_target(text, home, value)  # type: ignore[attr-defined]
+        for text, home, value in REDIRECT_CASES
+    }
+
+
 def _specificity_case() -> dict[str, object]:
     """The Python collector's own answer for each pattern, which the PowerShell one must
     reproduce exactly.
@@ -132,6 +173,7 @@ CASES: dict[str, object] = {
     "nulls_in_list": [None, "x", None],
     "pattern_specificity": _specificity_case(),
     "windows_expansion": _windows_expansion_case(),
+    "windows_redirect": _redirect_case(),
 }
 
 

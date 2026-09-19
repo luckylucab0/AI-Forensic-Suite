@@ -810,3 +810,86 @@ def test_a_percent_variable_with_a_digit_is_recognised_as_a_windows_spelling() -
     )
     assert not collect.PATTERN_REFUSALS
     collect.PATTERN_REFUSALS.clear()
+
+
+# ---------------------------------- a Windows placeholder the endpoint has moved
+
+
+def test_a_redirected_placeholder_is_searched_as_well_as_its_default(monkeypatch, tmp_path) -> None:
+    """Folder redirection is ordinary in a managed fleet, and the default then finds nothing.
+
+    %APPDATA% can be a network share and %TEMP% can be moved. 134 catalogue paths are
+    rooted at one of these placeholders, so a collection on such a host found none of them
+    and reported nothing wrong. Both locations are searched rather than one replacing the
+    other, because the default can still hold what was written before the redirection.
+    """
+    collect = _load_collector()
+    home = str(tmp_path / "profile")
+    monkeypatch.setattr(collect.os.path, "expanduser", lambda _: home)
+    monkeypatch.setenv("APPDATA", "D:\\redirected\\Roaming")
+    collect.PATTERN_REFUSALS.clear()
+
+    resolved = collect.expand_paths("%APPDATA%\\Block\\goose\\sessions.db", home, "windows", None)
+
+    assert resolved == [
+        f"{home}/AppData/Roaming/Block/goose/sessions.db",
+        "D:/redirected/Roaming/Block/goose/sessions.db",
+    ]
+    assert not collect.PATTERN_REFUSALS
+    collect.PATTERN_REFUSALS.clear()
+
+
+def test_another_user_s_profile_is_not_given_this_process_s_variables(
+    monkeypatch, tmp_path
+) -> None:
+    """The guard that keeps the redirection read from becoming a mis-attribution.
+
+    A collector run as an administrator walks every profile on the host, and the process
+    environment belongs to whoever ran it. Applying this user's %APPDATA% to another user's
+    profile would search one person's directory and file it under another's name.
+    """
+    collect = _load_collector()
+    monkeypatch.setattr(collect.os.path, "expanduser", lambda _: str(tmp_path / "mine"))
+    monkeypatch.setenv("APPDATA", "D:\\redirected\\Roaming")
+    collect.PATTERN_REFUSALS.clear()
+
+    resolved = collect.expand_paths(
+        "%APPDATA%\\Block\\goose\\sessions.db", "C:/Users/bob", "windows", None
+    )
+
+    assert resolved == ["C:/Users/bob/AppData/Roaming/Block/goose/sessions.db"]
+    collect.PATTERN_REFUSALS.clear()
+
+
+def test_a_mounted_image_is_never_asked_about_this_machine_s_variables(
+    monkeypatch, tmp_path
+) -> None:
+    """The analyst workstation's environment says nothing about the endpoint in the image."""
+    collect = _load_collector()
+    home = str(tmp_path / "img" / "Users" / "alice")
+    monkeypatch.setattr(collect.os.path, "expanduser", lambda _: home)
+    monkeypatch.setenv("APPDATA", "D:\\redirected\\Roaming")
+    collect.PATTERN_REFUSALS.clear()
+
+    resolved = collect.expand_paths(
+        "%APPDATA%\\Block\\goose\\sessions.db", home, "windows", str(tmp_path / "img")
+    )
+
+    assert resolved == [f"{home}/AppData/Roaming/Block/goose/sessions.db"]
+    collect.PATTERN_REFUSALS.clear()
+
+
+def test_a_live_run_on_a_windows_host_targets_windows() -> None:
+    """platform.system() returns "Windows" and it was not in the map, so the default fell
+    through to the linux target: a live run searched POSIX paths, skipped every %APPDATA%
+    one as another platform's spelling, and reported a collection that looked clean."""
+    collect = _load_collector()
+    assert collect.target_os_for("Windows", None) == "windows"
+    assert collect.target_os_for("Darwin", None) == "macos"
+    assert collect.target_os_for("Linux", None) == "linux"
+    # An unknown platform still has to resolve to something, and POSIX is the safe guess
+    # for this collector: it is the one whose paths it can actually expand.
+    assert collect.target_os_for("FreeBSD", None) == "linux"
+    # A named target wins, because a mounted image is collected from a workstation whose
+    # own platform says nothing about the image.
+    assert collect.target_os_for("Linux", "windows") == "windows"
