@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7b90a813f7ae
+# Catalogue digest: 8e99fe9d5a0a
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -150,7 +150,31 @@ Targets:
         Name: cursor.ai_code_tracking_db
         Category: log
         Path: C:\Users\%user%\.cursor\ai-tracking
+        FileMask: "*.db-shm"
+        Recursive: false
+    -
+        Name: cursor.ai_code_tracking_db
+        Category: log
+        Path: C:\Users\%user%\.cursor\ai-tracking
+        FileMask: "*.db-wal"
+        Recursive: false
+    -
+        Name: cursor.ai_code_tracking_db
+        Category: log
+        Path: C:\Users\%user%\.cursor\ai-tracking
         FileMask: "ai-code-tracking.db"
+        Recursive: false
+    -
+        Name: cursor.ai_code_tracking_db
+        Category: log
+        Path: C:\Users\%user%\.cursor\ai-tracking
+        FileMask: "ai-code-tracking.db-shm"
+        Recursive: false
+    -
+        Name: cursor.ai_code_tracking_db
+        Category: log
+        Path: C:\Users\%user%\.cursor\ai-tracking
+        FileMask: "ai-code-tracking.db-wal"
         Recursive: false
     -
         Name: cursor.auth_credentials
@@ -207,6 +231,18 @@ Targets:
         FileMask: "conversation-search.db"
         Recursive: false
     -
+        Name: cursor.conversation_search_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage
+        FileMask: "conversation-search.db-shm"
+        Recursive: false
+    -
+        Name: cursor.conversation_search_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage
+        FileMask: "conversation-search.db-wal"
+        Recursive: false
+    -
         Name: cursor.extensions
         Category: install_evidence
         Path: C:\Users\%user%\.cursor-server\extensions
@@ -235,6 +271,18 @@ Targets:
         Category: transcript
         Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage
         FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: cursor.global_state_vscdb
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: cursor.global_state_vscdb
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\globalStorage
+        FileMask: "state.vscdb-wal"
         Recursive: false
     -
         Name: cursor.local_file_history
@@ -295,6 +343,18 @@ Targets:
         Category: transcript
         Path: C:\Users\%user%\AppData\Roaming\Cursor\User\workspaceStorage\*
         FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: cursor.workspace_state_vscdb
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\workspaceStorage\*
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: cursor.workspace_state_vscdb
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\workspaceStorage\*
+        FileMask: "state.vscdb-wal"
         Recursive: false
     -
         Name: cursor.worktrees

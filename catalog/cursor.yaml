@@ -330,7 +330,11 @@ artifacts:
   - linux
   paths:
   - ~/.cursor/ai-tracking/*.db
+  - ~/.cursor/ai-tracking/*.db-shm
+  - ~/.cursor/ai-tracking/*.db-wal
   - ~/.cursor/ai-tracking/ai-code-tracking.db
+  - ~/.cursor/ai-tracking/ai-code-tracking.db-shm
+  - ~/.cursor/ai-tracking/ai-code-tracking.db-wal
   format: sqlite
   sensitivity: normal
   collect_priority: normal
@@ -735,7 +739,11 @@ artifacts:
   - linux
   paths:
   - $XDG_CONFIG_HOME/cursor/chats/<md5>/<session-uuid>/store.db
+  - $XDG_CONFIG_HOME/cursor/chats/<md5>/<session-uuid>/store.db-shm
+  - $XDG_CONFIG_HOME/cursor/chats/<md5>/<session-uuid>/store.db-wal
   - '%USERPROFILE%\.cursor\chats\<md5>\<session-uuid>\store.db'
+  - '%USERPROFILE%\.cursor\chats\<md5>\<session-uuid>\store.db-shm'
+  - '%USERPROFILE%\.cursor\chats\<md5>\<session-uuid>\store.db-wal'
   - ~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/store.db
   - ~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/store.db-shm
   - ~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/store.db-wal
@@ -764,8 +772,14 @@ artifacts:
   - linux
   paths:
   - '%APPDATA%\Cursor\User\globalStorage\conversation-search.db'
+  - '%APPDATA%\Cursor\User\globalStorage\conversation-search.db-shm'
+  - '%APPDATA%\Cursor\User\globalStorage\conversation-search.db-wal'
   - ~/.config/Cursor/User/globalStorage/conversation-search.db
+  - ~/.config/Cursor/User/globalStorage/conversation-search.db-shm
+  - ~/.config/Cursor/User/globalStorage/conversation-search.db-wal
   - ~/Library/Application Support/Cursor/User/globalStorage/conversation-search.db
+  - ~/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-shm
+  - ~/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-wal
   format: sqlite
   sensitivity: normal
   collect_priority: normal
@@ -789,7 +803,11 @@ artifacts:
   - linux
   paths:
   - '%APPDATA%\Cursor\User\globalStorage\state.vscdb'
+  - '%APPDATA%\Cursor\User\globalStorage\state.vscdb-shm'
+  - '%APPDATA%\Cursor\User\globalStorage\state.vscdb-wal'
   - ~/.config/Cursor/User/globalStorage/state.vscdb
+  - ~/.config/Cursor/User/globalStorage/state.vscdb-shm
+  - ~/.config/Cursor/User/globalStorage/state.vscdb-wal
   - ~/Library/Application Support/Cursor/User/globalStorage/state.vscdb
   - ~/Library/Application Support/Cursor/User/globalStorage/state.vscdb-shm
   - ~/Library/Application Support/Cursor/User/globalStorage/state.vscdb-wal
@@ -852,8 +870,14 @@ artifacts:
   - linux
   paths:
   - '%APPDATA%\Cursor\User\workspaceStorage\<workspace-hash>\state.vscdb'
+  - '%APPDATA%\Cursor\User\workspaceStorage\<workspace-hash>\state.vscdb-shm'
+  - '%APPDATA%\Cursor\User\workspaceStorage\<workspace-hash>\state.vscdb-wal'
   - ~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb
+  - ~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-shm
+  - ~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-wal
   - ~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb
+  - ~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-shm
+  - ~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-wal
   - ~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/workspace.json
   format: sqlite
   sensitivity: normal

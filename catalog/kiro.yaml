@@ -69,8 +69,14 @@ artifacts:
   - linux
   paths:
   - $KIRO_HOME/*.sqlite3
+  - $KIRO_HOME/*.sqlite3-shm
+  - $KIRO_HOME/*.sqlite3-wal
   - '%USERPROFILE%\.kiro\*.sqlite3'
+  - '%USERPROFILE%\.kiro\*.sqlite3-shm'
+  - '%USERPROFILE%\.kiro\*.sqlite3-wal'
   - ~/.kiro/*.sqlite3
+  - ~/.kiro/*.sqlite3-shm
+  - ~/.kiro/*.sqlite3-wal
   format: sqlite
   sensitivity: normal
   collect_priority: first

@@ -79,6 +79,8 @@ artifacts:
   - linux
   paths:
   - '%USERPROFILE%\.local\share\kilo\kilo.db'
+  - '%USERPROFILE%\.local\share\kilo\kilo.db-shm'
+  - '%USERPROFILE%\.local\share\kilo\kilo.db-wal'
   - ~/.local/share/kilo/kilo.db
   - ~/.local/share/kilo/kilo.db-shm
   - ~/.local/share/kilo/kilo.db-wal
@@ -89,6 +91,9 @@ artifacts:
   source: |-
     https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/code-with-ai/agents/session-history.md
   source_kind: official
+  unsourced_paths:
+  - '%USERPROFILE%\.local\share\kilo\kilo.db-shm'
+  - '%USERPROFILE%\.local\share\kilo\kilo.db-wal'
   volatility: |-
     Official doc warns 'resetting the database removes local session history, so back it up before recovery work'. WAL means the newest messages may be only in kilo.db-wal - acquire all three files together.
   notes: |-

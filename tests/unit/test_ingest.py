@@ -552,9 +552,56 @@ def test_the_other_claimants_are_tried_in_a_stable_order(
     assert _other_claimants(off_tree, matcher) == ["aider.tags_cache", "gemini_cli.chats"]
 
 
-def test_a_database_that_arrived_without_its_log_is_a_gap_in_the_case(
-    catalogue: Catalogue, tmp_path: Path
-) -> None:
+# A catalogue of one entry that names a database and not the files SQLite keeps beside it.
+# The committed catalogue no longer has such an entry, and a test that asserted against it
+# would have gone quiet the moment that was fixed while still passing.
+_DATABASE_ONLY = """
+agent: test_agent
+title: Test Agent
+artifacts:
+  - id: test_agent.store
+    category: transcript
+    os: [linux]
+    paths: ["~/.test/sessions.db"]
+    format: sqlite
+    sensitivity: normal
+    status: unverified
+    source: observed on linux
+    source_kind: observed
+"""
+
+
+def _catalogue_of(tmp_path: Path, body: str) -> Catalogue:
+    directory = tmp_path / "catalog"
+    (directory / "schema").mkdir(parents=True)
+    (directory / "schema" / "catalog.schema.json").write_text(
+        (REPO_ROOT / "catalog" / "schema" / "catalog.schema.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    (directory / "test_agent.yaml").write_text(body, encoding="utf-8")
+    return load_catalogue(directory)
+
+
+def _wal_database(path: Path) -> None:
+    import sqlite3
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    # A second dot-directory, because that is what makes the tree adapter read this root as
+    # one user's home rather than as a filesystem root. Without it the paths come back
+    # unanchored, nothing in the catalogue claims them, and the test would pass or fail for
+    # a reason that has nothing to do with write-ahead logs.
+    (path.parent.parent / ".config").mkdir(exist_ok=True)
+    connection = sqlite3.connect(path)
+    connection.execute("PRAGMA journal_mode=WAL")
+    connection.execute("CREATE TABLE session (id TEXT)")
+    connection.commit()
+    # Closed, so the log is folded in and deleted, which is the state a dead-box collection
+    # finds. The point is not that a log is missing here but that the entry never asks for
+    # one, so no collection of it could carry a log whatever the endpoint held.
+    connection.close()
+
+
+def test_a_database_that_arrived_without_its_log_is_a_gap_in_the_case(tmp_path: Path) -> None:
     """The reading that looks complete and is not, recorded where the case keeps them.
 
     A gap rather than an event, because it is a statement about what the collection carried
@@ -562,49 +609,42 @@ def test_a_database_that_arrived_without_its_log_is_a_gap_in_the_case(
     reports nothing at all about the transactions that stayed behind in a log nobody was
     asked to take, so the case has to say it instead.
     """
-    import sqlite3
-
     home = tmp_path / "home" / "alice"
-    store = home / ".local" / "share" / "opencode" / "opencode.db"
-    store.parent.mkdir(parents=True)
-    connection = sqlite3.connect(store)
-    connection.execute("PRAGMA journal_mode=WAL")
-    connection.execute("CREATE TABLE session (id TEXT)")
-    connection.commit()
-    # Closed, so the log is folded in and deleted, which is the state a dead-box collection
-    # finds. The point of the check is not that a log is missing here but that this
-    # catalogue entry never asks for one, so no collection of it could ever carry it.
-    connection.close()
+    _wal_database(home / ".test" / "sessions.db")
 
     with Case.open(tmp_path / "case.db") as case:
-        report = ingest(case, home, catalogue)
+        report = ingest(case, home, _catalogue_of(tmp_path, _DATABASE_ONLY))
         kinds = {row["kind"] for row in case.query("SELECT kind FROM collection_gaps")}
 
-    assert report.databases_without_their_log == ["~/.local/share/opencode/opencode.db"]
+    assert report.databases_without_their_log == ["~/.test/sessions.db"]
     assert "sqlite_write_ahead_log_not_collected" in kinds
 
 
-def test_a_store_whose_log_the_catalogue_does_ask_for_is_not_flagged(
-    catalogue: Catalogue, tmp_path: Path
-) -> None:
+def test_a_store_whose_log_the_catalogue_does_ask_for_is_not_flagged(tmp_path: Path) -> None:
     """Otherwise the gap would fire for almost every database in almost every collection.
 
     A cleanly closed application leaves no log at all, and most databases in a dead-box
     collection are in that state. Warning about each of them would train an analyst to
     scroll past the one collection where the log really was left behind.
     """
-    import sqlite3
-
     home = tmp_path / "home" / "alice"
-    store = home / ".copilot" / "session-store.db"
-    store.parent.mkdir(parents=True)
-    connection = sqlite3.connect(store)
-    connection.execute("PRAGMA journal_mode=WAL")
-    connection.execute("CREATE TABLE sessions (id TEXT)")
-    connection.commit()
-    connection.close()
+    _wal_database(home / ".test" / "sessions.db")
+    body = _DATABASE_ONLY.replace(
+        'paths: ["~/.test/sessions.db"]',
+        'paths: ["~/.test/sessions.db", "~/.test/sessions.db-shm", "~/.test/sessions.db-wal"]',
+    )
 
     with Case.open(tmp_path / "case.db") as case:
-        report = ingest(case, home, catalogue)
+        report = ingest(case, home, _catalogue_of(tmp_path, body))
 
     assert report.databases_without_their_log == []
+
+
+def test_the_committed_catalogue_leaves_no_database_without_its_log(catalogue: Catalogue) -> None:
+    """The same check the catalogue tests make, asserted from the ingest's side.
+
+    This is the one that matters for a real collection: it is the ingest that asks the
+    question, and an entry that lost its sidecars would make every store it claims read
+    short with nothing but this saying so.
+    """
+    assert not catalogue.databases_without_a_claimed_log()

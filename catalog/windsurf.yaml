@@ -299,6 +299,8 @@ artifacts:
   paths:
   - '%USERPROFILE%\.codeium\windsurf\database\<hash>\'
   - ~/.codeium/windsurf/database/<hash>/embedding_database.sqlite
+  - ~/.codeium/windsurf/database/<hash>/embedding_database.sqlite-shm
+  - ~/.codeium/windsurf/database/<hash>/embedding_database.sqlite-wal
   - ~/.codeium/windsurf/database/<md5-of-workspace-id>/
   format: sqlite
   sensitivity: normal
@@ -375,14 +377,32 @@ artifacts:
   - linux
   paths:
   - '%APPDATA%\Devin\User\globalStorage\state.vscdb'
+  - '%APPDATA%\Devin\User\globalStorage\state.vscdb-shm'
+  - '%APPDATA%\Devin\User\globalStorage\state.vscdb-wal'
   - '%APPDATA%\Windsurf - Next\User\globalStorage\state.vscdb'
+  - '%APPDATA%\Windsurf - Next\User\globalStorage\state.vscdb-shm'
+  - '%APPDATA%\Windsurf - Next\User\globalStorage\state.vscdb-wal'
   - '%APPDATA%\Windsurf Insiders\User\globalStorage\state.vscdb'
+  - '%APPDATA%\Windsurf Insiders\User\globalStorage\state.vscdb-shm'
+  - '%APPDATA%\Windsurf Insiders\User\globalStorage\state.vscdb-wal'
   - '%APPDATA%\Windsurf\User\globalStorage\state.vscdb'
+  - '%APPDATA%\Windsurf\User\globalStorage\state.vscdb-shm'
+  - '%APPDATA%\Windsurf\User\globalStorage\state.vscdb-wal'
   - ~/.config/Devin/User/globalStorage/state.vscdb
+  - ~/.config/Devin/User/globalStorage/state.vscdb-shm
+  - ~/.config/Devin/User/globalStorage/state.vscdb-wal
   - ~/.config/Windsurf/User/globalStorage/state.vscdb
+  - ~/.config/Windsurf/User/globalStorage/state.vscdb-shm
+  - ~/.config/Windsurf/User/globalStorage/state.vscdb-wal
   - ~/Library/Application Support/Devin/User/globalStorage/state.vscdb
+  - ~/Library/Application Support/Devin/User/globalStorage/state.vscdb-shm
+  - ~/Library/Application Support/Devin/User/globalStorage/state.vscdb-wal
   - ~/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb
+  - ~/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-shm
+  - ~/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-wal
   - ~/Library/Application Support/Windsurf/User/globalStorage/state.vscdb
+  - ~/Library/Application Support/Windsurf/User/globalStorage/state.vscdb-shm
+  - ~/Library/Application Support/Windsurf/User/globalStorage/state.vscdb-wal
   - ~/Library/Application Support/Windsurf/User/globalStorage/storage.json
   - ~/Library/Application Support/Windsurf/machineId
   format: sqlite
@@ -433,9 +453,15 @@ artifacts:
   - linux
   paths:
   - '%APPDATA%\Windsurf\User\workspaceStorage\<hash>\state.vscdb'
+  - '%APPDATA%\Windsurf\User\workspaceStorage\<hash>\state.vscdb-shm'
+  - '%APPDATA%\Windsurf\User\workspaceStorage\<hash>\state.vscdb-wal'
   - ~/.config/Windsurf/User/settings.json
   - ~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb
+  - ~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-shm
+  - ~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-wal
   - ~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb
+  - ~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb-shm
+  - ~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb-wal
   format: sqlite
   sensitivity: normal
   collect_priority: normal

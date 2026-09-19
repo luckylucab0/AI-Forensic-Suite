@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7b90a813f7ae
+# Catalogue digest: 8e99fe9d5a0a
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -33,7 +33,11 @@ sources:
     amazonq,/Users/*/.aws/sso/cache/*.json
     amazonq,/Users/*/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
     amazonq,/Users/*/.local/share/amazon-q/data.sqlite3
+    amazonq,/Users/*/.local/share/amazon-q/data.sqlite3-shm
+    amazonq,/Users/*/.local/share/amazon-q/data.sqlite3-wal
     amazonq,/Users/*/Library/Application Support/amazon-q/data.sqlite3
+    amazonq,/Users/*/Library/Application Support/amazon-q/data.sqlite3-shm
+    amazonq,/Users/*/Library/Application Support/amazon-q/data.sqlite3-wal
     amazonq,/home/*/.aws/amazonq/.cli_bash_history
     amazonq,/home/*/.aws/amazonq/history/*.json
     amazonq,/home/*/.aws/amazonq/history/chat-history-*.json
@@ -41,7 +45,11 @@ sources:
     amazonq,/home/*/.aws/sso/cache/*.json
     amazonq,/home/*/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
     amazonq,/home/*/.local/share/amazon-q/data.sqlite3
+    amazonq,/home/*/.local/share/amazon-q/data.sqlite3-shm
+    amazonq,/home/*/.local/share/amazon-q/data.sqlite3-wal
     amazonq,/home/*/Library/Application Support/amazon-q/data.sqlite3
+    amazonq,/home/*/Library/Application Support/amazon-q/data.sqlite3-shm
+    amazonq,/home/*/Library/Application Support/amazon-q/data.sqlite3-wal
     amazonq,/root/.aws/amazonq/.cli_bash_history
     amazonq,/root/.aws/amazonq/history/*.json
     amazonq,/root/.aws/amazonq/history/chat-history-*.json
@@ -49,7 +57,11 @@ sources:
     amazonq,/root/.aws/sso/cache/*.json
     amazonq,/root/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
     amazonq,/root/.local/share/amazon-q/data.sqlite3
+    amazonq,/root/.local/share/amazon-q/data.sqlite3-shm
+    amazonq,/root/.local/share/amazon-q/data.sqlite3-wal
     amazonq,/root/Library/Application Support/amazon-q/data.sqlite3
+    amazonq,/root/Library/Application Support/amazon-q/data.sqlite3-shm
+    amazonq,/root/Library/Application Support/amazon-q/data.sqlite3-wal
     amazonq,/var/root/.aws/amazonq/.cli_bash_history
     amazonq,/var/root/.aws/amazonq/history/*.json
     amazonq,/var/root/.aws/amazonq/history/chat-history-*.json
@@ -57,7 +69,11 @@ sources:
     amazonq,/var/root/.aws/sso/cache/*.json
     amazonq,/var/root/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
     amazonq,/var/root/.local/share/amazon-q/data.sqlite3
+    amazonq,/var/root/.local/share/amazon-q/data.sqlite3-shm
+    amazonq,/var/root/.local/share/amazon-q/data.sqlite3-wal
     amazonq,/var/root/Library/Application Support/amazon-q/data.sqlite3
+    amazonq,/var/root/Library/Application Support/amazon-q/data.sqlite3-shm
+    amazonq,/var/root/Library/Application Support/amazon-q/data.sqlite3-wal
     amazonq,C:/Users/*/.aws/amazonq/.cli_bash_history
     amazonq,C:/Users/*/.aws/amazonq/history/*.json
     amazonq,C:/Users/*/.aws/amazonq/history/chat-history-*.json
@@ -65,6 +81,8 @@ sources:
     amazonq,C:/Users/*/.aws/sso/cache/*.json
     amazonq,C:/Users/*/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
     amazonq,C:/Users/*/AppData/Local/amazon-q/data.sqlite3
+    amazonq,C:/Users/*/AppData/Local/amazon-q/data.sqlite3-shm
+    amazonq,C:/Users/*/AppData/Local/amazon-q/data.sqlite3-wal
     amp,/Users/*/.local/share/amp/session.json
     amp,/home/*/.local/share/amp/session.json
     amp,/root/.local/share/amp/session.json
@@ -558,6 +576,8 @@ sources:
     gemini_cli,C:/Users/*/.gemini/tmp/*/chats/**
     gemini_cli,C:/Users/*/.gemini/tmp/*/shell_history
     kiro,/Users/*/.kiro/*.sqlite3
+    kiro,/Users/*/.kiro/*.sqlite3-shm
+    kiro,/Users/*/.kiro/*.sqlite3-wal
     kiro,/Users/*/.kiro/sessions/*/*/messages.jsonl
     kiro,/Users/*/.kiro/sessions/*/*/session.json
     kiro,/Users/*/.kiro/sessions/*/*/sub-executions/*.jsonl
@@ -568,6 +588,8 @@ sources:
     kiro,/Users/*/.kiro/settings/permissions.yaml
     kiro,/Users/*/.kiro/workspace-roots/*/permissions.yaml
     kiro,/home/*/.kiro/*.sqlite3
+    kiro,/home/*/.kiro/*.sqlite3-shm
+    kiro,/home/*/.kiro/*.sqlite3-wal
     kiro,/home/*/.kiro/sessions/*/*/messages.jsonl
     kiro,/home/*/.kiro/sessions/*/*/session.json
     kiro,/home/*/.kiro/sessions/*/*/sub-executions/*.jsonl
@@ -578,6 +600,8 @@ sources:
     kiro,/home/*/.kiro/settings/permissions.yaml
     kiro,/home/*/.kiro/workspace-roots/*/permissions.yaml
     kiro,/root/.kiro/*.sqlite3
+    kiro,/root/.kiro/*.sqlite3-shm
+    kiro,/root/.kiro/*.sqlite3-wal
     kiro,/root/.kiro/sessions/*/*/messages.jsonl
     kiro,/root/.kiro/sessions/*/*/session.json
     kiro,/root/.kiro/sessions/*/*/sub-executions/*.jsonl
@@ -588,6 +612,8 @@ sources:
     kiro,/root/.kiro/settings/permissions.yaml
     kiro,/root/.kiro/workspace-roots/*/permissions.yaml
     kiro,/var/root/.kiro/*.sqlite3
+    kiro,/var/root/.kiro/*.sqlite3-shm
+    kiro,/var/root/.kiro/*.sqlite3-wal
     kiro,/var/root/.kiro/sessions/*/*/messages.jsonl
     kiro,/var/root/.kiro/sessions/*/*/session.json
     kiro,/var/root/.kiro/sessions/*/*/sub-executions/*.jsonl
@@ -598,6 +624,8 @@ sources:
     kiro,/var/root/.kiro/settings/permissions.yaml
     kiro,/var/root/.kiro/workspace-roots/*/permissions.yaml
     kiro,C:/Users/*/.kiro/*.sqlite3
+    kiro,C:/Users/*/.kiro/*.sqlite3-shm
+    kiro,C:/Users/*/.kiro/*.sqlite3-wal
     kiro,C:/Users/*/.kiro/sessions/*/*/messages.jsonl
     kiro,C:/Users/*/.kiro/sessions/*/*/session.json
     kiro,C:/Users/*/.kiro/sessions/*/*/sub-executions/*.jsonl

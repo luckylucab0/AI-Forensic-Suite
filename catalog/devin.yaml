@@ -60,9 +60,15 @@ artifacts:
   - linux
   paths:
   - '%USERPROFILE%\.local\share\devin\cli\sessions.db'
+  - '%USERPROFILE%\.local\share\devin\cli\sessions.db-shm'
+  - '%USERPROFILE%\.local\share\devin\cli\sessions.db-wal'
   - ~/.local/share/devin/cli/sessions.db
+  - ~/.local/share/devin/cli/sessions.db-shm
+  - ~/.local/share/devin/cli/sessions.db-wal
   - ~/.local/share/devin/cli/transcripts/<session-id>.json
   - ~/Library/Application Support/devin/cli/sessions.db
+  - ~/Library/Application Support/devin/cli/sessions.db-shm
+  - ~/Library/Application Support/devin/cli/sessions.db-wal
   - ~/Library/Application Support/devin/cli/transcripts/<session-id>.json
   format: sqlite
   sensitivity: normal

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7b90a813f7ae
+# Catalogue digest: 8e99fe9d5a0a
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -143,6 +143,8 @@ sources:
       filename='''agent,artifact_id,mapper,glob
       amazonq,amazonq.cli_prompt_history,file_only,C:/Users/*/.aws/amazonq/.cli_bash_history
       amazonq,amazonq.cli_state_database,file_only,C:/Users/*/AppData/Local/amazon-q/data.sqlite3
+      amazonq,amazonq.cli_state_database,file_only,C:/Users/*/AppData/Local/amazon-q/data.sqlite3-shm
+      amazonq,amazonq.cli_state_database,file_only,C:/Users/*/AppData/Local/amazon-q/data.sqlite3-wal
       amazonq,amazonq.ide_chat_history,file_only,C:/Users/*/.aws/amazonq/history/*.json
       amazonq,amazonq.ide_chat_history,file_only,C:/Users/*/.aws/amazonq/history/chat-history-*.json
       amazonq,amazonq.ide_chat_history,file_only,C:/Users/*/.aws/amazonq/history/chat-history-no-workspace.json
@@ -183,8 +185,14 @@ sources:
       cline,cline.data_tasks,file_only,C:/Users/*/.cline/data/tasks/*/api_conversation_history.json
       cline,cline.hooks_audit_log,generic_jsonl,C:/Users/*/.cline/data/logs/hooks.jsonl
       cline,cline.sqlite_dbs,file_only,C:/Users/*/.cline/data/db/connectors.db
+      cline,cline.sqlite_dbs,file_only,C:/Users/*/.cline/data/db/connectors.db-shm
+      cline,cline.sqlite_dbs,file_only,C:/Users/*/.cline/data/db/connectors.db-wal
       cline,cline.sqlite_dbs,file_only,C:/Users/*/.cline/data/db/cron.db
+      cline,cline.sqlite_dbs,file_only,C:/Users/*/.cline/data/db/cron.db-shm
+      cline,cline.sqlite_dbs,file_only,C:/Users/*/.cline/data/db/cron.db-wal
       cline,cline.sqlite_dbs,file_only,C:/Users/*/.cline/data/db/tasks.db
+      cline,cline.sqlite_dbs,file_only,C:/Users/*/.cline/data/db/tasks.db-shm
+      cline,cline.sqlite_dbs,file_only,C:/Users/*/.cline/data/db/tasks.db-wal
       cline,cline.vscode_task_transcripts,file_only,C:/Users/*/AppData/Roaming/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/tasks/*/api_conversation_history.json
       cline,cline.vscode_task_transcripts,file_only,C:/Users/*/AppData/Roaming/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/tasks/*/context_history.json
       cline,cline.vscode_task_transcripts,file_only,C:/Users/*/AppData/Roaming/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/tasks/*/task_metadata.json
@@ -258,15 +266,25 @@ sources:
       cursor,cursor.chat_store_db,file_only,C:/Users/*/.cursor/chats/*/*/store.db-shm
       cursor,cursor.chat_store_db,file_only,C:/Users/*/.cursor/chats/*/*/store.db-wal
       cursor,cursor.conversation_search_db,file_only,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/conversation-search.db
+      cursor,cursor.conversation_search_db,file_only,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/conversation-search.db-shm
+      cursor,cursor.conversation_search_db,file_only,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/conversation-search.db-wal
       cursor,cursor.global_prompt_history,file_only,C:/Users/*/.cursor/prompt_history.json
       cursor,cursor.global_state_vscdb,file_only,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/state.vscdb
+      cursor,cursor.global_state_vscdb,file_only,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/state.vscdb-shm
+      cursor,cursor.global_state_vscdb,file_only,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/state.vscdb-wal
       cursor,cursor.pasted_text,file_only,C:/Users/*/.cursor/chats/*/*/pasted_text.json
       cursor,cursor.subagent_output,file_only,C:/Users/*/.cursor/subagents/**
       cursor,cursor.workspace_state_vscdb,file_only,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb
+      cursor,cursor.workspace_state_vscdb,file_only,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-shm
+      cursor,cursor.workspace_state_vscdb,file_only,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-wal
       devin,devin.sessions_db,file_only,C:/Users/*/.local/share/devin/cli/sessions.db
+      devin,devin.sessions_db,file_only,C:/Users/*/.local/share/devin/cli/sessions.db-shm
+      devin,devin.sessions_db,file_only,C:/Users/*/.local/share/devin/cli/sessions.db-wal
       gemini_cli,gemini_cli.chats,file_only,C:/Users/*/.gemini/sessions/**
       gemini_cli,gemini_cli.chats,file_only,C:/Users/*/.gemini/tmp/*/chats/**
       goose,goose.sessions_db_windows,file_only,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db
+      goose,goose.sessions_db_windows,file_only,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db-shm
+      goose,goose.sessions_db_windows,file_only,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db-wal
       goose,goose.sessions_jsonl_legacy,generic_jsonl,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/*.jsonl
       hermes,hermes.sessions_dir,file_only,C:/Users/*/.hermes/sessions/**
       hermes,hermes.state_db,file_only,C:/Users/*/.hermes/state.db
@@ -279,9 +297,13 @@ sources:
       junie,junie.cli_sessions,generic_jsonl,C:/Users/*/.junie/sessions/*/transcript.md
       junie,junie.matterhorn_project_logs,file_only,C:/Users/*/AppData/Local/JetBrains/**/projects/*/matterhorn/.matterhorn/**
       kilo_code,kilo_code.cli_db,file_only,C:/Users/*/.local/share/kilo/kilo.db
+      kilo_code,kilo_code.cli_db,file_only,C:/Users/*/.local/share/kilo/kilo.db-shm
+      kilo_code,kilo_code.cli_db,file_only,C:/Users/*/.local/share/kilo/kilo.db-wal
       kilo_code,kilo_code.extension_id_legacy_tree,file_only,C:/Users/*/.vscode-server/data/User/globalStorage/kilocode.kilo-code/tasks/**
       kilo_code,kilo_code.extension_id_legacy_tree,file_only,C:/Users/*/AppData/Roaming/Code/User/globalStorage/kilocode.kilo-code/tasks/**
       kiro,kiro.cli_session_database,file_only,C:/Users/*/.kiro/*.sqlite3
+      kiro,kiro.cli_session_database,file_only,C:/Users/*/.kiro/*.sqlite3-shm
+      kiro,kiro.cli_session_database,file_only,C:/Users/*/.kiro/*.sqlite3-wal
       kiro,kiro.cli_session_files,generic_jsonl,C:/Users/*/.kiro/sessions/cli/*.json
       kiro,kiro.cli_session_files,generic_jsonl,C:/Users/*/.kiro/sessions/cli/*.jsonl
       kiro,kiro.cli_session_files,generic_jsonl,C:/Users/*/.kiro/sessions/cli/*.lock
@@ -291,10 +313,14 @@ sources:
       kiro,kiro.ide_session_files,generic_jsonl,C:/Users/*/.kiro/sessions/*/*/sub-executions/*.jsonl
       lmstudio,lmstudio.conversations,file_only,C:/Users/*/.lmstudio/conversations/**
       ollama,ollama.app_chat_database,file_only,C:/Users/*/.ollama/db.sqlite
+      ollama,ollama.app_chat_database,file_only,C:/Users/*/.ollama/db.sqlite-shm
+      ollama,ollama.app_chat_database,file_only,C:/Users/*/.ollama/db.sqlite-wal
       ollama,ollama.app_chat_database,file_only,C:/Users/*/AppData/Local/Ollama/db.sqlite
       ollama,ollama.app_chat_database,file_only,C:/Users/*/AppData/Local/Ollama/db.sqlite-wal
       ollama,ollama.cli_prompt_history,file_only,C:/Users/*/.ollama/history
       opencode,opencode.db,file_only,C:/Users/*/.local/share/opencode/opencode.db
+      opencode,opencode.db,file_only,C:/Users/*/.local/share/opencode/opencode.db-shm
+      opencode,opencode.db,file_only,C:/Users/*/.local/share/opencode/opencode.db-wal
       pi,pi.sessions,generic_jsonl,C:/Users/*/.pi/agent/sessions/--*--/*_*.jsonl
       qwen_code,qwen_code.conversation_transcript,generic_jsonl,C:/Users/*/.qwen/projects/*/chats/*.jsonl
       qwen_code,qwen_code.conversation_transcript,generic_jsonl,C:/Users/*/.qwen/projects/*/chats/archive/*.jsonl
@@ -342,6 +368,8 @@ sources:
       roo_code,roo_code.tasks,file_only,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/task_metadata.json
       roo_code,roo_code.tasks,file_only,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/ui_messages.json
       warp,warp.sqlite,file_only,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite
+      warp,warp.sqlite,file_only,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite-shm
+      warp,warp.sqlite,file_only,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite-wal
       windsurf,windsurf.cascade_trajectories,file_only,C:/Users/*/.codeium/windsurf-insiders/cascade/*
       windsurf,windsurf.cascade_trajectories,file_only,C:/Users/*/.codeium/windsurf-next/cascade/*
       windsurf,windsurf.cascade_trajectories,file_only,C:/Users/*/.codeium/windsurf/cascade/*
@@ -351,7 +379,11 @@ sources:
       windsurf,windsurf.cascade_transcripts,generic_jsonl,C:/Users/*/.windsurf/transcripts/*.jsonl
       windsurf,windsurf.implicit_trajectories,file_only,C:/Users/*/.codeium/windsurf/implicit/*.pb
       zed,zed.sidebar_threads,file_only,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite
+      zed,zed.sidebar_threads,file_only,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite-shm
+      zed,zed.sidebar_threads,file_only,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite-wal
       zed,zed.threads_db,file_only,C:/Users/*/AppData/Local/Zed/threads/threads.db
+      zed,zed.threads_db,file_only,C:/Users/*/AppData/Local/Zed/threads/threads.db-shm
+      zed,zed.threads_db,file_only,C:/Users/*/AppData/Local/Zed/threads/threads.db-wal
     ''')
 
     LET Me <= SELECT Hostname FROM info()
@@ -711,9 +743,17 @@ sources:
       amazonq,amazonq.cli_prompt_history,file_only,/Users/*/.aws/amazonq/.cli_bash_history
       amazonq,amazonq.cli_prompt_history,file_only,/var/root/.aws/amazonq/.cli_bash_history
       amazonq,amazonq.cli_state_database,file_only,/Users/*/.local/share/amazon-q/data.sqlite3
+      amazonq,amazonq.cli_state_database,file_only,/Users/*/.local/share/amazon-q/data.sqlite3-shm
+      amazonq,amazonq.cli_state_database,file_only,/Users/*/.local/share/amazon-q/data.sqlite3-wal
       amazonq,amazonq.cli_state_database,file_only,/Users/*/Library/Application Support/amazon-q/data.sqlite3
+      amazonq,amazonq.cli_state_database,file_only,/Users/*/Library/Application Support/amazon-q/data.sqlite3-shm
+      amazonq,amazonq.cli_state_database,file_only,/Users/*/Library/Application Support/amazon-q/data.sqlite3-wal
       amazonq,amazonq.cli_state_database,file_only,/var/root/.local/share/amazon-q/data.sqlite3
+      amazonq,amazonq.cli_state_database,file_only,/var/root/.local/share/amazon-q/data.sqlite3-shm
+      amazonq,amazonq.cli_state_database,file_only,/var/root/.local/share/amazon-q/data.sqlite3-wal
       amazonq,amazonq.cli_state_database,file_only,/var/root/Library/Application Support/amazon-q/data.sqlite3
+      amazonq,amazonq.cli_state_database,file_only,/var/root/Library/Application Support/amazon-q/data.sqlite3-shm
+      amazonq,amazonq.cli_state_database,file_only,/var/root/Library/Application Support/amazon-q/data.sqlite3-wal
       amazonq,amazonq.ide_chat_history,file_only,/Users/*/.aws/amazonq/history/*.json
       amazonq,amazonq.ide_chat_history,file_only,/Users/*/.aws/amazonq/history/chat-history-*.json
       amazonq,amazonq.ide_chat_history,file_only,/Users/*/.aws/amazonq/history/chat-history-no-workspace.json
@@ -819,11 +859,23 @@ sources:
       cline,cline.hooks_audit_log,generic_jsonl,/Users/*/.cline/data/logs/hooks.jsonl
       cline,cline.hooks_audit_log,generic_jsonl,/var/root/.cline/data/logs/hooks.jsonl
       cline,cline.sqlite_dbs,file_only,/Users/*/.cline/data/db/connectors.db
+      cline,cline.sqlite_dbs,file_only,/Users/*/.cline/data/db/connectors.db-shm
+      cline,cline.sqlite_dbs,file_only,/Users/*/.cline/data/db/connectors.db-wal
       cline,cline.sqlite_dbs,file_only,/Users/*/.cline/data/db/cron.db
+      cline,cline.sqlite_dbs,file_only,/Users/*/.cline/data/db/cron.db-shm
+      cline,cline.sqlite_dbs,file_only,/Users/*/.cline/data/db/cron.db-wal
       cline,cline.sqlite_dbs,file_only,/Users/*/.cline/data/db/tasks.db
+      cline,cline.sqlite_dbs,file_only,/Users/*/.cline/data/db/tasks.db-shm
+      cline,cline.sqlite_dbs,file_only,/Users/*/.cline/data/db/tasks.db-wal
       cline,cline.sqlite_dbs,file_only,/var/root/.cline/data/db/connectors.db
+      cline,cline.sqlite_dbs,file_only,/var/root/.cline/data/db/connectors.db-shm
+      cline,cline.sqlite_dbs,file_only,/var/root/.cline/data/db/connectors.db-wal
       cline,cline.sqlite_dbs,file_only,/var/root/.cline/data/db/cron.db
+      cline,cline.sqlite_dbs,file_only,/var/root/.cline/data/db/cron.db-shm
+      cline,cline.sqlite_dbs,file_only,/var/root/.cline/data/db/cron.db-wal
       cline,cline.sqlite_dbs,file_only,/var/root/.cline/data/db/tasks.db
+      cline,cline.sqlite_dbs,file_only,/var/root/.cline/data/db/tasks.db-shm
+      cline,cline.sqlite_dbs,file_only,/var/root/.cline/data/db/tasks.db-wal
       cline,cline.vscode_task_transcripts,file_only,/Users/*/Library/Application Support/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/tasks/*/api_conversation_history.json
       cline,cline.vscode_task_transcripts,file_only,/Users/*/Library/Application Support/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/tasks/*/context_history.json
       cline,cline.vscode_task_transcripts,file_only,/Users/*/Library/Application Support/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/tasks/*/task_metadata.json
@@ -967,17 +1019,29 @@ sources:
       cursor,cursor.chat_store_db,file_only,/var/root/.cursor/chats/*/*/store.db-shm
       cursor,cursor.chat_store_db,file_only,/var/root/.cursor/chats/*/*/store.db-wal
       cursor,cursor.conversation_search_db,file_only,/Users/*/.config/Cursor/User/globalStorage/conversation-search.db
+      cursor,cursor.conversation_search_db,file_only,/Users/*/.config/Cursor/User/globalStorage/conversation-search.db-shm
+      cursor,cursor.conversation_search_db,file_only,/Users/*/.config/Cursor/User/globalStorage/conversation-search.db-wal
       cursor,cursor.conversation_search_db,file_only,/Users/*/Library/Application Support/Cursor/User/globalStorage/conversation-search.db
+      cursor,cursor.conversation_search_db,file_only,/Users/*/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-shm
+      cursor,cursor.conversation_search_db,file_only,/Users/*/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-wal
       cursor,cursor.conversation_search_db,file_only,/var/root/.config/Cursor/User/globalStorage/conversation-search.db
+      cursor,cursor.conversation_search_db,file_only,/var/root/.config/Cursor/User/globalStorage/conversation-search.db-shm
+      cursor,cursor.conversation_search_db,file_only,/var/root/.config/Cursor/User/globalStorage/conversation-search.db-wal
       cursor,cursor.conversation_search_db,file_only,/var/root/Library/Application Support/Cursor/User/globalStorage/conversation-search.db
+      cursor,cursor.conversation_search_db,file_only,/var/root/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-shm
+      cursor,cursor.conversation_search_db,file_only,/var/root/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-wal
       cursor,cursor.global_prompt_history,file_only,/Users/*/.cursor/prompt_history.json
       cursor,cursor.global_prompt_history,file_only,/var/root/.cursor/prompt_history.json
       cursor,cursor.global_state_vscdb,file_only,/Users/*/.config/Cursor/User/globalStorage/state.vscdb
+      cursor,cursor.global_state_vscdb,file_only,/Users/*/.config/Cursor/User/globalStorage/state.vscdb-shm
+      cursor,cursor.global_state_vscdb,file_only,/Users/*/.config/Cursor/User/globalStorage/state.vscdb-wal
       cursor,cursor.global_state_vscdb,file_only,/Users/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb
       cursor,cursor.global_state_vscdb,file_only,/Users/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb-shm
       cursor,cursor.global_state_vscdb,file_only,/Users/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb-wal
       cursor,cursor.global_state_vscdb,file_only,/Users/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb.backup
       cursor,cursor.global_state_vscdb,file_only,/var/root/.config/Cursor/User/globalStorage/state.vscdb
+      cursor,cursor.global_state_vscdb,file_only,/var/root/.config/Cursor/User/globalStorage/state.vscdb-shm
+      cursor,cursor.global_state_vscdb,file_only,/var/root/.config/Cursor/User/globalStorage/state.vscdb-wal
       cursor,cursor.global_state_vscdb,file_only,/var/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb
       cursor,cursor.global_state_vscdb,file_only,/var/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb-shm
       cursor,cursor.global_state_vscdb,file_only,/var/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb-wal
@@ -987,18 +1051,34 @@ sources:
       cursor,cursor.subagent_output,file_only,/Users/*/.cursor/subagents/**
       cursor,cursor.subagent_output,file_only,/var/root/.cursor/subagents/**
       cursor,cursor.workspace_state_vscdb,file_only,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
+      cursor,cursor.workspace_state_vscdb,file_only,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
+      cursor,cursor.workspace_state_vscdb,file_only,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
       cursor,cursor.workspace_state_vscdb,file_only,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
+      cursor,cursor.workspace_state_vscdb,file_only,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
+      cursor,cursor.workspace_state_vscdb,file_only,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
       cursor,cursor.workspace_state_vscdb,file_only,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
       cursor,cursor.workspace_state_vscdb,file_only,/var/root/.config/Cursor/User/workspaceStorage/*/state.vscdb
+      cursor,cursor.workspace_state_vscdb,file_only,/var/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
+      cursor,cursor.workspace_state_vscdb,file_only,/var/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
       cursor,cursor.workspace_state_vscdb,file_only,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
+      cursor,cursor.workspace_state_vscdb,file_only,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
+      cursor,cursor.workspace_state_vscdb,file_only,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
       cursor,cursor.workspace_state_vscdb,file_only,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
       devin,devin.sessions_db,file_only,/Users/*/.local/share/devin/cli/sessions.db
+      devin,devin.sessions_db,file_only,/Users/*/.local/share/devin/cli/sessions.db-shm
+      devin,devin.sessions_db,file_only,/Users/*/.local/share/devin/cli/sessions.db-wal
       devin,devin.sessions_db,file_only,/Users/*/.local/share/devin/cli/transcripts/*.json
       devin,devin.sessions_db,file_only,/Users/*/Library/Application Support/devin/cli/sessions.db
+      devin,devin.sessions_db,file_only,/Users/*/Library/Application Support/devin/cli/sessions.db-shm
+      devin,devin.sessions_db,file_only,/Users/*/Library/Application Support/devin/cli/sessions.db-wal
       devin,devin.sessions_db,file_only,/Users/*/Library/Application Support/devin/cli/transcripts/*.json
       devin,devin.sessions_db,file_only,/var/root/.local/share/devin/cli/sessions.db
+      devin,devin.sessions_db,file_only,/var/root/.local/share/devin/cli/sessions.db-shm
+      devin,devin.sessions_db,file_only,/var/root/.local/share/devin/cli/sessions.db-wal
       devin,devin.sessions_db,file_only,/var/root/.local/share/devin/cli/transcripts/*.json
       devin,devin.sessions_db,file_only,/var/root/Library/Application Support/devin/cli/sessions.db
+      devin,devin.sessions_db,file_only,/var/root/Library/Application Support/devin/cli/sessions.db-shm
+      devin,devin.sessions_db,file_only,/var/root/Library/Application Support/devin/cli/sessions.db-wal
       devin,devin.sessions_db,file_only,/var/root/Library/Application Support/devin/cli/transcripts/*.json
       gemini_cli,gemini_cli.chats,file_only,/Users/*/.cache/.gemini/tmp/*/chats/**
       gemini_cli,gemini_cli.chats,file_only,/Users/*/.gemini/sessions/**
@@ -1010,10 +1090,14 @@ sources:
       goose,goose.sessions_db,file_only,/Users/*/.local/share/goose/sessions/sessions.db-shm
       goose,goose.sessions_db,file_only,/Users/*/.local/share/goose/sessions/sessions.db-wal
       goose,goose.sessions_db,file_only,/Users/*/Library/Application Support/Block/goose/data/sessions/sessions.db
+      goose,goose.sessions_db,file_only,/Users/*/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
+      goose,goose.sessions_db,file_only,/Users/*/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
       goose,goose.sessions_db,file_only,/var/root/.local/share/goose/sessions/sessions.db
       goose,goose.sessions_db,file_only,/var/root/.local/share/goose/sessions/sessions.db-shm
       goose,goose.sessions_db,file_only,/var/root/.local/share/goose/sessions/sessions.db-wal
       goose,goose.sessions_db,file_only,/var/root/Library/Application Support/Block/goose/data/sessions/sessions.db
+      goose,goose.sessions_db,file_only,/var/root/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
+      goose,goose.sessions_db,file_only,/var/root/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
       goose,goose.sessions_jsonl_legacy,generic_jsonl,/Users/*/.local/share/goose/sessions/*.jsonl
       goose,goose.sessions_jsonl_legacy,generic_jsonl,/var/root/.local/share/goose/sessions/*.jsonl
       hermes,hermes.sessions_dir,file_only,/Users/*/.hermes/sessions/**
@@ -1065,7 +1149,11 @@ sources:
       kilo_code,kilo_code.extension_id_legacy_tree,file_only,/var/root/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/tasks/*/task_metadata.json
       kilo_code,kilo_code.extension_id_legacy_tree,file_only,/var/root/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/tasks/*/ui_messages.json
       kiro,kiro.cli_session_database,file_only,/Users/*/.kiro/*.sqlite3
+      kiro,kiro.cli_session_database,file_only,/Users/*/.kiro/*.sqlite3-shm
+      kiro,kiro.cli_session_database,file_only,/Users/*/.kiro/*.sqlite3-wal
       kiro,kiro.cli_session_database,file_only,/var/root/.kiro/*.sqlite3
+      kiro,kiro.cli_session_database,file_only,/var/root/.kiro/*.sqlite3-shm
+      kiro,kiro.cli_session_database,file_only,/var/root/.kiro/*.sqlite3-wal
       kiro,kiro.cli_session_files,generic_jsonl,/Users/*/.kiro/sessions/cli/*.json
       kiro,kiro.cli_session_files,generic_jsonl,/Users/*/.kiro/sessions/cli/*.jsonl
       kiro,kiro.cli_session_files,generic_jsonl,/Users/*/.kiro/sessions/cli/*.lock
@@ -1087,20 +1175,28 @@ sources:
       lmstudio,lmstudio.conversations,file_only,/Users/*/.lmstudio/conversations/**
       lmstudio,lmstudio.conversations,file_only,/var/root/.lmstudio/conversations/**
       ollama,ollama.app_chat_database,file_only,/Users/*/.ollama/db.sqlite
+      ollama,ollama.app_chat_database,file_only,/Users/*/.ollama/db.sqlite-shm
+      ollama,ollama.app_chat_database,file_only,/Users/*/.ollama/db.sqlite-wal
       ollama,ollama.app_chat_database,file_only,/Users/*/Library/Application Support/Ollama/db.sqlite
       ollama,ollama.app_chat_database,file_only,/Users/*/Library/Application Support/Ollama/db.sqlite-shm
       ollama,ollama.app_chat_database,file_only,/Users/*/Library/Application Support/Ollama/db.sqlite-wal
       ollama,ollama.app_chat_database,file_only,/var/root/.ollama/db.sqlite
+      ollama,ollama.app_chat_database,file_only,/var/root/.ollama/db.sqlite-shm
+      ollama,ollama.app_chat_database,file_only,/var/root/.ollama/db.sqlite-wal
       ollama,ollama.app_chat_database,file_only,/var/root/Library/Application Support/Ollama/db.sqlite
       ollama,ollama.app_chat_database,file_only,/var/root/Library/Application Support/Ollama/db.sqlite-shm
       ollama,ollama.app_chat_database,file_only,/var/root/Library/Application Support/Ollama/db.sqlite-wal
       ollama,ollama.cli_prompt_history,file_only,/Users/*/.ollama/history
       ollama,ollama.cli_prompt_history,file_only,/var/root/.ollama/history
       opencode,opencode.db,file_only,/Users/*/.local/share/opencode/opencode-*.db
+      opencode,opencode.db,file_only,/Users/*/.local/share/opencode/opencode-*.db-shm
+      opencode,opencode.db,file_only,/Users/*/.local/share/opencode/opencode-*.db-wal
       opencode,opencode.db,file_only,/Users/*/.local/share/opencode/opencode.db
       opencode,opencode.db,file_only,/Users/*/.local/share/opencode/opencode.db-shm
       opencode,opencode.db,file_only,/Users/*/.local/share/opencode/opencode.db-wal
       opencode,opencode.db,file_only,/var/root/.local/share/opencode/opencode-*.db
+      opencode,opencode.db,file_only,/var/root/.local/share/opencode/opencode-*.db-shm
+      opencode,opencode.db,file_only,/var/root/.local/share/opencode/opencode-*.db-wal
       opencode,opencode.db,file_only,/var/root/.local/share/opencode/opencode.db
       opencode,opencode.db,file_only,/var/root/.local/share/opencode/opencode.db-shm
       opencode,opencode.db,file_only,/var/root/.local/share/opencode/opencode.db-wal
@@ -1225,11 +1321,23 @@ sources:
       windsurf,windsurf.implicit_trajectories,file_only,/Users/*/.codeium/windsurf/implicit/*.pb
       windsurf,windsurf.implicit_trajectories,file_only,/var/root/.codeium/windsurf/implicit/*.pb
       zed,zed.sidebar_threads,file_only,/Users/*/Library/Application Support/Zed/db/0-stable/db.sqlite
+      zed,zed.sidebar_threads,file_only,/Users/*/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
+      zed,zed.sidebar_threads,file_only,/Users/*/Library/Application Support/Zed/db/0-stable/db.sqlite-wal
       zed,zed.sidebar_threads,file_only,/var/root/Library/Application Support/Zed/db/0-stable/db.sqlite
+      zed,zed.sidebar_threads,file_only,/var/root/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
+      zed,zed.sidebar_threads,file_only,/var/root/Library/Application Support/Zed/db/0-stable/db.sqlite-wal
       zed,zed.threads_db,file_only,/Users/*/.local/share/zed/threads/threads.db
+      zed,zed.threads_db,file_only,/Users/*/.local/share/zed/threads/threads.db-shm
+      zed,zed.threads_db,file_only,/Users/*/.local/share/zed/threads/threads.db-wal
       zed,zed.threads_db,file_only,/Users/*/Library/Application Support/Zed/threads/threads.db
+      zed,zed.threads_db,file_only,/Users/*/Library/Application Support/Zed/threads/threads.db-shm
+      zed,zed.threads_db,file_only,/Users/*/Library/Application Support/Zed/threads/threads.db-wal
       zed,zed.threads_db,file_only,/var/root/.local/share/zed/threads/threads.db
+      zed,zed.threads_db,file_only,/var/root/.local/share/zed/threads/threads.db-shm
+      zed,zed.threads_db,file_only,/var/root/.local/share/zed/threads/threads.db-wal
       zed,zed.threads_db,file_only,/var/root/Library/Application Support/Zed/threads/threads.db
+      zed,zed.threads_db,file_only,/var/root/Library/Application Support/Zed/threads/threads.db-shm
+      zed,zed.threads_db,file_only,/var/root/Library/Application Support/Zed/threads/threads.db-wal
     ''')
 
     LET Me <= SELECT Hostname FROM info()
@@ -1589,9 +1697,17 @@ sources:
       amazonq,amazonq.cli_prompt_history,file_only,/home/*/.aws/amazonq/.cli_bash_history
       amazonq,amazonq.cli_prompt_history,file_only,/root/.aws/amazonq/.cli_bash_history
       amazonq,amazonq.cli_state_database,file_only,/home/*/.local/share/amazon-q/data.sqlite3
+      amazonq,amazonq.cli_state_database,file_only,/home/*/.local/share/amazon-q/data.sqlite3-shm
+      amazonq,amazonq.cli_state_database,file_only,/home/*/.local/share/amazon-q/data.sqlite3-wal
       amazonq,amazonq.cli_state_database,file_only,/home/*/Library/Application Support/amazon-q/data.sqlite3
+      amazonq,amazonq.cli_state_database,file_only,/home/*/Library/Application Support/amazon-q/data.sqlite3-shm
+      amazonq,amazonq.cli_state_database,file_only,/home/*/Library/Application Support/amazon-q/data.sqlite3-wal
       amazonq,amazonq.cli_state_database,file_only,/root/.local/share/amazon-q/data.sqlite3
+      amazonq,amazonq.cli_state_database,file_only,/root/.local/share/amazon-q/data.sqlite3-shm
+      amazonq,amazonq.cli_state_database,file_only,/root/.local/share/amazon-q/data.sqlite3-wal
       amazonq,amazonq.cli_state_database,file_only,/root/Library/Application Support/amazon-q/data.sqlite3
+      amazonq,amazonq.cli_state_database,file_only,/root/Library/Application Support/amazon-q/data.sqlite3-shm
+      amazonq,amazonq.cli_state_database,file_only,/root/Library/Application Support/amazon-q/data.sqlite3-wal
       amazonq,amazonq.ide_chat_history,file_only,/home/*/.aws/amazonq/history/*.json
       amazonq,amazonq.ide_chat_history,file_only,/home/*/.aws/amazonq/history/chat-history-*.json
       amazonq,amazonq.ide_chat_history,file_only,/home/*/.aws/amazonq/history/chat-history-no-workspace.json
@@ -1667,11 +1783,23 @@ sources:
       cline,cline.hooks_audit_log,generic_jsonl,/home/*/.cline/data/logs/hooks.jsonl
       cline,cline.hooks_audit_log,generic_jsonl,/root/.cline/data/logs/hooks.jsonl
       cline,cline.sqlite_dbs,file_only,/home/*/.cline/data/db/connectors.db
+      cline,cline.sqlite_dbs,file_only,/home/*/.cline/data/db/connectors.db-shm
+      cline,cline.sqlite_dbs,file_only,/home/*/.cline/data/db/connectors.db-wal
       cline,cline.sqlite_dbs,file_only,/home/*/.cline/data/db/cron.db
+      cline,cline.sqlite_dbs,file_only,/home/*/.cline/data/db/cron.db-shm
+      cline,cline.sqlite_dbs,file_only,/home/*/.cline/data/db/cron.db-wal
       cline,cline.sqlite_dbs,file_only,/home/*/.cline/data/db/tasks.db
+      cline,cline.sqlite_dbs,file_only,/home/*/.cline/data/db/tasks.db-shm
+      cline,cline.sqlite_dbs,file_only,/home/*/.cline/data/db/tasks.db-wal
       cline,cline.sqlite_dbs,file_only,/root/.cline/data/db/connectors.db
+      cline,cline.sqlite_dbs,file_only,/root/.cline/data/db/connectors.db-shm
+      cline,cline.sqlite_dbs,file_only,/root/.cline/data/db/connectors.db-wal
       cline,cline.sqlite_dbs,file_only,/root/.cline/data/db/cron.db
+      cline,cline.sqlite_dbs,file_only,/root/.cline/data/db/cron.db-shm
+      cline,cline.sqlite_dbs,file_only,/root/.cline/data/db/cron.db-wal
       cline,cline.sqlite_dbs,file_only,/root/.cline/data/db/tasks.db
+      cline,cline.sqlite_dbs,file_only,/root/.cline/data/db/tasks.db-shm
+      cline,cline.sqlite_dbs,file_only,/root/.cline/data/db/tasks.db-wal
       cline,cline.vscode_task_transcripts,file_only,/home/*/.config/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/tasks/*/api_conversation_history.json
       cline,cline.vscode_task_transcripts,file_only,/home/*/.config/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/tasks/*/context_history.json
       cline,cline.vscode_task_transcripts,file_only,/home/*/.config/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/tasks/*/task_metadata.json
@@ -1815,17 +1943,29 @@ sources:
       cursor,cursor.chat_store_db,file_only,/root/.cursor/chats/*/*/store.db-shm
       cursor,cursor.chat_store_db,file_only,/root/.cursor/chats/*/*/store.db-wal
       cursor,cursor.conversation_search_db,file_only,/home/*/.config/Cursor/User/globalStorage/conversation-search.db
+      cursor,cursor.conversation_search_db,file_only,/home/*/.config/Cursor/User/globalStorage/conversation-search.db-shm
+      cursor,cursor.conversation_search_db,file_only,/home/*/.config/Cursor/User/globalStorage/conversation-search.db-wal
       cursor,cursor.conversation_search_db,file_only,/home/*/Library/Application Support/Cursor/User/globalStorage/conversation-search.db
+      cursor,cursor.conversation_search_db,file_only,/home/*/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-shm
+      cursor,cursor.conversation_search_db,file_only,/home/*/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-wal
       cursor,cursor.conversation_search_db,file_only,/root/.config/Cursor/User/globalStorage/conversation-search.db
+      cursor,cursor.conversation_search_db,file_only,/root/.config/Cursor/User/globalStorage/conversation-search.db-shm
+      cursor,cursor.conversation_search_db,file_only,/root/.config/Cursor/User/globalStorage/conversation-search.db-wal
       cursor,cursor.conversation_search_db,file_only,/root/Library/Application Support/Cursor/User/globalStorage/conversation-search.db
+      cursor,cursor.conversation_search_db,file_only,/root/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-shm
+      cursor,cursor.conversation_search_db,file_only,/root/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-wal
       cursor,cursor.global_prompt_history,file_only,/home/*/.cursor/prompt_history.json
       cursor,cursor.global_prompt_history,file_only,/root/.cursor/prompt_history.json
       cursor,cursor.global_state_vscdb,file_only,/home/*/.config/Cursor/User/globalStorage/state.vscdb
+      cursor,cursor.global_state_vscdb,file_only,/home/*/.config/Cursor/User/globalStorage/state.vscdb-shm
+      cursor,cursor.global_state_vscdb,file_only,/home/*/.config/Cursor/User/globalStorage/state.vscdb-wal
       cursor,cursor.global_state_vscdb,file_only,/home/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb
       cursor,cursor.global_state_vscdb,file_only,/home/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb-shm
       cursor,cursor.global_state_vscdb,file_only,/home/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb-wal
       cursor,cursor.global_state_vscdb,file_only,/home/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb.backup
       cursor,cursor.global_state_vscdb,file_only,/root/.config/Cursor/User/globalStorage/state.vscdb
+      cursor,cursor.global_state_vscdb,file_only,/root/.config/Cursor/User/globalStorage/state.vscdb-shm
+      cursor,cursor.global_state_vscdb,file_only,/root/.config/Cursor/User/globalStorage/state.vscdb-wal
       cursor,cursor.global_state_vscdb,file_only,/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb
       cursor,cursor.global_state_vscdb,file_only,/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb-shm
       cursor,cursor.global_state_vscdb,file_only,/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb-wal
@@ -1835,18 +1975,34 @@ sources:
       cursor,cursor.subagent_output,file_only,/home/*/.cursor/subagents/**
       cursor,cursor.subagent_output,file_only,/root/.cursor/subagents/**
       cursor,cursor.workspace_state_vscdb,file_only,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
+      cursor,cursor.workspace_state_vscdb,file_only,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
+      cursor,cursor.workspace_state_vscdb,file_only,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
       cursor,cursor.workspace_state_vscdb,file_only,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
+      cursor,cursor.workspace_state_vscdb,file_only,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
+      cursor,cursor.workspace_state_vscdb,file_only,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
       cursor,cursor.workspace_state_vscdb,file_only,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
       cursor,cursor.workspace_state_vscdb,file_only,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb
+      cursor,cursor.workspace_state_vscdb,file_only,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
+      cursor,cursor.workspace_state_vscdb,file_only,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
       cursor,cursor.workspace_state_vscdb,file_only,/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
+      cursor,cursor.workspace_state_vscdb,file_only,/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
+      cursor,cursor.workspace_state_vscdb,file_only,/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
       cursor,cursor.workspace_state_vscdb,file_only,/root/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
       devin,devin.sessions_db,file_only,/home/*/.local/share/devin/cli/sessions.db
+      devin,devin.sessions_db,file_only,/home/*/.local/share/devin/cli/sessions.db-shm
+      devin,devin.sessions_db,file_only,/home/*/.local/share/devin/cli/sessions.db-wal
       devin,devin.sessions_db,file_only,/home/*/.local/share/devin/cli/transcripts/*.json
       devin,devin.sessions_db,file_only,/home/*/Library/Application Support/devin/cli/sessions.db
+      devin,devin.sessions_db,file_only,/home/*/Library/Application Support/devin/cli/sessions.db-shm
+      devin,devin.sessions_db,file_only,/home/*/Library/Application Support/devin/cli/sessions.db-wal
       devin,devin.sessions_db,file_only,/home/*/Library/Application Support/devin/cli/transcripts/*.json
       devin,devin.sessions_db,file_only,/root/.local/share/devin/cli/sessions.db
+      devin,devin.sessions_db,file_only,/root/.local/share/devin/cli/sessions.db-shm
+      devin,devin.sessions_db,file_only,/root/.local/share/devin/cli/sessions.db-wal
       devin,devin.sessions_db,file_only,/root/.local/share/devin/cli/transcripts/*.json
       devin,devin.sessions_db,file_only,/root/Library/Application Support/devin/cli/sessions.db
+      devin,devin.sessions_db,file_only,/root/Library/Application Support/devin/cli/sessions.db-shm
+      devin,devin.sessions_db,file_only,/root/Library/Application Support/devin/cli/sessions.db-wal
       devin,devin.sessions_db,file_only,/root/Library/Application Support/devin/cli/transcripts/*.json
       gemini_cli,gemini_cli.chats,file_only,/home/*/.cache/.gemini/tmp/*/chats/**
       gemini_cli,gemini_cli.chats,file_only,/home/*/.gemini/sessions/**
@@ -1858,10 +2014,14 @@ sources:
       goose,goose.sessions_db,file_only,/home/*/.local/share/goose/sessions/sessions.db-shm
       goose,goose.sessions_db,file_only,/home/*/.local/share/goose/sessions/sessions.db-wal
       goose,goose.sessions_db,file_only,/home/*/Library/Application Support/Block/goose/data/sessions/sessions.db
+      goose,goose.sessions_db,file_only,/home/*/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
+      goose,goose.sessions_db,file_only,/home/*/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
       goose,goose.sessions_db,file_only,/root/.local/share/goose/sessions/sessions.db
       goose,goose.sessions_db,file_only,/root/.local/share/goose/sessions/sessions.db-shm
       goose,goose.sessions_db,file_only,/root/.local/share/goose/sessions/sessions.db-wal
       goose,goose.sessions_db,file_only,/root/Library/Application Support/Block/goose/data/sessions/sessions.db
+      goose,goose.sessions_db,file_only,/root/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
+      goose,goose.sessions_db,file_only,/root/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
       goose,goose.sessions_jsonl_legacy,generic_jsonl,/home/*/.local/share/goose/sessions/*.jsonl
       goose,goose.sessions_jsonl_legacy,generic_jsonl,/root/.local/share/goose/sessions/*.jsonl
       hermes,hermes.sessions_dir,file_only,/home/*/.hermes/sessions/**
@@ -1913,7 +2073,11 @@ sources:
       kilo_code,kilo_code.extension_id_legacy_tree,file_only,/root/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/tasks/*/task_metadata.json
       kilo_code,kilo_code.extension_id_legacy_tree,file_only,/root/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/tasks/*/ui_messages.json
       kiro,kiro.cli_session_database,file_only,/home/*/.kiro/*.sqlite3
+      kiro,kiro.cli_session_database,file_only,/home/*/.kiro/*.sqlite3-shm
+      kiro,kiro.cli_session_database,file_only,/home/*/.kiro/*.sqlite3-wal
       kiro,kiro.cli_session_database,file_only,/root/.kiro/*.sqlite3
+      kiro,kiro.cli_session_database,file_only,/root/.kiro/*.sqlite3-shm
+      kiro,kiro.cli_session_database,file_only,/root/.kiro/*.sqlite3-wal
       kiro,kiro.cli_session_files,generic_jsonl,/home/*/.kiro/sessions/cli/*.json
       kiro,kiro.cli_session_files,generic_jsonl,/home/*/.kiro/sessions/cli/*.jsonl
       kiro,kiro.cli_session_files,generic_jsonl,/home/*/.kiro/sessions/cli/*.lock
@@ -1935,20 +2099,28 @@ sources:
       lmstudio,lmstudio.conversations,file_only,/home/*/.lmstudio/conversations/**
       lmstudio,lmstudio.conversations,file_only,/root/.lmstudio/conversations/**
       ollama,ollama.app_chat_database,file_only,/home/*/.ollama/db.sqlite
+      ollama,ollama.app_chat_database,file_only,/home/*/.ollama/db.sqlite-shm
+      ollama,ollama.app_chat_database,file_only,/home/*/.ollama/db.sqlite-wal
       ollama,ollama.app_chat_database,file_only,/home/*/Library/Application Support/Ollama/db.sqlite
       ollama,ollama.app_chat_database,file_only,/home/*/Library/Application Support/Ollama/db.sqlite-shm
       ollama,ollama.app_chat_database,file_only,/home/*/Library/Application Support/Ollama/db.sqlite-wal
       ollama,ollama.app_chat_database,file_only,/root/.ollama/db.sqlite
+      ollama,ollama.app_chat_database,file_only,/root/.ollama/db.sqlite-shm
+      ollama,ollama.app_chat_database,file_only,/root/.ollama/db.sqlite-wal
       ollama,ollama.app_chat_database,file_only,/root/Library/Application Support/Ollama/db.sqlite
       ollama,ollama.app_chat_database,file_only,/root/Library/Application Support/Ollama/db.sqlite-shm
       ollama,ollama.app_chat_database,file_only,/root/Library/Application Support/Ollama/db.sqlite-wal
       ollama,ollama.cli_prompt_history,file_only,/home/*/.ollama/history
       ollama,ollama.cli_prompt_history,file_only,/root/.ollama/history
       opencode,opencode.db,file_only,/home/*/.local/share/opencode/opencode-*.db
+      opencode,opencode.db,file_only,/home/*/.local/share/opencode/opencode-*.db-shm
+      opencode,opencode.db,file_only,/home/*/.local/share/opencode/opencode-*.db-wal
       opencode,opencode.db,file_only,/home/*/.local/share/opencode/opencode.db
       opencode,opencode.db,file_only,/home/*/.local/share/opencode/opencode.db-shm
       opencode,opencode.db,file_only,/home/*/.local/share/opencode/opencode.db-wal
       opencode,opencode.db,file_only,/root/.local/share/opencode/opencode-*.db
+      opencode,opencode.db,file_only,/root/.local/share/opencode/opencode-*.db-shm
+      opencode,opencode.db,file_only,/root/.local/share/opencode/opencode-*.db-wal
       opencode,opencode.db,file_only,/root/.local/share/opencode/opencode.db
       opencode,opencode.db,file_only,/root/.local/share/opencode/opencode.db-shm
       opencode,opencode.db,file_only,/root/.local/share/opencode/opencode.db-wal
@@ -2075,11 +2247,23 @@ sources:
       zed,zed.flatpak_legacy_threads,file_only,/home/*/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/**
       zed,zed.flatpak_legacy_threads,file_only,/root/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/**
       zed,zed.sidebar_threads,file_only,/home/*/Library/Application Support/Zed/db/0-stable/db.sqlite
+      zed,zed.sidebar_threads,file_only,/home/*/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
+      zed,zed.sidebar_threads,file_only,/home/*/Library/Application Support/Zed/db/0-stable/db.sqlite-wal
       zed,zed.sidebar_threads,file_only,/root/Library/Application Support/Zed/db/0-stable/db.sqlite
+      zed,zed.sidebar_threads,file_only,/root/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
+      zed,zed.sidebar_threads,file_only,/root/Library/Application Support/Zed/db/0-stable/db.sqlite-wal
       zed,zed.threads_db,file_only,/home/*/.local/share/zed/threads/threads.db
+      zed,zed.threads_db,file_only,/home/*/.local/share/zed/threads/threads.db-shm
+      zed,zed.threads_db,file_only,/home/*/.local/share/zed/threads/threads.db-wal
       zed,zed.threads_db,file_only,/home/*/Library/Application Support/Zed/threads/threads.db
+      zed,zed.threads_db,file_only,/home/*/Library/Application Support/Zed/threads/threads.db-shm
+      zed,zed.threads_db,file_only,/home/*/Library/Application Support/Zed/threads/threads.db-wal
       zed,zed.threads_db,file_only,/root/.local/share/zed/threads/threads.db
+      zed,zed.threads_db,file_only,/root/.local/share/zed/threads/threads.db-shm
+      zed,zed.threads_db,file_only,/root/.local/share/zed/threads/threads.db-wal
       zed,zed.threads_db,file_only,/root/Library/Application Support/Zed/threads/threads.db
+      zed,zed.threads_db,file_only,/root/Library/Application Support/Zed/threads/threads.db-shm
+      zed,zed.threads_db,file_only,/root/Library/Application Support/Zed/threads/threads.db-wal
     ''')
 
     LET Me <= SELECT Hostname FROM info()

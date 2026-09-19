@@ -229,8 +229,14 @@ artifacts:
   - windows
   paths:
   - $XDG_DATA_HOME/opencode/opencode.db
+  - $XDG_DATA_HOME/opencode/opencode.db-shm
+  - $XDG_DATA_HOME/opencode/opencode.db-wal
   - '%USERPROFILE%\.local\share\opencode\opencode.db'
+  - '%USERPROFILE%\.local\share\opencode\opencode.db-shm'
+  - '%USERPROFILE%\.local\share\opencode\opencode.db-wal'
   - ~/.local/share/opencode/opencode-*.db
+  - ~/.local/share/opencode/opencode-*.db-shm
+  - ~/.local/share/opencode/opencode-*.db-wal
   - ~/.local/share/opencode/opencode.db
   - ~/.local/share/opencode/opencode.db-shm
   - ~/.local/share/opencode/opencode.db-wal
@@ -270,6 +276,12 @@ artifacts:
   - credential.value
   - session_share.secret
   unsourced_paths:
+  - $XDG_DATA_HOME/opencode/opencode.db-shm
+  - $XDG_DATA_HOME/opencode/opencode.db-wal
+  - '%USERPROFILE%\.local\share\opencode\opencode.db-shm'
+  - '%USERPROFILE%\.local\share\opencode\opencode.db-wal'
+  - ~/.local/share/opencode/opencode-*.db-shm
+  - ~/.local/share/opencode/opencode-*.db-wal
   - ~/.local/share/opencode/opencode.db-shm
   - ~/.local/share/opencode/opencode.db-wal
   volatility: |-

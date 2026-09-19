@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7b90a813f7ae
+# Catalogue digest: 8e99fe9d5a0a
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -165,6 +165,8 @@ $targets = @(
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_prompt_history'; Path = '$profile\.aws\amazonq\.cli_bash_history' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_settings'; Path = '$profile\AppData\Local\amazon-q\settings.json' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_state_database'; Path = '$profile\AppData\Local\amazon-q\data.sqlite3' }
+    @{ Agent = 'amazonq'; Id = 'amazonq.cli_state_database'; Path = '$profile\AppData\Local\amazon-q\data.sqlite3-shm' }
+    @{ Agent = 'amazonq'; Id = 'amazonq.cli_state_database'; Path = '$profile\AppData\Local\amazon-q\data.sqlite3-wal' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_user_rules'; Path = '$profile\.aws\amazonq\rules' }
     @{ Agent = 'amazonq'; Id = 'amazonq.ide_chat_history'; Path = '$profile\.aws\amazonq\history' }
     @{ Agent = 'amazonq'; Id = 'amazonq.ide_chat_history'; Path = '$profile\.aws\amazonq\history\chat-history-' }
@@ -395,8 +397,14 @@ $targets = @(
     @{ Agent = 'cline'; Id = 'cline.rules_global'; Path = '$profile\Cline\Rules' }
     @{ Agent = 'cline'; Id = 'cline.secrets_json'; Path = '$profile\.cline\data\secrets.json' }
     @{ Agent = 'cline'; Id = 'cline.sqlite_dbs'; Path = '$profile\.cline\data\db\connectors.db' }
+    @{ Agent = 'cline'; Id = 'cline.sqlite_dbs'; Path = '$profile\.cline\data\db\connectors.db-shm' }
+    @{ Agent = 'cline'; Id = 'cline.sqlite_dbs'; Path = '$profile\.cline\data\db\connectors.db-wal' }
     @{ Agent = 'cline'; Id = 'cline.sqlite_dbs'; Path = '$profile\.cline\data\db\cron.db' }
+    @{ Agent = 'cline'; Id = 'cline.sqlite_dbs'; Path = '$profile\.cline\data\db\cron.db-shm' }
+    @{ Agent = 'cline'; Id = 'cline.sqlite_dbs'; Path = '$profile\.cline\data\db\cron.db-wal' }
     @{ Agent = 'cline'; Id = 'cline.sqlite_dbs'; Path = '$profile\.cline\data\db\tasks.db' }
+    @{ Agent = 'cline'; Id = 'cline.sqlite_dbs'; Path = '$profile\.cline\data\db\tasks.db-shm' }
+    @{ Agent = 'cline'; Id = 'cline.sqlite_dbs'; Path = '$profile\.cline\data\db\tasks.db-wal' }
     @{ Agent = 'cline'; Id = 'cline.team_data'; Path = '$profile\.cline\data\teams' }
     @{ Agent = 'cline'; Id = 'cline.vscode_task_transcripts'; Path = '$profile\AppData\Roaming\Code - Insiders\User\globalStorage\saoudrizwan.claude-dev\tasks' }
     @{ Agent = 'cline'; Id = 'cline.vscode_task_transcripts'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\tasks' }
@@ -436,8 +444,14 @@ $targets = @(
     @{ Agent = 'continue'; Id = 'continue.diffs'; Path = '$profile\.continue\.diffs' }
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\.utils\repo_map.txt' }
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\autocompleteCache.sqlite' }
+    @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\autocompleteCache.sqlite-shm' }
+    @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\autocompleteCache.sqlite-wal' }
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\docs.sqlite' }
+    @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\docs.sqlite-shm' }
+    @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\docs.sqlite-wal' }
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\index.sqlite' }
+    @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\index.sqlite-shm' }
+    @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\index.sqlite-wal' }
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\lancedb' }
     @{ Agent = 'continue'; Id = 'continue.sessions'; Path = '$profile\.continue\sessions' }
     @{ Agent = 'continue'; Id = 'continue.sessions'; Path = '$profile\.continue\sessions\sessions.json' }
@@ -502,6 +516,8 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.agent_transcripts_jsonl'; Path = '$profile\.cursor\projects' }
     @{ Agent = 'cursor'; Id = 'cursor.ai_code_tracking_db'; Path = '$profile\.cursor\ai-tracking' }
     @{ Agent = 'cursor'; Id = 'cursor.ai_code_tracking_db'; Path = '$profile\.cursor\ai-tracking\ai-code-tracking.db' }
+    @{ Agent = 'cursor'; Id = 'cursor.ai_code_tracking_db'; Path = '$profile\.cursor\ai-tracking\ai-code-tracking.db-shm' }
+    @{ Agent = 'cursor'; Id = 'cursor.ai_code_tracking_db'; Path = '$profile\.cursor\ai-tracking\ai-code-tracking.db-wal' }
     @{ Agent = 'cursor'; Id = 'cursor.auth_credentials'; Path = '$profile\.cursor\auth.json' }
     @{ Agent = 'cursor'; Id = 'cursor.auth_credentials'; Path = '$profile\AppData\Roaming\Cursor\auth.json' }
     @{ Agent = 'cursor'; Id = 'cursor.chat_session_meta_json'; Path = '$profile\.cursor\chats' }
@@ -509,11 +525,15 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.chat_store_db'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.commit_checkpoints'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\anysphere.cursor-commits\checkpoints' }
     @{ Agent = 'cursor'; Id = 'cursor.conversation_search_db'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\conversation-search.db' }
+    @{ Agent = 'cursor'; Id = 'cursor.conversation_search_db'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\conversation-search.db-shm' }
+    @{ Agent = 'cursor'; Id = 'cursor.conversation_search_db'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\conversation-search.db-wal' }
     @{ Agent = 'cursor'; Id = 'cursor.extensions'; Path = '$profile\.cursor-server\extensions' }
     @{ Agent = 'cursor'; Id = 'cursor.extensions'; Path = '$profile\.cursor\extensions' }
     @{ Agent = 'cursor'; Id = 'cursor.extensions'; Path = '$profile\.cursor\extensions\extensions.json' }
     @{ Agent = 'cursor'; Id = 'cursor.global_prompt_history'; Path = '$profile\.cursor\prompt_history.json' }
     @{ Agent = 'cursor'; Id = 'cursor.global_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\state.vscdb' }
+    @{ Agent = 'cursor'; Id = 'cursor.global_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\state.vscdb-shm' }
+    @{ Agent = 'cursor'; Id = 'cursor.global_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\state.vscdb-wal' }
     @{ Agent = 'cursor'; Id = 'cursor.local_file_history'; Path = '$profile\AppData\Roaming\Cursor\User\History' }
     @{ Agent = 'cursor'; Id = 'cursor.logs'; Path = '$profile\AppData\Roaming\Cursor\logs' }
     @{ Agent = 'cursor'; Id = 'cursor.pasted_text'; Path = '$profile\.cursor\chats' }
@@ -526,6 +546,8 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.worktrees'; Path = '$profile\.cursor\worktrees' }
     @{ Agent = 'devin'; Id = 'devin.acp_events'; Path = '$profile\AppData\Roaming\Devin\User\acp-events' }
     @{ Agent = 'devin'; Id = 'devin.sessions_db'; Path = '$profile\.local\share\devin\cli\sessions.db' }
+    @{ Agent = 'devin'; Id = 'devin.sessions_db'; Path = '$profile\.local\share\devin\cli\sessions.db-shm' }
+    @{ Agent = 'devin'; Id = 'devin.sessions_db'; Path = '$profile\.local\share\devin\cli\sessions.db-wal' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.auth'; Path = '$profile\.factory' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.logs'; Path = '$profile\.factory\bug-reports' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.logs'; Path = '$profile\.factory\logs' }
@@ -548,6 +570,8 @@ $targets = @(
     @{ Agent = 'goose'; Id = 'goose.secrets'; Path = '$profile\AppData\Roaming\Block\goose\config\secrets.yaml' }
     @{ Agent = 'goose'; Id = 'goose.server_logs'; Path = '$profile\AppData\Roaming\Block\goose\data\logs\server' }
     @{ Agent = 'goose'; Id = 'goose.sessions_db_windows'; Path = '$profile\AppData\Roaming\Block\goose\data\sessions\sessions.db' }
+    @{ Agent = 'goose'; Id = 'goose.sessions_db_windows'; Path = '$profile\AppData\Roaming\Block\goose\data\sessions\sessions.db-shm' }
+    @{ Agent = 'goose'; Id = 'goose.sessions_db_windows'; Path = '$profile\AppData\Roaming\Block\goose\data\sessions\sessions.db-wal' }
     @{ Agent = 'goose'; Id = 'goose.sessions_jsonl_legacy'; Path = '$profile\AppData\Roaming\Block\goose\data\sessions' }
     @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\.hermes\auth.json' }
     @{ Agent = 'hermes'; Id = 'hermes.config'; Path = '$profile\.hermes\config.yaml' }
@@ -582,6 +606,8 @@ $targets = @(
     @{ Agent = 'junie'; Id = 'junie.trust_and_auth_key'; Path = '$profile\.junie\trust' }
     @{ Agent = 'junie'; Id = 'junie.trust_and_auth_key'; Path = '$profile\.junie\trust\authentication-key' }
     @{ Agent = 'kilo_code'; Id = 'kilo_code.cli_db'; Path = '$profile\.local\share\kilo\kilo.db' }
+    @{ Agent = 'kilo_code'; Id = 'kilo_code.cli_db'; Path = '$profile\.local\share\kilo\kilo.db-shm' }
+    @{ Agent = 'kilo_code'; Id = 'kilo_code.cli_db'; Path = '$profile\.local\share\kilo\kilo.db-wal' }
     @{ Agent = 'kilo_code'; Id = 'kilo_code.extension_id_legacy_tree'; Path = '$profile\.vscode-server\data\User\globalStorage\kilocode.kilo-code\tasks' }
     @{ Agent = 'kilo_code'; Id = 'kilo_code.extension_id_legacy_tree'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\kilocode.kilo-code\tasks' }
     @{ Agent = 'kilo_code'; Id = 'kilo_code.settings'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\kilocode.kilo-code\settings\custom_modes.yaml' }
@@ -605,6 +631,8 @@ $targets = @(
     @{ Agent = 'lmstudio'; Id = 'lmstudio.models'; Path = '$profile\.lmstudio\models' }
     @{ Agent = 'lmstudio'; Id = 'lmstudio.presets'; Path = '$profile\.lmstudio\config-presets' }
     @{ Agent = 'ollama'; Id = 'ollama.app_chat_database'; Path = '$profile\.ollama\db.sqlite' }
+    @{ Agent = 'ollama'; Id = 'ollama.app_chat_database'; Path = '$profile\.ollama\db.sqlite-shm' }
+    @{ Agent = 'ollama'; Id = 'ollama.app_chat_database'; Path = '$profile\.ollama\db.sqlite-wal' }
     @{ Agent = 'ollama'; Id = 'ollama.app_chat_database'; Path = '$profile\AppData\Local\Ollama\db.sqlite' }
     @{ Agent = 'ollama'; Id = 'ollama.app_chat_database'; Path = '$profile\AppData\Local\Ollama\db.sqlite-wal' }
     @{ Agent = 'ollama'; Id = 'ollama.app_config'; Path = '$profile\.ollama\config.json' }
@@ -627,6 +655,8 @@ $targets = @(
     @{ Agent = 'ollama'; Id = 'ollama.private_key'; Path = '$profile\.ollama\id_ed25519.pub' }
     @{ Agent = 'opencode'; Id = 'opencode.auth'; Path = '$profile\AppData\Local\opencode\auth.json' }
     @{ Agent = 'opencode'; Id = 'opencode.db'; Path = '$profile\.local\share\opencode\opencode.db' }
+    @{ Agent = 'opencode'; Id = 'opencode.db'; Path = '$profile\.local\share\opencode\opencode.db-shm' }
+    @{ Agent = 'opencode'; Id = 'opencode.db'; Path = '$profile\.local\share\opencode\opencode.db-wal' }
     @{ Agent = 'opencode'; Id = 'opencode.log'; Path = '$profile\.local\share\opencode\log' }
     @{ Agent = 'opencode'; Id = 'opencode.managed_config'; Path = 'C:\ProgramData\opencode' }
     @{ Agent = 'pi'; Id = 'pi.auth'; Path = '$profile\.pi\agent\auth.json' }
@@ -751,9 +781,13 @@ $targets = @(
     @{ Agent = 'vscode'; Id = 'vscode.extension_install_evidence'; Path = '$profile\.vscode\extensions\rooveterinaryinc.roo-cline-' }
     @{ Agent = 'vscode'; Id = 'vscode.extension_install_evidence'; Path = '$profile\.vscode\extensions\saoudrizwan.claude-dev-' }
     @{ Agent = 'vscode'; Id = 'vscode.state_vscdb'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\state.vscdb' }
+    @{ Agent = 'vscode'; Id = 'vscode.state_vscdb'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\state.vscdb-shm' }
+    @{ Agent = 'vscode'; Id = 'vscode.state_vscdb'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\state.vscdb-wal' }
     @{ Agent = 'vscode'; Id = 'vscode.user_data_roots'; Path = '$profile\.vscode-server\data\User\globalStorage' }
     @{ Agent = 'vscode'; Id = 'vscode.user_data_roots'; Path = '$profile\AppData\Roaming\Code\User\globalStorage' }
     @{ Agent = 'warp'; Id = 'warp.sqlite'; Path = '$profile\AppData\Local\warp\Warp\data\warp.sqlite' }
+    @{ Agent = 'warp'; Id = 'warp.sqlite'; Path = '$profile\AppData\Local\warp\Warp\data\warp.sqlite-shm' }
+    @{ Agent = 'warp'; Id = 'warp.sqlite'; Path = '$profile\AppData\Local\warp\Warp\data\warp.sqlite-wal' }
     @{ Agent = 'windsurf'; Id = 'windsurf.acp_registry'; Path = '$profile\.windsurf-next\acp\registry.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.acp_registry'; Path = '$profile\.windsurf\acp\registry.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.auth_credentials'; Path = '$profile\.codeium\config.json' }
@@ -772,9 +806,17 @@ $targets = @(
     @{ Agent = 'windsurf'; Id = 'windsurf.global_rules'; Path = '$profile\.codeium\windsurf-next\memories\global_rules.md' }
     @{ Agent = 'windsurf'; Id = 'windsurf.global_rules'; Path = '$profile\.codeium\windsurf\memories\global_rules.md' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Devin\User\globalStorage\state.vscdb' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Devin\User\globalStorage\state.vscdb-shm' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Devin\User\globalStorage\state.vscdb-wal' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf - Next\User\globalStorage\state.vscdb' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf - Next\User\globalStorage\state.vscdb-shm' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf - Next\User\globalStorage\state.vscdb-wal' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf Insiders\User\globalStorage\state.vscdb' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf Insiders\User\globalStorage\state.vscdb-shm' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf Insiders\User\globalStorage\state.vscdb-wal' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf\User\globalStorage\state.vscdb' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf\User\globalStorage\state.vscdb-shm' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf\User\globalStorage\state.vscdb-wal' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\AppData\Roaming\Devin\User\settings.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\AppData\Roaming\Windsurf\User\keybindings.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\AppData\Roaming\Windsurf\User\settings.json' }
@@ -802,6 +844,8 @@ $targets = @(
     @{ Agent = 'zed'; Id = 'zed.logs'; Path = '$profile\AppData\Local\Zed\logs' }
     @{ Agent = 'zed'; Id = 'zed.sidebar_threads'; Path = '$profile\AppData\Local\Zed\db\0-' }
     @{ Agent = 'zed'; Id = 'zed.threads_db'; Path = '$profile\AppData\Local\Zed\threads\threads.db' }
+    @{ Agent = 'zed'; Id = 'zed.threads_db'; Path = '$profile\AppData\Local\Zed\threads\threads.db-shm' }
+    @{ Agent = 'zed'; Id = 'zed.threads_db'; Path = '$profile\AppData\Local\Zed\threads\threads.db-wal' }
 )
 
 $found = @{}

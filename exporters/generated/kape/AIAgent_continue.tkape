@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7b90a813f7ae
+# Catalogue digest: 8e99fe9d5a0a
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -81,13 +81,49 @@ Targets:
         Name: continue.index
         Category: cache
         Path: C:\Users\%user%\.continue\index
+        FileMask: "autocompleteCache.sqlite-shm"
+        Recursive: false
+    -
+        Name: continue.index
+        Category: cache
+        Path: C:\Users\%user%\.continue\index
+        FileMask: "autocompleteCache.sqlite-wal"
+        Recursive: false
+    -
+        Name: continue.index
+        Category: cache
+        Path: C:\Users\%user%\.continue\index
         FileMask: "docs.sqlite"
         Recursive: false
     -
         Name: continue.index
         Category: cache
         Path: C:\Users\%user%\.continue\index
+        FileMask: "docs.sqlite-shm"
+        Recursive: false
+    -
+        Name: continue.index
+        Category: cache
+        Path: C:\Users\%user%\.continue\index
+        FileMask: "docs.sqlite-wal"
+        Recursive: false
+    -
+        Name: continue.index
+        Category: cache
+        Path: C:\Users\%user%\.continue\index
         FileMask: "index.sqlite"
+        Recursive: false
+    -
+        Name: continue.index
+        Category: cache
+        Path: C:\Users\%user%\.continue\index
+        FileMask: "index.sqlite-shm"
+        Recursive: false
+    -
+        Name: continue.index
+        Category: cache
+        Path: C:\Users\%user%\.continue\index
+        FileMask: "index.sqlite-wal"
         Recursive: false
     -
         Name: continue.index

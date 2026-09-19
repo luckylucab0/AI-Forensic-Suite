@@ -35,7 +35,11 @@ artifacts:
   - windows
   paths:
   - ${XDG_STATE_HOME:-~/.local/state}/warp-terminal/warp.sqlite
+  - ${XDG_STATE_HOME:-~/.local/state}/warp-terminal/warp.sqlite-shm
+  - ${XDG_STATE_HOME:-~/.local/state}/warp-terminal/warp.sqlite-wal
   - '%LOCALAPPDATA%\warp\Warp\data\warp.sqlite'
+  - '%LOCALAPPDATA%\warp\Warp\data\warp.sqlite-shm'
+  - '%LOCALAPPDATA%\warp\Warp\data\warp.sqlite-wal'
   - ~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite
   - |-
     ~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm

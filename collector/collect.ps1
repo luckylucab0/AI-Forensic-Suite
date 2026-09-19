@@ -410,10 +410,20 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$Q_CLI_DATA_DIR/data.sqlite3",
+                        "$Q_CLI_DATA_DIR/data.sqlite3-shm",
+                        "$Q_CLI_DATA_DIR/data.sqlite3-wal",
                         "$XDG_DATA_HOME/amazon-q/data.sqlite3",
+                        "$XDG_DATA_HOME/amazon-q/data.sqlite3-shm",
+                        "$XDG_DATA_HOME/amazon-q/data.sqlite3-wal",
                         "%LOCALAPPDATA%\\amazon-q\\data.sqlite3",
+                        "%LOCALAPPDATA%\\amazon-q\\data.sqlite3-shm",
+                        "%LOCALAPPDATA%\\amazon-q\\data.sqlite3-wal",
                         "~/.local/share/amazon-q/data.sqlite3",
-                        "~/Library/Application Support/amazon-q/data.sqlite3"
+                        "~/.local/share/amazon-q/data.sqlite3-shm",
+                        "~/.local/share/amazon-q/data.sqlite3-wal",
+                        "~/Library/Application Support/amazon-q/data.sqlite3",
+                        "~/Library/Application Support/amazon-q/data.sqlite3-shm",
+                        "~/Library/Application Support/amazon-q/data.sqlite3-wal"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -3319,8 +3329,14 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "~/.cline/data/db/connectors.db",
+                        "~/.cline/data/db/connectors.db-shm",
+                        "~/.cline/data/db/connectors.db-wal",
                         "~/.cline/data/db/cron.db",
-                        "~/.cline/data/db/tasks.db"
+                        "~/.cline/data/db/cron.db-shm",
+                        "~/.cline/data/db/cron.db-wal",
+                        "~/.cline/data/db/tasks.db",
+                        "~/.cline/data/db/tasks.db-shm",
+                        "~/.cline/data/db/tasks.db-wal"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -3748,8 +3764,14 @@ $EmbeddedCatalogueJson = @'
                     "paths": [
                         "~/.continue/.utils/repo_map.txt",
                         "~/.continue/index/autocompleteCache.sqlite",
+                        "~/.continue/index/autocompleteCache.sqlite-shm",
+                        "~/.continue/index/autocompleteCache.sqlite-wal",
                         "~/.continue/index/docs.sqlite",
+                        "~/.continue/index/docs.sqlite-shm",
+                        "~/.continue/index/docs.sqlite-wal",
                         "~/.continue/index/index.sqlite",
+                        "~/.continue/index/index.sqlite-shm",
+                        "~/.continue/index/index.sqlite-wal",
                         "~/.continue/index/lancedb/"
                     ],
                     "root": "user_profile",
@@ -4695,7 +4717,11 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "~/.cursor/ai-tracking/*.db",
-                        "~/.cursor/ai-tracking/ai-code-tracking.db"
+                        "~/.cursor/ai-tracking/*.db-shm",
+                        "~/.cursor/ai-tracking/*.db-wal",
+                        "~/.cursor/ai-tracking/ai-code-tracking.db",
+                        "~/.cursor/ai-tracking/ai-code-tracking.db-shm",
+                        "~/.cursor/ai-tracking/ai-code-tracking.db-wal"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -4763,7 +4789,11 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$XDG_CONFIG_HOME/cursor/chats/<md5>/<session-uuid>/store.db",
+                        "$XDG_CONFIG_HOME/cursor/chats/<md5>/<session-uuid>/store.db-shm",
+                        "$XDG_CONFIG_HOME/cursor/chats/<md5>/<session-uuid>/store.db-wal",
                         "%USERPROFILE%\\.cursor\\chats\\<md5>\\<session-uuid>\\store.db",
+                        "%USERPROFILE%\\.cursor\\chats\\<md5>\\<session-uuid>\\store.db-shm",
+                        "%USERPROFILE%\\.cursor\\chats\\<md5>\\<session-uuid>\\store.db-wal",
                         "~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/store.db",
                         "~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/store.db-shm",
                         "~/.cursor/chats/<md5-hex-of-abs-workspace-path>/<session-uuid>/store.db-wal"
@@ -4841,8 +4871,14 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "%APPDATA%\\Cursor\\User\\globalStorage\\conversation-search.db",
+                        "%APPDATA%\\Cursor\\User\\globalStorage\\conversation-search.db-shm",
+                        "%APPDATA%\\Cursor\\User\\globalStorage\\conversation-search.db-wal",
                         "~/.config/Cursor/User/globalStorage/conversation-search.db",
-                        "~/Library/Application Support/Cursor/User/globalStorage/conversation-search.db"
+                        "~/.config/Cursor/User/globalStorage/conversation-search.db-shm",
+                        "~/.config/Cursor/User/globalStorage/conversation-search.db-wal",
+                        "~/Library/Application Support/Cursor/User/globalStorage/conversation-search.db",
+                        "~/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-shm",
+                        "~/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-wal"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -4897,7 +4933,11 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "%APPDATA%\\Cursor\\User\\globalStorage\\state.vscdb",
+                        "%APPDATA%\\Cursor\\User\\globalStorage\\state.vscdb-shm",
+                        "%APPDATA%\\Cursor\\User\\globalStorage\\state.vscdb-wal",
                         "~/.config/Cursor/User/globalStorage/state.vscdb",
+                        "~/.config/Cursor/User/globalStorage/state.vscdb-shm",
+                        "~/.config/Cursor/User/globalStorage/state.vscdb-wal",
                         "~/Library/Application Support/Cursor/User/globalStorage/state.vscdb",
                         "~/Library/Application Support/Cursor/User/globalStorage/state.vscdb-shm",
                         "~/Library/Application Support/Cursor/User/globalStorage/state.vscdb-wal",
@@ -5167,8 +5207,14 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "%APPDATA%\\Cursor\\User\\workspaceStorage\\<workspace-hash>\\state.vscdb",
+                        "%APPDATA%\\Cursor\\User\\workspaceStorage\\<workspace-hash>\\state.vscdb-shm",
+                        "%APPDATA%\\Cursor\\User\\workspaceStorage\\<workspace-hash>\\state.vscdb-wal",
                         "~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb",
+                        "~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-shm",
+                        "~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-wal",
                         "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb",
+                        "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-shm",
+                        "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-wal",
                         "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/workspace.json"
                     ],
                     "root": "user_profile",
@@ -5227,9 +5273,15 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "%USERPROFILE%\\.local\\share\\devin\\cli\\sessions.db",
+                        "%USERPROFILE%\\.local\\share\\devin\\cli\\sessions.db-shm",
+                        "%USERPROFILE%\\.local\\share\\devin\\cli\\sessions.db-wal",
                         "~/.local/share/devin/cli/sessions.db",
+                        "~/.local/share/devin/cli/sessions.db-shm",
+                        "~/.local/share/devin/cli/sessions.db-wal",
                         "~/.local/share/devin/cli/transcripts/<session-id>.json",
                         "~/Library/Application Support/devin/cli/sessions.db",
+                        "~/Library/Application Support/devin/cli/sessions.db-shm",
+                        "~/Library/Application Support/devin/cli/sessions.db-wal",
                         "~/Library/Application Support/devin/cli/transcripts/<session-id>.json"
                     ],
                     "root": "user_profile",
@@ -5706,7 +5758,9 @@ $EmbeddedCatalogueJson = @'
                         "~/.local/share/goose/sessions/sessions.db",
                         "~/.local/share/goose/sessions/sessions.db-shm",
                         "~/.local/share/goose/sessions/sessions.db-wal",
-                        "~/Library/Application Support/Block/goose/data/sessions/sessions.db"
+                        "~/Library/Application Support/Block/goose/data/sessions/sessions.db",
+                        "~/Library/Application Support/Block/goose/data/sessions/sessions.db-shm",
+                        "~/Library/Application Support/Block/goose/data/sessions/sessions.db-wal"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -5720,7 +5774,9 @@ $EmbeddedCatalogueJson = @'
                         "windows"
                     ],
                     "paths": [
-                        "%APPDATA%\\Block\\goose\\data\\sessions\\sessions.db"
+                        "%APPDATA%\\Block\\goose\\data\\sessions\\sessions.db",
+                        "%APPDATA%\\Block\\goose\\data\\sessions\\sessions.db-shm",
+                        "%APPDATA%\\Block\\goose\\data\\sessions\\sessions.db-wal"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -5947,6 +6003,8 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$HERMES_HOME/state.db",
+                        "$HERMES_HOME/state.db-shm",
+                        "$HERMES_HOME/state.db-wal",
                         "~/.hermes/state.db",
                         "~/.hermes/state.db-shm",
                         "~/.hermes/state.db-wal"
@@ -6282,6 +6340,8 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "%USERPROFILE%\\.local\\share\\kilo\\kilo.db",
+                        "%USERPROFILE%\\.local\\share\\kilo\\kilo.db-shm",
+                        "%USERPROFILE%\\.local\\share\\kilo\\kilo.db-wal",
                         "~/.local/share/kilo/kilo.db",
                         "~/.local/share/kilo/kilo.db-shm",
                         "~/.local/share/kilo/kilo.db-wal"
@@ -6434,8 +6494,14 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$KIRO_HOME/*.sqlite3",
+                        "$KIRO_HOME/*.sqlite3-shm",
+                        "$KIRO_HOME/*.sqlite3-wal",
                         "%USERPROFILE%\\.kiro\\*.sqlite3",
-                        "~/.kiro/*.sqlite3"
+                        "%USERPROFILE%\\.kiro\\*.sqlite3-shm",
+                        "%USERPROFILE%\\.kiro\\*.sqlite3-wal",
+                        "~/.kiro/*.sqlite3",
+                        "~/.kiro/*.sqlite3-shm",
+                        "~/.kiro/*.sqlite3-wal"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6900,6 +6966,8 @@ $EmbeddedCatalogueJson = @'
                         "%LOCALAPPDATA%\\Ollama\\db.sqlite",
                         "%LOCALAPPDATA%\\Ollama\\db.sqlite-wal",
                         "~/.ollama/db.sqlite",
+                        "~/.ollama/db.sqlite-shm",
+                        "~/.ollama/db.sqlite-wal",
                         "~/Library/Application Support/Ollama/db.sqlite",
                         "~/Library/Application Support/Ollama/db.sqlite-shm",
                         "~/Library/Application Support/Ollama/db.sqlite-wal"
@@ -7178,8 +7246,14 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$XDG_DATA_HOME/opencode/opencode.db",
+                        "$XDG_DATA_HOME/opencode/opencode.db-shm",
+                        "$XDG_DATA_HOME/opencode/opencode.db-wal",
                         "%USERPROFILE%\\.local\\share\\opencode\\opencode.db",
+                        "%USERPROFILE%\\.local\\share\\opencode\\opencode.db-shm",
+                        "%USERPROFILE%\\.local\\share\\opencode\\opencode.db-wal",
                         "~/.local/share/opencode/opencode-*.db",
+                        "~/.local/share/opencode/opencode-*.db-shm",
+                        "~/.local/share/opencode/opencode-*.db-wal",
                         "~/.local/share/opencode/opencode.db",
                         "~/.local/share/opencode/opencode.db-shm",
                         "~/.local/share/opencode/opencode.db-wal"
@@ -8232,8 +8306,14 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "%APPDATA%\\Code\\User\\globalStorage\\state.vscdb",
+                        "%APPDATA%\\Code\\User\\globalStorage\\state.vscdb-shm",
+                        "%APPDATA%\\Code\\User\\globalStorage\\state.vscdb-wal",
                         "~/.config/Code/User/globalStorage/state.vscdb",
+                        "~/.config/Code/User/globalStorage/state.vscdb-shm",
+                        "~/.config/Code/User/globalStorage/state.vscdb-wal",
                         "~/Library/Application Support/Code/User/globalStorage/state.vscdb",
+                        "~/Library/Application Support/Code/User/globalStorage/state.vscdb-shm",
+                        "~/Library/Application Support/Code/User/globalStorage/state.vscdb-wal",
                         "~/Library/Application Support/Code/User/globalStorage/state.vscdb.backup"
                     ],
                     "root": "user_profile",
@@ -8277,7 +8357,11 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "${XDG_STATE_HOME:-~/.local/state}/warp-terminal/warp.sqlite",
+                        "${XDG_STATE_HOME:-~/.local/state}/warp-terminal/warp.sqlite-shm",
+                        "${XDG_STATE_HOME:-~/.local/state}/warp-terminal/warp.sqlite-wal",
                         "%LOCALAPPDATA%\\warp\\Warp\\data\\warp.sqlite",
+                        "%LOCALAPPDATA%\\warp\\Warp\\data\\warp.sqlite-shm",
+                        "%LOCALAPPDATA%\\warp\\Warp\\data\\warp.sqlite-wal",
                         "~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite",
                         "~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm",
                         "~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal"
@@ -8399,6 +8483,8 @@ $EmbeddedCatalogueJson = @'
                     "paths": [
                         "%USERPROFILE%\\.codeium\\windsurf\\database\\<hash>\\",
                         "~/.codeium/windsurf/database/<hash>/embedding_database.sqlite",
+                        "~/.codeium/windsurf/database/<hash>/embedding_database.sqlite-shm",
+                        "~/.codeium/windsurf/database/<hash>/embedding_database.sqlite-wal",
                         "~/.codeium/windsurf/database/<md5-of-workspace-id>/"
                     ],
                     "root": "user_profile",
@@ -8474,14 +8560,32 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "%APPDATA%\\Devin\\User\\globalStorage\\state.vscdb",
+                        "%APPDATA%\\Devin\\User\\globalStorage\\state.vscdb-shm",
+                        "%APPDATA%\\Devin\\User\\globalStorage\\state.vscdb-wal",
                         "%APPDATA%\\Windsurf - Next\\User\\globalStorage\\state.vscdb",
+                        "%APPDATA%\\Windsurf - Next\\User\\globalStorage\\state.vscdb-shm",
+                        "%APPDATA%\\Windsurf - Next\\User\\globalStorage\\state.vscdb-wal",
                         "%APPDATA%\\Windsurf Insiders\\User\\globalStorage\\state.vscdb",
+                        "%APPDATA%\\Windsurf Insiders\\User\\globalStorage\\state.vscdb-shm",
+                        "%APPDATA%\\Windsurf Insiders\\User\\globalStorage\\state.vscdb-wal",
                         "%APPDATA%\\Windsurf\\User\\globalStorage\\state.vscdb",
+                        "%APPDATA%\\Windsurf\\User\\globalStorage\\state.vscdb-shm",
+                        "%APPDATA%\\Windsurf\\User\\globalStorage\\state.vscdb-wal",
                         "~/.config/Devin/User/globalStorage/state.vscdb",
+                        "~/.config/Devin/User/globalStorage/state.vscdb-shm",
+                        "~/.config/Devin/User/globalStorage/state.vscdb-wal",
                         "~/.config/Windsurf/User/globalStorage/state.vscdb",
+                        "~/.config/Windsurf/User/globalStorage/state.vscdb-shm",
+                        "~/.config/Windsurf/User/globalStorage/state.vscdb-wal",
                         "~/Library/Application Support/Devin/User/globalStorage/state.vscdb",
+                        "~/Library/Application Support/Devin/User/globalStorage/state.vscdb-shm",
+                        "~/Library/Application Support/Devin/User/globalStorage/state.vscdb-wal",
                         "~/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb",
+                        "~/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-shm",
+                        "~/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-wal",
                         "~/Library/Application Support/Windsurf/User/globalStorage/state.vscdb",
+                        "~/Library/Application Support/Windsurf/User/globalStorage/state.vscdb-shm",
+                        "~/Library/Application Support/Windsurf/User/globalStorage/state.vscdb-wal",
                         "~/Library/Application Support/Windsurf/User/globalStorage/storage.json",
                         "~/Library/Application Support/Windsurf/machineId"
                     ],
@@ -8526,9 +8630,15 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "%APPDATA%\\Windsurf\\User\\workspaceStorage\\<hash>\\state.vscdb",
+                        "%APPDATA%\\Windsurf\\User\\workspaceStorage\\<hash>\\state.vscdb-shm",
+                        "%APPDATA%\\Windsurf\\User\\workspaceStorage\\<hash>\\state.vscdb-wal",
                         "~/.config/Windsurf/User/settings.json",
                         "~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb",
-                        "~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb"
+                        "~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-shm",
+                        "~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-wal",
+                        "~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb",
+                        "~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb-shm",
+                        "~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb-wal"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -8849,8 +8959,14 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite",
+                        "$XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite-shm",
+                        "$XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite-wal",
                         "%LOCALAPPDATA%\\Zed\\db\\0-<release_channel>\\db.sqlite",
-                        "~/Library/Application Support/Zed/db/0-stable/db.sqlite"
+                        "%LOCALAPPDATA%\\Zed\\db\\0-<release_channel>\\db.sqlite-shm",
+                        "%LOCALAPPDATA%\\Zed\\db\\0-<release_channel>\\db.sqlite-wal",
+                        "~/Library/Application Support/Zed/db/0-stable/db.sqlite",
+                        "~/Library/Application Support/Zed/db/0-stable/db.sqlite-shm",
+                        "~/Library/Application Support/Zed/db/0-stable/db.sqlite-wal"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -8867,9 +8983,17 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$XDG_DATA_HOME/zed/threads/threads.db",
+                        "$XDG_DATA_HOME/zed/threads/threads.db-shm",
+                        "$XDG_DATA_HOME/zed/threads/threads.db-wal",
                         "%LOCALAPPDATA%\\Zed\\threads\\threads.db",
+                        "%LOCALAPPDATA%\\Zed\\threads\\threads.db-shm",
+                        "%LOCALAPPDATA%\\Zed\\threads\\threads.db-wal",
                         "~/.local/share/zed/threads/threads.db",
-                        "~/Library/Application Support/Zed/threads/threads.db"
+                        "~/.local/share/zed/threads/threads.db-shm",
+                        "~/.local/share/zed/threads/threads.db-wal",
+                        "~/Library/Application Support/Zed/threads/threads.db",
+                        "~/Library/Application Support/Zed/threads/threads.db-shm",
+                        "~/Library/Application Support/Zed/threads/threads.db-wal"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -8878,7 +9002,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "03fa8855d6cb1cc29236f9fb63c2891e0cf16e27914fa83f413833fab23df436"
+    "sha256": "023135bf6ae5c1d8f0fda9493c7e4b28995f911437fbce8cc5686673f623c6ea"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

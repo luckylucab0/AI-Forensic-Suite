@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7b90a813f7ae
+# Catalogue digest: 8e99fe9d5a0a
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -132,6 +132,18 @@ Targets:
         FileMask: "embedding_database.sqlite"
         Recursive: false
     -
+        Name: windsurf.embedding_database
+        Category: cache
+        Path: C:\Users\%user%\.codeium\windsurf\database\*
+        FileMask: "embedding_database.sqlite-shm"
+        Recursive: false
+    -
+        Name: windsurf.embedding_database
+        Category: cache
+        Path: C:\Users\%user%\.codeium\windsurf\database\*
+        FileMask: "embedding_database.sqlite-wal"
+        Recursive: false
+    -
         Name: windsurf.global_rules
         Category: instructions
         Path: C:\Users\%user%\.codeium\windsurf-insiders\memories
@@ -158,8 +170,32 @@ Targets:
     -
         Name: windsurf.ide_global_state_vscdb
         Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User\globalStorage
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: windsurf.ide_global_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User\globalStorage
+        FileMask: "state.vscdb-wal"
+        Recursive: false
+    -
+        Name: windsurf.ide_global_state_vscdb
+        Category: config
         Path: C:\Users\%user%\AppData\Roaming\Windsurf - Next\User\globalStorage
         FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: windsurf.ide_global_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf - Next\User\globalStorage
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: windsurf.ide_global_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf - Next\User\globalStorage
+        FileMask: "state.vscdb-wal"
         Recursive: false
     -
         Name: windsurf.ide_global_state_vscdb
@@ -170,8 +206,32 @@ Targets:
     -
         Name: windsurf.ide_global_state_vscdb
         Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf Insiders\User\globalStorage
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: windsurf.ide_global_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf Insiders\User\globalStorage
+        FileMask: "state.vscdb-wal"
+        Recursive: false
+    -
+        Name: windsurf.ide_global_state_vscdb
+        Category: config
         Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage
         FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: windsurf.ide_global_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: windsurf.ide_global_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage
+        FileMask: "state.vscdb-wal"
         Recursive: false
     -
         Name: windsurf.ide_user_data
@@ -202,6 +262,18 @@ Targets:
         Category: config
         Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\workspaceStorage\*
         FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: windsurf.ide_workspace_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\workspaceStorage\*
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: windsurf.ide_workspace_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\workspaceStorage\*
+        FileMask: "state.vscdb-wal"
         Recursive: false
     -
         Name: windsurf.implicit_trajectories

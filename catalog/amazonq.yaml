@@ -81,16 +81,37 @@ artifacts:
   - linux
   paths:
   - $Q_CLI_DATA_DIR/data.sqlite3
+  - $Q_CLI_DATA_DIR/data.sqlite3-shm
+  - $Q_CLI_DATA_DIR/data.sqlite3-wal
   - $XDG_DATA_HOME/amazon-q/data.sqlite3
+  - $XDG_DATA_HOME/amazon-q/data.sqlite3-shm
+  - $XDG_DATA_HOME/amazon-q/data.sqlite3-wal
   - '%LOCALAPPDATA%\amazon-q\data.sqlite3'
+  - '%LOCALAPPDATA%\amazon-q\data.sqlite3-shm'
+  - '%LOCALAPPDATA%\amazon-q\data.sqlite3-wal'
   - ~/.local/share/amazon-q/data.sqlite3
+  - ~/.local/share/amazon-q/data.sqlite3-shm
+  - ~/.local/share/amazon-q/data.sqlite3-wal
   - ~/Library/Application Support/amazon-q/data.sqlite3
+  - ~/Library/Application Support/amazon-q/data.sqlite3-shm
+  - ~/Library/Application Support/amazon-q/data.sqlite3-wal
   format: sqlite
   sensitivity: normal
   collect_priority: first
   status: verified
   source: https://github.com/aws/amazon-q-developer-cli/blob/main/crates/chat-cli/src/util/paths.rs
   source_kind: source_code
+  unsourced_paths:
+  - $Q_CLI_DATA_DIR/data.sqlite3-shm
+  - $Q_CLI_DATA_DIR/data.sqlite3-wal
+  - $XDG_DATA_HOME/amazon-q/data.sqlite3-shm
+  - $XDG_DATA_HOME/amazon-q/data.sqlite3-wal
+  - '%LOCALAPPDATA%\amazon-q\data.sqlite3-shm'
+  - '%LOCALAPPDATA%\amazon-q\data.sqlite3-wal'
+  - ~/.local/share/amazon-q/data.sqlite3-shm
+  - ~/.local/share/amazon-q/data.sqlite3-wal
+  - ~/Library/Application Support/amazon-q/data.sqlite3-shm
+  - ~/Library/Application Support/amazon-q/data.sqlite3-wal
   contains_credentials:
   - auth_kv.codewhisperer:odic:device-registration
   - auth_kv.codewhisperer:odic:token

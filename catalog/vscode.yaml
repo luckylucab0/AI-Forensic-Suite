@@ -42,8 +42,14 @@ artifacts:
   - linux
   paths:
   - '%APPDATA%\Code\User\globalStorage\state.vscdb'
+  - '%APPDATA%\Code\User\globalStorage\state.vscdb-shm'
+  - '%APPDATA%\Code\User\globalStorage\state.vscdb-wal'
   - ~/.config/Code/User/globalStorage/state.vscdb
+  - ~/.config/Code/User/globalStorage/state.vscdb-shm
+  - ~/.config/Code/User/globalStorage/state.vscdb-wal
   - ~/Library/Application Support/Code/User/globalStorage/state.vscdb
+  - ~/Library/Application Support/Code/User/globalStorage/state.vscdb-shm
+  - ~/Library/Application Support/Code/User/globalStorage/state.vscdb-wal
   - ~/Library/Application Support/Code/User/globalStorage/state.vscdb.backup
   format: sqlite
   sensitivity: normal
@@ -52,6 +58,13 @@ artifacts:
   source: |-
     https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/storage/electron-main/storageMain.ts
   source_kind: source_code
+  unsourced_paths:
+  - '%APPDATA%\Code\User\globalStorage\state.vscdb-shm'
+  - '%APPDATA%\Code\User\globalStorage\state.vscdb-wal'
+  - ~/.config/Code/User/globalStorage/state.vscdb-shm
+  - ~/.config/Code/User/globalStorage/state.vscdb-wal
+  - ~/Library/Application Support/Code/User/globalStorage/state.vscdb-shm
+  - ~/Library/Application Support/Code/User/globalStorage/state.vscdb-wal
   contains_credentials:
   - SecretStorage ItemTable rows
   volatility: |-

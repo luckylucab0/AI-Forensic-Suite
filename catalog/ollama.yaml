@@ -307,6 +307,8 @@ artifacts:
   - '%LOCALAPPDATA%\Ollama\db.sqlite'
   - '%LOCALAPPDATA%\Ollama\db.sqlite-wal'
   - ~/.ollama/db.sqlite
+  - ~/.ollama/db.sqlite-shm
+  - ~/.ollama/db.sqlite-wal
   - ~/Library/Application Support/Ollama/db.sqlite
   - ~/Library/Application Support/Ollama/db.sqlite-shm
   - ~/Library/Application Support/Ollama/db.sqlite-wal
@@ -318,6 +320,8 @@ artifacts:
   source_kind: source_code
   unsourced_paths:
   - '%LOCALAPPDATA%\Ollama\db.sqlite-wal'
+  - ~/.ollama/db.sqlite-shm
+  - ~/.ollama/db.sqlite-wal
   - ~/Library/Application Support/Ollama/db.sqlite-shm
   - ~/Library/Application Support/Ollama/db.sqlite-wal
   volatility: |-

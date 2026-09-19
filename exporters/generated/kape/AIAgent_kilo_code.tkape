@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7b90a813f7ae
+# Catalogue digest: 8e99fe9d5a0a
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -27,6 +27,18 @@ Targets:
         Category: transcript
         Path: C:\Users\%user%\.local\share\kilo
         FileMask: "kilo.db"
+        Recursive: false
+    -
+        Name: kilo_code.cli_db
+        Category: transcript
+        Path: C:\Users\%user%\.local\share\kilo
+        FileMask: "kilo.db-shm"
+        Recursive: false
+    -
+        Name: kilo_code.cli_db
+        Category: transcript
+        Path: C:\Users\%user%\.local\share\kilo
+        FileMask: "kilo.db-wal"
         Recursive: false
     -
         Name: kilo_code.extension_id_legacy_tree

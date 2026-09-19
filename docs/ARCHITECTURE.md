@@ -129,10 +129,11 @@ it cannot be rewritten *quietly*.
     decompressed first, which is how one editor stores whole threads and why the Python
     floor is 3.14 (ADR 0024). The copy takes the `-wal` and `-shm` siblings with it, because
     a database in write-ahead-log mode keeps its newest transactions in the log and nowhere
-    else. Where the catalogue never asked for that log, the case records a gap: the store
-    opens, every table is there, and the conversation stops before its last messages with
-    SQLite reporting no error at all, which is the only failure in this pipeline that looks
-    exactly like success (ADR 0032).
+    else. Every catalogued database now claims those siblings, and where one does not the
+    case records a gap rather than staying quiet: such a store opens, every table is there,
+    and the conversation stops before its last messages with SQLite reporting no error at
+    all, which is the only failure in this pipeline that looks exactly like success
+    (ADR 0032).
   - **Line-delimited logs.** Every JSON Lines artifact no verified parser claims, record by
     record. That floor exists because the two producers of the unified format had drifted
     apart and the analyzer was the side reading less; a test fails now when the gap opens

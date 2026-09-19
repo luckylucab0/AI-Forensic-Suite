@@ -43,8 +43,14 @@ artifacts:
   paths:
   - ~/.continue/.utils/repo_map.txt
   - ~/.continue/index/autocompleteCache.sqlite
+  - ~/.continue/index/autocompleteCache.sqlite-shm
+  - ~/.continue/index/autocompleteCache.sqlite-wal
   - ~/.continue/index/docs.sqlite
+  - ~/.continue/index/docs.sqlite-shm
+  - ~/.continue/index/docs.sqlite-wal
   - ~/.continue/index/index.sqlite
+  - ~/.continue/index/index.sqlite-shm
+  - ~/.continue/index/index.sqlite-wal
   - ~/.continue/index/lancedb/
   format: sqlite
   sensitivity: normal
@@ -52,6 +58,13 @@ artifacts:
   status: verified
   source: https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts
   source_kind: source_code
+  unsourced_paths:
+  - ~/.continue/index/autocompleteCache.sqlite-shm
+  - ~/.continue/index/autocompleteCache.sqlite-wal
+  - ~/.continue/index/docs.sqlite-shm
+  - ~/.continue/index/docs.sqlite-wal
+  - ~/.continue/index/index.sqlite-shm
+  - ~/.continue/index/index.sqlite-wal
   volatility: Rebuildable caches; may be wiped by a reindex without affecting the agent's function.
   notes: |-
     index.sqlite enumerates every file and chunk Continue ingested - a list of source files the agent had visibility into, including files since deleted. autocompleteCache.sqlite can retain completion text (i.e. model output) that never appeared in any session transcript because it was inline autocomplete rather than chat. docs.sqlite and lancedb record which external documentation sites were ingested.

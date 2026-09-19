@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7b90a813f7ae
+# Catalogue digest: 8e99fe9d5a0a
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -59,8 +59,32 @@ Targets:
         FileMask: "db.sqlite"
         Recursive: false
     -
+        Name: zed.sidebar_threads
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\Zed\db\0-*
+        FileMask: "db.sqlite-shm"
+        Recursive: false
+    -
+        Name: zed.sidebar_threads
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\Zed\db\0-*
+        FileMask: "db.sqlite-wal"
+        Recursive: false
+    -
         Name: zed.threads_db
         Category: transcript
         Path: C:\Users\%user%\AppData\Local\Zed\threads
         FileMask: "threads.db"
+        Recursive: false
+    -
+        Name: zed.threads_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\Zed\threads
+        FileMask: "threads.db-shm"
+        Recursive: false
+    -
+        Name: zed.threads_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\Zed\threads
+        FileMask: "threads.db-wal"
         Recursive: false

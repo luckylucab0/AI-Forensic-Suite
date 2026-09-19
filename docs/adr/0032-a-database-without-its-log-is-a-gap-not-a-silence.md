@@ -29,7 +29,18 @@ to scroll past it.
 
 ## Decision
 
-The gap is reported only where the catalogue never asked for the log. `Catalogue`
+The sixty-two paths get their `-wal` and `-shm` siblings written into the catalogue, on the
+entry that already claims the database, listed as unsourced where the entry is verified,
+because the vendor's page states the database and says nothing about the files SQLite keeps
+beside it. That is one hundred and twenty-four paths, and it is the ordinary way this
+project changes what is collected: the catalogue is the single source of truth, so both
+collectors, all five collection-rule exporters, the generated documentation and the
+analyzer pick the change up from one place with no new code. A rollback journal is not
+derived, because the entries that already catalogued their siblings by hand catalogue these
+two and not that one.
+
+The check stays, for the entries somebody adds next. The gap is reported where the
+catalogue never asked for the log. `Catalogue`
 answers which entries those are, from SQLite's own naming rule rather than from anything a
 vendor has to state, and the ingest checks the header of files belonging to those entries
 alone.
@@ -39,9 +50,9 @@ what the collection carried and not about a record in a file. The reason it carr
 both readings, since the evidence cannot distinguish them, and says what to collect to
 settle it.
 
-A test holds the list of affected entries in both directions, so an entry that gains its
-sidecar paths and stays on the list fails, and a new database entering the catalogue
-without them fails too.
+A test asserts that no catalogued database is left without its log. It is the only thing
+standing between a new entry and a collection that reads a conversation short, so it holds
+the set at empty rather than at a list somebody has to maintain.
 
 ## Consequences
 
@@ -56,11 +67,12 @@ question only the endpoint could have answered, and by the time the case is buil
 gone. An examiner with access to the endpoint can settle it; one working from a bundle
 cannot.
 
-The twenty-three entries are also not fixed by this, only declared. Adding their sidecar
-paths to the catalogue is a separate change: a sidecar's name is certain, but a hundred and
-twenty paths that must be kept in step with their databases by hand is a maintenance
-decision, and it would also be defensible to teach the collectors and the five exporters
-one rule instead. That choice is open.
+The catalogue carries a hundred and twenty-four more paths that have to be kept in step
+with their databases by hand, which is the cost of not putting the rule in code. The test
+above is what makes that safe: a database whose siblings are missing fails before anybody
+collects with it. The alternative, deriving the paths while the catalogue loads, would have
+been one rule instead of a hundred and twenty-four lines, at the price of a catalogue file
+that no longer says what a collection takes.
 
 ## Alternatives considered
 
@@ -73,3 +85,11 @@ one rule instead. That choice is open.
   mapped, and filing it as either would corrupt the two counts a case is judged by.
 - **Refuse to read a database whose log is absent.** Throws away a store that is usually
   complete, to avoid a case where it might not be.
+- **Derive the siblings in the loader instead of writing them down.** One rule rather than a
+  hundred and twenty-four lines, and every consumer would get it for free. Rejected because
+  reading `catalog/zed.yaml` would then no longer tell you what a collection of Zed takes,
+  and that file is where this project sends anybody asking that question.
+- **Teach the two collectors the rule instead.** It would have to be taught to the five
+  exporters as well, since they render the catalogue rather than call the collector, so it
+  is more places to drift and not fewer, and it breaks the invariant that the catalogue is
+  the single source of truth.

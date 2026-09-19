@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7b90a813f7ae
+# Catalogue digest: 8e99fe9d5a0a
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -174,6 +174,8 @@ sources:
     amazonq,amazonq.cli_prompt_history,C:/Users/*/.aws/amazonq/.cli_bash_history
     amazonq,amazonq.cli_settings,C:/Users/*/AppData/Local/amazon-q/settings.json
     amazonq,amazonq.cli_state_database,C:/Users/*/AppData/Local/amazon-q/data.sqlite3
+    amazonq,amazonq.cli_state_database,C:/Users/*/AppData/Local/amazon-q/data.sqlite3-shm
+    amazonq,amazonq.cli_state_database,C:/Users/*/AppData/Local/amazon-q/data.sqlite3-wal
     amazonq,amazonq.cli_user_rules,C:/Users/*/.aws/amazonq/rules/*
     amazonq,amazonq.ide_chat_history,C:/Users/*/.aws/amazonq/history/*.json
     amazonq,amazonq.ide_chat_history,C:/Users/*/.aws/amazonq/history/chat-history-*.json
@@ -431,8 +433,14 @@ sources:
     cline,cline.rules_global,C:/Users/*/Cline/Rules/**
     cline,cline.secrets_json,C:/Users/*/.cline/data/secrets.json
     cline,cline.sqlite_dbs,C:/Users/*/.cline/data/db/connectors.db
+    cline,cline.sqlite_dbs,C:/Users/*/.cline/data/db/connectors.db-shm
+    cline,cline.sqlite_dbs,C:/Users/*/.cline/data/db/connectors.db-wal
     cline,cline.sqlite_dbs,C:/Users/*/.cline/data/db/cron.db
+    cline,cline.sqlite_dbs,C:/Users/*/.cline/data/db/cron.db-shm
+    cline,cline.sqlite_dbs,C:/Users/*/.cline/data/db/cron.db-wal
     cline,cline.sqlite_dbs,C:/Users/*/.cline/data/db/tasks.db
+    cline,cline.sqlite_dbs,C:/Users/*/.cline/data/db/tasks.db-shm
+    cline,cline.sqlite_dbs,C:/Users/*/.cline/data/db/tasks.db-wal
     cline,cline.team_data,C:/Users/*/.cline/data/teams/**
     cline,cline.vscode_task_transcripts,C:/Users/*/AppData/Roaming/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/tasks/*/api_conversation_history.json
     cline,cline.vscode_task_transcripts,C:/Users/*/AppData/Roaming/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/tasks/*/context_history.json
@@ -500,8 +508,14 @@ sources:
     continue,continue.diffs,C:/Users/*/.continue/.diffs/**
     continue,continue.index,C:/Users/*/.continue/.utils/repo_map.txt
     continue,continue.index,C:/Users/*/.continue/index/autocompleteCache.sqlite
+    continue,continue.index,C:/Users/*/.continue/index/autocompleteCache.sqlite-shm
+    continue,continue.index,C:/Users/*/.continue/index/autocompleteCache.sqlite-wal
     continue,continue.index,C:/Users/*/.continue/index/docs.sqlite
+    continue,continue.index,C:/Users/*/.continue/index/docs.sqlite-shm
+    continue,continue.index,C:/Users/*/.continue/index/docs.sqlite-wal
     continue,continue.index,C:/Users/*/.continue/index/index.sqlite
+    continue,continue.index,C:/Users/*/.continue/index/index.sqlite-shm
+    continue,continue.index,C:/Users/*/.continue/index/index.sqlite-wal
     continue,continue.index,C:/Users/*/.continue/index/lancedb/**
     continue,continue.sessions,C:/Users/*/.continue/sessions/*.json
     continue,continue.sessions,C:/Users/*/.continue/sessions/sessions.json
@@ -575,7 +589,11 @@ sources:
     cursor,cursor.agent_transcripts_jsonl,C:/Users/*/.cursor/projects/*/agent-transcripts/*/transcript.jsonl
     cursor,cursor.agent_transcripts_jsonl,C:/Users/*/.cursor/projects/*/agent-transcripts/...
     cursor,cursor.ai_code_tracking_db,C:/Users/*/.cursor/ai-tracking/*.db
+    cursor,cursor.ai_code_tracking_db,C:/Users/*/.cursor/ai-tracking/*.db-shm
+    cursor,cursor.ai_code_tracking_db,C:/Users/*/.cursor/ai-tracking/*.db-wal
     cursor,cursor.ai_code_tracking_db,C:/Users/*/.cursor/ai-tracking/ai-code-tracking.db
+    cursor,cursor.ai_code_tracking_db,C:/Users/*/.cursor/ai-tracking/ai-code-tracking.db-shm
+    cursor,cursor.ai_code_tracking_db,C:/Users/*/.cursor/ai-tracking/ai-code-tracking.db-wal
     cursor,cursor.auth_credentials,C:/Users/*/.cursor/auth.json
     cursor,cursor.auth_credentials,C:/Users/*/AppData/Roaming/Cursor/auth.json
     cursor,cursor.chat_session_meta_json,C:/Users/*/.cursor/chats/*/*/meta.json
@@ -585,11 +603,15 @@ sources:
     cursor,cursor.chat_store_db,C:/Users/*/.cursor/chats/*/*/store.db-wal
     cursor,cursor.commit_checkpoints,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/**
     cursor,cursor.conversation_search_db,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/conversation-search.db
+    cursor,cursor.conversation_search_db,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/conversation-search.db-shm
+    cursor,cursor.conversation_search_db,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/conversation-search.db-wal
     cursor,cursor.extensions,C:/Users/*/.cursor-server/extensions/**
     cursor,cursor.extensions,C:/Users/*/.cursor/extensions/**
     cursor,cursor.extensions,C:/Users/*/.cursor/extensions/extensions.json
     cursor,cursor.global_prompt_history,C:/Users/*/.cursor/prompt_history.json
     cursor,cursor.global_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/state.vscdb
+    cursor,cursor.global_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/state.vscdb-shm
+    cursor,cursor.global_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/state.vscdb-wal
     cursor,cursor.local_file_history,C:/Users/*/AppData/Roaming/Cursor/User/History/**
     cursor,cursor.logs,C:/Users/*/AppData/Roaming/Cursor/logs/**
     cursor,cursor.pasted_text,C:/Users/*/.cursor/chats/*/*/pasted_text.json
@@ -600,9 +622,13 @@ sources:
     cursor,cursor.project_metadata,C:/Users/*/.cursor/projects/*/repo.json
     cursor,cursor.subagent_output,C:/Users/*/.cursor/subagents/**
     cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb
+    cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-wal
     cursor,cursor.worktrees,C:/Users/*/.cursor/worktrees/*
     devin,devin.acp_events,C:/Users/*/AppData/Roaming/Devin/User/acp-events/**
     devin,devin.sessions_db,C:/Users/*/.local/share/devin/cli/sessions.db
+    devin,devin.sessions_db,C:/Users/*/.local/share/devin/cli/sessions.db-shm
+    devin,devin.sessions_db,C:/Users/*/.local/share/devin/cli/sessions.db-wal
     factory_droid,factory_droid.auth,C:/Users/*/.factory/**
     factory_droid,factory_droid.logs,C:/Users/*/.factory/bug-reports/**
     factory_droid,factory_droid.logs,C:/Users/*/.factory/logs/**
@@ -625,6 +651,8 @@ sources:
     goose,goose.secrets,C:/Users/*/AppData/Roaming/Block/goose/config/secrets.yaml
     goose,goose.server_logs,C:/Users/*/AppData/Roaming/Block/goose/data/logs/server/**
     goose,goose.sessions_db_windows,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db
+    goose,goose.sessions_db_windows,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db-shm
+    goose,goose.sessions_db_windows,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db-wal
     goose,goose.sessions_jsonl_legacy,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/*.jsonl
     hermes,hermes.auth,C:/Users/*/.hermes/auth.json
     hermes,hermes.config,C:/Users/*/.hermes/config.yaml
@@ -665,11 +693,15 @@ sources:
     junie,junie.trust_and_auth_key,C:/Users/*/.junie/trust/**
     junie,junie.trust_and_auth_key,C:/Users/*/.junie/trust/authentication-key
     kilo_code,kilo_code.cli_db,C:/Users/*/.local/share/kilo/kilo.db
+    kilo_code,kilo_code.cli_db,C:/Users/*/.local/share/kilo/kilo.db-shm
+    kilo_code,kilo_code.cli_db,C:/Users/*/.local/share/kilo/kilo.db-wal
     kilo_code,kilo_code.extension_id_legacy_tree,C:/Users/*/.vscode-server/data/User/globalStorage/kilocode.kilo-code/tasks/**
     kilo_code,kilo_code.extension_id_legacy_tree,C:/Users/*/AppData/Roaming/Code/User/globalStorage/kilocode.kilo-code/tasks/**
     kilo_code,kilo_code.settings,C:/Users/*/AppData/Roaming/Code/User/globalStorage/kilocode.kilo-code/settings/custom_modes.yaml
     kiro,kiro.cli_log,C:/Users/*/AppData/Local/Temp/kiro-log/logs/kiro-chat.log
     kiro,kiro.cli_session_database,C:/Users/*/.kiro/*.sqlite3
+    kiro,kiro.cli_session_database,C:/Users/*/.kiro/*.sqlite3-shm
+    kiro,kiro.cli_session_database,C:/Users/*/.kiro/*.sqlite3-wal
     kiro,kiro.cli_session_files,C:/Users/*/.kiro/sessions/cli/*.json
     kiro,kiro.cli_session_files,C:/Users/*/.kiro/sessions/cli/*.jsonl
     kiro,kiro.cli_session_files,C:/Users/*/.kiro/sessions/cli/*.lock
@@ -691,6 +723,8 @@ sources:
     lmstudio,lmstudio.models,C:/Users/*/.lmstudio/models/*/*/*
     lmstudio,lmstudio.presets,C:/Users/*/.lmstudio/config-presets/**
     ollama,ollama.app_chat_database,C:/Users/*/.ollama/db.sqlite
+    ollama,ollama.app_chat_database,C:/Users/*/.ollama/db.sqlite-shm
+    ollama,ollama.app_chat_database,C:/Users/*/.ollama/db.sqlite-wal
     ollama,ollama.app_chat_database,C:/Users/*/AppData/Local/Ollama/db.sqlite
     ollama,ollama.app_chat_database,C:/Users/*/AppData/Local/Ollama/db.sqlite-wal
     ollama,ollama.app_config,C:/Users/*/.ollama/config.json
@@ -713,6 +747,8 @@ sources:
     ollama,ollama.private_key,C:/Users/*/.ollama/id_ed25519.pub
     opencode,opencode.auth,C:/Users/*/AppData/Local/opencode/auth.json
     opencode,opencode.db,C:/Users/*/.local/share/opencode/opencode.db
+    opencode,opencode.db,C:/Users/*/.local/share/opencode/opencode.db-shm
+    opencode,opencode.db,C:/Users/*/.local/share/opencode/opencode.db-wal
     opencode,opencode.log,C:/Users/*/.local/share/opencode/log/**
     opencode,opencode.managed_config,C:/ProgramData/opencode
     pi,pi.auth,C:/Users/*/.pi/agent/auth.json
@@ -882,9 +918,13 @@ sources:
     vscode,vscode.extension_install_evidence,C:/Users/*/.vscode/extensions/rooveterinaryinc.roo-cline-*/**
     vscode,vscode.extension_install_evidence,C:/Users/*/.vscode/extensions/saoudrizwan.claude-dev-*/**
     vscode,vscode.state_vscdb,C:/Users/*/AppData/Roaming/Code/User/globalStorage/state.vscdb
+    vscode,vscode.state_vscdb,C:/Users/*/AppData/Roaming/Code/User/globalStorage/state.vscdb-shm
+    vscode,vscode.state_vscdb,C:/Users/*/AppData/Roaming/Code/User/globalStorage/state.vscdb-wal
     vscode,vscode.user_data_roots,C:/Users/*/.vscode-server/data/User/globalStorage/**
     vscode,vscode.user_data_roots,C:/Users/*/AppData/Roaming/Code/User/globalStorage/**
     warp,warp.sqlite,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite
+    warp,warp.sqlite,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite-shm
+    warp,warp.sqlite,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite-wal
     windsurf,windsurf.acp_registry,C:/Users/*/.windsurf-next/acp/registry.json
     windsurf,windsurf.acp_registry,C:/Users/*/.windsurf/acp/registry.json
     windsurf,windsurf.auth_credentials,C:/Users/*/.codeium/config.json
@@ -902,18 +942,30 @@ sources:
     windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/windsurf/user_settings.pb
     windsurf,windsurf.embedding_database,C:/Users/*/.codeium/windsurf/database/*/**
     windsurf,windsurf.embedding_database,C:/Users/*/.codeium/windsurf/database/*/embedding_database.sqlite
+    windsurf,windsurf.embedding_database,C:/Users/*/.codeium/windsurf/database/*/embedding_database.sqlite-shm
+    windsurf,windsurf.embedding_database,C:/Users/*/.codeium/windsurf/database/*/embedding_database.sqlite-wal
     windsurf,windsurf.global_rules,C:/Users/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,windsurf.global_rules,C:/Users/*/.codeium/windsurf-next/memories/global_rules.md
     windsurf,windsurf.global_rules,C:/Users/*/.codeium/windsurf/memories/global_rules.md
     windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Devin/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Devin/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Devin/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf - Next/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf - Next/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf - Next/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf Insiders/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf Insiders/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf Insiders/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Devin/User/settings.json
     windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Windsurf/User/keybindings.json
     windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Windsurf/User/settings.json
     windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Windsurf/argv.json
     windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-wal
     windsurf,windsurf.implicit_trajectories,C:/Users/*/.codeium/windsurf/implicit/*.pb
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/.codeium/*/language_server_linux_x64
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/.codeium/*/language_server_macos_arm
@@ -933,7 +985,11 @@ sources:
     zed,zed.extensions,C:/Users/*/AppData/Local/Zed/prompt_overrides/**
     zed,zed.logs,C:/Users/*/AppData/Local/Zed/logs/**
     zed,zed.sidebar_threads,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite
+    zed,zed.sidebar_threads,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite-shm
+    zed,zed.sidebar_threads,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite-wal
     zed,zed.threads_db,C:/Users/*/AppData/Local/Zed/threads/threads.db
+    zed,zed.threads_db,C:/Users/*/AppData/Local/Zed/threads/threads.db-shm
+    zed,zed.threads_db,C:/Users/*/AppData/Local/Zed/threads/threads.db-wal
     ''')
     LET hits = SELECT * FROM foreach(row=targets, query={
         SELECT Agent, ArtifactId, OSPath, Size, Mode.String AS Mode,
@@ -964,9 +1020,17 @@ sources:
     amazonq,amazonq.cli_settings,/var/root/.local/share/amazon-q/settings.json
     amazonq,amazonq.cli_settings,/var/root/Library/Application Support/amazon-q/settings.json
     amazonq,amazonq.cli_state_database,/Users/*/.local/share/amazon-q/data.sqlite3
+    amazonq,amazonq.cli_state_database,/Users/*/.local/share/amazon-q/data.sqlite3-shm
+    amazonq,amazonq.cli_state_database,/Users/*/.local/share/amazon-q/data.sqlite3-wal
     amazonq,amazonq.cli_state_database,/Users/*/Library/Application Support/amazon-q/data.sqlite3
+    amazonq,amazonq.cli_state_database,/Users/*/Library/Application Support/amazon-q/data.sqlite3-shm
+    amazonq,amazonq.cli_state_database,/Users/*/Library/Application Support/amazon-q/data.sqlite3-wal
     amazonq,amazonq.cli_state_database,/var/root/.local/share/amazon-q/data.sqlite3
+    amazonq,amazonq.cli_state_database,/var/root/.local/share/amazon-q/data.sqlite3-shm
+    amazonq,amazonq.cli_state_database,/var/root/.local/share/amazon-q/data.sqlite3-wal
     amazonq,amazonq.cli_state_database,/var/root/Library/Application Support/amazon-q/data.sqlite3
+    amazonq,amazonq.cli_state_database,/var/root/Library/Application Support/amazon-q/data.sqlite3-shm
+    amazonq,amazonq.cli_state_database,/var/root/Library/Application Support/amazon-q/data.sqlite3-wal
     amazonq,amazonq.cli_user_rules,/Users/*/.aws/amazonq/rules/*
     amazonq,amazonq.cli_user_rules,/var/root/.aws/amazonq/rules/*
     amazonq,amazonq.ide_chat_history,/Users/*/.aws/amazonq/history/*.json
@@ -1595,11 +1659,23 @@ sources:
     cline,cline.secrets_json,/Users/*/.cline/data/secrets.json
     cline,cline.secrets_json,/var/root/.cline/data/secrets.json
     cline,cline.sqlite_dbs,/Users/*/.cline/data/db/connectors.db
+    cline,cline.sqlite_dbs,/Users/*/.cline/data/db/connectors.db-shm
+    cline,cline.sqlite_dbs,/Users/*/.cline/data/db/connectors.db-wal
     cline,cline.sqlite_dbs,/Users/*/.cline/data/db/cron.db
+    cline,cline.sqlite_dbs,/Users/*/.cline/data/db/cron.db-shm
+    cline,cline.sqlite_dbs,/Users/*/.cline/data/db/cron.db-wal
     cline,cline.sqlite_dbs,/Users/*/.cline/data/db/tasks.db
+    cline,cline.sqlite_dbs,/Users/*/.cline/data/db/tasks.db-shm
+    cline,cline.sqlite_dbs,/Users/*/.cline/data/db/tasks.db-wal
     cline,cline.sqlite_dbs,/var/root/.cline/data/db/connectors.db
+    cline,cline.sqlite_dbs,/var/root/.cline/data/db/connectors.db-shm
+    cline,cline.sqlite_dbs,/var/root/.cline/data/db/connectors.db-wal
     cline,cline.sqlite_dbs,/var/root/.cline/data/db/cron.db
+    cline,cline.sqlite_dbs,/var/root/.cline/data/db/cron.db-shm
+    cline,cline.sqlite_dbs,/var/root/.cline/data/db/cron.db-wal
     cline,cline.sqlite_dbs,/var/root/.cline/data/db/tasks.db
+    cline,cline.sqlite_dbs,/var/root/.cline/data/db/tasks.db-shm
+    cline,cline.sqlite_dbs,/var/root/.cline/data/db/tasks.db-wal
     cline,cline.team_data,/Users/*/.cline/data/teams/**
     cline,cline.team_data,/var/root/.cline/data/teams/**
     cline,cline.vscode_task_transcripts,/Users/*/Library/Application Support/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/tasks/*/api_conversation_history.json
@@ -1732,13 +1808,25 @@ sources:
     continue,continue.diffs,/var/root/.continue/.diffs/**
     continue,continue.index,/Users/*/.continue/.utils/repo_map.txt
     continue,continue.index,/Users/*/.continue/index/autocompleteCache.sqlite
+    continue,continue.index,/Users/*/.continue/index/autocompleteCache.sqlite-shm
+    continue,continue.index,/Users/*/.continue/index/autocompleteCache.sqlite-wal
     continue,continue.index,/Users/*/.continue/index/docs.sqlite
+    continue,continue.index,/Users/*/.continue/index/docs.sqlite-shm
+    continue,continue.index,/Users/*/.continue/index/docs.sqlite-wal
     continue,continue.index,/Users/*/.continue/index/index.sqlite
+    continue,continue.index,/Users/*/.continue/index/index.sqlite-shm
+    continue,continue.index,/Users/*/.continue/index/index.sqlite-wal
     continue,continue.index,/Users/*/.continue/index/lancedb/**
     continue,continue.index,/var/root/.continue/.utils/repo_map.txt
     continue,continue.index,/var/root/.continue/index/autocompleteCache.sqlite
+    continue,continue.index,/var/root/.continue/index/autocompleteCache.sqlite-shm
+    continue,continue.index,/var/root/.continue/index/autocompleteCache.sqlite-wal
     continue,continue.index,/var/root/.continue/index/docs.sqlite
+    continue,continue.index,/var/root/.continue/index/docs.sqlite-shm
+    continue,continue.index,/var/root/.continue/index/docs.sqlite-wal
     continue,continue.index,/var/root/.continue/index/index.sqlite
+    continue,continue.index,/var/root/.continue/index/index.sqlite-shm
+    continue,continue.index,/var/root/.continue/index/index.sqlite-wal
     continue,continue.index,/var/root/.continue/index/lancedb/**
     continue,continue.sessions,/Users/*/.continue/sessions/*.json
     continue,continue.sessions,/Users/*/.continue/sessions/sessions.json
@@ -1883,9 +1971,17 @@ sources:
     cursor,cursor.agent_transcripts_jsonl,/var/root/.cursor/projects/*/agent-transcripts/*/*.jsonl
     cursor,cursor.agent_transcripts_jsonl,/var/root/.cursor/projects/*/agent-transcripts/*/transcript.jsonl
     cursor,cursor.ai_code_tracking_db,/Users/*/.cursor/ai-tracking/*.db
+    cursor,cursor.ai_code_tracking_db,/Users/*/.cursor/ai-tracking/*.db-shm
+    cursor,cursor.ai_code_tracking_db,/Users/*/.cursor/ai-tracking/*.db-wal
     cursor,cursor.ai_code_tracking_db,/Users/*/.cursor/ai-tracking/ai-code-tracking.db
+    cursor,cursor.ai_code_tracking_db,/Users/*/.cursor/ai-tracking/ai-code-tracking.db-shm
+    cursor,cursor.ai_code_tracking_db,/Users/*/.cursor/ai-tracking/ai-code-tracking.db-wal
     cursor,cursor.ai_code_tracking_db,/var/root/.cursor/ai-tracking/*.db
+    cursor,cursor.ai_code_tracking_db,/var/root/.cursor/ai-tracking/*.db-shm
+    cursor,cursor.ai_code_tracking_db,/var/root/.cursor/ai-tracking/*.db-wal
     cursor,cursor.ai_code_tracking_db,/var/root/.cursor/ai-tracking/ai-code-tracking.db
+    cursor,cursor.ai_code_tracking_db,/var/root/.cursor/ai-tracking/ai-code-tracking.db-shm
+    cursor,cursor.ai_code_tracking_db,/var/root/.cursor/ai-tracking/ai-code-tracking.db-wal
     cursor,cursor.auth_credentials,/Users/*/.config/cursor/auth.json
     cursor,cursor.auth_credentials,/Users/*/.cursor/auth.json
     cursor,cursor.auth_credentials,/var/root/.config/cursor/auth.json
@@ -1909,9 +2005,17 @@ sources:
     cursor,cursor.commit_checkpoints,/var/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/files/*
     cursor,cursor.commit_checkpoints,/var/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/metadata.json
     cursor,cursor.conversation_search_db,/Users/*/.config/Cursor/User/globalStorage/conversation-search.db
+    cursor,cursor.conversation_search_db,/Users/*/.config/Cursor/User/globalStorage/conversation-search.db-shm
+    cursor,cursor.conversation_search_db,/Users/*/.config/Cursor/User/globalStorage/conversation-search.db-wal
     cursor,cursor.conversation_search_db,/Users/*/Library/Application Support/Cursor/User/globalStorage/conversation-search.db
+    cursor,cursor.conversation_search_db,/Users/*/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-shm
+    cursor,cursor.conversation_search_db,/Users/*/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-wal
     cursor,cursor.conversation_search_db,/var/root/.config/Cursor/User/globalStorage/conversation-search.db
+    cursor,cursor.conversation_search_db,/var/root/.config/Cursor/User/globalStorage/conversation-search.db-shm
+    cursor,cursor.conversation_search_db,/var/root/.config/Cursor/User/globalStorage/conversation-search.db-wal
     cursor,cursor.conversation_search_db,/var/root/Library/Application Support/Cursor/User/globalStorage/conversation-search.db
+    cursor,cursor.conversation_search_db,/var/root/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-shm
+    cursor,cursor.conversation_search_db,/var/root/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-wal
     cursor,cursor.extensions,/Users/*/.cursor-server/extensions/**
     cursor,cursor.extensions,/Users/*/.cursor/extensions/**
     cursor,cursor.extensions,/Users/*/.cursor/extensions/extensions.json
@@ -1923,11 +2027,15 @@ sources:
     cursor,cursor.global_prompt_history,/Users/*/.cursor/prompt_history.json
     cursor,cursor.global_prompt_history,/var/root/.cursor/prompt_history.json
     cursor,cursor.global_state_vscdb,/Users/*/.config/Cursor/User/globalStorage/state.vscdb
+    cursor,cursor.global_state_vscdb,/Users/*/.config/Cursor/User/globalStorage/state.vscdb-shm
+    cursor,cursor.global_state_vscdb,/Users/*/.config/Cursor/User/globalStorage/state.vscdb-wal
     cursor,cursor.global_state_vscdb,/Users/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb
     cursor,cursor.global_state_vscdb,/Users/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb-shm
     cursor,cursor.global_state_vscdb,/Users/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb-wal
     cursor,cursor.global_state_vscdb,/Users/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb.backup
     cursor,cursor.global_state_vscdb,/var/root/.config/Cursor/User/globalStorage/state.vscdb
+    cursor,cursor.global_state_vscdb,/var/root/.config/Cursor/User/globalStorage/state.vscdb-shm
+    cursor,cursor.global_state_vscdb,/var/root/.config/Cursor/User/globalStorage/state.vscdb-wal
     cursor,cursor.global_state_vscdb,/var/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb
     cursor,cursor.global_state_vscdb,/var/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb-shm
     cursor,cursor.global_state_vscdb,/var/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb-wal
@@ -1967,10 +2075,18 @@ sources:
     cursor,cursor.subagent_output,/Users/*/.cursor/subagents/**
     cursor,cursor.subagent_output,/var/root/.cursor/subagents/**
     cursor,cursor.workspace_state_vscdb,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
+    cursor,cursor.workspace_state_vscdb,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    cursor,cursor.workspace_state_vscdb,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
     cursor,cursor.workspace_state_vscdb,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
+    cursor,cursor.workspace_state_vscdb,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    cursor,cursor.workspace_state_vscdb,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
     cursor,cursor.workspace_state_vscdb,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
     cursor,cursor.workspace_state_vscdb,/var/root/.config/Cursor/User/workspaceStorage/*/state.vscdb
+    cursor,cursor.workspace_state_vscdb,/var/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    cursor,cursor.workspace_state_vscdb,/var/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
     cursor,cursor.workspace_state_vscdb,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
+    cursor,cursor.workspace_state_vscdb,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    cursor,cursor.workspace_state_vscdb,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
     cursor,cursor.workspace_state_vscdb,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
     cursor,cursor.worktrees,/Users/*/.cursor/worktrees/*
     cursor,cursor.worktrees,/var/root/.cursor/worktrees/*
@@ -1981,12 +2097,20 @@ sources:
     devin,devin.acp_events,/var/root/.config/Devin/logs/*/window*/exthost/output_logging_*/1-Devin Desktop.log
     devin,devin.acp_events,/var/root/Library/Application Support/Devin/User/acp-events/**
     devin,devin.sessions_db,/Users/*/.local/share/devin/cli/sessions.db
+    devin,devin.sessions_db,/Users/*/.local/share/devin/cli/sessions.db-shm
+    devin,devin.sessions_db,/Users/*/.local/share/devin/cli/sessions.db-wal
     devin,devin.sessions_db,/Users/*/.local/share/devin/cli/transcripts/*.json
     devin,devin.sessions_db,/Users/*/Library/Application Support/devin/cli/sessions.db
+    devin,devin.sessions_db,/Users/*/Library/Application Support/devin/cli/sessions.db-shm
+    devin,devin.sessions_db,/Users/*/Library/Application Support/devin/cli/sessions.db-wal
     devin,devin.sessions_db,/Users/*/Library/Application Support/devin/cli/transcripts/*.json
     devin,devin.sessions_db,/var/root/.local/share/devin/cli/sessions.db
+    devin,devin.sessions_db,/var/root/.local/share/devin/cli/sessions.db-shm
+    devin,devin.sessions_db,/var/root/.local/share/devin/cli/sessions.db-wal
     devin,devin.sessions_db,/var/root/.local/share/devin/cli/transcripts/*.json
     devin,devin.sessions_db,/var/root/Library/Application Support/devin/cli/sessions.db
+    devin,devin.sessions_db,/var/root/Library/Application Support/devin/cli/sessions.db-shm
+    devin,devin.sessions_db,/var/root/Library/Application Support/devin/cli/sessions.db-wal
     devin,devin.sessions_db,/var/root/Library/Application Support/devin/cli/transcripts/*.json
     factory_droid,factory_droid.auth,/Users/*/.factory/**
     factory_droid,factory_droid.auth,/var/root/.factory/**
@@ -2038,10 +2162,14 @@ sources:
     goose,goose.sessions_db,/Users/*/.local/share/goose/sessions/sessions.db-shm
     goose,goose.sessions_db,/Users/*/.local/share/goose/sessions/sessions.db-wal
     goose,goose.sessions_db,/Users/*/Library/Application Support/Block/goose/data/sessions/sessions.db
+    goose,goose.sessions_db,/Users/*/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
+    goose,goose.sessions_db,/Users/*/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
     goose,goose.sessions_db,/var/root/.local/share/goose/sessions/sessions.db
     goose,goose.sessions_db,/var/root/.local/share/goose/sessions/sessions.db-shm
     goose,goose.sessions_db,/var/root/.local/share/goose/sessions/sessions.db-wal
     goose,goose.sessions_db,/var/root/Library/Application Support/Block/goose/data/sessions/sessions.db
+    goose,goose.sessions_db,/var/root/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
+    goose,goose.sessions_db,/var/root/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
     goose,goose.sessions_jsonl_legacy,/Users/*/.local/share/goose/sessions/*.jsonl
     goose,goose.sessions_jsonl_legacy,/var/root/.local/share/goose/sessions/*.jsonl
     hermes,hermes.auth,/Users/*/.hermes/auth.json
@@ -2188,7 +2316,11 @@ sources:
     kiro,kiro.cli_install,/var/root/.local/bin/q
     kiro,kiro.cli_log,/tmp/kiro-log/*.log
     kiro,kiro.cli_session_database,/Users/*/.kiro/*.sqlite3
+    kiro,kiro.cli_session_database,/Users/*/.kiro/*.sqlite3-shm
+    kiro,kiro.cli_session_database,/Users/*/.kiro/*.sqlite3-wal
     kiro,kiro.cli_session_database,/var/root/.kiro/*.sqlite3
+    kiro,kiro.cli_session_database,/var/root/.kiro/*.sqlite3-shm
+    kiro,kiro.cli_session_database,/var/root/.kiro/*.sqlite3-wal
     kiro,kiro.cli_session_files,/Users/*/.kiro/sessions/cli/*.json
     kiro,kiro.cli_session_files,/Users/*/.kiro/sessions/cli/*.jsonl
     kiro,kiro.cli_session_files,/Users/*/.kiro/sessions/cli/*.lock
@@ -2246,10 +2378,14 @@ sources:
     lmstudio,lmstudio.presets,/Users/*/.lmstudio/config-presets/**
     lmstudio,lmstudio.presets,/var/root/.lmstudio/config-presets/**
     ollama,ollama.app_chat_database,/Users/*/.ollama/db.sqlite
+    ollama,ollama.app_chat_database,/Users/*/.ollama/db.sqlite-shm
+    ollama,ollama.app_chat_database,/Users/*/.ollama/db.sqlite-wal
     ollama,ollama.app_chat_database,/Users/*/Library/Application Support/Ollama/db.sqlite
     ollama,ollama.app_chat_database,/Users/*/Library/Application Support/Ollama/db.sqlite-shm
     ollama,ollama.app_chat_database,/Users/*/Library/Application Support/Ollama/db.sqlite-wal
     ollama,ollama.app_chat_database,/var/root/.ollama/db.sqlite
+    ollama,ollama.app_chat_database,/var/root/.ollama/db.sqlite-shm
+    ollama,ollama.app_chat_database,/var/root/.ollama/db.sqlite-wal
     ollama,ollama.app_chat_database,/var/root/Library/Application Support/Ollama/db.sqlite
     ollama,ollama.app_chat_database,/var/root/Library/Application Support/Ollama/db.sqlite-shm
     ollama,ollama.app_chat_database,/var/root/Library/Application Support/Ollama/db.sqlite-wal
@@ -2298,10 +2434,14 @@ sources:
     opencode,opencode.auth,/Users/*/.local/share/opencode/auth.json
     opencode,opencode.auth,/var/root/.local/share/opencode/auth.json
     opencode,opencode.db,/Users/*/.local/share/opencode/opencode-*.db
+    opencode,opencode.db,/Users/*/.local/share/opencode/opencode-*.db-shm
+    opencode,opencode.db,/Users/*/.local/share/opencode/opencode-*.db-wal
     opencode,opencode.db,/Users/*/.local/share/opencode/opencode.db
     opencode,opencode.db,/Users/*/.local/share/opencode/opencode.db-shm
     opencode,opencode.db,/Users/*/.local/share/opencode/opencode.db-wal
     opencode,opencode.db,/var/root/.local/share/opencode/opencode-*.db
+    opencode,opencode.db,/var/root/.local/share/opencode/opencode-*.db-shm
+    opencode,opencode.db,/var/root/.local/share/opencode/opencode-*.db-wal
     opencode,opencode.db,/var/root/.local/share/opencode/opencode.db
     opencode,opencode.db,/var/root/.local/share/opencode/opencode.db-shm
     opencode,opencode.db,/var/root/.local/share/opencode/opencode.db-wal
@@ -2654,10 +2794,18 @@ sources:
     vscode,vscode.extension_install_evidence,/var/root/.vscode/extensions/rooveterinaryinc.roo-cline-*/**
     vscode,vscode.extension_install_evidence,/var/root/.vscode/extensions/saoudrizwan.claude-dev-*/**
     vscode,vscode.state_vscdb,/Users/*/.config/Code/User/globalStorage/state.vscdb
+    vscode,vscode.state_vscdb,/Users/*/.config/Code/User/globalStorage/state.vscdb-shm
+    vscode,vscode.state_vscdb,/Users/*/.config/Code/User/globalStorage/state.vscdb-wal
     vscode,vscode.state_vscdb,/Users/*/Library/Application Support/Code/User/globalStorage/state.vscdb
+    vscode,vscode.state_vscdb,/Users/*/Library/Application Support/Code/User/globalStorage/state.vscdb-shm
+    vscode,vscode.state_vscdb,/Users/*/Library/Application Support/Code/User/globalStorage/state.vscdb-wal
     vscode,vscode.state_vscdb,/Users/*/Library/Application Support/Code/User/globalStorage/state.vscdb.backup
     vscode,vscode.state_vscdb,/var/root/.config/Code/User/globalStorage/state.vscdb
+    vscode,vscode.state_vscdb,/var/root/.config/Code/User/globalStorage/state.vscdb-shm
+    vscode,vscode.state_vscdb,/var/root/.config/Code/User/globalStorage/state.vscdb-wal
     vscode,vscode.state_vscdb,/var/root/Library/Application Support/Code/User/globalStorage/state.vscdb
+    vscode,vscode.state_vscdb,/var/root/Library/Application Support/Code/User/globalStorage/state.vscdb-shm
+    vscode,vscode.state_vscdb,/var/root/Library/Application Support/Code/User/globalStorage/state.vscdb-wal
     vscode,vscode.state_vscdb,/var/root/Library/Application Support/Code/User/globalStorage/state.vscdb.backup
     vscode,vscode.user_data_roots,/Users/*/.config/Code/User/globalStorage/**
     vscode,vscode.user_data_roots,/Users/*/.config/VSCodium/User/globalStorage/**
@@ -2711,8 +2859,12 @@ sources:
     windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/windsurf/user_settings.pb
     windsurf,windsurf.embedding_database,/Users/*/.codeium/windsurf/database/*/**
     windsurf,windsurf.embedding_database,/Users/*/.codeium/windsurf/database/*/embedding_database.sqlite
+    windsurf,windsurf.embedding_database,/Users/*/.codeium/windsurf/database/*/embedding_database.sqlite-shm
+    windsurf,windsurf.embedding_database,/Users/*/.codeium/windsurf/database/*/embedding_database.sqlite-wal
     windsurf,windsurf.embedding_database,/var/root/.codeium/windsurf/database/*/**
     windsurf,windsurf.embedding_database,/var/root/.codeium/windsurf/database/*/embedding_database.sqlite
+    windsurf,windsurf.embedding_database,/var/root/.codeium/windsurf/database/*/embedding_database.sqlite-shm
+    windsurf,windsurf.embedding_database,/var/root/.codeium/windsurf/database/*/embedding_database.sqlite-wal
     windsurf,windsurf.global_rules,/Users/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,windsurf.global_rules,/Users/*/.codeium/windsurf-next/memories/global_rules.md
     windsurf,windsurf.global_rules,/Users/*/.codeium/windsurf/memories/global_rules.md
@@ -2720,17 +2872,37 @@ sources:
     windsurf,windsurf.global_rules,/var/root/.codeium/windsurf-next/memories/global_rules.md
     windsurf,windsurf.global_rules,/var/root/.codeium/windsurf/memories/global_rules.md
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/.config/Devin/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/Users/*/.config/Devin/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/Users/*/.config/Devin/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/.config/Windsurf/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/Users/*/.config/Windsurf/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/Users/*/.config/Windsurf/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Devin/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Devin/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Devin/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/globalStorage/storage.json
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Windsurf/machineId
     windsurf,windsurf.ide_global_state_vscdb,/var/root/.config/Devin/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/var/root/.config/Devin/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/var/root/.config/Devin/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/var/root/.config/Windsurf/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/var/root/.config/Windsurf/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/var/root/.config/Windsurf/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Devin/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Devin/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Devin/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Windsurf/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Windsurf/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Windsurf/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Windsurf/User/globalStorage/storage.json
     windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Windsurf/machineId
     windsurf,windsurf.ide_user_data,/Users/*/.config/Windsurf/User/settings.json
@@ -2749,10 +2921,18 @@ sources:
     windsurf,windsurf.ide_user_data,/var/root/Library/Application Support/Windsurf/argv.json
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/settings.json
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/settings.json
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
     windsurf,windsurf.implicit_trajectories,/Users/*/.codeium/windsurf/implicit/*.pb
     windsurf,windsurf.implicit_trajectories,/var/root/.codeium/windsurf/implicit/*.pb
     windsurf,windsurf.language_server_binaries_and_logs,/Applications/Devin.app
@@ -2800,11 +2980,23 @@ sources:
     zed,zed.logs,/Users/*/Library/Logs/Zed/**
     zed,zed.logs,/var/root/Library/Logs/Zed/**
     zed,zed.sidebar_threads,/Users/*/Library/Application Support/Zed/db/0-stable/db.sqlite
+    zed,zed.sidebar_threads,/Users/*/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
+    zed,zed.sidebar_threads,/Users/*/Library/Application Support/Zed/db/0-stable/db.sqlite-wal
     zed,zed.sidebar_threads,/var/root/Library/Application Support/Zed/db/0-stable/db.sqlite
+    zed,zed.sidebar_threads,/var/root/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
+    zed,zed.sidebar_threads,/var/root/Library/Application Support/Zed/db/0-stable/db.sqlite-wal
     zed,zed.threads_db,/Users/*/.local/share/zed/threads/threads.db
+    zed,zed.threads_db,/Users/*/.local/share/zed/threads/threads.db-shm
+    zed,zed.threads_db,/Users/*/.local/share/zed/threads/threads.db-wal
     zed,zed.threads_db,/Users/*/Library/Application Support/Zed/threads/threads.db
+    zed,zed.threads_db,/Users/*/Library/Application Support/Zed/threads/threads.db-shm
+    zed,zed.threads_db,/Users/*/Library/Application Support/Zed/threads/threads.db-wal
     zed,zed.threads_db,/var/root/.local/share/zed/threads/threads.db
+    zed,zed.threads_db,/var/root/.local/share/zed/threads/threads.db-shm
+    zed,zed.threads_db,/var/root/.local/share/zed/threads/threads.db-wal
     zed,zed.threads_db,/var/root/Library/Application Support/Zed/threads/threads.db
+    zed,zed.threads_db,/var/root/Library/Application Support/Zed/threads/threads.db-shm
+    zed,zed.threads_db,/var/root/Library/Application Support/Zed/threads/threads.db-wal
     ''')
     LET hits = SELECT * FROM foreach(row=targets, query={
         SELECT Agent, ArtifactId, OSPath, Size, Mode.String AS Mode,
@@ -2835,9 +3027,17 @@ sources:
     amazonq,amazonq.cli_settings,/root/.local/share/amazon-q/settings.json
     amazonq,amazonq.cli_settings,/root/Library/Application Support/amazon-q/settings.json
     amazonq,amazonq.cli_state_database,/home/*/.local/share/amazon-q/data.sqlite3
+    amazonq,amazonq.cli_state_database,/home/*/.local/share/amazon-q/data.sqlite3-shm
+    amazonq,amazonq.cli_state_database,/home/*/.local/share/amazon-q/data.sqlite3-wal
     amazonq,amazonq.cli_state_database,/home/*/Library/Application Support/amazon-q/data.sqlite3
+    amazonq,amazonq.cli_state_database,/home/*/Library/Application Support/amazon-q/data.sqlite3-shm
+    amazonq,amazonq.cli_state_database,/home/*/Library/Application Support/amazon-q/data.sqlite3-wal
     amazonq,amazonq.cli_state_database,/root/.local/share/amazon-q/data.sqlite3
+    amazonq,amazonq.cli_state_database,/root/.local/share/amazon-q/data.sqlite3-shm
+    amazonq,amazonq.cli_state_database,/root/.local/share/amazon-q/data.sqlite3-wal
     amazonq,amazonq.cli_state_database,/root/Library/Application Support/amazon-q/data.sqlite3
+    amazonq,amazonq.cli_state_database,/root/Library/Application Support/amazon-q/data.sqlite3-shm
+    amazonq,amazonq.cli_state_database,/root/Library/Application Support/amazon-q/data.sqlite3-wal
     amazonq,amazonq.cli_user_rules,/home/*/.aws/amazonq/rules/*
     amazonq,amazonq.cli_user_rules,/root/.aws/amazonq/rules/*
     amazonq,amazonq.ide_chat_history,/home/*/.aws/amazonq/history/*.json
@@ -3386,11 +3586,23 @@ sources:
     cline,cline.secrets_json,/home/*/.cline/data/secrets.json
     cline,cline.secrets_json,/root/.cline/data/secrets.json
     cline,cline.sqlite_dbs,/home/*/.cline/data/db/connectors.db
+    cline,cline.sqlite_dbs,/home/*/.cline/data/db/connectors.db-shm
+    cline,cline.sqlite_dbs,/home/*/.cline/data/db/connectors.db-wal
     cline,cline.sqlite_dbs,/home/*/.cline/data/db/cron.db
+    cline,cline.sqlite_dbs,/home/*/.cline/data/db/cron.db-shm
+    cline,cline.sqlite_dbs,/home/*/.cline/data/db/cron.db-wal
     cline,cline.sqlite_dbs,/home/*/.cline/data/db/tasks.db
+    cline,cline.sqlite_dbs,/home/*/.cline/data/db/tasks.db-shm
+    cline,cline.sqlite_dbs,/home/*/.cline/data/db/tasks.db-wal
     cline,cline.sqlite_dbs,/root/.cline/data/db/connectors.db
+    cline,cline.sqlite_dbs,/root/.cline/data/db/connectors.db-shm
+    cline,cline.sqlite_dbs,/root/.cline/data/db/connectors.db-wal
     cline,cline.sqlite_dbs,/root/.cline/data/db/cron.db
+    cline,cline.sqlite_dbs,/root/.cline/data/db/cron.db-shm
+    cline,cline.sqlite_dbs,/root/.cline/data/db/cron.db-wal
     cline,cline.sqlite_dbs,/root/.cline/data/db/tasks.db
+    cline,cline.sqlite_dbs,/root/.cline/data/db/tasks.db-shm
+    cline,cline.sqlite_dbs,/root/.cline/data/db/tasks.db-wal
     cline,cline.team_data,/home/*/.cline/data/teams/**
     cline,cline.team_data,/root/.cline/data/teams/**
     cline,cline.vscode_task_transcripts,/home/*/.config/Code - Insiders/User/globalStorage/saoudrizwan.claude-dev/tasks/*/api_conversation_history.json
@@ -3525,13 +3737,25 @@ sources:
     continue,continue.diffs,/root/.continue/.diffs/**
     continue,continue.index,/home/*/.continue/.utils/repo_map.txt
     continue,continue.index,/home/*/.continue/index/autocompleteCache.sqlite
+    continue,continue.index,/home/*/.continue/index/autocompleteCache.sqlite-shm
+    continue,continue.index,/home/*/.continue/index/autocompleteCache.sqlite-wal
     continue,continue.index,/home/*/.continue/index/docs.sqlite
+    continue,continue.index,/home/*/.continue/index/docs.sqlite-shm
+    continue,continue.index,/home/*/.continue/index/docs.sqlite-wal
     continue,continue.index,/home/*/.continue/index/index.sqlite
+    continue,continue.index,/home/*/.continue/index/index.sqlite-shm
+    continue,continue.index,/home/*/.continue/index/index.sqlite-wal
     continue,continue.index,/home/*/.continue/index/lancedb/**
     continue,continue.index,/root/.continue/.utils/repo_map.txt
     continue,continue.index,/root/.continue/index/autocompleteCache.sqlite
+    continue,continue.index,/root/.continue/index/autocompleteCache.sqlite-shm
+    continue,continue.index,/root/.continue/index/autocompleteCache.sqlite-wal
     continue,continue.index,/root/.continue/index/docs.sqlite
+    continue,continue.index,/root/.continue/index/docs.sqlite-shm
+    continue,continue.index,/root/.continue/index/docs.sqlite-wal
     continue,continue.index,/root/.continue/index/index.sqlite
+    continue,continue.index,/root/.continue/index/index.sqlite-shm
+    continue,continue.index,/root/.continue/index/index.sqlite-wal
     continue,continue.index,/root/.continue/index/lancedb/**
     continue,continue.sessions,/home/*/.continue/sessions/*.json
     continue,continue.sessions,/home/*/.continue/sessions/sessions.json
@@ -3676,9 +3900,17 @@ sources:
     cursor,cursor.agent_transcripts_jsonl,/root/.cursor/projects/*/agent-transcripts/*/*.jsonl
     cursor,cursor.agent_transcripts_jsonl,/root/.cursor/projects/*/agent-transcripts/*/transcript.jsonl
     cursor,cursor.ai_code_tracking_db,/home/*/.cursor/ai-tracking/*.db
+    cursor,cursor.ai_code_tracking_db,/home/*/.cursor/ai-tracking/*.db-shm
+    cursor,cursor.ai_code_tracking_db,/home/*/.cursor/ai-tracking/*.db-wal
     cursor,cursor.ai_code_tracking_db,/home/*/.cursor/ai-tracking/ai-code-tracking.db
+    cursor,cursor.ai_code_tracking_db,/home/*/.cursor/ai-tracking/ai-code-tracking.db-shm
+    cursor,cursor.ai_code_tracking_db,/home/*/.cursor/ai-tracking/ai-code-tracking.db-wal
     cursor,cursor.ai_code_tracking_db,/root/.cursor/ai-tracking/*.db
+    cursor,cursor.ai_code_tracking_db,/root/.cursor/ai-tracking/*.db-shm
+    cursor,cursor.ai_code_tracking_db,/root/.cursor/ai-tracking/*.db-wal
     cursor,cursor.ai_code_tracking_db,/root/.cursor/ai-tracking/ai-code-tracking.db
+    cursor,cursor.ai_code_tracking_db,/root/.cursor/ai-tracking/ai-code-tracking.db-shm
+    cursor,cursor.ai_code_tracking_db,/root/.cursor/ai-tracking/ai-code-tracking.db-wal
     cursor,cursor.auth_credentials,/home/*/.config/cursor/auth.json
     cursor,cursor.auth_credentials,/home/*/.cursor/auth.json
     cursor,cursor.auth_credentials,/root/.config/cursor/auth.json
@@ -3702,9 +3934,17 @@ sources:
     cursor,cursor.commit_checkpoints,/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/files/*
     cursor,cursor.commit_checkpoints,/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/metadata.json
     cursor,cursor.conversation_search_db,/home/*/.config/Cursor/User/globalStorage/conversation-search.db
+    cursor,cursor.conversation_search_db,/home/*/.config/Cursor/User/globalStorage/conversation-search.db-shm
+    cursor,cursor.conversation_search_db,/home/*/.config/Cursor/User/globalStorage/conversation-search.db-wal
     cursor,cursor.conversation_search_db,/home/*/Library/Application Support/Cursor/User/globalStorage/conversation-search.db
+    cursor,cursor.conversation_search_db,/home/*/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-shm
+    cursor,cursor.conversation_search_db,/home/*/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-wal
     cursor,cursor.conversation_search_db,/root/.config/Cursor/User/globalStorage/conversation-search.db
+    cursor,cursor.conversation_search_db,/root/.config/Cursor/User/globalStorage/conversation-search.db-shm
+    cursor,cursor.conversation_search_db,/root/.config/Cursor/User/globalStorage/conversation-search.db-wal
     cursor,cursor.conversation_search_db,/root/Library/Application Support/Cursor/User/globalStorage/conversation-search.db
+    cursor,cursor.conversation_search_db,/root/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-shm
+    cursor,cursor.conversation_search_db,/root/Library/Application Support/Cursor/User/globalStorage/conversation-search.db-wal
     cursor,cursor.extensions,/home/*/.cursor-server/extensions/**
     cursor,cursor.extensions,/home/*/.cursor/extensions/**
     cursor,cursor.extensions,/home/*/.cursor/extensions/extensions.json
@@ -3716,11 +3956,15 @@ sources:
     cursor,cursor.global_prompt_history,/home/*/.cursor/prompt_history.json
     cursor,cursor.global_prompt_history,/root/.cursor/prompt_history.json
     cursor,cursor.global_state_vscdb,/home/*/.config/Cursor/User/globalStorage/state.vscdb
+    cursor,cursor.global_state_vscdb,/home/*/.config/Cursor/User/globalStorage/state.vscdb-shm
+    cursor,cursor.global_state_vscdb,/home/*/.config/Cursor/User/globalStorage/state.vscdb-wal
     cursor,cursor.global_state_vscdb,/home/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb
     cursor,cursor.global_state_vscdb,/home/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb-shm
     cursor,cursor.global_state_vscdb,/home/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb-wal
     cursor,cursor.global_state_vscdb,/home/*/Library/Application Support/Cursor/User/globalStorage/state.vscdb.backup
     cursor,cursor.global_state_vscdb,/root/.config/Cursor/User/globalStorage/state.vscdb
+    cursor,cursor.global_state_vscdb,/root/.config/Cursor/User/globalStorage/state.vscdb-shm
+    cursor,cursor.global_state_vscdb,/root/.config/Cursor/User/globalStorage/state.vscdb-wal
     cursor,cursor.global_state_vscdb,/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb
     cursor,cursor.global_state_vscdb,/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb-shm
     cursor,cursor.global_state_vscdb,/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb-wal
@@ -3760,10 +4004,18 @@ sources:
     cursor,cursor.subagent_output,/home/*/.cursor/subagents/**
     cursor,cursor.subagent_output,/root/.cursor/subagents/**
     cursor,cursor.workspace_state_vscdb,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
+    cursor,cursor.workspace_state_vscdb,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    cursor,cursor.workspace_state_vscdb,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
     cursor,cursor.workspace_state_vscdb,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
+    cursor,cursor.workspace_state_vscdb,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    cursor,cursor.workspace_state_vscdb,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
     cursor,cursor.workspace_state_vscdb,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
     cursor,cursor.workspace_state_vscdb,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb
+    cursor,cursor.workspace_state_vscdb,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    cursor,cursor.workspace_state_vscdb,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
     cursor,cursor.workspace_state_vscdb,/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
+    cursor,cursor.workspace_state_vscdb,/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    cursor,cursor.workspace_state_vscdb,/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
     cursor,cursor.workspace_state_vscdb,/root/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
     cursor,cursor.worktrees,/home/*/.cursor/worktrees/*
     cursor,cursor.worktrees,/root/.cursor/worktrees/*
@@ -3774,12 +4026,20 @@ sources:
     devin,devin.acp_events,/root/.config/Devin/logs/*/window*/exthost/output_logging_*/1-Devin Desktop.log
     devin,devin.acp_events,/root/Library/Application Support/Devin/User/acp-events/**
     devin,devin.sessions_db,/home/*/.local/share/devin/cli/sessions.db
+    devin,devin.sessions_db,/home/*/.local/share/devin/cli/sessions.db-shm
+    devin,devin.sessions_db,/home/*/.local/share/devin/cli/sessions.db-wal
     devin,devin.sessions_db,/home/*/.local/share/devin/cli/transcripts/*.json
     devin,devin.sessions_db,/home/*/Library/Application Support/devin/cli/sessions.db
+    devin,devin.sessions_db,/home/*/Library/Application Support/devin/cli/sessions.db-shm
+    devin,devin.sessions_db,/home/*/Library/Application Support/devin/cli/sessions.db-wal
     devin,devin.sessions_db,/home/*/Library/Application Support/devin/cli/transcripts/*.json
     devin,devin.sessions_db,/root/.local/share/devin/cli/sessions.db
+    devin,devin.sessions_db,/root/.local/share/devin/cli/sessions.db-shm
+    devin,devin.sessions_db,/root/.local/share/devin/cli/sessions.db-wal
     devin,devin.sessions_db,/root/.local/share/devin/cli/transcripts/*.json
     devin,devin.sessions_db,/root/Library/Application Support/devin/cli/sessions.db
+    devin,devin.sessions_db,/root/Library/Application Support/devin/cli/sessions.db-shm
+    devin,devin.sessions_db,/root/Library/Application Support/devin/cli/sessions.db-wal
     devin,devin.sessions_db,/root/Library/Application Support/devin/cli/transcripts/*.json
     factory_droid,factory_droid.auth,/home/*/.factory/**
     factory_droid,factory_droid.auth,/root/.factory/**
@@ -3829,10 +4089,14 @@ sources:
     goose,goose.sessions_db,/home/*/.local/share/goose/sessions/sessions.db-shm
     goose,goose.sessions_db,/home/*/.local/share/goose/sessions/sessions.db-wal
     goose,goose.sessions_db,/home/*/Library/Application Support/Block/goose/data/sessions/sessions.db
+    goose,goose.sessions_db,/home/*/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
+    goose,goose.sessions_db,/home/*/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
     goose,goose.sessions_db,/root/.local/share/goose/sessions/sessions.db
     goose,goose.sessions_db,/root/.local/share/goose/sessions/sessions.db-shm
     goose,goose.sessions_db,/root/.local/share/goose/sessions/sessions.db-wal
     goose,goose.sessions_db,/root/Library/Application Support/Block/goose/data/sessions/sessions.db
+    goose,goose.sessions_db,/root/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
+    goose,goose.sessions_db,/root/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
     goose,goose.sessions_jsonl_legacy,/home/*/.local/share/goose/sessions/*.jsonl
     goose,goose.sessions_jsonl_legacy,/root/.local/share/goose/sessions/*.jsonl
     hermes,hermes.auth,/home/*/.hermes/auth.json
@@ -3979,7 +4243,11 @@ sources:
     kiro,kiro.cli_install,/root/.local/bin/q
     kiro,kiro.cli_log,/tmp/kiro-log/*.log
     kiro,kiro.cli_session_database,/home/*/.kiro/*.sqlite3
+    kiro,kiro.cli_session_database,/home/*/.kiro/*.sqlite3-shm
+    kiro,kiro.cli_session_database,/home/*/.kiro/*.sqlite3-wal
     kiro,kiro.cli_session_database,/root/.kiro/*.sqlite3
+    kiro,kiro.cli_session_database,/root/.kiro/*.sqlite3-shm
+    kiro,kiro.cli_session_database,/root/.kiro/*.sqlite3-wal
     kiro,kiro.cli_session_files,/home/*/.kiro/sessions/cli/*.json
     kiro,kiro.cli_session_files,/home/*/.kiro/sessions/cli/*.jsonl
     kiro,kiro.cli_session_files,/home/*/.kiro/sessions/cli/*.lock
@@ -4025,10 +4293,14 @@ sources:
     lmstudio,lmstudio.presets,/home/*/.lmstudio/config-presets/**
     lmstudio,lmstudio.presets,/root/.lmstudio/config-presets/**
     ollama,ollama.app_chat_database,/home/*/.ollama/db.sqlite
+    ollama,ollama.app_chat_database,/home/*/.ollama/db.sqlite-shm
+    ollama,ollama.app_chat_database,/home/*/.ollama/db.sqlite-wal
     ollama,ollama.app_chat_database,/home/*/Library/Application Support/Ollama/db.sqlite
     ollama,ollama.app_chat_database,/home/*/Library/Application Support/Ollama/db.sqlite-shm
     ollama,ollama.app_chat_database,/home/*/Library/Application Support/Ollama/db.sqlite-wal
     ollama,ollama.app_chat_database,/root/.ollama/db.sqlite
+    ollama,ollama.app_chat_database,/root/.ollama/db.sqlite-shm
+    ollama,ollama.app_chat_database,/root/.ollama/db.sqlite-wal
     ollama,ollama.app_chat_database,/root/Library/Application Support/Ollama/db.sqlite
     ollama,ollama.app_chat_database,/root/Library/Application Support/Ollama/db.sqlite-shm
     ollama,ollama.app_chat_database,/root/Library/Application Support/Ollama/db.sqlite-wal
@@ -4067,10 +4339,14 @@ sources:
     opencode,opencode.auth,/home/*/.local/share/opencode/auth.json
     opencode,opencode.auth,/root/.local/share/opencode/auth.json
     opencode,opencode.db,/home/*/.local/share/opencode/opencode-*.db
+    opencode,opencode.db,/home/*/.local/share/opencode/opencode-*.db-shm
+    opencode,opencode.db,/home/*/.local/share/opencode/opencode-*.db-wal
     opencode,opencode.db,/home/*/.local/share/opencode/opencode.db
     opencode,opencode.db,/home/*/.local/share/opencode/opencode.db-shm
     opencode,opencode.db,/home/*/.local/share/opencode/opencode.db-wal
     opencode,opencode.db,/root/.local/share/opencode/opencode-*.db
+    opencode,opencode.db,/root/.local/share/opencode/opencode-*.db-shm
+    opencode,opencode.db,/root/.local/share/opencode/opencode-*.db-wal
     opencode,opencode.db,/root/.local/share/opencode/opencode.db
     opencode,opencode.db,/root/.local/share/opencode/opencode.db-shm
     opencode,opencode.db,/root/.local/share/opencode/opencode.db-wal
@@ -4423,10 +4699,18 @@ sources:
     vscode,vscode.extension_install_evidence,/root/.vscode/extensions/rooveterinaryinc.roo-cline-*/**
     vscode,vscode.extension_install_evidence,/root/.vscode/extensions/saoudrizwan.claude-dev-*/**
     vscode,vscode.state_vscdb,/home/*/.config/Code/User/globalStorage/state.vscdb
+    vscode,vscode.state_vscdb,/home/*/.config/Code/User/globalStorage/state.vscdb-shm
+    vscode,vscode.state_vscdb,/home/*/.config/Code/User/globalStorage/state.vscdb-wal
     vscode,vscode.state_vscdb,/home/*/Library/Application Support/Code/User/globalStorage/state.vscdb
+    vscode,vscode.state_vscdb,/home/*/Library/Application Support/Code/User/globalStorage/state.vscdb-shm
+    vscode,vscode.state_vscdb,/home/*/Library/Application Support/Code/User/globalStorage/state.vscdb-wal
     vscode,vscode.state_vscdb,/home/*/Library/Application Support/Code/User/globalStorage/state.vscdb.backup
     vscode,vscode.state_vscdb,/root/.config/Code/User/globalStorage/state.vscdb
+    vscode,vscode.state_vscdb,/root/.config/Code/User/globalStorage/state.vscdb-shm
+    vscode,vscode.state_vscdb,/root/.config/Code/User/globalStorage/state.vscdb-wal
     vscode,vscode.state_vscdb,/root/Library/Application Support/Code/User/globalStorage/state.vscdb
+    vscode,vscode.state_vscdb,/root/Library/Application Support/Code/User/globalStorage/state.vscdb-shm
+    vscode,vscode.state_vscdb,/root/Library/Application Support/Code/User/globalStorage/state.vscdb-wal
     vscode,vscode.state_vscdb,/root/Library/Application Support/Code/User/globalStorage/state.vscdb.backup
     vscode,vscode.user_data_roots,/home/*/.config/Code/User/globalStorage/**
     vscode,vscode.user_data_roots,/home/*/.config/VSCodium/User/globalStorage/**
@@ -4480,8 +4764,12 @@ sources:
     windsurf,windsurf.code_tracker_and_settings,/root/.codeium/windsurf/user_settings.pb
     windsurf,windsurf.embedding_database,/home/*/.codeium/windsurf/database/*/**
     windsurf,windsurf.embedding_database,/home/*/.codeium/windsurf/database/*/embedding_database.sqlite
+    windsurf,windsurf.embedding_database,/home/*/.codeium/windsurf/database/*/embedding_database.sqlite-shm
+    windsurf,windsurf.embedding_database,/home/*/.codeium/windsurf/database/*/embedding_database.sqlite-wal
     windsurf,windsurf.embedding_database,/root/.codeium/windsurf/database/*/**
     windsurf,windsurf.embedding_database,/root/.codeium/windsurf/database/*/embedding_database.sqlite
+    windsurf,windsurf.embedding_database,/root/.codeium/windsurf/database/*/embedding_database.sqlite-shm
+    windsurf,windsurf.embedding_database,/root/.codeium/windsurf/database/*/embedding_database.sqlite-wal
     windsurf,windsurf.global_rules,/home/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,windsurf.global_rules,/home/*/.codeium/windsurf-next/memories/global_rules.md
     windsurf,windsurf.global_rules,/home/*/.codeium/windsurf/memories/global_rules.md
@@ -4489,17 +4777,37 @@ sources:
     windsurf,windsurf.global_rules,/root/.codeium/windsurf-next/memories/global_rules.md
     windsurf,windsurf.global_rules,/root/.codeium/windsurf/memories/global_rules.md
     windsurf,windsurf.ide_global_state_vscdb,/home/*/.config/Devin/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/home/*/.config/Devin/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/home/*/.config/Devin/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/home/*/.config/Windsurf/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/home/*/.config/Windsurf/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/home/*/.config/Windsurf/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Devin/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Devin/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Devin/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Windsurf/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Windsurf/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Windsurf/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Windsurf/User/globalStorage/storage.json
     windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Windsurf/machineId
     windsurf,windsurf.ide_global_state_vscdb,/root/.config/Devin/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/root/.config/Devin/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/root/.config/Devin/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/root/.config/Windsurf/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/root/.config/Windsurf/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/root/.config/Windsurf/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Devin/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Devin/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Devin/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Windsurf/User/globalStorage/state.vscdb
+    windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Windsurf/User/globalStorage/state.vscdb-shm
+    windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Windsurf/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Windsurf/User/globalStorage/storage.json
     windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Windsurf/machineId
     windsurf,windsurf.ide_user_data,/home/*/.config/Windsurf/User/settings.json
@@ -4518,10 +4826,18 @@ sources:
     windsurf,windsurf.ide_user_data,/root/Library/Application Support/Windsurf/argv.json
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/settings.json
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/settings.json
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
     windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
     windsurf,windsurf.implicit_trajectories,/home/*/.codeium/windsurf/implicit/*.pb
     windsurf,windsurf.implicit_trajectories,/root/.codeium/windsurf/implicit/*.pb
     windsurf,windsurf.language_server_binaries_and_logs,/Applications/Devin.app
@@ -4571,11 +4887,23 @@ sources:
     zed,zed.logs,/home/*/Library/Logs/Zed/**
     zed,zed.logs,/root/Library/Logs/Zed/**
     zed,zed.sidebar_threads,/home/*/Library/Application Support/Zed/db/0-stable/db.sqlite
+    zed,zed.sidebar_threads,/home/*/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
+    zed,zed.sidebar_threads,/home/*/Library/Application Support/Zed/db/0-stable/db.sqlite-wal
     zed,zed.sidebar_threads,/root/Library/Application Support/Zed/db/0-stable/db.sqlite
+    zed,zed.sidebar_threads,/root/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
+    zed,zed.sidebar_threads,/root/Library/Application Support/Zed/db/0-stable/db.sqlite-wal
     zed,zed.threads_db,/home/*/.local/share/zed/threads/threads.db
+    zed,zed.threads_db,/home/*/.local/share/zed/threads/threads.db-shm
+    zed,zed.threads_db,/home/*/.local/share/zed/threads/threads.db-wal
     zed,zed.threads_db,/home/*/Library/Application Support/Zed/threads/threads.db
+    zed,zed.threads_db,/home/*/Library/Application Support/Zed/threads/threads.db-shm
+    zed,zed.threads_db,/home/*/Library/Application Support/Zed/threads/threads.db-wal
     zed,zed.threads_db,/root/.local/share/zed/threads/threads.db
+    zed,zed.threads_db,/root/.local/share/zed/threads/threads.db-shm
+    zed,zed.threads_db,/root/.local/share/zed/threads/threads.db-wal
     zed,zed.threads_db,/root/Library/Application Support/Zed/threads/threads.db
+    zed,zed.threads_db,/root/Library/Application Support/Zed/threads/threads.db-shm
+    zed,zed.threads_db,/root/Library/Application Support/Zed/threads/threads.db-wal
     ''')
     LET hits = SELECT * FROM foreach(row=targets, query={
         SELECT Agent, ArtifactId, OSPath, Size, Mode.String AS Mode,

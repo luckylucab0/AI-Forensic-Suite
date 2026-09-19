@@ -263,6 +263,8 @@ artifacts:
   - ~/.local/share/goose/sessions/sessions.db-shm
   - ~/.local/share/goose/sessions/sessions.db-wal
   - ~/Library/Application Support/Block/goose/data/sessions/sessions.db
+  - ~/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
+  - ~/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
   format: sqlite
   sensitivity: normal
   collect_priority: normal
@@ -273,6 +275,8 @@ artifacts:
   unsourced_paths:
   - ~/.local/share/goose/sessions/sessions.db-shm
   - ~/.local/share/goose/sessions/sessions.db-wal
+  - ~/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
+  - ~/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
   volatility: |-
     No automatic expiry documented. Deleting a session in Goose Desktop also removes it from the CLI and the docs state the action cannot be undone - i.e. a SQL delete, so carving the SQLite freelist and the -wal file may still recover it.
   notes: |-
@@ -287,6 +291,8 @@ artifacts:
   - windows
   paths:
   - '%APPDATA%\Block\goose\data\sessions\sessions.db'
+  - '%APPDATA%\Block\goose\data\sessions\sessions.db-shm'
+  - '%APPDATA%\Block\goose\data\sessions\sessions.db-wal'
   format: sqlite
   sensitivity: normal
   collect_priority: normal

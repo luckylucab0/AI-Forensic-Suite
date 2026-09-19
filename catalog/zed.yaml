@@ -36,15 +36,32 @@ artifacts:
   - windows
   paths:
   - $XDG_DATA_HOME/zed/threads/threads.db
+  - $XDG_DATA_HOME/zed/threads/threads.db-shm
+  - $XDG_DATA_HOME/zed/threads/threads.db-wal
   - '%LOCALAPPDATA%\Zed\threads\threads.db'
+  - '%LOCALAPPDATA%\Zed\threads\threads.db-shm'
+  - '%LOCALAPPDATA%\Zed\threads\threads.db-wal'
   - ~/.local/share/zed/threads/threads.db
+  - ~/.local/share/zed/threads/threads.db-shm
+  - ~/.local/share/zed/threads/threads.db-wal
   - ~/Library/Application Support/Zed/threads/threads.db
+  - ~/Library/Application Support/Zed/threads/threads.db-shm
+  - ~/Library/Application Support/Zed/threads/threads.db-wal
   format: sqlite
   sensitivity: normal
   collect_priority: live_only
   status: verified
   source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/agent/src/db.rs
   source_kind: source_code
+  unsourced_paths:
+  - $XDG_DATA_HOME/zed/threads/threads.db-shm
+  - $XDG_DATA_HOME/zed/threads/threads.db-wal
+  - '%LOCALAPPDATA%\Zed\threads\threads.db-shm'
+  - '%LOCALAPPDATA%\Zed\threads\threads.db-wal'
+  - ~/.local/share/zed/threads/threads.db-shm
+  - ~/.local/share/zed/threads/threads.db-wal
+  - ~/Library/Application Support/Zed/threads/threads.db-shm
+  - ~/Library/Application Support/Zed/threads/threads.db-wal
   volatility: |-
     No automatic expiry. If ZED_STATELESS is set, an in-memory database is used and NOTHING is persisted. If the file DB cannot be opened Zed falls back to an in-memory DB, so absence of the file does not prove absence of use.
   notes: |-
@@ -160,14 +177,27 @@ artifacts:
   - windows
   paths:
   - $XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite
+  - $XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite-shm
+  - $XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite-wal
   - '%LOCALAPPDATA%\Zed\db\0-<release_channel>\db.sqlite'
+  - '%LOCALAPPDATA%\Zed\db\0-<release_channel>\db.sqlite-shm'
+  - '%LOCALAPPDATA%\Zed\db\0-<release_channel>\db.sqlite-wal'
   - ~/Library/Application Support/Zed/db/0-stable/db.sqlite
+  - ~/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
+  - ~/Library/Application Support/Zed/db/0-stable/db.sqlite-wal
   format: sqlite
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/db/src/db.rs
   source_kind: source_code
+  unsourced_paths:
+  - $XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite-shm
+  - $XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite-wal
+  - '%LOCALAPPDATA%\Zed\db\0-<release_channel>\db.sqlite-shm'
+  - '%LOCALAPPDATA%\Zed\db\0-<release_channel>\db.sqlite-wal'
+  - ~/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
+  - ~/Library/Application Support/Zed/db/0-stable/db.sqlite-wal
   volatility: |-
     Migration-populated. The migration only unarchives the 5 most recent threads per project and archives the rest; draft threads with no project are archived by default; threads with no project are excluded from migration entirely.
   notes: |-

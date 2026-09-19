@@ -602,14 +602,27 @@ artifacts:
   - linux
   paths:
   - ~/.cline/data/db/connectors.db
+  - ~/.cline/data/db/connectors.db-shm
+  - ~/.cline/data/db/connectors.db-wal
   - ~/.cline/data/db/cron.db
+  - ~/.cline/data/db/cron.db-shm
+  - ~/.cline/data/db/cron.db-wal
   - ~/.cline/data/db/tasks.db
+  - ~/.cline/data/db/tasks.db-shm
+  - ~/.cline/data/db/tasks.db-wal
   format: sqlite
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
   source_kind: source_code
+  unsourced_paths:
+  - ~/.cline/data/db/connectors.db-shm
+  - ~/.cline/data/db/connectors.db-wal
+  - ~/.cline/data/db/cron.db-shm
+  - ~/.cline/data/db/cron.db-wal
+  - ~/.cline/data/db/tasks.db-shm
+  - ~/.cline/data/db/tasks.db-wal
   volatility: SQLite - collect any -wal/-shm siblings in the same pass or lose the most recent writes.
   notes: |-
     resolveDbDataDir() = join(resolveClineDataDir(), "db"); resolveTasksDbPath/resolveConnectorsDbPath/resolveCronDbPath resolve tasks.db, connectors.db, cron.db inside it. tasks.db is the session/task index that the VS Code history view and `cline` CLI read; cron.db holds scheduled/recurring agent runs (a persistence-mechanism artifact in its own right). Overridable via $CLINE_DB_DATA_DIR.

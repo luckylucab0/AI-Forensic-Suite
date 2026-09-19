@@ -285,6 +285,8 @@ artifacts:
   - windows
   paths:
   - $HERMES_HOME/state.db
+  - $HERMES_HOME/state.db-shm
+  - $HERMES_HOME/state.db-wal
   - ~/.hermes/state.db
   - ~/.hermes/state.db-shm
   - ~/.hermes/state.db-wal
@@ -295,6 +297,9 @@ artifacts:
   source: |-
     https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/developer-guide/session-storage.md
   source_kind: official
+  unsourced_paths:
+  - $HERMES_HOME/state.db-shm
+  - $HERMES_HOME/state.db-wal
   volatility: |-
     Journal mode is configurable (WAL or delete) - capture -wal and -shm. Compaction ARCHIVES old rows by setting active=0 rather than deleting them, so compacted history is still fully present. Real deletion only happens via explicit prune_sessions(older_than_days=N) (the docs example uses 90) or clear_messages().
   notes: |-
