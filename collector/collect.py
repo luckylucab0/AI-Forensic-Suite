@@ -6180,6 +6180,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "<project>/.aiignore",
+                        "<project>/.idea/",
                         "<project>/.junie/AGENTS.md",
                         "<project>/.junie/config.json",
                         "<project>/.junie/guidelines.md",
@@ -8822,7 +8823,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "88d1e29350a6c3fb07443fa00125dbe390d1d41fecdd96640e04ad67717bae8a"
+    "sha256": "03fa8855d6cb1cc29236f9fb63c2891e0cf16e27914fa83f413833fab23df436"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

@@ -22,6 +22,8 @@ vendor_sources:
 - https://raw.githubusercontent.com/JetBrains/
 - https://www.jetbrains.com/
 - https://plugins.jetbrains.com/
+description: |-
+  JetBrains' agent, inside the IDE and on the command line. Two things decide what a collection of it means. Its instruction file does not have to be where this catalogue looks: the vendor's own guidelines repository states that a project defines its guidelines in .junie/AGENTS.md or AGENTS.md and that a custom path can be set in the IDE's project settings instead, so a glob over the project can miss the file the agent actually read, and the setting has to be read off the endpoint before an absence means anything. And the vendor's documentation host answers requests but serves no text: every path on it, including the pages the community sources cite, returns the same 203 byte stub that redirects a browser to the start page, because the site renders its content with JavaScript. So the entries here that rest on a third party's reading of those pages stay unverified, and settling them needs somebody with a browser rather than another fetch.
 references:
 - |-
   https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt
@@ -172,6 +174,7 @@ artifacts:
   - linux
   paths:
   - <project>/.aiignore
+  - <project>/.idea/
   - <project>/.junie/AGENTS.md
   - <project>/.junie/config.json
   - <project>/.junie/guidelines.md
@@ -188,12 +191,15 @@ artifacts:
   source_kind: official
   unsourced_paths:
   - <project>/.aiignore
+  - <project>/.idea/
   - <project>/.junie/config.json
   - <project>/.junie/guidelines/
   - <project>/.junie/playbook.md
   - <project>/.junie/rules/*.md
   volatility: Committed to the repo in practice, so also recoverable from git history.
   notes: |-
+    THE INSTRUCTION FILE DOES NOT HAVE TO BE HERE. The vendor's own guidelines repository states that a project defines its guidelines in .junie/AGENTS.md or AGENTS.md and that a custom path can be set instead, in the IDE's project settings (Settings, Tools, Junie, Project Settings). So a glob over the project can miss the file the agent actually read, and an absent instruction file is inconclusive until the setting has been read off the endpoint. The IDE keeps its project settings in .idea, which is why that directory is collected here; which file inside it carries the setting is not documented anywhere this pass could reach, so the directory is claimed and no file in it is. Source: https://raw.githubusercontent.com/JetBrains/junie-guidelines/main/README.md
+
     JetBrains' own junie-guidelines repo README states guidelines 'can be stored in two places: .junie/AGENTS.md [or] AGENTS.md' and that a custom guidelines path can be set in 'Settings | Tools | Junie | Project Settings' - so the path may be OVERRIDDEN per project and .junie/ absence is not proof of no guidelines. CORRECTION TO THE BRIEF: .junie/guidelines.md is the LEGACY form; the current form is .junie/AGENTS.md then root AGENTS.md, with discovery order .junie/AGENTS.md -> AGENTS.md -> legacy .junie/guidelines.md or .junie/guidelines/. The legacy form is nonetheless extremely common in the wild - GitHub code search returns 432 repositories with a committed .junie/guidelines.md - so keep globbing for it. playbook.md, rules/*.md and .aiignore are reported by community sources citing vendor docs I could not fetch; .aiignore is a user-authored file-access boundary (gitignore syntax) and is worth collecting as a permissions-adjacent artifact.
 
     Re-sourced by the verification pass: the guidelines README states the agent instruction files and nothing else, while the vendor's own guide states the project guidelines file at the project root. The pass found no reachable vendor source for the remaining five paths, so they are marked unsourced. The ignore file in particular: its only hit in the vendor's code base is an unrelated list of risky file extensions, which does not support a project-root location.
