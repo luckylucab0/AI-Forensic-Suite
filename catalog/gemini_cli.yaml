@@ -134,7 +134,9 @@ artifacts:
     Two things this gives an analyst that a transcript does not. The set of hash directories enumerates the projects the agent was used in, even where the conversations have been deleted by the retention policy. And the commands themselves are what actually happened, as opposed to what the model said it would do.
 
     The hash is one-way, so the directory name identifies a project only by comparison: hash the candidate paths from the other agents' state and match.
-  parser: null
+
+    Record structure, read out of the product's own reader and writer (packages/cli/src/ui/hooks/useShellHistory.ts): plain text, one command per line, OLDEST FIRST on disk while the interface shows it newest first, and no timestamp anywhere. A command continued over several lines ends in an odd number of backslashes and the product rejoins the parts with a SPACE, not a line break. Two properties matter more than the format. The file is a ring of a hundred entries, and a command that is run again is REMOVED from its old position before being added at the end, so the file holds one line per distinct command: the number of times something ran cannot be read from it, and an older command's absence is the ring or the deduplication rather than evidence that it never ran. The whole file is rewritten on every command, so its mtime dates the last command and nothing else in it can be dated at all.
+  parser: shell_history
 - id: gemini_cli.user_settings
   category: config
   root: user_profile

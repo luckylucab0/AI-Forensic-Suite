@@ -1806,7 +1806,7 @@ artifacts:
   paths:
   - /Library/Managed Preferences/com.anthropic.claudecode.plist
   - /Library/Managed Preferences/<user>/com.anthropic.claudecode.plist
-  format: binary
+  format: plist
   sensitivity: normal
   collect_priority: normal
   status: unverified
@@ -1817,7 +1817,7 @@ artifacts:
     The domain name is verified; the file paths are inferred from macOS convention. Also collect the installed profile itself from /var/db/ConfigurationProfiles/. This source ranks as an admin source above the managed settings files.
 
     Record structure: The docs verify only the managed preferences DOMAIN name, `com.anthropic.claudecode`, using the same top-level keys as managed-settings.json with nested settings as dictionaries and lists as plist arrays. The concrete /Library/Managed Preferences plist file paths above are the standard macOS location for a managed preferences domain and are NOT stated in Anthropic documentation. recollection, needs verification
-  parser: null
+  parser: plist_generic
 - id: claude_code.managed_settings_registry
   category: permissions
   root: registry

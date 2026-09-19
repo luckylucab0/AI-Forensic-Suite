@@ -35,6 +35,17 @@ https://raw.githubusercontent.com/fish-shell/fish-shell/master/doc_src/language.
 **PSReadLine** writes plain lines with no timestamp anywhere in the file, and continues a
 multi-line entry with a trailing backtick, which is PowerShell's line continuation.
 
+Two agents keep a fifth file that is not a shell's history but their own: the commands the
+agent itself ran through its shell tool, one per line, oldest first. Its quirks come from
+the vendor's own reader and writer, and all three matter to an analyst. A line ending in an
+odd number of backslashes continues on the next line, and the vendor rejoins the two with a
+space rather than a line break, so this reader does the same. The file is a ring of a
+hundred entries. And a command that is run again is REMOVED from its old position and added
+at the end, so the file holds one line per distinct command and says nothing about how
+often it ran; an analyst counting invocations there would undercount every repeated one.
+Source, fetched and read:
+https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/cli/src/ui/hooks/useShellHistory.ts
+
 What this module does not do is decide what a command did. A line here is what somebody
 typed, or what a script typed, and not proof that it ran or that it succeeded: a history
 file records submission. The exit status is in none of these formats except fish's, which
@@ -64,6 +75,10 @@ SHAPES = {
     "crosscutting.shell_fish_history": "fish",
     "crosscutting.shell_psreadline_history": "psreadline",
     "crosscutting.shell_zsh_history": "zsh",
+    # The agent's own shell tool rather than a shell: one product and the fork of it that
+    # inherited the code, so the reading is the same for both.
+    "gemini_cli.shell_history": "agent_recall",
+    "qwen_code.shell_history": "agent_recall",
 }
 
 # Said on every entry from a file that carries no time. It is not a defect and it is not an
@@ -92,6 +107,8 @@ class ShellHistoryParser:
             yield from _bash(context, lines)
         elif shape == "fish":
             yield from _fish(context, lines)
+        elif shape == "agent_recall":
+            yield from _agent_recall(context, lines)
         else:
             yield from _plain(context, lines)
 
@@ -320,6 +337,71 @@ def _fish_unescape(text: str) -> str:
         out.append(char)
         index += 1
     return "".join(out)
+
+
+# Said on every entry of the agent's own recall file, because the absence it explains
+# reads as evidence otherwise. A command that appears once may have run a hundred times,
+# and a command that is missing may have been pushed out of the ring.
+DEDUPLICATED = (
+    "this file holds one line per distinct command, because the agent removes a repeated "
+    "command from its old position rather than appending it again, and it keeps only the "
+    "last hundred, so neither the number of times a command ran nor the absence of an "
+    "older one can be read from it"
+)
+
+
+def _agent_recall(context: ParseContext, lines: list[TextLine]) -> Iterator[Event]:
+    """The agent's own shell tool history: one command per line, oldest first.
+
+    The continuation is the vendor's, not a shell's: a line ending in an odd number of
+    backslashes is joined to the next one with a SPACE, which is what the product's own
+    reader does with it. Rejoining with a line break instead would show an analyst a
+    command the agent never assembled.
+    """
+    pending: list[str] = []
+    problems: list[str] = []
+    start = 0
+
+    def flush() -> Iterator[Event]:
+        if not pending:
+            return
+        yield _event(
+            context,
+            start,
+            "".join(pending),
+            note=" ".join([*problems, NO_TIME, DEDUPLICATED]),
+            # The project this file belongs to is in the directory name above it, as a hash
+            # the vendor does not reverse, so nothing here claims a project path.
+            raw={"command": "".join(pending)},
+        )
+
+    for line in lines:
+        if not line.text.strip():
+            # The vendor's own reader skips a blank line rather than ending an entry on it.
+            continue
+        if pending:
+            pending[-1] = pending[-1][:-1] + " "
+            pending.append(line.text)
+        else:
+            start = line.number
+            pending = [line.text]
+        if line.problem:
+            problems.append(line.problem)
+        if not _continues(line.text):
+            yield from flush()
+            pending, problems = [], []
+    yield from flush()
+
+
+def _continues(text: str) -> bool:
+    """Whether this line is continued on the next one, by the vendor's own rule.
+
+    An odd number of trailing backslashes continues the command; an even number is a
+    command that ends with escaped backslashes. Counting rather than looking at the last
+    character is what the product does, and the difference is a command split in two.
+    """
+    trailing = len(text) - len(text.rstrip("\\"))
+    return trailing % 2 == 1
 
 
 def _plain(context: ParseContext, lines: list[TextLine]) -> Iterator[Event]:

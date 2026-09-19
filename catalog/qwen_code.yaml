@@ -244,7 +244,9 @@ artifacts:
     Grows in place; not swept by housekeeping.
   notes: |-
     The project documentation states the location verbatim ('Location: ~/.qwen/tmp/<project_hash>/shell_history') and the source constructs the same path from getProjectTempDir(). Plain text, one command per line. Because it is keyed on the project hash rather than a session id it mixes every session in that project, so correlate with the transcripts for attribution.
-  parser: null
+
+    This product is a fork of the one whose reader and writer this format comes from, so the properties recorded on that agent's entry apply here until somebody reads this fork's own copy: oldest first, no timestamps, a backslash continuation rejoined with a space, a ring of a hundred entries, and a repeated command moved rather than appended, which means the file cannot be counted.
+  parser: shell_history
 - id: qwen_code.project_temp_spill
   title: 'Project temp directory: truncated tool output, captured background shell output, checkpoints'
   category: cache

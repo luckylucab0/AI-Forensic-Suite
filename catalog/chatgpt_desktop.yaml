@@ -78,7 +78,7 @@ artifacts:
   - ~/Library/Preferences/com.openai.chat.*.plist
   - ~/Library/Preferences/com.openai.chat.plist
   - ~/Library/Preferences/com.openai.codex.plist
-  format: binary
+  format: plist
   sensitivity: normal
   collect_priority: normal
   status: unverified
@@ -90,7 +90,7 @@ artifacts:
     Feature-flag plists are an underrated dating artifact - they change as OpenAI rolls features out, so they help bound when the install was last online.
 
     Record structure: Binary plist. The wildcard sibling files are real: an uninstaller in the wild explicitly removes ~/Library/Preferences/com.openai.chat.RemoteFeatureFlags.plist, i.e. server-pushed feature-flag state is cached locally and tells you which app capabilities (agent mode, connectors) were enabled for that user.
-  parser: null
+  parser: plist_generic
 - id: chatgpt_desktop.macos_cookies
   category: credentials
   root: user_profile

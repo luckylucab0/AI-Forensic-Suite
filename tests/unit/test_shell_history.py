@@ -16,8 +16,9 @@ from pathlib import Path
 
 from agentforensics.parsers import for_artifact
 from agentforensics.parsers.base import ParseContext
-from agentforensics.parsers.shell_history import NO_TIME
+from agentforensics.parsers.shell_history import DEDUPLICATED, NO_TIME
 
+AGENT_RECALL = "gemini_cli.shell_history"
 BASH = "crosscutting.shell_bash_history"
 FISH = "crosscutting.shell_fish_history"
 PSREADLINE = "crosscutting.shell_psreadline_history"
@@ -240,3 +241,46 @@ def test_a_line_that_did_not_decode_is_kept_and_said_to_be_inexact(tmp_path: Pat
     events = parse(path, BASH)
     assert len(events) == 2
     assert "did not decode" in (events[0].parse_problem or "")
+
+
+# --------------------------------------------------------------- the agent's own
+
+
+def test_the_agents_own_history_is_one_command_per_line(tmp_path: Path) -> None:
+    events = parse(
+        write(tmp_path / "shell_history", "npm test\ngit status\n"),
+        AGENT_RECALL,
+    )
+    assert commands(events) == ["npm test", "git status"]
+
+
+def test_a_continued_command_is_rejoined_the_way_the_product_rejoins_it(tmp_path: Path) -> None:
+    """With a space, not a line break. The vendor's own reader replaces the trailing
+    backslash with a space, so a line break here would show a command the agent never
+    assembled."""
+    events = parse(
+        write(tmp_path / "shell_history", "grep -r needle \\\n  src/\n"),
+        AGENT_RECALL,
+    )
+    # The spacing is the vendor's arithmetic rather than a choice made here: the
+    # trailing backslash is dropped, a space is put in its place, and the next line
+    # follows with its own indentation intact.
+    assert commands(events) == ["grep -r needle    src/"]
+
+
+def test_an_even_number_of_backslashes_ends_the_command(tmp_path: Path) -> None:
+    """Two trailing backslashes are an escaped backslash, not a continuation, which is what
+    the product counts for. Getting it wrong glues two commands into one."""
+    events = parse(
+        write(tmp_path / "shell_history", "printf 'a\\\\'\nls\n"),
+        AGENT_RECALL,
+    )
+    assert commands(events) == ["printf 'a\\\\'", "ls"]
+
+
+def test_every_entry_says_the_file_holds_no_repeats(tmp_path: Path) -> None:
+    """The absence this explains reads as evidence otherwise: a command that appears once
+    may have run a hundred times, and one that is missing may have left the ring."""
+    events = parse(write(tmp_path / "shell_history", "npm test\n"), AGENT_RECALL)
+    assert DEDUPLICATED in (events[0].parse_problem or "")
+    assert NO_TIME in (events[0].parse_problem or "")

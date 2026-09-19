@@ -490,7 +490,7 @@ artifacts:
     Rewritten by MDM. The managed-preferences copy is replaced whenever the profile is redeployed, so the version in force at the time of an event may not be recoverable.
   notes: |-
     This is the permissions and approved-directories artifact. allowedWorkspaceFolders is the allowlist of folders a user may attach to a Cowork session, and the vendor states a folder can carry mode ro, that a leading ~ expands per user, and that a fixed set of %VAR% tokens is expanded. The retention keys here decide whether session records are being deleted on a schedule, which an analyst must read before concluding that absence of sessions means absence of use. secureVmFeaturesEnabled and requireCoworkFullVmSandbox decide whether device-deployed policy reaches Cowork at all. The Managed Preferences paths are stated by the vendor; the unmanaged user-domain plist path is the standard macOS location for the same domain but the vendor does not state it, so it is listed as unsourced. Inference credentials can be delivered through these keys, so treat the file as potentially secret-bearing.
-  parser: null
+  parser: plist_generic
 - id: claude_desktop.managed_policy_windows
   title: Managed configuration and approved folders (Windows policy registry)
   category: permissions
