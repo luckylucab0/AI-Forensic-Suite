@@ -1104,7 +1104,16 @@ def test_a_named_user_is_looked_up_where_the_platform_keeps_profiles(monkeypatch
     --all-users and --user answer the same question about the same host, and only one of
     them was taught where Windows keeps profiles. `--user alice` there looked under a
     directory that does not hold profiles and found nobody, with nothing said.
+
+    Windows is simulated rather than the test being skipped off it, and the first version
+    of this test is the reason that is worth insisting on: it compared the joined path with
+    a forward-slash literal, which is a statement about the separator of the machine
+    running the test rather than about the branch under test. It passed here and failed on
+    the one runner nobody watches. ntpath.join reproduces the join Windows would do, and
+    the tolerant isdir reproduces Windows accepting either separator.
     """
+    import ntpath
+
     collect = _load_collector()
     asked: list[str] = []
 
@@ -1113,11 +1122,17 @@ def test_a_named_user_is_looked_up_where_the_platform_keeps_profiles(monkeypatch
         return ["Z:/Users"]
 
     monkeypatch.setattr(collect, "live_profile_parents", parents)
-    monkeypatch.setattr(collect.os.path, "isdir", lambda path: path == "Z:/Users/alice")
+    monkeypatch.setattr(collect.os.path, "join", ntpath.join)
+    monkeypatch.setattr(
+        collect.os.path, "isdir", lambda path: path.replace("\\", "/") == "Z:/Users/alice"
+    )
 
     found = collect.discover_users(None, False, ["alice"])
 
     assert asked, "the named branch has to ask the same question --all-users asks"
+    # And the home leaves the function in the collector's one separator convention, because
+    # it is the prefix of every pattern built for that profile and every consumer of those
+    # splits on a forward slash.
     assert found == [{"name": "alice", "home": "Z:/Users/alice"}]
 
 
