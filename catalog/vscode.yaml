@@ -60,7 +60,7 @@ artifacts:
     OPERATIONAL SPLIT: this one file holds BOTH non-secret extension globalState (collect as evidence) and SecretStorage ciphertext (do not exfiltrate). Recommend the collector copy state.vscdb (+ .backup) as normal evidence but treat the ItemTable rows under the secret key prefix as secret. Cline <=3.x stored its task index here via context.globalState.update("taskHistory", ...) and its API keys via context.secrets.store(...) - verified in https://raw.githubusercontent.com/cline/cline/v3.20.0/src/core/storage/state.ts. Secrets are encrypted with Electron safeStorage (AES-128-CBC); the key lives in the macOS Keychain item 'Code Safe Storage' / 'Code - Insiders Safe Storage', Windows DPAPI via Chromium OSCrypt, Linux libsecret/KeyStorageLinux. Without that keychain material the ciphertext is unrecoverable - so acquire keychain artifacts separately or record the secret as non-recoverable.
 
     Re-sourced after a new guard caught the previous citation: it was a discussion thread in one of the vendor's repositories, which the provenance check accepted because the URL sits under the vendor's organization while the text was written by a member of the public. The vendor's own storage implementation declares the filename and joins it onto the global storage directory, and declares the same filename again for the per-workspace store, which is what fixes both spellings.
-  parser: sqlite_generic
+  parser: vscode_state
 - id: vscode.extension_dirs
   category: install_evidence
   root: user_profile

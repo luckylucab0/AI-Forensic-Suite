@@ -423,7 +423,7 @@ artifacts:
     The catalogued path had an explanation appended to it, kept here: ~/.config/Windsurf/User/globalStorage/state.vscdb  (ItemTable key: windsurfAuthStatus)
 
     Record structure: Standard VS Code ItemTable(key, value BLOB). Windsurf-specific keys: windsurfAuthStatus (JSON containing an apiKey field plus base64-encoded protobuf blobs for the cached allowed-models list) and windsurf.settings.cachedPlanInfo (quota/usage counters: quotaUsage, or usedMessages/messages and usedFlowActions/flowActions in newer shapes). Generic VS Code chat keys worth checking: chat.ChatSessionStore.index (observed EMPTY: {"version":1,"entries":{}}), aiService.prompts, workbench.panel.aichat.view.aichat.chatdata, agentSessions.model.cache. CONVERSATION CONTENT IS NOT HERE — only session metadata (title, cwd, lastActivity) and UI state.
-  parser: sqlite_generic
+  parser: vscode_state
 - id: windsurf.ide_workspace_state_vscdb
   category: config
   root: user_profile
@@ -449,7 +449,7 @@ artifacts:
     Explicitly described by an independent instrumentation project as a 'narrow legacy DB history fallback' behind the authoritative Cascade transcript. Do not build the Windsurf parser on this.
 
     Record structure: ItemTable only. Legacy VS Code chat keys (aiService.prompts, workbench.panel.aichat.view.aichat.chatdata) can be populated on older builds and are the only SQLite-resident Windsurf chat text; treat as a narrow legacy fallback, not the primary transcript. workspace.json beside it maps the hash to a folder URI.
-  parser: sqlite_generic
+  parser: vscode_state
 - id: windsurf.auth_credentials
   category: credentials
   root: user_profile

@@ -224,6 +224,25 @@ def test_a_compressed_store_under_the_local_data_root_is_read_rather_than_record
     assert "the lockfile is stale" in texts
 
 
+def test_the_editors_state_store_is_read_by_the_key_it_is_stored_under(
+    windows_case: list[dict[str, Any]],
+) -> None:
+    """The one file five catalogue entries across three products are, read where it lives.
+
+    A key/value store is searched by its key, so the key has to be a field of the event and
+    not something inside raw. This is the end-to-end half of that: the store is found by a
+    Windows application-data pattern, collected, matched to its entry, and read by the
+    parser that has the vendor's schema.
+    """
+    keys = [
+        json.loads(row["payload"]).get("key")
+        for row in windows_case
+        if row["artifact_id"] == "vscode.state_vscdb" and row["kind"] == "config.snapshot"
+    ]
+    assert "extensionIdentifiers/enabled" in keys
+    assert "aiService.prompts" in keys
+
+
 def test_a_file_with_no_parser_is_carried_rather_than_dropped(
     windows_case: list[dict[str, Any]],
 ) -> None:
@@ -302,7 +321,7 @@ def test_the_same_task_reads_the_same_from_both_shapes(
 def test_the_fixture_declares_why_each_artifact_is_in_it() -> None:
     """The fixture names its own coverage, so a gap is a sentence rather than an absence.
 
-    Six artifacts out of the eighty-four the catalogue has under the two application-data
+    Seven artifacts out of the eighty-four the catalogue has under the two application-data
     roots. The number is not the point and raising it is not automatically an improvement:
     what this pins is that the chain works for every shape in the fixture, and that
     somebody said out loud which shapes those are.
@@ -313,6 +332,7 @@ def test_the_fixture_declares_why_each_artifact_is_in_it() -> None:
         "goose.config",
         "goose.secrets",
         "kilo_code.extension_id_legacy_tree",
+        "vscode.state_vscdb",
         "zed.threads_db",
     }
     for artifact, reason in WINDOWS_ARTIFACTS.items():

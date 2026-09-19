@@ -34,6 +34,7 @@ from agentforensics.parsers.instructions import InstructionsParser
 from agentforensics.parsers.opencode import OpencodeParser
 from agentforensics.parsers.pi import PiParser
 from agentforensics.parsers.sqlite_generic import SqliteGenericParser
+from agentforensics.parsers.vscode_state import VscodeStateParser
 from agentforensics.parsers.zed import ZedParser
 
 # Order matters only in that the first parser to claim an artifact wins, so a more specific
@@ -52,6 +53,10 @@ PARSERS: tuple[Parser, ...] = (
     # this one has a verified schema, so it claims opencode.db and the reader does not.
     OpencodeParser(),
     PiParser(),
+    # Five catalogue entries across three products are one file with one schema, read
+    # here rather than by the generic reader, which had the key in raw and the value in
+    # text and said nobody had read the store.
+    VscodeStateParser(),
     ZedParser(),
     # Last, and it has to stay last: it claims every SQLite store in the catalogue, so a
     # verified schema parser placed after it would never be reached.

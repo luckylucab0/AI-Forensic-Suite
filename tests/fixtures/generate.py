@@ -828,6 +828,48 @@ def write_zed_store(path: Path, folder: str, mtime: int = RECENT) -> Path:
     return path
 
 
+# The table the editor creates on connect, copied from the vendor's own CREATE statement so
+# the fixture cannot drift into a schema the parser was not written against:
+# https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/base/parts/storage/node/storage.ts
+VSCODE_SCHEMA = (
+    "CREATE TABLE IF NOT EXISTS ItemTable (key TEXT UNIQUE ON CONFLICT REPLACE, value BLOB)"
+)
+
+
+def write_vscode_state(path: Path, mtime: int = RECENT) -> Path:
+    """The editor's key/value state store, holding what an agent extension left in it.
+
+    Two rows and no more, because what this exercises is the reading and not the volume: a
+    list of enabled extensions, which is how a case answers whether an agent was installed
+    at all, and one legacy chat key, which is where an older build kept the prompts. Both
+    are written as JSON in a BLOB column, which is what the storage layer does.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        path.unlink()
+    connection = sqlite3.connect(path)
+    try:
+        connection.execute(VSCODE_SCHEMA)
+        connection.executemany(
+            "INSERT INTO ItemTable VALUES (?,?)",
+            [
+                (
+                    "extensionIdentifiers/enabled",
+                    json.dumps([{"id": "example.agent-extension"}], sort_keys=True).encode(),
+                ),
+                (
+                    "aiService.prompts",
+                    json.dumps([{"text": "remove the debug logging"}], sort_keys=True).encode(),
+                ),
+            ],
+        )
+        connection.commit()
+    finally:
+        connection.close()
+    os.utime(path, (mtime, mtime))
+    return path
+
+
 # What build_windows_home writes, as {catalogue artifact id: why it is in the fixture}.
 # Named here rather than only in a test, because the value of this tree is that each file
 # is reached by a Windows application-data pattern from the catalogue and nothing else, and
@@ -839,6 +881,10 @@ WINDOWS_ARTIFACTS = {
         "them can only be the path"
     ),
     "zed.threads_db": "a compressed thread store under the local data root",
+    "vscode.state_vscdb": (
+        "the editor's key/value state store, which five catalogue entries across three "
+        "products are, so the one file's reading is exercised where it actually lives"
+    ),
     "goose.secrets": "a credential file, so the withholding rule is exercised on a "
     "Windows path rather than only on a POSIX one",
     "goose.config": "its non-secret sibling in the same directory",
@@ -894,6 +940,7 @@ def build_windows_home(home: Path) -> dict:
     write(task / "context_history.json", '{"truncated": ', RECENT)
 
     write_zed_store(local / "Zed" / "threads" / "threads.db", project.replace("\\", "/"))
+    write_vscode_state(roaming / "Code" / "User" / "globalStorage" / "state.vscdb")
 
     goose_config = roaming / "Block" / "goose" / "config"
     write(
