@@ -1572,3 +1572,90 @@ def test_no_parser_declares_an_artifact_the_catalogue_does_not_have() -> None:
         "these readers name an artifact the catalogue does not have, so they claim nothing "
         f"and nothing says so: {wrong}"
     )
+
+
+# A file this suite can read, in the catalogue, that nothing reads. Each one is a decision
+# somebody made and wrote down; the test below fails on any that is not here, so the
+# question "why does nothing read this" always has an answer next to it.
+#
+# Not listed, and not needing to be: every entry whose sensitivity is secret. The collector
+# records those by metadata and hash and does not copy the content unless it is told to, so
+# there is nothing for a parser to read and a list of them would be a list of the same
+# sentence twenty-six times.
+READABLE_AND_UNREAD = {
+    "cline.extension_id": "the entry is the extension's storage directory, and what is "
+    "under it is claimed by the entries for the task tree and the checkpoints. The id "
+    "itself is the evidence and it is in the path, which the artifact event carries",
+    "crosscutting.homebrew_prefixes": "an installation prefix, so the evidence is which "
+    "directories exist under it rather than what any one file says",
+    "crosscutting.uv_tool_dir": "declared and deliberately not read by the reader for this "
+    "format, which says why in its own module: the manifests here describe the installer's "
+    "own bookkeeping rather than an agent's activity",
+    "jetbrains_ai.base_directories": "the entry is the product's directory layout, which "
+    "is what makes the other entries for this family resolvable. The files under it are "
+    "claimed by those",
+    "roo_code.extension_id": "the same shape as the other extension id entry above",
+    "windsurf.enterprise_policy_templates": "group-policy templates, which are XML and say "
+    "which settings exist rather than which were set. What was set is in the registry keys "
+    "of the entry beside this one, and nothing in this suite reads the registry",
+}
+
+# The formats this suite has a reader for. A catalogue entry in one of these and claimed by
+# nobody is the case worth catching: the others need format work and the filesystem event
+# is the honest answer for them until somebody does it.
+_READABLE_FORMATS = frozenset(
+    {"json", "jsonl", "leveldb", "markdown", "plist", "sqlite", "text", "toml", "yaml"}
+)
+
+
+def test_a_readable_artifact_is_read_or_says_why_not() -> None:
+    """The quiet way this project's coverage would stop growing.
+
+    A catalogue entry in a format the suite already reads, claimed by no parser, produces
+    one inventory row in a case and nothing else. That is indistinguishable from an agent
+    that wrote nothing, and it is the state a hundred and ninety artifacts were in when the
+    parsers were started. What stops it coming back is not remembering: it is that adding
+    such an entry fails here until somebody either reads it or writes down why not.
+
+    Both directions, so a reason that stops being needed has to be removed rather than
+    sitting here making the check look narrower than it is.
+    """
+    from agentforensics.catalog import load_catalogue
+
+    catalogue = load_catalogue(Path(__file__).resolve().parents[2] / "catalog")
+    unread = {
+        artifact.id
+        for artifact in catalogue.artifacts
+        if artifact.format in _READABLE_FORMATS
+        and artifact.sensitivity != "secret"
+        and for_artifact(artifact.id) is None
+    }
+    assert unread == set(READABLE_AND_UNREAD), {
+        "readable, read by nothing, and no reason given": sorted(unread - set(READABLE_AND_UNREAD)),
+        "now read, or gone from the catalogue": sorted(set(READABLE_AND_UNREAD) - unread),
+    }
+    for artifact_id, reason in READABLE_AND_UNREAD.items():
+        assert reason.strip(), artifact_id
+
+
+def test_a_withheld_artifact_is_the_only_thing_excused_without_a_reason() -> None:
+    """The one class that needs no individual justification, held to its own rule.
+
+    An entry marked secret has its content withheld by the collector, so a parser would be
+    handed a file that is not there. That is a good reason and it applies to every one of
+    them equally, which is why they are excused as a class. This asserts the class is what
+    it says it is: every excused entry is a credential store, so the exemption cannot
+    quietly widen to cover a transcript somebody marked secret by mistake.
+    """
+    from agentforensics.catalog import load_catalogue
+
+    catalogue = load_catalogue(Path(__file__).resolve().parents[2] / "catalog")
+    wrong = [
+        artifact.id
+        for artifact in catalogue.artifacts
+        if artifact.sensitivity == "secret" and artifact.category != "credentials"
+    ]
+    assert not wrong, (
+        "these entries withhold their content and are not credential stores, so they are "
+        f"excused from being read for a reason that does not apply to them: {wrong}"
+    )

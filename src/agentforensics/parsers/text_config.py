@@ -45,14 +45,19 @@ from agentforensics.parsers.instructions import BINARY_FILE, MAX_TEXT
 SOURCES = frozenset(
     {
         "claude_code.anthropic_active_config",
+        "claude_code.changelog_cache",
         "claude_code.git_global_excludes",
         "claude_code.worktreeinclude",
         "claude_desktop.device_identifier",
+        "claude_desktop.install_evidence_linux",
         "cline.data_dir_root",
         "cline.workspace_specs",
         "continue.aux_config",
+        "copilot.ide_locks",
+        "cursor.machine_identity_file",
         "cursor.retrieval_index",
         "ollama.env_overrides",
+        "qwen_code.install_evidence",
         "windsurf.ignore_files",
     }
 )

@@ -1034,7 +1034,7 @@ artifacts:
     Record structure: Cached copy of the vendor changelog shown by `/release-notes`. Plain markdown with `## <version>` headings.
 
     Cached copy of the Claude Code changelog, shown by /release-notes.
-  parser: null
+  parser: text_config
 - id: claude_code.git_global_excludes
   category: install_evidence
   root: user_profile

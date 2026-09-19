@@ -67,7 +67,7 @@ artifacts:
     Lock files, so they exist while an integration is live and are cleaned up when it is not. Documented as "Lock files and state for IDE integrations" that are "automatically managed", which is another way of saying they will not be there later.
   notes: |-
     Worth collecting first precisely because it is worthless later: a lock file present at collection time says an IDE integration was running at that moment, which no durable artifact can establish.
-  parser: null
+  parser: text_config
 - id: copilot.session_store_sidecars
   category: transcript
   root: user_profile

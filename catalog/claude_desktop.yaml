@@ -1000,4 +1000,4 @@ artifacts:
     Uninstalling the package removes the repository entry and signing key it registered, so absence of these files does not mean the app was never installed. The dpkg metadata and logs outlive the package files.
   notes: |-
     The vendor states the package name is claude-desktop, installed from Anthropic's apt repository at downloads.claude.ai, registering /etc/apt/sources.list.d/claude-desktop.list and /usr/share/keyrings/claude-desktop-archive-keyring.asc, and that creating /etc/default/claude-desktop with CLAUDE_DESKTOP_ADD_REPO="false" suppresses the repository registration. Cowork on Linux needs QEMU, OVMF and virtiofsd plus the vhost_vsock kernel module, so /etc/modules-load.d/vhost_vsock.conf is corroborating evidence that on-device Cowork was set up. Linux is a beta platform. The dpkg path is the standard location and is not stated by the vendor, so it is listed as unsourced; prefer /var/log/apt and the dpkg status file for the install timeline.
-  parser: null
+  parser: text_config

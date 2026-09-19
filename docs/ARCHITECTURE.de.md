@@ -114,10 +114,13 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 34 Module lesen 370 der 473
-  Katalogartefakte; der Rest sind die Anmeldedatenspeicher, die absichtlich niemand liest,
-  die Installationsspuren, die das Dateisystem-Ereignis beantwortet, und die Binärspeicher,
-  die noch eigene Formate brauchen.
+  zählt diese Dateien und sagt, welche es sind. 34 Module lesen 375 der 473
+  Katalogartefakte, und was der Rest ist, wird behauptet und nicht angenommen: jeder Eintrag
+  in einem Format, das diese Suite liest, wird entweder gelesen oder trägt einen
+  aufgeschriebenen Grund, warum nicht, und die Anmeldedatenspeicher sind als Klasse
+  ausgenommen, weil der Collector ihren Inhalt zurückhält, was ein Test darauf festnagelt,
+  nur für Anmeldedatenspeicher zu gelten. Was bleibt, braucht Formatarbeit, und dafür ist
+  das Dateisystem-Ereignis die ehrliche Antwort, bis sie jemand macht.
 
   **Die Agenten-Parser** sind die, die gegen eine Herstellerquelle geschrieben wurden:
   Claude Code, Codex CLI und dessen Projektion in Zeilen, Copilot CLI, Gemini CLI und Qwen

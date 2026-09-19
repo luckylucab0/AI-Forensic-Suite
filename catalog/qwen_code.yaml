@@ -885,4 +885,4 @@ artifacts:
     installation_id is written once and then stable, which makes it a durable pseudonymous identifier for the install. Older version directories under updates/npm are pruned by the updater.
   notes: |-
     installation_id and bin are constructed in storage.ts (the cited source). source.json is read by the telemetry client from BOTH the QWEN_HOME-relative path and the literal ~/.qwen/source.json, because the installer writes to the real home directory regardless of QWEN_HOME - so with QWEN_HOME set this file is the one artifact that stays behind; that path is stated in packages/core/src/telemetry/qwen-logger/qwen-logger.ts, not in the cited file. The updates/npm tree is stated in packages/cli/src/utils/managed-npm-update.ts and gives a version history of the install. The npm package name is @qwen-code/qwen-code, so also check the global npm prefix and its node_modules for the installed version, which is not under ~/.qwen at all.
-  parser: null
+  parser: text_config
