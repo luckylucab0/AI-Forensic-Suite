@@ -20,6 +20,7 @@ Findings are written into the case database next to the events they rest on, and
 |  | [AFX-ANTIFORENSICS-002](#afx-antiforensics-002) | high |
 |  | [AFX-ANTIFORENSICS-003](#afx-antiforensics-003) | critical |
 |  | [AFX-ANTIFORENSICS-004](#afx-antiforensics-004) | high |
+| [`collection_integrity`](#collection-integrity) | [AFX-COLLECTIONINTEGRITY-001](#afx-collectionintegrity-001) | medium |
 | [`dangerous_commands`](#dangerous-commands) | [AFX-DANGEROUSCOMMANDS-001](#afx-dangerouscommands-001) | high |
 |  | [AFX-DANGEROUSCOMMANDS-002](#afx-dangerouscommands-002) | high |
 |  | [AFX-DANGEROUSCOMMANDS-003](#afx-dangerouscommands-003) | medium |
@@ -182,6 +183,41 @@ A shell command deletes or truncates a path that holds agent history or shell hi
 - A redirection into an unrelated file whose path merely mentions one of these directories, since the two halves of this rule are matched over the whole record rather than against each other.
 
 *Samples in the rule file:* 4 / 2 (+/-)
+
+## collection integrity
+
+Whether what was collected can answer the question it is being asked. Every other pack says something happened on the endpoint; this one says a part of the collection may be looking in the wrong place, which is the one failure that reads exactly like a clean result. Its rule is generated from the catalogue, because a list of catalogue facts copied into a rule file is a list that stops being true without anybody noticing.
+
+#### AFX-COLLECTIONINTEGRITY-001
+
+**An agent was configured to write somewhere else, or not at all**
+
+| | |
+| --- | --- |
+| Severity | medium |
+| Pack | `collection_integrity` |
+| Agents | `any` |
+| Event kinds | `config.snapshot`, `prompt.history`, `command.exec`, `unparsed.record` |
+| Fields read | `event_text` |
+| Tags | `collection-integrity`, `relocated-tree` |
+
+A shell profile, or the environment an agent ran in, exports a variable the catalogue records as changing where that agent keeps its data or whether it keeps it. What was collected from the default path is therefore not necessarily what that agent wrote.
+
+*What it matches:* `event_text matches /\b(ANTHROPIC_CONFIG_DIR\|CLAUDE_CODE_DEBUG_LOGS_DIR\|CLAUDE_CODE_PLUGIN_CACHE_DIR\|CLAUDE_CODE_PROJECT_DIR_NAME\|CLAUDE_CODE_SKIP_PROMPT_HISTORY\|CLAUDE_CONFIG_DIR\|CLAUDE_DESKTOP_ADD_REPO\|CLAUDE_PLUGIN_ROOT\|CLINE_CONNECTORS_DB_PATH\|CLINE_CONNECTOR_DATA_DIR\|CLINE_CONNECTOR_SETTINGS_PATH\|CLINE_CRON_DB_PATH\|CLINE_DATA_DIR\|CLINE_DB_DATA_DIR\|CLINE_DIR\|CLINE_GLOBAL_SETTINGS_PATH\|CLINE_HOOKS_LOG_PATH\|CLINE_MCP_SETTINGS_PATH\|CLINE_PROVIDER_SETTINGS_PATH\|CLINE_SESSION_DATA_DIR\|CLINE_TASKS_DB_PATH\|CLINE_TEAM_DATA_DIR\|CODEX_HOME\|CODEX_SQLITE_HOME\|CONTINUE_GLOBAL_DIR\|COPILOT_CACHE_HOME\|COPILOT_HOME\|COPILOT_PROVIDERS_CONFIG\|CURSOR_CONFIG_DIR\|CURSOR_TRANSCRIPT_PATH\|GEMINI_CLI_HOME\|GEMINI_CLI_SYSTEM_DEFAULTS_PATH\|GEMINI_CLI_SYSTEM_SETTINGS_PATH\|GEMINI_CLI_TRUSTED_FOLDERS_PATH\|GEMINI_SYSTEM_MD\|HERMES_HOME\|KIRO_ACP_RECORD_PATH\|KIRO_API_KEY\|KIRO_CHAT_LOG_FILE\|KIRO_HOME\|KIRO_LOG_LEVEL\|KIRO_LOG_NO_COLOR\|OLLAMA_MODELS\|PI_CODING_AGENT_SESSION_DIR\|QWEN_CODE_FORCE_ENCRYPTED_FILE_STORAGE\|QWEN_CODE_MCP_APPROVALS_PATH\|QWEN_CODE_MEMORY_BASE_DIR\|QWEN_CODE_MEMORY_LOCAL\|QWEN_CODE_MEMORY_PROJECT_SCOPE\|QWEN_CODE_PROFILE_STARTUP\|QWEN_CODE_SYSTEM_DEFAULTS_PATH\|QWEN_CODE_SYSTEM_SETTINGS_PATH\|QWEN_DEBUG_LOG_FILE\|QWEN_HOME\|QWEN_RUNTIME_DIR\|QWEN_SANDBOX\|QWEN_SANDBOX_IMAGE\|QWEN_SANDBOX_NET\|QWEN_TELEMETRY_OUTFILE\|Q_CLI_DATA_DIR\|Q_DISABLE_TELEMETRY\|Q_LOG_LEVEL\|Q_LOG_STDOUT\|Q_ZDOTDIR\|SEATBELT_PROFILE\|WINDSURF_CONFIG_DIR)[^\S\n]*[=:][^\S\n]*\S/`
+
+*Why an analyst cares:* This rule is about the case rather than about the endpoint, which is why it exists at all. Every other finding says something happened; this one says a part of the collection may be answering the wrong question. An agent whose home was moved leaves nothing at the path a collection searched, and nothing found there reads exactly like an agent that was never used. The variable is usually set for an ordinary reason, so this is not a suspicion about anybody: it is an instruction to go back and collect the path the variable names before concluding anything from an empty result.
+
+*Known false positives:*
+
+- A variable set to the location the agent uses anyway, which changes nothing and is common in a profile that spells out a default.
+- A mention in a configuration file or a script that explains the variable rather than setting it, since the rule searches the text a record holds. A question about the variable in a conversation is out of scope by kind and cannot reach this rule.
+- A variable that was exported after the period under investigation, since a profile says what is in force and not when a line was added to it.
+
+*References:*
+
+- <https://code.claude.com/docs/en/troubleshoot-install.md>
+
+*Samples in the rule file:* 2 / 2 (+/-)
 
 ## dangerous commands
 

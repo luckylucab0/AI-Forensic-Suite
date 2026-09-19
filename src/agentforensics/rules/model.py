@@ -46,6 +46,10 @@ SEVERITY_ORDER = {"critical": 0, "high": 1, "medium": 2, "low": 3, "info": 4}
 # a data loss prevention question rather than a question about what an agent did.
 PACKS = (
     "anti_forensics",
+    # About the case rather than about the endpoint: whether what was collected can answer
+    # the question it is being asked. Every other pack says something happened; this one
+    # says a part of the collection may be looking in the wrong place.
+    "collection_integrity",
     "dangerous_commands",
     "data_volume",
     "exfil_indicators",

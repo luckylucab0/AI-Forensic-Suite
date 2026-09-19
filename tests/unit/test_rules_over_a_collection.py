@@ -52,6 +52,8 @@ EXPECTED = {
     "AFX-ANTIFORENSICS-002": "~/.zsh_history holds the export that stops the prompt history "
     "being written, and the captured shell environment holds it as a variable that was in "
     "force",
+    "AFX-COLLECTIONINTEGRITY-001": "~/.zshrc exports the variable that moves the agent's "
+    "whole configuration tree away from the path this very fixture writes it to",
     "AFX-DANGEROUSCOMMANDS-002": "a transcript holds a command that pipes a download into a shell",
     "AFX-EXFILINDICATORS-004": "~/.zsh_history holds a command that uploaded a named file",
     "AFX-PERMISSIONBYPASS-001": "~/.zsh_history holds the start line that skips the prompts",

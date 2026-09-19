@@ -43,6 +43,20 @@ LOCALES_DIR = DOCS_DIR / "locales"
 # still has to appear in the reference: a reader has to be able to tell a pack that found
 # nothing from a pack that does not exist.
 PACK_INTROS = {
+    "collection_integrity": {
+        "en": "Whether what was collected can answer the question it is being asked. Every "
+        "other pack says something happened on the endpoint; this one says a part of the "
+        "collection may be looking in the wrong place, which is the one failure that reads "
+        "exactly like a clean result. Its rule is generated from the catalogue, because a "
+        "list of catalogue facts copied into a rule file is a list that stops being true "
+        "without anybody noticing.",
+        "de": "Ob das Gesammelte die Frage beantworten kann, die ihm gestellt wird. Jedes "
+        "andere Pack sagt, dass auf dem Endpunkt etwas geschehen ist; dieses sagt, dass "
+        "ein Teil der Sammlung an der falschen Stelle sucht, und das ist der eine "
+        "Fehlschlag, der sich genau wie ein sauberes Ergebnis liest. Seine Regel wird aus "
+        "dem Katalog erzeugt, denn eine Liste von Katalogtatsachen, die in eine Regeldatei "
+        "kopiert wurde, hört auf zu stimmen, ohne dass es jemand merkt.",
+    },
     "secrets": {
         "en": "Credentials that reached a transcript. These rules search the whole record "
         "rather than the mapped fields, because a credential can sit anywhere in one, "

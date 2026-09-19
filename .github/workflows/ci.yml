@@ -96,6 +96,13 @@ jobs:
       - name: Generated collection rules current with the catalogue
         run: uv run python scripts/gen_collection_rules.py --check
 
+      # The one rule in this repository that is generated rather than written. It names
+      # sixty-odd environment variables the catalogue records as moving an agent's data,
+      # and a stale copy of that list is a rule that quietly stops covering the agent
+      # somebody added last week.
+      - name: The relocation rule current with the catalogue
+        run: uv run python scripts/gen_relocation_rule.py --check
+
       # A rule that fires on everything passes every positive sample it has, so the
       # samples are only worth anything with the negative ones beside them, which the
       # loader enforces. This step is what makes them run outside the test suite too, so a

@@ -98,6 +98,13 @@ repos:
         pass_filenames: false
         files: '^(catalog/|exporters/|src/agentforensics/exporters/|scripts/gen_collection_rules\.py)'
 
+      - id: relocation-rule
+        name: the relocation rule current with the catalogue
+        entry: uv run python scripts/gen_relocation_rule.py --check
+        language: system
+        pass_filenames: false
+        files: '^(catalog/|rules/collection_integrity/|scripts/gen_relocation_rule\.py)'
+
       - id: rule-self-test
         name: every rule agrees with its own samples
         entry: uv run agentforensics scan --self-test

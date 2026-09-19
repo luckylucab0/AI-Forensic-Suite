@@ -17,6 +17,7 @@
       "type": "string",
       "enum": [
         "anti_forensics",
+        "collection_integrity",
         "dangerous_commands",
         "data_volume",
         "exfil_indicators",
