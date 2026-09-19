@@ -32,3 +32,5 @@ Add one with the next free number, using [0000-template.md](0000-template.md).
 | [0022](0022-an-unknown-sqlite-store-is-read-uninterpreted.md) | A SQLite store with no verified schema is read uninterpreted, never guessed |
 | [0023](0023-the-instruction-surface-is-its-own-event-kind.md) | The instruction surface is read into its own event kind, and is never called a system prompt |
 | [0024](0024-the-python-floor-is-3-14.md) | The analyzer requires Python 3.14, so zstd comes from the standard library |
+| [0025](0025-the-attribution-of-a-file-is-a-hint-not-a-verdict.md) | The entry a source attributed a file to is a hint, and the best claimant wins |
+| [0026](0026-a-store-comparison-is-a-view-not-a-rule.md) | Comparing an agent's stores against each other is a view, and produces no findings |
