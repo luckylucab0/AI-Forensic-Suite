@@ -9224,6 +9224,17 @@ def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> l
     dropped: a collector that quietly searches nothing produces a clean bundle from a
     host it never looked at.
     """
+    # Both of these are a prefix of every pattern this function returns, and a Windows
+    # caller hands them over with backslashes: str(Path) does, and so does an operator
+    # typing --root D:\image. The collector's own entry point normalises them and this
+    # function relied on that, which left it wrong for every other caller. A backslashed
+    # root failed the startswith test in the re-anchoring below, so the path was anchored a
+    # second time and the profile home appeared twice in it. Normalised here, where the
+    # precondition cannot be missed.
+    home = as_posix(home)
+    if root:
+        root = as_posix(root)
+
     text = pattern
     if text.startswith("<vscode-user>"):
         results = []

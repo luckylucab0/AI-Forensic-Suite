@@ -825,7 +825,9 @@ def test_a_redirected_placeholder_is_searched_as_well_as_its_default(monkeypatch
     other, because the default can still hold what was written before the redirection.
     """
     collect = _load_collector()
-    home = str(tmp_path / "profile")
+    # as_posix, because that is what the collector passes: str(Path) is backslashed on
+    # Windows, and an expectation built from it asserts the platform rather than the code.
+    home = (tmp_path / "profile").as_posix()
     monkeypatch.setattr(collect.os.path, "expanduser", lambda _: home)
     monkeypatch.setenv("APPDATA", "D:\\redirected\\Roaming")
     collect.PATTERN_REFUSALS.clear()
@@ -850,7 +852,7 @@ def test_another_user_s_profile_is_not_given_this_process_s_variables(
     profile would search one person's directory and file it under another's name.
     """
     collect = _load_collector()
-    monkeypatch.setattr(collect.os.path, "expanduser", lambda _: str(tmp_path / "mine"))
+    monkeypatch.setattr(collect.os.path, "expanduser", lambda _: (tmp_path / "mine").as_posix())
     monkeypatch.setenv("APPDATA", "D:\\redirected\\Roaming")
     collect.PATTERN_REFUSALS.clear()
 
@@ -867,13 +869,16 @@ def test_a_mounted_image_is_never_asked_about_this_machine_s_variables(
 ) -> None:
     """The analyst workstation's environment says nothing about the endpoint in the image."""
     collect = _load_collector()
-    home = str(tmp_path / "img" / "Users" / "alice")
+    home = (tmp_path / "img" / "Users" / "alice").as_posix()
     monkeypatch.setattr(collect.os.path, "expanduser", lambda _: home)
     monkeypatch.setenv("APPDATA", "D:\\redirected\\Roaming")
     collect.PATTERN_REFUSALS.clear()
 
     resolved = collect.expand_paths(
-        "%APPDATA%\\Block\\goose\\sessions.db", home, "windows", str(tmp_path / "img")
+        "%APPDATA%\\Block\\goose\\sessions.db",
+        home,
+        "windows",
+        (tmp_path / "img").as_posix(),
     )
 
     assert resolved == [f"{home}/AppData/Roaming/Block/goose/sessions.db"]
@@ -957,3 +962,32 @@ def test_a_discovered_profile_home_never_carries_a_backslash(monkeypatch, tmp_pa
     assert [user["name"] for user in found] == ["alice", "bob"]
     for user in found:
         assert "\\" not in user["home"], user
+
+
+def test_a_backslashed_home_or_root_does_not_double_the_profile(monkeypatch) -> None:
+    """The function used to rely on its caller having normalised these two.
+
+    The collector's own entry point does, so this never showed up there. Any other caller,
+    including a test that built a path with str(Path) on Windows, got a home and a root full
+    of backslashes, and then the re-anchoring's startswith test failed for a separator
+    reason rather than a path reason: the pattern was anchored under the root a second time
+    and the profile home appeared twice in it. A pattern like that matches nothing, which is
+    this project's one unacceptable outcome, so the normalisation is at the top of the
+    function now instead of in the caller's hands.
+    """
+    import ntpath
+
+    collect = _load_collector()
+    monkeypatch.setattr(collect.os, "path", ntpath)
+    collect.PATTERN_REFUSALS.clear()
+
+    resolved = collect.expand_paths(
+        "%APPDATA%\\Block\\goose\\sessions.db",
+        "C:\\image\\Users\\alice",
+        "windows",
+        "C:\\image",
+    )
+
+    assert resolved == ["C:/image/Users/alice/AppData/Roaming/Block/goose/sessions.db"]
+    assert not collect.PATTERN_REFUSALS
+    collect.PATTERN_REFUSALS.clear()
