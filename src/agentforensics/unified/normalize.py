@@ -47,10 +47,14 @@ class NormalizeReport:
     files_failed: int = 0
     events: int = 0
     unparsed_records: int = 0
-    # The part of that number which was read and has no verified mapping yet. Separate
-    # because the endpoint query this log is compared against makes the same distinction:
-    # a record it could not decode and a record it returned uninterpreted are different
-    # answers, and a log summary that merged them would not match the hunt's.
+    # Records nothing could read at all, counted on its own rather than as a difference:
+    # a read record with no verified mapping is filed under whatever kind the catalogue
+    # could say it was, so it is not always an unparsed.record.
+    unreadable_records: int = 0
+    # Records that were read and whose format nobody has mapped yet. Separate because the
+    # endpoint query this log is compared against makes the same distinction: a record it
+    # could not decode and a record it returned uninterpreted are different answers, and a
+    # log summary that merged them would not match the hunt's.
     uninterpreted_records: int = 0
     agents: dict[str, int] = field(default_factory=dict)
     # Paths no catalogue entry claims. Each one is a lead: an agent nobody has catalogued,
@@ -68,7 +72,7 @@ class NormalizeReport:
         if self.agents:
             named = ", ".join(f"{name} {count}" for name, count in sorted(self.agents.items()))
             lines.append(f"  by agent: {named}")
-        unreadable = self.unparsed_records - self.uninterpreted_records
+        unreadable = self.unreadable_records
         if unreadable:
             lines.append(
                 f"  {unreadable} record(s) nothing could read, written to the log as "
@@ -140,6 +144,7 @@ def normalize(
             else:
                 report.files_parsed += 1
         report.unparsed_records += read.unparsed_records
+        report.unreadable_records += read.unreadable_records
         report.uninterpreted_records += read.uninterpreted_records
         events.extend(read.events)
 

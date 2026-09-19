@@ -231,6 +231,116 @@ DOCUMENTS = frozenset(
 )
 
 
+# The documents the catalogue files as configuration, which is the one thing about them
+# that is known without reading a byte. A record out of one of these is a snapshot of that
+# configuration, so it is `config.snapshot` rather than `unparsed.record`: the kind says
+# what the record is, and the catalogue is what says it, not a guess at the document.
+#
+# It matters beyond tidiness. A rule is shown the events its `applies_to` names, and the
+# pack that asks which MCP servers were configured, whether the model endpoint was pointed
+# elsewhere, whether retention was lowered and which hooks were set is written against
+# `config.snapshot`. Filed as unparsed records, every one of those documents would be in
+# the case and invisible to the rules that exist to read them, which was the state this
+# catalogue was in: four shipped rules could not fire on a real collection at all.
+#
+# Everything else keeps `unparsed.record`, because for a transcript or a log the catalogue
+# says what the file is and not what a record inside it is, and a turn read as a snapshot
+# would be worse than one read as unknown.
+CONFIGURATIONS = frozenset(
+    {
+        "aider.model_metadata",
+        "amazonq.cli_agents",
+        "amazonq.cli_mcp_config",
+        "amazonq.cli_settings",
+        "amazonq.ide_agent_config",
+        "amazonq.legacy_profiles_and_context",
+        "amp.session_pointer",
+        "amp.settings",
+        "claude_code.anthropic_profile_configs",
+        "claude_code.config_backups",
+        "claude_code.global_config",
+        "claude_code.keybindings",
+        "claude_code.known_marketplaces",
+        "claude_code.managed_mcp_json",
+        "claude_code.managed_settings_dropins",
+        "claude_code.managed_settings_file",
+        "claude_code.org_policy_cache",
+        "claude_code.plugin_manifests",
+        "claude_code.policy_limits",
+        "claude_code.project_mcp_json",
+        "claude_code.project_settings",
+        "claude_code.project_settings_local",
+        "claude_code.session_env",
+        "claude_code.themes",
+        "claude_code.user_settings",
+        "claude_code.user_settings_local",
+        "claude_desktop.code_launch_config",
+        "claude_desktop.cowork_account_settings",
+        "claude_desktop.local_config_library",
+        "claude_desktop.managed_policy_linux",
+        "claude_desktop.mcp_config",
+        "cline.agent_schedules",
+        "cline.global_settings",
+        "cline.global_state_json",
+        "cline.mcp_settings",
+        "cline.team_data",
+        "copilot.config_json",
+        "copilot.lsp_config",
+        "copilot.mcp_config",
+        "copilot.mcp_config_jetbrains",
+        "copilot.permissions",
+        "copilot.providers",
+        "copilot.settings",
+        "crosscutting.mcp_config_files",
+        "cursor.agent_cli_state",
+        "cursor.cli_config",
+        "cursor.hooks",
+        "cursor.mcp_config",
+        "cursor.project_metadata",
+        "factory_droid.auth",
+        "factory_droid.config",
+        "factory_droid.mcp_and_hooks",
+        "gemini_cli.google_accounts",
+        "gemini_cli.system_settings",
+        "gemini_cli.trusted_folders",
+        "gemini_cli.user_settings",
+        "jetbrains_ai.mcp_config",
+        "junie.allowlist",
+        "junie.home_config",
+        "junie.mcp_config",
+        "kiro.agents",
+        "kiro.cli_settings",
+        "kiro.hooks",
+        "kiro.managed_settings",
+        "kiro.mcp_config_project",
+        "kiro.mcp_config_user",
+        "lmstudio.mcp_config",
+        "ollama.app_config",
+        "ollama.cli_config",
+        "opencode.config",
+        "opencode.managed_config",
+        "opencode.tui_config",
+        "pi.models",
+        "pi.settings",
+        "qwen_code.channels_scheduled_tasks",
+        "qwen_code.mcp_approvals",
+        "qwen_code.project_mcp_config",
+        "qwen_code.project_settings",
+        "qwen_code.system_settings",
+        "qwen_code.trusted_folders",
+        "qwen_code.user_settings",
+        "roo_code.custom_storage_path",
+        "roo_code.settings",
+        "vscode.mcp_config",
+        "windsurf.acp_registry",
+        "windsurf.hooks",
+        "windsurf.ide_user_data",
+        "windsurf.mcp_config",
+        "zed.settings",
+    }
+)
+
+
 class JsonGenericParser:
     """The reading of last resort for a whole JSON document."""
 
@@ -303,11 +413,15 @@ class JsonGenericParser:
         field, raw_time = literal_field(record, TIME_FIELDS)
         when, precision, timing = normalise_ts(raw_time)
         text = literal_text(record)
-        return unparsed(
-            context.provenance(at),
-            context.agent,
-            value,
-            " ".join(part for part in (note, timing, UNINTERPRETED) if part),
+        return Event(
+            # What the record is, where the catalogue says so, and unknown otherwise. The
+            # reading is just as thin either way and the event says so either way: the kind
+            # is the one thing about these documents that rests on something checked.
+            kind="config.snapshot" if context.artifact_id in CONFIGURATIONS else "unparsed.record",
+            provenance=context.provenance(at),
+            agent=context.agent,
+            raw=value,
+            parse_problem=" ".join(part for part in (note, timing, UNINTERPRETED) if part),
             ts_utc=when,
             ts_precision=precision,
             ts_source=f"the field named {field}" if when and field else None,
@@ -333,4 +447,11 @@ def _splittable(value: Any) -> bool:
     )
 
 
-__all__ = ["DOCUMENTS", "NOT_SPLIT", "SPLIT_LIMIT", "UNINTERPRETED", "JsonGenericParser"]
+__all__ = [
+    "CONFIGURATIONS",
+    "DOCUMENTS",
+    "NOT_SPLIT",
+    "SPLIT_LIMIT",
+    "UNINTERPRETED",
+    "JsonGenericParser",
+]

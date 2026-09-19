@@ -204,12 +204,13 @@ UNINTERPRETED_MARK = "is returned uninterpreted"
 def is_uninterpreted(event: Event) -> bool:
     """Whether this record was read and is only waiting for somebody to map its format.
 
-    The other kind of `unparsed.record` is a record nothing could read at all. Both are in
-    the case, and a reader counting them as one number would call a whole store of intact
-    evidence unreadable, or lose one broken line among a hundred thousand rows nobody has
-    a schema for.
+    The mark alone, not the kind. Most of these records are `unparsed.record`, but a
+    document out of a catalogue entry the catalogue calls configuration is filed as a
+    `config.snapshot` with exactly as thin a reading, and a count that went by the kind
+    would report it as interpreted. The two questions are independent: what a record is,
+    and whether anybody has read the format it is in.
     """
-    return event.kind == "unparsed.record" and UNINTERPRETED_MARK in (event.parse_problem or "")
+    return UNINTERPRETED_MARK in (event.parse_problem or "")
 
 
 def unparsed(

@@ -80,16 +80,19 @@ def case_summary(case: Case) -> dict[str, Any]:
         dict(row)
         for row in case.query(
             "SELECT agent, count(*) AS events, "
-            "       sum(CASE WHEN kind = 'unparsed.record' THEN 1 ELSE 0 END) AS unparsed, "
-            # The part of that which was read and has no mapping yet, so a screen can say
-            # which of the two it is showing. One is a defect in the evidence and the other
-            # is evidence nobody has read.
+            # Two independent numbers, not a total and a part of it. One is a defect in the
+            # evidence: a record nothing could read. The other is evidence nobody has read
+            # the format of, which is filed under whatever kind the catalogue could say it
+            # was, so it is counted by the statement on the event and not by the kind.
             "       sum(CASE WHEN kind = 'unparsed.record' "
-            "                 AND parse_problem LIKE '%' || ? || '%' "
+            "                 AND (parse_problem IS NULL "
+            "                      OR parse_problem NOT LIKE '%' || ? || '%') "
+            "            THEN 1 ELSE 0 END) AS unreadable, "
+            "       sum(CASE WHEN parse_problem LIKE '%' || ? || '%' "
             "            THEN 1 ELSE 0 END) AS uninterpreted, "
             "       min(ts_utc) AS first_ts, max(ts_utc) AS last_ts "
             "  FROM events GROUP BY agent ORDER BY events DESC, agent",
-            (UNINTERPRETED_MARK,),
+            (UNINTERPRETED_MARK, UNINTERPRETED_MARK),
         )
     ]
     kinds = [
@@ -148,9 +151,11 @@ SELECT e.agent                                                             AS ag
        count(*)                                                            AS events,
        min(e.ts_utc)                                                       AS first_ts,
        max(e.ts_utc)                                                       AS last_ts,
-       sum(CASE WHEN e.kind = 'unparsed.record' THEN 1 ELSE 0 END)         AS unparsed,
        sum(CASE WHEN e.kind = 'unparsed.record'
-                 AND e.parse_problem LIKE '%' || :mark || '%'
+                 AND (e.parse_problem IS NULL
+                      OR e.parse_problem NOT LIKE '%' || :mark || '%')
+            THEN 1 ELSE 0 END)                                             AS unreadable,
+       sum(CASE WHEN e.parse_problem LIKE '%' || :mark || '%'
             THEN 1 ELSE 0 END)                                             AS uninterpreted,
        sum(CASE WHEN e.ts_utc IS NULL THEN 1 ELSE 0 END)                   AS undated,
        group_concat(DISTINCT e.kind)                                       AS kinds
@@ -205,7 +210,7 @@ def sessions(case: Case) -> list[dict[str, Any]]:
                 "session_id": row["session_id"],
                 "files": bool(row["files"]),
                 "events": int(row["events"]),
-                "unparsed": int(row["unparsed"] or 0),
+                "unreadable": int(row["unreadable"] or 0),
                 "uninterpreted": int(row["uninterpreted"] or 0),
                 "undated": int(row["undated"] or 0),
                 "first_ts": row["first_ts"],

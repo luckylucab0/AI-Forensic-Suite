@@ -471,6 +471,15 @@ class Case:
             "events_unparsed": query(
                 "SELECT count(*) AS n FROM events WHERE kind = 'unparsed.record'"
             ).fetchone()["n"],
+            # Records nothing could read at all: a line that would not decode, a half
+            # written record, a store that would not open. Counted on its own rather than
+            # as the difference between the two below, because the uninterpreted ones are
+            # not all filed under unparsed.record and a subtraction would go negative.
+            "events_unreadable": query(
+                "SELECT count(*) AS n FROM events WHERE kind = 'unparsed.record' "
+                "   AND (parse_problem IS NULL OR parse_problem NOT LIKE '%' || ? || '%')",
+                (UNINTERPRETED_MARK,),
+            ).fetchone()["n"],
             # The part of that total which was read fine and has no verified mapping yet,
             # so the two opposite answers under one kind can be told apart. A line that did
             # not decode is a defect in the evidence; a row of a store nobody has read a
@@ -479,8 +488,7 @@ class Case:
             # the second and the word unreadable in front of the total is wrong about
             # nearly all of it.
             "events_uninterpreted": query(
-                "SELECT count(*) AS n FROM events WHERE kind = 'unparsed.record' "
-                "   AND parse_problem LIKE '%' || ? || '%'",
+                "SELECT count(*) AS n FROM events WHERE parse_problem LIKE '%' || ? || '%'",
                 (UNINTERPRETED_MARK,),
             ).fetchone()["n"],
             "events_without_timestamp": query(

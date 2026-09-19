@@ -202,6 +202,7 @@ def test_a_record_read_out_of_an_unmapped_format_is_not_called_unreadable() -> N
         source_kind="directory",
         source_path="/tmp/x",
         unparsed_records=5,
+        unreadable_records=1,
         uninterpreted_records=4,
     )
 

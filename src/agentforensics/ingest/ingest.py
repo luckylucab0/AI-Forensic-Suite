@@ -57,10 +57,14 @@ class IngestReport:
     # events and two hundred unreadable records is a different case from one with a
     # thousand events and none.
     unparsed_records: int = 0
-    # The part of that number which was read and has no verified mapping yet, so the two
-    # opposite answers under one kind stay apart: a line that would not decode is a defect
-    # in the evidence, and a row of a store nobody has read a schema for is intact evidence
-    # with no reading yet.
+    # Records nothing could read at all. Counted on its own rather than as the difference
+    # between the two numbers around it: a record that was read and has no verified mapping
+    # is filed under whatever kind the catalogue could say it was, so it is not always an
+    # unparsed.record and a subtraction would go negative.
+    unreadable_records: int = 0
+    # Records that were read and whose format nobody has mapped yet. The opposite answer to
+    # the one above: a line that would not decode is a defect in the evidence, and a row of
+    # a store nobody has read a schema for is intact evidence with no reading yet.
     uninterpreted_records: int = 0
     gaps: int = 0
     # Files parsed under a claimant other than the source's own attribution. Reported
@@ -81,7 +85,7 @@ class IngestReport:
             f"{self.attributed_by_path} matched from the path, {self.unattributed} unclaimed",
             f"  {self.events} event(s)",
         ]
-        unreadable = self.unparsed_records - self.uninterpreted_records
+        unreadable = self.unreadable_records
         if unreadable:
             lines.append(
                 f"  {unreadable} record(s) nothing could read, kept in the case as "
@@ -132,6 +136,7 @@ class EntryEvents:
     # own log, and the one artifact.fs event per file is not one of them.
     parser_events: int
     unparsed_records: int
+    unreadable_records: int
     uninterpreted_records: int
     parser: str | None
     detail: str | None
@@ -174,6 +179,9 @@ def events_for(
         events=events,
         parser_events=len(parsed),
         unparsed_records=unreadable,
+        unreadable_records=sum(
+            1 for event in parsed if event.kind == "unparsed.record" and not is_uninterpreted(event)
+        ),
         uninterpreted_records=sum(1 for event in parsed if is_uninterpreted(event)),
         parser=parser_name,
         detail=detail,
@@ -246,6 +254,7 @@ def ingest(
             report.events += case.add_events(read.events)
             report.parsed_records += read.parser_events - read.unparsed_records
             report.unparsed_records += read.unparsed_records
+            report.unreadable_records += read.unreadable_records
             report.uninterpreted_records += read.uninterpreted_records
 
             status, detail = read.status, read.detail

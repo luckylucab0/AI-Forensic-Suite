@@ -145,7 +145,12 @@ it cannot be rewritten *quietly*.
   whole in the document event, which is visibly a partial reading rather than a wrong one.
   The credential stores are the one thing it does not claim, because a token in the payload
   of a timeline event is not what `--include-secrets` was for, and the file and its hash are
-  in the case either way. Beside
+  in the case either way. What a record out of one of these documents *is* comes from the
+  catalogue rather than from the document: an entry the catalogue files as configuration
+  produces `config.snapshot` records and everything else produces `unparsed.record`. That
+  is the difference between a case holding a configuration and the rules being able to read
+  it, and it was worth four shipped rules that could not fire on a real collection at all.
+  Beside
   it sits a second format-shaped module, `instructions/`, for the instruction surface: the
   sixty-three catalogue artifacts that hold skills, commands, output styles, rules, steering
   files and hook scripts. It reads each file whole, tells the scope apart from the working

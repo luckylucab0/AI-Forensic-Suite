@@ -1507,7 +1507,7 @@ function renderCasePanel(){
     // Two numbers, because they are opposite answers. A record nothing could read is a
     // defect in the evidence; a record read out of a format nobody has mapped is intact
     // evidence with no reading yet, and one store can hold a hundred thousand of them.
-    caseNum((counts.events_unparsed||0)-(counts.events_uninterpreted||0),'records unreadable',true),
+    caseNum(counts.events_unreadable||0,'records unreadable',true),
     caseNum(counts.events_uninterpreted||0,'records not yet mapped',true),
     caseNum(counts.events_without_timestamp||0,'events with no time',true),
     caseNum(counts.collection_gaps||0,'gaps in collection',true),
@@ -1538,7 +1538,7 @@ function renderCasePanel(){
     body.appendChild(el('div',{class:'case-block',text:'Agents'}));
     for(const agent of summary.agents){
       body.appendChild(kv(agent.agent,agent.events+' event(s)'
-        +((agent.unparsed-(agent.uninterpreted||0))?', '+(agent.unparsed-(agent.uninterpreted||0))+' unreadable':'')
+        +(agent.unreadable?', '+agent.unreadable+' unreadable':'')
         +(agent.uninterpreted?', '+agent.uninterpreted+' not yet mapped':'')
         +' · '+(agent.first_ts||'no earliest timestamp')+' to '+(agent.last_ts||'no latest timestamp')));
     }
@@ -2329,14 +2329,11 @@ function sessionMarks(session){
   if(!info) return [];
   const marks=[];
   if(findingSessions().has(info.session_id||'')) marks.push('findings');
-  if(unreadableCount(info)) marks.push('unreadable');
+  if(info.unreadable) marks.push('unreadable');
   if(info.uninterpreted) marks.push('unmapped');
   return marks;
 }
 
-// The records nothing could read: the rest of the unparsed ones were read and are only
-// waiting for somebody to map their format.
-function unreadableCount(info){return (info.unparsed||0)-(info.uninterpreted||0);}
 
 // The session ids a rule fired in. A finding with no session id belongs to no session and
 // is reachable in the Findings tab; it is not attached to an arbitrary one here.
@@ -2408,7 +2405,7 @@ function renderSidebar(){
             ? el('span',{class:'dot smark find',text:'findings',title:'A rule found something in this session'}):null,
           sessionMarks(s).indexOf('unreadable')>=0
             ? el('span',{class:'dot smark bad',
-                text:unreadableCount(s.caseSession)+' unreadable',
+                text:(s.caseSession.unreadable)+' unreadable',
                 title:'Records in this session that nothing could read. They are in the case, kept with their original text.'}):null,
           sessionMarks(s).indexOf('unmapped')>=0
             ? el('span',{class:'dot smark',

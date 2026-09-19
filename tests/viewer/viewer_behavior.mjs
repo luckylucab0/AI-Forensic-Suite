@@ -784,11 +784,14 @@ function fakeFetch(pages) {
   // on a large case, which is exactly why it gets a chip.
   api.state.caseFindings = { findings: [{ session_id: 's1' }, { session_id: null }] };
   eq(api.findingSessions().size, 1, 'a finding with no session belongs to no session');
-  const flagged = { caseSession: { session_id: 's1', unparsed: 0 } };
-  const unreadable = { caseSession: { session_id: 's2', unparsed: 3 } };
-  const quiet = { caseSession: { session_id: 's3', unparsed: 0 } };
+  const flagged = { caseSession: { session_id: 's1', unreadable: 0 } };
+  const unreadable = { caseSession: { session_id: 's2', unreadable: 3 } };
+  // Read fine, in a format nobody has mapped: the other mark, and the opposite answer.
+  const unmapped = { caseSession: { session_id: 's4', uninterpreted: 40 } };
+  const quiet = { caseSession: { session_id: 's3', unreadable: 0 } };
   eq(api.sessionMarks(flagged).join(), 'findings', 'a session a rule fired in is marked');
   eq(api.sessionMarks(unreadable).join(), 'unreadable', 'a session with a record nobody read is marked');
+  eq(api.sessionMarks(unmapped).join(), 'unmapped', 'a session whose records nobody has mapped is marked apart');
   eq(api.sessionMarks(quiet).join(), '', 'and a session with neither is not');
   eq(api.sessionMarks({}).join(), '', 'a session from a folder source carries no marks at all');
   api.state.caseFindings = null;

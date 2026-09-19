@@ -158,7 +158,11 @@ ist, dass das nicht *unbemerkt* geht.
   Dokument-Ereignis, was sichtbar eine unvollständige Lesung ist und keine falsche. Die
   Credential-Speicher beansprucht sie als Einziges nicht, denn ein Token im Payload eines
   Timeline-Ereignisses ist nicht der Zweck von `--include-secrets`, und die Datei samt Hash
-  ist ohnehin im Fall.
+  ist ohnehin im Fall. Was ein Datensatz aus einem solchen Dokument *ist*, sagt der Katalog
+  und nicht das Dokument: ein Eintrag, den der Katalog als Konfiguration führt, ergibt
+  `config.snapshot`-Datensätze, alles andere `unparsed.record`. Das ist der Unterschied
+  zwischen einem Fall, der eine Konfiguration enthält, und Regeln, die sie lesen können, und
+  er war vier ausgelieferte Regeln wert, die in einer echten Sammlung nie auslösen konnten.
   Daneben liegt ein zweites formatbezogenes Modul, `instructions/`, für den
   Anweisungsbestand: die dreiundsechzig Katalogartefakte mit Skills, Commands, Output
   Styles, Regeln, Steering-Dateien und Hook-Skripten. Es liest jede Datei ganz, unterscheidet
