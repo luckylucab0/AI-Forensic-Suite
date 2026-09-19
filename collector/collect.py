@@ -9074,7 +9074,11 @@ def resolve_env_prefix(text, home, root):
     if name == "HOME":
         return home.rstrip("/") + tail, "ok"
     if name in _XDG_DEFAULTS:
-        base = (None if root else os.environ.get(name)) or os.path.join(home, _XDG_DEFAULTS[name])
+        # Also a literal separator rather than os.path.join, for the reason given at the
+        # re-anchoring below: this string is a pattern that every consumer splits on "/".
+        base = (None if root else os.environ.get(name)) or (
+            home.rstrip("/") + "/" + _XDG_DEFAULTS[name]
+        )
         return base.rstrip("/") + tail, "ok"
 
     if root:
@@ -9312,7 +9316,16 @@ def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> l
         # removed with an explicit match: lstrip("C:/") would also eat a leading 'C' from
         # a directory name.
         relative = re.sub(r"^[A-Za-z]:/", "", text).lstrip("/")
-        text = os.path.join(root, relative)
+        # Joined with a literal separator, not os.path.join, and the difference is a real
+        # failure rather than a preference. os.path.join uses the separator of the machine
+        # this collector runs on, so an analyst workstation running Windows produced
+        # "/mnt/img\Windows/Prefetch/*.pf" for a machine-wide pattern. Every consumer of
+        # this list splits on "/", so iter_matches looked for one segment named
+        # "mnt/img\Windows" and found nothing: on a Windows workstation, collecting a
+        # mounted image, the wildcarded execution evidence matched nothing and said so
+        # nowhere. Found by the collectors' self-test parity case, which is the only check
+        # that runs both of them on the platform where they differ.
+        text = root.rstrip("/") + "/" + relative
 
     # A pattern that reduces to a bare wildcard near the top of the tree would collect the
     # whole filesystem under one artifact id. That is not hypothetical: a catalogue entry
@@ -9435,23 +9448,31 @@ def discover_users(root: str | None, all_users: bool, named: list) -> list:
     if root:
         # A mounted image or an exported profile. Look for the usual profile parents, and
         # fall back to treating the root itself as one profile.
+        #
+        # Every home is normalised through as_posix before it leaves this function. It is
+        # built with os.path.join, which uses the separator of the machine running the
+        # collector, so on a Windows workstation a home came out as "/mnt/img\Users\alice"
+        # and that string is the prefix of every pattern for that profile. The Windows
+        # target normalises separators later and would have survived it; a POSIX target,
+        # which is how a Windows workstation collects a macOS or Linux image, does not.
         found = []
         for parent in ("Users", "home", "root"):
             base = os.path.join(root, parent)
             if not os.path.isdir(base):
                 continue
             if parent == "root":
-                found.append({"name": "root", "home": base})
+                found.append({"name": "root", "home": as_posix(base)})
                 continue
             try:
                 for name in sorted(os.listdir(base)):
                     home = os.path.join(base, name)
                     if os.path.isdir(home):
-                        found.append({"name": name, "home": home})
+                        found.append({"name": name, "home": as_posix(home)})
             except OSError:
                 continue
         if not found:
-            found = [{"name": os.path.basename(root.rstrip("/")) or "root", "home": root}]
+            name = os.path.basename(root.rstrip("/")) or "root"
+            found = [{"name": name, "home": as_posix(root)}]
         if named:
             found = [u for u in found if u["name"] in named]
         return found
@@ -9465,7 +9486,7 @@ def discover_users(root: str | None, all_users: bool, named: list) -> list:
                 for name in sorted(os.listdir(parent)):
                     home = os.path.join(parent, name)
                     if os.path.isdir(home) and not os.path.islink(home):
-                        found.append({"name": name, "home": home})
+                        found.append({"name": name, "home": as_posix(home)})
             except OSError:
                 continue
         if os.path.isdir("/var/root"):
@@ -9482,7 +9503,7 @@ def discover_users(root: str | None, all_users: bool, named: list) -> list:
             for parent in ("/Users", "/home"):
                 home = os.path.join(parent, name)
                 if os.path.isdir(home):
-                    out.append({"name": name, "home": home})
+                    out.append({"name": name, "home": as_posix(home)})
                     break
         return out
 
@@ -9490,7 +9511,7 @@ def discover_users(root: str | None, all_users: bool, named: list) -> list:
         who = getpass.getuser()
     except Exception:
         who = os.environ.get("USER") or "unknown"
-    return [{"name": who, "home": os.path.expanduser("~")}]
+    return [{"name": who, "home": as_posix(os.path.expanduser("~"))}]
 
 
 def discover_project_roots(home: str) -> list:

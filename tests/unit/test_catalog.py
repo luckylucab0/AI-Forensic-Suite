@@ -10,6 +10,7 @@ wrong answer in an investigation, and no amount of unit testing the loader would
 from __future__ import annotations
 
 import importlib.util
+import os
 import re
 from pathlib import Path
 from typing import Any
@@ -893,3 +894,66 @@ def test_a_live_run_on_a_windows_host_targets_windows() -> None:
     # A named target wins, because a mounted image is collected from a workstation whose
     # own platform says nothing about the image.
     assert collect.target_os_for("Linux", "windows") == "windows"
+
+
+def test_a_pattern_is_built_with_one_separator_whatever_machine_expands_it(
+    monkeypatch,
+) -> None:
+    """os.path.join uses the separator of the machine running the collector, and every
+    consumer of these patterns splits on "/".
+
+    An analyst workstation running Windows produced `/mnt/img\\Windows/Prefetch/*.pf` for a
+    machine-wide pattern under --root. iter_matches then looked for a single segment named
+    `mnt/img\\Windows`, found nothing, and reported nothing: collecting a mounted image from
+    a Windows workstation, the wildcarded execution evidence, Amcache and Prefetch, matched
+    nothing at all. The no-wildcard branch normalises and converts back, so only the
+    wildcarded patterns were affected, which is most of the machine-wide ones.
+
+    ntpath is substituted rather than the test being skipped off Windows, because a defect
+    that only one platform's CI can see is one that waits for the next release to be found.
+    """
+    import ntpath
+
+    collect = _load_collector()
+    monkeypatch.setattr(collect.os, "path", ntpath)
+    collect.PATTERN_REFUSALS.clear()
+
+    resolved = collect.expand_paths(
+        "%SystemRoot%\\Prefetch\\*.pf", "/mnt/img/Users/alice", "windows", "/mnt/img"
+    )
+
+    assert resolved == ["/mnt/img/Windows/Prefetch/*.pf"]
+    assert all("\\" not in pattern for pattern in resolved)
+    collect.PATTERN_REFUSALS.clear()
+
+
+def test_a_discovered_profile_home_never_carries_a_backslash(monkeypatch, tmp_path) -> None:
+    """The home is the prefix of every pattern for that profile, and it was built with
+    os.path.join.
+
+    On a Windows workstation collecting a mounted image that produced
+    `/mnt/img\\Users\\alice`. The Windows target normalises separators afterwards and would
+    have survived it. A POSIX target does not, and a POSIX target is how a Windows
+    workstation collects a macOS or a Linux image.
+
+    Windows' tolerance of both separators is simulated rather than the test being skipped,
+    for the reason the test above gives: a defect only one CI platform can see waits for a
+    release.
+    """
+    import ntpath
+
+    collect = _load_collector()
+    (tmp_path / "Users" / "alice").mkdir(parents=True)
+    (tmp_path / "home" / "bob").mkdir(parents=True)
+    real_isdir, real_listdir, real_islink = os.path.isdir, os.listdir, os.path.islink
+    monkeypatch.setattr(collect.os.path, "join", ntpath.join)
+    monkeypatch.setattr(collect.os.path, "isdir", lambda p: real_isdir(p.replace("\\", "/")))
+    monkeypatch.setattr(collect.os.path, "islink", lambda p: real_islink(p.replace("\\", "/")))
+    monkeypatch.setattr(collect.os, "listdir", lambda p: real_listdir(p.replace("\\", "/")))
+
+    found = collect.discover_users(str(tmp_path), False, [])
+
+    assert found, "the simulation has to reach the profiles, or it asserts nothing"
+    assert [user["name"] for user in found] == ["alice", "bob"]
+    for user in found:
+        assert "\\" not in user["home"], user
