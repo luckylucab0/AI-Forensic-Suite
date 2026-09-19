@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: d3d74c509974
+# Catalogue digest: 4dd5d8ed2fee
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,8 +8,8 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# Scope: the 87 artifacts the catalogue files under transcript and prompt_history.
-# The other 374 are configuration, credentials, caches, logs and install
+# Scope: the 88 artifacts the catalogue files under transcript and prompt_history.
+# The other 378 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
 # credential store what an analyst wants is the file, which is what the Collect
@@ -254,6 +254,7 @@ sources:
       cursor,cursor.global_prompt_history,file_only,C:/Users/*/.cursor/prompt_history.json
       cursor,cursor.global_state_vscdb,file_only,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/state.vscdb
       cursor,cursor.pasted_text,file_only,C:/Users/*/.cursor/chats/*/*/pasted_text.json
+      cursor,cursor.subagent_output,file_only,C:/Users/*/.cursor/subagents/**
       cursor,cursor.workspace_state_vscdb,file_only,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb
       devin,devin.sessions_db,file_only,C:/Users/*/.local/share/devin/cli/sessions.db
       gemini_cli,gemini_cli.chats,file_only,C:/Users/*/.gemini/sessions/**
@@ -976,6 +977,8 @@ sources:
       cursor,cursor.global_state_vscdb,file_only,/var/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb.backup
       cursor,cursor.pasted_text,file_only,/Users/*/.cursor/chats/*/*/pasted_text.json
       cursor,cursor.pasted_text,file_only,/var/root/.cursor/chats/*/*/pasted_text.json
+      cursor,cursor.subagent_output,file_only,/Users/*/.cursor/subagents/**
+      cursor,cursor.subagent_output,file_only,/var/root/.cursor/subagents/**
       cursor,cursor.workspace_state_vscdb,file_only,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
       cursor,cursor.workspace_state_vscdb,file_only,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
       cursor,cursor.workspace_state_vscdb,file_only,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
@@ -1822,6 +1825,8 @@ sources:
       cursor,cursor.global_state_vscdb,file_only,/root/Library/Application Support/Cursor/User/globalStorage/state.vscdb.backup
       cursor,cursor.pasted_text,file_only,/home/*/.cursor/chats/*/*/pasted_text.json
       cursor,cursor.pasted_text,file_only,/root/.cursor/chats/*/*/pasted_text.json
+      cursor,cursor.subagent_output,file_only,/home/*/.cursor/subagents/**
+      cursor,cursor.subagent_output,file_only,/root/.cursor/subagents/**
       cursor,cursor.workspace_state_vscdb,file_only,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
       cursor,cursor.workspace_state_vscdb,file_only,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
       cursor,cursor.workspace_state_vscdb,file_only,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json

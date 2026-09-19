@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: d3d74c509974
+# Catalogue digest: 4dd5d8ed2fee
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -84,9 +84,12 @@
 #     crosscutting.instructions_windsurf_rules
 #     crosscutting.mcp_config_files
 #     cursor.cli_config
+#     cursor.commands_and_plans
 #     cursor.hooks
 #     cursor.mcp_config
 #     cursor.project_instructions
+#     cursor.skills
+#     cursor.subagents
 #     factory_droid.config
 #     factory_droid.mcp_and_hooks
 #     factory_droid.sessions
@@ -489,13 +492,10 @@ $targets = @(
     @{ Agent = 'crosscutting'; Id = 'crosscutting.windows_execution_evidence_files'; Path = 'C:\Windows\System32\sru\SRUDB.dat' }
     @{ Agent = 'cursor'; Id = 'cursor.acp_session_store'; Path = '$profile\.cursor\acp-sessions' }
     @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\agent-cli-state.json' }
-    @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\agents' }
     @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\browser-logs' }
     @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\commands' }
     @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\hooks.json' }
-    @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\plugins' }
     @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\sandbox-policies' }
-    @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\skills' }
     @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\skills-cursor' }
     @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\snapshots' }
     @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\worktrees' }
@@ -517,8 +517,11 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.local_file_history'; Path = '$profile\AppData\Roaming\Cursor\User\History' }
     @{ Agent = 'cursor'; Id = 'cursor.logs'; Path = '$profile\AppData\Roaming\Cursor\logs' }
     @{ Agent = 'cursor'; Id = 'cursor.pasted_text'; Path = '$profile\.cursor\chats' }
+    @{ Agent = 'cursor'; Id = 'cursor.plugins'; Path = '$profile\.cursor\plugins' }
+    @{ Agent = 'cursor'; Id = 'cursor.plugins'; Path = '$profile\.cursor\plugins\local' }
     @{ Agent = 'cursor'; Id = 'cursor.project_metadata'; Path = '$profile\.cursor\projects' }
     @{ Agent = 'cursor'; Id = 'cursor.project_metadata'; Path = '$profile\.cursor\projects-metadata.json' }
+    @{ Agent = 'cursor'; Id = 'cursor.subagent_output'; Path = '$profile\.cursor\subagents' }
     @{ Agent = 'cursor'; Id = 'cursor.workspace_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\workspaceStorage' }
     @{ Agent = 'cursor'; Id = 'cursor.worktrees'; Path = '$profile\.cursor\worktrees' }
     @{ Agent = 'devin'; Id = 'devin.acp_events'; Path = '$profile\AppData\Roaming\Devin\User\acp-events' }

@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: d3d74c509974
+// Catalogue digest: 4dd5d8ed2fee
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -81,9 +81,12 @@
 //     crosscutting.instructions_windsurf_rules
 //     crosscutting.mcp_config_files
 //     cursor.cli_config
+//     cursor.commands_and_plans
 //     cursor.hooks
 //     cursor.mcp_config
 //     cursor.project_instructions
+//     cursor.skills
+//     cursor.subagents
 //     factory_droid.config
 //     factory_droid.mcp_and_hooks
 //     factory_droid.sessions
@@ -927,24 +930,18 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.acp_session_store", ".cursor/acp-sessions",
     "cursor", "cursor.acp_session_store", ".cursor\\acp-sessions",
     "cursor", "cursor.agent_cli_state", ".cursor/agent-cli-state.json",
-    "cursor", "cursor.agent_cli_state", ".cursor/agents",
     "cursor", "cursor.agent_cli_state", ".cursor/browser-logs",
     "cursor", "cursor.agent_cli_state", ".cursor/commands",
     "cursor", "cursor.agent_cli_state", ".cursor/hooks.json",
-    "cursor", "cursor.agent_cli_state", ".cursor/plugins",
     "cursor", "cursor.agent_cli_state", ".cursor/sandbox-policies",
-    "cursor", "cursor.agent_cli_state", ".cursor/skills",
     "cursor", "cursor.agent_cli_state", ".cursor/skills-cursor",
     "cursor", "cursor.agent_cli_state", ".cursor/snapshots",
     "cursor", "cursor.agent_cli_state", ".cursor/worktrees",
     "cursor", "cursor.agent_cli_state", ".cursor\\agent-cli-state.json",
-    "cursor", "cursor.agent_cli_state", ".cursor\\agents",
     "cursor", "cursor.agent_cli_state", ".cursor\\browser-logs",
     "cursor", "cursor.agent_cli_state", ".cursor\\commands",
     "cursor", "cursor.agent_cli_state", ".cursor\\hooks.json",
-    "cursor", "cursor.agent_cli_state", ".cursor\\plugins",
     "cursor", "cursor.agent_cli_state", ".cursor\\sandbox-policies",
-    "cursor", "cursor.agent_cli_state", ".cursor\\skills",
     "cursor", "cursor.agent_cli_state", ".cursor\\skills-cursor",
     "cursor", "cursor.agent_cli_state", ".cursor\\snapshots",
     "cursor", "cursor.agent_cli_state", ".cursor\\worktrees",
@@ -1016,6 +1013,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.logs", "Library\\Application Support\\Cursor\\logs",
     "cursor", "cursor.pasted_text", ".cursor/chats",
     "cursor", "cursor.pasted_text", ".cursor\\chats",
+    "cursor", "cursor.plugins", ".cursor/plugins",
+    "cursor", "cursor.plugins", ".cursor/plugins/local",
+    "cursor", "cursor.plugins", ".cursor\\plugins",
+    "cursor", "cursor.plugins", ".cursor\\plugins\\local",
     "cursor", "cursor.project_metadata", ".cursor/projects",
     "cursor", "cursor.project_metadata", ".cursor/projects-metadata.json",
     "cursor", "cursor.project_metadata", ".cursor\\projects",
@@ -1026,6 +1027,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.retrieval_index", "Library\\Application Support\\Cursor\\CachedData",
     "cursor", "cursor.retrieval_index", "Library\\Application Support\\Cursor\\User\\workspaceStorage",
     "cursor", "cursor.retrieval_index", "Library\\Caches\\cursor-compile-cache",
+    "cursor", "cursor.subagent_output", ".cursor/subagents",
+    "cursor", "cursor.subagent_output", ".cursor\\subagents",
     "cursor", "cursor.workspace_state_vscdb", ".config/Cursor/User/workspaceStorage",
     "cursor", "cursor.workspace_state_vscdb", ".config\\Cursor\\User\\workspaceStorage",
     "cursor", "cursor.workspace_state_vscdb", "Cursor/User/workspaceStorage",

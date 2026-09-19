@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: d3d74c509974
+# Catalogue digest: 4dd5d8ed2fee
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -75,9 +75,12 @@
 #     crosscutting.instructions_windsurf_rules
 #     crosscutting.mcp_config_files
 #     cursor.cli_config
+#     cursor.commands_and_plans
 #     cursor.hooks
 #     cursor.mcp_config
 #     cursor.project_instructions
+#     cursor.skills
+#     cursor.subagents
 #     factory_droid.config
 #     factory_droid.mcp_and_hooks
 #     factory_droid.sessions
@@ -558,14 +561,11 @@ sources:
     cursor,cursor.acp_session_store,C:/Users/*/.cursor/acp-sessions/*/store.db-shm
     cursor,cursor.acp_session_store,C:/Users/*/.cursor/acp-sessions/*/store.db-wal
     cursor,cursor.agent_cli_state,C:/Users/*/.cursor/agent-cli-state.json
-    cursor,cursor.agent_cli_state,C:/Users/*/.cursor/agents/**
     cursor,cursor.agent_cli_state,C:/Users/*/.cursor/browser-logs/**
     cursor,cursor.agent_cli_state,C:/Users/*/.cursor/commands/*.md
     cursor,cursor.agent_cli_state,C:/Users/*/.cursor/hooks.json
-    cursor,cursor.agent_cli_state,C:/Users/*/.cursor/plugins/**
     cursor,cursor.agent_cli_state,C:/Users/*/.cursor/sandbox-policies/**
     cursor,cursor.agent_cli_state,C:/Users/*/.cursor/skills-cursor/**
-    cursor,cursor.agent_cli_state,C:/Users/*/.cursor/skills/**
     cursor,cursor.agent_cli_state,C:/Users/*/.cursor/snapshots/**
     cursor,cursor.agent_cli_state,C:/Users/*/.cursor/worktrees/**
     cursor,cursor.agent_transcripts_jsonl,C:/Users/*/.cursor/projects/*/agent-tools/*.txt
@@ -593,9 +593,12 @@ sources:
     cursor,cursor.local_file_history,C:/Users/*/AppData/Roaming/Cursor/User/History/**
     cursor,cursor.logs,C:/Users/*/AppData/Roaming/Cursor/logs/**
     cursor,cursor.pasted_text,C:/Users/*/.cursor/chats/*/*/pasted_text.json
+    cursor,cursor.plugins,C:/Users/*/.cursor/plugins/**
+    cursor,cursor.plugins,C:/Users/*/.cursor/plugins/local/**
     cursor,cursor.project_metadata,C:/Users/*/.cursor/projects-metadata.json
     cursor,cursor.project_metadata,C:/Users/*/.cursor/projects/*/mcp-approvals.json
     cursor,cursor.project_metadata,C:/Users/*/.cursor/projects/*/repo.json
+    cursor,cursor.subagent_output,C:/Users/*/.cursor/subagents/**
     cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.worktrees,C:/Users/*/.cursor/worktrees/*
     devin,devin.acp_events,C:/Users/*/AppData/Roaming/Devin/User/acp-events/**
@@ -1854,25 +1857,19 @@ sources:
     cursor,cursor.acp_session_store,/var/root/.cursor/acp-sessions/*/store.db-shm
     cursor,cursor.acp_session_store,/var/root/.cursor/acp-sessions/*/store.db-wal
     cursor,cursor.agent_cli_state,/Users/*/.cursor/agent-cli-state.json
-    cursor,cursor.agent_cli_state,/Users/*/.cursor/agents/**
     cursor,cursor.agent_cli_state,/Users/*/.cursor/browser-logs/**
     cursor,cursor.agent_cli_state,/Users/*/.cursor/commands/*.md
     cursor,cursor.agent_cli_state,/Users/*/.cursor/hooks.json
-    cursor,cursor.agent_cli_state,/Users/*/.cursor/plugins/**
     cursor,cursor.agent_cli_state,/Users/*/.cursor/sandbox-policies/**
     cursor,cursor.agent_cli_state,/Users/*/.cursor/skills-cursor/**
-    cursor,cursor.agent_cli_state,/Users/*/.cursor/skills/**
     cursor,cursor.agent_cli_state,/Users/*/.cursor/snapshots/**
     cursor,cursor.agent_cli_state,/Users/*/.cursor/worktrees/**
     cursor,cursor.agent_cli_state,/var/root/.cursor/agent-cli-state.json
-    cursor,cursor.agent_cli_state,/var/root/.cursor/agents/**
     cursor,cursor.agent_cli_state,/var/root/.cursor/browser-logs/**
     cursor,cursor.agent_cli_state,/var/root/.cursor/commands/*.md
     cursor,cursor.agent_cli_state,/var/root/.cursor/hooks.json
-    cursor,cursor.agent_cli_state,/var/root/.cursor/plugins/**
     cursor,cursor.agent_cli_state,/var/root/.cursor/sandbox-policies/**
     cursor,cursor.agent_cli_state,/var/root/.cursor/skills-cursor/**
-    cursor,cursor.agent_cli_state,/var/root/.cursor/skills/**
     cursor,cursor.agent_cli_state,/var/root/.cursor/snapshots/**
     cursor,cursor.agent_cli_state,/var/root/.cursor/worktrees/**
     cursor,cursor.agent_transcripts_jsonl,/Users/*/.cursor/projects/*/agent-tools/*.txt
@@ -1949,6 +1946,10 @@ sources:
     cursor,cursor.logs,/var/root/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log
     cursor,cursor.pasted_text,/Users/*/.cursor/chats/*/*/pasted_text.json
     cursor,cursor.pasted_text,/var/root/.cursor/chats/*/*/pasted_text.json
+    cursor,cursor.plugins,/Users/*/.cursor/plugins/**
+    cursor,cursor.plugins,/Users/*/.cursor/plugins/local/**
+    cursor,cursor.plugins,/var/root/.cursor/plugins/**
+    cursor,cursor.plugins,/var/root/.cursor/plugins/local/**
     cursor,cursor.project_metadata,/Users/*/.cursor/projects-metadata.json
     cursor,cursor.project_metadata,/Users/*/.cursor/projects/*/mcp-approvals.json
     cursor,cursor.project_metadata,/Users/*/.cursor/projects/*/repo.json
@@ -1963,6 +1964,8 @@ sources:
     cursor,cursor.retrieval_index,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,cursor.retrieval_index,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,cursor.retrieval_index,/var/root/Library/Caches/cursor-compile-cache/**
+    cursor,cursor.subagent_output,/Users/*/.cursor/subagents/**
+    cursor,cursor.subagent_output,/var/root/.cursor/subagents/**
     cursor,cursor.workspace_state_vscdb,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
@@ -3647,25 +3650,19 @@ sources:
     cursor,cursor.acp_session_store,/root/.cursor/acp-sessions/*/store.db-shm
     cursor,cursor.acp_session_store,/root/.cursor/acp-sessions/*/store.db-wal
     cursor,cursor.agent_cli_state,/home/*/.cursor/agent-cli-state.json
-    cursor,cursor.agent_cli_state,/home/*/.cursor/agents/**
     cursor,cursor.agent_cli_state,/home/*/.cursor/browser-logs/**
     cursor,cursor.agent_cli_state,/home/*/.cursor/commands/*.md
     cursor,cursor.agent_cli_state,/home/*/.cursor/hooks.json
-    cursor,cursor.agent_cli_state,/home/*/.cursor/plugins/**
     cursor,cursor.agent_cli_state,/home/*/.cursor/sandbox-policies/**
     cursor,cursor.agent_cli_state,/home/*/.cursor/skills-cursor/**
-    cursor,cursor.agent_cli_state,/home/*/.cursor/skills/**
     cursor,cursor.agent_cli_state,/home/*/.cursor/snapshots/**
     cursor,cursor.agent_cli_state,/home/*/.cursor/worktrees/**
     cursor,cursor.agent_cli_state,/root/.cursor/agent-cli-state.json
-    cursor,cursor.agent_cli_state,/root/.cursor/agents/**
     cursor,cursor.agent_cli_state,/root/.cursor/browser-logs/**
     cursor,cursor.agent_cli_state,/root/.cursor/commands/*.md
     cursor,cursor.agent_cli_state,/root/.cursor/hooks.json
-    cursor,cursor.agent_cli_state,/root/.cursor/plugins/**
     cursor,cursor.agent_cli_state,/root/.cursor/sandbox-policies/**
     cursor,cursor.agent_cli_state,/root/.cursor/skills-cursor/**
-    cursor,cursor.agent_cli_state,/root/.cursor/skills/**
     cursor,cursor.agent_cli_state,/root/.cursor/snapshots/**
     cursor,cursor.agent_cli_state,/root/.cursor/worktrees/**
     cursor,cursor.agent_transcripts_jsonl,/home/*/.cursor/projects/*/agent-tools/*.txt
@@ -3742,6 +3739,10 @@ sources:
     cursor,cursor.logs,/root/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log
     cursor,cursor.pasted_text,/home/*/.cursor/chats/*/*/pasted_text.json
     cursor,cursor.pasted_text,/root/.cursor/chats/*/*/pasted_text.json
+    cursor,cursor.plugins,/home/*/.cursor/plugins/**
+    cursor,cursor.plugins,/home/*/.cursor/plugins/local/**
+    cursor,cursor.plugins,/root/.cursor/plugins/**
+    cursor,cursor.plugins,/root/.cursor/plugins/local/**
     cursor,cursor.project_metadata,/home/*/.cursor/projects-metadata.json
     cursor,cursor.project_metadata,/home/*/.cursor/projects/*/mcp-approvals.json
     cursor,cursor.project_metadata,/home/*/.cursor/projects/*/repo.json
@@ -3756,6 +3757,8 @@ sources:
     cursor,cursor.retrieval_index,/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,cursor.retrieval_index,/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,cursor.retrieval_index,/root/Library/Caches/cursor-compile-cache/**
+    cursor,cursor.subagent_output,/home/*/.cursor/subagents/**
+    cursor,cursor.subagent_output,/root/.cursor/subagents/**
     cursor,cursor.workspace_state_vscdb,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json

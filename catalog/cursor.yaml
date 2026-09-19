@@ -134,13 +134,10 @@ artifacts:
   paths:
   - ~/.cursor/commands/*.md
   - ~/.cursor/agent-cli-state.json
-  - ~/.cursor/agents/
   - ~/.cursor/browser-logs/
   - ~/.cursor/hooks.json
-  - ~/.cursor/plugins/
   - ~/.cursor/sandbox-policies/
   - ~/.cursor/skills-cursor/
-  - ~/.cursor/skills/
   - ~/.cursor/snapshots/
   - ~/.cursor/worktrees/
   format: json
@@ -154,6 +151,8 @@ artifacts:
     deletes.
   notes: |-
     Grab-bag of cursor-agent auxiliary state. Individually each path has 1-2 sources; collectively they are confirmed by a full ~/.cursor teardown, a cleanup tool's exclusion list, and a devcontainer seeding script. Treat each as medium confidence.
+
+    Three paths left this entry when the vendor documentation became reachable and could carry them: the subagent definitions are cursor.subagents, the skills are cursor.skills, and the plugin folder is cursor.plugins. What is left here is the state that still rests on a teardown of one machine.
 
     Record structure: skills-cursor/.sync-manifest.json is skill-sync bookkeeping. hooks.json configures preToolUse / beforeReadFile style gates and is the record of what interception was active. sandbox-policies/ and worktrees/ appear in a container-seeding script's list of cursor-agent state dirs.
   parser: json_generic
@@ -435,13 +434,41 @@ artifacts:
   - windows
   - linux
   paths:
-  - <project>/.cursor/agents/
-  - <project>/.cursor/commands/*.md
-  - <project>/.cursor/plans/
+  - <project>/**/AGENTS.md
+  - <project>/.cursor/rules/
+  - <project>/.cursor/rules/**/*.mdc
   - <project>/.cursor/rules/*.mdc
-  - <project>/.cursor/skills/
   - <project>/.cursorrules
   - <project>/AGENTS.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://cursor.com/docs/context/rules
+  source_kind: official
+  unsourced_paths:
+  - <project>/.cursorrules
+  volatility: Version-controlled in most repos, so git history gives you the change timeline for free.
+    Check `git log` on these paths and check for uncommitted modifications.
+  notes: |-
+    PRIMARY PROMPT-INJECTION SURFACE. Anyone who can land a rule file in a repository gets standing instructions for every contributor who opens it, and two of the four rule types need no user action at all: alwaysApply puts the file in every session, and a glob-scoped rule puts it in every session that touches a matching file. Collect the full text, not the filenames.
+
+    Record structure: a rule is a .mdc file, markdown with YAML frontmatter carrying description, globs and alwaysApply, and it may sit in a folder below the rules directory. The vendor states that a plain .md file there is ignored for want of that frontmatter, so such a file is an instruction that did NOT reach the model, which reads differently from one that did. See crosscutting.instructions_cursor_rules, which holds that reasoning and the paths for the ignored spellings.
+
+    The flat .cursorrules file is not mentioned on the current vendor page at all, not even as deprecated, so it stays unsourced here: it dates an install rather than proving a rule was read, and other agents read it too.
+
+    The commands, plans, skills and subagent definitions that used to sit in this entry now have their own, each resting on the vendor page that documents it: cursor.commands_and_plans, cursor.skills and cursor.subagents.
+  parser: instructions
+- id: cursor.commands_and_plans
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.cursor/commands/*.md
+  - <project>/.cursor/plans/
   format: markdown
   sensitivity: normal
   collect_priority: normal
@@ -449,13 +476,124 @@ artifacts:
   source: |-
     https://raw.githubusercontent.com/r3nzsec/irflow-timeline/a0af054723ef5db771098156979c52bb42ae703e/docs/dfir-tips/ai-apps/cursor.md
   source_kind: community
-  volatility: |-
-    Version-controlled in most repos, so git history gives you the change timeline for free — check `git log` on these paths.
+  volatility: A plan is working state until somebody keeps it. The vendor states a plan is saved in the
+    user's home directory by default and only moves into the workspace when Save to workspace is clicked,
+    so the copy in the project is the one somebody chose to keep and the default copy is elsewhere.
   notes: |-
-    PRIMARY PROMPT-INJECTION SURFACE — labelled as such by a DFIR catalogue. An attacker who lands a .mdc file in a repo gets persistent instruction injection for every contributor who opens it in Cursor. Collect the full text, not just filenames.
+    Split out of cursor.project_instructions when the vendor documentation became reachable: the rules and the instruction file could be promoted against a vendor page and these two could not. The vendor describes commands as markdown files holding a reusable prompt invoked with / in chat, and describes Plan Mode as writing a reviewable plan before any code is written, but neither page states a path, so the paths here still rest on a third-party DFIR reference.
 
-    Record structure: .mdc = markdown with YAML frontmatter; frontmatter keys include alwaysApply (boolean), description (drives agent-requested activation) and globs (path-scoped attachment). Legacy flat `.cursorrules` in the repo root is still read by older builds but is deprecated in favour of .cursor/rules/ and AGENTS.md.
+    Both are evidence of intent rather than of action. A command is a prompt somebody wrote down and can re-run, so it is the closest thing to a script in this product's instruction surface. A plan is what the agent proposed to do, which is worth comparing against what the transcript shows it did.
+
+    OPEN: where a plan goes when it is NOT saved to the workspace. The vendor says the home directory and names no path; the candidates under ~/.cursor are collected by cursor.agent_cli_state, which is where that answer will land when somebody finds it.
   parser: instructions
+- id: cursor.skills
+  category: instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/**/.agents/skills/
+  - <project>/**/.cursor/skills/
+  - <project>/.agents/skills/
+  - <project>/.cursor/skills/
+  - ~/.agents/skills/
+  - ~/.cursor/skills/
+  format: markdown
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://cursor.com/docs/skills
+  source_kind: official
+  volatility: Not swept. Publishing a personal skill to a team marketplace packs it into a plugin and the
+    skill then loads from that plugin instead of the local folder, so the local copy can disappear while
+    the skill stays active. Unpublishing returns it to the machine.
+  notes: |-
+    The vendor's own table of the four directories a skill is loaded from: .agents/skills/ and .cursor/skills/ at project level, ~/.agents/skills/ and ~/.cursor/skills/ at user level. A skill is a SKILL.md with YAML frontmatter and it enters the model's context when the agent decides it is relevant, so it is an instruction surface that needs no user action, exactly like an always-applied rule.
+
+    DO NOT STOP AT THE PROJECT ROOT. The vendor states that a skills folder anywhere inside the repository is picked up and is automatically scoped to files under that directory, which is how a skill reaches a session without appearing anywhere a reviewer would look.
+
+    ~/.agents/skills is not this vendor's directory. Several other agents load it too, so a skill found there steered whichever agent ran, and attributing it to one product by its path is wrong.
+
+    Data leaving the endpoint: the vendor states that user-level skills in ~/.cursor/skills stay on the machine until they are synced for Cloud Agents or published to a team, and that ~/.agents/skills and unsynced local skills are not copied to Cloud Agents. So a synced or published skill is content that left the device, and the sync bookkeeping under ~/.cursor/skills-cursor, collected by cursor.agent_cli_state, is where to look for which ones.
+  parser: instructions
+- id: cursor.subagents
+  category: instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.claude/agents/
+  - <project>/.codex/agents/
+  - <project>/.cursor/agents/
+  - ~/.claude/agents/
+  - ~/.codex/agents/
+  - ~/.cursor/agents/
+  format: markdown
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://cursor.com/docs/subagents
+  source_kind: official
+  volatility: Not swept. The vendor recommends checking the project directory into the repository, so git
+    history usually carries the authorship and the timing.
+  notes: |-
+    A subagent is a markdown definition with frontmatter that the main agent delegates work to, so it is an instruction file that decides what a second agent was told to do. The vendor's table lists three project directories and three user directories, and states that the project ones win on a name conflict and that .cursor wins over .claude or .codex.
+
+    TWO OF THE SIX DIRECTORIES BELONG TO OTHER VENDORS, and that is the point of collecting them here: a definition under .claude/agents or .codex/agents ran under THIS product when this product was the one in use. Reading a directory name as the agent that used it is wrong in both directions, and those paths are also claimed by the entries of the agents that own them, which is how the same file reaches an analyst from either side.
+
+    The output of a background subagent is a separate artifact, cursor.subagent_output, and it is the only place that work is written down.
+  parser: instructions
+- id: cursor.subagent_output
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cursor/subagents/
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://cursor.com/docs/subagents
+  source_kind: official
+  volatility: Working state between a subagent and its parent, so it is transient and is the kind of
+    directory a cleanup empties. Collect it first.
+  notes: |-
+    The vendor states that background subagents write their output here and that the parent agent reads these files to check progress. That makes this the record of what a delegated agent actually did, and the main transcript may hold nothing but the parent's summary of it, so an analyst who only reads the conversation sees a second agent's work described rather than recorded.
+
+    The file format is not documented, so nothing parses it yet. The files are collected whole and reach the case as read but uninterpreted, which is the state an analyst can act on: it says a record exists and that this tool has not mapped it, rather than saying nothing was there.
+  parser: null
+- id: cursor.plugins
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - ~/.cursor/plugins/
+  - ~/.cursor/plugins/local/
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://cursor.com/docs/plugins
+  source_kind: official
+  unsourced_paths:
+  - ~/.cursor/plugins/
+  notes: |-
+    A plugin is a bundle of rules, skills, subagents, commands, MCP servers and hooks installed from a marketplace, so it delivers every extension surface this product has in one step and from a repository the endpoint's user does not control. An instruction or an MCP server that arrived this way is present in the product and absent from the project, which is the case that makes a repository-only search conclude nothing was configured.
+
+    The vendor documents ~/.cursor/plugins/local as the folder a plugin is developed and loaded from, with either a root plugin.json or a .cursor-plugin/plugin.json manifest, and states that local imports can be switched off centrally and are off by default on one plan. Where an INSTALLED marketplace plugin lands is not stated on that page, so the parent directory is kept as an unsourced path rather than as a claim.
+
+    A team marketplace is a repository the team points the product at, and the product re-indexes it on a push, so the content of a plugin can change on the endpoint without anyone on the endpoint doing anything.
+  parser: json_generic
 - id: cursor.chat_session_prompt_history
   category: prompt_history
   root: user_profile

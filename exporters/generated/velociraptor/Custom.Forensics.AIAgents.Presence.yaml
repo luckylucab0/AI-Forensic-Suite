@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: d3d74c509974
+# Catalogue digest: 4dd5d8ed2fee
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -507,26 +507,31 @@ sources:
     crosscutting,C:/Users/*/AppData/Local/npm-cache/_logs/*-debug-*.log
     crosscutting,C:/Users/*/AppData/Roaming/npm/**
     crosscutting,C:/Users/*/AppData/Roaming/npm/node_modules/**
+    cursor,/Users/*/.cursor/subagents/**
     cursor,/Users/*/.cursor/worktrees/*
     cursor,/Users/*/Library/Application Support/Cursor/CachedData/**
     cursor,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,/Users/*/Library/Caches/cursor-compile-cache/**
+    cursor,/home/*/.cursor/subagents/**
     cursor,/home/*/.cursor/worktrees/*
     cursor,/home/*/Library/Application Support/Cursor/CachedData/**
     cursor,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,/home/*/Library/Caches/cursor-compile-cache/**
+    cursor,/root/.cursor/subagents/**
     cursor,/root/.cursor/worktrees/*
     cursor,/root/Library/Application Support/Cursor/CachedData/**
     cursor,/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,/root/Library/Caches/cursor-compile-cache/**
+    cursor,/var/root/.cursor/subagents/**
     cursor,/var/root/.cursor/worktrees/*
     cursor,/var/root/Library/Application Support/Cursor/CachedData/**
     cursor,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,/var/root/Library/Caches/cursor-compile-cache/**
+    cursor,C:/Users/*/.cursor/subagents/**
     cursor,C:/Users/*/.cursor/worktrees/*
     gemini_cli,/Users/*/.cache/.gemini/tmp/*/chats/**
     gemini_cli,/Users/*/.gemini/**

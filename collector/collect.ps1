@@ -4652,13 +4652,10 @@ $EmbeddedCatalogueJson = @'
                     "paths": [
                         "~/.cursor/commands/*.md",
                         "~/.cursor/agent-cli-state.json",
-                        "~/.cursor/agents/",
                         "~/.cursor/browser-logs/",
                         "~/.cursor/hooks.json",
-                        "~/.cursor/plugins/",
                         "~/.cursor/sandbox-policies/",
                         "~/.cursor/skills-cursor/",
-                        "~/.cursor/skills/",
                         "~/.cursor/snapshots/",
                         "~/.cursor/worktrees/"
                     ],
@@ -4789,6 +4786,23 @@ $EmbeddedCatalogueJson = @'
                         "%USERPROFILE%\\.cursor\\cli-config.json",
                         "<project>/.cursor/cli.json",
                         "~/.cursor/cli-config.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "cursor.commands_and_plans",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.cursor/commands/*.md",
+                        "<project>/.cursor/plans/"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -5008,6 +5022,23 @@ $EmbeddedCatalogueJson = @'
                     "status": "unverified"
                 },
                 {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "cursor.plugins",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cursor/plugins/",
+                        "~/.cursor/plugins/local/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "project_instructions",
                     "collect_priority": "normal",
                     "id": "cursor.project_instructions",
@@ -5017,17 +5048,16 @@ $EmbeddedCatalogueJson = @'
                         "linux"
                     ],
                     "paths": [
-                        "<project>/.cursor/agents/",
-                        "<project>/.cursor/commands/*.md",
-                        "<project>/.cursor/plans/",
+                        "<project>/**/AGENTS.md",
+                        "<project>/.cursor/rules/",
+                        "<project>/.cursor/rules/**/*.mdc",
                         "<project>/.cursor/rules/*.mdc",
-                        "<project>/.cursor/skills/",
                         "<project>/.cursorrules",
                         "<project>/AGENTS.md"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "config",
@@ -5065,6 +5095,64 @@ $EmbeddedCatalogueJson = @'
                     "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "unverified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "cursor.skills",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/**/.agents/skills/",
+                        "<project>/**/.cursor/skills/",
+                        "<project>/.agents/skills/",
+                        "<project>/.cursor/skills/",
+                        "~/.agents/skills/",
+                        "~/.cursor/skills/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "cursor.subagent_output",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.cursor/subagents/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "cursor.subagents",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.claude/agents/",
+                        "<project>/.codex/agents/",
+                        "<project>/.cursor/agents/",
+                        "~/.claude/agents/",
+                        "~/.codex/agents/",
+                        "~/.cursor/agents/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 },
                 {
                     "category": "transcript",
@@ -8787,7 +8875,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "f744cd51f4c5582e6e9218e633d07d04350936992815d79a92b712a9479fa086"
+    "sha256": "431f60872d04f7009a3e8f3625b3c97bb5f0ef10e724f5fc6785985c51588449"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

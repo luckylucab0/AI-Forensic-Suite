@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: d3d74c509974
+# Catalogue digest: 4dd5d8ed2fee
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 28 of the 461 catalogue artifacts declare
+# KAPE is Windows only. 28 of the 466 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -18,9 +18,12 @@
 #     cursor.install_and_machine_identity
 #   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
 #     cursor.cli_config
+#     cursor.commands_and_plans
 #     cursor.hooks
 #     cursor.mcp_config
 #     cursor.project_instructions
+#     cursor.skills
+#     cursor.subagents
 #   no Windows path that a drive-and-mask target can express
 #     cursor.retrieval_index
 Description: AI coding agent artifacts, Cursor
@@ -68,12 +71,6 @@ Targets:
     -
         Name: cursor.agent_cli_state
         Category: config
-        Path: C:\Users\%user%\.cursor\agents
-        FileMask: "*"
-        Recursive: true
-    -
-        Name: cursor.agent_cli_state
-        Category: config
         Path: C:\Users\%user%\.cursor\browser-logs
         FileMask: "*"
         Recursive: true
@@ -86,19 +83,7 @@ Targets:
     -
         Name: cursor.agent_cli_state
         Category: config
-        Path: C:\Users\%user%\.cursor\plugins
-        FileMask: "*"
-        Recursive: true
-    -
-        Name: cursor.agent_cli_state
-        Category: config
         Path: C:\Users\%user%\.cursor\sandbox-policies
-        FileMask: "*"
-        Recursive: true
-    -
-        Name: cursor.agent_cli_state
-        Category: config
-        Path: C:\Users\%user%\.cursor\skills
         FileMask: "*"
         Recursive: true
     -
@@ -270,6 +255,18 @@ Targets:
         FileMask: "pasted_text.json"
         Recursive: false
     -
+        Name: cursor.plugins
+        Category: config
+        Path: C:\Users\%user%\.cursor\plugins
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.plugins
+        Category: config
+        Path: C:\Users\%user%\.cursor\plugins\local
+        FileMask: "*"
+        Recursive: true
+    -
         Name: cursor.project_metadata
         Category: config
         Path: C:\Users\%user%\.cursor
@@ -287,6 +284,12 @@ Targets:
         Path: C:\Users\%user%\.cursor\projects\*
         FileMask: "repo.json"
         Recursive: false
+    -
+        Name: cursor.subagent_output
+        Category: transcript
+        Path: C:\Users\%user%\.cursor\subagents
+        FileMask: "*"
+        Recursive: true
     -
         Name: cursor.workspace_state_vscdb
         Category: transcript
