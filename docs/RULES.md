@@ -470,12 +470,12 @@ A permission.change event records the agent's approval mode moving to one that a
 | Pack | `permission_bypass` |
 | Agents | `any` |
 | Event kinds | `config.snapshot` |
-| Fields read | `payload.permissions[].subject` |
+| Fields read | `payload.permissions[].subject`, `event_text` |
 | Tags | `T1562.001`, `permission-bypass` |
 
 A configuration snapshot holds an allow entry that is a bare tool name. The vendor documents a bare name as matching every call of that tool, so an entry of Bash allows every shell command, Read every file read and WebFetch every outbound request.
 
-*What it matches:* `payload.permissions[].subject is 'Bash' or 'Read' or 'Write' or 'Edit' or 'MultiEdit' or 'WebFetch' or 'WebSearch' or 'NotebookEdit'`
+*What it matches:* `(payload.permissions[].subject is 'Bash' or 'Read' or 'Write' or 'Edit' or 'MultiEdit' or 'WebFetch' or 'WebSearch' or 'NotebookEdit' or event_text matches /(?m)^[^\S\n]*(?:Bash\|Read\|Write\|Edit\|MultiEdit\|WebFetch\|WebSearch\|NotebookEdit)\(\*\)[^\S\n]*$/)`
 
 *Why an analyst cares:* This is the quiet version of a bypass. Nobody typed a dangerous-looking flag and no mode changed; a line in a settings file means the prompt for a whole class of action never appears again, in every session, for as long as the file says so. An analyst reading a transcript with no permission prompts in it needs to know whether that is because nothing needed approving or because a rule had already approved it.
 
@@ -488,7 +488,7 @@ A configuration snapshot holds an allow entry that is a bare tool name. The vend
 
 - <https://code.claude.com/docs/en/permissions>
 
-*Samples in the rule file:* 2 / 2 (+/-)
+*Samples in the rule file:* 3 / 3 (+/-)
 
 #### AFX-PERMISSIONBYPASS-004
 
@@ -892,12 +892,13 @@ A configuration snapshot or a command starts an MCP server through a runner that
 
 A configuration snapshot holds a hook that runs a shell command, or a file write adds a git hook or a package lifecycle script.
 
-*What it matches:* `(payload.hooks is present or payload.files[].path matches path **/.git/hooks/* or **/.husky/** or **/.claude/hooks/** or **/.claude/settings.json or **/.claude/settings.local.json or event_text matches /(?i)"(?:PreToolUse\|PostToolUse\|SessionStart\|UserPromptSubmit\|Stop\|PreCompact)"\s*:/ or event_text matches /"scripts"\s*:[\s\S]{0,200}"(?:preinstall\|postinstall\|prepare)"\s*:/)`
+*What it matches:* `(payload.hooks is present or payload.files[].path matches path **/.git/hooks/* or **/.husky/** or **/.claude/hooks/** or **/.claude/settings.json or **/.claude/settings.local.json or event_text matches /(?i)"(?:PreToolUse\|PostToolUse\|SessionStart\|UserPromptSubmit\|Stop\|PreCompact)"\s*:/ or event_text matches /(?m)^[^\S\n]*(?:PreToolUse\|PostToolUse\|SessionStart\|UserPromptSubmit\|PreCompact)[^\S\n]*$/ or event_text matches /"scripts"\s*:[\s\S]{0,200}"(?:preinstall\|postinstall\|prepare)"\s*:/ or event_text matches /(?m)^[^\S\n]*(?:preinstall\|postinstall\|prepare)[^\S\n]*=/)`
 
 *Why an analyst cares:* A hook is code that runs without anyone asking, at a moment the agent chose, and the vendor documents that a pre-tool hook can let a call proceed without the prompt that would otherwise appear. That makes a hook both a persistence mechanism and a permission bypass wearing different clothes. It also survives the session, so a hook found on a machine is a question about every session since it was written, not just this one.
 
 *Known false positives:*
 
+- A key on a line of its own in some other document that happens to be named like a hook event. The text views render a mapping one leaf per line, so the second pattern here matches a line rather than a JSON key, which is what makes it work on a document nobody has mapped and what makes this possible.
 - A project that uses hooks for what they are for, formatting on commit being the obvious case, which is good practice and matches.
 - A settings file written because the developer granted a permission through the agent's own interface, which is the documented way to do it.
 
@@ -905,7 +906,7 @@ A configuration snapshot holds a hook that runs a shell command, or a file write
 
 - <https://code.claude.com/docs/en/permissions>
 
-*Samples in the rule file:* 3 / 2 (+/-)
+*Samples in the rule file:* 5 / 2 (+/-)
 
 #### AFX-SUPPLYCHAIN-003
 

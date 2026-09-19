@@ -15,8 +15,16 @@ rationale: >
 applies_to:
   kinds: [config.snapshot]
 match:
-  field: payload.permissions[].subject
-  equals_any: [Bash, Read, Write, Edit, MultiEdit, WebFetch, WebSearch, NotebookEdit]
+  any:
+    # The facet, where a parser mapped the file and said which tool a rule names.
+    - field: payload.permissions[].subject
+      equals_any: [Bash, Read, Write, Edit, MultiEdit, WebFetch, WebSearch, NotebookEdit]
+    # The same permission in a settings file nobody has a parser for, which is how most of
+    # them reach a case. The text views render a list one element per line, so an entry
+    # written as Bash(*) is a line of its own. Only the explicit wildcard is matched here:
+    # a bare tool name on a line would match a word in any document.
+    - field: event_text
+      regex: '(?m)^[^\S\n]*(?:Bash|Read|Write|Edit|MultiEdit|WebFetch|WebSearch|NotebookEdit)\(\*\)[^\S\n]*$'
 tags:
   - T1562.001
   - permission-bypass
@@ -31,6 +39,25 @@ false_positives:
 references:
   - https://code.claude.com/docs/en/permissions
 tests:
+  - name: the wildcard form in a settings file nobody has mapped
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      # The shape the reader for whole documents produces, which is what a collection
+      # holds for a settings file: the structure in raw rather than a mapped facet.
+      raw:
+        permissions:
+          allow: ["Read(*)", "Bash(git status)", "Bash(*)"]
+          defaultMode: acceptEdits
+  - name: a settings file that scopes every rule it allows
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        permissions:
+          allow: ["Read(./src/**)", "Bash(git status)"]
   - name: every shell command allowed
     match: true
     event:

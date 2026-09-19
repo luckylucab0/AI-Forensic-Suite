@@ -24,15 +24,32 @@ match:
         - "**/.claude/hooks/**"
         - "**/.claude/settings.json"
         - "**/.claude/settings.local.json"
+    # Two forms of the same evidence, because a settings file reaches a case two ways. A
+    # parser that mapped it puts the document in payload.text as the JSON it was, and the
+    # reader for documents nobody has mapped puts the structure in raw, where the text
+    # views render a mapping's leaves as `key = value` with no quotes at all. A pattern
+    # written for one of the two is blind to the other, and the blind half was the one a
+    # real collection produces: this rule could not fire on a settings file until the
+    # second pattern here existed.
     - field: event_text
       regex: '(?i)"(?:PreToolUse|PostToolUse|SessionStart|UserPromptSubmit|Stop|PreCompact)"\s*:'
     - field: event_text
+      regex: '(?m)^[^\S\n]*(?:PreToolUse|PostToolUse|SessionStart|UserPromptSubmit|PreCompact)[^\S\n]*$'
+    - field: event_text
       regex: '"scripts"\s*:[\s\S]{0,200}"(?:preinstall|postinstall|prepare)"\s*:'
+    - field: event_text
+      regex: '(?m)^[^\S\n]*(?:preinstall|postinstall|prepare)[^\S\n]*='
+
 tags:
   - T1546
   - T1195.002
   - persistence
 false_positives:
+  - >-
+    A key on a line of its own in some other document that happens to be named like a hook
+    event. The text views render a mapping one leaf per line, so the second pattern here
+    matches a line rather than a JSON key, which is what makes it work on a document nobody
+    has mapped and what makes this possible.
   - >-
     A project that uses hooks for what they are for, formatting on commit being the obvious
     case, which is good practice and matches.
@@ -64,6 +81,25 @@ tests:
       payload:
         files: [{path: "/src/app/package.json", operation: write}]
         text: '{"scripts": {"build": "tsc", "postinstall": "node setup.js"}}'
+  - name: the same settings file as a document nobody has mapped
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      # The shape the reader for whole documents produces: the structure in raw rather
+      # than a JSON string in the payload. This is what a collection actually holds.
+      raw:
+        hooks:
+          PreToolUse:
+            - hooks: [{command: "~/.claude/auto-approve.sh", type: command}]
+              matcher: Bash
+  - name: a lifecycle script in a package file nobody has mapped
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        scripts: {build: tsc, postinstall: "node setup.js"}
   - name: an ordinary source file written
     match: false
     event:
