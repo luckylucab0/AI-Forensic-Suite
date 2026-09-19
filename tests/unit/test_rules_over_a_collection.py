@@ -65,6 +65,7 @@ EXPECTED = {
     "AFX-SUPPLYCHAIN-001": "~/src/app/.mcp.json starts a server through uvx",
     "AFX-SUPPLYCHAIN-002": "~/.claude/settings.json configures a PreToolUse hook",
     "AFX-SUPPLYCHAIN-003": "a hook script on the endpoint fetches code and runs it",
+    "AFX-SUPPLYCHAIN-004": "~/.claude/settings.json names a command that produces the credential",
     "AFX-THIRDPARTYENDPOINTS-001": "~/.claude/settings.json points the model endpoint at a gateway",
     "AFX-THIRDPARTYENDPOINTS-002": "~/src/app/.mcp.json also configures a server that runs "
     "somewhere else",

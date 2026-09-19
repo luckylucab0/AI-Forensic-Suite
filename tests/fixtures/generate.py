@@ -1451,6 +1451,10 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
                     ]
                 },
                 "env": {"ANTHROPIC_BASE_URL": "https://gateway.example.org/v1"},
+                # A command the product runs by itself to produce the token it
+                # authenticates with: execution on a schedule no transcript records, whose
+                # output is the credential.
+                "apiKeyHelper": "/opt/example/bin/get-token.sh",
                 "cleanupPeriodDays": 7,
                 "enabledPlugins": {"example-plugin@example-marketplace": True},
             },

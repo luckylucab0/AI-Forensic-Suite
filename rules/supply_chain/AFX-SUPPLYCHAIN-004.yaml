@@ -1,0 +1,107 @@
+id: AFX-SUPPLYCHAIN-004
+pack: supply_chain
+title: A settings file names a command the agent runs to fetch its credentials
+severity: high
+description: >
+  A configuration sets one of the credential helper keys: a shell command line the product
+  runs by itself to produce the token it authenticates with, or to refresh a cloud
+  credential. Claude Code documents apiKeyHelper, awsAuthRefresh, awsCredentialExport,
+  gcpAuthRefresh and otelHeadersHelper, each as a command line it executes.
+rationale: >
+  The hook rule beside this one finds a command the agent runs around a tool call. This is
+  a command it runs around authentication, and it differs in three ways that matter to an
+  investigation.
+
+  It runs outside the conversation. The vendor documents the helper being rerun on a cache
+  timer, on a 401 or a 403, and before a request when the cached token has expired, so it
+  executes on a schedule no transcript records and leaves no turn behind.
+
+  Its output is a credential. The vendor states that the helper's output is sent as the
+  API key and as the bearer token, so whatever this command prints is what authenticated
+  every model request, and a command that was replaced prints whatever its replacement
+  wants.
+
+  And it can arrive with a repository. The vendor scopes these keys to any settings file,
+  including a project one, and notes that an interactive session waits for the workspace
+  trust prompt before running one from project or local settings. So the file is evidence
+  of intent even where the prompt was never accepted, and evidence of execution where it
+  was.
+applies_to:
+  kinds: [config.snapshot]
+match:
+  any:
+    - field: raw.apiKeyHelper
+      exists: true
+    - field: raw.awsAuthRefresh
+      exists: true
+    - field: raw.awsCredentialExport
+      exists: true
+    - field: raw.gcpAuthRefresh
+      exists: true
+    - field: raw.otelHeadersHelper
+      exists: true
+    # The same keys in a document the text views render one leaf per line. Anchored to the
+    # start of the line so a mention of the key name inside a longer value does not match,
+    # and requiring something after the separator so an empty setting does not.
+    - field: event_text
+      regex: '(?m)^[^\S\n]*(?:apiKeyHelper|awsAuthRefresh|awsCredentialExport|gcpAuthRefresh|otelHeadersHelper)[^\S\n]*=[^\S\n]*\S'
+tags:
+  - T1078
+  - T1552
+  - supply-chain
+false_positives:
+  - >-
+    The ordinary use, which is what the setting is for: a vault client or a cloud login
+    command, in an organization that rotates credentials. The finding says the agent runs
+    a command of somebody's choosing to get its token, which is worth reading once
+    whatever the answer turns out to be.
+  - >-
+    A settings file that carries the key and was never the effective one, such as a project
+    file in a workspace nobody trusted. The finding names the file, and the vendor
+    documents the trust prompt that decides it.
+references:
+  - https://code.claude.com/docs/en/settings-reference
+tests:
+  - name: a helper that produces the API credential
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        apiKeyHelper: /opt/example/bin/get-token.sh
+  - name: a cloud credential refresh command
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        awsAuthRefresh: aws sso login --profile example
+  - name: the same setting in a document nobody has mapped
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        env:
+          NOTE: unrelated
+        otelHeadersHelper: /opt/example/bin/headers.sh
+  - name: a settings file with no helper in it
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      raw:
+        permissions:
+          allow: ["Read(./src/**)"]
+        env:
+          ANTHROPIC_MODEL: example-model
+  - name: a prompt that mentions the setting
+    match: false
+    # Excluded by the rule's scope rather than by its condition, which is the point of the
+    # sample: a question about a setting is not a setting.
+    out_of_scope: true
+    event:
+      kind: user.prompt
+      agent: claude_code
+      payload:
+        text: "should we use apiKeyHelper = /opt/example/bin/get-token.sh here?"

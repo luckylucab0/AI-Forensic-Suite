@@ -53,6 +53,7 @@ Findings are written into the case database next to the events they rest on, and
 | [`supply_chain`](#supply-chain) | [AFX-SUPPLYCHAIN-001](#afx-supplychain-001) | medium |
 |  | [AFX-SUPPLYCHAIN-002](#afx-supplychain-002) | high |
 |  | [AFX-SUPPLYCHAIN-003](#afx-supplychain-003) | high |
+|  | [AFX-SUPPLYCHAIN-004](#afx-supplychain-004) | high |
 | [`third_party_endpoints`](#third-party-endpoints) | [AFX-THIRDPARTYENDPOINTS-001](#afx-thirdpartyendpoints-001) | high |
 |  | [AFX-THIRDPARTYENDPOINTS-002](#afx-thirdpartyendpoints-002) | medium |
 
@@ -1157,6 +1158,36 @@ A file the catalogue files under instructions is a script rather than prose, and
 - An installer or bootstrap hook a team wrote deliberately, fetching a pinned release from a host they control. The finding is still worth reading: the code that ran is not in evidence either way.
 
 *Samples in the rule file:* 3 / 3 (+/-)
+
+#### AFX-SUPPLYCHAIN-004
+
+**A settings file names a command the agent runs to fetch its credentials**
+
+| | |
+| --- | --- |
+| Severity | high |
+| Pack | `supply_chain` |
+| Agents | `any` |
+| Event kinds | `config.snapshot` |
+| Fields read | `raw.apiKeyHelper`, `raw.awsAuthRefresh`, `raw.awsCredentialExport`, `raw.gcpAuthRefresh`, `raw.otelHeadersHelper`, `event_text` |
+| Tags | `T1078`, `T1552`, `supply-chain` |
+
+A configuration sets one of the credential helper keys: a shell command line the product runs by itself to produce the token it authenticates with, or to refresh a cloud credential. Claude Code documents apiKeyHelper, awsAuthRefresh, awsCredentialExport, gcpAuthRefresh and otelHeadersHelper, each as a command line it executes.
+
+*What it matches:* `(raw.apiKeyHelper is present or raw.awsAuthRefresh is present or raw.awsCredentialExport is present or raw.gcpAuthRefresh is present or raw.otelHeadersHelper is present or event_text matches /(?m)^[^\S\n]*(?:apiKeyHelper\|awsAuthRefresh\|awsCredentialExport\|gcpAuthRefresh\|otelHeadersHelper)[^\S\n]*=[^\S\n]*\S/)`
+
+*Why an analyst cares:* The hook rule beside this one finds a command the agent runs around a tool call. This is a command it runs around authentication, and it differs in three ways that matter to an investigation. It runs outside the conversation. The vendor documents the helper being rerun on a cache timer, on a 401 or a 403, and before a request when the cached token has expired, so it executes on a schedule no transcript records and leaves no turn behind. Its output is a credential. The vendor states that the helper's output is sent as the API key and as the bearer token, so whatever this command prints is what authenticated every model request, and a command that was replaced prints whatever its replacement wants. And it can arrive with a repository. The vendor scopes these keys to any settings file, including a project one, and notes that an interactive session waits for the workspace trust prompt before running one from project or local settings. So the file is evidence of intent even where the prompt was never accepted, and evidence of execution where it was.
+
+*Known false positives:*
+
+- The ordinary use, which is what the setting is for: a vault client or a cloud login command, in an organization that rotates credentials. The finding says the agent runs a command of somebody's choosing to get its token, which is worth reading once whatever the answer turns out to be.
+- A settings file that carries the key and was never the effective one, such as a project file in a workspace nobody trusted. The finding names the file, and the vendor documents the trust prompt that decides it.
+
+*References:*
+
+- <https://code.claude.com/docs/en/settings-reference>
+
+*Samples in the rule file:* 3 / 2 (+/-)
 
 ## third party endpoints
 
