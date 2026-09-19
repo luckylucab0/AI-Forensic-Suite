@@ -70,7 +70,7 @@ artifacts:
     Timestamps on files here date aider runs even when the project directory (and its history files) is gone.
 
     Record structure: HISTORY.md v0.42.0: 'New $HOME/.aider/caches dir for app-wide expendable caches.' Known contents include model_prices_and_context_window.json. Retrieved via GitHub code search content fragment.
-  parser: null
+  parser: json_generic
 - id: aider.config
   category: config
   root: project
@@ -115,7 +115,7 @@ artifacts:
     Presence of a custom entry for an unusual model name is a strong indicator of a non-default or proxied provider.
 
     Re-sourced by the verification pass: the argument parser cited before carries the bare filename as a default and never expands a home directory. The advanced model settings page lists the three locations the file is looked for in.
-  parser: null
+  parser: json_generic
 - id: aider.model_settings
   category: config
   root: project
@@ -181,7 +181,7 @@ artifacts:
     Gives a stable per-install pseudonymous identifier that can tie one endpoint's aider usage to server-side PostHog records obtainable by legal process, and dates first use of aider on the host.
 
     Record structure: analytics.py: Path.home() / '.aider' / 'analytics.json'. Single JSON object holding the stable install UUID, the opt-in flag, and a permanently-disabled flag. Telemetry backend is PostHog (a Mixpanel path exists but is commented out).
-  parser: null
+  parser: json_generic
 - id: aider.input_history
   category: prompt_history
   root: project

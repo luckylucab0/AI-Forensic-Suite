@@ -131,7 +131,7 @@ artifacts:
     context_servers is the Zed MCP inventory with full command lines and env, including any inline secrets. The macOS config/data split is a frequent acquisition miss: imaging only ~/Library/Application Support/Zed gets the transcripts but not the MCP configuration.
 
     Re-sourced by the verification pass: the page cited before says only your settings file and states no path at all. The configuration guide lists all four spellings verbatim.
-  parser: null
+  parser: json_generic
 - id: zed.flatpak_legacy_threads
   category: transcript
   root: user_profile

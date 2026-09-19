@@ -134,9 +134,9 @@ class JsonlGenericParser:
 
     def _record(self, context: ParseContext, locator: str, record: dict[str, Any]) -> Event:
         """One record, with only what it plainly says read out of it."""
-        field, raw_time = _first(record, TIME_FIELDS)
+        field, raw_time = literal_field(record, TIME_FIELDS)
         when, precision, note = normalise_ts(raw_time)
-        text = _literal_text(record)
+        text = literal_text(record)
         return unparsed(
             context.provenance(locator),
             context.agent,
@@ -152,14 +152,19 @@ class JsonlGenericParser:
             ts_source=f"the field named {field}" if when and field else None,
             user=context.user,
             host=context.host,
-            session_id=_session(record),
-            project_path=_project(record),
+            session_id=literal_session(record),
+            project_path=literal_project(record),
             payload={"text": text} if text is not None else {},
         )
 
 
-def _first(record: dict[str, Any], fields: tuple[str, ...]) -> tuple[str | None, Any]:
-    """The first of these field names the record carries a usable value under."""
+def literal_field(record: dict[str, Any], fields: tuple[str, ...]) -> tuple[str | None, Any]:
+    """The first of these field names the record carries a usable value under.
+
+    Public, along with the three readings below it, because the reader for whole JSON
+    documents uses them: the two are the same floor under two formats, and a record they
+    read two different ways would be the drift this module exists to prevent.
+    """
     for field in fields:
         value = record.get(field)
         if value not in (None, "", [], {}):
@@ -167,14 +172,14 @@ def _first(record: dict[str, Any], fields: tuple[str, ...]) -> tuple[str | None,
     return None, None
 
 
-def _session(record: dict[str, Any]) -> str | None:
+def literal_session(record: dict[str, Any]) -> str | None:
     """A session id, only where the record names one and it is a string or a number.
 
     A structured value under a name like `sessionId` is something other than an id, and
     stringifying it would put a rendered object into the column a case groups conversations
     by.
     """
-    _, value = _first(record, SESSION_FIELDS)
+    _, value = literal_field(record, SESSION_FIELDS)
     if isinstance(value, str):
         return value
     if isinstance(value, int) and not isinstance(value, bool):
@@ -182,13 +187,13 @@ def _session(record: dict[str, Any]) -> str | None:
     return None
 
 
-def _project(record: dict[str, Any]) -> str | None:
+def literal_project(record: dict[str, Any]) -> str | None:
     """The working copy, only where the record names it as a plain path."""
-    _, value = _first(record, PROJECT_FIELDS)
+    _, value = literal_field(record, PROJECT_FIELDS)
     return value if isinstance(value, str) else None
 
 
-def _literal_text(record: dict[str, Any]) -> str | None:
+def literal_text(record: dict[str, Any]) -> str | None:
     """The record's text, where the record holds text rather than a structure.
 
     This is the endpoint query's `TextOf` in Python, and it stops where that stops. A string
@@ -198,7 +203,7 @@ def _literal_text(record: dict[str, Any]) -> str | None:
     whole record is there either way, and a payload built out of a guess would be the part
     an analyst quotes.
     """
-    _, value = _first(record, TEXT_FIELDS)
+    _, value = literal_field(record, TEXT_FIELDS)
     if isinstance(value, str):
         return value
     if isinstance(value, dict):
@@ -226,4 +231,8 @@ __all__ = [
     "TIME_FIELDS",
     "UNINTERPRETED",
     "JsonlGenericParser",
+    "literal_field",
+    "literal_project",
+    "literal_session",
+    "literal_text",
 ]

@@ -182,7 +182,7 @@ artifacts:
     Deleting it "removes command history" and the user then "will no longer be able to search previous commands". One user action, no second copy.
   notes: |-
     Documented as "Command history data used for reverse search". This is what the user typed, which survives independently of whether the session it belonged to still exists, so it is often the only remaining evidence that a deleted session ever happened.
-  parser: null
+  parser: json_generic
 - id: copilot.config_json
   category: config
   root: user_profile
@@ -206,7 +206,7 @@ artifacts:
     The vendor's own description is "Stores internal application state...including authentication data, installed plugin metadata", and a community reference adds that trusted folders are kept here under a trusted_folders key.
 
     Collected in full, and flagged rather than withheld. It is evidence of what the agent was permitted to touch and what was installed, and withholding it to protect the token inside would remove the evidence with it. Handle the bundle accordingly: see SECURITY.md.
-  parser: null
+  parser: json_generic
 - id: copilot.settings
   category: config
   root: user_profile
@@ -226,7 +226,7 @@ artifacts:
   volatility: Persistent until edited.
   notes: |-
     The "Primary configuration file" for user preferences. Documented as supporting JSON with comments, so a strict JSON parser will fail on a valid file: parse it as JSONC or record the parse failure rather than reporting no settings.
-  parser: null
+  parser: json_generic
 - id: copilot.permissions
   category: permissions
   root: user_profile
@@ -246,7 +246,7 @@ artifacts:
   volatility: Appended to as the user approves things; nothing observed that expires an entry.
   notes: |-
     "Stores your saved tool and directory permission decisions, organized by project". The direct answer to whether a safety control was bypassed, and by project, so it shows where the user decided to stop being asked.
-  parser: null
+  parser: json_generic
 - id: copilot.mcp_config
   category: mcp_config
   root: user_profile
@@ -266,7 +266,7 @@ artifacts:
   volatility: Persistent until edited.
   notes: |-
     "Defines MCP (Model Context Protocol) servers available at user level", and it persists across all sessions and workspaces. Each entry is a process the agent could start or a network endpoint it could reach, which is the data-egress surface.
-  parser: null
+  parser: json_generic
 - id: copilot.mcp_config_jetbrains
   category: mcp_config
   root: user_profile
@@ -289,7 +289,7 @@ artifacts:
     The JetBrains-side sibling of the CLI's own configuration, in a different tree entirely. From JetBrains source (detectGitHubCopilotJetBrains): macOS and Linux both use ~/.config/github-copilot/intellij/mcp.json, note the XDG-style path on macOS rather than ~/Library, and Windows uses %LOCALAPPDATA%/github-copilot/intellij/mcp.json.
 
     The detector treats the existence of the parent directory as the signal, so ~/.config/github-copilot/intellij/ is itself install evidence for the Copilot JetBrains plugin. The whole ~/.config/github-copilot/ tree is claimed here for that reason.
-  parser: null
+  parser: json_generic
 - id: copilot.mcp_credentials
   category: credentials
   root: user_profile
@@ -410,7 +410,7 @@ artifacts:
   volatility: Persistent until edited.
   notes: |-
     "Defines Language Server Protocol (LSP) servers available at user level". Another set of processes the agent starts, configured by a file the user can edit, and a path to code execution that is not a tool call.
-  parser: null
+  parser: json_generic
 - id: copilot.lsp_config_repo
   category: project_instructions
   root: project
@@ -451,7 +451,7 @@ artifacts:
     "Defines a registry of bring-your-own-key (BYOK) providers and models". Directly relevant to which data left the device and where it went: an entry here can point the agent at a model endpoint that is not GitHub's, and the prompts then go there instead.
 
     COPILOT_PROVIDERS_CONFIG relocates this file, so check the environment before concluding that no custom provider was configured.
-  parser: null
+  parser: json_generic
 - id: copilot.cache
   category: cache
   root: user_profile

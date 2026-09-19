@@ -189,7 +189,7 @@ artifacts:
     LokiJS with autosave every 1000 ms and persistenceMethod 'fs', so the whole JSON file is rewritten roughly every second while a chat is open. Deleting a conversation in the UI calls findAndRemove on the tabs collection and the record is gone from the next rewrite. There is no age-based expiry in the code, so undeleted history accumulates indefinitely; conversely deleted tabs are only recoverable from unallocated space or from backups, and the constant rewriting works against that.
   notes: |-
     Verbatim construction: this.dbDirectory = path.join(fs.getUserHomeDir(), '.aws/amazonq/history') and const dbName = `chat-history-${workspaceId}.json`. The <hash> is NOT random, which is the key insight for an analyst: getWorkspaceIdentifier() returns the md5 hex digest of the .code-workspace file path for a saved workspace, or of the single workspace folder path, or of all multi-root folder paths sorted and joined with '|', and falls back to the literal string 'no-workspace' when no folder is open. So you can map a file name back to a workspace by computing md5 over candidate paths, and chat-history-no-workspace.json specifically holds conversations held with no project open. The record model reaches into what the agent did, not just what was said: Message.toolUses records tool invocations and Message.codeReference records code-attribution references. Conversation.clientType distinguishes IDE-VSCode, IDE_JetBrains and CLI, which means this same store is shared with the JetBrains plugin, so one file can cover several IDEs. The vendor's user guide corroborates the location loosely, stating only that 'Amazon Q stores your conversations on your local computer, in your home directory' and that conversations are saved per workspace.
-  parser: null
+  parser: json_generic
 - id: amazonq.sso_token_cache
   title: AWS SSO and Builder ID token cache
   category: credentials
@@ -247,7 +247,7 @@ artifacts:
     Rewritten by q mcp add / q mcp remove / q mcp import and by hand.
   notes: |-
     The vendor's own repository documentation states: 'the legacy MCP configuration files (~/.aws/amazonq/mcp.json for global and cwd/.amazonq/mcp.json for workspace)', and the source constructs the same two paths in legacy_global_mcp_config_path() (home_dir()?.join(".aws").join(AWS_DIR_NAME).join("mcp.json")) and legacy_workspace_mcp_config_path() (current_dir()?.join(format!(".{}", AWS_DIR_NAME)).join("mcp.json")), with AWS_DIR_NAME = "amazonq". 'Legacy' is a trap word here: whether these files are honoured depends on the agent's useLegacyMcpJson field, which the vendor documents as defaulting to true, so a legacy file is normally live. The vendor also notes these same files may be used by the IDE, so one file can explain MCP activity in two products. Remote servers appear as type http with a url. Inline env and headers values are the usual place MCP credentials sit, so treat as secret.
-  parser: null
+  parser: json_generic
 - id: amazonq.cli_agents
   title: Amazon Q Developer CLI agent configurations
   category: permissions
@@ -283,7 +283,7 @@ artifacts:
     The vendor states Q CLI creates the global agents directory automatically but the local one must be created by hand, so the presence of a project .amazonq/cli-agents directory is itself a deliberate act. Legacy profiles under ~/.aws/amazonq/profiles are auto-migrated into cli-agents on first startup, which rewrites this directory without user action.
   notes: |-
     This is the autonomy and auto-approve record for the Amazon Q CLI, and the reason it is categorised as permissions rather than config. The vendor documents allowedTools as 'Tools that can be used without prompting the user for permission', supporting glob-style wildcards with * and ?, plus server-level MCP permissions and a toolsSettings block that can constrain allowable patterns but is overridden if the same tool also appears in allowedTools. An entry there is a standing pre-authorisation: any matching tool call in a transcript ran with no prompt, which is the difference between an approved action and a silent one. Resolution is local first (.amazonq/cli-agents/ in the working directory) then global fallback (~/.aws/amazonq/cli-agents/), so collect both and note which would have won for the directory in question. The file can also embed its own mcpServers, so it is a second place MCP credentials and egress destinations hide. Default agent resources include file://.amazonq/rules/**/*.md, file://AmazonQ.md, file://AGENTS.md and file://README.md.
-  parser: null
+  parser: json_generic
 - id: amazonq.ide_agent_config
   title: Amazon Q Developer IDE agent and MCP configuration
   category: mcp_config
@@ -317,7 +317,7 @@ artifacts:
     Rewritten whenever a server is added, enabled, disabled or deleted through the IDE MCP panel, and when tool permissions are adjusted.
   notes: |-
     The vendor states: 'When you use the GUI to add an MCP server to Q Developer in the IDE, the configuration is stored in one of two files: At the global scope: ~/.aws/amazonq/default.json, or at the local scope: .amazonq/default.json', and that workspace-level configuration takes precedence. It also states support for the legacy mcp.json files is controlled by useLegacyMcpJson in the global default.json and is true by default. IMPORTANT DISCREPANCY, which is exactly the kind of thing that makes a collection come back empty: a user-filed issue on the vendor's VS Code repository reports that the extension actually writes global MCP configuration to ~/.aws/amazonq/agents/default.json, one directory deeper than the documentation says, and no maintainer has confirmed which is correct. That fourth path is listed here and flagged as not stated by the cited source. Collect the whole ~/.aws/amazonq tree rather than named files. Credentials can sit inline: the vendor's add-server walkthrough has the user type environment variable values and HTTP headers into the GUI, and those land in this file even though the UI subsequently hides the values.
-  parser: null
+  parser: json_generic
 - id: amazonq.project_rules
   title: Amazon Q Developer project rules
   category: project_instructions
@@ -487,7 +487,7 @@ artifacts:
     Persist until the user removes a context. Indexed content is a snapshot of the source material at index time and does not follow later changes to the source.
   notes: |-
     The vendor documents the layout verbatim as ~/.aws/amazonq/knowledge_bases/<agent-name>[_<alphanumeric-code>]/ containing contexts.json plus one directory per context holding data.json and, for the fast index, bm25_data.json; the source builds it as knowledge_bases_dir()?.join(unique_id). This is a durable copy of indexed content outside its original location, so it can preserve text from files or directories that have since been deleted, and contexts.json records what was indexed and when. Per-agent isolation means the directory name tells you which agent had access to which corpus. Experimental feature, so it is absent on most endpoints; when present it is high value for a data-movement question.
-  parser: null
+  parser: json_generic
 - id: amazonq.cli_logs
   title: Amazon Q Developer CLI logs
   category: log
@@ -544,7 +544,7 @@ artifacts:
     Last-write-wins, no history.
   notes: |-
     Constructed verbatim as Ok(dirs::data_local_dir().ok_or(DirectoryError::NoHomeDirectory)?.join("amazon-q").join("settings.json")), sitting beside data.sqlite3 in the same data directory, and as data_dir()?.join("settings.json") in the newer agent crate. Useful mainly for establishing which experimental features were enabled, since several of them (knowledge bases, sub-agent delegation, todo lists) decide whether the corresponding artifacts exist at all. The per-OS prefixes are the dirs crate data_local_dir contract, as for the database.
-  parser: null
+  parser: json_generic
 - id: amazonq.legacy_profiles_and_context
   title: Amazon Q Developer CLI legacy profiles and global context
   category: config
@@ -568,7 +568,7 @@ artifacts:
     Left in place, not deleted, when superseded. The vendor states global profiles support automatic migration into ~/.aws/amazonq/cli-agents on initial startup, and that global context under ~/.aws/amazonq/global_context.json 'is no longer supported'.
   notes: |-
     Dead-but-present configuration, which is often the most informative kind. Because the migration copies rather than removes, these files can preserve the user's context and profile configuration from before the agents model, giving an analyst a view of an earlier period that the current configuration has erased. global_context.json specifically held the user's global context file list. The source declares both paths as constants PROFILES_DIR = ".aws/amazonq/profiles" and GLOBAL_CONTEXT = ".aws/amazonq/global_context.json" and joins them to the home directory in GlobalPaths::profiles_dir() and GlobalPaths::global_context(). Do not read the presence of global_context.json as evidence it was in effect at the time of the incident.
-  parser: null
+  parser: json_generic
 - id: amazonq.ide_chat_export
   title: Amazon Q Developer IDE exported conversations
   category: transcript

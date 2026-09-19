@@ -178,7 +178,7 @@ artifacts:
   volatility: Persists until edited.
   notes: |-
     Added by the vendor verification pass. The vendor states that a user can configure their own agents by editing this file, which points the editor at a local agent binary of the user's choosing. Two consequences for an investigation. The agent that ran a conversation may not be this vendor's at all, so this file is part of answering which agent actually ran. And it is a way to route work through a binary that none of this catalogue's other entries describe, which makes it worth reading in any question about a control that was bypassed.
-  parser: null
+  parser: json_generic
 - id: windsurf.ignore_files
   title: Ignore files
   category: config
@@ -262,7 +262,7 @@ artifacts:
     Added by the vendor verification pass, which also settled where this product's settings file actually lives. It is the editor's own user data directory, inherited from the editor this product is derived from, and it is a different tree from the agent configuration directory under .codeium. An entry here used to claim a settings file under the agent configuration directory, which was wrong.
 
     The workspace list is the part worth reading first: it is the record of which projects were opened in this editor, which is how a collection finds the working copies the agent's project-anchored artifacts hang off.
-  parser: null
+  parser: json_generic
 - id: windsurf.global_rules
   category: instructions
   root: user_profile
@@ -365,7 +365,7 @@ artifacts:
     Hooks are ARBITRARY LOCAL COMMAND EXECUTION on agent events — a persistence and code-execution primitive as much as a config. Confirmed by a rules-sync research doc and an independent agent-guardrail tool's coverage matrix.
 
     Confirmed by the vendor verification pass, which found the hooks page states three levels that are loaded and merged: the editor's user-level file, the plugin's user-level file one directory up, and the workspace file. The third level is the machine-wide one, which has its own entry here and runs first in the merge order.
-  parser: null
+  parser: json_generic
 - id: windsurf.ide_global_state_vscdb
   category: config
   root: user_profile
@@ -560,7 +560,7 @@ artifacts:
     The single most widely corroborated Windsurf path — attested verbatim in dozens of vendor-neutral MCP server READMEs, an MCP security scanner, an enterprise MCP config sweep, and a DFIR catalogue. Also reachable by deep link windsurf://windsurf-mcp-registry?serverName=<name>, which makes silent server registration a real attack path.
 
     Record structure: { "mcpServers": { "<name>": { "command", "args", "env", "serverUrl" } } }. Per-server `env` blocks carry plaintext API keys and bearer tokens — hash those values, keep the rest. An empty install reads exactly {"mcpServers":{}}.
-  parser: null
+  parser: json_generic
 - id: windsurf.enterprise_policy
   category: permissions
   root: registry

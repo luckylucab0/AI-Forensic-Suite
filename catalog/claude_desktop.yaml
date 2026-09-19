@@ -80,7 +80,7 @@ artifacts:
     Rewritten in place whenever the user edits it or toggles a server in Settings. No rotation, no backup copy. An MSIX profile reset recreates the parent directory and loses it.
   notes: |-
     The vendor names the file itself in first-party docs (code.claude.com/docs/en/desktop: 'The Desktop app loads MCP servers from claude_desktop_config.json into local Code tab sessions, alongside servers from ~/.claude.json and .mcp.json') and the vendor's own cookbook repository states the macOS path. The Windows and Linux spellings are inferred from the vendor's statement that standard installs use %APPDATA%\Claude\ (macOS: ~/Library/Application Support/Claude/) as the application-data directory, plus community reports; they are listed as unsourced. Traps: (1) only local stdio servers live here. Remote MCP servers are claude.ai connectors held server-side, and Anthropic's own plugin documentation says remote servers configured in this file are ignored, so an empty mcpServers block does NOT mean no MCP was used. (2) On Microsoft Store / MSIX installs the file the app actually reads is the virtualized LocalCache\Roaming copy; the in-app 'Edit Config' button opens the non-virtualized %APPDATA%\Claude copy, so both can exist with different contents and the %APPDATA% one may be dead. (3) Credentials are routinely pasted inline into the env block. (4) The standalone Claude Code CLI does not read this file; 'claude mcp add-from-claude-desktop' copies entries into ~/.claude.json, which is how an entry can appear in both products.
-  parser: null
+  parser: json_generic
 - id: claude_desktop.cowork_session_store
   title: Cowork and Chat session store (local-agent-mode-sessions)
   category: transcript
@@ -322,7 +322,7 @@ artifacts:
     Rewritten when the user changes a preference in Settings.
   notes: |-
     Small but useful: the memory toggle records whether Cowork memory was on, which decides whether the absence of memory notes means nothing was learned or that recording was off. Vendor text is the third-party mode page; standard-mode spellings are unsourced.
-  parser: null
+  parser: json_generic
 - id: claude_desktop.code_session_index
   title: Code tab session records (claude-code-sessions)
   category: transcript
@@ -359,7 +359,7 @@ artifacts:
     The vendor states the conversation transcripts are not here but in Claude Code's own store at ~/.claude/projects/. Community investigation on macOS reports two independent decay processes: the .jsonl transcript under ~/.claude/projects/ disappears roughly 2 to 15 days after session creation, and the cliSessionId pointer in this file is separately nulled with transcriptUnavailable flipped to true after about seven weeks, one-directionally and without recovery. Claude Code's own cleanupPeriodDays (default 30) governs transcript deletion but community reports say transcript mtimes are refreshed in clusters, which defeats mtime-based ageing. Sidebar 'Delete session' is reported to remove only the index entry and leave the .jsonl on disk.
   notes: |-
     This is the index that maps a desktop Code session to its working folder and to the transcript file in the shared Claude Code store. It is the join key an analyst needs, and it is also the artifact most likely to be out of sync with reality in both directions: entries whose transcript is already gone, and transcripts on disk with no entry. Treat the index as a claim, not as evidence of presence or absence, and always enumerate ~/.claude/projects/ independently. The vendor page documenting the layout is the third-party mode page; standard-mode spellings come from community reports plus Anthropic's statement that standard installs use the Claude directory with the same subpaths.
-  parser: null
+  parser: json_generic
 - id: claude_desktop.app_logs
   title: Application logs (main.log, cowork_vm_node.log, mcp-server-<name>.log)
   category: log
@@ -526,7 +526,7 @@ artifacts:
     Replaced by configuration management. The app rejects the whole file if /etc/claude-desktop is a symlink, is not root-owned, or is group- or world-writable, and logs the reason to main.log.
   notes: |-
     Anthropic's Cowork changelog records the addition: 'administrators can provision settings in a root-owned /etc/claude-desktop/managed-settings.json, validated against the same schema as the macOS and Windows sources'. Distinct from Claude Code's /etc/claude-code/managed-settings.json, which is a different file for a different product and is also read by Desktop's sessions. If the file is present but rejected, the device is treated as managed but unreadable and local settings are disabled too, so a rejected file changes behaviour and is worth reporting.
-  parser: null
+  parser: json_generic
 - id: claude_desktop.local_config_library
   title: Locally authored configuration (configLibrary)
   category: config
@@ -556,7 +556,7 @@ artifacts:
     Ignored entirely when a managed profile is present, so it can sit on disk describing a configuration that is not in force. Deleted by the user through Settings.
   notes: |-
     Only present in third-party deployment mode, where it is the lowest-precedence configuration source: locally authored settings from the in-app configuration window. _meta.json records which saved configuration is applied. An analyst must check for a managed profile before treating any of it as effective. Inference credentials can be stored here.
-  parser: null
+  parser: json_generic
 - id: claude_desktop.oauth_and_signin_tokens
   title: OAuth tokens and stored sign-ins (OS secure storage)
   category: credentials
@@ -860,7 +860,7 @@ artifacts:
     Written automatically when the desktop app first detects a dev server setup, then edited by the user or Claude. Lives in the user's working copy, so it can be committed to version control and travel off the endpoint.
   notes: |-
     The vendor states Claude 'automatically detects your dev server setup and stores the configuration in .claude/launch.json at the root of the folder you selected when starting the session'. Its presence in a repository is evidence that the Claude Code Desktop app, not the terminal CLI, was used on that working copy, which is one of the few positive discriminators between the two products. It also records a command the app will run, so it is a place an attacker could plant execution. autoVerify false records that automatic post-edit verification was turned off.
-  parser: null
+  parser: json_generic
 - id: claude_desktop.ssh_remote_artifacts
   title: Artifacts Claude Desktop writes on an SSH remote host
   category: file_snapshot

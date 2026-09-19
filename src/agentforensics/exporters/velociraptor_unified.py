@@ -154,6 +154,9 @@ UNINTERPRETED: dict[str, str] = {
 UNINTERPRETED_FORMATS: dict[str, str] = {
     "sqlite": "a database, which this query does not open. The suite analyzer reads every "
     "table of one, so collect the file and ingest it",
+    "json": "a whole document, which this query does not read: it reads a file line by "
+    "line and a document is one value. The suite analyzer splits one by its structure, so "
+    "collect the file and ingest it",
 }
 
 _OS_SOURCES = (

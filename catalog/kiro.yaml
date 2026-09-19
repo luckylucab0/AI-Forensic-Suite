@@ -176,7 +176,7 @@ artifacts:
     No vendor-provided cleanup. A user-filed issue reports this tree growing past 13 GB over months with no built-in way to manage it, which means old conversations tend to survive here long after the user believes they are gone. Manual file deletion is the only stated remedy, so absence of a directory can be an anti-forensic act rather than non-use.
   notes: |-
     Kiro IDE is a VS Code derivative, so this is the standard <user-data-dir>/User/globalStorage/<extension-id> location for extension kiro.kiroagent. Third-party only, on two independent community sources. Two traps. First, the directory case differs between reports (Kiro vs kiro): macOS is case-insensitive by default so both spellings appear in write-ups and a case-sensitive collector must try both. Second, the interesting file names inside are opaque 32-hex-character strings rather than readable names: the community viewer hardcodes one such name as the per-workspace execution index and another as the execution log directory, and identifies workspace directories only by the 32-hex-character pattern. Do not filter by extension or by name here, collect the whole subtree. The workspace-sessions child directories are base64url of the workspace path (with _ and - substituted for = and +), so the workspace path is directly recoverable by decoding the directory name. Execution logs are the record of what the agent actually did (tool calls, commands, file operations) and are keyed by executionId inside the first bytes of each file.
-  parser: null
+  parser: json_generic
 - id: kiro.cli_settings
   title: Kiro CLI settings
   category: config
@@ -206,7 +206,7 @@ artifacts:
     Rewritten by /settings, kiro-cli settings and by /model and /effort selections, which now persist automatically. Last-write-wins, no history kept.
   notes: |-
     Single global settings file, no project scope. Forensically it dates and explains behaviour rather than holding content: chat.agentEngine pins the harness version (v1/v2/v3) which decides which of the competing session stores is in use; chat.historyMode is 'session' or 'global' and therefore tells you whether arrow-up prompt recall was shared across all sessions or isolated per session; chat.sessionDashboard.indexResponses says whether the local search index covers agent responses as well as prompts; chat.modelDefaults records per-model reasoning effort. The vendor explicitly documents editing this file directly with kiro-cli settings open, so an unexpected mtime here can indicate hand-editing.
-  parser: null
+  parser: json_generic
 - id: kiro.permissions_user
   title: Kiro user permission rules
   category: permissions
@@ -289,7 +289,7 @@ artifacts:
     Deployed and replaced by MDM, Group Policy or SCCM, so it can change without any user action and without a local trace of the previous content.
   notes: |-
     Machine-wide policy that uses the same rule schema as the user permission file and is deployed by administrators. It is the baseline an analyst needs before judging a user's own rules: a deny here cannot be overridden by the user, so an action that happened despite an apparent policy means either the policy postdates the action or the deny did not match. Requires a Kiro restart to take effect, so its mtime is only an upper bound on when it became effective. Collect from all three locations: the macOS path is under the system /Library, not the user one.
-  parser: null
+  parser: json_generic
 - id: kiro.mcp_config_user
   title: Kiro user MCP server configuration
   category: mcp_config
@@ -329,7 +329,7 @@ artifacts:
     Rewritten whenever a server is added, edited, enabled or disabled through the UI or the command palette. No history.
   notes: |-
     The primary record of which external tools and network destinations the agent could reach. Treat it as secret: the vendor's own examples put literal values in env (for example an API key variable) and in headers (Authorization: Bearer ...), and the oauth object documents a clientSecret field with a literal example value, so inline credentials are expected rather than exceptional. The IDE UI hides those values from the user while the file on disk holds them, which is exactly the gap a forensic collection closes. Remote servers appear as type http with a url, which gives an analyst the egress destination even when no traffic capture exists. Note that the CLI supports confidential OAuth clients (clientId plus clientSecret) while the IDE supports public PKCE clients only, so a clientSecret present in this file points to CLI use.
-  parser: null
+  parser: json_generic
 - id: kiro.mcp_config_project
   title: Kiro project MCP server configuration
   category: mcp_config
@@ -363,7 +363,7 @@ artifacts:
     Lives inside the working copy, so it is also subject to git history, branch switches and checkouts. Prior versions may be recoverable from the repository even when the working-tree file was changed or removed.
   notes: |-
     Project scope beats global scope for MCP resolution (agent scope beats both), so this file, not the user one, usually decides what actually ran. Because it is committed, it is a supply-chain vector: an MCP server added by someone else in a pull request will run for every developer who opens the repository. Check the repository history as well as the working tree. Kiro Web and Mobile read only repository-committed configuration, never ~/.kiro, so for cloud sessions this file is the whole story.
-  parser: null
+  parser: json_generic
 - id: kiro.steering_user
   title: Kiro global steering files
   category: instructions
@@ -481,7 +481,7 @@ artifacts:
     User or agent edited. Writes to .kiro/agents/** are vendor-stated always-ask, so a modification here implies an explicit approval at the time.
   notes: |-
     Agent scope is the highest-priority configuration scope, so an agent file can carry its own mcpServers, its own permissions block and its own resources (steering and skills) that beat both project and global settings. That makes it the place a bypass is most likely to hide: a permissive permissions field inside a custom agent silently overrides a careful user-level policy. The vendor documents both YAML (.kiro/agents/code-review.yaml appears in their examples) and JSON spellings, so match on the directory rather than the extension. Collect both scopes; project wins on a name collision with a warning.
-  parser: null
+  parser: json_generic
 - id: kiro.hooks
   title: Kiro agent hooks
   category: config
@@ -509,7 +509,7 @@ artifacts:
     User or agent edited. Writes to .kiro/hooks/** are vendor-stated always-ask.
   notes: |-
     Hooks fire on agent file changes, tool use or task completion and can run scripts or inject context. They are therefore both an execution mechanism (commands that ran with no user prompt at the moment of execution) and an injection mechanism (context added to every session). All scopes are merged rather than overridden, so a global hook and a project hook both run. Kiro Web also reads project hooks, so a committed hook executes in the cloud sandbox too. Read every hook body before concluding which commands in a transcript were user-initiated.
-  parser: null
+  parser: json_generic
 - id: kiro.skills_powers
   title: Kiro skills and powers
   category: instructions

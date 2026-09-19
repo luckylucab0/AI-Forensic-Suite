@@ -175,7 +175,7 @@ artifacts:
     The runtime-status sidecar tracks a live process and is deliberately transient; the worktree sidecar is cleared when the worktree is removed. All three are unlinked when the session is deleted. No age-based expiry.
   notes: |-
     Deliberately co-located with the transcripts so external observers can scan one directory for live sessions. The runtime sidecar carries sessionId and workDir, which is how the tool re-attributes a session whose recorded cwd hashes to a different project (for example a git worktree). For an analyst these are the cheap way to tell which sessions were live at collection time and which working copy each one was driving.
-  parser: null
+  parser: json_generic
 - id: qwen_code.prompt_terminal_ledger
   title: Per-session prompt terminal ledger
   category: prompt_history
@@ -301,7 +301,7 @@ artifacts:
     Rewritten in place whenever a setting or a persisted permission changes. Legacy files are renamed to a backup on configuration migration, so a *.json backup beside it can preserve an older state.
   notes: |-
     The single most informative configuration artifact. Carries tools.approvalMode (whose DEFAULT in this fork is 'auto', an LLM classifier that auto-approves actions it judges safe, with 'yolo' auto-approving everything), permissions.allow / permissions.ask / permissions.deny, mcpServers, hooks, telemetry, general.chatRecording and general.cleanupPeriodDays. Choosing 'always allow' on a tool confirmation writes a rule into permissions.allow at user or workspace scope, so this file is the durable record of granted permissions. JSON with comments is accepted (values are read through strip-json-comments), so a strict JSON parser can fail on a valid file. String values may be $VAR / ${VAR} references resolved at load time, so a key can look absent here and still be set. The env object holds API keys in plaintext by the project's own documented recommendation.
-  parser: null
+  parser: json_generic
 - id: qwen_code.project_settings
   title: Project settings and the project .qwen directory
   category: config
@@ -328,7 +328,7 @@ artifacts:
     Lives in the working copy, so git history may hold prior versions. Rewritten when a workspace-scoped permission is persisted.
   notes: |-
     Overrides user settings, and is the surface an attacker-supplied repository would use: it can declare mcpServers, hooks and permissions.allow. Not loaded at all when the folder is untrusted, which is why trustedFolders.json has to be read alongside it - a rule here that looks active may never have been applied. A few keys are read from operator scopes only and are ignored here (review policy, ui.brand.name), so presence in this file is not proof of effect. The custom sandbox profile and Dockerfile are the record of how confinement was configured for this project.
-  parser: null
+  parser: json_generic
 - id: qwen_code.system_settings
   title: System settings and system defaults
   category: config
@@ -354,7 +354,7 @@ artifacts:
     Administrator managed; changes only when an operator edits it.
   notes: |-
     System settings have the HIGHEST precedence of the files and system defaults the lowest, so both ends of the precedence chain live here. Either path can be moved by QWEN_CODE_SYSTEM_SETTINGS_PATH or QWEN_CODE_SYSTEM_DEFAULTS_PATH, so check the process environment before concluding the default path is authoritative. Note the macOS directory is spelled 'QwenCode' while the Linux and Windows ones are 'qwen-code'.
-  parser: null
+  parser: json_generic
 - id: qwen_code.trusted_folders
   title: Trusted folders decisions
   category: permissions
@@ -376,7 +376,7 @@ artifacts:
     Appended to the first time the user answers the trust prompt for a folder; entries are not expired.
   notes: |-
     The durable record of which directories the user let the tool treat as trusted. Forensically decisive: in an untrusted folder the workspace .qwen/settings.json is not loaded at all, so a project-declared MCP server or hook only ever ran if the folder appears here as trusted. The project documentation describes the file as the central store and tells users to inspect it directly. When an IDE is connected the IDE's own trust decision is consulted first, so a folder can be effectively trusted without an entry here.
-  parser: null
+  parser: json_generic
 - id: qwen_code.mcp_approvals
   title: MCP server approval decisions
   category: permissions
@@ -401,7 +401,7 @@ artifacts:
     Written when the user approves or rejects a project-scoped MCP server; entries are not expired. Relocatable by QWEN_CODE_MCP_APPROVALS_PATH, in which case the default path holds nothing.
   notes: |-
     Shape is { '<absolute project root>': { '<server name>': { hash, status } } } where status is 'approved' or 'rejected' and hash is a canonical hash of the exact server configuration the user reviewed. This is the artifact that proves a project-declared MCP server was consciously accepted, and it names the project roots the user worked in. The hash binding means an approval silently lapses to pending if .mcp.json is later edited, so a stored 'approved' whose hash does not match the .mcp.json on disk is evidence the configuration CHANGED after approval.
-  parser: null
+  parser: json_generic
 - id: qwen_code.project_mcp_config
   title: Project MCP server configuration (.mcp.json)
   category: mcp_config
@@ -425,7 +425,7 @@ artifacts:
     Part of the working copy; git history may hold earlier versions.
   notes: |-
     Read from the workspace root only, never from ancestors, and each server is tagged scope:'project' and left UNTRUSTED until the user approves it (pair with mcpApprovals.json before claiming a server ran). Comments are stripped before parsing, so expect JSONC. Credentials can sit inline in a server's headers or env. MCP servers are ALSO configurable in settings.json at user, project and system scope, so .mcp.json alone is not the full MCP picture.
-  parser: null
+  parser: json_generic
 - id: qwen_code.mcp_oauth_tokens
   title: MCP OAuth token store
   category: credentials
@@ -673,7 +673,7 @@ artifacts:
     Swept by housekeeping against model.openAILogRetentionDays, default 7 DAYS - a much shorter window than anything else, chosen because one file is written per API call. The sweep runs even when logging is currently off, so residue from an earlier debugging session is also removed.
   notes: |-
     Off by default (model.enableOpenAILogging false), but when it was on this is the richest artifact in the whole product: the complete request and response of every model call, including the full system prompt, every tool definition and the raw model output. Default location is 'logs/openai' UNDER THE CURRENT WORKING DIRECTORY, so it lands inside the user's project checkout (and may be committed); model.openAILoggingDir or --openai-logging-dir moves it anywhere, including outside the project. Each file records the session id, which is how you tie it back to a transcript. Seven-day retention means it is usually the first thing to disappear.
-  parser: null
+  parser: json_generic
 - id: qwen_code.debug_logs
   title: Per-session debug log
   category: log
@@ -828,7 +828,7 @@ artifacts:
     Maintained by the channel service while it runs; the pid file is only meaningful live.
   notes: |-
     Evidence of UNATTENDED operation: cron.json is the schedule on which the agent runs itself with no human at the keyboard, and sessions.json maps channel conversations to sessions. Transcripts produced by these runs carry system/cron and system/notification subtypes, which is how you separate autonomous activity from interactive activity. Collect before the host is powered down so the pid file still resolves.
-  parser: null
+  parser: json_generic
 - id: qwen_code.session_registry
   title: Live session registry
   category: log
@@ -850,7 +850,7 @@ artifacts:
     Registered at session start, patched during the session and removed at clean exit; a record left behind by a crash or a reboot is stale by design.
   notes: |-
     Records are keyed by PID and carry identity fields (pidNs and a boot-derived prefix) precisely because PIDs collide across namespaces, machines and reboots. Treat a record as a claim about a process, not proof one is running. Collect live: this is how you enumerate the agent processes that were active at the moment of collection and tie each to its session id.
-  parser: null
+  parser: json_generic
 - id: qwen_code.install_evidence
   title: Installation identity, install source and downloaded versions
   category: install_evidence

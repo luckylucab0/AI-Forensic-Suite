@@ -48,7 +48,7 @@ artifacts:
     Names the most recent thread id even after the corresponding threads/ file is gone, giving you an id to request from the server. agentMode records the autonomy setting in force.
 
     Record structure: Contains lastThreadId and the current agentMode. Path string retrieved via GitHub code search content fragments from two independent projects.
-  parser: null
+  parser: json_generic
 - id: amp.settings
   category: config
   root: project
@@ -82,7 +82,7 @@ artifacts:
     Carries the MCP inventory and, critically, amp.url - which can point the CLI at a self-hosted or proxied Amp server instead of ampcode.com. A non-default amp.url materially changes where the transcripts actually live.
 
     Re-sourced by the verification pass. The guide cited before states the user settings file only, and the vendor's own manual states the whole stack: the user file in both spellings and on both platforms, the nearest project file searched upward from the working directory to the repository root, and a machine-wide managed settings file per platform. The managed file is the one to read first in a policy question, because it is what an administrator uses to constrain the agent and it was missing from this catalogue entirely. The base directory variable spelling is how the collector reaches a relocated configuration directory and is not what the manual states, so it is marked unsourced.
-  parser: null
+  parser: json_generic
 - id: amp.secrets
   category: credentials
   root: user_profile
@@ -169,7 +169,7 @@ artifacts:
     recollection, needs verification
 
     Record structure: Seen in a single community skill definition alongside the threads path. Path string retrieved via GitHub code search content fragment. Not corroborated elsewhere.
-  parser: null
+  parser: json_generic
 - id: amp.skills
   category: project_instructions
   root: project
@@ -220,4 +220,4 @@ artifacts:
     CORRECTION to the starting brief, twice over. (1) The path is per-OS, not just ~/.local/share/amp - macOS and Windows differ. (2) Amp's own first-party docs describe conversations as stored server-side (Amp Server / PostgreSQL) and do not document a local thread store; the local threads/ directory is corroborated only by many third-party parsers. Treat local files as corroborating evidence and expect to need 'amp threads list --include-archived --json' or a provider request for the complete set. AMP_DATA_HOME is used as an override by at least one third-party tool.
 
     Record structure: One JSON document per thread, filename T-<uuid>.json matching the thread id (the T- prefix is checked by multiple independent parsers). Contains a messages[] array with role/content blocks in Anthropic-API shape, with per-assistant-message token usage under both snake_case and camelCase aliases (input/inputTokens, output/outputTokens, cache_read/cacheReadInputTokens, cache_write/cacheWriteInputTokens). Data dir resolution order: $XDG_DATA_HOME/amp, then macOS ~/Library/Application Support/amp, Linux ~/.local/share/amp, Windows %APPDATA%/amp.
-  parser: null
+  parser: json_generic

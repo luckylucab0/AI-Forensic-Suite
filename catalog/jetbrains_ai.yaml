@@ -169,7 +169,7 @@ artifacts:
   source_kind: official
   notes: |-
     AGENT WE DID NOT HAVE ON THE LIST. JetBrains' own McpClientDetector.kt has a dedicated AirClient with global config at (mac) ~/Library/Application Support/JetBrains/Air/mcp.json, (windows) %APPDATA%/JetBrains/Air/mcp.json, (linux) $XDG_CONFIG_HOME (falling back to ~/.config) + /JetBrains/Air/mcp.json, and project scope <workspace>/.air/mcp.json. Note the directory is 'JetBrains/Air' with NO version suffix - it does not follow the <Product><Version> convention, so a <Product><Version> glob will miss it. Recommend adding 'jetbrains_air' as its own agent key and researching its transcript store separately.
-  parser: null
+  parser: json_generic
 - id: jetbrains_ai.aia_task_history
   category: transcript
   root: user_profile

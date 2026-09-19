@@ -147,7 +147,18 @@ ist, dass das nicht *unbemerkt* geht.
   war, die weniger las: die erzeugte Endpunktabfrage gab längst jeden Datensatz eines nicht
   zugeordneten Logs zurück, während ein Fall aus einer Sammlung desselben Endpunkts ein
   `artifact.fs`-Ereignis pro Datei enthielt und nichts über deren Inhalt. Ein Test schlägt
-  jetzt fehl, wenn diese Lücke in einer der beiden Richtungen wieder aufgeht.
+  jetzt fehl, wenn diese Lücke in einer der beiden Richtungen wieder aufgeht. Die dritte
+  Untergrenze brauchte eine Entscheidung statt einer Regel (ADR 0027): ein ganzes
+  JSON-Dokument hat keine eigenen Datensätze, also ist die Frage, wo sie darin liegen, eine
+  Frage nach der Bedeutung des Dokuments. Es wird allein nach seiner Struktur zerlegt, eine
+  Ebene tief. Eine Wurzel, die eine Liste ist, ergibt ein Ereignis je Element; eine Wurzel,
+  die ein Objekt ist, ein Ereignis für das Dokument und dann eines je Element jedes
+  Schlüssels der obersten Ebene, dessen Wert eine Liste von Objekten ist; alles andere ein
+  Ereignis. Ein Dokument, das seine Datensätze tiefer verschachtelt, behält sie ganz im
+  Dokument-Ereignis, was sichtbar eine unvollständige Lesung ist und keine falsche. Die
+  Credential-Speicher beansprucht sie als Einziges nicht, denn ein Token im Payload eines
+  Timeline-Ereignisses ist nicht der Zweck von `--include-secrets`, und die Datei samt Hash
+  ist ohnehin im Fall.
   Daneben liegt ein zweites formatbezogenes Modul, `instructions/`, für den
   Anweisungsbestand: die dreiundsechzig Katalogartefakte mit Skills, Commands, Output
   Styles, Regeln, Steering-Dateien und Hook-Skripten. Es liest jede Datei ganz, unterscheidet

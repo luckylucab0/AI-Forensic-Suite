@@ -56,7 +56,7 @@ artifacts:
     Two collection traps: (1) OPENCODE_CONFIG_CONTENT means live config may exist only in the process environment with no file on disk; (2) the remote .well-known/opencode source means part of the effective config was fetched from a server and is not on the endpoint at all. Note both in the report.
 
     The verification pass confirmed the documented locations and found no mention of the base directory variable on that page. The variable-rooted spelling is correct, it is built by the global path module, but it is not what the cited page states, so it is marked unsourced.
-  parser: null
+  parser: json_generic
 - id: opencode.managed_config
   category: config
   root: system
@@ -79,7 +79,7 @@ artifacts:
     Outside the user home directory, so routinely missed by home-directory-only acquisitions. Establishes organisation-imposed policy, which is what separates 'user went rogue' from 'the fleet was configured this way'.
 
     Record structure: System-wide admin-controlled config, plus MDM-deployed .mobileconfig managed preferences on macOS.
-  parser: null
+  parser: json_generic
 - id: opencode.tui_config
   category: config
   root: project
@@ -101,7 +101,7 @@ artifacts:
     Minor, but its mtime is another independent timestamp of interactive (as opposed to headless) use.
 
     Record structure: TUI-only settings, global or project scoped.
-  parser: null
+  parser: json_generic
 - id: opencode.auth
   category: credentials
   root: user_profile
@@ -305,4 +305,4 @@ artifacts:
     Same value as the Goose legacy JSONL: a frozen pre-migration record that modern in-app session deletion will not touch. Always collect the whole storage/ tree if it exists.
 
     Record structure: Pre-1.2.0 layout: one JSON file per session under storage/session/<project>/ses_<id>.json plus per-message files under storage/message/<id>/. Observed on opencode 1.1.53. The part/ subtree is inferred from the session/message pattern and the modern schema - confirm by listing the storage/ tree rather than assuming.
-  parser: null
+  parser: json_generic

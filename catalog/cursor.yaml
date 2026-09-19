@@ -74,7 +74,7 @@ artifacts:
     Added by the vendor verification pass. Three scopes, and the machine-wide one is the reason to collect this even when the user's own directories look complete: an administrator can place a hook there that the user cannot see or remove, and a blocking hook explains an action the analyst expected to find attempted and did not.
 
     The scripts matter more than the configuration. A hook is an executable the agent runs at a lifecycle point, so the script directory is where a persistence mechanism or an exfiltration step would live, and it is content this catalogue cannot predict: collect the directory whole rather than a list of filenames. The hook interface is also how a collector learns where a conversation transcript is, since the vendor states no path for one and passes it to the script instead.
-  parser: null
+  parser: json_generic
 - id: cursor.worktrees
   title: Agent-created git worktrees
   category: file_snapshot
@@ -156,7 +156,7 @@ artifacts:
     Grab-bag of cursor-agent auxiliary state. Individually each path has 1-2 sources; collectively they are confirmed by a full ~/.cursor teardown, a cleanup tool's exclusion list, and a devcontainer seeding script. Treat each as medium confidence.
 
     Record structure: skills-cursor/.sync-manifest.json is skill-sync bookkeeping. hooks.json configures preToolUse / beforeReadFile style gates and is the record of what interception was active. sandbox-policies/ and worktrees/ appear in a container-seeding script's list of cursor-agent state dirs.
-  parser: null
+  parser: json_generic
 - id: cursor.project_metadata
   category: config
   root: user_profile
@@ -179,7 +179,7 @@ artifacts:
     repo.json and mcp-approvals.json each come from a single source; projects-metadata.json from a separate audit listing. High value for mapping the opaque escaped-cwd directory names back to real project paths and for proving what the agent was authorised to invoke.
 
     Record structure: repo.json = repository metadata with a project UUID. mcp-approvals.json = which MCP servers the user approved for this project (a consent/authorisation record). projects-metadata.json observed at the ~/.cursor root in one home-directory audit tree listing.
-  parser: null
+  parser: json_generic
 - id: cursor.auth_credentials
   category: credentials
   root: user_profile
@@ -235,7 +235,7 @@ artifacts:
     PRE-EDIT FILE CONTENT — recovers what a file looked like before the agent touched it, including changes never committed to git. metadata.json.agentRequestId joins to cursorDiskKV agentKv:* and to ai_code_hashes.requestId, giving a file-change → prompt linkage.
 
     Record structure: metadata.json fields: agentRequestId, requestFiles, deduplicatedGitInfos, workspaceId, startTrackingDateUnixMilliseconds. Diff payload fields: fsPath, fileUuid, diffChanges, gitInfo, kind. files/<uuid> are pre-edit file bodies.
-  parser: null
+  parser: json_generic
 - id: cursor.local_file_history
   category: file_snapshot
   root: user_profile
@@ -260,7 +260,7 @@ artifacts:
     Inherited VS Code artifact, NOT AI-specific — but it is the fallback record of agent-driven edits when Cursor's own checkpoints have aged out. Explicitly named as a collection target by the UAC Cursor artifact file.
 
     Record structure: Standard VS Code local-history layout: one directory per tracked resource containing an entries.json manifest (resource URI + timestamped entry list) plus the numbered content snapshots themselves.
-  parser: null
+  parser: json_generic
 - id: cursor.extensions
   category: install_evidence
   root: user_profile
@@ -287,7 +287,7 @@ artifacts:
     User-installed extensions live in ~/.cursor/extensions/ (confirmed by a third-party install guide with explicit macOS/Linux and Windows paths, a Metasploit persistence module's target list, and multiple theme installers). SEPARATELY, one full product teardown places the ~17 FIRST-PARTY extensions (cursor-agent-exec, cursor-agent-worker, cursor-browser-automation, cursor-mcp, cursor-retrieval, cursor-commits, cursor-shadow-workspace, cursor-always-local, …) under ~/Library/Application Support/Cursor/extensions/. Collect BOTH. ~/.cursor-server/extensions/ is the remote/SSH server-side copy. This directory is a known IDE-extension persistence location.
 
     Record structure: extensions.json is a JSON ARRAY of installed-extension records (identifier, version, location, metadata). Each extension unpacks to its own <publisher>.<name>-<version>/ directory beside it.
-  parser: null
+  parser: json_generic
 - id: cursor.install_and_machine_identity
   category: install_evidence
   root: registry
@@ -394,7 +394,7 @@ artifacts:
     Flagged as an execution primitive and highest-value config by two DFIR catalogues. MCP OAuth/client-registration secret envelopes are additionally stored in the IDE's state.vscdb ItemTable in byte-array Buffer form.
 
     Record structure: { "mcpServers": { "<id": { "command", "args", "env", "url", "disabled" } } }. The per-server `env` block routinely holds plaintext API keys and bearer tokens — hash those values on export while keeping the rest of the file. Project-scoped .cursor/mcp.json travels with the repository, so it can arrive on a host via git clone with no local user action.
-  parser: null
+  parser: json_generic
 - id: cursor.cli_config
   category: permissions
   root: project
@@ -426,7 +426,7 @@ artifacts:
     The catalogued path had an explanation appended to it, kept here: ~/.cursor/cli-config.json  (key: authInfo)
 
     Record structure: Permission grammar uses four rule kinds: Shell(commandBase) where commandBase is the first token of the command line, Read(pathOrGlob), Write(pathOrGlob), WebFetch(domainOrPattern). Only permissions are configurable at project level; all other CLI settings are global. Newer cursor-agent builds ALSO store credentials in this same file under the top-level "authInfo" key — treat that subtree as secret and hash it rather than exporting it, but still collect the file for the permission evidence.
-  parser: null
+  parser: json_generic
 - id: cursor.project_instructions
   category: project_instructions
   root: project
@@ -478,7 +478,7 @@ artifacts:
     Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The result is stronger than an absent source. The vendor documents around twenty paths under the same agent directory, among them the agent, skill, subagent, command and worktree directories and the configuration, hook and authentication files, and a chats directory is not one of them. Nothing in two hundred and fifty documentation pages, three changelogs, the data-use and security pages or the vendor's code hosting organization mentions this layout: no hit for the database filename, for the prompt history filename, for a chats directory, or for an md5 keyed directory level. Control searches against the same sources returned hundreds of results, so the absence is real rather than a failed search.
 
     There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and the slug one is the better supported of the two. Collect the whole agent directory rather than either path list, and expect the layout that is actually on the endpoint to settle which is right.
-  parser: null
+  parser: json_generic
 - id: cursor.global_prompt_history
   category: prompt_history
   root: user_profile
@@ -503,7 +503,7 @@ artifacts:
     Independently listed as a first-class collection target by two DFIR tools (UAC artifact file for Cursor; a Windows/osquery artifact catalogue that tags it family=history).
 
     Record structure: Flat JSON array of user prompt strings (workspace-wide, not per-session).
-  parser: null
+  parser: json_generic
 - id: cursor.acp_session_store
   category: transcript
   root: user_profile
@@ -582,7 +582,7 @@ artifacts:
     Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The result is stronger than an absent source. The vendor documents around twenty paths under the same agent directory, among them the agent, skill, subagent, command and worktree directories and the configuration, hook and authentication files, and a chats directory is not one of them. Nothing in two hundred and fifty documentation pages, three changelogs, the data-use and security pages or the vendor's code hosting organization mentions this layout: no hit for the database filename, for the prompt history filename, for a chats directory, or for an md5 keyed directory level. Control searches against the same sources returned hundreds of results, so the absence is real rather than a failed search.
 
     There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and the slug one is the better supported of the two. Collect the whole agent directory rather than either path list, and expect the layout that is actually on the endpoint to settle which is right.
-  parser: null
+  parser: json_generic
 - id: cursor.chat_store_db
   category: transcript
   root: user_profile
@@ -699,7 +699,7 @@ artifacts:
     Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The result is stronger than an absent source. The vendor documents around twenty paths under the same agent directory, among them the agent, skill, subagent, command and worktree directories and the configuration, hook and authentication files, and a chats directory is not one of them. Nothing in two hundred and fifty documentation pages, three changelogs, the data-use and security pages or the vendor's code hosting organization mentions this layout: no hit for the database filename, for the prompt history filename, for a chats directory, or for an md5 keyed directory level. Control searches against the same sources returned hundreds of results, so the absence is real rather than a failed search.
 
     There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and the slug one is the better supported of the two. Collect the whole agent directory rather than either path list, and expect the layout that is actually on the endpoint to settle which is right.
-  parser: null
+  parser: json_generic
 - id: cursor.workspace_state_vscdb
   category: transcript
   root: user_profile

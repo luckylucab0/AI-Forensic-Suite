@@ -109,12 +109,18 @@ def test_a_working_directory_reaches_the_log(log: list[dict]) -> None:
 
 def test_records_no_parser_could_read_are_in_the_log(log: list[dict]) -> None:
     """The non-negotiable, carried into this format: a record that is quietly dropped reads
-    as a record that never existed."""
+    as a record that never existed.
+
+    The one record allowed to be empty in `raw` is a file that was read and was empty, and
+    it has to say so: an empty object with nothing else on the event reads as a parser that
+    came back with nothing, and those are opposite answers.
+    """
     unreadable = [r for r in log if r["kind"] == "unparsed.record"]
     assert unreadable
     for record in unreadable:
         assert record["parse_problem"]
-        assert record["raw"] not in (None, "", {})
+        if record["raw"] in (None, "", {}, []):
+            assert "read and holds an empty" in record["parse_problem"], record["provenance"]
 
 
 def test_a_file_with_no_parser_still_appears_once(log: list[dict], tree: Path) -> None:

@@ -87,7 +87,7 @@ artifacts:
     The prefix is NOT fixed - it follows the node install, so nvm/fnm/volta/asdf and Homebrew node all relocate it. Resolve it from `npm prefix -g` on a live box, or on an image enumerate candidate node installs. Agent packages to look for: @anthropic-ai/claude-code (plus its per-platform optional deps such as @anthropic-ai/claude-code-darwin-arm64), @openai/codex, @google/gemini-cli, @github/copilot.
 
     The verification pass confirmed the prefix-relative locations and the two documented default prefixes, and found the package manager and version manager paths absent from the page. They are the same prefix-relative layout under a prefix a third party chose, which is exactly the kind of path worth collecting and not worth calling vendor-stated.
-  parser: null
+  parser: json_generic
 - id: crosscutting.npm_debug_logs
   category: log
   root: user_profile
@@ -172,7 +172,7 @@ artifacts:
     VERSION-DEPENDENT PATHS - a real dating signal. Verbatim: "After version 1.16.0, pipx moved its default paths from ~/.local/pipx to per-platform user directories from the platformdirs library." So finding ~/.local/pipx means an older pipx (or an old install never migrated), and the collector must check both. Relevant for Python-based agents installed this way (aider-chat, various MCP servers).
 
     Record structure: Verbatim PIPX_HOME: "Root directory for pipx virtual environments. Default: platformdirs.user_data_path(\"pipx\") - Linux ~/.local/share/pipx, macOS ~/Library/Application Support/pipx, Windows %LOCALAPPDATA%\\pipx\\pipx." PIPX_BIN_DIR: "Directory for application entry-point symlinks. Default: ~/.local/bin." PIPX_MAN_DIR: "~/.local/share/man". PIPX_SHARED_LIBS: "$PIPX_HOME/shared". PIPX_GLOBAL_HOME: "/opt/pipx". Each venv directory is named for the package; read venvs/<pkg>/pipx_metadata.json for the pinned version, the injected packages and the exposed entry points.
-  parser: null
+  parser: json_generic
 - id: crosscutting.uv_tool_dir
   category: install_evidence
   root: user_profile
@@ -333,7 +333,7 @@ artifacts:
     Narrowed to what its source states. The verification pass found this entry claiming thirteen paths across six vendors on one vendor's documentation page, which states two of them. Every other path now sits with the vendor that owns it: the editor, the two closed-source editors, the command line agent of one vendor, and the desktop application, which has its own file in this catalogue since the research pass that added it. Two spellings were dropped rather than moved, because reading the real pages showed they do not exist: a user-level project server file directly under the profile, where the vendor's Windows example is actually its user configuration file, and a user-level editor server file directly under a dot-directory in the home directory, where the vendor puts it in the editor's user profile folder instead.
 
     What is left is the genuinely cross-cutting part: the convention that a project carries a server inventory at its root, which more than one agent reads, and the user-level file of the agent whose page this is. Read it together with the per-vendor entries rather than instead of them.
-  parser: null
+  parser: json_generic
 - id: crosscutting.instructions_agents_md
   category: project_instructions
   root: project
@@ -704,4 +704,4 @@ artifacts:
     MAJOR ADDITION beyond the brief's one-line mention. This is the cleanest proof available that a one-shot agent or MCP server was executed without ever being installed globally - exactly how most MCP servers are launched (`npx -y some-mcp-server`). Sibling cache dirs at the same level: _cacache (the content-addressable package cache, which contains the actual downloaded tarballs and registry metadata) and _tuf.
 
     The verification pass confirmed the cache roots, which the tool builds by joining its cache directory with an underscore-prefixed directory name, and found nothing about the layout inside one of those directories. The manifest and module directory are npm's own package layout rather than anything this page states.
-  parser: null
+  parser: json_generic

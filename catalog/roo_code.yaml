@@ -53,7 +53,7 @@ artifacts:
     COLLECTION-CRITICAL. package.json contributes the setting `roo-cline.customStoragePath` (string, default ""): 'a custom location for storing extension data'. src/utils/storage.ts reads it via vscode.workspace.getConfiguration(Package.name), validates that the path is absolute, and falls back to the default global storage path only if it is inaccessible. So the ENTIRE tasks/settings/cache/checkpoints tree can legitimately live anywhere on the volume (or a network share). Always parse the VS Code settings.json for roo-cline.customStoragePath and roo-cline.autoImportSettingsPath before reporting 'no Roo Code data'. autoImportSettingsPath is a second lead: it names a settings file Roo imports on startup, which may point at an exported config containing provider profiles.
 
     The verification pass confirmed that the extension declares the setting and found no statement of where a setting value is stored: that is the editor's layout, and the page the pass would have cited for it was not reachable. Both paths are marked unsourced. The setting matters more than the file: it relocates the whole task store, so an endpoint where it is set has its transcripts somewhere this catalogue cannot predict.
-  parser: null
+  parser: json_generic
 - id: roo_code.extension_id
   category: install_evidence
   root: user_profile
@@ -122,7 +122,7 @@ artifacts:
     CORRECTION TO THE BRIEF'S IMPLICIT ASSUMPTION: Roo's MCP file is mcp_settings.json, NOT cline_mcp_settings.json - do not reuse the Cline filename for the fork. storage.ts builds `path.join(basePath, "settings")` and `path.join(basePath, "cache")`. custom_modes.yaml defines custom agent personas including their tool/file-access restrictions, i.e. it is effectively a permissions artifact as well as config.
 
     The verification pass confirmed the settings directory itself and neither filename inside it: the storage utility constructs the directory, the filename map states the names, and no page states the two together.
-  parser: null
+  parser: json_generic
 - id: roo_code.rules
   category: project_instructions
   root: project

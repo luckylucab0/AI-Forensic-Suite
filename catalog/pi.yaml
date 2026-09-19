@@ -49,7 +49,7 @@ artifacts:
     Custom model and base-URL definitions: reveals proxied or self-hosted inference endpoints, which is where traffic-side evidence would have to be sought.
 
     Record structure: config.ts getModelsPath() = join(getAgentDir(), 'models.json').
-  parser: null
+  parser: json_generic
 - id: pi.settings
   category: config
   root: project
@@ -73,7 +73,7 @@ artifacts:
     Read this and the env overrides BEFORE globbing for sessions: the session directory is independently relocatable, so ~/.pi/agent/sessions being empty does not mean no sessions exist.
 
     The verification pass found no project-local lookup in the cited configuration module; the settings manager is what implements it.
-  parser: null
+  parser: json_generic
 - id: pi.auth
   category: credentials
   root: user_profile

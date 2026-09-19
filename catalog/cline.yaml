@@ -127,7 +127,7 @@ artifacts:
     ensureCacheDirectoryExists() = getGlobalStorageDir("cache"). GlobalFileNames.clineRecommendedModels = "cline_recommended_models.json" and remoteConfig = (orgId) => `remote_config_${orgId}.json`. The remote_config_<orgId>.json filename LEAKS THE ENTERPRISE ORG ID - useful for attribution, and a reason to sanitise before publishing sample data.
 
     Path correction from the source verification pass: remote config is built as path.join(await ensureCacheDirectoryExists(), remoteConfig(organizationId)), and that helper returns the cache directory, so the file sits under cache/ and not under settings/ as this entry previously claimed. The recommended-models file is declared only as a filename constant with no directory join anywhere, so its placement under settings/ is unsourced.
-  parser: null
+  parser: json_generic
 - id: cline.data_dir_root
   category: config
   root: user_profile
@@ -165,7 +165,7 @@ artifacts:
   source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
   source_kind: source_code
   notes: resolveGlobalSettingsPath() = join(resolveClineDataDir(), "settings", "global-settings.json").
-  parser: null
+  parser: json_generic
 - id: cline.global_state_json
   category: config
   root: user_profile
@@ -184,7 +184,7 @@ artifacts:
   source_kind: source_code
   notes: |-
     createStorageContext() writes globalState.json and per-workspace workspaceState.json under data/workspaces/<hash>/. This is the 4.x replacement for VS Code globalState in state.vscdb - so on 4.x the task index and settings are plain readable JSON on disk instead of SQLite BLOBs. The <hash> is a workspace-isolation hash (not reversible to a path directly; correlate via content).
-  parser: null
+  parser: json_generic
 - id: cline.home_config_tree
   category: config
   root: user_profile
@@ -451,7 +451,7 @@ artifacts:
     Two live locations. disk.ts: GlobalFileNames.mcpSettings = "cline_mcp_settings.json" and getMcpSettingsFilePath() resolves it inside ensureSettingsDirectoryExists() = getGlobalStorageDir("settings"); ensureMcpServersDirectoryExists() points at "Cline/MCP" under Documents (installed MCP server code). paths.ts: CLINE_MCP_SETTINGS_FILE_NAME = "cline_mcp_settings.json", resolveMcpSettingsPath() = join(resolveClineDataDir(), "settings", <that>). The brief's path is correct but incomplete - the ~/.cline copy must be collected too. Treat as normal sensitivity but expect embedded env vars / bearer tokens for remote MCP servers; flag for review.
 
     Re-sourced by the verification pass, same cause as the global rules entry.
-  parser: null
+  parser: json_generic
 - id: cline.rules_project
   category: project_instructions
   root: project
@@ -553,7 +553,7 @@ artifacts:
     A schedule the agent created for itself, so it persists until something removes it. Removing the schedule removes the only record of why a run happened, while the run's own transcript stays in the session store, which is the pairing to look for.
   notes: |-
     Found by the source verification pass while re-sourcing the rules and MCP entries, and missing from this catalogue until then. The resolver's own comment calls these agent-created schedules and user-level routines, which is the forensically interesting part: this is the agent arranging to run itself later, with no user present at the time of the run. Read it together with the cron database and the cron specification directories, and treat a run in the session store with no matching interactive prompt as expected rather than anomalous when a schedule exists.
-  parser: null
+  parser: json_generic
 - id: cline.team_data
   category: config
   root: user_profile
@@ -572,7 +572,7 @@ artifacts:
   volatility: Persists until the shared configuration is removed.
   notes: |-
     Found by the source verification pass, and missing from this catalogue until then. A separate tree under the data directory for shared rather than personal configuration, with its own relocation variable. Worth reading before concluding that a rule or a server the agent used came from the user.
-  parser: null
+  parser: json_generic
 - id: cline.chat_workspace
   category: file_snapshot
   root: user_profile

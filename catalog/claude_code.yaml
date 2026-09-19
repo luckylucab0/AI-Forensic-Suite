@@ -93,7 +93,7 @@ artifacts:
     Record structure: Used to detect concurrent sessions and crashes.
 
     Used to detect concurrent sessions and crashes. Per-file schema not documented - needs verification. NOTE: several third-party pages wrongly describe transcripts as living in `~/.claude/projects/<encoded>/sessions/<uuid>.jsonl`; this top-level `~/.claude/sessions/` directory is a different thing and holds no transcript content.
-  parser: null
+  parser: json_generic
 - id: claude_code.shell_snapshots
   category: shell_history
   root: user_profile
@@ -173,7 +173,7 @@ artifacts:
     Historical DIFFS of global state: which projects existed, which were trusted, which MCP servers were configured, and per-project history - including projects that have since been purged. Because `claude project purge` does not touch this directory, a purged project's entry often survives here. Directly useful for proving that a project or MCP server existed on a machine after the user tried to remove the evidence.
 
     Re-sourced by the verification pass: the corrupted-config backup is documented on the settings page rather than on the directory page cited before.
-  parser: null
+  parser: json_generic
 - id: claude_code.policy_limits
   category: config
   root: user_profile
@@ -194,7 +194,7 @@ artifacts:
     Presence plus content ties the endpoint to a specific organization/account tier.
 
     Record structure: Cached feature policy settings for the user's organization. Only present for some account types.
-  parser: null
+  parser: json_generic
 - id: claude_code.credentials
   category: credentials
   root: user_profile
@@ -292,7 +292,7 @@ artifacts:
     Model-written descriptions of problems encountered during sessions, stored locally and never sent unless the user chooses to send. Useful as a narrative summary of what went wrong in a session, in the model's own words.
 
     Record structure: Queued Claude-drafted feedback awaiting human review in `/feedback`. Per-file schema not documented - needs verification. Requires Claude Code v2.1.238 or later, so absence on older versions is expected.
-  parser: null
+  parser: json_generic
 - id: claude_code.feedback_bundles
   category: transcript
   root: user_profile
@@ -471,7 +471,7 @@ artifacts:
     Version-dating evidence: content here means an older build wrote it AND no current build has swept since. On older images statsig/ can carry a stable device/session identifier and todos/ can carry task content not preserved anywhere else - collect before running any current Claude Code on the evidence.
 
     Record structure: Legacy directories from older Claude Code versions. todos/ held task state (now ~/.claude/tasks/), statsig/ held feature-flag/telemetry state, logs/ held logs (now ~/.claude/debug/).
-  parser: null
+  parser: json_generic
 - id: claude_code.paste_cache
   category: cache
   root: user_profile
@@ -517,7 +517,7 @@ artifacts:
     The versioned layout is a timeline: it preserves the actual bytes of superseded plugin versions, letting you prove which code ran when. Also check for node_modules inside cached copies - that is third-party dependency code on disk.
 
     Record structure: Claude Code COPIES each installed marketplace plugin here rather than running it in place, for security and verification, and installs the plugin's eligible Node.js package dependencies into the cached copy. The exception is a marketplace `command` source in link mode, where Claude Code stores links here and the real files stay in the directory the command prints - follow those links out.
-  parser: null
+  parser: json_generic
 - id: claude_code.plugin_data
   category: cache
   root: user_profile
@@ -567,7 +567,7 @@ artifacts:
     Record structure: Aggregated token and cost counts shown by `/usage`. Schema not documented - needs verification.
 
     Aggregated token and cost counts shown by /usage.
-  parser: null
+  parser: json_generic
 - id: claude_code.uploads
   category: cache
   root: user_profile
@@ -659,7 +659,7 @@ artifacts:
     NOT IN THE STARTING BRIEF - a whole second credential tree outside ~/.claude. The `base_url` field here is a provider/gateway override that no settings.json scan would find, and `organization_id` / `service_account_id` attribute activity to a specific org and machine identity. Note Claude Code does not read profiles in bare mode, in Claude Desktop, or in cloud sessions.
 
     Record structure: Non-secret half of an Anthropic profile. Keys: `version` ("major.minor", currently "1.0"), `authentication` block (with `type` of `oidc_federation` or `user_oauth`, plus `federation_rule_id` (fdrl_...), `service_account_id` (svac_...), and `identity_token` with `source`/`path`), `organization_id` (UUID), `workspace_id` (wrkspc_...), and `base_url`. Claude Code and the Claude Agent SDK honour the same resolution order as the SDK. Configuration directory resolution: $ANTHROPIC_CONFIG_DIR, then ~/.config/anthropic on Linux/macOS, then %APPDATA%\Anthropic on Windows.
-  parser: null
+  parser: json_generic
 - id: claude_code.global_config
   category: config
   root: user_profile
@@ -685,7 +685,7 @@ artifacts:
     CORRECTION TO BRIEF: the docs describe the `projects` key as per-project trust and last-session metrics and do not document per-project prompt history here; prompt history is ~/.claude/history.jsonl. Older Claude Code versions did keep a per-project `history` array in this file - treat that as unverified for current versions but still worth parsing on older images, since it would be an independent prompt-history source. Sensitivity secret: it carries the OAuth session and MCP server definitions that may embed tokens.
 
     Re-sourced by the verification pass: the configuration directory page redirects every path under ~/.claude when the config directory variable is set, and this file sits beside that directory rather than inside it, so that page did not cover the relocated spelling.
-  parser: null
+  parser: json_generic
 - id: claude_code.keybindings
   category: config
   root: user_profile
@@ -706,7 +706,7 @@ artifacts:
     Low evidential weight on its own, but a binding to an external editor or shell action can explain otherwise-unattributed activity. Related setting: `keybindingFlavor`.
 
     Record structure: Top-level keys `$schema` (https://www.schemastore.org/claude-code-keybindings.json), `$docs`, and `bindings` - an array of `{context, bindings}` objects where each inner map goes key combo -> action name, or null to unbind. Example context: "Chat"; example action: "chat:externalEditor". Ctrl+C, Ctrl+D, Ctrl+M and Caps Lock are reserved and cannot be rebound. Created or opened by /keybindings.
-  parser: null
+  parser: json_generic
 - id: claude_code.known_marketplaces
   category: config
   root: user_profile
@@ -729,7 +729,7 @@ artifacts:
     VERIFIED - this half of the brief's community claim is correct. This is the provenance record for third-party code on the endpoint: every marketplace URL here is a supply-chain entry point worth attributing.
 
     Re-sourced by the verification pass. The directory page's tree that contains this file is labelled with the plugin seed directory, not the plugin cache directory, so the previous citation supported the wrong parent.
-  parser: null
+  parser: json_generic
 - id: claude_code.org_policy_cache
   category: config
   root: user_profile
@@ -760,7 +760,7 @@ artifacts:
     Record structure: `remote-settings.json` is a cached copy of the organization's server-managed settings, or `{}` when none are configured; present only when the session fetches them. `policy-limits.json` holds cached feature-policy settings and appears only for some account types.
 
     Cached copy of server-managed settings fetched from the claude.ai admin console or a self-hosted Claude apps gateway, or `{}` when the organization has configured none. Only present when the session is eligible to fetch them (direct Anthropic API auth, or gateway /login). If validation partly fails, the salvaged payload with invalid entries removed is what gets cached, except invalid `cleanupPeriodDays` / `desktopSessionCleanupPeriodDays` values, which remain in the cached copy but are never applied. The approval record for settings that need security approval is kept in the same configuration directory alongside this cache (an API key / CLAUDE_CODE_OAUTH_TOKEN session stores one approval for the delivered settings).
-  parser: null
+  parser: json_generic
 - id: claude_code.plugin_manifests
   category: config
   root: plugin
@@ -786,7 +786,7 @@ artifacts:
     That last rule is a quiet persistence mechanism: dropping a .claude-plugin/plugin.json into ~/.claude/skills/<anything>/ registers a plugin - complete with hooks and MCP servers - with no install command and no marketplace record. Worth a dedicated detection rule.
 
     Re-sourced by the verification pass: the reference cited before gives the bare filename, the marketplace page gives it inside its directory.
-  parser: null
+  parser: json_generic
 - id: claude_code.project_settings
   category: config
   root: project
@@ -808,7 +808,7 @@ artifacts:
     A hostile committed settings.json is a real attack path: hooks and env merge across files. Collect alongside git history to see who added a hook.
 
     Record structure: Precedence rank 4. Same key vocabulary as user settings. Read from the session's primary working directory, so a file committed at the repo root only applies when Claude Code was started there (or after /cd, v2.1.246+). Project and local files cannot set env vars that choose where Claude Code writes files (CLAUDE_CONFIG_DIR, CLAUDE_CODE_TMPDIR, HOME, TMPDIR, TMP, TEMP, XDG_*), content-exporting vars (OTEL_LOG_RAW_API_BODIES, ENABLE_BETA_TRACING_DETAILED, BETA_TRACING_ENDPOINT) or startup/sync vars (CLAUDE_CODE_PROCESS_WRAPPER, CLAUDE_CODE_SYNC_SKILLS, CLAUDE_CODE_SYNC_PLUGINS, CLAUDE_CODE_PLUGIN_CACHE_DIR, CLAUDE_CODE_PLUGIN_SEED_DIR) - dropped with a warning visible under --debug. Before v2.1.251 most of those were accepted. `permissions.defaultMode` values `auto` and `bypassPermissions` do not take effect from project or local settings (before v2.1.257 `bypassPermissions` did).
-  parser: null
+  parser: json_generic
 - id: claude_code.session_env
   category: config
   root: user_profile
@@ -838,7 +838,7 @@ artifacts:
     Record structure: Vendor describes it only as 'per-session environment metadata'; internal file naming and schema are NOT documented - needs verification. Format assumed JSON, unverified. Changelog v2.1.163 confirms it is a real directory used by the Bash tool path on Windows ('EEXIST ... on the session-env directory when it has the read-only attribute or is inside OneDrive').
 
     Documented only as "per-session environment metadata"; the record structure is not published. Listed among the paths with "nothing user-facing" that depend on it, so it is safe to delete from the user's perspective.
-  parser: null
+  parser: json_generic
 - id: claude_code.settings_referenced_executables
   category: config
   root: project
@@ -886,7 +886,7 @@ artifacts:
     Mainly a user-attribution / customisation-depth signal. A `theme` value of custom:<slug> in settings.json with no matching file here means the theme file was deleted.
 
     Record structure: Each .json file defines one theme: `name`, `base` (a built-in preset such as "dark"), and an `overrides` map of colour tokens. Selecting a custom theme stores `custom:<slug>` as the `theme` setting value.
-  parser: null
+  parser: json_generic
 - id: claude_code.user_settings
   category: config
   root: user_profile
@@ -909,7 +909,7 @@ artifacts:
     Marked sensitivity secret because `env` commonly holds plaintext tokens and `apiKeyHelper` reveals the credential pipeline. `$CLAUDE_CONFIG_DIR` relocates the entire configuration directory (default ~/.claude) - check the launching shell profile and settings env blocks for it before assuming ~/.claude.
 
     Record structure: Precedence rank 5 (lowest of the four files). Forensically load-bearing keys, exact spelling: `permissions` object -> `allow`, `ask`, `deny` (arrays of `Tool` or `Tool(specifier)` rules; evaluation order deny > ask > allow, first match wins), `additionalDirectories`, `blockReadsOutsideWorkingDirectories`, `defaultMode`, `disableBypassPermissionsMode` (value is the string "disable"), `disableAutoMode`. Permission mode names: `default`, `acceptEdits`, `plan`, `auto`, `dontAsk`, `bypassPermissions`, and `manual` (alias for `default`, v2.1.200+). `hooks` object keyed by event name; each value an array of `{matcher, hooks}` groups whose entries have `type` of `command`|`prompt`|`agent`|`http`|`mcp_tool`. `env` object (string->string) can set ANTHROPIC_BASE_URL and any env var. Credential/provider keys: `apiKeyHelper` (shell command line, output sent as BOTH X-Api-Key and Authorization: Bearer), `awsAuthRefresh`, `awsCredentialExport`, `gcpAuthRefresh`, `otelHeadersHelper`, `forceLoginMethod`, `forceLoginGatewayUrl`, `forceLoginOrgUUID`. Executable-reference keys worth flagging: `statusLine`, `subagentStatusLine`, `fileSuggestion`, `processWrapper`, `policyHelper`. Plugin/MCP keys: `enabledPlugins` (map "plugin@marketplace"->bool), `extraKnownMarketplaces`, `pluginConfigs` (non-sensitive plugin userConfig answers, keyed by plugin id), `blockedMarketplaces`, `strictKnownMarketplaces`, `managedMcpServers`, `allowedMcpServers`, `deniedMcpServers`, `enabledMcpjsonServers`, `disabledMcpjsonServers`, `enableAllProjectMcpServers`, `allowAllClaudeAiMcps`, `disableClaudeAiConnectors`. Data-retention keys: `cleanupPeriodDays`, `desktopSessionCleanupPeriodDays`. Sandbox tree `sandbox.*` incl. `sandbox.network.allowedDomains`, `sandbox.credentials.files`, `sandbox.credentials.envVars`. Also `sshConfigs`, `sshHostAllowlist` (host/identity leakage), `autoMemoryDirectory`, `plansDirectory`, `claudeMd`, `claudeMdExcludes`, `agent`, `teammateMode`, `worktree.*`. Full key index is at the settings-reference URL.
-  parser: null
+  parser: json_generic
 - id: claude_code.workflows
   category: config
   root: project
@@ -1135,7 +1135,7 @@ artifacts:
     These are git clones: .git/ gives you remote URLs, commit hashes, fetch times and reflogs - the best provenance and timing evidence in the whole plugin subsystem. Do not skip .git when imaging.
 
     Record structure: Cloned marketplace repositories, each containing .claude-plugin/marketplace.json at its root. Path confirmed by the documented seed-directory layout, which mirrors ~/.claude/plugins. Clones use the user's existing git credential helpers (gh auth login, macOS Keychain, git-credential-store); GitHub owner/repo shorthand clones over SSH by default unless CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1.
-  parser: null
+  parser: json_generic
 - id: claude_code.plugins_root
   category: install_evidence
   root: user_profile
@@ -1158,7 +1158,7 @@ artifacts:
     CORRECTION TO BRIEF: there is no installed_plugins.json. Plugin enablement lives in the `enabledPlugins` key of settings.json files; marketplace registration lives in known_marketplaces.json.
 
     Re-sourced by the verification pass: the plugin cache override is documented on the environment variable reference, which also states the default under ~/.claude/plugins. The directory page cited before never mentions the variable.
-  parser: null
+  parser: json_generic
 - id: claude_code.plugins_synced
   category: install_evidence
   root: user_profile
@@ -1180,7 +1180,7 @@ artifacts:
     An install with NO install record - the only on-disk evidence that account-level plugins ran is this directory. The @synced vs @inline identity dates the build to before or after v2.1.239.
 
     Record structure: Plugins enabled for the user's claude.ai account, downloaded in Cowork and cloud sessions and loaded as <name>@synced with no marketplace and no install record. Before v2.1.239 they loaded as <name>@inline, the identity --plugin-dir plugins use.
-  parser: null
+  parser: json_generic
 - id: claude_code.shell_profile_evidence
   category: install_evidence
   root: user_profile
@@ -1460,7 +1460,7 @@ artifacts:
     Record structure: `roster.json` lists running background sessions and is used to reconnect after a restart; unrecognized fields are preserved across version mixes. `daemon.log` is the supervisor's own log. A separate supervisor instance (with its own sessions) runs per CLAUDE_CONFIG_DIR.
 
     Supervisor (background service) state. daemon.log is the supervisor log; daemon/roster.json lists running background sessions and is used to reconnect after a restart; daemon.lock records the supervisor process ID. State lives under the Claude Code config directory, so a session with CLAUDE_CONFIG_DIR set runs a SEPARATE supervisor instance with its own sessions.
-  parser: null
+  parser: json_generic
 - id: claude_code.debug_logs
   category: log
   root: user_profile
@@ -1519,7 +1519,7 @@ artifacts:
     Record structure: One directory per background session, named with the session's short ID (the ID printed by `claude --bg`). state.json holds the per-session state shown in agent view; the docs warn it is not a stable interface and that values written to `state`, `detail`, `tempo` and `needs` are replaced on the next update, so prefer `claude agents --json` on a live system. Each background session gets CLAUDE_JOB_DIR set to its ~/.claude/jobs/<id> directory, and Write/Edit calls inside jobs/<id>/tmp/ do not prompt for permission.
 
     `state.json` is the per-session state shown in agent view; vendor says to read it via `claude agents --json` rather than parsing it, and notes that older versions preserve unrecognized fields on write - so expect forward-compatible, version-mixed documents. `jobs/<id>/tmp/` is a per-session scratch directory where Claude's Write and Edit calls do not prompt for permission; each background session gets CLAUDE_JOB_DIR pointing at `~/.claude/jobs/<id>`.
-  parser: null
+  parser: json_generic
 - id: claude_code.legacy_dirs
   category: log
   root: user_profile
@@ -1546,7 +1546,7 @@ artifacts:
     Do not skip these on acquired (non-live) evidence: many published DFIR write-ups were written when todos/ was the live to-do artifact, and older images will still have all three. Their existence alongside a modern transcript layout is itself an anomaly worth noting (sweep paused, or CLAUDE_CONFIG_DIR pointing elsewhere).
 
     Record structure: `todos/` held per-session to-do lists (superseded by `tasks/`); `statsig/` held feature-gate/telemetry cache; `logs/` held client logs. Schemas are version-specific and undocumented - treat any parse as best-effort and needs verification.
-  parser: null
+  parser: json_generic
 - id: claude_code.mcp_logs
   category: log
   root: user_profile
@@ -1639,7 +1639,7 @@ artifacts:
     Not in the starting brief. Its presence means any other MCP server definition found on disk was inert - essential for correctly interpreting .mcp.json and ~/.claude.json findings.
 
     Record structure: A standalone file (cannot be delivered through server-managed settings) that takes EXCLUSIVE control: when present, only the servers it defines load, plus servers provided via the `managedMcpServers` setting and in-process servers registered by the host app. Users cannot add or use any other server, including plugin-provided servers and --mcp-config. An empty server map disables MCP entirely. Read separately from the managed settings tier, so it still applies when server-managed settings are in effect.
-  parser: null
+  parser: json_generic
 - id: claude_code.project_mcp_json
   category: mcp_config
   root: project
@@ -1660,7 +1660,7 @@ artifacts:
     `command`/`args` is arbitrary process execution and `env`/`headersHelper` routinely carries secrets, hence secret sensitivity. Pair with ~/.claude.json (user and local scope servers) and managed-mcp.json for the complete server inventory - no single file holds it.
 
     Record structure: Project-scope MCP servers, shared via version control. Wrapper key `mcpServers`, mapping server name to an entry with `command`, `args`, `env`, `url`, `type` (`stdio`, `http`, `sse`, `ws`; `streamable-http` is accepted as an alias for `http`), `timeout` (ms, overrides MCP_TOOL_TIMEOUT for that server), and `headersHelper`. Supports ${VAR} expansion, including ${CLAUDE_PROJECT_DIR} (needs a default such as ${CLAUDE_PROJECT_DIR:-.} outside plugin-provided configs). Requires explicit approval: a server here shows as "Pending approval" until accepted, and approval state is recorded via `enabledMcpjsonServers` / `disabledMcpjsonServers` / `enableAllProjectMcpServers` in settings. As of v2.1.196 approvals are read only from settings files not checked into the repository until the workspace is trusted, so a cloned repo cannot approve its own servers. NOTE: Claude Code explicitly does NOT read a .mcp.json placed at ~/.claude/.mcp.json.
-  parser: null
+  parser: json_generic
 - id: claude_code.agent_memory
   category: memory
   root: project
@@ -1747,7 +1747,7 @@ artifacts:
     The agent's own to-do plan and progress state, which a resumed session picks up - a compact, readable summary of intent and completion status when the full transcript is gone. This is the current home of to-do data; the legacy `todos/` directory is no longer written. Availability of the task tools is model-dependent (v2.1.233/v2.1.268 restricted them to certain model families unless CLAUDE_CODE_ENABLE_TODO_TOOLS=1), so absence is not evidence of inactivity.
 
     Record structure: 'Task lists written by the task tools, one directory per list.' Per-file schema not documented - needs verification. Written by TaskCreate/TaskGet/TaskUpdate/TaskList and TodoWrite. Changelog v2.1.269 mentions 'a background task's on-disk record' containing terminal escape codes and oversized text, so expect raw ANSI in stored task text.
-  parser: null
+  parser: json_generic
 - id: claude_code.managed_settings_dropins
   category: permissions
   root: system
@@ -1770,7 +1770,7 @@ artifacts:
     Not in the starting brief. Must be collected or the reconstructed effective policy will be wrong.
 
     Record structure: managed-settings.json is merged FIRST, then every *.json in managed-settings.d/ in alphabetical order (numeric prefixes such as 10-telemetry.json, 20-security.json control order). Hidden files and non-.json files are ignored. Merge rules: single values - later file wins; lists (permissions.deny, sandbox.network.allowedDomains) - union with duplicates removed; nested blocks (env, sandbox) - merged key by key; `fallbackModel` and `modelPicker` - later replaces whole; `extraKnownMarketplaces` and `managedMcpServers` - later entry with the same name replaces that entry whole.
-  parser: null
+  parser: json_generic
 - id: claude_code.managed_settings_file
   category: permissions
   root: system
@@ -1797,7 +1797,7 @@ artifacts:
     CORRECTION TO BRIEF: the Windows path is C:\Program Files\ClaudeCode\managed-settings.json. The docs state explicitly that Claude Code does NOT read the legacy C:\ProgramData\ClaudeCode\managed-settings.json. Collect the ProgramData path anyway as historical evidence (older deployments and stale policy), but do not treat it as live policy.
 
     The verification pass found the ProgramData spelling absent from the managed settings page, which names only the Program Files location, and the vendor's changelog records the removal of a deprecated Windows managed settings fallback. Still worth collecting on an endpoint that has not been updated, so it stays in the list, marked unsourced.
-  parser: null
+  parser: json_generic
 - id: claude_code.managed_settings_macos_profile
   category: permissions
   root: system
@@ -1861,7 +1861,7 @@ artifacts:
     Timeline value: each allow rule is a human decision to widen the agent's authority. Compare against transcripts to date the approval.
 
     Record structure: Precedence rank 3 (highest of the non-managed files). This is the single best record of user-granted standing tool approvals: choosing "Yes, and don't ask again" on a Bash permission prompt writes an `allow` rule here. Written at the git repository ROOT even when the session started in a subdirectory, and at the main checkout's root when in a worktree. Falls back to sitting beside .claude/settings.json instead when: outside a git repository, when the repo root is the home directory, on Windows, or when the repo root / its .git / .claude entry is not owned by the running user. A few /config options (including "Show tips") also save here.
-  parser: null
+  parser: json_generic
 - id: claude_code.user_settings_local
   category: permissions
   root: user_profile
@@ -1882,7 +1882,7 @@ artifacts:
     Easy to mistake for user-scope settings. Its presence indicates sessions were run with the home directory as cwd.
 
     Record structure: Exists because ~/.claude can itself be a session working directory. Documented explicitly as still being LOCAL scope, so it is read only in sessions started in the home directory itself, not in every project.
-  parser: null
+  parser: json_generic
 - id: claude_code.project_claude_local_md
   category: project_instructions
   root: project

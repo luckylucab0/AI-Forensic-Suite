@@ -104,7 +104,7 @@ artifacts:
     Distinct from the CLI config (ollama.cli_config). Presence of BOTH a stale config.json and a db.sqlite dates the install across the GUI migration boundary.
 
     Record structure: legacyConfigPath() uses the same three-way OS switch as defaultDBPath but with filename config.json. The app/store/migration.go path reads it once and marks the config migrated.
-  parser: null
+  parser: json_generic
 - id: ollama.cli_config
   category: config
   root: user_profile
@@ -128,7 +128,7 @@ artifacts:
     Confirmed via GitHub code search content match against cmd/config/config.go and cmd/config/config_test.go rather than a direct page fetch. The Integrations key is interesting: sibling files cmd/launch/claude_desktop_test.go and app/cmd/app/codex_app_darwin_test.go show Ollama now records that a user launched Claude Desktop / Codex Desktop integrations, i.e. Ollama's own store is cross-agent evidence.
 
     Record structure: Code comment reads: "migrateConfig moves the config from the legacy path to ~/.ollama/config.json". Holds an `Integrations` object (cloud/agent integrations) plus unknown top-level fields that are preserved.
-  parser: null
+  parser: json_generic
 - id: ollama.env_overrides
   category: config
   root: system
@@ -266,7 +266,7 @@ artifacts:
     This is the single best proof of WHICH models a subject pulled, including private/uncensored or fine-tuned models, and the tag proves the exact variant. Confirmed via GitHub code search content match on manifest/paths.go plus the two route tests.
 
     The verification pass confirmed the models directory and its documented default on the cited page, and found neither the three concrete roots nor the four-level glob depth there: the depth comes from the model name layout, which is defined elsewhere. The three glob paths are marked unsourced; the variable-rooted spelling carries the claim.
-  parser: null
+  parser: json_generic
 - id: ollama.logs
   category: log
   root: user_profile

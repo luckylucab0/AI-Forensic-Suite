@@ -34,6 +34,7 @@ from agentforensics.parsers.copilot import CopilotParser
 from agentforensics.parsers.gemini import GeminiParser
 from agentforensics.parsers.hermes import HermesParser
 from agentforensics.parsers.instructions import InstructionsParser
+from agentforensics.parsers.json_generic import JsonGenericParser
 from agentforensics.parsers.jsonl_generic import JsonlGenericParser
 from agentforensics.parsers.opencode import OpencodeParser
 from agentforensics.parsers.pi import PiParser
@@ -80,11 +81,13 @@ PARSERS: tuple[Parser, ...] = (
     # holds which agent ran them, which of them were archived out of the sidebar, and what
     # each one was left doing to a git worktree.
     ZedSidebarParser(),
-    # The last two claim every store and every line-delimited log in the catalogue, so they
-    # have to stay last: a parser with a verified schema placed after one of them would
-    # never be reached. They read nothing out of a record but what it literally says, and
-    # exist so that a file nobody has mapped is visible in a case as records somebody has
-    # to look at rather than as a file name with nothing behind it.
+    # The last three claim every store, every line-delimited log and every JSON document in
+    # the catalogue, so they have to stay last: a parser with a verified schema placed after
+    # one of them would never be reached. They read nothing out of a record but what it
+    # literally says, and exist so that a file nobody has mapped is visible in a case as
+    # records somebody has to look at rather than as a file name with nothing behind it.
+    # The one for whole documents splits them by structure alone, which is ADR 0027.
+    JsonGenericParser(),
     JsonlGenericParser(),
     SqliteGenericParser(),
 )

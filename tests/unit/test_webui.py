@@ -596,12 +596,17 @@ def test_the_viewer_renders_a_served_session(client: Client, tmp_path: Path) -> 
         pytest.skip("node is not installed")
 
     projects = client.json("/api/projects")["projects"]
+    # The largest session that holds a turn somebody typed. The three generic readers put
+    # every unmapped store, log and document into the case as records with no session of
+    # their own, and those group into one large per-agent row that is evidence rather than
+    # a conversation. What this test is about is the viewer rendering a conversation, so it
+    # asks for one.
     session = max(
         (
             session
             for project in projects
             for session in project["sessions"]
-            if not session["files"]
+            if not session["files"] and "user.prompt" in session["kinds"]
         ),
         key=lambda item: item["events"],
     )

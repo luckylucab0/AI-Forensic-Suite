@@ -1448,7 +1448,7 @@ def test_the_agent_of_an_event_is_the_catalogues_not_the_parsers(tmp_path: Path)
     assert events[0].agent == "roo_code"
 
 
-def test_only_the_two_generic_readers_say_a_record_is_uninterpreted() -> None:
+def test_only_the_generic_readers_say_a_record_is_uninterpreted() -> None:
     """The mark is what tells the two populations of `unparsed.record` apart.
 
     One is a record nothing could read, which is a defect in the evidence. The other is a
@@ -1467,5 +1467,5 @@ def test_only_the_two_generic_readers_say_a_record_is_uninterpreted() -> None:
         if "UNINTERPRETED_MARK" in module.read_text(encoding="utf-8")
     )
 
-    assert writers == ["jsonl_generic.py", "sqlite_generic.py"], writers
+    assert writers == ["json_generic.py", "jsonl_generic.py", "sqlite_generic.py"], writers
     assert UNINTERPRETED_MARK in JSONL_UNINTERPRETED

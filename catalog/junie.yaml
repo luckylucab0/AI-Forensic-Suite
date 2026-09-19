@@ -52,7 +52,7 @@ artifacts:
   source_kind: community
   notes: |-
     recollection, needs verification - the community source labels these '[docs]' (junie-cli-configuration.html / guidelines-and-memory.html) and I could not reach junie.jetbrains.com to confirm. The Windows %USERPROFILE%\.junie\AGENTS.md form is reported as an explicit vendor-documented path. ~/.junie itself IS confirmed to exist as a real directory by JetBrains' own source (McpClientDetector.kt resolves ~/.junie/mcp/mcp.json and treats the parent's existence as the detection signal), so the tree is real even where individual filenames are not confirmed. config.json is reported to carry 'mcp-locations', 'skill-locations', 'command-locations', 'agent-locations' and 'model-locations' keys - i.e. it can REDIRECT where MCP servers, skills, commands and sub-agents are loaded from, which makes it a prerequisite read before trusting any default glob.
-  parser: null
+  parser: json_generic
 - id: junie.trust_and_auth_key
   category: credentials
   root: user_profile
@@ -142,7 +142,7 @@ artifacts:
     VERIFIED FROM JETBRAINS' OWN SOURCE - the strongest Junie path I have. McpClientDetector.detectJunie() does `Paths.get(OSAgnosticPathUtil.expandUserHome("~/.junie/mcp/mcp.json"))` for global scope, and detectJunieProject() does `Paths.get(projectBasePath, ".junie", "mcp", "mcp.json")` for project scope. Both are gated on looksLikeMcpJson(), which checks the file content contains "mcpServers". Independently corroborated by many third-party integration docs (oraios/serena, dagger/container-use, unoplatform/uno's spec which explicitly notes the older {ws}/.idea/mcpServers.json path is NOT the documented location). Expect embedded env vars / API keys for MCP servers - normal sensitivity, flag for review. YouTrack JUNIE-1331 notes the IDE and CLI mcp.json formats are not fully compatible, so parse defensively.
 
     Record structure: Top-level 'mcpServers' object, Claude-Desktop-style.
-  parser: null
+  parser: json_generic
 - id: junie.allowlist
   category: permissions
   root: user_profile
@@ -162,7 +162,7 @@ artifacts:
   source_kind: community
   notes: |-
     recollection, needs verification - single community source, labelled '[docs: junie.jetbrains.com/docs/junie-cli.html]' there, and that page is unreachable from here. Described as the 'Allowlist of shell commands/patterns Junie may run without asking'. If real this is a first-class permissions artifact: it records exactly which dangerous commands the user pre-authorised the agent to run unattended, and it 'encodes user trust decisions'. High investigative value - worth confirming on a live endpoint.
-  parser: null
+  parser: json_generic
 - id: junie.project_dir
   category: project_instructions
   root: project

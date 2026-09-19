@@ -136,7 +136,16 @@ it cannot be rewritten *quietly*.
   less: the generated endpoint query already returned every record of an unmapped log,
   while a case built from a collection of the same endpoint held one `artifact.fs` event
   per file and nothing about what was in it. A test fails now when that gap opens again in
-  either direction. Beside
+  either direction. The third floor is the one that needed a decision rather than a rule
+  (ADR 0027): a whole JSON document has no records of its own, so where the records are
+  inside it is a question about what the document means. It is split by structure alone, one
+  level deep. A root that is a list is one event per element; a root that is an object is one
+  event for the document and then one per element of each top-level key whose value is a list
+  of objects; anything else is one event. A document that nests its records deeper keeps them
+  whole in the document event, which is visibly a partial reading rather than a wrong one.
+  The credential stores are the one thing it does not claim, because a token in the payload
+  of a timeline event is not what `--include-secrets` was for, and the file and its hash are
+  in the case either way. Beside
   it sits a second format-shaped module, `instructions/`, for the instruction surface: the
   sixty-three catalogue artifacts that hold skills, commands, output styles, rules, steering
   files and hook scripts. It reads each file whole, tells the scope apart from the working

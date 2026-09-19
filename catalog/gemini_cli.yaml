@@ -158,7 +158,7 @@ artifacts:
     Read it first in any case involving a missing conversation. general.sessionRetention here decides whether chats are being deleted on a timer, and general.checkpointing.enabled, off by default, decides whether recoverable session checkpoints exist at all. The telemetry section can point at a local outfile, which is another on-disk record of the same activity.
 
     Also here: the MCP server definitions and context.fileName, which renames the instruction file the agent reads from GEMINI.md to something else.
-  parser: null
+  parser: json_generic
 - id: gemini_cli.system_settings
   category: permissions
   root: system
@@ -184,7 +184,7 @@ artifacts:
     Machine-wide policy, in two layers with the user's settings between them: system-defaults.json is the floor that user and project settings override, and settings.json is the ceiling that overrides them. Which file a restriction is written in therefore decides whether it was in force, and reporting a control from the wrong layer describes a machine that does not exist.
 
     Both are relocatable, by GEMINI_CLI_SYSTEM_SETTINGS_PATH and GEMINI_CLI_SYSTEM_DEFAULTS_PATH, so an absent file is not evidence that no policy was applied.
-  parser: null
+  parser: json_generic
 - id: gemini_cli.google_accounts
   category: config
   root: user_profile
@@ -207,7 +207,7 @@ artifacts:
     GOOGLE_ACCOUNTS_FILENAME = 'google_accounts.json'. Which account the agent ran as, which is the attribution question: a transcript says what was asked, this says whose credentials answered it, and on a shared or handed-over machine those are different people.
 
     Re-sourced by the verification pass, same cause as the home tree entry. This file is under the runtime directory, so it is one of the files that moves to ~/.cache/.gemini under the macOS Seatbelt sandbox.
-  parser: null
+  parser: json_generic
 - id: gemini_cli.trusted_folders
   category: permissions
   root: user_profile
@@ -230,7 +230,7 @@ artifacts:
     TRUSTED_FOLDERS_FILENAME = 'trustedFolders.json'. The directories the user allowed the agent to operate in, which is both the permission record and a list of working copies to collect project-anchored artifacts from.
 
     Re-sourced by the verification pass, same cause as the home tree entry. Also under the runtime directory, so it moves under the macOS Seatbelt sandbox.
-  parser: null
+  parser: json_generic
 - id: gemini_cli.credentials
   category: credentials
   root: user_profile
