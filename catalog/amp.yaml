@@ -128,7 +128,7 @@ artifacts:
     Extremely useful when threads/ is incomplete: the ledger proves an assistant response with a given message id occurred and when, even if the transcript body is only on the server. Gives a billing-grade activity timeline.
 
     Record structure: One JSON object per line per billed assistant response, keyed by toMessageId, carrying authoritative credits (or cost) and optional token metadata.
-  parser: null
+  parser: jsonl_generic
 - id: amp.thread_logs
   category: log
   root: user_profile

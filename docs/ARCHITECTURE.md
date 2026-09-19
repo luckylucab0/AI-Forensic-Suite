@@ -128,7 +128,15 @@ it cannot be rewritten *quietly*.
   zstd frame in a BLOB, so the store reader decompresses one before any parser sees it, and
   every other SQLite store gains the same reading. A Zed thread carries one time for the
   whole thread and none for the turns inside it, which the parser states rather than filling
-  in. Beside
+  in. A second floor of the same shape sits under the line-delimited logs: every JSON Lines
+  artifact in the catalogue that no verified parser claims is read record by record, with
+  the record whole in `raw` and nothing taken out of it but what it literally names, a
+  field named as a time, a session, a working copy or text. That one exists because the two
+  producers of the unified format had drifted apart and the analyzer was the side reading
+  less: the generated endpoint query already returned every record of an unmapped log,
+  while a case built from a collection of the same endpoint held one `artifact.fs` event
+  per file and nothing about what was in it. A test fails now when that gap opens again in
+  either direction. Beside
   it sits a second format-shaped module, `instructions/`, for the instruction surface: the
   sixty-three catalogue artifacts that hold skills, commands, output styles, rules, steering
   files and hook scripts. It reads each file whole, tells the scope apart from the working

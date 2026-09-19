@@ -113,7 +113,7 @@ artifacts:
     Written per turn. A .lock file marks a session held open by a live process. Deleted by the same /sessions cleanup commands as the database sessions.
   notes: |-
     Third-party viewer only, not a vendor statement. That tool resolves join(homedir(), '.kiro', 'sessions', 'cli') and, for each <id>.json metadata file that is not a .lock, reads the sibling <id>.jsonl for the messages. The metadata object carries session_id, cwd, updated_at and session_state.conversation_metadata.user_turn_metadatas (per-turn model name, request count and metering usage), which gives an analyst a per-turn model and cost trail even when the message bodies are gone. The vendor's own 'Export sessions' page documents exactly this session.json + messages.jsonl + sub-executions/*.jsonl shape for exported sessions, which corroborates the record layout while saying nothing about the directory.
-  parser: null
+  parser: jsonl_generic
 - id: kiro.ide_session_files
   title: Kiro IDE session transcripts
   category: transcript
@@ -145,7 +145,7 @@ artifacts:
     Appended per message. Deleting a chat in the IDE removes the session directory. Because messages.jsonl is append-only, a partially deleted session may leave the JSONL behind after the index or session.json is gone, and vice versa.
   notes: |-
     Location is third-party: the viewer resolves join(homedir(), '.kiro', 'sessions') and treats every child directory except 'cli' as a workspace-hash directory holding <session-id>/session.json plus <session-id>/messages.jsonl. The FILE LAYOUT is separately confirmed by the vendor's 'Export sessions' page, which says an exported session is a directory named for the session id containing session.json (agent name, model, timestamps), messages.jsonl (one message per line: prompts, responses, code blocks, tool calls) and sub-executions/*.jsonl (sub-agent runs). Treat the sub-executions files as first-class: a sub-agent can run tools that never appear in the parent transcript. The <workspace-hash> mapping back to a real workspace path is not documented; recover it from session.json rather than trying to invert the hash. Vendor also states that IDE 'Agent Artifacts' (generated documents, diagrams, PDFs, Office files, up to 12 MB each) are stored per session 'in its global application storage, outside your project .kiro directory', with no path given: sweep the whole ~/.kiro tree for them.
-  parser: null
+  parser: jsonl_generic
 - id: kiro.ide_legacy_global_storage
   title: Kiro IDE legacy chat storage (pre-1.0 global storage)
   category: transcript
@@ -634,7 +634,7 @@ artifacts:
     Only exists while the environment variable is set. Path and lifetime are entirely operator-chosen.
   notes: |-
     The vendor documents KIRO_ACP_RECORD_PATH as the path to a JSONL file for recording TUI ACP wire traffic. There is no default location, so it is invisible to any path-based collection: it has to be discovered from the live environment, from shell profiles, from wrapper scripts or from shell history. When present it is a complete protocol-level transcript of a session, including tool calls, which is frequently richer than the saved session store. Worth an explicit check in every Kiro engagement precisely because nobody expects it.
-  parser: null
+  parser: jsonl_generic
 - id: kiro.legacy_amazonq_config
   title: Amazon Q Developer configuration still read by Kiro
   category: config

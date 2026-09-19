@@ -269,9 +269,16 @@ def test_every_artifact_a_python_parser_claims_is_accounted_for(catalogue: Catal
     in_scope = {artifact.id for artifact in catalogue.artifacts if artifact.category in CATEGORIES}
     by_id = {artifact.id: artifact for artifact in catalogue.artifacts}
 
+    # An artifact the query cannot express a glob for at all, with the reason. The generated
+    # artifact prints these in its own not-covered section, which an operator reads in the
+    # same place as the list below, so a second entry there would be a worse statement of
+    # the same limit: it would say the hunt returns the file, and for these it returns
+    # nothing at all.
+    unreachable = {skip.artifact_id for skip in render(catalogue)[0].skipped}
+
     unaccounted = []
     for artifact_id in sorted(claimed & in_scope):
-        if artifact_id in MAPPERS or artifact_id in UNINTERPRETED:
+        if artifact_id in MAPPERS or artifact_id in UNINTERPRETED or artifact_id in unreachable:
             continue
         artifact = by_id[artifact_id]
         # A format the query cannot read at all is named once for the format rather than
@@ -326,6 +333,42 @@ def test_nothing_in_the_uninterpreted_list_is_invented(catalogue: Catalogue) -> 
         for artifact in catalogue.artifacts:
             if artifact.format == fmt:
                 assert artifact.id not in MAPPERS, artifact.id
+
+
+def test_nothing_the_endpoint_query_reads_is_unread_by_the_analyzer(
+    catalogue: Catalogue,
+) -> None:
+    """The asymmetry that was there for months, in the direction that costs the most.
+
+    The generic normalizer returns every record of an unmapped line-delimited log, and for
+    ten artifacts the analyzer had no reading at all, so the same file produced records in a
+    fleet hunt and one `artifact.fs` event in a case. The primary route through this suite
+    is the second one: collect on the endpoint, analyse in the lab. Returning less there
+    than a hunt does is the failure the whole design is against, because a case showing
+    nothing is read as a file that held nothing.
+
+    So the rule is one line: whatever the query reads record by record, something here reads
+    too. A format nobody has mapped is covered by `jsonl_generic`, the same way the query
+    covers it, and a verified parser takes an artifact over from either of them.
+    """
+    unread = []
+    for artifact in catalogue.artifacts:
+        if artifact.category not in CATEGORIES:
+            continue
+        mappers = {
+            unified._mapper_for(artifact, glob)
+            for os_name in ("linux", "macos", "windows")
+            for glob in (unified._covered(artifact, os_name)[0] or [])
+        }
+        if not mappers - {NOT_NORMALIZED}:
+            continue
+        if not any(parser.handles(artifact.id) for parser in PARSERS):
+            unread.append(artifact.id)
+    assert not unread, (
+        "the endpoint query returns records for these and the analyzer returns nothing, so "
+        "a case built from a collection says less than a hunt over the same endpoint: "
+        f"{unread}"
+    )
 
 
 def test_no_vql_mapper_claims_an_artifact_no_parser_knows(catalogue: Catalogue) -> None:

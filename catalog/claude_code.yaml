@@ -1571,7 +1571,7 @@ artifacts:
     NOT documented by Anthropic. The macOS path is corroborated by several Claude Code GitHub issues (#18869 dated 2026-01-17 on v2.1.12, #79634, #55587, #52961) and the Windows path by issue #13679 (2025-12-11). The Linux path is INFERRED from the Node env-paths convention ($XDG_CACHE_HOME/<name>-nodejs) and is recollection, needs verification. Current documentation instead routes MCP stderr to ~/.claude/debug/<session-id>.txt under `claude --debug=mcp`, so this cache may have been retired in recent builds - treat the directory's presence and file mtimes as version evidence. High collection priority regardless: it is long-lived and can contain tool arguments and tokens.
 
     Record structure: Per-project, per-server MCP diagnostic streams including server stderr. The cwd is encoded by replacing path separators and the drive colon with hyphens: cwd C:\Users\alice\work\analysis becomes directory C--Users-alice-work-analysis. The server segment is the MCP server name; for plugin-provided servers it is mcp-logs-plugin:<plugin>:<server>, whose colons caused an ENOENT bug on Windows in v2.1.x (reported against 2.0.65, working in 2.0.64). Observed directory names also include the form --mcp-logs-*. Files are timestamped .jsonl.
-  parser: null
+  parser: jsonl_generic
 - id: claude_code.usage_data
   category: log
   root: user_profile

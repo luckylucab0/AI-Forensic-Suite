@@ -161,7 +161,7 @@ artifacts:
     The vendor describes it as an 'append-only log of session events (tool invocations, permission decisions, file operations)' with each entry HMAC-chained to the previous one, and a companion .audit-key holding the per-session signing key encrypted via the OS keychain. For an analyst this is the record of what the agent did and what the user approved, independent of the transcript, and it can be verified for tampering if the key can be recovered from the keychain on a live host. Community reports describe an audit.jsonl at the session root carrying costs, durations and rate limits as well. Because the key lives in the OS keychain, chain verification is live-only work; collect the key material before imaging if verification matters. The vendor text describing this is the third-party mode page; standard-mode spellings are unsourced.
 
     Adjusted when this entry was written into the catalogue. It was marked as a credential store, which would have reduced this file to a hash. It is the opposite of that: the record of every tool the agent invoked, every permission decision and every file operation, which is most of what an investigation is trying to establish. The signing key beside it is the credential, and it has its own entry so that one path carries one claim.
-  parser: null
+  parser: jsonl_generic
 - id: claude_desktop.cowork_audit_key
   title: Per-session audit signing key (.audit-key)
   category: credentials

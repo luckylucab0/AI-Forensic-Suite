@@ -23,14 +23,19 @@
 # Every other line-delimited log is returned uninterpreted, and every other format
 # is returned as one row per file. Both are visible in the output, never omitted.
 #
-# Read by the suite's own parsers and NOT interpreted here, so a fleet hunt returns
-# the file and not the conversation. Collect these and ingest them:
+# Read by the suite's own parsers and NOT interpreted here, in whole or for the
+# paths each entry names, so for those a fleet hunt returns the file and not the
+# conversation. Collect these and ingest them:
 #   - aider.chat_history: a markdown log whose turns are blocks of lines rather than records, so a line of it is a fragment of one
 #   - aider.input_history: a line editor's history file whose entries span several lines, which this query reads one line at a time
 #   - amazonq.cli_prompt_history: a line editor's history file whose entries are escaped, so a line of it is not the text that was typed
+#   - chatgpt_desktop.macos_codex_home: a profile directory this artifact will not narrow to an extension
 #   - cline.data_tasks: a task directory of whole JSON documents
 #   - cline.vscode_task_transcripts: a task directory of whole JSON documents
 #   - gemini_cli.chats: a chats directory this artifact will not narrow to an extension
+#   - hermes.sessions_dir: a sessions directory this artifact will not narrow to an extension
+#   - junie.cli_sessions: read in part: its own event log comes back record by record and the subagent transcripts beside it sit in a subtree this artifact will not narrow to an extension
+#   - junie.matterhorn_project_logs: read in part: the event and issue files come back record by record and the tree around them, which is where this product's Windows paths lead, is returned as files
 #   - kilo_code.extension_id_legacy_tree: a task directory of whole JSON documents
 #   - ollama.cli_prompt_history: a line editor's history file, which is a line each and carries no timestamp, agent or session for a record to be built from
 #   - qwen_code.prompt_history_log: one JSON document rewritten whole on every append
@@ -83,10 +88,11 @@ description: |
       timestamps, so that a store nobody has read is visible as a store nobody has
       read rather than as an agent that left nothing behind.
 
-    - Seven of the formats the suite's own analyzer reads are not read here, and
-      they are named in the notes below. For those agents a row says the file was
-      there, with its hash and timestamps, and nothing about the conversation in
-      it. Collect the files with the Collect artifact and ingest them.
+    - Some of what the suite's own analyzer reads is not read here, or is read
+      only in part: 15 artifacts, named in the notes below. Where
+      one of them is not read, a row says the file was there, with its hash and its
+      timestamps, and nothing about the conversation in it. Collect those files
+      with the Collect artifact and ingest them.
 
     - Records carry no `event_id`. It is derived from provenance and the kind, and a
       reader recomputes it, so emitting one here would only create something to

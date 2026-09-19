@@ -192,7 +192,7 @@ artifacts:
     dev_data is Continue's own development-telemetry store: per-event records of accepted/rejected suggestions, tokens generated, and edit outcomes. It is an independent, event-level timeline that survives deletion of the session JSON files.
 
     Record structure: paths.ts defines getDevDataFilePath() and getDevDataSqlitePath() under dev_data, and getLogsDirPath() with core.log.
-  parser: null
+  parser: jsonl_generic
 - id: continue.sessions
   category: transcript
   root: user_profile

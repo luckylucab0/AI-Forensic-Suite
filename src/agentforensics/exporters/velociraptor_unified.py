@@ -109,9 +109,12 @@ NOT_NORMALIZED = "file_only"
 # fleet hunt has to know that for these agents the rows say a file was there and nothing
 # about what is in it, so the answer is to collect the files and ingest them.
 #
-# Every entry here is a format VQL cannot read line by line: a whole JSON document, or a
-# directory this artifact will not guess an extension for. A line-delimited log needs no
-# entry, because the generic normalizer already returns every one of its records.
+# Every entry here is something VQL cannot read line by line: a whole JSON document, or a
+# directory this artifact will not guess an extension for. A line-delimited log whose own
+# path names a file needs no entry, because the generic normalizer already returns every
+# one of its records. Two entries say "read in part", which is the honest shape where one
+# artifact holds both: a named log this query reads and a subtree beside it that it will
+# not narrow to an extension, so the session comes back and its subagents do not.
 UNINTERPRETED: dict[str, str] = {
     "aider.chat_history": "a markdown log whose turns are blocks of lines rather than "
     "records, so a line of it is a fragment of one",
@@ -119,9 +122,18 @@ UNINTERPRETED: dict[str, str] = {
     "which this query reads one line at a time",
     "amazonq.cli_prompt_history": "a line editor's history file whose entries are escaped, "
     "so a line of it is not the text that was typed",
+    "chatgpt_desktop.macos_codex_home": "a profile directory this artifact will not narrow "
+    "to an extension",
     "cline.data_tasks": "a task directory of whole JSON documents",
     "cline.vscode_task_transcripts": "a task directory of whole JSON documents",
     "gemini_cli.chats": "a chats directory this artifact will not narrow to an extension",
+    "hermes.sessions_dir": "a sessions directory this artifact will not narrow to an extension",
+    "junie.cli_sessions": "read in part: its own event log comes back record by record and "
+    "the subagent transcripts beside it sit in a subtree this artifact will not narrow to "
+    "an extension",
+    "junie.matterhorn_project_logs": "read in part: the event and issue files come back "
+    "record by record and the tree around them, which is where this product's Windows "
+    "paths lead, is returned as files",
     "kilo_code.extension_id_legacy_tree": "a task directory of whole JSON documents",
     "ollama.cli_prompt_history": "a line editor's history file, which is a line each and "
     "carries no timestamp, agent or session for a record to be built from",
@@ -357,10 +369,11 @@ def _description() -> list[str]:
         "    timestamps, so that a store nobody has read is visible as a store nobody has",
         "    read rather than as an agent that left nothing behind.",
         "",
-        "  - Seven of the formats the suite's own analyzer reads are not read here, and",
-        "    they are named in the notes below. For those agents a row says the file was",
-        "    there, with its hash and timestamps, and nothing about the conversation in",
-        "    it. Collect the files with the Collect artifact and ingest them.",
+        "  - Some of what the suite's own analyzer reads is not read here, or is read",
+        f"    only in part: {len(UNINTERPRETED)} artifacts, named in the notes below. Where",
+        "    one of them is not read, a row says the file was there, with its hash and its",
+        "    timestamps, and nothing about the conversation in it. Collect those files",
+        "    with the Collect artifact and ingest them.",
         "",
         "  - Records carry no `event_id`. It is derived from provenance and the kind, and a",
         "    reader recomputes it, so emitting one here would only create something to",
@@ -395,8 +408,9 @@ def _header_notes(catalogue: Catalogue) -> list[str]:
         "Every other line-delimited log is returned uninterpreted, and every other format",
         "is returned as one row per file. Both are visible in the output, never omitted.",
         "",
-        "Read by the suite's own parsers and NOT interpreted here, so a fleet hunt returns",
-        "the file and not the conversation. Collect these and ingest them:",
+        "Read by the suite's own parsers and NOT interpreted here, in whole or for the",
+        "paths each entry names, so for those a fleet hunt returns the file and not the",
+        "conversation. Collect these and ingest them:",
         *[f"  - {key}: {reason}" for key, reason in sorted(UNINTERPRETED.items())],
         *[
             f"  - every artifact the catalogue records as {fmt}: {reason}"

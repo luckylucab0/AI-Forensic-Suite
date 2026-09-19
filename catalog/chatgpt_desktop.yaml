@@ -196,7 +196,7 @@ artifacts:
     ANSWERS THE BRIEF'S OPEN QUESTION: yes, the Codex-in-ChatGPT-app local agent mode writes to disk, and it writes into the same ~/.codex home as the Codex CLI. Practical consequence for aafs: the Codex CLI collector and the ChatGPT-desktop collector target overlapping evidence, and a ~/.codex tree can no longer be taken as proof that the CLI specifically was used. Attribution between CLI, IDE extension and desktop app has to come from other signals (shell history, Amcache/Prefetch, bundle logs). OpenAI's own Codex app announcement states the app "picks up your session history and configuration from the Codex CLI and IDE extension" (openai.com/index/introducing-the-codex-app/ - domain blocked here, seen only in search snippets), which is consistent.
 
     Record structure: ~/.codex is listed in the zap (uninstall) set of the ChatGPT desktop cask, which means the GUI app owns and writes that directory - it is not merely the CLI's directory that the app happens to read.
-  parser: null
+  parser: jsonl_generic
 - id: chatgpt_desktop.macos_legacy_app_support
   category: transcript
   root: user_profile

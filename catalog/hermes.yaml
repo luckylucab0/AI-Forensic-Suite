@@ -275,7 +275,7 @@ artifacts:
     Collect the whole directory. As with Goose and OpenCode, the pre-SQLite files are the copy that in-app deletion and pruning do not reach.
 
     Record structure: Documented as 'Gateway session data and conversation transcripts'. The session-storage doc says the SQLite database 'replaces the earlier per-session JSONL file approach' but does not detail the legacy layout - enumerate the directory rather than assuming a filename pattern.
-  parser: null
+  parser: jsonl_generic
 - id: hermes.state_db
   category: transcript
   root: user_profile

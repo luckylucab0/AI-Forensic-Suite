@@ -138,7 +138,16 @@ ist, dass das nicht *unbemerkt* geht.
   Thread als zstd-Frame in ein BLOB, also dekomprimiert der Speicherleser einen, bevor ein
   Parser JSON sieht, und jeder andere SQLite-Speicher bekommt dieselbe Lesung dazu. Ein
   Zed-Thread trägt eine Zeit für den ganzen Thread und keine für die Züge darin, was der
-  Parser sagt statt sie zu ergänzen.
+  Parser sagt statt sie zu ergänzen. Eine zweite Untergrenze derselben Art liegt unter den
+  zeilenweisen Logs: jedes JSON-Lines-Artefakt des Katalogs, das kein geprüfter Parser für
+  sich beansprucht, wird Datensatz für Datensatz gelesen, mit dem ganzen Datensatz in `raw`
+  und nichts daraus entnommen als das, was er wörtlich benennt, ein Feld mit dem Namen einer
+  Zeit, einer Sitzung, einer Arbeitskopie oder eines Textes. Diese gibt es, weil die beiden
+  Erzeuger des einheitlichen Formats auseinandergelaufen waren und der Analyzer die Seite
+  war, die weniger las: die erzeugte Endpunktabfrage gab längst jeden Datensatz eines nicht
+  zugeordneten Logs zurück, während ein Fall aus einer Sammlung desselben Endpunkts ein
+  `artifact.fs`-Ereignis pro Datei enthielt und nichts über deren Inhalt. Ein Test schlägt
+  jetzt fehl, wenn diese Lücke in einer der beiden Richtungen wieder aufgeht.
   Daneben liegt ein zweites formatbezogenes Modul, `instructions/`, für den
   Anweisungsbestand: die dreiundsechzig Katalogartefakte mit Skills, Commands, Output
   Styles, Regeln, Steering-Dateien und Hook-Skripten. Es liest jede Datei ganz, unterscheidet

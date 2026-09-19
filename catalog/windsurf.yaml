@@ -75,7 +75,7 @@ artifacts:
     Two traps. The file is per trajectory and named after the trajectory identifier, so tying it to a conversation in the interface needs the identifier, not the title. And the vendor exposes the path to hooks at runtime rather than as a documented location, with a note that it is absent when transcripts are disabled: an empty directory can therefore mean the feature was switched off rather than that nothing happened.
 
     Record structure: one JSON object per line with a type and a status. Types seen in the vendor's worked example are user_input, which carries the applied rules and the user's own text, planner_response, and code_action, which carries a path and the new content.
-  parser: null
+  parser: jsonl_generic
 - id: windsurf.system_config
   title: Machine-wide administrator configuration
   category: instructions

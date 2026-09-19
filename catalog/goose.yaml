@@ -324,4 +324,4 @@ artifacts:
     Forensically excellent: because goose stopped managing these files, they are a frozen snapshot of pre-1.10.0 activity that a user deleting sessions through the modern UI will NOT remove. Always collect them even when sessions.db is present.
 
     Re-sourced by the verification pass: the logs guide states the pre-1.10.0 per-session file layout and the directory it lived in. It carries no Windows path at all, so the Windows spelling is marked unsourced.
-  parser: null
+  parser: jsonl_generic

@@ -197,7 +197,7 @@ artifacts:
     Append-only sidecar next to the transcript; removed with the session. No age-based expiry.
   notes: |-
     The code calls it the 'per-session prompt terminal ledger' and an append-only sidecar whose absence must be read as 'no ledger evidence' rather than 'nothing happened'. Useful as a cross-check on the transcript: if the transcript was edited or truncated the ledger may still carry the prompt terminations.
-  parser: null
+  parser: jsonl_generic
 - id: qwen_code.prompt_history_log
   title: Prompt history log (logs.json)
   category: prompt_history
@@ -717,7 +717,7 @@ artifacts:
     Appended at session end. Can be REBUILT from the transcripts under ~/.qwen/projects/*/chats, so a record here may postdate the session it describes. Not swept by housekeeping.
   notes: |-
     One line per completed session with sessionId, startTime, endTime, the project path and token metrics. The cheapest way to enumerate which projects were worked on and when, and the only place a session leaves a trace after its transcript has been deleted - a sessionId here with no matching chats/<id>.jsonl is positive evidence that a transcript was removed, since nothing expires transcripts automatically.
-  parser: null
+  parser: jsonl_generic
 - id: qwen_code.plan_files
   title: Approved plan-mode plans
   category: log

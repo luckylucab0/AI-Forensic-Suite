@@ -50,7 +50,7 @@ artifacts:
     Successor-product artifact: Devin Desktop is the rebranded Windsurf IDE (shared Codeium/Cognition lineage). Worth cataloguing now because it is where third-party agents driven THROUGH the IDE leave their only local trace. Two independent sources (a usage-tracking tool with per-OS paths, and an extension-development skill doc for the log path).
 
     Record structure: NDJSON stream of ACP protocol events including usage_update records. Only ACP-CONNECTED agents (Cascade/Windsurf, claude-code, opencode) emit local events; the default cloud agent keeps its activity server-side and leaves NO local record.
-  parser: null
+  parser: jsonl_generic
 - id: devin.sessions_db
   category: transcript
   root: user_profile

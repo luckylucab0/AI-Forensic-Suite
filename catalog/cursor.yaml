@@ -558,7 +558,7 @@ artifacts:
     Plaintext canonical transcript, by far the easiest Cursor CLI artifact to read. Paired sidecars: agent-tools/*.txt. Some tooling also reports a per-transcript index .db built by third parties, not by Cursor — do not attribute that to the product.
 
     Record structure: One JSON object per line, shape {role, message:{content:[blocks]}} with `text` and `tool_use` blocks often in one record. NO per-record timestamps — order is positional and wall-clock must come from the paired store.db meta/createdAt or file mtime. Directory name is the project's absolute path with path separators flattened to '-' (e.g. Users-alice-repos-proj). At least three on-disk layouts exist across versions (nested <uuid>/<uuid>.jsonl, nested <uuid>/transcript.jsonl, flat <uuid>.jsonl) plus an older <composerId>.txt form — glob all four.
-  parser: null
+  parser: jsonl_generic
 - id: cursor.chat_session_meta_json
   category: transcript
   root: user_profile
