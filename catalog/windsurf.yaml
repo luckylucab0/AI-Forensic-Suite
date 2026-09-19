@@ -205,7 +205,7 @@ artifacts:
     Added by the vendor verification pass. Forensically this is the inverse of every other entry here: it does not record what the agent did, it records what the agent was configured never to read, write or index. Two uses. A file the analyst expected the agent to have touched, and which it did not, may be explained here rather than by the agent's behaviour. And a rule added to one of these files shortly before the period under investigation is worth its own look, because it is a way to keep material out of the agent's context and therefore out of every transcript.
 
     The vendor documents a global ignore file in the configuration directory for enforcing rules across all repositories, which applies in addition to the per-repository files rather than instead of them.
-  parser: null
+  parser: text_config
 - id: windsurf.plugin_log
   title: Plugin log
   category: log

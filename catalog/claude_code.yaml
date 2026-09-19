@@ -635,7 +635,7 @@ artifacts:
     Tells you which identity was actually in use, which the config and credential files alone do not. mtime is a cheap 'identity last switched' timestamp.
 
     Record structure: A one-line plaintext file holding the active profile name. Active-profile resolution order: $ANTHROPIC_PROFILE, then this file, then the literal name `default`. An active profile with auth mode `oidc_federation` outranks a /login credential; one with `user_oauth` ranks below a working /login credential.
-  parser: null
+  parser: text_config
 - id: claude_code.anthropic_profile_configs
   category: config
   root: user_profile
@@ -952,7 +952,7 @@ artifacts:
     Read this first when triaging a worktree: it is an explicit, author-written inventory of which SECRET files were duplicated out of the main checkout into every worktree. It tells you where copies of .env files should be looked for.
 
     Record structure: Plain-text list of gitignored files to copy into every new worktree Claude Code creates - documented examples are .env, .env.local and secrets config files. NOT processed when a WorktreeCreate hook replaces the default git behaviour.
-  parser: null
+  parser: text_config
 - id: claude_code.anthropic_profile_credentials
   category: credentials
   root: user_profile

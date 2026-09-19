@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  Thirty-three modules read 358 of the catalogue's 473 artifacts; the rest are the credential
+  Thirty-four modules read 366 of the catalogue's 473 artifacts; the rest are the credential
   stores nothing reads on purpose, the install evidence the filesystem event answers, and
   the binary stores that still need their own formats.
 
@@ -159,6 +159,16 @@ it cannot be rewritten *quietly*.
     original path, another documents the directory and not the naming inside it, and a
     third keeps both sides of an edit with nothing to say which is which. What the path
     states is read; what it does not state is said rather than inferred.
+  - **Text configuration.** The small files that say how an agent was set up, read whole,
+    and two that are read a line at a time because a line is what an analyst compares
+    against a path. An ignore file is the inverse of every other artifact here: it records
+    what the agent was configured never to read, write or index, which is how a file
+    somebody expected the agent to have touched gets explained, and a pattern added shortly
+    before the period under investigation keeps material out of every transcript the agent
+    wrote. A worktree include list is an inventory of the gitignored files the agent copies
+    into every worktree it creates, which the vendor documents with environment files and
+    secrets configuration as its examples, so a name in it says where copies of that file
+    are.
   - **Shell history.** Four shells and the agent's own recall file, each read the way its
     own writer writes it. This is where an agent's start line is, which is the brief's first
     question about an agent and is almost never inside the agent.

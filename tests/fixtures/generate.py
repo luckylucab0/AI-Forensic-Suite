@@ -1699,6 +1699,24 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         ),
     )
     write(project / ".claude" / "rules" / "style.md", "Use tabs.\n")
+    # The author's own inventory of which gitignored files the agent duplicates into every
+    # worktree it creates. The vendor documents this list and names environment files and
+    # secrets configuration as the examples, so a name here says copies of that file exist
+    # beside every checkout on the machine. Nothing here is a value, only names.
+    write(
+        project / ".worktreeinclude",
+        "# copied into every worktree so the tests can run\n"
+        ".env.local\n"
+        "config/secrets.yaml\n"
+        "node_modules/\n",
+    )
+    # The inverse artifact: what the agent was configured never to read, write or index. A
+    # pattern here explains a file the agent did not touch, and one added shortly before
+    # the period under investigation keeps material out of every transcript.
+    write(
+        project / ".codeiumignore",
+        "# vendor drop, do not index\nvendor/\ncustomer-data/\n*.pem\n",
+    )
     write(project / "build.log", "error: missing dependency acme-widget\n")
 
     # The instruction surface, in the three shapes that are worth testing rather than the

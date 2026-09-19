@@ -154,12 +154,34 @@ def test_every_severity_is_one_of_the_five(rules: list[Rule]) -> None:
         assert rule.severity in SEVERITIES
 
 
+# The secrets rules whose match is a name rather than a value, with the reason. Redaction
+# replaces a match with its shape, which is right when the match is the credential and wrong
+# when the match is the path to one: a finding that said a file of ten characters beginning
+# ".env" had been copied everywhere would have hidden the one thing it exists to report.
+# Kept as a list with reasons rather than as a field on the rule, so adding one is a
+# decision somebody writes down here and not a flag they set in passing.
+MATCHES_A_NAME = {
+    "AFX-SECRETS-008": "the match is an entry in a worktree include list, which is a file "
+    "name the author wrote down. The finding is where copies of that file are, and the "
+    "name is the whole of it; no value is read and none is quoted",
+}
+
+
 def test_a_secrets_rule_never_quotes_what_it_matched(rules: list[Rule]) -> None:
     """The matched value there is the credential. A finding is exported to CSV and pasted
     into reports, so quoting it would spread the credential rather than report it."""
+    exempt = set(MATCHES_A_NAME)
     for rule in rules:
-        if rule.pack == "secrets":
+        if rule.pack == "secrets" and rule.id not in exempt:
             assert rule.redact, f"{rule.id} matches credentials and does not redact them"
+    # Both directions, so an exemption that stops being needed has to be removed rather
+    # than sitting here making the guard look narrower than it is.
+    ids = {rule.id for rule in rules}
+    assert exempt <= ids, sorted(exempt - ids)
+    for rule in rules:
+        if rule.id in exempt:
+            assert not rule.redact, f"{rule.id} redacts and no longer needs its exemption"
+            assert MATCHES_A_NAME[rule.id].strip()
 
 
 def test_every_rule_file_hashes_to_something_stable(rules: list[Rule]) -> None:

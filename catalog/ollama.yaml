@@ -154,7 +154,7 @@ artifacts:
     Read these BEFORE globbing ~/.ollama: a set OLLAMA_MODELS means the manifests are somewhere else entirely, and OLLAMA_NOHISTORY explains an absent history file without implying anti-forensics. OLLAMA_TMPDIR is NOT defined in current envconfig despite appearing in older third-party guides.
 
     Re-sourced by the verification pass: the configuration module cited before only reads process environment variables and contains none of these filenames. The Linux page states both service unit paths verbatim. The two shell startup files have no vendor source at all and are an analyst's inference about where a variable might have been set, so they are marked unsourced. They are still the right place to look, which is why they stay in the list.
-  parser: null
+  parser: text_config
 - id: ollama.env_overrides_registry
   category: config
   root: registry

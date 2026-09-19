@@ -49,6 +49,7 @@ from agentforensics.parsers.prose_document import ProseDocumentParser
 from agentforensics.parsers.shell_history import ShellHistoryParser
 from agentforensics.parsers.shell_snapshot import ShellSnapshotParser
 from agentforensics.parsers.sqlite_generic import SqliteGenericParser
+from agentforensics.parsers.text_config import TextConfigParser
 from agentforensics.parsers.text_log import TextLogParser
 from agentforensics.parsers.toml_generic import TomlGenericParser
 from agentforensics.parsers.vscode_state import VscodeStateParser
@@ -114,6 +115,10 @@ PARSERS: tuple[Parser, ...] = (
     # environment its commands actually ran in rather than a record that somebody once
     # typed a line. It also outlives the product's own purge command.
     ShellSnapshotParser(),
+    # The small text files that say how an agent was set up, and the two that say what it
+    # was kept away from: an ignore file is the inverse of every other artifact here, and a
+    # worktree include list is an inventory of the secrets somebody copied.
+    TextConfigParser(),
     # Five catalogue entries across three products are one file with one schema, read
     # here rather than by the generic reader, which had the key in raw and the value in
     # text and said nobody had read the store.

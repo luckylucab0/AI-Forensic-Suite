@@ -72,6 +72,8 @@ EXPECTED = {
     "AFX-SECRETS-005": "~/.claude/paste-cache holds the configuration somebody pasted "
     "instead of committing, with a password named the way a configuration file names one",
     "AFX-SECRETS-006": "~/.zsh_history holds a command that carried an API key as a flag",
+    "AFX-SECRETS-008": "<project>/.worktreeinclude names the gitignored files the agent "
+    "copies into every worktree it creates, and two of them are credentials",
     "AFX-SECRETS-007": "a wrapper function in the captured shell environment adds an "
     "authorization header the transcript never shows, and the pre-edit copy of a settings "
     "file holds the same header as JSON",

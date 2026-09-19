@@ -118,7 +118,7 @@ artifacts:
     Two useful signals: .configs holds configuration pulled from a REMOTE server (so the effective policy may not have originated on this endpoint), and .migrations dates each Continue version upgrade, giving a version timeline to correlate with format changes.
 
     Record structure: paths.ts: getRemoteConfigsFolderPath() = '.configs', getGlobalPromptsPath() = 'prompts', migrations dir = '.migrations', getGlobalContinueIgnorePath() = the global .continueignore.
-  parser: null
+  parser: text_config
 - id: continue.config
   category: config
   root: project

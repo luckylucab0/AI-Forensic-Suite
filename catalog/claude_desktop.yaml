@@ -807,7 +807,7 @@ artifacts:
     Generated once on first launch in third-party mode and then stable. Regenerated if the application-data directory is recreated, which is itself a signal.
   notes: |-
     Documented only for third-party deployment mode: on first launch the app generates a random UUID and writes it base64-encoded to ant-did. It is the identifier attached to telemetry events alongside deploymentOrganizationUuid, so it is the join key between this endpoint and any OpenTelemetry records an organization holds. The vendor states it is random per device and per OS-user account and cannot be traced back to a device or person by Anthropic. I found no evidence of an equivalent file in standard (account-signed-in) mode, where the account UUID plays that role instead; a community report names lastKnownAccountUuid in a config.json for that.
-  parser: null
+  parser: text_config
 - id: claude_desktop.embedded_claude_code
   title: Embedded Claude Code engine and VM workspace
   category: install_evidence

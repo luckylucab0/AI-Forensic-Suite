@@ -148,7 +148,7 @@ artifacts:
   source_kind: source_code
   notes: |-
     MAJOR LAYOUT CHANGE the brief does not cover. Cline 4.x resolves a product data dir outside VS Code entirely: resolveClineDir() = join(HOME, ".cline"), resolveClineDataDir() = join(that, "data"). Resolution order per apps/vscode/src/shared/storage/storage-context.ts and apps/vscode/src/sdk/legacy-state-reader.ts: $CLINE_DATA_DIR (trimmed) > $CLINE_DIR + "/data" > ~/.cline/data. A third override $CLINE_DB_DATA_DIR (= <dataDir>/db) appears in apps/cli/src/tests/helpers/env.ts. COLLECTION IMPLICATION: a globs-only collector will miss a relocated tree - read the process environment / shell profiles for CLINE_DIR, CLINE_DATA_DIR, CLINE_DB_DATA_DIR before concluding no Cline data exists.
-  parser: null
+  parser: text_config
 - id: cline.global_settings
   category: config
   root: user_profile
@@ -229,7 +229,7 @@ artifacts:
   source_kind: source_code
   notes: |-
     resolveWorkspaceTaskSpecsDir(workspaceRoot) = join(workspaceRoot, ".cline", "tasks"); resolveWorkspaceCronSpecsDir(workspaceRoot) = join(workspaceRoot, ".cline", "cron"). Committed task/cron specs are 'what the agent was told to do, repeatedly' - distinct from .clinerules.
-  parser: null
+  parser: text_config
 - id: cline.provider_settings
   category: credentials
   root: user_profile

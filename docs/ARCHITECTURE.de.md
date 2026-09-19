@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 33 Module lesen 358 der 473
+  zählt diese Dateien und sagt, welche es sind. 34 Module lesen 366 der 473
   Katalogartefakte; der Rest sind die Anmeldedatenspeicher, die absichtlich niemand liest,
   die Installationsspuren, die das Dateisystem-Ereignis beantwortet, und die Binärspeicher,
   die noch eigene Formate brauchen.
@@ -174,6 +174,17 @@ ist, dass das nicht *unbemerkt* geht.
     zweites dokumentiert das Verzeichnis und nicht die Benennung darin, ein drittes hält
     beide Seiten einer Änderung, ohne zu sagen, welche welche ist. Was der Pfad aussagt,
     wird gelesen; was er nicht aussagt, wird gesagt statt erschlossen.
+  - **Textkonfiguration.** Die kleinen Dateien, die sagen, wie ein Agent eingerichtet war,
+    am Stück gelesen, und zwei, die Zeile für Zeile gelesen werden, weil eine Zeile das
+    ist, was eine Untersuchende gegen einen Pfad hält. Eine Ignore-Datei ist die Umkehrung
+    jedes anderen Artefakts hier: sie hält fest, was der Agent nie lesen, schreiben oder
+    indizieren sollte. So erklärt sich eine Datei, die jemand für angefasst hielt und die
+    es nicht war, und ein kurz vor dem Untersuchungszeitraum hinzugefügtes Muster hält
+    Material aus jedem Transkript heraus, das der Agent je geschrieben hat. Eine
+    Worktree-Include-Liste ist ein Verzeichnis der gitignorierten Dateien, die der Agent in
+    jeden von ihm angelegten Worktree kopiert, und der Hersteller dokumentiert sie mit
+    Umgebungsdateien und Secrets-Konfiguration als Beispielen: ein Name darin sagt also,
+    wo Kopien dieser Datei liegen.
   - **Shell-History.** Vier Shells und die Recall-Datei des Agenten selbst, jede so gelesen,
     wie ihr eigener Schreiber sie schreibt. Hier steht die Startzeile eines Agenten, also
     die erste Frage des Briefings über einen Agenten, und sie steht fast nie im Agenten.

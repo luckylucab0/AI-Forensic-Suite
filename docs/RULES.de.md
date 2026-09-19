@@ -48,6 +48,7 @@ Funde werden in die Falldatenbank geschrieben, neben die Ereignisse, auf denen s
 |  | [AFX-SECRETS-005](#afx-secrets-005) | mittel |
 |  | [AFX-SECRETS-006](#afx-secrets-006) | hoch |
 |  | [AFX-SECRETS-007](#afx-secrets-007) | hoch |
+|  | [AFX-SECRETS-008](#afx-secrets-008) | mittel |
 | [`sensitive_paths`](#sensitive-paths) | [AFX-SENSITIVEPATHS-001](#afx-sensitivepaths-001) | hoch |
 |  | [AFX-SENSITIVEPATHS-002](#afx-sensitivepaths-002) | hoch |
 |  | [AFX-SENSITIVEPATHS-003](#afx-sensitivepaths-003) | kritisch |
@@ -1026,6 +1027,37 @@ Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein
 - <https://datatracker.ietf.org/doc/html/rfc9110#name-authorization>
 
 *Stichproben in der Regeldatei:* 4 / 2 (+/-)
+
+#### AFX-SECRETS-008
+
+**A credential file was copied into every worktree the agent creates**
+
+| | |
+| --- | --- |
+| Schweregrad | mittel |
+| Paket | `secrets` |
+| Agenten | `any` |
+| Ereignisarten | `config.snapshot` |
+| Gelesene Felder | `payload.key`, `payload.text` |
+| Schlagworte | `T1552.001`, `credential-at-rest` |
+
+[EN] A worktree include list names a file whose name says it holds credentials. The vendor documents this list as the gitignored files to copy into every worktree the agent creates, so a name here means copies of that file exist beside every checkout on the machine rather than only in the main one.
+
+*Worauf sie trifft:* `payload.key matches /^include:/ and payload.text matches /(?i)(^\|[/\\])\.env(\.\|$)/ or /(?i)\b(secrets?\|credentials?\|\.netrc\|id_rsa\|id_ed25519\|\.pem\|\.p12\|keystore\|serviceaccount)\b/ or /(?i)\.(pem\|key\|p12\|pfx\|jks)$/`
+
+*Warum das für die Analyse zählt:* [EN] This is a finding about where to look rather than about a value. The list is written by the author of the repository and it is an explicit inventory: it says, in the author's own words, which files git was deliberately keeping out of the repository and which of those the agent is to duplicate anyway. Every worktree is then a second copy of the credential, in a directory the developer may not think of as holding one, outside whatever protects the original. The vendor's own documentation names .env and secrets configuration as the examples, so this is the documented use of the feature and not an abuse of it, which is exactly why it is easy to leave in place and forget.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A file named for secrets that holds only names, such as a template or an example environment file checked in for documentation. The list says what is copied and not what is in it.
+- [EN] An entry that no longer exists on disk. The list is the author's intent at the time it was written, and the worktrees it applied to may have been removed since.
+- [EN] A repository where the feature was never used, since the file is read whether or not the agent ever created a worktree. The vendor also documents that the list is not processed when a hook replaces the default worktree behaviour.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/worktrees.md>
+
+*Stichproben in der Regeldatei:* 3 / 2 (+/-)
 
 ## sensitive paths
 
