@@ -103,7 +103,12 @@ gematcht hat und die Ereignisse, auf denen er beruht; ein Klick darauf öffnet d
 **Instructions** ist der Anweisungsbestand: alles, dem die Agenten folgen sollten, so wie es
 auf dem Endpunkt stand. Eine Zeile pro Datei, mit dem Scope, in dem sie galt, den Werkzeugen,
 die ein Skill sich selbst zuspricht, der Angabe, ob sie ausgeführt statt gelesen wird, und
-einer Zählung der Zeichen, die ein Prüfer nicht sehen konnte. Ein Klick zeigt den Text, und
+einer Zählung der Zeichen, die ein Prüfer nicht sehen konnte. Der Pfad einer Zeile sagt, wo
+die Anweisung gefunden wurde, und das ist nicht immer die Datei, die sie ist: ein Agent, der
+festhält, welche Regeldateien auf einen Zug angewandt wurden, legt diesen Vermerk in seinem
+Sitzungsspeicher ab, und ein mit der Sitzung gespeicherter Prompt benennt die Sitzungsdatei.
+Eine solche Zeile sagt, welche Datei sie benennt, denn der Fundpfad beantwortet, wo gesucht
+wurde, und der benannte Pfad, welche Datei den Agenten geformt hat. Ein Klick zeigt den Text, und
 bei einer Datei mit unsichtbaren Zeichen wird er mit jedem davon markiert angezeigt, denn
 genau darum geht es: ein Mensch hat einen Text genehmigt und das Modell hat einen anderen
 gelesen. Eine Aussage lässt die Ansicht niemanden übersehen: das ist kein Systemprompt. Jeder

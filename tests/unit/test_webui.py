@@ -287,6 +287,42 @@ def test_the_instruction_view_lists_what_the_agents_were_told_to_obey(case: Case
     assert view["counts"]["files"] == len(view["instructions"])
 
 
+def test_an_instruction_recorded_somewhere_else_names_the_file_it_is(case: Case) -> None:
+    """The row's own path says where this was found. It is not always the file that shaped
+    the agent, and the difference is the whole point of the view.
+
+    Continue records, per turn, which rule files applied to it, so the event comes out of a
+    session file and names a rules file in the working copy. Shown only by the path it was
+    found under, that row reads as a session file being an instruction, and the one thing an
+    analyst came here for, which file shaped the turn, is not on the screen at all.
+    """
+    view = api.instructions(case)
+
+    elsewhere = [row for row in view["instructions"] if row["instruction_is_elsewhere"]]
+
+    assert elsewhere, "the synthetic profile records a rule that applied to a turn"
+    row = elsewhere[0]
+    assert row["instruction_paths"], "a row that says the file is elsewhere has to say where"
+    assert not any(path == row["original_path"] for path in row["instruction_paths"])
+    assert view["counts"]["recorded_elsewhere"] == len(elsewhere)
+
+
+def test_an_instruction_file_names_itself_and_is_not_called_elsewhere(case: Case) -> None:
+    """The other side of the same field, and the common case. A file the instruction parser
+    read is its own instruction, so a view that flagged every row would be telling an
+    analyst to check seventeen files for a difference that exists in one."""
+    view = api.instructions(case)
+
+    own = [
+        row
+        for row in view["instructions"]
+        if row["original_path"].endswith("CLAUDE.md") and row["instruction_paths"]
+    ]
+
+    assert own
+    assert all(row["instruction_is_elsewhere"] is False for row in own)
+
+
 def test_the_instruction_view_says_it_is_not_a_system_prompt(case: Case) -> None:
     """The honesty guarantee of the whole view, pinned as a test because it is the one thing
     a reader would otherwise assume. The base prompt is compiled into the product or comes

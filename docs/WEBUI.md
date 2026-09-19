@@ -98,7 +98,11 @@ on; clicking one of those opens the event.
 **Instructions** is the instruction surface: everything the agents were told to obey, as it
 stood on the endpoint. One row per file, with the scope it applied at, the tools a skill
 granted itself, whether it is executed rather than read, and a count of the characters a
-reviewer could not see. Clicking a row shows the text, and for a file with invisible
+reviewer could not see. A row's path is where the instruction was found, which is not always
+the file it is: an agent that records which rule files applied to a turn puts that record in
+its session store, and a prompt persisted with a session names the session file. Such a row
+says which file it names, because the path it was found under answers where we looked and
+the path it names answers which file shaped the agent. Clicking a row shows the text, and for a file with invisible
 characters it is shown with each of them marked, because the whole point is that a human
 approved one text and the model read another. The panel carries one statement it will not
 let a reader miss: this is not a system prompt. Every agent here assembles its prompt at

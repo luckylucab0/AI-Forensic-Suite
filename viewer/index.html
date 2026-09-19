@@ -1820,6 +1820,13 @@ function drawInstructions(){
       el('span',{class:'sc '+row.scope,text:row.scope}),
       el('span',{class:'ag',text:row.agent||'unclaimed'}),
       el('span',{class:'pth',text:row.original_path}),
+      // Where the instruction names a file other than the one it was found in: a rule a
+      // product recorded as having shaped a turn, or a prompt persisted with a session.
+      // The row's own path answers where this was found; this answers which file shaped
+      // the agent, which is the question the view is open for.
+      row.instruction_is_elsewhere
+        ? el('span',{class:'mk',title:'the file this instruction names, which is not the file it was recorded in',
+                     text:'names '+row.instruction_paths.join(', ')}):null,
       marks.length?el('span',{class:'mk',text:marks.join(' · ')}):null,
       el('span',{class:'n',text:row.chars+' chars'}),
     ]);

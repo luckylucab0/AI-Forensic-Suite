@@ -555,6 +555,19 @@ def instructions(case: Case) -> dict[str, Any]:
                 # document rather than in a settings file. It is the one field here that is
                 # a permission question, so it travels with the instruction.
                 "declared_tools": payload.get("declared_tools") or [],
+                # The file the instruction *is*, which is not always the file the event
+                # came from. For a file the instruction parser read they are the same path.
+                # For an instruction carried inside a transcript they are not: a system
+                # prompt persisted with a session names the session file, and a rule a
+                # product recorded as having shaped a turn names the rule file on the
+                # endpoint. Showing only the event's own path answers "where did we find
+                # this" and hides "which file shaped the turn", which is the question this
+                # view exists for.
+                "instruction_paths": [
+                    entry.get("path")
+                    for entry in (payload.get("instructions") or [])
+                    if isinstance(entry, dict) and entry.get("path")
+                ],
                 "executable": bool(payload.get("executable")),
                 "prompt_field": payload.get("prompt_field"),
                 "hidden_characters": payload.get("hidden_characters") or [],
@@ -566,6 +579,15 @@ def instructions(case: Case) -> dict[str, Any]:
                 # because a preview mistaken for a whole file is a wrong reading of evidence.
                 "preview_is_whole_file": len(text) <= PREVIEW,
             }
+        )
+        # Said as a field rather than left to a reader comparing two paths, because the
+        # two are equal for almost every row and the exceptions are the interesting ones.
+        row["instruction_is_elsewhere"] = bool(
+            row["instruction_paths"]
+            and all(
+                str(path).split("#", 1)[0] != str(row.get("original_path") or "")
+                for path in row["instruction_paths"]
+            )
         )
         out.append(row)
 
@@ -586,6 +608,11 @@ def instructions(case: Case) -> dict[str, Any]:
             "executable": sum(1 for row in out if row["executable"]),
             "unreadable": sum(1 for row in out if row["parse_problem"]),
             "scope_unknown": sum(1 for row in out if row["scope"] == "unknown"),
+            # Instructions that were recorded somewhere other than in the file they name:
+            # a rule a product says applied to a turn, a prompt persisted with a session.
+            # An analyst reading this view for which files shaped an agent needs to know
+            # that these rows point at a file the collection may not even hold.
+            "recorded_elsewhere": sum(1 for row in out if row["instruction_is_elsewhere"]),
         },
         "note": (
             "This is the instruction surface that was on the endpoint: instruction files, "
