@@ -498,6 +498,47 @@ class Case:
         }
         return {key: int(value) for key, value in out.items()}
 
+    def unread_by_artifact(self, limit: int = 25) -> dict[str, Any]:
+        """Which files the records nobody read are in, largest first.
+
+        The counts alone answer half the question. A case that says two hundred thousand
+        records are in a format nobody has mapped is telling an analyst something they can
+        only act on once they know whether that is one debug log or every transcript on the
+        machine, and those two cases call for opposite next steps. So the same two numbers
+        are reported per artifact, with the number of files behind them.
+
+        Limited, because a long tail of one-record artifacts would bury the head, and the
+        result says how many rows it did not list rather than trimming quietly.
+        """
+        rows = [
+            dict(row)
+            for row in self._connection.execute(
+                "SELECT artifact_id, agent, count(DISTINCT original_path) AS files, "
+                "       sum(CASE WHEN kind = 'unparsed.record' "
+                "                 AND (parse_problem IS NULL "
+                "                      OR parse_problem NOT LIKE '%' || ? || '%') "
+                "            THEN 1 ELSE 0 END) AS unreadable, "
+                "       sum(CASE WHEN parse_problem LIKE '%' || ? || '%' "
+                "            THEN 1 ELSE 0 END) AS uninterpreted "
+                "  FROM events GROUP BY artifact_id, agent "
+                "HAVING unreadable > 0 OR uninterpreted > 0 "
+                " ORDER BY (unreadable + uninterpreted) DESC, artifact_id LIMIT ?",
+                (UNINTERPRETED_MARK, UNINTERPRETED_MARK, limit),
+            )
+        ]
+        total = self._connection.execute(
+            "SELECT count(*) AS n FROM ("
+            "  SELECT artifact_id, agent FROM events GROUP BY artifact_id, agent "
+            "  HAVING sum(CASE WHEN kind = 'unparsed.record' "
+            "                   AND (parse_problem IS NULL "
+            "                        OR parse_problem NOT LIKE '%' || ? || '%') "
+            "              THEN 1 ELSE 0 END) > 0 "
+            "      OR sum(CASE WHEN parse_problem LIKE '%' || ? || '%' "
+            "              THEN 1 ELSE 0 END) > 0)",
+            (UNINTERPRETED_MARK, UNINTERPRETED_MARK),
+        ).fetchone()["n"]
+        return {"artifacts": rows, "listed": len(rows), "total": int(total)}
+
     def query(
         self, sql: str, parameters: Sequence[Any] | Mapping[str, Any] = ()
     ) -> list[sqlite3.Row]:

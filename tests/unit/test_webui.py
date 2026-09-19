@@ -142,6 +142,22 @@ def test_the_case_summary_carries_the_counts_that_qualify_it(case: Case) -> None
     assert summary["scanned"] is True
 
 
+def test_the_summary_says_which_artifacts_the_unread_records_are_in(case: Case) -> None:
+    """The counts above are a total, and a total cannot be acted on: one debug log and
+    every transcript on the machine produce the same number and call for opposite next
+    steps. The breakdown is what turns the number into a next step."""
+    summary = api.case_summary(case)
+    unread = summary["unread"]
+    assert unread["total"] >= 1, "the fixture case holds records nobody read"
+    assert unread["listed"] == len(unread["artifacts"])
+    for row in unread["artifacts"]:
+        assert row["unreadable"] or row["uninterpreted"], (
+            "an artifact with nothing wrong with it would be noise in the view somebody "
+            "reads to find the holes"
+        )
+        assert row["files"] >= 1
+
+
 def test_every_event_in_the_case_belongs_to_exactly_one_session(case: Case) -> None:
     """The property the whole session view rests on. An event in no group would be an event
     an analyst can only reach through the timeline, and one in two groups would be an event

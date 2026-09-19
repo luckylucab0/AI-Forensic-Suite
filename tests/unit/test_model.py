@@ -13,6 +13,7 @@ import pytest
 
 from agentforensics.model import (
     EVENT_KINDS,
+    UNINTERPRETED_MARK,
     BundleRecord,
     Case,
     CaseError,
@@ -186,3 +187,62 @@ def test_opening_something_that_is_not_a_case_fails_clearly(tmp_path: Path) -> N
     path.write_bytes(b"")
     with pytest.raises(CaseError):
         Case.open(path)
+
+
+# ------------------------------------------- where the records nobody read are
+
+
+def unread_event(artifact: str, locator: str, problem: str, kind: str = "unparsed.record") -> Event:
+    """One event whose provenance names an artifact, for the breakdown below."""
+    return Event(
+        kind=kind,
+        provenance=Provenance("bundle-1", f"/home/alice/{artifact}", "aa", artifact, locator),
+        agent="claude_code",
+        raw={"line": locator},
+        parse_problem=problem,
+    )
+
+
+def test_the_unread_records_are_reported_per_artifact(case: Case) -> None:
+    """A total says how many records nobody read; this says which files they are in, and
+    that is the part an analyst can act on: one debug log and every transcript on the
+    machine produce the same number and call for opposite next steps."""
+    with case.transaction():
+        case.add_events(
+            [
+                unread_event("a.log", "line:1", f"read but {UNINTERPRETED_MARK}"),
+                unread_event("a.log", "line:2", f"read but {UNINTERPRETED_MARK}"),
+                unread_event("b.jsonl", "line:1", "the line could not be read"),
+            ]
+        )
+
+    out = case.unread_by_artifact()
+    rows = {row["artifact_id"]: row for row in out["artifacts"]}
+    assert rows["a.log"]["uninterpreted"] == 2
+    assert rows["a.log"]["unreadable"] == 0
+    assert rows["b.jsonl"]["unreadable"] == 1
+    assert rows["b.jsonl"]["uninterpreted"] == 0
+    assert out["total"] == 2
+
+
+def test_an_artifact_everything_was_read_from_is_not_listed(case: Case) -> None:
+    """The listing is of what is missing. An artifact with nothing wrong with it would be
+    noise in a view somebody reads to find the holes."""
+    with case.transaction():
+        case.add_events([event(provenance=provenance("line:1"))])
+    assert case.unread_by_artifact()["artifacts"] == []
+
+
+def test_a_trimmed_listing_says_how_many_it_left_out(case: Case) -> None:
+    """A quietly trimmed list of what a case failed to read is the same defect as a
+    quietly trimmed reading."""
+    with case.transaction():
+        case.add_events(
+            [
+                unread_event(f"artifact-{index}", "line:1", "the line could not be read")
+                for index in range(5)
+            ]
+        )
+    out = case.unread_by_artifact(limit=2)
+    assert out["listed"] == 2
+    assert out["total"] == 5

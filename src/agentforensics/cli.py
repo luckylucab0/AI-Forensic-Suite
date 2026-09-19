@@ -551,6 +551,10 @@ def cmd_case(args: argparse.Namespace) -> int:
         agents = case.query(
             "SELECT agent, count(*) AS events FROM events GROUP BY agent ORDER BY events DESC"
         )
+        # Where the records nobody read actually are. The totals below say how many there
+        # are, and the answer an analyst needs next is whether that is one debug log or
+        # every transcript on the machine, because those call for opposite next steps.
+        unread = case.unread_by_artifact()
     finally:
         case.close()
 
@@ -562,6 +566,7 @@ def cmd_case(args: argparse.Namespace) -> int:
                     "counts": counts,
                     "bundles": [dict(row) for row in bundles],
                     "agents": [dict(row) for row in agents],
+                    "unread": unread,
                 },
                 indent=2,
                 sort_keys=True,
@@ -596,6 +601,20 @@ def cmd_case(args: argparse.Namespace) -> int:
         f"{counts['events_without_timestamp']} event(s) with no timestamp, "
         f"{counts['collection_gaps']} gap(s) reported by the collection itself",
     )
+    for row in unread["artifacts"]:
+        _write(
+            sys.stderr,
+            f"  unread  {row['artifact_id'] or 'unattributed':<42} "
+            f"{row['unreadable']} nothing could read, "
+            f"{row['uninterpreted']} in a format nobody has mapped, "
+            f"in {row['files']} file(s)",
+        )
+    if unread["total"] > unread["listed"]:
+        _write(
+            sys.stderr,
+            f"  unread  and {unread['total'] - unread['listed']} more artifact(s) with "
+            "records nobody read, not listed here",
+        )
     return EXIT_OK
 
 

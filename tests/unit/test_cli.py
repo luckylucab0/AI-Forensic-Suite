@@ -6,10 +6,20 @@ live-response sessions where the only signal is the exit code.
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import pytest
 
 from agentforensics import __version__
-from agentforensics.cli import EXIT_ERROR, build_parser, main
+from agentforensics.cli import EXIT_ERROR, EXIT_OK, build_parser, main
+from agentforensics.model import (
+    UNINTERPRETED_MARK,
+    BundleRecord,
+    Case,
+    Event,
+    Provenance,
+)
 
 
 def test_version_is_reported(capsys: pytest.CaptureFixture[str]) -> None:
@@ -40,3 +50,65 @@ def test_authorization_is_mentioned_in_the_help(capsys: pytest.CaptureFixture[st
     with pytest.raises(SystemExit):
         build_parser().parse_args(["--help"])
     assert "authorization" in capsys.readouterr().out.lower()
+
+
+# ---------------------------------------------------------------- the case summary
+
+
+def _case_with_unread(path: Path) -> Path:
+    """A case holding one record nobody could read and two nobody has mapped."""
+    with Case.open(path) as case, case.transaction():
+        case.add_bundle(BundleRecord("bundle-1", "native", "/tmp/b"))
+        case.add_events(
+            [
+                Event(
+                    kind="unparsed.record",
+                    provenance=Provenance(
+                        "bundle-1", "/home/alice/a.log", "aa", "agent.debug_logs", f"line:{n}"
+                    ),
+                    agent="claude_code",
+                    raw={"line": n},
+                    parse_problem=f"read but {UNINTERPRETED_MARK}",
+                )
+                for n in (1, 2)
+            ]
+            + [
+                Event(
+                    kind="unparsed.record",
+                    provenance=Provenance(
+                        "bundle-1", "/home/alice/b.jsonl", "bb", "agent.transcripts", "line:1"
+                    ),
+                    agent="claude_code",
+                    raw={"line": 1},
+                    parse_problem="the line could not be read",
+                )
+            ]
+        )
+    return path
+
+
+def test_the_case_summary_says_where_the_unread_records_are(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The counts say how many; an analyst's next question is which files, because one
+    debug log and every transcript on the machine give the same number."""
+    case_path = _case_with_unread(tmp_path / "case.sqlite")
+    assert main(["case", "--case", str(case_path)]) == EXIT_OK
+
+    err = capsys.readouterr().err
+    assert "record(s) nothing could read" in err
+    assert "agent.debug_logs" in err
+    assert "agent.transcripts" in err
+
+
+def test_the_json_summary_carries_the_same_breakdown(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    case_path = _case_with_unread(tmp_path / "case.sqlite")
+    assert main(["case", "--case", str(case_path), "--json"]) == EXIT_OK
+
+    out = json.loads(capsys.readouterr().out)
+    rows = {row["artifact_id"]: row for row in out["unread"]["artifacts"]}
+    assert rows["agent.debug_logs"]["uninterpreted"] == 2
+    assert rows["agent.transcripts"]["unreadable"] == 1
+    assert out["unread"]["total"] == 2

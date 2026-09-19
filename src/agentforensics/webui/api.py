@@ -124,6 +124,11 @@ def case_summary(case: Case) -> dict[str, Any]:
         "counts": counts,
         "bundles": bundles,
         "agents": agents,
+        # The same two numbers as the counts, per artifact: which files the records nobody
+        # read are in. A total on its own cannot be acted on, because one debug log and
+        # every transcript on the machine produce the same number and need opposite next
+        # steps.
+        "unread": case.unread_by_artifact(),
         "kinds": kinds,
         "collection_gaps": gaps,
         "scan_runs": scans,

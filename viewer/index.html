@@ -1512,6 +1512,24 @@ function renderCasePanel(){
     caseNum(counts.events_without_timestamp||0,'events with no time',true),
     caseNum(counts.collection_gaps||0,'gaps in collection',true),
   ]));
+  // The same two numbers, per file. A total cannot be acted on: one debug log and every
+  // transcript on the machine give the same number and call for opposite next steps.
+  const unread=(summary.unread&&summary.unread.artifacts)||[];
+  if(unread.length){
+    body.appendChild(el('div',{class:'case-block',text:'Where those records are'}));
+    body.appendChild(el('div',{class:'panel-sub',text:'The files the unreadable and the not-yet-mapped records came out of, largest first.'}));
+    for(const row of unread){
+      const parts=[];
+      if(row.unreadable) parts.push(row.unreadable+' unreadable');
+      if(row.uninterpreted) parts.push(row.uninterpreted+' not yet mapped');
+      parts.push(row.files+' file(s)');
+      body.appendChild(kv(row.artifact_id||'unattributed',parts.join(' · ')));
+    }
+    if((summary.unread.total||0)>(summary.unread.listed||0)){
+      body.appendChild(el('div',{class:'panel-sub',text:'and '+(summary.unread.total-summary.unread.listed)+' more artifact(s) with records nobody read, not listed here.'}));
+    }
+  }
+
   if(!summary.scanned){
     body.appendChild(el('div',{class:'notice',html:'<b>Nobody has run the rules over this case.</b> '
       +'An empty findings list means nothing until a scan has run: <code>afx scan --case &lt;db&gt;</code>.'}));
