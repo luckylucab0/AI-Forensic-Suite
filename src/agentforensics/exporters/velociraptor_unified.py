@@ -113,6 +113,8 @@ NOT_NORMALIZED = "file_only"
 # directory this artifact will not guess an extension for. A line-delimited log needs no
 # entry, because the generic normalizer already returns every one of its records.
 UNINTERPRETED: dict[str, str] = {
+    "aider.chat_history": "a markdown log whose turns are blocks of lines rather than "
+    "records, so a line of it is a fragment of one",
     "aider.input_history": "a line editor's history file whose entries span several lines, "
     "which this query reads one line at a time",
     "amazonq.cli_prompt_history": "a line editor's history file whose entries are escaped, "

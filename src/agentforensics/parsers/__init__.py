@@ -14,6 +14,7 @@ summarised.
 
 from __future__ import annotations
 
+from agentforensics.parsers.aider import AiderParser
 from agentforensics.parsers.amazonq import AmazonQParser
 from agentforensics.parsers.base import (
     Line,
@@ -44,6 +45,7 @@ from agentforensics.parsers.zed_sidebar import ZedSidebarParser
 # parser has to come before a general one. Kept as a tuple rather than a registry decorator
 # so that reading this file tells you the whole set.
 PARSERS: tuple[Parser, ...] = (
+    AiderParser(),
     AmazonQParser(),
     ClaudeCodeParser(),
     ClineParser(),

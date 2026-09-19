@@ -1215,6 +1215,19 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         "\n# 2026-09-05 08:01:12.000000\n+remove the debug logging from:\n"
         "+  src/app/index.js\n+  src/app/util.js\n",
     )
+    # aider's chat log, in the working copy where aider keeps it. Every shape one writer
+    # produces: the banner a run writes, a prompt prefixed line by line, an answer as plain
+    # markdown with the code the model emitted still fenced, and the one blockquote that
+    # carries an approval and a status notice alike.
+    write(
+        project / ".aider.chat.history.md",
+        "\n# aider chat started at 2026-09-05 08:00:00\n\n"
+        "\n#### /add src/app/index.js\n"
+        "> Add src/app/index.js to the chat? y  \n"
+        "\n#### remove the debug logging from:  \n#### src/app/index.js\n"
+        "\nHere is the change.\n\n```python\nprint('x')\n```\n\n"
+        "> Applied edit to src/app/index.js  \n",
+    )
     # A rustyline v2 file, which is what Amazon Q's chat prompt keeps. Two traps in one
     # path: the name says bash history and it is not one, and it is a dotfile inside a
     # dotdirectory, so a collector that does not glob hidden files misses it silently.

@@ -224,4 +224,4 @@ artifacts:
     Highest-value Aider artifact: full prompt + response text including code the model emitted. Lives INSIDE the repo working tree, so it is frequently committed by accident and also frequently recoverable from git objects and from backups of the project dir rather than only a home directory.
 
     Record structure: args.py: default_chat_history_file = os.path.join(git_root, '.aider.chat.history.md') if git_root else '.aider.chat.history.md'. Overridable with --chat-history-file or AIDER_CHAT_HISTORY_FILE, and via 'chat-history-file:' in .aider.conf.yml, so the file may be relocated anywhere. Markdown with '#### ' prefixes for user turns; assistant turns and diffs are plain markdown blocks.
-  parser: null
+  parser: aider

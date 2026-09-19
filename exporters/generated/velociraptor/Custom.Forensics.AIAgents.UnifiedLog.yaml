@@ -25,6 +25,7 @@
 #
 # Read by the suite's own parsers and NOT interpreted here, so a fleet hunt returns
 # the file and not the conversation. Collect these and ingest them:
+#   - aider.chat_history: a markdown log whose turns are blocks of lines rather than records, so a line of it is a fragment of one
 #   - aider.input_history: a line editor's history file whose entries span several lines, which this query reads one line at a time
 #   - amazonq.cli_prompt_history: a line editor's history file whose entries are escaped, so a line of it is not the text that was typed
 #   - cline.data_tasks: a task directory of whole JSON documents
