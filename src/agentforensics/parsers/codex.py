@@ -10,9 +10,27 @@ the case without inflating the conversation.
 Two other things the format does that a reader has to know about. A `compacted` record
 means the conversation was rewritten to fit a context window, which is the usual
 explanation for an apparent gap in a transcript and therefore has to be an event rather
-than a skip. And the rollout files are compressed after seven days, so the ones a
-collection finds uncompressed are the recent week: an absent older conversation is the
-documented default rather than anything anybody did.
+than a skip. And the rollout files are compressed after seven days, so the uncompressed
+ones are the recent week and everything older sits beside them under another extension.
+
+**The compressed ones are read here too**, which is the whole reason this project requires
+a Python with zstd in its standard library (ADR 0024). A reader that only took the plain
+files would show the last seven days of a machine that has a year of conversations on it,
+and would show it without saying anything was missing, which is the failure this project
+treats as the worst one it can have. The compressed transcript is expanded and then read by
+exactly the same code as a plain one, so a line of a year-old conversation produces the same
+events as a line of yesterday's.
+
+A locator on one of these is the line number **of the expanded transcript**, which is the
+only line number the records have. The path on the event ends in the compressed extension,
+so an analyst can see which it was, and checking a finding means expanding the file the same
+way and counting.
+
+The compression is done through a temporary file, so an interrupted compression leaves one
+behind and the catalogue collects those too. Whether such a file is compressed depends on
+when it was interrupted, so the bytes decide it here rather than the name: a file that
+starts with a zstd frame is expanded and one that does not is read as the plain JSON Lines
+it still is.
 
 The mapping was ported from the viewer, which had already been written against real
 rollouts, so the record and item types here are the ones that exist rather than the ones
@@ -21,8 +39,11 @@ that seemed likely.
 
 from __future__ import annotations
 
+import compression.zstd as zstd
 import json
+import tempfile
 from collections.abc import Iterator
+from pathlib import Path
 from typing import Any
 
 from agentforensics.model import Event, unparsed
@@ -34,6 +55,83 @@ from agentforensics.parsers.base import (
     normalise_ts,
     text_of,
 )
+from agentforensics.parsers.sqlite_store import ZSTD_MAGIC
+
+# How large one transcript is allowed to expand to. A rollout of a long session is tens of
+# megabytes, so this is generous, and it is finite because a compressed file says nothing
+# about its expanded size and a case should not be fillable by one of them. Reaching it is
+# reported rather than quietly truncating a conversation an analyst then reads as complete.
+MAX_EXPANDED = 512 * 1024 * 1024
+
+
+def _expand(source: Path, destination: Path) -> tuple[Path | None, str | None]:
+    """The transcript as plain JSON Lines, and what was wrong with getting there.
+
+    Returns the path to read and a problem, either of which can be present on its own: a
+    frame that stops early still expands the lines before the break, and those lines are
+    evidence. Only a file that produced nothing comes back without a path.
+
+    The bytes decide whether to expand, not the name. A file left behind by an interrupted
+    compression can be either form depending on when it was interrupted, and the catalogue
+    collects those files on purpose.
+    """
+    try:
+        with source.open("rb") as handle:
+            head = handle.read(len(ZSTD_MAGIC))
+    except OSError as error:
+        return None, f"the transcript could not be read: {error}"
+    if head != ZSTD_MAGIC:
+        # Not compressed, whatever the extension says. Read where it lies, which also means
+        # no copy of a transcript is made for no reason.
+        return source, None
+
+    written = 0
+    problem: str | None = None
+    # Fed chunk by chunk through the incremental decompressor rather than read through a
+    # file object, and the difference is the whole point of the branch below it: a stream
+    # reader raises on a truncated frame and loses everything it had decoded, while this
+    # one has already written it. A cut-off transcript is exactly the case where the
+    # records before the cut are what an investigation has left.
+    decompressor = zstd.ZstdDecompressor()
+    try:
+        with source.open("rb") as handle, destination.open("wb") as out:
+            while chunk := handle.read(1024 * 1024):
+                try:
+                    piece = decompressor.decompress(chunk)
+                except zstd.ZstdError as error:
+                    problem = (
+                        "the compressed transcript stopped part way through: "
+                        f"{' '.join(str(error).split())}. The records before that point "
+                        "are in the case and the ones after it are not"
+                    )
+                    break
+                if written + len(piece) > MAX_EXPANDED:
+                    out.write(piece[: MAX_EXPANDED - written])
+                    written = MAX_EXPANDED
+                    problem = (
+                        f"this transcript expands past the ingest limit of {MAX_EXPANDED} "
+                        "bytes, so the records after that point are not in the case. The "
+                        "compressed file is in the bundle, at the path in this event's "
+                        "provenance"
+                    )
+                    break
+                out.write(piece)
+                written += len(piece)
+            else:
+                if not decompressor.eof:
+                    # The file ended before the frame did, which is what an interrupted
+                    # compression leaves behind. Said in the same words as a frame that
+                    # errored, because to an analyst it is the same fact.
+                    problem = (
+                        "the compressed transcript stopped part way through: the file ends "
+                        "before the frame does. The records before that point are in the "
+                        "case and the ones after it are not"
+                    )
+    except OSError as error:
+        problem = f"the transcript could not be expanded: {error}"
+    if not written:
+        return None, problem or "the compressed transcript expanded to nothing"
+    return destination, problem
 
 
 class CodexParser:
@@ -42,23 +140,59 @@ class CodexParser:
     name = "codex"
 
     _ROLLOUTS = frozenset({"codex.rollouts", "codex.archived_sessions"})
+    _COMPRESSED = frozenset({"codex.rollouts_compressed"})
     _HISTORY = frozenset({"codex.prompt_history"})
 
     def handles(self, artifact_id: str | None) -> bool:
-        return artifact_id in self._ROLLOUTS or artifact_id in self._HISTORY
+        return (
+            artifact_id in self._ROLLOUTS
+            or artifact_id in self._COMPRESSED
+            or artifact_id in self._HISTORY
+        )
 
     def parse(self, context: ParseContext) -> Iterator[Event]:
         if context.artifact_id in self._HISTORY:
             yield from self._history(context)
             return
+        if context.artifact_id in self._COMPRESSED:
+            yield from self._compressed(context)
+            return
         yield from self._rollout(context)
 
-    def _rollout(self, context: ParseContext) -> Iterator[Event]:
+    def _compressed(self, context: ParseContext) -> Iterator[Event]:
+        """A rollout that was compressed after its seven days, read as if it were not."""
+        with tempfile.TemporaryDirectory(prefix="afx-codex-") as workspace:
+            expanded, problem = _expand(context.local_path, Path(workspace) / "rollout.jsonl")
+            if expanded is None:
+                yield unparsed(
+                    context.provenance("file"),
+                    context.agent,
+                    None,
+                    problem or "the compressed transcript could not be expanded",
+                    user=context.user,
+                    host=context.host,
+                )
+                return
+            yield from self._rollout(context, path=expanded)
+            if problem:
+                # The lines that did expand are already in the case above. This says where
+                # the reading stopped, which is the difference between a conversation that
+                # ended and a file that was cut off.
+                yield unparsed(
+                    context.provenance("file"),
+                    context.agent,
+                    None,
+                    problem,
+                    user=context.user,
+                    host=context.host,
+                )
+
+    def _rollout(self, context: ParseContext, path: Path | None = None) -> Iterator[Event]:
         # Session-wide facts arrive in their own records and apply to everything after
         # them, so they are carried forward rather than looked up per event.
         state: dict[str, Any] = {"cwd": None, "branch": None, "model": None, "session_id": None}
 
-        for line in iter_lines(context.local_path):
+        for line in iter_lines(path if path is not None else context.local_path):
             if not line.ok:
                 yield unparsed(
                     context.provenance(line.locator),

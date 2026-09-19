@@ -124,6 +124,10 @@ UNINTERPRETED: dict[str, str] = {
     "so a line of it is not the text that was typed",
     "chatgpt_desktop.macos_codex_home": "a profile directory this artifact will not narrow "
     "to an extension",
+    "codex.rollouts_compressed": "a transcript compressed in place after seven days, which "
+    "this query cannot expand on the endpoint. Everything older than a week is in these "
+    "files, so collect them and ingest them: the analyzer reads them line by line exactly "
+    "as it reads an uncompressed one",
     "cline.cli_sessions": "a session directory of whole JSON documents. The hook log that "
     "dates this agent's prompts is a separate artifact and does come back record by record",
     "cline.data_tasks": "a task directory of whole JSON documents",

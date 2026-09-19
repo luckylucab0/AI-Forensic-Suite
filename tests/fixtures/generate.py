@@ -1624,6 +1624,19 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         codex_rollout(SESSION_A, str(project)),
         RECENT,
     )
+    # The same agent's older conversation, in the form its own housekeeping leaves behind
+    # after seven days. It is here because a reader that takes only the plain files shows
+    # the last week of a machine that has a year on it and says nothing is missing.
+    write(
+        codex
+        / "sessions"
+        / "2026"
+        / "07"
+        / "02"
+        / f"rollout-2026-07-02T09-00-00-{SESSION_B}.jsonl.zst",
+        zstd.compress(codex_rollout(SESSION_B, str(project)).encode("utf-8")),
+        OLD,
+    )
     write(
         codex / "history.jsonl",
         jsonl([{"session_id": SESSION_A, "ts": 1788912000, "text": "check the lockfile"}]),

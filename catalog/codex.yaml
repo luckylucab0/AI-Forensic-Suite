@@ -128,7 +128,7 @@ artifacts:
     The single most likely way to miss almost everything. A collection or a viewer that globs rollout-*.jsonl finds the last seven days and silently reports nothing older, on a host where a year of conversations is sitting right next to it under a different extension. Constants: COMPRESSED_SUFFIX = ".zst", TEMP_SUFFIX = ".tmp".
 
     Glob correction from the source verification pass: an interrupted compression leaves either a tempfile named with the prefix rollout-compress- and the suffix .tmp, or a file named <name>.jsonl.<operation>.<pid>.<counter>.tmp. Neither ends in .jsonl.tmp, which is what this entry globbed for, so a partially compressed transcript was unreachable.
-  parser: null
+  parser: codex
 - id: codex.archived_sessions
   category: transcript
   root: user_profile

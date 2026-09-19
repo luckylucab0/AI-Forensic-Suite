@@ -33,6 +33,7 @@
 #   - cline.cli_sessions: a session directory of whole JSON documents. The hook log that dates this agent's prompts is a separate artifact and does come back record by record
 #   - cline.data_tasks: a task directory of whole JSON documents
 #   - cline.vscode_task_transcripts: a task directory of whole JSON documents
+#   - codex.rollouts_compressed: a transcript compressed in place after seven days, which this query cannot expand on the endpoint. Everything older than a week is in these files, so collect them and ingest them: the analyzer reads them line by line exactly as it reads an uncompressed one
 #   - gemini_cli.chats: a chats directory this artifact will not narrow to an extension
 #   - hermes.sessions_dir: a sessions directory this artifact will not narrow to an extension
 #   - junie.cli_sessions: read in part: its own event log comes back record by record and the subagent transcripts beside it sit in a subtree this artifact will not narrow to an extension
@@ -91,7 +92,7 @@ description: |
       read rather than as an agent that left nothing behind.
 
     - Some of what the suite's own analyzer reads is not read here, or is read
-      only in part: 16 artifacts, named in the notes below. Where
+      only in part: 17 artifacts, named in the notes below. Where
       one of them is not read, a row says the file was there, with its hash and its
       timestamps, and nothing about the conversation in it. Collect those files
       with the Collect artifact and ingest them.
