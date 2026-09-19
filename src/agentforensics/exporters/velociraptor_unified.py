@@ -132,7 +132,13 @@ UNINTERPRETED: dict[str, str] = {
     "dates this agent's prompts is a separate artifact and does come back record by record",
     "cline.data_tasks": "a task directory of whole JSON documents",
     "cline.vscode_task_transcripts": "a task directory of whole JSON documents",
+    "claude_code.tool_result_spills": "the bulk output of one tool call in one file, which "
+    "is prose rather than records: a line of it is a fragment of what the agent saw",
+    "cursor.subagent_output": "what a background subagent wrote for its parent, in a format "
+    "the vendor documents nothing about, so a line of it is a fragment of a report",
     "gemini_cli.chats": "a chats directory this artifact will not narrow to an extension",
+    "jetbrains_ai.aia_task_history": "a session file of prose rather than records, so a "
+    "line of it is a fragment of a conversation",
     "hermes.sessions_dir": "a sessions directory this artifact will not narrow to an extension",
     "junie.cli_sessions": "read in part: its own event log comes back record by record and "
     "the subagent transcripts beside it sit in a subtree this artifact will not narrow to "

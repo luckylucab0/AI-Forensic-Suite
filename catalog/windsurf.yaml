@@ -156,7 +156,7 @@ artifacts:
   volatility: Persistent markdown files the vendor describes as kept across the session, so they survive the conversation they belong to.
   notes: |-
     Added by the vendor verification pass. A record of what the agent intended to do, written separately from the conversation, which makes it readable on its own and useful when the conversation record has been pruned or is an opaque blob. The vendor describes a mode in which the agent researches with read-only commands, keeps a persistent plan file, and asks for approval before implementing, so a plan with no corresponding edits is the expected shape of a refused or abandoned run rather than an anomaly.
-  parser: null
+  parser: prose_document
 - id: windsurf.acp_registry
   title: Local agent registry
   category: config

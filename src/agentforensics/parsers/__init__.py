@@ -42,6 +42,7 @@ from agentforensics.parsers.opencode import OpencodeParser
 from agentforensics.parsers.pi import PiParser
 from agentforensics.parsers.plist_generic import PlistGenericParser
 from agentforensics.parsers.prompt_history import PromptHistoryParser
+from agentforensics.parsers.prose_document import ProseDocumentParser
 from agentforensics.parsers.shell_history import ShellHistoryParser
 from agentforensics.parsers.sqlite_generic import SqliteGenericParser
 from agentforensics.parsers.text_log import TextLogParser
@@ -87,6 +88,10 @@ PARSERS: tuple[Parser, ...] = (
     # module because it is a format question and not an agent question: three agents,
     # three libraries, three file formats.
     PromptHistoryParser(),
+    # The transcripts that are prose rather than records: a chat export, a spilled tool
+    # result, the output of a background subagent, a written plan. Read whole, because
+    # half a prompt reads in a report as what somebody asked.
+    ProseDocumentParser(),
     # The shell's own record of what was typed, which is where the flag that switched
     # the approvals off is written down. Four files, four formats, and until this parser
     # all four were collected and none was read.

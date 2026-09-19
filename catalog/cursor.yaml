@@ -573,7 +573,7 @@ artifacts:
     The vendor states that background subagents write their output here and that the parent agent reads these files to check progress. That makes this the record of what a delegated agent actually did, and the main transcript may hold nothing but the parent's summary of it, so an analyst who only reads the conversation sees a second agent's work described rather than recorded.
 
     The file format is not documented, so nothing parses it yet. The files are collected whole and reach the case as read but uninterpreted, which is the state an analyst can act on: it says a record exists and that this tool has not mapped it, rather than saying nothing was there.
-  parser: null
+  parser: prose_document
 - id: cursor.plugins
   category: config
   root: user_profile

@@ -370,7 +370,7 @@ artifacts:
     Contains the bulk content of big command outputs, fetched web pages and large file reads - i.e. exactly the material an analyst wants when asking 'what did the agent actually see'.
 
     Record structure: Large tool outputs spilled out of the transcript into separate files; the transcript line references them instead of inlining the content. Exact file naming is NOT documented publicly (an unverified observation in this environment shows files named after the tool-use id with a .txt extension, e.g. toolu_<id>.txt - treat as needing verification on a test system). Ingest must join these back to the referencing transcript entry or tool output will be silently truncated in the reconstructed conversation.
-  parser: null
+  parser: prose_document
 - id: claude_code.transcripts
   category: transcript
   root: user_profile

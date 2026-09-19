@@ -590,7 +590,7 @@ artifacts:
     Static once written. A user-initiated export, so it survives deletion of the conversation from the history database and is a common way a transcript escapes to a shared drive, a ticket or a chat message.
   notes: |-
     The vendor states that on export 'By default, Amazon Q names the file q-dev-chat-{{yyyy}}-{{mm}}-{{dd}}.{{md|html}} and saves it in the root of your project.' Two reasons to look for these. They are frequently the only surviving copy of a conversation the user later deleted from the IDE history. And because the default location is the project root, they get committed to repositories by accident, so the same file may also exist in git history and on any remote. The date in the file name is the export date, not the conversation date, so do not use it as a conversation timestamp. The user can choose another location, so also search outside the project.
-  parser: null
+  parser: prose_document
 - id: amazonq.ide_extension_install
   title: Amazon Q Developer IDE extension install evidence
   category: install_evidence

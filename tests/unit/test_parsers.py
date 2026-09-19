@@ -1473,6 +1473,7 @@ def test_only_the_generic_readers_say_a_record_is_uninterpreted() -> None:
     # design.
     assert writers == [
         "jsonl_generic.py",
+        "prose_document.py",
         "sqlite_generic.py",
         "structured_generic.py",
         "text_log.py",
