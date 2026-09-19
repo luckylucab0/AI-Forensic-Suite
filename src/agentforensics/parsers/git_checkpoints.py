@@ -46,7 +46,7 @@ from collections.abc import Iterator
 from typing import Any
 
 from agentforensics.model import Event, unparsed
-from agentforensics.parsers import git_objects
+from agentforensics.parsers import git_index, git_objects
 from agentforensics.parsers.base import ParseContext, looks_binary, normalise_ts, text_lines
 from agentforensics.parsers.instructions import BINARY_FILE, MAX_TEXT
 
@@ -57,6 +57,7 @@ STORES = frozenset(
     {
         "amazonq.cli_checkpoints",
         "cline.checkpoint_refs_in_workspace",
+        "cline.checkpoint_scratch",
         "cline.checkpoints_shadow_git_legacy",
         "roo_code.checkpoints",
     }
@@ -109,6 +110,12 @@ NOT_AN_OBJECT = (
 # What a repository holds besides its references and its objects. Named rather than read,
 # because an agent's own repository carries the same bookkeeping as any other and none of
 # it is the evidence this artifact is collected for.
+INDEX_STOPPED = (
+    "this listing holds more than {limit} paths and the reading stopped there. What is "
+    "missing is the rest of this file, not the rest of the evidence: the whole of it is in "
+    "the bundle, at the path in this event's provenance"
+)
+
 BOOKKEEPING = (
     "this is a git repository's own bookkeeping rather than a checkpoint. It is recorded "
     "so the case says the repository was there and what shape it was in"
@@ -186,10 +193,99 @@ class GitCheckpointsParser:
         if "/objects/" in name:
             yield from self._object(context, name)
             return
+        if context.local_path.name == "index":
+            yield from self._index(context)
+            return
+        if context.local_path.name == "pathspec":
+            yield from self._pathspec(context)
+            return
         if "/refs/" in name:
             yield from self._ref(context)
             return
         yield from self._bookkeeping(context, name)
+
+    # ------------------------------------------------------------- the listing
+
+    def _index(self, context: ParseContext) -> Iterator[Event]:
+        """The working copy as git last saw it: one path, with its size, mode and clock.
+
+        The agent that writes one of these beside a checkpoint keeps it out of the system
+        temporary directory on purpose, and its own source says why: this file and the path
+        list beside it enumerate workspace paths. So it is a listing of somebody's working
+        copy at the moment of a checkpoint, untracked files included, and no other artifact
+        in this catalogue is that.
+        """
+        try:
+            raw = context.local_path.read_bytes()
+        except OSError as error:
+            yield unparsed(
+                context.provenance("file"),
+                context.agent,
+                None,
+                f"this file could not be read: {error}",
+                user=context.user,
+                host=context.host,
+            )
+            return
+        if not git_index.looks_like_index(raw):
+            yield from self._bookkeeping(context, context.original_path)
+            return
+        seen = 0
+        try:
+            for entry in git_index.read(raw):
+                seen += 1
+                when, precision, timing = normalise_ts(entry.mtime)
+                yield self._event(
+                    context,
+                    f"path:{entry.path}",
+                    {
+                        "path": entry.path,
+                        "mode": f"{entry.mode:06o}",
+                        "executable": entry.executable,
+                        "size": entry.size,
+                        "object_id": entry.object_id,
+                    },
+                    when=when,
+                    precision=precision,
+                    # git's own stat cache, which is the filesystem's time for the file
+                    # rather than a time the agent wrote down.
+                    source="the modification time in git's stat cache",
+                    note=timing,
+                    text=entry.path,
+                )
+        except git_index.GitIndexError as error:
+            yield self._file_note(
+                context,
+                f"this index stopped reading after {seen} entry(ies): {error}. What came "
+                "out before it is in the case",
+            )
+            return
+        if seen >= git_index.MAX_ENTRIES:
+            yield self._file_note(context, INDEX_STOPPED.format(limit=git_index.MAX_ENTRIES))
+
+    def _pathspec(self, context: ParseContext) -> Iterator[Event]:
+        """The path list beside the index, one workspace path per line."""
+        for line in text_lines(context.local_path):
+            text = line.text.strip()
+            if not text:
+                continue
+            yield self._event(
+                context,
+                line.locator,
+                {"path": text},
+                note=line.problem,
+                text=text,
+            )
+
+    def _file_note(self, context: ParseContext, reason: str) -> Event:
+        return unparsed(
+            context.provenance("file"),
+            context.agent,
+            {"file": context.local_path.name, "bytes": _size(context)},
+            reason,
+            user=context.user,
+            host=context.host,
+        )
 
     # -------------------------------------------------------------- bookkeeping
 

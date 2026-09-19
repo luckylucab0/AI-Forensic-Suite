@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 34 Module lesen 375 der 473
+  zählt diese Dateien und sagt, welche es sind. 34 Module lesen 376 der 473
   Katalogartefakte, und was der Rest ist, wird behauptet und nicht angenommen: jeder Eintrag
   in einem Format, das diese Suite liest, wird entweder gelesen oder trägt einen
   aufgeschriebenen Grund, warum nicht, und die Anmeldedatenspeicher sind als Klasse
@@ -244,6 +244,12 @@ ist, dass das nicht *unbemerkt* geht.
   normalerweise nie aufgeräumt, also ist ein Pack darin selbst einen Blick wert. Ein Hook,
   der keine von gits abgeschalteten Vorlagen ist, wird als Instruktion abgelegt und nicht
   als Konfiguration, denn er ist ein Skript, das der Endpunkt von sich aus ausführt.
+  Derselbe Leser nimmt den git-Index, den ein Agent neben jeden Checkpoint legt, in einem
+  Kratzverzeichnis, das er absichtlich aus dem System-Temporärverzeichnis heraushält: seine
+  eigene Quelle sagt als Grund, dass der Index und die Pfadliste daneben Arbeitsbereichs-
+  pfade aufzählen. Diese Datei ist also eine Auflistung der Arbeitskopie im Moment eines
+  Checkpoints, unverfolgte Dateien eingeschlossen, mit Grösse, Modus und der Uhr des
+  Dateisystems auf jeder Zeile, und nichts anderes in diesem Katalog ist das.
 
   **Die Instruktionsfläche** hat ihr eigenes formatförmiges Modul für die Artefakte, die
   Skills, Commands, Output Styles, Rules, Steering-Dateien, Subagent-Definitionen und

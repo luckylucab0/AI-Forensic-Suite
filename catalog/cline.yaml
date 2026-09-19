@@ -315,7 +315,7 @@ artifacts:
     HIGH-VALUE, SHORT-LIVED. checkpointScratchDir(cwd, sessionId) = join(resolveClineDataDir(), "checkpoint-scratch", sha256(`${cwd}\0${sessionId}`).hex.slice(0,32)). The source comment says it deliberately avoids the OS tmpdir because 'the index and pathspec files enumerate workspace paths' - i.e. these two files are a FILE LISTING of the victim workspace, including untracked files, at checkpoint time, and the index carries git's stat cache (size + mtime + mode per path). Directory mtime is refreshed every turn, so mtime is a per-session last-activity timestamp. The 32-hex key is sha256(cwd + NUL + sessionId) so it can be recomputed to attribute a scratch dir to a known workspace + session id.
 
     Record structure: `index` is a standard git index file (GIT_INDEX_FILE); parse with any git index reader. `pathspec` is a plain path list.
-  parser: null
+  parser: git_checkpoints
 - id: cline.checkpoints_shadow_git_legacy
   category: file_snapshot
   root: user_profile

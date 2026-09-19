@@ -217,7 +217,13 @@ it cannot be rewritten *quietly*.
   its two delta encodings and this suite will not guess at them; these repositories are
   normally never garbage collected, so a pack in one is itself worth a look. A hook that is
   not one of git's disabled templates is filed as an instruction rather than as
-  configuration, because it is a script the endpoint runs on its own.
+  configuration, because it is a script the endpoint runs on its own. The same reader takes
+  the git index one agent keeps beside each checkpoint, in a scratch directory it holds out
+  of the system temporary directory on purpose: its own source says the reason is that the
+  index and the path list beside it enumerate workspace paths. So that file is a listing of
+  somebody's working copy at the moment of a checkpoint, untracked files included, with a
+  size, a mode and the filesystem's own clock on every line, and nothing else in this
+  catalogue is that.
 
   **The instruction surface** has its own format-shaped module for the artifacts that hold
   skills, commands, output styles, rules, steering files, subagent definitions and hook

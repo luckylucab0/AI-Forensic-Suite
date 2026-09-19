@@ -273,27 +273,49 @@ def test_which_repositories_carry_their_objects_is_the_catalogues_answer() -> No
         text = _re.sub(r"/\*+$", "", text)
         return "/home/alice" + text[1:] if text.startswith("~") else text
 
-    def object_in(pattern: str) -> str:
-        """Where a loose object would sit in the repository this pattern is part of.
+    def repository_root(pattern: str) -> str | None:
+        """The repository this pattern is part of, or nothing when it is not part of one.
 
-        At the repository's root, which is the `.git` directory where there is one and the
-        claimed directory itself where the repository is bare. Appending to the leaf a
-        pattern happens to name would ask about a path no repository has, which is how the
-        first version of this test answered yes for an entry that collects references only.
+        A pattern naming a file inside a repository gives the root away through its .git
+        component. A pattern with no such component is only a repository root when it
+        claims a directory, which is how a bare one is catalogued. Anything else names a
+        file that is not in a repository at all, and appending to it asks about a path
+        nothing has: that is twice now that this test answered yes to an entry by building
+        a candidate out of a leaf, so the construction is the thing to get right here.
         """
         text = concrete(pattern)
         parts = text.split("/")
         if ".git" in parts:
-            text = "/".join(parts[: parts.index(".git") + 1])
-        return f"{text}/objects/ab/{'c' * 38}"
+            return "/".join(parts[: parts.index(".git") + 1])
+        stripped = pattern.rstrip()
+        if stripped.endswith(("/", "\\")) or stripped.endswith(("*", "**")):
+            return text
+        return None
+
+    # Where a loose object and a reference sit, relative to a repository's root.
+    LOOSE_OBJECT = f"objects/ab/{'c' * 38}"
+    REFERENCE = "refs/heads/main"
+
+    def claims(artifact_id: str, tail: str) -> bool:
+        for pattern in catalogue.artifact(artifact_id).paths:
+            root = repository_root(pattern)
+            if root is None:
+                continue
+            if any(match.artifact.id == artifact_id for match in matcher.matches(f"{root}/{tail}")):
+                return True
+        return False
 
     carries = set()
     for artifact_id in STORES:
-        for pattern in catalogue.artifact(artifact_id).paths:
-            candidate = object_in(pattern)
-            if any(match.artifact.id == artifact_id for match in matcher.matches(candidate)):
-                carries.add(artifact_id)
-                break
+        # Not every entry this reader claims is a repository. One of them is a scratch
+        # directory holding a listing and a path list, with no references and no objects in
+        # it at all, and asking whether its object store travelled is a question about a
+        # thing it does not have. Decided from the catalogue rather than from a third list
+        # in the module, so a new entry answers for itself.
+        if not claims(artifact_id, REFERENCE) and not claims(artifact_id, LOOSE_OBJECT):
+            continue
+        if claims(artifact_id, LOOSE_OBJECT):
+            carries.add(artifact_id)
 
     assert carries == set(OWN_REPOSITORY), {
         "collects its objects and the module does not say so": sorted(carries - OWN_REPOSITORY),

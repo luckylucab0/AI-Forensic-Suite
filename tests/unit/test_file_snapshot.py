@@ -141,8 +141,6 @@ NOT_CLAIMED = {
     "claude_desktop.user_output_folder": "what the agent produced for the user, which is "
     "its output rather than a copy of something it replaced",
     "claude_desktop.ssh_remote_artifacts": "what the agent left on another host",
-    "cline.checkpoint_scratch": "an index and a pathspec, which are a listing of the "
-    "workspace rather than the contents of a file",
     "cline.chat_workspace": "a working directory of arbitrary files",
     "cursor.worktrees": "a whole working copy, not a copy of one file",
     "hermes.sandboxes": "a sandbox tree of arbitrary files",
