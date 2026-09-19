@@ -50,6 +50,7 @@ vendor_sources:
 - https://docs.npmjs.com/
 - https://docs.brew.sh/
 - https://agents.md/
+- https://cursor.com/
 description: |-
   Evidence that belongs to no single agent: shell history showing how an agent was invoked and with which flags, package manager traces proving it was installed, and the instruction-file conventions that several agents read, which are the surface through which injected instructions reach an agent.
 references:
@@ -476,21 +477,37 @@ artifacts:
   - windows
   paths:
   - <project>/**/.cursor/rules/
-  - <project>/AGENTS.md
+  - <project>/**/AGENTS.md
   - <project>/.cursor/rules/
+  - <project>/.cursor/rules/**/*.md
+  - <project>/.cursor/rules/**/*.mdc
+  - <project>/.cursor/rules/*.md
   - <project>/.cursor/rules/*.mdc
   - <project>/.cursor/rules/*/RULE.md
   - <project>/.cursorrules
+  - <project>/AGENTS.md
   format: markdown
   sensitivity: normal
   collect_priority: normal
-  status: unverified
-  source: https://raw.githubusercontent.com/sanjeed5/awesome-cursor-rules-mdc/main/cursor-rules-reference.md
-  source_kind: community
+  status: verified
+  source: https://cursor.com/docs/context/rules
+  source_kind: official
+  unsourced_paths:
+  - <project>/**/.cursor/rules/
+  - <project>/.cursor/rules/*/RULE.md
+  - <project>/.cursorrules
   notes: |-
-    MARKED UNVERIFIED DELIBERATELY: docs.cursor.com is egress-blocked from this environment, so I could not reach the vendor documentation and my only source is a community reference repo - recollection-adjacent, needs verification against docs.cursor.com. The RULE.md-vs-.mdc question in particular is unresolved and is the kind of layout change that is itself forensically interesting (it dates the install). What IS well corroborated across several independent sources: Cursor now also reads AGENTS.md from the project root and any subdirectory with more specific paths taking precedence. Note the alwaysApply and glob-triggered rule types mean a rule can enter the model's context with no user action at all - an injection vector.
+    The vendor page was unreachable when this entry was written and is reachable now, so the entry rests on it rather than on the community reference it used to cite, and that reference turned out to be wrong about the one thing this entry could not check.
 
-    Record structure: COLLECT BOTH SPELLINGS AND DO NOT ASSUME WHICH IS CURRENT. Legacy: a single .cursorrules file at the repo root (deprecated around Cursor 0.43 but still read). Then .cursor/rules/ with per-rule .mdc files carrying YAML frontmatter fields description, globs and alwaysApply. The community reference I fetched states the CURRENT shape is a folder per rule containing a RULE.md, with .mdc described as "legacy format with metadata" that is "functional but superseded". Rule application types: Always Apply, Apply Intelligently (agent decides from `description`), Apply to Specific Files (glob match), Apply Manually (@-mention). Stated precedence: Team Rules -> Project Rules -> User Rules. Nested .cursor/rules directories apply to their subtree. User and Team rules live in Cursor Settings / the Cursor dashboard, i.e. partly off-disk.
+    What the vendor states: project rules live in .cursor/rules as .mdc files, each rule file may be named anything, and the rules may be organised in folders below .cursor/rules. A plain .md file in that directory "is ignored by the rules system because it has no frontmatter to specify description, globs, and alwaysApply", with the vendor's own example listing api-guidelines.md as "Ignored (wrong extension)". AGENTS.md is the plain-markdown alternative and is read in the project root and in any subdirectory, where the nested files combine with their parents and the more specific one wins. Precedence across the four rule types is Team Rules, then Project Rules, then User Rules.
+
+    THE COMMUNITY SOURCE WAS WRONG, AND IT WAS WRONG IN THE DIRECTION THAT LOSES EVIDENCE: it described a folder per rule holding a RULE.md as the current shape and .mdc as superseded. The vendor says the opposite. Both spellings stay in the paths, because collecting a file that turns out not to be read costs nothing and missing one costs the case, but the meaning is now the other way round: a RULE.md or any other .md below .cursor/rules is an instruction that did NOT reach the model, which is a different finding from one that did, and worth saying out loud in a report rather than quietly treating it as a rule.
+
+    .cursorrules is not mentioned anywhere on the current page, not even as deprecated, so it is kept as an unsourced path: older builds read it, the file survives a Cursor upgrade, and Cline reads it too (see crosscutting.instructions_clinerules), so its presence dates an install rather than proving a rule was active.
+
+    Nested .cursor/rules directories in project subdirectories are also unsourced. The vendor documents folders INSIDE .cursor/rules and nested AGENTS.md files in subdirectories, and says nothing about a second .cursor/rules further down the tree.
+
+    Two ways a rule reaches a model with no user action, both injection surfaces: alwaysApply and the glob-triggered type put a file in the context of a session nobody opened it in, and a plugin installed from a marketplace repository (one carrying .cursor-plugin/marketplace.json) brings its rules with it, so a rule can be present in Customize without being present in the repository at all. User Rules and Team Rules are edited in Customize and in the team dashboard, so they are partly off-disk and the local stores under ~/.cursor are the only place to look for them.
   parser: instructions
 - id: crosscutting.instructions_gemini_md
   category: project_instructions

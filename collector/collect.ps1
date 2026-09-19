@@ -4284,15 +4284,19 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "<project>/**/.cursor/rules/",
-                        "<project>/AGENTS.md",
+                        "<project>/**/AGENTS.md",
                         "<project>/.cursor/rules/",
+                        "<project>/.cursor/rules/**/*.md",
+                        "<project>/.cursor/rules/**/*.mdc",
+                        "<project>/.cursor/rules/*.md",
                         "<project>/.cursor/rules/*.mdc",
                         "<project>/.cursor/rules/*/RULE.md",
-                        "<project>/.cursorrules"
+                        "<project>/.cursorrules",
+                        "<project>/AGENTS.md"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "project_instructions",
@@ -8783,7 +8787,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "f1acc43690449c8ffad68fbe7d682c8cd35b40ae97d4869eade63bc1ffa23113"
+    "sha256": "f744cd51f4c5582e6e9218e633d07d04350936992815d79a92b712a9479fa086"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json
