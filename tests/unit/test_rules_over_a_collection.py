@@ -55,6 +55,7 @@ EXPECTED = {
     "approves every tool",
     "AFX-PERMISSIONBYPASS-006": "~/.claude/settings.json starts sessions in acceptEdits",
     "AFX-PERMISSIONBYPASS-007": "~/.codex/config.toml disables the sandbox entirely",
+    "AFX-PERMISSIONBYPASS-008": "~/.codex/config.toml also lets the sandbox reach the network",
     "AFX-PROMPTINJECTION-002": "a rules file carries invisible characters",
     "AFX-PROMPTINJECTION-003": "a project instruction file arrived with the work",
     "AFX-PROMPTINJECTION-004": "a memory holds a standing permission the user is never asked "

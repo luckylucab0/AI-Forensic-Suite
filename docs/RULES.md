@@ -36,6 +36,7 @@ Findings are written into the case database next to the events they rest on, and
 |  | [AFX-PERMISSIONBYPASS-005](#afx-permissionbypass-005) | high |
 |  | [AFX-PERMISSIONBYPASS-006](#afx-permissionbypass-006) | medium |
 |  | [AFX-PERMISSIONBYPASS-007](#afx-permissionbypass-007) | high |
+|  | [AFX-PERMISSIONBYPASS-008](#afx-permissionbypass-008) | medium |
 | [`prompt_injection`](#prompt-injection) | [AFX-PROMPTINJECTION-001](#afx-promptinjection-001) | high |
 |  | [AFX-PROMPTINJECTION-002](#afx-promptinjection-002) | high |
 |  | [AFX-PROMPTINJECTION-003](#afx-promptinjection-003) | medium |
@@ -647,6 +648,36 @@ A configuration disables the sandbox the agent otherwise runs its commands in. C
 - <https://developers.openai.com/codex/config-advanced>
 
 *Samples in the rule file:* 2 / 2 (+/-)
+
+#### AFX-PERMISSIONBYPASS-008
+
+**The sandbox the agent runs commands in was allowed to reach the network**
+
+| | |
+| --- | --- |
+| Severity | medium |
+| Pack | `permission_bypass` |
+| Agents | `any` |
+| Event kinds | `config.snapshot` |
+| Fields read | `raw.sandbox_workspace_write.network_access`, `payload.sandbox_workspace_write.network_access`, `event_text` |
+| Tags | `T1562.001`, `permission-bypass`, `egress` |
+
+A configuration turns on outbound network access for the sandbox the agent's commands run in. Codex spells this network_access under its workspace-write sandbox table, and its own documentation carries the setting with the comment that it is an opt in.
+
+*What it matches:* `(raw.sandbox_workspace_write.network_access is 'true' or payload.sandbox_workspace_write.network_access is 'true' or event_text matches /(?mi)^[^\S\n]*network_access[^\S\n]*=[^\S\n]*true[^\S\n]*$/)`
+
+*Why an analyst cares:* The rule before this one finds the sandbox switched off entirely. This is the narrower change that is far more common and much easier to miss: the sandbox stays on, the filesystem limits still apply, and the one thing that was off by default is now on. It matters for the question this suite exists to answer about data leaving a device. With the sandbox's network off, a command the agent ran could not reach anything, whatever the command says, so a curl in a transcript is an attempt rather than a transfer. With it on, the same line has to be read as a transfer. Nothing in the transcript distinguishes the two cases, and no other artifact records it.
+
+*Known false positives:*
+
+- Ordinary development, where an agent has to install dependencies or call an API to do what it was asked. This is a documented setting people turn on for good reasons, and the finding is context for reading the commands rather than a mistake on its own.
+- A configuration recording a past run rather than setting a future one. The finding names the file, which is what tells the two apart.
+
+*References:*
+
+- <https://developers.openai.com/codex/config-advanced>
+
+*Samples in the rule file:* 1 / 2 (+/-)
 
 ## prompt injection
 

@@ -1,0 +1,75 @@
+id: AFX-PERMISSIONBYPASS-008
+pack: permission_bypass
+title: The sandbox the agent runs commands in was allowed to reach the network
+severity: medium
+description: >
+  A configuration turns on outbound network access for the sandbox the agent's commands run
+  in. Codex spells this network_access under its workspace-write sandbox table, and its own
+  documentation carries the setting with the comment that it is an opt in.
+rationale: >
+  The rule before this one finds the sandbox switched off entirely. This is the narrower
+  change that is far more common and much easier to miss: the sandbox stays on, the
+  filesystem limits still apply, and the one thing that was off by default is now on.
+
+  It matters for the question this suite exists to answer about data leaving a device. With
+  the sandbox's network off, a command the agent ran could not reach anything, whatever the
+  command says, so a curl in a transcript is an attempt rather than a transfer. With it on,
+  the same line has to be read as a transfer. Nothing in the transcript distinguishes the
+  two cases, and no other artifact records it.
+applies_to:
+  kinds: [config.snapshot]
+match:
+  any:
+    # The operators compare text, and a boolean renders as the JSON word, so the value
+    # here is written the way the comparison sees it rather than the way the file has it.
+    - field: raw.sandbox_workspace_write.network_access
+      equals: "true"
+    - field: payload.sandbox_workspace_write.network_access
+      equals: "true"
+    # The same setting in a document the text views render one leaf per line, where a
+    # boolean arrives as the word. Kept on its own line, because \s would cross into the
+    # next field and match the setting's absence followed by whatever came after it.
+    - field: event_text
+      regex: '(?mi)^[^\S\n]*network_access[^\S\n]*=[^\S\n]*true[^\S\n]*$'
+tags:
+  - T1562.001
+  - permission-bypass
+  - egress
+false_positives:
+  - >-
+    Ordinary development, where an agent has to install dependencies or call an API to do
+    what it was asked. This is a documented setting people turn on for good reasons, and
+    the finding is context for reading the commands rather than a mistake on its own.
+  - >-
+    A configuration recording a past run rather than setting a future one. The finding
+    names the file, which is what tells the two apart.
+references:
+  - https://developers.openai.com/codex/config-advanced
+tests:
+  - name: outbound access turned on for the sandbox
+    match: true
+    event:
+      kind: config.snapshot
+      agent: codex
+      raw:
+        sandbox_mode: workspace-write
+        sandbox_workspace_write:
+          network_access: true
+  - name: the documented default
+    match: false
+    event:
+      kind: config.snapshot
+      agent: codex
+      raw:
+        sandbox_mode: workspace-write
+        sandbox_workspace_write:
+          network_access: false
+          writable_roots: ["/home/alice/src/app"]
+  - name: a setting of another name that happens to be true
+    match: false
+    event:
+      kind: config.snapshot
+      agent: codex
+      raw:
+        sandbox_workspace_write:
+          exclude_slash_tmp: true
