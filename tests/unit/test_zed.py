@@ -86,7 +86,9 @@ def store(
                 data_type,
                 data,
                 None,
-                json.dumps([FOLDER]),
+                # The vendor's own serialisation: the paths joined with a newline in
+                # lexicographic order, and the index each had before that sort.
+                FOLDER,
                 "0",
                 created,
             ),
@@ -196,16 +198,35 @@ def test_a_row_from_before_the_created_at_migration_says_which_time_it_used(
     assert "not when it started" in (start.parse_problem or "")
 
 
-def test_the_folder_paths_column_is_read_both_ways(tmp_path: Path) -> None:
-    """The vendor writes it from a path list whose serialisation this parser has not read,
-    so JSON and a separated list are both tried and neither is claimed."""
+def test_the_folder_paths_are_read_the_way_the_vendor_writes_them() -> None:
+    """Two columns: the paths joined with a newline, sorted, and their order before sorting.
+
+    The parser used to split this column on commas as well, which is not a separator the
+    vendor writes. A working copy whose directory name holds a comma came out as two paths
+    and the first of them became the thread's project path, which is a truncated path
+    presented as an answer.
+    """
     from agentforensics.parsers.zed import _folders
 
-    assert _folders(json.dumps(["/a", "/b"])) == ["/a", "/b"]
     assert _folders("/a\n/b") == ["/a", "/b"]
-    assert _folders("/a,/b") == ["/a", "/b"]
+    assert _folders("/a\n/b", "1,0") == ["/b", "/a"], "the order the person opened them in"
+    assert _folders("/home/alice/one, two") == ["/home/alice/one, two"], "one path, not two"
     assert _folders("") == []
     assert _folders(None) == []
+
+
+def test_an_order_that_does_not_describe_the_paths_is_discarded() -> None:
+    """What the vendor's own reader does, for the reason it does it.
+
+    An order of the wrong length cannot be applied to the paths. Zed falls back to the
+    lexicographic order the column is already in rather than guessing, and a reader that
+    guessed would reorder somebody's working copies in the case.
+    """
+    from agentforensics.parsers.zed import _folders
+
+    assert _folders("/a\n/b", "0") == ["/a", "/b"]
+    assert _folders("/a\n/b", "3,4") == ["/a", "/b"]
+    assert _folders("/a\n/b", "not an order") == ["/a", "/b"]
 
 
 # ------------------------------------------------------------------- the turns

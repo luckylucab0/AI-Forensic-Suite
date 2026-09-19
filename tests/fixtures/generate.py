@@ -816,7 +816,12 @@ def write_zed_store(path: Path, folder: str, mtime: int = RECENT) -> Path:
                 "zstd",
                 zstd.compress(zed_thread().encode("utf-8")),
                 None,
-                json.dumps([folder]),
+                # The vendor's own serialisation of a path list: the paths joined with a
+                # newline in lexicographic order, and a comma separated list of the index
+                # each of them had before that sort. Not JSON, which is what this fixture
+                # held until somebody read
+                # https://raw.githubusercontent.com/zed-industries/zed/main/crates/util/src/path_list.rs
+                folder,
                 "0",
                 "2026-09-06T09:00:00Z",
             ),

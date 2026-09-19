@@ -112,14 +112,14 @@ def _threads(
 
 def _thread(context: ParseContext, locator: str, values: dict[str, Any]) -> Iterator[Event]:
     session_id = _text(values.get("id")) or None
-    folders = _folders(values.get("folder_paths"))
+    folders = _folders(values.get("folder_paths"), values.get("folder_paths_order"))
     common: dict[str, Any] = {
         "user": context.user,
         "host": context.host,
         "session_id": session_id,
-        # The first of the workspace folders, which the vendor sorts lexicographically. All
-        # of them are in the payload: a thread opened against two folders belongs to both,
-        # and the event model has one project_path.
+        # The first of the workspace folders in the order the person opened them, which the
+        # second column restores. All of them are in the payload: a thread opened against
+        # two folders belongs to both, and the event model has one project_path.
         "project_path": folders[0] if folders else None,
     }
 
@@ -434,26 +434,40 @@ def _document(value: Any) -> tuple[dict[str, Any] | None, str | None]:
     return parsed, None
 
 
-def _folders(value: Any) -> list[str]:
-    """The workspace folders, which the column holds as text.
+def _folders(value: Any, order: Any = None) -> list[str]:
+    """The workspace folders, in the order the person opened them.
 
-    Read as JSON where it is JSON and as a newline or comma separated list otherwise. The
-    vendor writes this column from a path list whose serialisation this parser has not read,
-    so both are tried and neither is claimed: a folder that comes out wrong is visible in
-    raw beside it.
+    Two columns, and reading only the first one gets the answer wrong twice. The vendor
+    serialises a path list as the paths joined with a newline, sorted lexicographically,
+    plus a comma separated list of the index each path had before that sort. Source, fetched
+    and read:
+    https://raw.githubusercontent.com/zed-industries/zed/main/crates/util/src/path_list.rs
+
+    So `folder_paths` alone is in an order nobody chose, and this parser used to also split
+    it on commas, which is not a separator the vendor writes: a working copy whose directory
+    name contains a comma came out as two paths, and the first of them became the thread's
+    project path. A truncated path on an event is worse than no path, because it looks like
+    an answer.
+
+    The vendor's own reader discards the order when it does not describe the paths, and so
+    does this one, for the same reason: an order of the wrong length cannot be applied and
+    guessing at it would reorder somebody's working copies.
     """
     if isinstance(value, list):
         return [str(item) for item in value if item]
     if not isinstance(value, str) or not value.strip():
         return []
-    try:
-        parsed = json.loads(value)
-    except json.JSONDecodeError:
-        parts = [part.strip() for part in value.replace(",", "\n").splitlines()]
-        return [part for part in parts if part]
-    if isinstance(parsed, list):
-        return [str(item) for item in parsed if item]
-    return [str(parsed)] if parsed else []
+    # split, not splitlines: the separator is the newline the vendor writes, and a path is
+    # allowed to hold anything else a filesystem allows.
+    paths = [part for part in value.split("\n") if part.strip()]
+    indices = [
+        int(part) for part in str(order or "").split(",") if part.strip().lstrip("-").isdigit()
+    ]
+    if sorted(indices) != list(range(len(paths))):
+        # Not an order over these paths. The vendor falls back to the lexicographic order it
+        # stored, which is the order they are already in.
+        return paths
+    return [path for _, path in sorted(zip(indices, paths, strict=True))]
 
 
 def _models(document: dict[str, Any] | None) -> list[dict[str, Any]] | None:
