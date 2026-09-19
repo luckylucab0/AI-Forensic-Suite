@@ -303,32 +303,85 @@ def test_a_query_that_matched_everything_reports_no_difference(script, profile) 
 # ----------------------------------------------- every source gets the same comparison
 
 
-def test_the_windows_failure_carries_the_reason_it_can_be_a_false_alarm(script, profile) -> None:
-    """One source has a known way of producing this result without the query being at fault.
+def test_a_note_travels_with_the_failure_it_explains(script, profile) -> None:
+    """A source with a known way of producing this result says so where it is read.
 
-    The Windows globs are Windows-shaped and this harness builds one POSIX-shaped profile,
-    so an artifact reachable only under a Windows application-data path would come back as
-    missing. Today the Windows query reaches every file the analyzer reads, measured against
-    a real engine, which is why it gets the same full comparison as the other two. The note
-    exists so that if that ever changes, the failure says where to look instead of sending
-    somebody to edit the exporter.
+    MISSING_NOTES is empty today. The entry it had said that a record reachable only under
+    a Windows application-data path was this harness's shape rather than a hole in the
+    query, because the sandbox held one POSIX-shaped profile; the sandbox now builds the
+    application-data tree as well, so that excuse is gone and the Windows source is
+    compared like the other two.
+
+    The mechanism is still tested, with a note written here, because the point of it is
+    that the reason reaches the person reading the failure rather than sitting in a comment
+    in a script they have no reason to open.
     """
+    note = " This source has a known way of producing this result."
     rows = rows_for(script, profile)
     problems: list[str] = []
 
-    script.differential(
-        rows[1:], profile / "home" / "alice", problems, script.MISSING_NOTES["windows"]
-    )
+    script.differential(rows[1:], profile / "home" / "alice", problems, note)
 
     assert problems
     assert "returned less than was on disk" in problems[0]
-    assert "Windows-shaped" in problems[0], "the reason has to travel with the failure"
+    assert note.strip() in problems[0], "the reason has to travel with the failure"
 
     plain: list[str] = []
     script.differential(rows[1:], profile / "home" / "alice", plain)
-    assert "Windows-shaped" not in plain[0], "and only on the source it applies to"
+    assert note.strip() not in plain[0], "and only on the source it applies to"
 
 
 def test_a_note_cannot_sit_on_a_source_that_does_not_exist(script) -> None:
     """A typo in the table would be a comment nobody reads rather than a note anybody sees."""
     assert set(script.MISSING_NOTES) <= set(script.PROFILE_PLACEMENTS)
+
+
+def test_a_windows_run_that_returned_nothing_from_the_application_data_says_so(
+    script, tmp_path
+) -> None:
+    """The Windows source's own requirement, checkable without an engine.
+
+    134 catalogue paths hang off the two application-data variables and the Windows globs
+    are written from them. If that translation broke, the query would go on returning the
+    profile's own files and silently stop returning everything under AppData: the schema
+    check passes, every required kind is still present, and only the row count falls.
+    Nobody watches a row count.
+    """
+    sandbox = tmp_path / "sandbox"
+
+    def row(path: str, kind: str = "user.prompt") -> dict:
+        return {
+            "kind": kind,
+            "agent": "claude_code",
+            "provenance": {
+                "original_path": f"{sandbox}/{path}",
+                "locator": "line:1",
+                "artifact_id": "claude_code.transcripts",
+            },
+        }
+
+    profile_only = [
+        row("C:/Users/alice/.claude/projects/p/s.jsonl"),
+        row("C:/Users/alice/.claude/projects/p/s.jsonl", "assistant.text"),
+        row("C:/Users/alice/.claude/projects/p/s.jsonl", "artifact.fs"),
+        row("C:/Users/alice/.claude/projects/p/s.jsonl", "unparsed.record"),
+    ]
+    problems: list[str] = []
+    script.check(profile_only, sandbox, problems, "windows")
+    assert [p for p in problems if "AppData/Roaming" in p]
+    assert [p for p in problems if "AppData/Local" in p]
+
+    # The same rows on a source the requirement does not apply to are not a problem.
+    elsewhere: list[str] = []
+    script.check(profile_only, sandbox, elsewhere, "linux")
+    assert not [p for p in elsewhere if "AppData" in p]
+
+    # And with the two roots reached, the requirement is satisfied.
+    complete = [
+        *profile_only,
+        row("C:/Users/alice/AppData/Roaming/Block/goose/config/config.yaml"),
+        row("C:/Users/alice/AppData/Local/Zed/threads/threads.db"),
+    ]
+    satisfied: list[str] = []
+    script.check(complete, sandbox, satisfied, "windows")
+    assert not [p for p in satisfied if "AppData" in p]

@@ -142,7 +142,7 @@ def sandbox_query(document: dict[str, Any], os_name: str, sandbox: Path) -> str:
 def build_sandbox(root: Path, os_name: str) -> None:
     """Fill the sandbox with a synthetic profile at every place the globs will look."""
     sys.path.insert(0, str(REPO / "tests" / "fixtures"))
-    from generate import build_home
+    from generate import build_home, build_windows_home
 
     first: Path | None = None
     for placement in PROFILE_PLACEMENTS[os_name]:
@@ -150,6 +150,14 @@ def build_sandbox(root: Path, os_name: str) -> None:
         home.parent.mkdir(parents=True, exist_ok=True)
         if first is None:
             build_home(home)
+            if os_name == "windows":
+                # The application-data tree as well, on top of the same profile. A Windows
+                # host has both: the CLI agents keep their data in the profile directory
+                # itself, and the editor and desktop products keep theirs under AppData. A
+                # profile with only the first half made the Windows source the one where a
+                # missing record could always be explained by the shape of the harness,
+                # which is a check that cannot fail.
+                build_windows_home(home)
             first = home
         else:
             # Copied rather than generated twice, so the two profiles are identical and a
@@ -187,7 +195,9 @@ def run(command: list[str]) -> subprocess.CompletedProcess[str]:
     return subprocess.run(command, capture_output=True, text=True, check=False)
 
 
-def check(rows: list[dict[str, Any]], sandbox: Path, problems: list[str]) -> None:
+def check(
+    rows: list[dict[str, Any]], sandbox: Path, problems: list[str], os_name: str = "linux"
+) -> None:
     """Everything the returned rows have to satisfy."""
     import fastjsonschema
 
@@ -226,6 +236,21 @@ def check(rows: list[dict[str, Any]], sandbox: Path, problems: list[str]) -> Non
         )
     if not all(row.get("agent") for row in rows):
         problems.append("a row came back with no agent, which the format does not allow")
+
+    if os_name == "windows":
+        # 134 catalogue paths hang off the two application-data variables, and the Windows
+        # source reaches them through globs the exporter writes from those variables. If
+        # that translation broke, the query would keep returning the profile's own files
+        # and stop returning everything under AppData, and every other check here would
+        # still pass. The count of rows would fall and nobody would be watching it.
+        for root in ("AppData/Roaming", "AppData/Local"):
+            if not any(
+                root in str(row.get("provenance", {}).get("original_path", "")) for row in rows
+            ):
+                problems.append(
+                    f"no row came back from under {root}, so the Windows globs are not "
+                    "reaching the application-data tree the sandbox put there"
+                )
 
     # Locators have to be per file and start at one. A shared counter across files is the
     # defect this whole script was written after finding.
@@ -347,17 +372,12 @@ def differential(
 
 
 # What a "missing from the query" result can mean on one source besides a real hole in a
-# collection. The Windows globs are Windows-shaped while build_home writes one POSIX-shaped
-# profile, so an artifact that only exists under AppData would come back missing here
-# without the query being at fault. Today every file the analyzer reads is reached by all
-# three sources, which is why the full comparison runs for all three; if that changes, the
-# note says where to look before anybody edits the exporter.
-MISSING_NOTES = {
-    "windows": " This source's globs are Windows-shaped and the synthetic profile is "
-    "POSIX-shaped, so a record only reachable under a Windows application-data path is "
-    "this harness's shape rather than a hole in the query. Check the paths above before "
-    "changing the exporter; the fix is a Windows-shaped profile in the fixture generator.",
-}
+# collection, keyed by source. Empty, and deliberately kept: the one entry it had said that
+# a record reachable only under a Windows application-data path was the harness's shape
+# rather than the query's fault, because the sandbox held one POSIX-shaped profile. The
+# sandbox now builds the application-data tree as well, so that excuse is gone and a
+# missing record on the Windows source means what it means on the other two.
+MISSING_NOTES: dict[str, str] = {}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -451,7 +471,7 @@ def main(argv: list[str] | None = None) -> int:
             except ValueError as exc:
                 problems.append(f"output line {number} is not valid JSON: {exc}")
 
-        check(rows, sandbox, problems)
+        check(rows, sandbox, problems, args.os_name)
 
         print(f"check-velociraptor-vql: {args.os_name}, {len(rows)} row(s) returned")
         # Per profile, because the sandbox holds one synthetic profile per place the globs
