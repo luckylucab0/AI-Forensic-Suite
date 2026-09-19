@@ -9,7 +9,7 @@ Der Viewer selbst bleibt unverändert. Er ist weiter die einzelne HTML-Datei, di
 Analystin auf einem USB-Stick mitnehmen und auf einem Rechner öffnen kann, auf dem nichts
 installiert werden darf, und er liest weiter ein Verzeichnis voller Transcripts oder ein
 einzelnes vereinheitlichtes Log ganz ohne Server. Von `afx serve` ausgeliefert bekommt er
-eine dritte Datenquelle und fünf zusätzliche Ansichten, und sonst verschiebt sich nichts.
+eine dritte Datenquelle und sechs zusätzliche Ansichten, und sonst verschiebt sich nichts.
 
 ## Der Weg dorthin
 
@@ -79,7 +79,7 @@ Die drei Ansichten des eigenständigen Viewers bleiben unverändert: **Sessions*
 Konversation, **Tools** listet jeden Tool-Aufruf über alle hinweg, und **Security** ist der
 eingebaute Regex-Scan nach Zugangsdaten im Transcript-Text.
 
-Ein ausgelieferter Fall ergänzt fünf weitere, und das sind Fragen an einen Fall, nicht an
+Ein ausgelieferter Fall ergänzt sechs weitere, und das sind Fragen an einen Fall, nicht an
 ein Transcript:
 
 **Case** zeigt, was der Fall enthält und was ihm fehlt. Zuerst die Zahlen, die eine
@@ -119,6 +119,26 @@ Sammlung keine Arbeitskopien festgehalten hat, eine Projektdatei also nicht von 
 Profildatei zu unterscheiden ist, und die Zeile sagt das, statt zu raten: das sind
 entgegengesetzte Befunde darüber, wer den Agenten angewiesen hat.
 
+**Conversations** stellt die Speicher eines Agenten einander gegenüber. Mehrere Agenten
+halten eine Konversation an mehr als einer Stelle: einen Transcript-Speicher und einen
+Seitenleisten-Index, eine Rollout-Datei und die Datenbank, die sie projiziert, eine
+Prompt-Historie und die Sitzung, zu der sie gehört. Die Ansicht listet je Agent, welche
+seiner Speicher überhaupt Konversationen benennen und worüber jedes Paar von ihnen einig
+ist, und danach die Konversationen, an die sich nur ein Speicher erinnert. Sie ist die eine
+Ansicht über etwas, das nicht da ist, und genau deshalb gibt es sie: Ein Parser sieht einen
+Datensatz und eine Regel ein Ereignis oder deren Anzahl, und keiner von beiden kann eine
+Konversation sehen, die den einen Speicher erreicht hat und den anderen nicht.
+
+Drei Einschränkungen reisen mit, und die Ansicht nennt alle drei, statt sie als bekannt
+vorauszusetzen. Schweigen ist eine Spur und kein Befund: Ein Speicher hat eine Konversation
+womöglich nie gehalten, weil er nur indexiert, was geöffnet wurde, oder weil die beiden von
+verschiedenen Generationen desselben Produkts geschrieben wurden. Verglichen wird über die
+Sitzungs-Id, so wie jeder Speicher sie schreibt, und ein Paar ohne eine einzige gemeinsame
+Konversation benutzt weit eher zwei Id-Räume, als dass jede einzelne verloren wäre; die
+Zeile zum Paar sagt, wonach es aussieht. Und verglichen werden nur Speicher, die im Fall
+sind: Ein Speicher, den niemand gesammelt hat, kann nicht schweigen, er fehlt, und dafür
+ist die Artifacts-Ansicht da.
+
 **Artifacts** ist jede Datei, die die Sammlung mitgebracht hat, gelesen oder nicht. Das ist
 die Ansicht, die alle anderen relativiert, und der Unterschied, für den sie existiert, ist
 der zwischen einer Datei, die niemand gesammelt hat, und einer, die gesammelt und nie
@@ -128,7 +148,7 @@ Agenten aus.
 
 ## Filter
 
-Fünf der Ansichten filtern, und alle folgen einer Regel: ein Filter darf Zeilen vom
+Sechs der Ansichten filtern, und alle folgen einer Regel: ein Filter darf Zeilen vom
 Schirm nehmen, weil jemand danach gefragt hat, und er darf sie niemals abwesend aussehen
 lassen. Jede gefilterte Ansicht sagt deshalb, wie viele Zeilen ausserhalb des Blickfelds
 sind, und der Filter innerhalb eines Chats hält Zahl und Rücknahme sichtbar, solange er
@@ -192,6 +212,7 @@ Analystin, die gegen einen bereits offenen Fall skriptet, nicht den Quellcode le
 | `/api/timeline` | einer Seite der geräteweiten Timeline, in der Zeilenform des Exports |
 | `/api/findings` | den Funden, und der Tatsache, dass ein Scan gelaufen ist |
 | `/api/instructions` | dem Anweisungsbestand, mit seinen Scopes und dem, was einen Blick wert ist |
+| `/api/corroboration` | welcher Speicher eines Agenten welche Konversation benennt und welcher dazu schweigt |
 | `/api/artifacts` | jeder Datei, die die Sammlung mitgebracht hat, und den Lücken |
 | `/api/health` | dass dies ein `afx serve` ist |
 
@@ -256,3 +277,9 @@ entscheidet, wie viel die anderen Ansichten wert sind.
 Der Anweisungsbestand, gefiltert auf die Dateien, die einen Blick wert sind:
 
 ![Der Anweisungsbestand](images/webui-instructions.png)
+
+Die Konversationen, mit den Speichern jedes Agenten einander gegenübergestellt. In diesem
+Fall ist jeder Speicher mit seinem Geschwister einig, und so sieht ein Fall aus, in dem
+nichts fehlt:
+
+![Konversationen über Speicher hinweg](images/webui-corroboration.png)

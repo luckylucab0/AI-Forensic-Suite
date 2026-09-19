@@ -23,9 +23,9 @@ from pathlib import Path
 
 from agentforensics.webui import server as webui
 
-# The five case views, each photographed after its tab is clicked. The session view is
+# The six case views, each photographed after its tab is clicked. The session view is
 # handled separately because it needs a session opened first.
-VIEWS = ("case", "timeline", "findings", "instructions", "artifacts")
+VIEWS = ("case", "timeline", "findings", "instructions", "corroboration", "artifacts")
 
 # Where Playwright's Chromium usually sits when the browsers are installed outside the
 # package, which is how a sandbox or a CI image normally does it.

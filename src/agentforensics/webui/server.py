@@ -256,6 +256,11 @@ def _instructions(ctx: Context, match: re.Match[str], query: Query) -> Response:
         return _json(api.instructions(case))
 
 
+def _corroboration(ctx: Context, match: re.Match[str], query: Query) -> Response:
+    with _open(ctx) as case:
+        return _json(api.corroboration(case))
+
+
 def _artifacts(ctx: Context, match: re.Match[str], query: Query) -> Response:
     with _open(ctx) as case:
         return _json(api.artifacts(case))
@@ -278,6 +283,7 @@ ROUTES: tuple[tuple[re.Pattern[str], Callable[[Context, re.Match[str], Query], R
     (re.compile(r"^/api/timeline$"), _timeline),
     (re.compile(r"^/api/findings$"), _findings),
     (re.compile(r"^/api/instructions$"), _instructions),
+    (re.compile(r"^/api/corroboration$"), _corroboration),
     (re.compile(r"^/api/artifacts$"), _artifacts),
     (re.compile(r"^/api/health$"), _health),
 )

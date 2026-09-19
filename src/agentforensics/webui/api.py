@@ -583,6 +583,154 @@ def instructions(case: Case) -> dict[str, Any]:
     }
 
 
+# --------------------------------------------------------------- corroboration
+
+
+# One row per conversation per store that names it. artifact.fs is left out because it is
+# the filesystem record of a file rather than anything inside one: counting it would make
+# every collected file look like a store that knows about every conversation in it.
+_CORROBORATION_SQL = """
+SELECT e.agent        AS agent,
+       e.session_id   AS session_id,
+       e.artifact_id  AS artifact_id,
+       count(*)       AS events,
+       min(e.ts_utc)  AS first_ts,
+       max(e.ts_utc)  AS last_ts
+  FROM events e
+ WHERE e.kind <> 'artifact.fs'
+   AND e.session_id IS NOT NULL
+   AND trim(e.session_id) <> ''
+   AND e.artifact_id IS NOT NULL
+ GROUP BY agent, session_id, artifact_id
+ ORDER BY agent, session_id, artifact_id
+"""
+
+# What this view is and is not, carried with it. An analyst reading a list of conversations
+# one store knows nothing about needs all three of these sentences before acting on it.
+_CORROBORATION_NOTE = (
+    "Several agents keep one conversation in more than one place: a transcript store and a "
+    "sidebar index, a rollout file and the database that projects it, a prompt history and "
+    "the session it belongs to. This view says which of the stores in this case name each "
+    "conversation and which of them stay silent about it, so a conversation only one store "
+    "remembers is visible rather than having to be noticed. Three limits travel with that. "
+    "Silence is a lead and not a finding: a store may never have held a conversation, "
+    "because it indexes only what was opened, or because the two were written by different "
+    "generations of the same product. The comparison is by session id as each store spells "
+    "it, so a pair of stores that share no conversation at all is far more likely to use "
+    "two id spaces than to have lost every one, and each pair below says which of the two "
+    "it looks like. And only stores that are in this case are compared: a store nobody "
+    "collected cannot be silent, it is absent, which is a question for the artifacts view."
+)
+
+
+def corroboration(case: Case) -> dict[str, Any]:
+    """Which stores name each conversation, and which stay silent about it.
+
+    The question this answers is the one no single parser can: an agent's own two stores
+    disagreeing about which conversations existed. Zed keeps its threads in one file and
+    their metadata in another, Codex keeps rollout files and a database that projects them,
+    and a conversation that reached one and not the other is either an ordinary gap in how
+    the product writes or the trace of something removed. Neither the parser nor a rule can
+    see it, because each of them sees one record at a time and this is about a record that
+    is not there.
+
+    Derived from the case rather than from a declared list of which store pairs with which.
+    A store that names conversations is one that names conversations, whatever agent it
+    belongs to, and a pairing table would be a second place to be wrong about an agent
+    nobody has looked at yet.
+    """
+    seen: dict[tuple[str, str], dict[str, dict[str, Any]]] = {}
+    names: dict[str, dict[str, set[str]]] = {}
+    for row in case.query(_CORROBORATION_SQL):
+        agent = row["agent"] or "unknown"
+        session_id = str(row["session_id"])
+        artifact_id = str(row["artifact_id"])
+        seen.setdefault((agent, session_id), {})[artifact_id] = {
+            "artifact_id": artifact_id,
+            "events": int(row["events"]),
+            "first_ts": row["first_ts"],
+            "last_ts": row["last_ts"],
+        }
+        names.setdefault(agent, {}).setdefault(artifact_id, set()).add(session_id)
+
+    out = []
+    for (agent, session_id), found in sorted(seen.items()):
+        # Every store of this agent that names conversations at all, minus the ones that
+        # name this conversation. How many each of them does name travels with it: a store
+        # that knows one conversation in forty is plainly not a peer of one that knows all
+        # of them, and saying so here is cheaper than an analyst working it out.
+        silent = [
+            {"artifact_id": artifact_id, "names_sessions": len(sessions_named)}
+            for artifact_id, sessions_named in sorted(names.get(agent, {}).items())
+            if artifact_id not in found
+        ]
+        named_by = [found[artifact_id] for artifact_id in sorted(found)]
+        out.append(
+            {
+                "agent": agent,
+                "session_id": session_id,
+                "named_by": named_by,
+                "silent": silent,
+                "stores": len(named_by),
+                "events": sum(entry["events"] for entry in named_by),
+                "first_ts": min(
+                    (entry["first_ts"] for entry in named_by if entry["first_ts"]), default=None
+                ),
+                "last_ts": max(
+                    (entry["last_ts"] for entry in named_by if entry["last_ts"]), default=None
+                ),
+            }
+        )
+
+    return {
+        "afx_api": API_VERSION,
+        "agents": [_agent_corroboration(agent, names[agent]) for agent in sorted(names)],
+        "sessions": out,
+        "counts": {
+            "sessions": len(out),
+            "in_one_store": sum(1 for row in out if row["stores"] == 1 and row["silent"]),
+            "corroborated": sum(1 for row in out if row["stores"] > 1),
+        },
+        "note": _CORROBORATION_NOTE,
+    }
+
+
+def _agent_corroboration(agent: str, named: dict[str, set[str]]) -> dict[str, Any]:
+    """One agent's stores, and what each pair of them agrees about."""
+    artifacts_here = sorted(named)
+    pairs = []
+    for index, left in enumerate(artifacts_here):
+        for right in artifacts_here[index + 1 :]:
+            both = named[left] & named[right]
+            pairs.append(
+                {
+                    "left": left,
+                    "right": right,
+                    "both": len(both),
+                    "left_only": len(named[left] - named[right]),
+                    "right_only": len(named[right] - named[left]),
+                    # Said rather than left to be read out of a zero. Two stores of one
+                    # agent that share no conversation are usually two id spaces, and an
+                    # analyst told "every conversation is missing from both" would go
+                    # looking for a deletion that never happened.
+                    "overlap": "none"
+                    if not both
+                    else "partial"
+                    if (named[left] != named[right])
+                    else "complete",
+                }
+            )
+    return {
+        "agent": agent,
+        "sessions": len(set().union(*named.values())) if named else 0,
+        "artifacts": [
+            {"artifact_id": artifact_id, "sessions": len(named[artifact_id])}
+            for artifact_id in artifacts_here
+        ],
+        "pairs": pairs,
+    }
+
+
 def artifacts(case: Case) -> dict[str, Any]:
     """Every file the collection carried, read or not, plus the holes it reported.
 

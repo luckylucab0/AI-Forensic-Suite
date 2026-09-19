@@ -374,6 +374,85 @@ def cmd_normalize(args: argparse.Namespace) -> int:
     return EXIT_FINDING if report.unclaimed_paths else EXIT_OK
 
 
+def cmd_sessions(args: argparse.Namespace) -> int:
+    """Show which stores name each conversation, and which of them stay silent about it.
+
+    Several agents keep one conversation in more than one place: a transcript store and a
+    sidebar index, a rollout file and the database that projects it. A conversation that
+    reached one store and not the other is either an ordinary gap in how the product writes
+    or the trace of something removed, and neither a parser nor a rule can see it, because
+    each of those looks at one record at a time and this is about a record that is not
+    there.
+
+    By default this lists the conversations only one store remembers, which is the reason
+    to run it. --all lists every conversation with the stores that name it.
+    """
+    try:
+        case = Case.open(Path(args.case), create=False)
+    except CaseError as exc:
+        _write(sys.stderr, f"sessions: {exc}")
+        return EXIT_ERROR
+
+    try:
+        view = api.corroboration(case)
+    finally:
+        case.close()
+
+    agents = set(args.agent or [])
+    rows = [row for row in view["sessions"] if not agents or row["agent"] in agents]
+    if not args.all:
+        rows = [row for row in rows if row["silent"]]
+
+    if args.json:
+        _write(sys.stdout, json.dumps({**view, "sessions": rows}, indent=2, sort_keys=True))
+        return EXIT_OK
+
+    for agent in view["agents"]:
+        if agents and agent["agent"] not in agents:
+            continue
+        stores = ", ".join(
+            f"{entry['artifact_id']} ({entry['sessions']})" for entry in agent["artifacts"]
+        )
+        _write(sys.stdout, f"{agent['agent']}: {agent['sessions']} conversation(s) in {stores}")
+        for pair in agent["pairs"]:
+            _write(
+                sys.stdout,
+                f"           {pair['left']} and {pair['right']}: "
+                f"{pair['both']} shared, {pair['left_only']} only in the first, "
+                f"{pair['right_only']} only in the second"
+                + (
+                    ". No conversation at all is in both, which usually means the two "
+                    "stores do not share an id space rather than that every one is missing"
+                    if pair["overlap"] == "none"
+                    else ""
+                ),
+            )
+
+    for row in rows:
+        named = ", ".join(entry["artifact_id"] for entry in row["named_by"])
+        _write(
+            sys.stdout,
+            f"[{row['agent']}] {row['session_id']}  in {named}"
+            + (f"  ({row['first_ts']})" if row["first_ts"] else "  (no timestamp)"),
+        )
+        for entry in row["silent"]:
+            _write(
+                sys.stdout,
+                f"           not named by {entry['artifact_id']}, "
+                f"which names {entry['names_sessions']} conversation(s) of this agent",
+            )
+
+    counts = view["counts"]
+    _write(
+        sys.stdout,
+        f"total: {len(rows)} conversation(s) shown of {counts['sessions']} in the case, "
+        f"{counts['corroborated']} named by more than one store, "
+        f"{counts['in_one_store']} named by one store while another stayed silent",
+    )
+    _write(sys.stderr, f"note: {view['note']}")
+    return EXIT_OK
+
+
 def cmd_instructions(args: argparse.Namespace) -> int:
     """Show the instruction surface a case holds: what the agents were told to obey.
 
@@ -899,6 +978,21 @@ def build_parser() -> argparse.ArgumentParser:
     instructions.add_argument("--agent", action="append", help="only this agent, repeatable")
     instructions.add_argument("--json", action="store_true")
     instructions.set_defaults(func=cmd_instructions)
+
+    sessions = sub.add_parser(
+        "sessions",
+        help="show which stores name each conversation, and which stay silent about it",
+        description=cmd_sessions.__doc__,
+    )
+    sessions.add_argument("--case", required=True, help="case database")
+    sessions.add_argument("--agent", action="append", help="only this agent, repeatable")
+    sessions.add_argument(
+        "--all",
+        action="store_true",
+        help="every conversation, not only the ones a store stayed silent about",
+    )
+    sessions.add_argument("--json", action="store_true")
+    sessions.set_defaults(func=cmd_sessions)
 
     scan = sub.add_parser(
         "scan",

@@ -197,6 +197,7 @@ Einzige, was der Viewer irgendwo schreibt, ist die Themenwahl in `localStorage`.
 uv run afx ingest /evidence/bundle-2026-09-17 --case case.db   # eine Sammlung einlesen
 uv run afx scan --case case.db                                 # die Regelpakete laufen lassen
 uv run afx instructions --case case.db                        # was die Agenten befolgen sollten
+uv run afx sessions --case case.db                            # Konversationen, an die sich nur ein Speicher erinnert
 uv run afx serve --case case.db                                # im Browser öffnen
 ```
 

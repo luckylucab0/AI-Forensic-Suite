@@ -75,7 +75,7 @@ The three views the standalone viewer has are unchanged: **Sessions** renders on
 conversation, **Tools** lists every tool call across all of them, and **Security** is the
 built-in regex scan for credentials in transcript text.
 
-Serving a case adds five more, and they are questions about a case rather than about a
+Serving a case adds six more, and they are questions about a case rather than about a
 transcript:
 
 **Case** is what the case holds and what it is missing. The counts an analyst reads first,
@@ -112,6 +112,24 @@ request could put it there. `local` is the documented personal override inside a
 copy. `user` is the profile's own. `unknown` means the collection recorded no working copies,
 so a project file cannot be told from a profile one, and the row says so rather than
 guessing: those are opposite findings about who instructed the agent.
+
+**Conversations** compares an agent's stores against each other. Several agents keep one
+conversation in more than one place: a transcript store and a sidebar index, a rollout file
+and the database that projects it, a prompt history and the session it belongs to. The view
+lists, per agent, which of its stores name conversations at all and what each pair of them
+agrees about, and then the conversations only one store remembers. It is the one view about
+something that is not there, which is why it exists at all: a parser sees one record and a
+rule sees one event or a count of them, and neither can see a conversation that reached one
+store and not the other.
+
+Three limits travel with it, and the panel says all three rather than leaving them to be
+known. Silence is a lead and not a finding: a store may never have held a conversation,
+because it indexes only what was opened, or because the two stores were written by
+different generations of the same product. The comparison is by session id as each store
+spells it, so a pair of stores with no conversation in common is far more likely to use two
+id spaces than to have lost every one, and the pair line says which of the two it looks
+like. And only stores that are in the case are compared: a store nobody collected cannot be
+silent, it is absent, which is what the artifacts view is for.
 
 **Artifacts** is every file the collection carried, read or not. This is the view that
 qualifies all the others, and the one distinction it exists for is between a file nobody
@@ -179,6 +197,7 @@ scripting against a case they already have open should not have to read the sour
 | `/api/timeline` | a page of the device-wide timeline, in the export's row shape |
 | `/api/findings` | the findings, and the fact of a scan having run |
 | `/api/instructions` | the instruction surface, with its scopes and what is worth a look |
+| `/api/corroboration` | which of an agent's stores name each conversation, and which stay silent |
 | `/api/artifacts` | every file the collection carried, and the gaps |
 | `/api/health` | that this is an `afx serve` |
 
@@ -242,3 +261,8 @@ decides how much the other views are worth.
 The instruction surface, filtered to the files worth a look:
 
 ![The instruction surface](images/webui-instructions.png)
+
+The conversations, with each agent's stores compared against each other. In this case every
+store agrees with its sibling, which is what a case looks like when nothing is missing:
+
+![Conversations across stores](images/webui-corroboration.png)

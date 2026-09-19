@@ -342,6 +342,15 @@ def test_the_instruction_endpoint_is_served(client: Client) -> None:
     assert "not a system prompt" in served["note"]
 
 
+def test_the_corroboration_endpoint_is_served(client: Client) -> None:
+    """Routed explicitly, for the reason the instruction endpoint is: no fallback."""
+    served = client.json("/api/corroboration")
+
+    assert served["afx_api"] == api.API_VERSION
+    assert served["sessions"], "the synthetic profile has conversations"
+    assert "lead and not a finding" in served["note"]
+
+
 def test_the_artifact_list_separates_not_collected_from_not_read(case: Case) -> None:
     """The distinction the reliability of every other view depends on."""
     listed = api.artifacts(case)

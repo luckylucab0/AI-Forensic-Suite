@@ -364,6 +364,7 @@ mark.hl.hl-current{background:var(--coral);color:#fff;}
         <div class="tab" data-view="timeline">Timeline</div>
         <div class="tab" data-view="findings">Findings<span id="find-badge" class="tab-badge" style="display:none">0</span></div>
         <div class="tab" data-view="instructions">Instructions</div>
+        <div class="tab" data-view="corroboration">Conversations</div>
         <div class="tab" data-view="artifacts">Artifacts</div>
       </div>
       <input id="search" type="text" placeholder="Filter sessions…" autocomplete="off" />
@@ -438,6 +439,13 @@ mark.hl.hl-current{background:var(--coral);color:#fff;}
       <div id="instructions-note" class="notice"></div>
       <div id="instructions-filters" class="tool-filters"></div>
       <div id="instructions-body"></div>
+    </div>
+    <div id="corroboration-panel" class="view-panel hidden">
+      <div class="panel-h">Conversations across stores <span class="panel-sub" id="corroboration-count" style="margin:0"></span></div>
+      <div class="panel-sub">Which of an agent&#39;s stores name each conversation, and which of them stay silent about it. Several agents keep one conversation in two places, and a conversation only one of them remembers is the thing no single record can show.</div>
+      <div id="corroboration-note" class="notice"></div>
+      <div id="corroboration-filters" class="tool-filters"></div>
+      <div id="corroboration-body"></div>
     </div>
     <div id="artifacts-panel" class="view-panel hidden">
       <div class="panel-h">Artifacts <span class="panel-sub" id="artifacts-count" style="margin:0"></span></div>
@@ -1108,7 +1116,7 @@ function resetData(){
   renderSidebar();
   if(typeof updateSecBadge==='function') updateSecBadge();
   if(typeof updateFindBadge==='function') updateFindBadge();
-  if(['case','timeline','findings','instructions','artifacts'].indexOf(state.view)>=0) switchView('sessions');
+  if(['case','timeline','findings','instructions','corroboration','artifacts'].indexOf(state.view)>=0) switchView('sessions');
   else if(state.view==='tools') renderToolsPanel();
   else if(state.view==='security') renderSecurityPanel();
 }
@@ -1815,6 +1823,101 @@ function drawInstructions(){
   }
 }
 
+// Which of an agent's stores name each conversation. The one view in here that is about
+// something not being there: a parser sees one record and a rule sees one event, so a
+// conversation missing from the second of an agent's two stores is invisible to both of
+// them and visible here. The note from the API is rendered above the list rather than
+// summarised, because every sentence in it is a limit on how the list may be read.
+async function renderCorroborationPanel(){
+  const body=document.getElementById('corroboration-body');
+  const filters=document.getElementById('corroboration-filters');
+  const note=document.getElementById('corroboration-note');
+  if(!state.caseApi){
+    filters.innerHTML=''; body.innerHTML=''; note.textContent='';
+    body.appendChild(el('div',{class:'agg-empty',text:'No case is being served to this page.'}));
+    return;
+  }
+  if(!state.caseCorroboration){
+    body.innerHTML='';
+    body.appendChild(el('div',{class:'agg-empty',text:'Loading…'}));
+    try{
+      const res=await fetch('api/corroboration',{headers:{Accept:'application/json'}});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      state.caseCorroboration=await res.json();
+    }catch(e){
+      state.caseCorroboration={error:String((e&&e.message)||e),agents:[],sessions:[],counts:{},note:''};
+    }
+    if(state.view!=='corroboration') return;
+  }
+  // The filter starts where the answer is. A view that opens on "one store only" in a case
+  // where every store agrees would open empty, and an empty screen reads as a view that
+  // does not work rather than as a case with nothing wrong in it.
+  if(state.corrScope===undefined){
+    state.corrScope=(state.caseCorroboration.sessions||[]).some(r=>(r.silent||[]).length)?'alone':'all';
+  }
+  drawCorroboration();
+}
+
+function drawCorroboration(){
+  const body=document.getElementById('corroboration-body');
+  const filters=document.getElementById('corroboration-filters');
+  const note=document.getElementById('corroboration-note');
+  const data=state.caseCorroboration||{agents:[],sessions:[]};
+  const all=data.sessions||[];
+  note.textContent=data.note||'';
+
+  const alone=all.filter(r=>(r.silent||[]).length);
+  filters.innerHTML='';
+  filters.appendChild(el('div',{class:'tfilter'+(state.corrScope==='alone'?' active':''),
+    onclick:()=>{state.corrScope='alone';drawCorroboration();}},
+    [document.createTextNode('one store only'),el('span',{class:'c',text:String(alone.length)})]));
+  filters.appendChild(el('div',{class:'tfilter'+(state.corrScope==='all'?' active':''),
+    onclick:()=>{state.corrScope='all';drawCorroboration();}},
+    [document.createTextNode('all'),el('span',{class:'c',text:String(all.length)})]));
+
+  body.innerHTML='';
+  if(data.error) body.appendChild(el('div',{class:'notice',text:'The stores could not be compared: '+data.error}));
+
+  // Per agent first: which of its stores name conversations at all, and what each pair of
+  // them agrees about. A reader needs that before a row below means anything.
+  for(const agent of (data.agents||[])){
+    const stores=(agent.artifacts||[]).map(a=>a.artifact_id+' ('+a.sessions+')').join(', ');
+    body.appendChild(el('div',{class:'tool-io-label',
+      text:agent.agent+': '+agent.sessions+' conversation(s) in '+stores}));
+    for(const pair of (agent.pairs||[])){
+      const shape=pair.overlap==='none'
+        ? '. No conversation is in both, which usually means these two do not share an id '
+          +'space rather than that every one is missing'
+        : '';
+      body.appendChild(el('div',{class:'panel-sub',
+        text:pair.left+' and '+pair.right+': '+pair.both+' shared, '+pair.left_only
+          +' only in the first, '+pair.right_only+' only in the second'+shape}));
+    }
+  }
+
+  const rows=state.corrScope==='all'?all:alone;
+  document.getElementById('corroboration-count').textContent=rows.length===all.length
+    ? '· '+all.length+' conversation(s)'
+    : '· '+rows.length+' of '+all.length+' conversation(s), '+(all.length-rows.length)+' hidden by this filter';
+  if(!rows.length){
+    body.appendChild(el('div',{class:'agg-empty',
+      text:state.corrScope==='alone'
+        ? 'Every conversation in this case is named by every store of its agent that names conversations at all.'
+        : 'No conversation in this case carries a session id.'}));
+    return;
+  }
+  for(const row of rows){
+    const named=(row.named_by||[]).map(e=>e.artifact_id).join(', ');
+    const silent=(row.silent||[]).map(e=>e.artifact_id+' (names '+e.names_sessions+')').join(', ');
+    body.appendChild(el('div',{class:'ins-row'},[
+      el('span',{class:'ag',text:row.agent||'unclaimed'}),
+      el('span',{class:'pth',text:row.session_id}),
+      el('span',{class:'mk',text:'in '+named+(silent?' · silent: '+silent:'')}),
+      el('span',{class:'n',text:row.events+' event(s)'}),
+    ]));
+  }
+}
+
 // The characters a reviewer cannot see, made visible. The point of the whole view is that
 // a human approved one text and the model read another, so the detail shows where: each
 // invisible character is replaced by its codepoint in brackets, and the label says the text
@@ -1845,6 +1948,9 @@ async function toggleInstruction(row,detail){
   const head=[];
   if(row.declared_name||row.title) head.push(row.declared_name||row.title);
   if(row.declared_description) head.push(row.declared_description);
+  // The two are different claims about the same file: one says the tier it applied at is
+  // unknown, the other says the file was not read. See the API note on scope_problem.
+  if(row.scope_problem) head.push('scope not settled: '+row.scope_problem);
   if(row.parse_problem) head.push('not fully read: '+row.parse_problem);
   if(head.length) detail.appendChild(el('div',{class:'tool-io-label',text:head.join(' — ')}));
   let text=row.preview;
@@ -2560,7 +2666,7 @@ const VIEW_PANELS={
   tools:renderToolsPanel, security:renderSecurityPanel,
   case:renderCasePanel, timeline:renderTimelinePanel,
   findings:renderFindingsPanel, instructions:renderInstructionsPanel,
-  artifacts:renderArtifactsPanel,
+  corroboration:renderCorroborationPanel, artifacts:renderArtifactsPanel,
 };
 
 function switchView(view){

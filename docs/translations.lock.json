@@ -2,12 +2,12 @@
   "_comment": "sha256 of each English document whose German sibling was confirmed current. Refresh with scripts/check_translations.py --update after updating a translation, or after an English edit that needs none.",
   "english_hashes": {
     "CONTRIBUTING.md": "c7c781eb69374fc2fbc8c6333ff31e30dd5f44b39318e6cedde23a817fa2cc5f",
-    "README.md": "19a8e411b77a9ea70e9347b632c0bb60f6090ea99b588ab0aa15fab32ac8f882",
+    "README.md": "ab21f22e078e6374f652943906b2207eb6fffc69cbf96ae93a2a2ccf1afcd509",
     "SECURITY.md": "d762c856c43ffe27dab58d6f00918c2e0fb47f1f2dcea722e64c6259c2eb0041",
     "docs/ARCHITECTURE.md": "b0ba2601fff695405fd65cb5a9acb0923fa41c115f6829ce1b4cacc9e8a75c27",
     "docs/BUNDLE_FORMAT.md": "64149ccccdc88a0be2154ca5ba74b31b4caabe55cf1a1cf983895db4d32774d8",
     "docs/COLLECTION.md": "ebac16674533f2b97af2061f47264e495bd121371552e79a0c30c9822c128c6f",
     "docs/UNIFIED_FORMAT.md": "51d4041f6db026f504011a215f76009d587daf3e9946a86141875e9b1d08022d",
-    "docs/WEBUI.md": "696fb1f74ecaa306e62714638a3fa07342579e366725bdd89d924164bea5c999"
+    "docs/WEBUI.md": "1e0d0ebe48fb35d4a994d07670084ea1e25b4ce1daf72ed20e02e05e82c65402"
   }
 }

@@ -176,6 +176,7 @@ thing the viewer writes anywhere is your theme choice, in `localStorage`.
 uv run afx ingest /evidence/bundle-2026-09-17 --case case.db   # read a collection in
 uv run afx scan --case case.db                                 # run the rule packs
 uv run afx instructions --case case.db                        # what the agents were told to obey
+uv run afx sessions --case case.db                            # conversations only one store remembers
 uv run afx serve --case case.db                                # open it in a browser
 ```
 
