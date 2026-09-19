@@ -315,7 +315,7 @@ def test_every_read_shape_including_the_aliases_is_read(tmp_path: Path, value: o
 
     read = next(e for e in events if e.kind == "file.read")
 
-    assert read.payload["files"] == [{"path": "/a.js", "action": "read"}]
+    assert read.payload["files"] == [{"path": "/a.js", "operation": "read"}]
 
 
 def test_an_input_in_no_shape_the_schema_accepts_says_so(tmp_path: Path) -> None:
@@ -339,7 +339,13 @@ def test_a_patch_names_its_files_with_the_verb_the_patch_used(tmp_path: Path) ->
     written = next(e for e in events if e.kind == "file.write")
 
     assert written.payload["files"] == [
-        {"path": "/home/alice/src/app/index.js", "action": "update"}
+        {
+            "path": "/home/alice/src/app/index.js",
+            # The operation is the word a case queries, and it comes from the enum the
+            # unified format defines; the patch's own verb travels beside it.
+            "operation": "write",
+            "patch_verb": "update",
+        }
     ]
 
 

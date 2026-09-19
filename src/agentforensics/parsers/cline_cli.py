@@ -724,7 +724,7 @@ def _facets(name: str, value: Any) -> tuple[dict[str, Any], str | None]:
             )
         return {"commands": commands}, None
     if name == READ_FILES:
-        files = [{"path": path, "action": "read"} for path in _paths(value)]
+        files = [{"path": path, "operation": "read"} for path in _paths(value)]
         if not files:
             return {}, (
                 "this read_files input is in none of the shapes the vendor's schema "
@@ -735,7 +735,7 @@ def _facets(name: str, value: Any) -> tuple[dict[str, Any], str | None]:
         path = _text(_mapping(value).get("path"))
         if not path:
             return {}, "this editor input names no path, so no file was read out of it"
-        return {"files": [{"path": path, "action": "write"}]}, None
+        return {"files": [{"path": path, "operation": "write"}]}, None
     if name == APPLY_PATCH:
         body = value if isinstance(value, str) else _text(_mapping(value).get("input"))
         files = _patched(body or "")
@@ -768,7 +768,9 @@ def _effects(payload: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
     if payload.get("network"):
         out.append(("network.request", {"network": payload["network"]}))
     for entry in payload.get("files") or []:
-        kind = "file.read" if entry.get("action") == "read" else "file.write"
+        # There is no file.delete kind: a delete is a change to the working copy, and the
+        # operation on the facet is what says which change it was.
+        kind = "file.read" if entry.get("operation") == "read" else "file.write"
         out.append((kind, {"files": [entry]}))
     return out
 
@@ -821,18 +823,27 @@ def _paths(value: Any) -> list[str]:
     return []
 
 
+# What a patch verb does to a file, in the words the unified format's file facet uses. A
+# verb this does not know is `unknown` rather than a guess at write: the grammar can grow
+# one, and the patch's own word travels beside it either way.
+_PATCH_OPERATIONS = {"add": "write", "update": "write", "delete": "delete"}
+
+
 def _patched(body: str) -> list[dict[str, Any]]:
-    """The files a patch names, with the verb the patch used for each."""
+    """The files a patch names, with what the patch does to each."""
     out = []
     for line in body.splitlines():
         found = _PATCH_FILE.match(line)
         if found:
+            verb = found.group("verb").lower()
             out.append(
                 {
                     "path": found.group("path"),
-                    # The patch's own word, lowercased, rather than one of ours: a grammar
-                    # that grows a verb should show it rather than be read as an update.
-                    "action": found.group("verb").lower(),
+                    "operation": _PATCH_OPERATIONS.get(verb, "unknown"),
+                    # The patch's own word, kept beside the operation rather than in place
+                    # of it: a grammar that grows a verb should show it rather than be read
+                    # as an update, and a case queries the operation.
+                    "patch_verb": verb,
                 }
             )
     return out

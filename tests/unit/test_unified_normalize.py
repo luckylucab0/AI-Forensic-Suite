@@ -103,6 +103,26 @@ def test_a_command_keeps_its_command_line(log: list[dict]) -> None:
         assert record["payload"]["commands"][0]["command"]
 
 
+def test_every_file_a_parser_claims_says_what_was_done_to_it(log: list[dict]) -> None:
+    """The facet's field is `operation` and it has to be one of the five the format allows.
+
+    The case database reads exactly that key and stores `unknown` when it is missing, so a
+    parser that spelled it anything else would file every file it found as a file nobody
+    knows what happened to, and a search for what an agent wrote would not find them. That
+    is silent: the events are there, the counts look right, and the answer is wrong. It
+    happened once, which is why this is a test.
+    """
+    allowed = {"read", "write", "delete", "snapshot", "unknown"}
+    files = [
+        (record["provenance"], entry)
+        for record in log
+        for entry in (record["payload"].get("files") or [])
+    ]
+    assert files, "the fixture has file facets, or this test is asserting nothing"
+    for provenance, entry in files:
+        assert entry.get("operation") in allowed, (provenance, entry)
+
+
 def test_a_working_directory_reaches_the_log(log: list[dict]) -> None:
     assert any(record["project_path"] for record in log)
 
