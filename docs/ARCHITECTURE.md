@@ -106,58 +106,70 @@ it cannot be rewritten *quietly*.
 - `parsers/` one module per agent or per format family, turning raw records into unified
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
-  unsupported rather than skipped. Seven agents are read today: Claude Code, Codex CLI,
-  Copilot CLI, Gemini CLI and Qwen Code (one module, because Qwen is a fork and both write
-  the Gemini content shape), Pi, and Cline with its forks Roo Code and Kilo Code (one
-  module for the same reason). Under all of those sits one module that is about a format
-  rather than an agent: every SQLite store in the catalogue, twenty-eight of them across
-  fifteen agents, is opened read-only from a copy and returned table by table and row by
-  row. It reads nothing out of a row beyond what the row literally says, a column named as
-  a time or as text, and every event it produces states that this is an uninterpreted
-  reading. So a chat database nobody has a verified schema for is visible evidence somebody
-  still has to look at, instead of a file the case merely says existed. A verified
-  per-agent parser placed ahead of it takes an artifact over, one schema at a time, and
-  opencode is the first: its module maps the three tables whose schema was read against the
-  vendor's own generated migration and hands every other table, including the older message
-  pair, back to the uninterpreted reading, so a store is never half read with the other half
-  silently absent. Amazon Q's CLI store is the second, and it is the one whose store holds
-  what no other artifact does: its conversations table is keyed by the working directory,
-  its history table is a shell command log with exit codes, and its conversation state
-  records which turns the agent has stopped sending to the model while keeping them on disk.
-  Zed is the third, and it is the reason the Python floor moved: it writes each thread as a
-  zstd frame in a BLOB, so the store reader decompresses one before any parser sees it, and
-  every other SQLite store gains the same reading. A Zed thread carries one time for the
-  whole thread and none for the turns inside it, which the parser states rather than filling
-  in. A second floor of the same shape sits under the line-delimited logs: every JSON Lines
-  artifact in the catalogue that no verified parser claims is read record by record, with
-  the record whole in `raw` and nothing taken out of it but what it literally names, a
-  field named as a time, a session, a working copy or text. That one exists because the two
-  producers of the unified format had drifted apart and the analyzer was the side reading
-  less: the generated endpoint query already returned every record of an unmapped log,
-  while a case built from a collection of the same endpoint held one `artifact.fs` event
-  per file and nothing about what was in it. A test fails now when that gap opens again in
-  either direction. The third floor is the one that needed a decision rather than a rule
-  (ADR 0027): a whole JSON document has no records of its own, so where the records are
-  inside it is a question about what the document means. It is split by structure alone, one
-  level deep. A root that is a list is one event per element; a root that is an object is one
-  event for the document and then one per element of each top-level key whose value is a list
-  of objects; anything else is one event. A document that nests its records deeper keeps them
-  whole in the document event, which is visibly a partial reading rather than a wrong one.
-  The credential stores are the one thing it does not claim, because a token in the payload
-  of a timeline event is not what `--include-secrets` was for, and the file and its hash are
-  in the case either way. What a record out of one of these documents *is* comes from the
-  catalogue rather than from the document: an entry the catalogue files as configuration
-  produces `config.snapshot` records and everything else produces `unparsed.record`. That
-  is the difference between a case holding a configuration and the rules being able to read
-  it, and it was worth four shipped rules that could not fire on a real collection at all.
-  Beside
-  it sits a second format-shaped module, `instructions/`, for the instruction surface: the
-  sixty-three catalogue artifacts that hold skills, commands, output styles, rules, steering
-  files and hook scripts. It reads each file whole, tells the scope apart from the working
-  copies the collection recorded rather than from the path's shape, lifts a skill's front
-  matter including the tools it grants itself, and counts the characters a reviewer cannot
-  see. It does not claim to show a system prompt: the vendor's base prompt is not on the
-  endpoint, and saying otherwise would answer a question the evidence cannot.
+  unsupported rather than skipped, and the case counts those files and says which they are.
+  Twenty-nine modules read 344 of the catalogue's 466 artifacts; the rest are the credential
+  stores nothing reads on purpose, the install evidence the filesystem event answers, and
+  the binary stores that still need their own formats.
+
+  **The agent parsers** are the ones written against a vendor source: Claude Code, Codex CLI
+  and its projection into rows, Copilot CLI, Gemini CLI and Qwen Code (one module, because
+  Qwen is a fork and both write the Gemini content shape), Pi, Cline with its forks Roo Code
+  and Kilo Code and its separate SDK session store, Continue, Zed and its sidebar, Aider,
+  Amazon Q, opencode, Hermes, and the VS Code state stores. Each takes its artifacts over
+  from the floors below, one verified schema at a time.
+
+  **The floors** are about formats rather than agents, and they exist so that a file nobody
+  has mapped is visible in a case as records somebody still has to look at rather than as a
+  file name with nothing behind it. Every one of them says on each event that the reading is
+  uninterpreted, and the case counts those records separately from the records nothing could
+  read: one is intact evidence with no reading yet, the other is a defect in the evidence.
+
+  - **SQLite stores.** Opened read-only from a copy and returned table by table, row by row,
+    reading nothing out of a row beyond what it literally says. A zstd frame in a BLOB is
+    decompressed first, which is how one editor stores whole threads and why the Python
+    floor is 3.14 (ADR 0024).
+  - **Line-delimited logs.** Every JSON Lines artifact no verified parser claims, record by
+    record. That floor exists because the two producers of the unified format had drifted
+    apart and the analyzer was the side reading less; a test fails now when the gap opens
+    again in either direction.
+  - **Whole documents.** JSON, YAML, TOML and property lists, through one shared reading
+    (ADR 0027 for the rule, ADR 0028 for the other three formats). A document has no records
+    of its own, so it is split by structure alone, one level deep, never by a guess at what
+    it means. What a record *is* comes from the catalogue rather than from the document: an
+    entry filed as configuration produces `config.snapshot` and everything else produces
+    `unparsed.record`. That distinction is what lets a rule about a setting find one, and it
+    was worth four shipped rules that could not fire on a real collection at all.
+  - **Text logs.** One line is one record, dated only where the line begins with its own
+    timestamp, because a line that mentions a date is not a line that happened then. The
+    reading stops after a set number of lines and says so in an event of its own.
+  - **Prose.** A chat export, a spilled tool result, a background subagent's output, a
+    written plan: read whole, one event per file, because half a prompt reads in a report as
+    what somebody asked.
+  - **Shell history.** Four shells and the agent's own recall file, each read the way its
+    own writer writes it. This is where an agent's start line is, which is the brief's first
+    question about an agent and is almost never inside the agent.
+  - **Encrypted stores.** One product keeps its conversations in an AES-GCM container around
+    a protocol buffer. The container is opened only with a key the examiner supplies, under
+    whichever framing authenticates, and the plaintext is walked by the wire format, so its
+    fields are numbers rather than names and every record says so (ADR 0029).
+
+  **The instruction surface** has its own format-shaped module for the artifacts that hold
+  skills, commands, output styles, rules, steering files, subagent definitions and hook
+  scripts. It reads each file whole, tells the scope apart from the working copies the
+  collection recorded rather than from the path's shape, lifts a skill's front matter
+  including the tools it grants itself, and counts the characters a reviewer cannot see. It
+  does not claim to show a system prompt: the vendor's base prompt is not on the endpoint,
+  and saying otherwise would answer a question the evidence cannot. The notes an agent wrote
+  to itself are read the same way and filed as memories rather than instructions, because
+  the instruction surface answers what the agent was told to obey and a note it wrote itself
+  is a different question.
+
+  **A file that is not text** is recorded by size and hash rather than as a page of
+  replacement characters, in every one of these readers. A NUL byte in the first few
+  kilobytes and a high share of characters that failed to decode are what decide it, and the
+  threshold is high enough that a document written on a machine with another code page is
+  still read as the document it is.
+
 - `model/` the unified event model and the SQLite case schema
 - `unified/` the event model on the wire: the JSON Lines format and its schema, plus
   the normalizer that turns a collection into one log without building a case

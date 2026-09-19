@@ -112,3 +112,59 @@ def test_the_json_summary_carries_the_same_breakdown(
     assert rows["agent.debug_logs"]["uninterpreted"] == 2
     assert rows["agent.transcripts"]["unreadable"] == 1
     assert out["unread"]["total"] == 2
+
+
+# ------------------------------------------------- the keys an examiner supplies
+
+
+def test_a_key_is_taken_from_the_command_line() -> None:
+    from agentforensics.cli import _keys
+
+    assert _keys(["windsurf=aabbcc"]) == {"windsurf": "aabbcc"}
+
+
+def test_a_key_may_come_from_the_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    """So that a key does not sit in a shell history, which this suite reads for a living."""
+    from agentforensics.cli import _keys
+
+    monkeypatch.setenv("AFX_KEY_WINDSURF", "ddeeff")
+    assert _keys(None) == {"windsurf": "ddeeff"}
+
+
+def test_the_command_line_wins_over_the_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    from agentforensics.cli import _keys
+
+    monkeypatch.setenv("AFX_KEY_WINDSURF", "from-the-environment")
+    assert _keys(["windsurf=from-the-command-line"]) == {"windsurf": "from-the-command-line"}
+
+
+def test_a_malformed_key_argument_is_refused_rather_than_ignored() -> None:
+    """A key that silently did not apply produces a case saying the store could not be
+    opened, which is the same output as a wrong key and a different fact."""
+    from agentforensics.cli import _keys
+
+    with pytest.raises(ValueError):
+        _keys(["windsurf"])
+    with pytest.raises(ValueError):
+        _keys(["=aabbcc"])
+
+
+def test_ingest_refuses_to_run_with_a_malformed_key(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    source = tmp_path / "tree"
+    (source / "home").mkdir(parents=True)
+    assert (
+        main(
+            [
+                "ingest",
+                str(source),
+                "--case",
+                str(tmp_path / "case.sqlite"),
+                "--key",
+                "windsurf",
+            ]
+        )
+        == EXIT_ERROR
+    )
+    assert "--key expects AGENT=KEY" in capsys.readouterr().err

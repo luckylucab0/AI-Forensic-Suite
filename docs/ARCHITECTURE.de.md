@@ -111,67 +111,82 @@ ist, dass das nicht *unbemerkt* geht.
 - `ingest/` Adapter für ein eigenes Bundle, einen KAPE-Baum, eine Velociraptor-Sammlung
   sowie ein einfaches Verzeichnis oder eingebundenes Abbild
 - `parsers/` ein Modul pro Agent oder pro Formatfamilie, das Rohdatensätze in einheitliche
-  Ereignisse überführt. Welcher Parser läuft, entscheidet der Katalogeintrag, der die Datei
-  beansprucht hat, damit ein Parser dem Katalog nie widersprechen kann. Eine Datei ohne
-  Parser wird als nicht unterstützt festgehalten, nicht übersprungen. Sieben Agenten werden
-  heute gelesen: Claude Code, Codex CLI, Copilot CLI, Gemini CLI und Qwen Code (ein Modul,
-  weil Qwen ein Fork ist und beide die Gemini-Inhaltsform schreiben), Pi sowie Cline mit
-  seinen Forks Roo Code und Kilo Code (aus demselben Grund ein Modul). Unter all diesen
-  liegt ein Modul, das nicht zu einem Agenten gehört, sondern zu einem Format: jeder
-  SQLite-Speicher des Katalogs, achtundzwanzig über fünfzehn Agenten, wird aus einer Kopie
-  nur lesend geöffnet und Tabelle für Tabelle, Zeile für Zeile zurückgegeben. Aus einer
-  Zeile wird nichts gelesen, was die Zeile nicht wörtlich sagt, also eine Spalte, die als
-  Zeit oder als Text benannt ist, und jedes Ereignis daraus sagt selbst, dass es eine
-  uninterpretierte Lesung ist. Damit ist eine Chat-Datenbank, für die es noch kein
-  geprüftes Schema gibt, sichtbares Material, das jemand noch ansehen muss, und nicht bloß
-  eine Datei, deren Existenz der Fall vermerkt. Ein geprüfter Parser für einen einzelnen
-  Agenten, der davor eingeordnet wird, übernimmt ein Artefakt, ein Schema auf einmal, und
-  opencode ist das erste: dessen Modul bildet die drei Tabellen ab, deren Schema gegen die
-  generierte Migration des Herstellers gelesen wurde, und gibt jede andere Tabelle, auch das
-  ältere Message-Paar, an die uninterpretierte Lesung zurück. Ein Speicher ist damit nie halb
-  gelesen, während die andere Hälfte stillschweigend fehlt. Der CLI-Speicher von Amazon Q ist
-  das zweite, und sein Store enthält, was kein anderes Artefakt hat: die
-  conversations-Tabelle ist nach Arbeitsverzeichnis geschlüsselt, die history-Tabelle ist ein
-  Shell-Kommandoprotokoll mit Exit-Codes, und der Conversation State hält fest, welche Züge
-  der Agent dem Modell nicht mehr schickt, während sie auf der Platte bleiben. Zed ist das
-  dritte und der Grund, aus dem die Python-Untergrenze gestiegen ist: es schreibt jeden
-  Thread als zstd-Frame in ein BLOB, also dekomprimiert der Speicherleser einen, bevor ein
-  Parser JSON sieht, und jeder andere SQLite-Speicher bekommt dieselbe Lesung dazu. Ein
-  Zed-Thread trägt eine Zeit für den ganzen Thread und keine für die Züge darin, was der
-  Parser sagt statt sie zu ergänzen. Eine zweite Untergrenze derselben Art liegt unter den
-  zeilenweisen Logs: jedes JSON-Lines-Artefakt des Katalogs, das kein geprüfter Parser für
-  sich beansprucht, wird Datensatz für Datensatz gelesen, mit dem ganzen Datensatz in `raw`
-  und nichts daraus entnommen als das, was er wörtlich benennt, ein Feld mit dem Namen einer
-  Zeit, einer Sitzung, einer Arbeitskopie oder eines Textes. Diese gibt es, weil die beiden
-  Erzeuger des einheitlichen Formats auseinandergelaufen waren und der Analyzer die Seite
-  war, die weniger las: die erzeugte Endpunktabfrage gab längst jeden Datensatz eines nicht
-  zugeordneten Logs zurück, während ein Fall aus einer Sammlung desselben Endpunkts ein
-  `artifact.fs`-Ereignis pro Datei enthielt und nichts über deren Inhalt. Ein Test schlägt
-  jetzt fehl, wenn diese Lücke in einer der beiden Richtungen wieder aufgeht. Die dritte
-  Untergrenze brauchte eine Entscheidung statt einer Regel (ADR 0027): ein ganzes
-  JSON-Dokument hat keine eigenen Datensätze, also ist die Frage, wo sie darin liegen, eine
-  Frage nach der Bedeutung des Dokuments. Es wird allein nach seiner Struktur zerlegt, eine
-  Ebene tief. Eine Wurzel, die eine Liste ist, ergibt ein Ereignis je Element; eine Wurzel,
-  die ein Objekt ist, ein Ereignis für das Dokument und dann eines je Element jedes
-  Schlüssels der obersten Ebene, dessen Wert eine Liste von Objekten ist; alles andere ein
-  Ereignis. Ein Dokument, das seine Datensätze tiefer verschachtelt, behält sie ganz im
-  Dokument-Ereignis, was sichtbar eine unvollständige Lesung ist und keine falsche. Die
-  Credential-Speicher beansprucht sie als Einziges nicht, denn ein Token im Payload eines
-  Timeline-Ereignisses ist nicht der Zweck von `--include-secrets`, und die Datei samt Hash
-  ist ohnehin im Fall. Was ein Datensatz aus einem solchen Dokument *ist*, sagt der Katalog
-  und nicht das Dokument: ein Eintrag, den der Katalog als Konfiguration führt, ergibt
-  `config.snapshot`-Datensätze, alles andere `unparsed.record`. Das ist der Unterschied
-  zwischen einem Fall, der eine Konfiguration enthält, und Regeln, die sie lesen können, und
-  er war vier ausgelieferte Regeln wert, die in einer echten Sammlung nie auslösen konnten.
-  Daneben liegt ein zweites formatbezogenes Modul, `instructions/`, für den
-  Anweisungsbestand: die dreiundsechzig Katalogartefakte mit Skills, Commands, Output
-  Styles, Regeln, Steering-Dateien und Hook-Skripten. Es liest jede Datei ganz, unterscheidet
-  den Scope anhand der von der Sammlung festgehaltenen Arbeitskopien statt anhand der Form
-  des Pfades, holt das Front Matter eines Skills heraus samt der Werkzeuge, die es sich
-  selbst zuspricht, und zählt die Zeichen, die ein Prüfer nicht sehen kann. Es behauptet
-  nicht, einen Systemprompt zu zeigen: der Basisprompt des Herstellers liegt nicht auf dem
-  Endpunkt, und das Gegenteil zu sagen würde eine Frage beantworten, die das Material nicht
-  beantworten kann.
+  Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
+  beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
+  Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
+  zählt diese Dateien und sagt, welche es sind. 29 Module lesen 344 der 466
+  Katalogartefakte; der Rest sind die Anmeldedatenspeicher, die absichtlich niemand liest,
+  die Installationsspuren, die das Dateisystem-Ereignis beantwortet, und die Binärspeicher,
+  die noch eigene Formate brauchen.
+
+  **Die Agenten-Parser** sind die, die gegen eine Herstellerquelle geschrieben wurden:
+  Claude Code, Codex CLI und dessen Projektion in Zeilen, Copilot CLI, Gemini CLI und Qwen
+  Code (ein Modul, weil Qwen ein Fork ist und beide die Gemini-Inhaltsform schreiben), Pi,
+  Cline mit seinen Forks Roo Code und Kilo Code und dem separaten SDK-Sitzungsspeicher,
+  Continue, Zed und seine Seitenleiste, Aider, Amazon Q, opencode, Hermes und die
+  VS-Code-Zustandsspeicher. Jeder übernimmt seine Artefakte von den Böden darunter, ein
+  verifiziertes Schema nach dem anderen.
+
+  **Die Böden** gehen über Formate statt über Agenten und existieren, damit eine Datei, die
+  niemand gemappt hat, im Fall als Datensätze sichtbar ist, die sich jemand ansehen muss,
+  statt als Dateiname ohne Inhalt dahinter. Jeder von ihnen schreibt auf jedes Ereignis,
+  dass die Lesung uninterpretiert ist, und der Fall zählt diese Datensätze getrennt von
+  denen, die nichts lesen konnte: das eine ist intakte Evidenz ohne Lesung, das andere ein
+  Defekt in der Evidenz.
+
+  - **SQLite-Speicher.** Nur lesend aus einer Kopie geöffnet und Tabelle für Tabelle, Zeile
+    für Zeile zurückgegeben, ohne aus einer Zeile mehr zu lesen, als sie wörtlich sagt. Ein
+    zstd-Frame in einem BLOB wird vorher entpackt, denn so legt ein Editor ganze Threads ab,
+    und deshalb ist der Python-Boden 3.14 (ADR 0024).
+  - **Zeilenbegrenzte Logs.** Jedes JSON-Lines-Artefakt, das kein verifizierter Parser
+    beansprucht, Datensatz für Datensatz. Dieser Boden existiert, weil die beiden Erzeuger
+    des einheitlichen Formats auseinandergelaufen waren und der Analyzer die Seite war, die
+    weniger las; ein Test schlägt jetzt fehl, wenn sich die Lücke in eine der beiden
+    Richtungen wieder öffnet.
+  - **Ganze Dokumente.** JSON, YAML, TOML und Property Lists über eine gemeinsame Lesung
+    (ADR 0027 für die Regel, ADR 0028 für die anderen drei Formate). Ein Dokument hat keine
+    eigenen Datensätze, also wird es allein nach Struktur aufgeteilt, eine Ebene tief, nie
+    nach einer Vermutung über seine Bedeutung. Was ein Datensatz *ist*, kommt aus dem
+    Katalog und nicht aus dem Dokument: ein als Konfiguration geführter Eintrag erzeugt
+    `config.snapshot`, alles andere `unparsed.record`. Genau diese Unterscheidung lässt eine
+    Regel über eine Einstellung sie auch finden, und sie war vier ausgelieferte Regeln wert,
+    die auf einer echten Sammlung überhaupt nicht feuern konnten.
+  - **Textlogs.** Eine Zeile ist ein Datensatz, datiert nur dort, wo die Zeile mit ihrem
+    eigenen Zeitstempel beginnt, denn eine Zeile, die ein Datum erwähnt, ist keine Zeile,
+    die damals passiert ist. Die Lesung stoppt nach einer festen Zeilenzahl und sagt das in
+    einem eigenen Ereignis.
+  - **Prosa.** Ein Chat-Export, eine ausgelagerte Werkzeugausgabe, die Ausgabe eines
+    Hintergrund-Subagenten, ein geschriebener Plan: am Stück gelesen, ein Ereignis pro
+    Datei, denn ein halber Prompt liest sich in einem Bericht wie das, was jemand gefragt
+    hat.
+  - **Shell-History.** Vier Shells und die Recall-Datei des Agenten selbst, jede so gelesen,
+    wie ihr eigener Schreiber sie schreibt. Hier steht die Startzeile eines Agenten, also
+    die erste Frage des Briefings über einen Agenten, und sie steht fast nie im Agenten.
+  - **Verschlüsselte Speicher.** Ein Produkt legt seine Gespräche in einem AES-GCM-Container
+    um ein Protobuf ab. Der Container wird nur mit einem Schlüssel geöffnet, den die
+    Untersuchende mitgibt, unter der Rahmung, die sich authentifiziert, und der Klartext
+    wird über das Wire-Format gelaufen, also sind seine Felder Nummern statt Namen, und
+    jeder Datensatz sagt das (ADR 0029).
+
+  **Die Instruktionsfläche** hat ihr eigenes formatförmiges Modul für die Artefakte, die
+  Skills, Commands, Output Styles, Rules, Steering-Dateien, Subagent-Definitionen und
+  Hook-Skripte enthalten. Es liest jede Datei ganz, unterscheidet den Geltungsbereich anhand
+  der Arbeitskopien, die die Sammlung aufgezeichnet hat, statt anhand der Pfadform, hebt das
+  Frontmatter eines Skills samt der Werkzeuge heraus, die es sich selbst gewährt, und zählt
+  die Zeichen, die eine Prüferin nicht sehen kann. Es behauptet nicht, einen System-Prompt
+  zu zeigen: der Basis-Prompt des Herstellers liegt nicht auf dem Endpunkt, und etwas
+  anderes zu sagen hiesse, eine Frage zu beantworten, die die Evidenz nicht beantworten
+  kann. Die Notizen, die ein Agent sich selbst geschrieben hat, werden genauso gelesen und
+  als Erinnerungen statt als Instruktionen geführt, denn die Instruktionsfläche beantwortet,
+  was dem Agenten aufgetragen wurde, und eine Notiz, die er sich selbst schrieb, ist eine
+  andere Frage.
+
+  **Eine Datei, die kein Text ist**, wird mit Grösse und Hash vermerkt statt als Seite voller
+  Ersatzzeichen, und zwar in jedem dieser Leser. Ein NUL-Byte in den ersten Kilobytes und ein
+  hoher Anteil nicht dekodierter Zeichen entscheiden darüber, und die Schwelle liegt hoch
+  genug, dass ein Dokument von einer Maschine mit anderer Codepage weiterhin als das
+  Dokument gelesen wird, das es ist.
+
 - `model/` das einheitliche Ereignismodell und das SQLite-Fallschema
 - `unified/` das Ereignismodell als Datenstrom: das JSON-Lines-Format und sein Schema,
   dazu der Normalisierer, der eine Sammlung ohne Falldatenbank in ein Log überführt
