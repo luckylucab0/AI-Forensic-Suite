@@ -45,11 +45,13 @@ from agentforensics.parsers.instructions import BINARY_FILE, MAX_TEXT
 SOURCES = frozenset(
     {
         "claude_code.anthropic_active_config",
+        "claude_code.git_global_excludes",
         "claude_code.worktreeinclude",
         "claude_desktop.device_identifier",
         "cline.data_dir_root",
         "cline.workspace_specs",
         "continue.aux_config",
+        "cursor.retrieval_index",
         "ollama.env_overrides",
         "windsurf.ignore_files",
     }
@@ -57,14 +59,20 @@ SOURCES = frozenset(
 
 # The entries whose files are read line by line rather than whole, and what a line is.
 PER_LINE = {
+    "claude_code.git_global_excludes": "exclude",
     "claude_code.worktreeinclude": "include",
     "windsurf.ignore_files": "ignore",
 }
 
-# The name an ignore file has, for the one entry that holds both an ignore file and other
-# things. Read from the name rather than the entry, because that entry claims a directory of
-# configuration with the ignore file beside it.
-_IGNORE_NAMES = (".continueignore", ".codeiumignore", ".devinignore", ".windsurfignore")
+# Files that are a list whichever entry claimed them. Two of these entries claim a whole
+# directory with a list among the things in it, so the entry alone cannot say.
+_BY_NAME = {
+    ".continueignore": "ignore",
+    ".codeiumignore": "ignore",
+    ".devinignore": "ignore",
+    ".windsurfignore": "ignore",
+    "embeddable_files.txt": "indexed",
+}
 
 IGNORED = (
     "this is a pattern the agent was configured never to read, write or index. It is the "
@@ -83,9 +91,37 @@ INCLUDED = (
     "in every worktree on this machine, which is where to look for them"
 )
 
+EXCLUDED = (
+    "this is a pattern in the user's global git excludes, which is where one agent appends "
+    "an entry the first time it writes its own saved-permission file into a repository "
+    "that does not already ignore it. So a pattern naming that file is durable proof the "
+    "agent ran here and saved at least one standing permission, and it survives the "
+    "deletion of every directory the agent made. The file itself belongs to git and most "
+    "of what is in it has nothing to do with any agent"
+)
+
+INDEXED = (
+    "this is a workspace-relative path an editor listed as eligible for upload to its "
+    "vendor's indexing service. It is a name and not content: it says the file existed in "
+    "that workspace and was in scope for indexing, which is still an answer after the file "
+    "itself is gone. Whether it was uploaded is not in this file"
+)
+
 CONFIGURATION = (
     "this is a configuration file read whole. Nothing is read out of it beyond the text it "
     "holds, because no parser has mapped this product's settings to an event"
+)
+
+# How many lines of one list are turned into events. The index list is the reason there is
+# a limit at all: its entry records a hundred thousand paths in one file, and a case should
+# not be fillable by one inventory. Reaching it is said in an event of its own, because a
+# list cut in the middle reads as a shorter list.
+MAX_PATTERNS = 20_000
+
+STOPPED = (
+    "this list holds more than {limit} lines and the reading stopped there. What is missing "
+    "is the rest of this file, not the rest of the evidence: the whole of it is in the "
+    "bundle, at the path in this event's provenance"
 )
 
 TRUNCATED = (
@@ -144,11 +180,23 @@ class TextConfigParser:
         comment is kept because somebody wrote it: a note saying why a directory was
         excluded is exactly the thing an analyst wants to read next to the exclusion.
         """
-        reason = IGNORED if kind == "ignore" else INCLUDED
+        reason = {"ignore": IGNORED, "include": INCLUDED, "exclude": EXCLUDED}.get(kind, INDEXED)
+        seen = 0
         for line in text_lines(context.local_path):
             text = line.text.strip()
             if not text:
                 continue
+            seen += 1
+            if seen > MAX_PATTERNS:
+                yield unparsed(
+                    context.provenance(f"line:{line.number}"),
+                    context.agent,
+                    None,
+                    STOPPED.format(limit=MAX_PATTERNS),
+                    user=context.user,
+                    host=context.host,
+                )
+                return
             comment = text.startswith("#")
             yield Event(
                 kind="config.snapshot",
@@ -207,15 +255,19 @@ def _per_line(context: ParseContext) -> str | None:
     declared = PER_LINE.get(str(context.artifact_id))
     if declared:
         return declared
-    return "ignore" if context.local_path.name in _IGNORE_NAMES else None
+    return _BY_NAME.get(context.local_path.name)
 
 
 __all__ = [
     "CONFIGURATION",
+    "EXCLUDED",
     "IGNORED",
     "INCLUDED",
+    "INDEXED",
+    "MAX_PATTERNS",
     "PER_LINE",
     "SOURCES",
+    "STOPPED",
     "TRUNCATED",
     "TextConfigParser",
 ]

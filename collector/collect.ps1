@@ -7475,7 +7475,7 @@ $EmbeddedCatalogueJson = @'
                     "status": "verified"
                 },
                 {
-                    "category": "install_evidence",
+                    "category": "instructions",
                     "collect_priority": "normal",
                     "id": "pi.extensions",
                     "os": [
@@ -9093,7 +9093,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "e5e3ddce107eecc99bb5bef5e6c1b39b682a28963879436111288c139dfc304c"
+    "sha256": "a394b4a373b6941ba0087f2181bbd5250bfcceaba9d8753832e92b377c13e551"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

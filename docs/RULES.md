@@ -20,6 +20,7 @@ Findings are written into the case database next to the events they rest on, and
 |  | [AFX-ANTIFORENSICS-002](#afx-antiforensics-002) | high |
 |  | [AFX-ANTIFORENSICS-003](#afx-antiforensics-003) | critical |
 |  | [AFX-ANTIFORENSICS-004](#afx-antiforensics-004) | high |
+|  | [AFX-ANTIFORENSICS-005](#afx-antiforensics-005) | low |
 | [`collection_integrity`](#collection-integrity) | [AFX-COLLECTIONINTEGRITY-001](#afx-collectionintegrity-001) | medium |
 | [`dangerous_commands`](#dangerous-commands) | [AFX-DANGEROUSCOMMANDS-001](#afx-dangerouscommands-001) | high |
 |  | [AFX-DANGEROUSCOMMANDS-002](#afx-dangerouscommands-002) | high |
@@ -183,6 +184,37 @@ A shell command deletes or truncates a path that holds agent history or shell hi
 - A redirection into an unrelated file whose path merely mentions one of these directories, since the two halves of this rule are matched over the whole record rather than against each other.
 
 *Samples in the rule file:* 4 / 2 (+/-)
+
+#### AFX-ANTIFORENSICS-005
+
+**An agent's own saved-permission file is named in the global git excludes**
+
+| | |
+| --- | --- |
+| Severity | low |
+| Pack | `anti_forensics` |
+| Agents | `any` |
+| Event kinds | `config.snapshot` |
+| Fields read | `payload.key`, `payload.text` |
+| Tags | `T1070`, `proof-of-use` |
+
+The user's global git excludes file names an agent's saved-permission file. One agent appends that pattern by itself, the first time it writes such a file into a repository that does not already ignore it, so the pattern is a record the agent left outside every directory it owns.
+
+*What it matches:* `payload.key matches /^exclude:/ and payload.text matches /(?i)(^\|[/\\*])\.(claude\|cline\|codeium\|continue\|cursor\|aider\|qwen\|gemini)[/\\]/`
+
+*Why an analyst cares:* This is the one finding here that survives a thorough clean-up, which is why it is worth a rule despite being small. Deleting an agent's configuration directory, purging its projects and clearing its transcripts leaves this line untouched: it is in git's file, in the user's own configuration directory, and nothing an agent does removes it. So it says two things after everything else is gone. That the agent ran on this machine at all, and that it wrote at least one saved permission, which means somebody was asked to approve something and the answer was kept for next time. It says nothing about what was approved or when. It is low severity because on a machine where the agent was used openly it is entirely expected, and it becomes interesting only next to an absence: an endpoint whose agent directories are gone and whose git excludes still carry this line.
+
+*Known false positives:*
+
+- A pattern the user wrote themselves, which is common and indistinguishable from one an agent appended. The finding is that the line is there, not who put it there.
+- A machine where the agent is still installed and in daily use, where this is the expected state and says nothing beyond that.
+- A pattern naming one of these directories for an unrelated reason, since the directory names are short and several are ordinary words.
+
+*References:*
+
+- <https://code.claude.com/docs/en/settings>
+
+*Samples in the rule file:* 2 / 2 (+/-)
 
 ## collection integrity
 

@@ -54,13 +54,13 @@ Targets:
         Recursive: false
     -
         Name: pi.extensions
-        Category: install_evidence
+        Category: instructions
         Path: C:\Users\%user%\.pi\agent\extensions
         FileMask: "*.ts"
         Recursive: false
     -
         Name: pi.extensions
-        Category: install_evidence
+        Category: instructions
         Path: C:\Users\%user%\.pi\agent\tools
         FileMask: "*"
         Recursive: true

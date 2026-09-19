@@ -125,7 +125,7 @@ artifacts:
     FILE-NAME INVENTORY, not content: proves which files existed in a workspace and were eligible for upload to the vendor's indexing service, even if the files themselves are gone. Low session linkage. CachedData is keyed by commit hash (219 MB / 11 directories observed) and is useful only for version dating.
 
     Record structure: embeddable_files.txt is a newline-delimited list of workspace-relative paths (100,000 unique paths / 9.51 MB observed, mean 94 chars, max 273). high_level_folder_description.txt is a one-line marker (39 bytes observed). A 'Crepe' local index (index.bin, postings.bin, metadata.json, built by the bundled crepectl helper) is referenced but was not present in the audited profile.
-  parser: null
+  parser: text_config
 - id: cursor.agent_cli_state
   category: config
   root: user_profile

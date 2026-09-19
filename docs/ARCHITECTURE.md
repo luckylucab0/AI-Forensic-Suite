@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  Thirty-four modules read 367 of the catalogue's 473 artifacts; the rest are the credential
+  Thirty-four modules read 370 of the catalogue's 473 artifacts; the rest are the credential
   stores nothing reads on purpose, the install evidence the filesystem event answers, and
   the binary stores that still need their own formats.
 
@@ -168,7 +168,12 @@ it cannot be rewritten *quietly*.
     wrote. A worktree include list is an inventory of the gitignored files the agent copies
     into every worktree it creates, which the vendor documents with environment files and
     secrets configuration as its examples, so a name in it says where copies of that file
-    are.
+    are. Two more lists join them for the same reason. The user's global git excludes,
+    where one agent appends a pattern naming its own saved-permission file the first time
+    it writes one, which makes that line the single marker that outlives every directory
+    the agent owns. And an editor's index list, which is a file-name inventory rather than
+    content: it says which files existed in a workspace and were in scope for upload to the
+    vendor's indexing service, which is still an answer after the files are gone.
   - **Shell history.** Four shells and the agent's own recall file, each read the way its
     own writer writes it. This is where an agent's start line is, which is the brief's first
     question about an agent and is almost never inside the agent.

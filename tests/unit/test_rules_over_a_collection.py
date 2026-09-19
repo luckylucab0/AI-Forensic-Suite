@@ -54,6 +54,8 @@ EXPECTED = {
     "force",
     "AFX-COLLECTIONINTEGRITY-001": "~/.zshrc exports the variable that moves the agent's "
     "whole configuration tree away from the path this very fixture writes it to",
+    "AFX-ANTIFORENSICS-005": "~/.config/git/ignore carries the line the agent appended "
+    "when it saved its first standing permission, which outlives every directory it owns",
     "AFX-DANGEROUSCOMMANDS-002": "a transcript holds a command that pipes a download into a shell",
     "AFX-EXFILINDICATORS-004": "~/.zsh_history holds a command that uploaded a named file",
     "AFX-PERMISSIONBYPASS-001": "~/.zsh_history holds the start line that skips the prompts",

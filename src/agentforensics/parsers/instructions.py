@@ -119,6 +119,12 @@ SOURCES = frozenset(
         "lmstudio.hub_downloads",
         "lmstudio.presets",
         "opencode.agents_commands",
+        # Executable TypeScript the agent loads. Its entry says to treat it as
+        # user-supplied code: a modified built-in or a bespoke tool is both a
+        # capability grant and, potentially, the malicious component itself. The
+        # suffix rule below files it as executable, which is what a rule about a
+        # script that fetches code and runs it needs to see it.
+        "pi.extensions",
         "pi.prompts",
         "qwen_code.ignore_files",
         "qwen_code.project_extension_points",

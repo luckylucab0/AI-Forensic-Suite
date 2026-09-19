@@ -20,6 +20,7 @@ Funde werden in die Falldatenbank geschrieben, neben die Ereignisse, auf denen s
 |  | [AFX-ANTIFORENSICS-002](#afx-antiforensics-002) | hoch |
 |  | [AFX-ANTIFORENSICS-003](#afx-antiforensics-003) | kritisch |
 |  | [AFX-ANTIFORENSICS-004](#afx-antiforensics-004) | hoch |
+|  | [AFX-ANTIFORENSICS-005](#afx-antiforensics-005) | niedrig |
 | [`collection_integrity`](#collection-integrity) | [AFX-COLLECTIONINTEGRITY-001](#afx-collectionintegrity-001) | mittel |
 | [`dangerous_commands`](#dangerous-commands) | [AFX-DANGEROUSCOMMANDS-001](#afx-dangerouscommands-001) | hoch |
 |  | [AFX-DANGEROUSCOMMANDS-002](#afx-dangerouscommands-002) | hoch |
@@ -185,6 +186,37 @@ Schritte, die den Nachweis verkürzen oder entfernen. Der ergiebigste Fund in di
 - [EN] A redirection into an unrelated file whose path merely mentions one of these directories, since the two halves of this rule are matched over the whole record rather than against each other.
 
 *Stichproben in der Regeldatei:* 4 / 2 (+/-)
+
+#### AFX-ANTIFORENSICS-005
+
+**An agent's own saved-permission file is named in the global git excludes**
+
+| | |
+| --- | --- |
+| Schweregrad | niedrig |
+| Paket | `anti_forensics` |
+| Agenten | `any` |
+| Ereignisarten | `config.snapshot` |
+| Gelesene Felder | `payload.key`, `payload.text` |
+| Schlagworte | `T1070`, `proof-of-use` |
+
+[EN] The user's global git excludes file names an agent's saved-permission file. One agent appends that pattern by itself, the first time it writes such a file into a repository that does not already ignore it, so the pattern is a record the agent left outside every directory it owns.
+
+*Worauf sie trifft:* `payload.key matches /^exclude:/ and payload.text matches /(?i)(^\|[/\\*])\.(claude\|cline\|codeium\|continue\|cursor\|aider\|qwen\|gemini)[/\\]/`
+
+*Warum das für die Analyse zählt:* [EN] This is the one finding here that survives a thorough clean-up, which is why it is worth a rule despite being small. Deleting an agent's configuration directory, purging its projects and clearing its transcripts leaves this line untouched: it is in git's file, in the user's own configuration directory, and nothing an agent does removes it. So it says two things after everything else is gone. That the agent ran on this machine at all, and that it wrote at least one saved permission, which means somebody was asked to approve something and the answer was kept for next time. It says nothing about what was approved or when. It is low severity because on a machine where the agent was used openly it is entirely expected, and it becomes interesting only next to an absence: an endpoint whose agent directories are gone and whose git excludes still carry this line.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A pattern the user wrote themselves, which is common and indistinguishable from one an agent appended. The finding is that the line is there, not who put it there.
+- [EN] A machine where the agent is still installed and in daily use, where this is the expected state and says nothing beyond that.
+- [EN] A pattern naming one of these directories for an unrelated reason, since the directory names are short and several are ordinary words.
+
+*Quellen:*
+
+- <https://code.claude.com/docs/en/settings>
+
+*Stichproben in der Regeldatei:* 2 / 2 (+/-)
 
 ## collection integrity
 

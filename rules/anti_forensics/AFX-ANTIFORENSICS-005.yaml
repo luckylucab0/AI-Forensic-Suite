@@ -1,0 +1,73 @@
+id: AFX-ANTIFORENSICS-005
+pack: anti_forensics
+title: An agent's own saved-permission file is named in the global git excludes
+severity: low
+description: >
+  The user's global git excludes file names an agent's saved-permission file. One agent
+  appends that pattern by itself, the first time it writes such a file into a repository
+  that does not already ignore it, so the pattern is a record the agent left outside every
+  directory it owns.
+rationale: >
+  This is the one finding here that survives a thorough clean-up, which is why it is worth
+  a rule despite being small. Deleting an agent's configuration directory, purging its
+  projects and clearing its transcripts leaves this line untouched: it is in git's file, in
+  the user's own configuration directory, and nothing an agent does removes it. So it says
+  two things after everything else is gone. That the agent ran on this machine at all, and
+  that it wrote at least one saved permission, which means somebody was asked to approve
+  something and the answer was kept for next time. It says nothing about what was approved
+  or when. It is low severity because on a machine where the agent was used openly it is
+  entirely expected, and it becomes interesting only next to an absence: an endpoint whose
+  agent directories are gone and whose git excludes still carry this line.
+applies_to:
+  kinds: [config.snapshot]
+match:
+  all:
+    # Only the global git excludes reader writes this key, so no other configuration
+    # reaches this rule and no transcript that merely quotes the pattern can.
+    - field: payload.key
+      regex: '^exclude:'
+    - field: payload.text
+      regex: '(?i)(^|[/\\*])\.(claude|cline|codeium|continue|cursor|aider|qwen|gemini)[/\\]'
+tags:
+  - T1070
+  - proof-of-use
+false_positives:
+  - >-
+    A pattern the user wrote themselves, which is common and indistinguishable from one an
+    agent appended. The finding is that the line is there, not who put it there.
+  - >-
+    A machine where the agent is still installed and in daily use, where this is the
+    expected state and says nothing beyond that.
+  - >-
+    A pattern naming one of these directories for an unrelated reason, since the
+    directory names are short and several are ordinary words.
+references:
+  - https://code.claude.com/docs/en/settings
+tests:
+  - name: the saved-permission file one agent appends by itself
+    match: true
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      payload:
+        key: "exclude:**/.claude/settings.local.json"
+        text: "**/.claude/settings.local.json"
+  - name: another agent's directory excluded globally
+    match: true
+    event:
+      kind: config.snapshot
+      agent: crosscutting
+      payload: {key: "exclude:.cline/", text: ".cline/"}
+  - name: an ordinary global exclude
+    match: false
+    event:
+      kind: config.snapshot
+      agent: crosscutting
+      payload: {key: "exclude:.DS_Store", text: ".DS_Store"}
+  - name: the same pattern quoted in a conversation
+    match: false
+    out_of_scope: true
+    event:
+      kind: user.prompt
+      agent: claude_code
+      payload: {text: "add **/.claude/settings.local.json to gitignore"}

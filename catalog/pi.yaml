@@ -121,7 +121,7 @@ artifacts:
     The verification pass found the word server absent from the cited configuration module. The experimental server module joins the home directory with .pi and server, so the path is real but not stated where this entry points.
   parser: null
 - id: pi.extensions
-  category: install_evidence
+  category: instructions
   root: user_profile
   os:
   - macos
@@ -140,10 +140,10 @@ artifacts:
   - ~/.pi/agent/extensions/*.ts
   volatility: Persistent until removed.
   notes: |-
-    These are executable TypeScript loaded into the agent. Treat as user-supplied code: a modified edit.ts or a bespoke tool is both a capability grant and, potentially, the malicious component itself. Collect content, not just filenames.
+    These are executable TypeScript loaded into the agent. Treat as user-supplied code: a modified edit.ts or a bespoke tool is both a capability grant and, potentially, the malicious component itself. Collect content, not just filenames. Recategorised from install_evidence to instructions: this entry's own note says to collect the content and not the filenames, which is the opposite of what install evidence is for, and the catalogue already files a hook script referenced by an agent's settings as an instruction. The event kind names a hook script as an example of one, so executable code an agent loads belongs with the rest of the instruction surface rather than with proof that a product was installed.
 
     The verification pass found the word extension absent from the cited configuration module; the extension loader is what builds this directory.
-  parser: null
+  parser: instructions
 - id: pi.prompts
   category: instructions
   root: user_profile

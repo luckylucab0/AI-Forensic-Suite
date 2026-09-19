@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 34 Module lesen 367 der 473
+  zählt diese Dateien und sagt, welche es sind. 34 Module lesen 370 der 473
   Katalogartefakte; der Rest sind die Anmeldedatenspeicher, die absichtlich niemand liest,
   die Installationsspuren, die das Dateisystem-Ereignis beantwortet, und die Binärspeicher,
   die noch eigene Formate brauchen.
@@ -184,7 +184,13 @@ ist, dass das nicht *unbemerkt* geht.
     Worktree-Include-Liste ist ein Verzeichnis der gitignorierten Dateien, die der Agent in
     jeden von ihm angelegten Worktree kopiert, und der Hersteller dokumentiert sie mit
     Umgebungsdateien und Secrets-Konfiguration als Beispielen: ein Name darin sagt also,
-    wo Kopien dieser Datei liegen.
+    wo Kopien dieser Datei liegen. Zwei weitere Listen kommen aus demselben Grund dazu. Die
+    globalen git-Excludes der Nutzenden, wo ein Agent ein Muster für seine eigene Datei mit
+    gespeicherten Berechtigungen anhängt, sobald er die erste schreibt, womit diese Zeile
+    der einzige Marker ist, der jedes Verzeichnis des Agenten überlebt. Und die Indexliste
+    eines Editors, die ein Dateinamens-Verzeichnis ist und kein Inhalt: sie sagt, welche
+    Dateien in einem Arbeitsbereich existierten und für den Upload zum Indexdienst des
+    Herstellers in Frage kamen, und das ist noch eine Antwort, wenn die Dateien weg sind.
   - **Shell-History.** Vier Shells und die Recall-Datei des Agenten selbst, jede so gelesen,
     wie ihr eigener Schreiber sie schreibt. Hier steht die Startzeile eines Agenten, also
     die erste Frage des Briefings über einen Agenten, und sie steht fast nie im Agenten.

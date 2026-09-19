@@ -1057,7 +1057,7 @@ artifacts:
     A durable, easily-missed proof-of-use marker: the presence of `**/.claude/settings.local.json` in the global git excludes shows Claude Code granted and saved at least one standing permission on this machine, even if every .claude directory has since been deleted. Excellent anti-anti-forensics indicator and a trivial detection rule.
 
     Record structure: The first time Claude Code writes .claude/settings.local.json in a git repository that does not already ignore it, it appends the pattern `**/.claude/settings.local.json` to the user's GLOBAL git excludes file. That file is `core.excludesFile` when the global git config sets it to an absolute or ~-prefixed path; otherwise $XDG_CONFIG_HOME/git/ignore, or ~/.config/git/ignore when XDG_CONFIG_HOME is unset.
-  parser: null
+  parser: text_config
 - id: claude_code.install_legacy_and_npm
   category: install_evidence
   root: user_profile

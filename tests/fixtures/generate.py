@@ -1795,6 +1795,16 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         "alias claude-work='CLAUDE_CONFIG_DIR=~/.claude-work claude'\n",
     )
 
+    # The line one agent appends to the user's global git excludes the first time it
+    # writes its own saved-permission file into a repository that does not already ignore
+    # it. It is here because it is the one marker that survives a thorough clean-up: it
+    # sits in git's file, in the user's own configuration directory, and nothing the agent
+    # does removes it.
+    write(
+        home / ".config" / "git" / "ignore",
+        ".DS_Store\n*.swp\n**/.claude/settings.local.json\n",
+    )
+
     # Cross-cutting evidence that an agent ran at all.
     write(
         home / ".zsh_history",
