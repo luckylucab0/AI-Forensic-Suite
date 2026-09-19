@@ -297,14 +297,8 @@ artifacts:
   os:
   - windows
   paths:
-  - '%LOCALAPPDATA%\Programs\cursor\'
-  - '%LOCALAPPDATA%\cursor-updater\'
   - HKCU\Software\Classes\cursor\shell\open\command
   - HKCU\Software\Microsoft\Windows\CurrentVersion\Run
-  - ~/Library/Application Support/Cursor/User/globalStorage/statsig-cache.json
-  - ~/Library/Application Support/Cursor/User/globalStorage/storage.json
-  - ~/Library/Application Support/Cursor/machineid
-  - ~/Library/Preferences/com.todesktop.230313mzl4w4u92.plist
   format: registry
   sensitivity: normal
   collect_priority: normal
@@ -313,14 +307,92 @@ artifacts:
     https://raw.githubusercontent.com/depalmar/ai-dfir-toolkit/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/catalog/cursor.yml
   source_kind: community
   volatility: |-
-    machineid and telemetry ids are stable across launches but are exactly what account-resetter tools rewrite — a mismatch between machineid and storage.json telemetry ids is a tamper indicator.
+    Machine-wide persistence keys. An administrative action rather than user activity, and unlikely to be cleaned up by the user.
   notes: |-
-    macOS bundle identifier is com.todesktop.230313mzl4w4u92 (a ToDesktop-built Electron app), which is why naive sweeps keyed on the string 'Cursor' miss ~/Library/Preferences, ~/Library/HTTPStorages and the ByHost ShipIt updater plist. Registry paths come from a DFIR catalogue; the macOS bundle-id paths from a product teardown.
+    The registry half of this product's install evidence. The filesystem paths that used to sit in this entry are now cursor.install_dirs, cursor.machine_identity_storage, cursor.machine_identity_file and cursor.macos_preferences: an entry declared root: registry is skipped whole by the analyzer's path matcher, so those files were collected and then claimed by nothing, and the entry also declared os: windows, so the macOS ones were never collected at all.
 
     Variable location, not globbable: HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\<Cursor GUID>
 
-    Record structure: storage.json holds window state, profile association, theme/splash state, shutdown timing, openedPathsList / backupWorkspaces.folders[].folderUri (the workspace-hash resolver), and telemetry.machineId / devDeviceId / sqmId. Registry Uninstall key yields InstallLocation and DisplayVersion. The cursor:// protocol-handler command key and the Run key are persistence-relevant. Bundle version dating: Contents/Resources/app/product.json (observed version 3.11.13, vscodeVersion 1.125.0, date 2026-07-10T01:45:28Z, commit 3f21b08f0b436a07be29fbfe00b304fa15553350).
+    Record structure: the Uninstall key yields InstallLocation and DisplayVersion. The cursor:// protocol-handler command key and the Run key are persistence-relevant.
   parser: null
+- id: cursor.install_dirs
+  category: install_evidence
+  root: user_profile
+  os:
+  - windows
+  paths:
+  - '%LOCALAPPDATA%\Programs\cursor\'
+  - '%LOCALAPPDATA%\cursor-updater\'
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/depalmar/ai-dfir-toolkit/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/catalog/cursor.yml
+  source_kind: community
+  notes: |-
+    Split out of cursor.install_and_machine_identity, which declared root: registry and was therefore skipped whole by the analyzer's path matcher.
+
+    Record structure: bundle version dating comes from the application's own product.json under the install directory.
+  parser: null
+- id: cursor.machine_identity_storage
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Application Support/Cursor/User/globalStorage/statsig-cache.json
+  - ~/Library/Application Support/Cursor/User/globalStorage/storage.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/depalmar/ai-dfir-toolkit/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/catalog/cursor.yml
+  source_kind: community
+  volatility: |-
+    The telemetry identifiers are stable across launches and are exactly what account-resetter tools rewrite, so a mismatch between these and the machineid file beside them is a tamper indicator.
+  notes: |-
+    Split out of cursor.install_and_machine_identity, which declared root: registry and os: windows, so this document was skipped by the analyzer's path matcher and never collected on the platform it exists on.
+
+    Record structure: storage.json holds window state, profile association, theme and splash state, shutdown timing, openedPathsList and backupWorkspaces.folders[].folderUri, which is the resolver for the workspace hashes other entries are keyed by, and telemetry.machineId, devDeviceId and sqmId.
+  parser: json_generic
+- id: cursor.machine_identity_file
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Application Support/Cursor/machineid
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/depalmar/ai-dfir-toolkit/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/catalog/cursor.yml
+  source_kind: community
+  volatility: |-
+    Stable across launches and rewritten by account-resetter tools, so a mismatch with the telemetry identifiers in storage.json is a tamper indicator.
+  notes: |-
+    Split out of cursor.install_and_machine_identity for the reason given there. One identifier on one line, and its value only means something next to the telemetry identifiers in storage.json.
+  parser: null
+- id: cursor.macos_preferences
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Preferences/com.todesktop.230313mzl4w4u92.plist
+  format: plist
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/depalmar/ai-dfir-toolkit/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/catalog/cursor.yml
+  source_kind: community
+  notes: |-
+    Split out of cursor.install_and_machine_identity for the reason given there. The bundle identifier is com.todesktop.230313mzl4w4u92, a ToDesktop-built Electron application, which is why a sweep keyed on the string Cursor misses this file, the HTTPStorages beside it and the ByHost updater plist.
+  parser: plist_generic
 - id: cursor.ai_code_tracking_db
   category: log
   root: user_profile

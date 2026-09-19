@@ -432,8 +432,10 @@ def test_every_artifact_resolves_to_at_least_one_pattern_per_declared_os(
     for agent in collect.EMBEDDED_CATALOGUE["agents"]:
         for entry in agent["artifacts"]:
             if entry.get("root") == "registry":
-                # A registry key is not a filesystem path. collect.ps1 reads these; the
-                # POSIX collector has nothing to expand and correctly resolves nothing.
+                # A registry key is not a filesystem path and neither collector reads one.
+                # It is skipped here and declined by name where it applies, which is what
+                # the test below holds. The comment that used to stand here said collect.ps1
+                # read these, and it was wrong in the direction that hides a gap.
                 continue
             if all(is_bare_variable(p) for p in entry["paths"]):
                 # An artifact that exists only where a variable points has no default
@@ -1294,4 +1296,108 @@ def test_every_database_has_its_write_ahead_log_claimed() -> None:
         "these databases would be collected without the log holding their newest "
         "transactions, and nothing downstream can tell that the reading is short: "
         f"{ {name: list(paths) for name, paths in sorted(without.items())} }"
+    )
+
+
+# ------------------------------------------------------------- the registry keys
+
+
+def test_a_registry_key_is_declined_by_name_rather_than_as_a_broken_pattern() -> None:
+    """Neither collector reads the registry, and the manifest has to say which it is.
+
+    A key used to fall through to the end of the expander, fail the absolute-path test and
+    be refused as `not_absolute`. That reads as a malformed catalogue entry. It is not one:
+    it is a whole class of evidence that this collector cannot reach, and two of the six
+    entries in that class are the managed policy saying what an agent was allowed to do.
+    The difference between the two readings is the difference between "no policy was in
+    force" and "nobody looked", which is the question a collection exists to answer.
+    """
+    collect = _load_collector()
+    collect.PATTERN_REFUSALS.clear()
+    for key in (
+        r"HKLM\SOFTWARE\Policies\ClaudeCode",
+        r"HKEY_CURRENT_USER\Environment",
+        r"HKCU\Software\Microsoft\Windows\CurrentVersion\Run",
+    ):
+        assert collect.expand_paths(key, "C:/Users/alice", "windows", None) == []
+    reasons = {refusal["reason"] for refusal in collect.PATTERN_REFUSALS}
+    collect.PATTERN_REFUSALS.clear()
+    assert reasons == {"registry_key"}
+
+
+def test_a_registry_key_on_a_posix_target_is_not_a_refusal() -> None:
+    """There it is another platform's spelling of the same artifact, like a %APPDATA% path.
+
+    The entry carries no POSIX sibling for it because there is none, and reporting it would
+    fill the refusal list on every Linux collection with keys that could never have
+    applied. That list is meant to be read.
+    """
+    collect = _load_collector()
+    collect.PATTERN_REFUSALS.clear()
+    assert (
+        collect.expand_paths(r"HKLM\SOFTWARE\Policies\ClaudeCode", "/home/alice", "linux", None)
+        == []
+    )
+    assert not collect.PATTERN_REFUSALS
+
+
+def test_every_catalogued_registry_key_is_declined_the_same_way() -> None:
+    """Over the catalogue rather than over examples, so a key added tomorrow is covered."""
+    collect = _load_collector()
+    catalogue = load_catalogue(CATALOG_DIR)
+    collect.PATTERN_REFUSALS.clear()
+    keys = 0
+    for artifact in catalogue.artifacts:
+        if artifact.root != "registry":
+            continue
+        for path in artifact.paths:
+            assert collect.expand_paths(path, "C:/Users/alice", "windows", None) == [], path
+            keys += 1
+    reasons = {refusal["reason"] for refusal in collect.PATTERN_REFUSALS}
+    refused = len(collect.PATTERN_REFUSALS)
+    collect.PATTERN_REFUSALS.clear()
+    assert keys > 15, "the catalogue's registry keys, not a sample"
+    assert refused == keys and reasons == {"registry_key"}
+
+
+def test_a_registry_entry_holds_registry_keys_and_nothing_else() -> None:
+    """A filesystem path under a registry root is collected and then claimed by nothing.
+
+    The analyzer's path matcher skips an artifact whose root is registry, because a key is
+    not a path it could ever match. That skip is per entry, not per path, so a filesystem
+    path listed alongside the keys disappears from the analyzer entirely: the collector
+    takes the file, the bundle carries it, and the case reports it as a path no catalogue
+    entry claims. Two entries were in that state, and between them they hid eight paths,
+    among them the machine-wide policy file that says what an agent was allowed to do for
+    every user on the host. Both also declared os: windows, so their macOS and Linux
+    locations were never collected either.
+    """
+    catalogue = load_catalogue(CATALOG_DIR)
+    mixed = {}
+    for artifact in catalogue.artifacts:
+        if artifact.root != "registry":
+            continue
+        paths = [path for path in artifact.paths if not path.upper().startswith("HK")]
+        if paths:
+            mixed[artifact.id] = paths
+    assert not mixed, (
+        "these entries declare a registry root and list filesystem paths, so the analyzer "
+        f"skips the entry whole and nothing claims the files: {mixed}"
+    )
+
+
+def test_an_entry_whose_paths_are_registry_keys_says_so_in_its_root() -> None:
+    """The other direction, so a key cannot arrive in an entry the matcher will try to
+    match against a filesystem path and quietly never hit."""
+    catalogue = load_catalogue(CATALOG_DIR)
+    misfiled = {}
+    for artifact in catalogue.artifacts:
+        if artifact.root == "registry":
+            continue
+        keys = [path for path in artifact.paths if path.upper().startswith("HK")]
+        if keys:
+            misfiled[artifact.id] = keys
+    assert not misfiled, (
+        "these entries list a registry key under a filesystem root, so the collector "
+        f"would search for it as a path: {misfiled}"
     )

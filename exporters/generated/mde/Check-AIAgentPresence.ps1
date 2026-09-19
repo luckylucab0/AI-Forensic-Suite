@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 8e99fe9d5a0a
+# Catalogue digest: 03d2e4d3dcba
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -534,6 +534,8 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.global_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\state.vscdb' }
     @{ Agent = 'cursor'; Id = 'cursor.global_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\state.vscdb-shm' }
     @{ Agent = 'cursor'; Id = 'cursor.global_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\state.vscdb-wal' }
+    @{ Agent = 'cursor'; Id = 'cursor.install_dirs'; Path = '$profile\AppData\Local\Programs\cursor' }
+    @{ Agent = 'cursor'; Id = 'cursor.install_dirs'; Path = '$profile\AppData\Local\cursor-updater' }
     @{ Agent = 'cursor'; Id = 'cursor.local_file_history'; Path = '$profile\AppData\Roaming\Cursor\User\History' }
     @{ Agent = 'cursor'; Id = 'cursor.logs'; Path = '$profile\AppData\Roaming\Cursor\logs' }
     @{ Agent = 'cursor'; Id = 'cursor.pasted_text'; Path = '$profile\.cursor\chats' }
@@ -802,6 +804,8 @@ $targets = @(
     @{ Agent = 'windsurf'; Id = 'windsurf.code_tracker_and_settings'; Path = '$profile\.codeium\windsurf\installation_id' }
     @{ Agent = 'windsurf'; Id = 'windsurf.code_tracker_and_settings'; Path = '$profile\.codeium\windsurf\user_settings.pb' }
     @{ Agent = 'windsurf'; Id = 'windsurf.embedding_database'; Path = '$profile\.codeium\windsurf\database' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.enterprise_policy_templates'; Path = 'C:\Windows\PolicyDefinitions\en-US\windsurf.adml' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.enterprise_policy_templates'; Path = 'C:\Windows\PolicyDefinitions\windsurf.admx' }
     @{ Agent = 'windsurf'; Id = 'windsurf.global_rules'; Path = '$profile\.codeium\windsurf-insiders\memories\global_rules.md' }
     @{ Agent = 'windsurf'; Id = 'windsurf.global_rules'; Path = '$profile\.codeium\windsurf-next\memories\global_rules.md' }
     @{ Agent = 'windsurf'; Id = 'windsurf.global_rules'; Path = '$profile\.codeium\windsurf\memories\global_rules.md' }

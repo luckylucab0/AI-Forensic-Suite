@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 8e99fe9d5a0a
+# Catalogue digest: 03d2e4d3dcba
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -137,6 +137,7 @@
 #     kiro.managed_settings
 #     opencode.legacy_json_storage
 #     qwen_code.system_settings
+#     windsurf.enterprise_policy_templates
 #     windsurf.system_config
 #   reachable only through a relocation variable, which a static glob cannot resolve: read the variable off the endpoint
 #     claude_code.git_global_excludes
@@ -612,6 +613,8 @@ sources:
     cursor,cursor.global_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/state.vscdb
     cursor,cursor.global_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/state.vscdb-shm
     cursor,cursor.global_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/state.vscdb-wal
+    cursor,cursor.install_dirs,C:/Users/*/AppData/Local/Programs/cursor/**
+    cursor,cursor.install_dirs,C:/Users/*/AppData/Local/cursor-updater/**
     cursor,cursor.local_file_history,C:/Users/*/AppData/Roaming/Cursor/User/History/**
     cursor,cursor.logs,C:/Users/*/AppData/Roaming/Cursor/logs/**
     cursor,cursor.pasted_text,C:/Users/*/.cursor/chats/*/*/pasted_text.json
@@ -2052,6 +2055,14 @@ sources:
     cursor,cursor.logs,/var/root/Library/Application Support/Cursor/User/process-monitor/**
     cursor,cursor.logs,/var/root/Library/Application Support/Cursor/logs/*/**
     cursor,cursor.logs,/var/root/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log
+    cursor,cursor.machine_identity_file,/Users/*/Library/Application Support/Cursor/machineid
+    cursor,cursor.machine_identity_file,/var/root/Library/Application Support/Cursor/machineid
+    cursor,cursor.machine_identity_storage,/Users/*/Library/Application Support/Cursor/User/globalStorage/statsig-cache.json
+    cursor,cursor.machine_identity_storage,/Users/*/Library/Application Support/Cursor/User/globalStorage/storage.json
+    cursor,cursor.machine_identity_storage,/var/root/Library/Application Support/Cursor/User/globalStorage/statsig-cache.json
+    cursor,cursor.machine_identity_storage,/var/root/Library/Application Support/Cursor/User/globalStorage/storage.json
+    cursor,cursor.macos_preferences,/Users/*/Library/Preferences/com.todesktop.230313mzl4w4u92.plist
+    cursor,cursor.macos_preferences,/var/root/Library/Preferences/com.todesktop.230313mzl4w4u92.plist
     cursor,cursor.pasted_text,/Users/*/.cursor/chats/*/*/pasted_text.json
     cursor,cursor.pasted_text,/var/root/.cursor/chats/*/*/pasted_text.json
     cursor,cursor.plugins,/Users/*/.cursor/plugins/**
@@ -2865,6 +2876,7 @@ sources:
     windsurf,windsurf.embedding_database,/var/root/.codeium/windsurf/database/*/embedding_database.sqlite
     windsurf,windsurf.embedding_database,/var/root/.codeium/windsurf/database/*/embedding_database.sqlite-shm
     windsurf,windsurf.embedding_database,/var/root/.codeium/windsurf/database/*/embedding_database.sqlite-wal
+    windsurf,windsurf.enterprise_policy_bundled,/Applications/Devin.app/Contents/Resources/app/policies
     windsurf,windsurf.global_rules,/Users/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,windsurf.global_rules,/Users/*/.codeium/windsurf-next/memories/global_rules.md
     windsurf,windsurf.global_rules,/Users/*/.codeium/windsurf/memories/global_rules.md
@@ -4770,6 +4782,7 @@ sources:
     windsurf,windsurf.embedding_database,/root/.codeium/windsurf/database/*/embedding_database.sqlite
     windsurf,windsurf.embedding_database,/root/.codeium/windsurf/database/*/embedding_database.sqlite-shm
     windsurf,windsurf.embedding_database,/root/.codeium/windsurf/database/*/embedding_database.sqlite-wal
+    windsurf,windsurf.enterprise_policy_json,/etc/windsurf/policies/policy.json
     windsurf,windsurf.global_rules,/home/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,windsurf.global_rules,/home/*/.codeium/windsurf-next/memories/global_rules.md
     windsurf,windsurf.global_rules,/home/*/.codeium/windsurf/memories/global_rules.md

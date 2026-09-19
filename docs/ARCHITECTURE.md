@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  Thirty-two modules read 350 of the catalogue's 466 artifacts; the rest are the credential
+  Thirty-two modules read 353 of the catalogue's 473 artifacts; the rest are the credential
   stores nothing reads on purpose, the install evidence the filesystem event answers, and
   the binary stores that still need their own formats.
 

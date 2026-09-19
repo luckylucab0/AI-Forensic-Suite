@@ -257,8 +257,16 @@ the reason for each. Read that section before you read the results. The recurrin
 - **Platform scope.** KAPE and the live response package are Windows only, and they say how
   much of the catalogue that puts out of reach.
 
-The collector reads all four of those. That is the honest division of labour: a generated
-rule finds the hosts worth looking at, the collector gets the evidence.
+The collector reads three of those four. A working copy, a relocation variable and a
+Windows-only path are all filesystem questions and it answers them. A registry key is not:
+both collectors read the filesystem and neither reads the registry, so a catalogued key is
+declined by name and appears in the bundle's `refused_patterns` as `registry_key`. Six
+catalogue entries are registry keys, and two of them are the managed policy that says what
+an agent was allowed to do, so for those the generated rules are not a way of finding hosts
+worth looking at: they are the only thing in this suite that gets the evidence.
+
+For the other three that is the honest division of labour: a generated rule finds the hosts
+worth looking at, the collector gets the evidence.
 
 An empty result from any of these means the paths it searched held nothing. It does not mean
 the host is clean, and each generated file argues that point in its header, because the

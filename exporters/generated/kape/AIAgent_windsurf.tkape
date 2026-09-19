@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 8e99fe9d5a0a
+# Catalogue digest: 03d2e4d3dcba
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 28 of the 466 catalogue artifacts declare
+# KAPE is Windows only. 33 of the 473 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -142,6 +142,18 @@ Targets:
         Category: cache
         Path: C:\Users\%user%\.codeium\windsurf\database\*
         FileMask: "embedding_database.sqlite-wal"
+        Recursive: false
+    -
+        Name: windsurf.enterprise_policy_templates
+        Category: permissions
+        Path: C:\Windows\PolicyDefinitions
+        FileMask: "windsurf.admx"
+        Recursive: false
+    -
+        Name: windsurf.enterprise_policy_templates
+        Category: permissions
+        Path: C:\Windows\PolicyDefinitions\en-US
+        FileMask: "windsurf.adml"
         Recursive: false
     -
         Name: windsurf.global_rules

@@ -4922,16 +4922,25 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
-                        "%LOCALAPPDATA%\\Programs\\cursor\\",
-                        "%LOCALAPPDATA%\\cursor-updater\\",
                         "HKCU\\Software\\Classes\\cursor\\shell\\open\\command",
-                        "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-                        "~/Library/Application Support/Cursor/User/globalStorage/statsig-cache.json",
-                        "~/Library/Application Support/Cursor/User/globalStorage/storage.json",
-                        "~/Library/Application Support/Cursor/machineid",
-                        "~/Library/Preferences/com.todesktop.230313mzl4w4u92.plist"
+                        "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
                     ],
                     "root": "registry",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "cursor.install_dirs",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Programs\\cursor\\",
+                        "%LOCALAPPDATA%\\cursor-updater\\"
+                    ],
+                    "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "unverified"
                 },
@@ -4968,6 +4977,49 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/Library/Application Support/Cursor/User/process-monitor/",
                         "~/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log",
                         "~/Library/Application Support/Cursor/logs/<launch-timestamp>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "cursor.machine_identity_file",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/Cursor/machineid"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "cursor.machine_identity_storage",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/Cursor/User/globalStorage/statsig-cache.json",
+                        "~/Library/Application Support/Cursor/User/globalStorage/storage.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "cursor.macos_preferences",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Preferences/com.todesktop.230313mzl4w4u92.plist"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -8444,14 +8496,53 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
-                        "/Applications/Devin.app/Contents/Resources/app/policies",
-                        "/etc/windsurf/policies/policy.json",
-                        "C:\\Windows\\PolicyDefinitions\\en-US\\windsurf.adml",
-                        "C:\\Windows\\PolicyDefinitions\\windsurf.admx",
                         "HKCU\\Software\\Policies\\Windsurf\\<ProductName>",
                         "HKLM\\Software\\Policies\\Windsurf\\<ProductName>"
                     ],
                     "root": "registry",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "windsurf.enterprise_policy_bundled",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "/Applications/Devin.app/Contents/Resources/app/policies"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "windsurf.enterprise_policy_json",
+                    "os": [
+                        "linux"
+                    ],
+                    "paths": [
+                        "/etc/windsurf/policies/policy.json"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "windsurf.enterprise_policy_templates",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "C:\\Windows\\PolicyDefinitions\\en-US\\windsurf.adml",
+                        "C:\\Windows\\PolicyDefinitions\\windsurf.admx"
+                    ],
+                    "root": "system",
                     "sensitivity": "normal",
                     "status": "unverified"
                 },
@@ -8947,7 +9038,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "023135bf6ae5c1d8f0fda9493c7e4b28995f911437fbce8cc5686673f623c6ea"
+    "sha256": "e5e3ddce107eecc99bb5bef5e6c1b39b682a28963879436111288c139dfc304c"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)
@@ -9390,6 +9481,12 @@ PATTERN_REFUSALS = []
 STATE_READ_PROBLEMS = []
 
 
+# The hive names the catalogue uses, both spellings. A key is recognised before any
+# expansion, because nothing here can turn one into a path and every later step would
+# make it look more like one.
+_REGISTRY_KEY = re.compile(r"^HK(EY_[A-Z_]+|CU|LM|U|CR|CC)[\\/]")
+
+
 def refuse_pattern(pattern, expanded, reason):
     """Record a refusal once and return the empty result the caller expects."""
     record = {"pattern": pattern, "expanded": expanded, "reason": reason}
@@ -9522,6 +9619,17 @@ def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> l
     # still cannot be resolved, which is what the refusal at the end of this function is
     # for.
     if target_os == "windows":
+        if _REGISTRY_KEY.match(text):
+            # A registry key on a Windows target is evidence this collector cannot reach.
+            # It is not a malformed pattern and it is not another platform's spelling, and
+            # it used to be reported as the first: the key fell through to the end of this
+            # function, failed the absolute-path test and was refused as `not_absolute`,
+            # which tells a reader the catalogue is broken rather than that a whole class
+            # of evidence was never collected. Two of these keys are the managed policy
+            # that says what an agent was allowed to do, so reading the refusal correctly
+            # is the difference between "no policy was in force" and "nobody looked".
+            # The generated Velociraptor and KAPE rules do read them.
+            return refuse_pattern(pattern, text, "registry_key")
         if text.startswith("$"):
             if variable_name(text) in _POSIX_ONLY_VARIABLES:
                 # Another platform's spelling of the same artifact. The entry carries a

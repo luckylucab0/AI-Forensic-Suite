@@ -67,8 +67,12 @@ Fassungen nicht auseinanderlaufen. Die Felder, die nicht selbsterklärend sind:
 - `refused_patterns` führt die Katalogmuster auf, die der Collector nicht durchsucht hat,
   jeweils mit dem Muster wie geschrieben, dem Stand der Auflösung und einem der Gründe
   `not_absolute`, `wildcard_too_broad`, `wildcard_only`, `malformed_variable`,
-  `environment_unreadable_offline`, `environment_unreadable_other_user` oder
-  `profile_is_a_symlink`. Das Feld gibt es, weil ein nicht durchsuchtes Muster
+  `environment_unreadable_offline`, `environment_unreadable_other_user`,
+  `profile_is_a_symlink` oder `registry_key`. Der letzte ist eine ganze Klasse und kein
+  Defekt an einem einzelnen Muster: beide Collectors lesen das Dateisystem und keiner
+  liest die Registry, also wird ein katalogisierter Schlüssel namentlich abgelehnt. Zwei
+  dieser Schlüssel sind die verwaltete Richtlinie, die sagt, was ein Agent durfte, und
+  gelesen werden sie von den generierten Velociraptor- und KAPE-Regeln. Das Feld gibt es, weil ein nicht durchsuchtes Muster
   eine Lücke in der Abdeckung ist und ein Bundle, das darüber schweigt, genauso aussieht
   wie ein Bundle von einem Host, auf dem das Artefakt gar nicht vorhanden war.
 

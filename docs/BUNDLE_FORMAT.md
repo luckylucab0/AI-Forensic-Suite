@@ -129,8 +129,12 @@ Field notes that are not obvious:
 - `refused_patterns` lists the catalogue patterns the collector declined to search, with
   the pattern as written, how far it got expanding it, and one of `not_absolute`,
   `wildcard_too_broad`, `wildcard_only`, `malformed_variable`,
-  `environment_unreadable_offline`, `environment_unreadable_other_user` or
-  `profile_is_a_symlink`. It exists because a pattern nobody searched is a hole in the
+  `environment_unreadable_offline`, `environment_unreadable_other_user`,
+  `profile_is_a_symlink` or `registry_key`. The last one is a whole class rather than a
+  defect in one pattern: both collectors read the filesystem and neither reads the
+  registry, so a catalogued key is declined by name. Two of those keys are the managed
+  policy that says what an agent was allowed to do, and the generated Velociraptor and
+  KAPE rules are what reads them. It exists because a pattern nobody searched is a hole in the
   coverage, and a bundle that is silent about it looks exactly like a bundle from a host
   where the artifact was absent.
 

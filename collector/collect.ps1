@@ -4977,16 +4977,25 @@ $EmbeddedCatalogueJson = @'
                         "windows"
                     ],
                     "paths": [
-                        "%LOCALAPPDATA%\\Programs\\cursor\\",
-                        "%LOCALAPPDATA%\\cursor-updater\\",
                         "HKCU\\Software\\Classes\\cursor\\shell\\open\\command",
-                        "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-                        "~/Library/Application Support/Cursor/User/globalStorage/statsig-cache.json",
-                        "~/Library/Application Support/Cursor/User/globalStorage/storage.json",
-                        "~/Library/Application Support/Cursor/machineid",
-                        "~/Library/Preferences/com.todesktop.230313mzl4w4u92.plist"
+                        "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
                     ],
                     "root": "registry",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "cursor.install_dirs",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Programs\\cursor\\",
+                        "%LOCALAPPDATA%\\cursor-updater\\"
+                    ],
+                    "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "unverified"
                 },
@@ -5023,6 +5032,49 @@ $EmbeddedCatalogueJson = @'
                         "~/Library/Application Support/Cursor/User/process-monitor/",
                         "~/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log",
                         "~/Library/Application Support/Cursor/logs/<launch-timestamp>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "cursor.machine_identity_file",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/Cursor/machineid"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "cursor.machine_identity_storage",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/Cursor/User/globalStorage/statsig-cache.json",
+                        "~/Library/Application Support/Cursor/User/globalStorage/storage.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "cursor.macos_preferences",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Preferences/com.todesktop.230313mzl4w4u92.plist"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -8499,14 +8551,53 @@ $EmbeddedCatalogueJson = @'
                         "windows"
                     ],
                     "paths": [
-                        "/Applications/Devin.app/Contents/Resources/app/policies",
-                        "/etc/windsurf/policies/policy.json",
-                        "C:\\Windows\\PolicyDefinitions\\en-US\\windsurf.adml",
-                        "C:\\Windows\\PolicyDefinitions\\windsurf.admx",
                         "HKCU\\Software\\Policies\\Windsurf\\<ProductName>",
                         "HKLM\\Software\\Policies\\Windsurf\\<ProductName>"
                     ],
                     "root": "registry",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "windsurf.enterprise_policy_bundled",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "/Applications/Devin.app/Contents/Resources/app/policies"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "windsurf.enterprise_policy_json",
+                    "os": [
+                        "linux"
+                    ],
+                    "paths": [
+                        "/etc/windsurf/policies/policy.json"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "windsurf.enterprise_policy_templates",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "C:\\Windows\\PolicyDefinitions\\en-US\\windsurf.adml",
+                        "C:\\Windows\\PolicyDefinitions\\windsurf.admx"
+                    ],
+                    "root": "system",
                     "sensitivity": "normal",
                     "status": "unverified"
                 },
@@ -9002,7 +9093,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "023135bf6ae5c1d8f0fda9493c7e4b28995f911437fbce8cc5686673f623c6ea"
+    "sha256": "e5e3ddce107eecc99bb5bef5e6c1b39b682a28963879436111288c139dfc304c"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json
@@ -9820,6 +9911,19 @@ function Expand-CataloguePath {
     # not a refusal. What must never be quiet is a pattern that applies here and still
     # cannot be resolved, which is what the refusals at the end are for.
     if ($TargetOs -eq 'windows') {
+        if ($text -match '^HK(EY_[A-Z_]+|CU|LM|U|CR|CC)[\\/]') {
+            # A registry key on a Windows target is evidence this collector cannot reach.
+            # It is not a malformed pattern and it is not another platform's spelling, and
+            # it used to be reported as the first: the key fell through to the end of this
+            # function, failed the absolute-path test and was refused as not_absolute,
+            # which tells a reader the catalogue is broken rather than that a whole class
+            # of evidence was never collected. Two of these keys are the managed policy
+            # that says what an agent was allowed to do, so reading the refusal correctly
+            # is the difference between "no policy was in force" and "nobody looked".
+            # The generated Velociraptor and KAPE rules do read them.
+            Add-PatternRefusal -Pattern $Pattern -Expanded $text -Reason 'registry_key'
+            return ,$results
+        }
         if ($text.StartsWith('$')) {
             if ($script:PosixOnlyVariables.Contains((Get-VariableName -Text $text))) {
                 # Another platform's spelling of the same artifact. The entry carries a

@@ -273,8 +273,17 @@ wiederkehrenden Gründe:
 - **Plattformumfang.** KAPE und das Live-Response-Paket sind nur Windows, und sie sagen,
   wie viel des Katalogs damit außer Reichweite liegt.
 
-Der Collector liest alle vier. Das ist die ehrliche Arbeitsteilung: eine generierte Regel
-findet die Hosts, die man ansehen muss, der Collector holt die Beweise.
+Der Collector liest drei dieser vier. Eine Arbeitskopie, eine Verlagerungsvariable und ein
+nur unter Windows existierender Pfad sind alle Dateisystemfragen, und die beantwortet er.
+Ein Registry-Schlüssel ist keine: beide Collectors lesen das Dateisystem und keiner liest
+die Registry, also wird ein katalogisierter Schlüssel namentlich abgelehnt und erscheint in
+`refused_patterns` des Bundles als `registry_key`. Sechs Katalogeinträge sind
+Registry-Schlüssel, und zwei davon sind die verwaltete Richtlinie, die sagt, was ein Agent
+durfte. Für die sind die generierten Regeln also kein Weg, Hosts zu finden, die man ansehen
+muss: sie sind das Einzige in dieser Suite, das die Beweise holt.
+
+Für die anderen drei ist das die ehrliche Arbeitsteilung: eine generierte Regel findet die
+Hosts, die man ansehen muss, der Collector holt die Beweise.
 
 Ein leeres Ergebnis aus einer dieser Regeln bedeutet, dass an den durchsuchten Pfaden nichts
 lag. Es bedeutet nicht, dass der Host sauber ist, und jede generierte Datei widerspricht

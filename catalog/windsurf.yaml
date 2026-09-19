@@ -593,10 +593,6 @@ artifacts:
   os:
   - windows
   paths:
-  - /Applications/Devin.app/Contents/Resources/app/policies
-  - /etc/windsurf/policies/policy.json
-  - C:\Windows\PolicyDefinitions\en-US\windsurf.adml
-  - C:\Windows\PolicyDefinitions\windsurf.admx
   - HKCU\Software\Policies\Windsurf\<ProductName>
   - HKLM\Software\Policies\Windsurf\<ProductName>
   format: registry
@@ -607,11 +603,73 @@ artifacts:
     https://github.com/depalmar/ai-dfir-toolkit/blob/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/docs/RESEARCH-2026-08-14.md
   source_kind: community
   volatility: |-
-    Machine-wide and administrator-writable — changes here are an administrative action, not user activity, and are unlikely to be cleaned up by the user.
+    Machine-wide and administrator-writable. A change here is an administrative action rather than user activity, and is unlikely to be cleaned up by the user.
   notes: |-
-    Retrieved as a code-search snippet from a research-audit log inside a DFIR toolkit repo that quotes the vendor's enterprise-policies page verbatim; I could not reach the vendor page itself (docs.devin.ai blocked). Marked medium confidence for that reason. Forensically important: this is where an administrator (or an attacker with admin) can enable hooks and rules for every user on the machine — a system-wide agent-configuration backdoor with no per-user artifact.
+    The registry half of this product's enterprise policy. The filesystem paths that used to sit in this entry are now windsurf.enterprise_policy_json, windsurf.enterprise_policy_bundled and windsurf.enterprise_policy_templates: an entry declared root: registry is skipped whole by the analyzer's path matcher, so the policy file was collected and claimed by nothing, and the entry also declared os: windows, so the Linux and macOS locations were never collected at all.
 
-    Record structure: <ProductName> is the channel name, e.g. Software\Policies\Windsurf\Windsurf or Software\Policies\Windsurf\WindsurfInsiders — deliberately contrasted with VS Code's Software\Policies\Microsoft\<ProductName>. The Linux path is likewise contrasted with VS Code's /etc/vscode/policy.json. A machine-wide system.json in these same administrator-writable directories reportedly also carries system-level RULES AND HOOKS.
+    Retrieved as a code-search snippet from a research-audit log inside a DFIR toolkit repo that quotes the vendor's enterprise-policies page verbatim; the vendor page itself was unreachable, which is why this is community and unverified.
+
+    Record structure: <ProductName> is the channel name, for example Software\Policies\Windsurf\Windsurf or Software\Policies\Windsurf\WindsurfInsiders, deliberately contrasted with the editor it forked, whose keys sit under Software\Policies\Microsoft\<ProductName>.
+  parser: null
+- id: windsurf.enterprise_policy_json
+  category: permissions
+  root: system
+  os:
+  - linux
+  paths:
+  - /etc/windsurf/policies/policy.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://github.com/depalmar/ai-dfir-toolkit/blob/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/docs/RESEARCH-2026-08-14.md
+  source_kind: community
+  volatility: |-
+    Machine-wide and administrator-writable. A change here is an administrative action rather than user activity, and is unlikely to be cleaned up by the user.
+  notes: |-
+    Split out of windsurf.enterprise_policy, which declared root: registry and os: windows, so this file was skipped by the analyzer's path matcher and never collected on the platform it exists on. Forensically this is where an administrator, or an attacker holding administrative rights, enables hooks and rules for every user on the machine: a system-wide agent configuration with no per-user artifact to show for it.
+
+    Record structure: the path is deliberately contrasted with the editor this product forked, whose machine-wide policy is /etc/vscode/policy.json. A machine-wide system.json in the same administrator-writable directory reportedly also carries system-level rules and hooks.
+  parser: json_generic
+- id: windsurf.enterprise_policy_bundled
+  category: permissions
+  root: system
+  os:
+  - macos
+  paths:
+  - /Applications/Devin.app/Contents/Resources/app/policies
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://github.com/depalmar/ai-dfir-toolkit/blob/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/docs/RESEARCH-2026-08-14.md
+  source_kind: community
+  volatility: |-
+    Inside the application bundle, so it is replaced wholesale by an update and carries no history of what was there before.
+  notes: |-
+    Split out of windsurf.enterprise_policy for the reason given there. A policy directory inside the application bundle rather than in an administrator-writable location, so a file here is what the product shipped unless somebody modified the bundle, which is itself worth noticing.
+  parser: null
+- id: windsurf.enterprise_policy_templates
+  category: permissions
+  root: system
+  os:
+  - windows
+  paths:
+  - C:\Windows\PolicyDefinitions\en-US\windsurf.adml
+  - C:\Windows\PolicyDefinitions\windsurf.admx
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: |-
+    https://github.com/depalmar/ai-dfir-toolkit/blob/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/docs/RESEARCH-2026-08-14.md
+  source_kind: community
+  volatility: |-
+    Installed by an administrator and left alone by the product, so their presence dates the moment somebody set this machine up to be managed.
+  notes: |-
+    Split out of windsurf.enterprise_policy for the reason given there. These are the group-policy templates, not the policy: they tell an administrative console which settings exist and say nothing about which were set. Their presence is still evidence, because it means somebody deliberately brought this product under machine-wide management, and the values that were set are in the registry keys of the entry above.
   parser: null
 - id: windsurf.project_instructions
   category: project_instructions
