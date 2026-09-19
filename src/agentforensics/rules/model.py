@@ -27,6 +27,7 @@ import fastjsonschema
 import yaml
 
 from agentforensics.catalog import resolve_text
+from agentforensics.model import UNINTERPRETED_MARK
 from agentforensics.rules.conditions import Condition, ConditionError, parse
 from agentforensics.rules.select import EventView
 
@@ -142,13 +143,34 @@ class Rule:
 
         Checked before the condition because it is cheap and because it is what keeps a
         pack of eighty rules from running eighty regexes over every event in a large case.
+
+        A record out of a store or a log nobody has mapped is the exception, and it is the
+        one this project cannot afford to get wrong. Such a record is filed under
+        unparsed.record because no kind could be established for it, which is not the same
+        as establishing that it is not a command: for several agents the only copy of a
+        conversation on the endpoint is in a format nothing has a schema for, and a pack
+        that skipped those records would report nothing about exactly the evidence an
+        investigation has left. So a rule restricted by kind still sees them, and the
+        finding says the kind is unknown rather than implying the record is what the rule
+        is usually about. See ADR 0030.
         """
-        if "any" not in self.kinds and event.kind not in self.kinds:
+        if "any" not in self.kinds and event.kind not in self.kinds and not unmapped(event):
             return False
         return "any" in self.agents or event.agent in self.agents
 
     def matches(self, event: EventView) -> bool:
         return self.applies_to(event) and self.condition.matches(event)
+
+
+def unmapped(event: EventView) -> bool:
+    """Whether this record was read fine out of a format nobody has a mapping for.
+
+    The mark is the one the readers and the case counts already use, so there is one
+    definition of the difference between a record nothing could read and a record nobody
+    has read the format of. The first is a defect in the evidence and no rule should treat
+    it as content; the second is intact evidence whose kind is simply unknown.
+    """
+    return event.kind == "unparsed.record" and UNINTERPRETED_MARK in (event.parse_problem or "")
 
 
 @lru_cache(maxsize=1)

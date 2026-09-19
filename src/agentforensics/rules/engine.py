@@ -40,7 +40,7 @@ from typing import Any
 from agentforensics import __version__
 from agentforensics.model import Case
 from agentforensics.rules.conditions import Leaf
-from agentforensics.rules.model import SEVERITY_ORDER, Aggregate, Rule
+from agentforensics.rules.model import SEVERITY_ORDER, Aggregate, Rule, unmapped
 from agentforensics.rules.select import EventView, as_text
 
 # How much of a matched value a finding quotes. Long enough to recognise a command line,
@@ -375,6 +375,19 @@ def _leaves(condition: Any) -> Iterator[Leaf]:
         yield from _leaves(part)
 
 
+# How much of the matched value the one-line summary carries. The finding's matched field
+# keeps the whole of it; this is the part that has to fit on a line an analyst scans. A
+# whole-record text view can be a screenful, and a summary that spanned one would make a
+# findings list unreadable.
+SUMMARY_QUOTE = 120
+
+
+def _one_line(value: Any) -> str:
+    """A matched value as one line, short enough to read in a list."""
+    text = " ".join(str(value).split())
+    return text if len(text) <= SUMMARY_QUOTE else text[:SUMMARY_QUOTE] + " ..."
+
+
 def _summary(rule: Rule, members: Sequence[EventView], matched: dict[str, Any]) -> str:
     """The one line an analyst reads first.
 
@@ -384,9 +397,13 @@ def _summary(rule: Rule, members: Sequence[EventView], matched: dict[str, Any]) 
     """
     where = members[0].provenance.get("original_path") or "an unknown path"
     quoted = ""
-    for key, value in matched.items():
+    # The gate a rule uses to confine an arm to a record nobody has mapped is not the
+    # evidence, and quoting it puts a parser's own note where an analyst expects the thing
+    # that matched. It is only used when nothing else matched.
+    ordered = sorted(matched.items(), key=lambda item: item[0] == "parse_problem")
+    for key, value in ordered:
         if isinstance(value, list) and value:
-            quoted = f"{key} {value[0]}"
+            quoted = f"{key} {_one_line(value[0])}"
             break
     parts = [rule.title]
     if len(members) > 1:
@@ -394,6 +411,15 @@ def _summary(rule: Rule, members: Sequence[EventView], matched: dict[str, Any]) 
     if quoted:
         parts.append(quoted)
     parts.append(f"in {where}")
+    if any(unmapped(member) for member in members):
+        # The rule is usually about a particular kind of event and this record has none,
+        # because it came out of a format nobody has a mapping for. Said on the finding so
+        # that a line reading "the agent ran this" is never quoted from a record where the
+        # only thing established is that the text is in the file. See ADR 0030.
+        parts.append(
+            "from a record in a format nobody has mapped, so what kind of event it is has "
+            "not been established"
+        )
     return ", ".join(parts)
 
 

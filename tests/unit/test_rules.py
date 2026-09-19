@@ -799,3 +799,120 @@ def test_the_engine_always_reads_english(rules: list[Rule]) -> None:
     not get to pick. Only the documentation generator loads a translation."""
     for rule in rules:
         assert load_file(rule.path, pack=rule.pack).description == rule.description
+
+
+# ------------------------------------- a record nobody has mapped, and what sees it
+
+UNMAPPED_PROBLEM = (
+    "this record came out of a protocol buffer with no schema, so the record is returned "
+    "uninterpreted"
+)
+
+COMMAND_RULE = """
+id: AFX-DANGEROUSCOMMANDS-901
+pack: dangerous_commands
+title: A test rule about commands
+severity: low
+description: A rule that says which kind of event it is about and searches whole-record text.
+rationale: >
+  It exists for the tests below, which are about which events a rule with a kind
+  restriction is allowed to see.
+applies_to:
+  kinds: [command.exec]
+match:
+  field: event_text
+  contains: rm -rf /
+tests:
+  - name: a command
+    match: true
+    event:
+      kind: command.exec
+      payload: {text: "rm -rf /"}
+  - name: something else
+    match: false
+    event:
+      kind: command.exec
+      payload: {text: "ls"}
+"""
+
+
+def unmapped_view(text: str, *, mapped: bool = False, unreadable: bool = False) -> Any:
+    """One record as a rule sees it, in the three states this distinction is about."""
+    if mapped:
+        problem = None
+    elif unreadable:
+        problem = "the line did not decode as UTF-8"
+    else:
+        problem = UNMAPPED_PROBLEM
+    return rule_testing.view(
+        {
+            "kind": "unparsed.record",
+            "agent": "windsurf",
+            "parse_problem": problem,
+            "raw": {"f2": text},
+        }
+    )
+
+
+def command_rule(tmp_path: Path) -> Rule:
+    path = tmp_path / "AFX-DANGEROUSCOMMANDS-901.yaml"
+    path.write_text(COMMAND_RULE, encoding="utf-8")
+    return load_file(path)
+
+
+def test_a_rule_about_one_kind_still_sees_a_record_nobody_has_mapped(tmp_path: Path) -> None:
+    """The case this project cannot afford to get wrong. For several agents the only copy
+    of a conversation on the endpoint is in a format nothing has a schema for, so those
+    records are filed under unparsed.record: not because they are not commands, but
+    because nobody could establish what they are. A pack that skipped them would report
+    nothing about exactly the evidence those cases have left."""
+    rule = command_rule(tmp_path)
+    assert rule.matches(unmapped_view("rm -rf /var/log"))
+
+
+def test_a_record_nothing_could_read_is_not_treated_as_content(tmp_path: Path) -> None:
+    """The other half of the same distinction. A line that would not decode is a defect in
+    the evidence, and matching a pattern in the bytes that survived it would report a
+    command out of a damaged record."""
+    rule = command_rule(tmp_path)
+    assert not rule.matches(unmapped_view("rm -rf /var/log", unreadable=True))
+
+
+def test_a_mapped_event_of_another_kind_is_still_skipped(tmp_path: Path) -> None:
+    """The kind restriction keeps its meaning where the kind is known: a rule about
+    commands does not look at a prompt that mentions one."""
+    rule = command_rule(tmp_path)
+    prompt = rule_testing.view({"kind": "user.prompt", "payload": {"text": "rm -rf /"}})
+    assert not rule.matches(prompt)
+
+
+def test_the_finding_says_the_kind_of_such_a_record_is_unknown(tmp_path: Path) -> None:
+    """Without it a findings list reads as "the agent ran this", and what is established
+    is only that the text is in the file."""
+    from agentforensics.rules.engine import _summary
+
+    rule = command_rule(tmp_path)
+    view = unmapped_view("rm -rf /var/log")
+    summary = _summary(rule, [view], {"event_text": ["rm -rf /var/log"]})
+    assert "nobody has mapped" in summary
+    assert "has not been established" in summary
+
+
+def test_a_summary_of_a_mapped_event_says_nothing_of_the_sort(tmp_path: Path) -> None:
+    from agentforensics.rules.engine import _summary
+
+    rule = command_rule(tmp_path)
+    view = rule_testing.view({"kind": "command.exec", "payload": {"text": "rm -rf /"}})
+    assert "nobody has mapped" not in _summary(rule, [view], {"event_text": ["rm -rf /"]})
+
+
+def test_a_summary_stays_on_one_line(tmp_path: Path) -> None:
+    """A whole-record text view can be a screenful, and a findings list is read by
+    scanning it."""
+    from agentforensics.rules.engine import _summary
+
+    rule = command_rule(tmp_path)
+    view = rule_testing.view({"kind": "command.exec", "payload": {"text": "rm -rf /"}})
+    summary = _summary(rule, [view], {"event_text": ["a\nb\n" + "x" * 500]})
+    assert "\n" not in summary
+    assert " ..." in summary

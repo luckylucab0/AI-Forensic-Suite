@@ -25,6 +25,7 @@ import argparse
 # Standard library from Python 3.14, which is this package's floor (ADR 0024) precisely
 # because one agent compresses its transcripts with it. The collectors never import this
 # module, so their own 3.8 floor is untouched.
+import base64
 import compression.zstd as zstd
 import json
 import os
@@ -1350,6 +1351,20 @@ def continue_index() -> str:
     )
 
 
+# One product keeps its conversations in an AES-GCM container around a protocol buffer.
+# The fixture carries one, sealed once and embedded here rather than encrypted on the fly,
+# so that this generator stays dependency free and so that the same bytes land on every
+# machine: a fixture whose content changed per run could not be compared between two
+# collections. Nothing here is anybody's secret. The key is bytes 0 to 31, the nonce is
+# bytes 0 to 11, and the plaintext is two synthetic turns.
+CASCADE_KEY = bytes(range(32)).hex()
+CASCADE_TRAJECTORY = base64.b64decode(
+    "AAECAwQFBgcICQoLTSbiff2G836/ILq7gdlIQLfmtwTdQ29MCErVtS1ZMIIxIJ7Mn/MAsX6gCp7t9ToZ"
+    "jTUF7DT21qof40J8OIyZitBQqR2g8U8PPHvcD52gYodfmIlofwIgG5SO6q0WhKu+uZk33IQivWjyPBPU"
+    "OyZtX9ITFtuQ/wq1KIc2oPKKCyDUIGfp17uuMmaUOI9Osmy+FoeLbaTxcIAd+EFesEmDgz0K/Q=="
+)
+
+
 def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     """Create the synthetic profile. Returns a summary for assertions."""
     project = home / "src" / "app"
@@ -1656,6 +1671,14 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         "network_access = true\n",
         RECENT,
     )
+
+    # The encrypted trajectory store of one product, plus the zero-byte file its archiving
+    # leaves behind. Both are here because the two are read differently and both readings
+    # are statements an analyst acts on: one is a conversation, the other is a conversation
+    # that was destroyed.
+    cascade = home / ".codeium" / "windsurf" / "cascade"
+    write(cascade / "cascade-0001.pb", CASCADE_TRAJECTORY, RECENT)
+    write(cascade / "cascade-0002.pb.archived", b"", OLD)
 
     copilot = home / ".copilot"
     write(

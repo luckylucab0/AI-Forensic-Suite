@@ -216,12 +216,12 @@ The agent ran a recursive, forced delete whose target is a root, a home director
 | Pack | `dangerous_commands` |
 | Agents | `any` |
 | Event kinds | `command.exec` |
-| Fields read | `payload.commands[].command` |
+| Fields read | `payload.commands[].command`, `parse_problem`, `event_text` |
 | Tags | `T1059`, `T1105`, `remote-code-execution` |
 
 The agent fetched something from the network and piped it into a shell or an interpreter in one command, the curl or wget into sh pattern and its PowerShell equivalent.
 
-*What it matches:* `(payload.commands[].command matches /(?:curl\|wget\|Invoke-WebRequest\|iwr\|Invoke-RestMethod)\b[^\|]*\\|\s*(?:sudo\s+)?(?:ba\|z\|d\|k)?sh\b/ or payload.commands[].command matches /(?:curl\|wget)\b[^\|]*\\|\s*(?:sudo\s+)?(?:python[23]?\|perl\|ruby\|node)\b/ or payload.commands[].command matches /(?i)(?:iwr\|Invoke-WebRequest\|Invoke-RestMethod)\b[^\|]*\\|\s*(?:iex\|Invoke-Expression)\b/)`
+*What it matches:* `(payload.commands[].command matches /(?:curl\|wget\|Invoke-WebRequest\|iwr\|Invoke-RestMethod)\b[^\|]*\\|\s*(?:sudo\s+)?(?:ba\|z\|d\|k)?sh\b/ or payload.commands[].command matches /(?:curl\|wget)\b[^\|]*\\|\s*(?:sudo\s+)?(?:python[23]?\|perl\|ruby\|node)\b/ or payload.commands[].command matches /(?i)(?:iwr\|Invoke-WebRequest\|Invoke-RestMethod)\b[^\|]*\\|\s*(?:iex\|Invoke-Expression)\b/ or parse_problem contains 'is returned uninterpreted' and event_text matches /(?:curl\|wget\|Invoke-WebRequest\|iwr\|Invoke-RestMethod)\b[^\|\n]*\\|[^\S\n]*(?:sudo[^\S\n]+)?(?:ba\|z\|d\|k)?sh\b/)`
 
 *Why an analyst cares:* This is remote code execution the agent chose to perform, and the code it ran is not in the transcript: only the address it came from is. So the finding is both the action and the limit of what can be known about it, which is why the address matters more here than in most findings. It is also the shape a prompt injection most often asks an agent to produce, which makes the surrounding conversation worth reading.
 
@@ -229,8 +229,9 @@ The agent fetched something from the network and piped it into a shell or an int
 
 - A documented installer. Several widely used tools publish exactly this command as their installation instruction, so the pattern is common in legitimate setup work.
 - A line in a Dockerfile or a CI script the agent was reading or writing rather than running, which reaches the command facet only if the agent also executed it.
+- In a record nobody has mapped, a command the conversation only talked about. Nothing in such a record says whether the text is a command that ran, a command that was proposed or a command somebody quoted, which is why the finding says the kind of the record has not been established.
 
-*Samples in the rule file:* 2 / 2 (+/-)
+*Samples in the rule file:* 3 / 3 (+/-)
 
 #### AFX-DANGEROUSCOMMANDS-003
 
