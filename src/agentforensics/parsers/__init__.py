@@ -46,6 +46,7 @@ from agentforensics.parsers.plist_generic import PlistGenericParser
 from agentforensics.parsers.prompt_history import PromptHistoryParser
 from agentforensics.parsers.prose_document import ProseDocumentParser
 from agentforensics.parsers.shell_history import ShellHistoryParser
+from agentforensics.parsers.shell_snapshot import ShellSnapshotParser
 from agentforensics.parsers.sqlite_generic import SqliteGenericParser
 from agentforensics.parsers.text_log import TextLogParser
 from agentforensics.parsers.toml_generic import TomlGenericParser
@@ -102,6 +103,10 @@ PARSERS: tuple[Parser, ...] = (
     # the approvals off is written down. Four files, four formats, and until this parser
     # all four were collected and none was read.
     ShellHistoryParser(),
+    # The copy one agent takes of the user's shell before it runs anything, which is the
+    # environment its commands actually ran in rather than a record that somebody once
+    # typed a line. It also outlives the product's own purge command.
+    ShellSnapshotParser(),
     # Five catalogue entries across three products are one file with one schema, read
     # here rather than by the generic reader, which had the key in raw and the value in
     # text and said nobody had read the store.

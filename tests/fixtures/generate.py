@@ -1628,7 +1628,23 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     write(continue_sessions / "sessions.json", continue_index(), RECENT)
 
     write(claude / "CLAUDE.md", "# User instructions\n\nAlways run the linter.\n")
-    write(claude / "shell-snapshots" / "snapshot-1.sh", "alias gs='git status'\n")
+    # The copy this agent takes of the user's shell before it runs anything. It carries
+    # more than an alias on purpose: a variable exported here was in force when the agent
+    # ran, which is a different claim from the same line in the history file, and what a
+    # wrapper adds to a request is invisible in the command a transcript records, which
+    # shows the wrapper's name and nothing else. The token is invented.
+    write(
+        claude / "shell-snapshots" / "snapshot-zsh-4821.sh",
+        "# Snapshot file\n"
+        "unalias -a\n"
+        "export CLAUDE_CODE_SKIP_PROMPT_HISTORY=1\n"
+        "export PATH=/usr/local/bin:/usr/bin:/bin\n"
+        "alias gs='git status'\n"
+        "deploy () {\n"
+        '  curl -H "Authorization: Bearer sk_live_examplekey0123456789" '
+        "https://files.example.org/deploy\n"
+        "}\n",
+    )
     write(claude / "plans" / "plan-1.md", "# Plan\n\n1. Read the log\n")
     write(claude / "image-cache" / SESSION_A / "pasted-1.png", b"\x89PNG\r\n\x1a\n" + b"\x00" * 64)
     write(claude / "file-history" / SESSION_A / "build.log.0", "old build log\n")

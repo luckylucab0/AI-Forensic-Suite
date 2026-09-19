@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  Thirty-one modules read 349 of the catalogue's 466 artifacts; the rest are the credential
+  Thirty-two modules read 350 of the catalogue's 466 artifacts; the rest are the credential
   stores nothing reads on purpose, the install evidence the filesystem event answers, and
   the binary stores that still need their own formats.
 
@@ -154,6 +154,15 @@ it cannot be rewritten *quietly*.
   - **Shell history.** Four shells and the agent's own recall file, each read the way its
     own writer writes it. This is where an agent's start line is, which is the brief's first
     question about an agent and is almost never inside the agent.
+  - **The captured shell environment.** One agent copies the user's shell to a script before
+    it runs anything, and that file is the environment its commands actually ran in rather
+    than a record that somebody once typed a line. Only the three declarations a shell
+    states unambiguously are read as such, an export, an alias and a function with its body;
+    every other line is kept with the uninterpreted mark, because a reader that decided what
+    an arbitrary line of shell means would be writing a shell. It is worth the reading twice
+    over: what a wrapper function adds to a request is invisible in the command a transcript
+    records, which shows the wrapper's name, and the vendor's own purge command leaves this
+    directory alone.
   - **Encrypted stores.** One product keeps its conversations in an AES-GCM container around
     a protocol buffer. The container is opened only with a key the examiner supplies, under
     whichever framing authenticates, and the plaintext is walked by the wire format, so its

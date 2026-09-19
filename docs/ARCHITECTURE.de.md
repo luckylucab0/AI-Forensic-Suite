@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 31 Module lesen 349 der 466
+  zählt diese Dateien und sagt, welche es sind. 32 Module lesen 350 der 466
   Katalogartefakte; der Rest sind die Anmeldedatenspeicher, die absichtlich niemand liest,
   die Installationsspuren, die das Dateisystem-Ereignis beantwortet, und die Binärspeicher,
   die noch eigene Formate brauchen.
@@ -168,6 +168,16 @@ ist, dass das nicht *unbemerkt* geht.
   - **Shell-History.** Vier Shells und die Recall-Datei des Agenten selbst, jede so gelesen,
     wie ihr eigener Schreiber sie schreibt. Hier steht die Startzeile eines Agenten, also
     die erste Frage des Briefings über einen Agenten, und sie steht fast nie im Agenten.
+  - **Die kopierte Shell-Umgebung.** Ein Agent kopiert die Shell der Nutzenden in ein
+    Skript, bevor er irgendetwas ausführt, und diese Datei ist die Umgebung, in der seine
+    Befehle tatsächlich liefen, statt einer Aufzeichnung, dass jemand einmal eine Zeile
+    getippt hat. Nur die drei Deklarationen, die eine Shell eindeutig ausspricht, werden
+    als solche gelesen: ein Export, ein Alias und eine Funktion samt Rumpf. Jede andere
+    Zeile bleibt mit der Uninterpretiert-Marke stehen, denn ein Leser, der entschiede, was
+    eine beliebige Shell-Zeile bedeutet, würde eine Shell schreiben. Das Lesen lohnt
+    doppelt: was eine Wrapper-Funktion einer Anfrage hinzufügt, ist im Befehl, den ein
+    Transkript aufzeichnet, unsichtbar, denn dort steht nur der Name des Wrappers, und der
+    Purge-Befehl des Herstellers lässt dieses Verzeichnis in Ruhe.
   - **Verschlüsselte Speicher.** Ein Produkt legt seine Gespräche in einem AES-GCM-Container
     um ein Protobuf ab. Der Container wird nur mit einem Schlüssel geöffnet, den die
     Untersuchende mitgibt, unter der Rahmung, die sich authentifiziert, und der Klartext

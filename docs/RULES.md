@@ -47,6 +47,7 @@ Findings are written into the case database next to the events they rest on, and
 |  | [AFX-SECRETS-004](#afx-secrets-004) | high |
 |  | [AFX-SECRETS-005](#afx-secrets-005) | medium |
 |  | [AFX-SECRETS-006](#afx-secrets-006) | high |
+|  | [AFX-SECRETS-007](#afx-secrets-007) | high |
 | [`sensitive_paths`](#sensitive-paths) | [AFX-SENSITIVEPATHS-001](#afx-sensitivepaths-001) | high |
 |  | [AFX-SENSITIVEPATHS-002](#afx-sensitivepaths-002) | high |
 |  | [AFX-SENSITIVEPATHS-003](#afx-sensitivepaths-003) | critical |
@@ -989,6 +990,39 @@ This rule does not quote what it matched. The matched value is a credential, and
 - <https://cursor.com/docs/cli/reference/authentication>
 
 *Samples in the rule file:* 3 / 3 (+/-)
+
+#### AFX-SECRETS-007
+
+**A credential was carried in an authorization header**
+
+| | |
+| --- | --- |
+| Severity | high |
+| Pack | `secrets` |
+| Agents | `any` |
+| Event kinds | `any` |
+| Fields read | `event_text` |
+| Tags | `T1552.001`, `credential-in-transcript` |
+
+An HTTP authorization header with a value appears in this record: a bearer token, a basic-auth blob, or an API key header. The header names itself, so unlike a bare string this is a credential in a request rather than a string that looks like one.
+
+*What it matches:* `event_text matches /(?i)\bauthorization[^\S\n]*[:=][^\S\n]*["']?(?:bearer\|token\|basic\|apikey)[^\S\n]+[A-Za-z0-9_\-./+=]{12,}/ or /(?i)\b(?:x-api-key\|x-auth-token\|api-key\|proxy-authorization)[^\S\n]*[:=][^\S\n]*["']?[A-Za-z0-9_\-./+=]{12,}/`
+
+This rule does not quote what it matched. The matched value is a credential, and a finding is exported and pasted into reports, so the value stays in the event it came from.
+
+*Why an analyst cares:* This is the shape a credential takes at the moment it is used, and it is the one shape the other rules in this pack miss. They match a token by its vendor prefix or by the name of the variable it was assigned to, and a header has neither: the token is whatever the service issued, and the name in front of it is Authorization, which no rule about a variable called api_key will ever see. It matters most where the request is not in the transcript at all. A wrapper function in a shell environment adds the header to every call it makes, and the transcript records the wrapper's name, so the credential is only ever visible in the environment the agent ran in.
+
+*Known false positives:*
+
+- A documentation example or a template, where the value is a placeholder of plausible length such as YOUR_API_KEY_HERE or a row of x characters. This rule cannot tell a placeholder from a credential, and neither can the file it is reading.
+- A header in a recorded response or in a log the agent read rather than one it sent, which is still a credential on the endpoint but says nothing about the agent using it.
+- A test fixture in the working copy, which is where deliberately invalid tokens of the right shape live.
+
+*References:*
+
+- <https://datatracker.ietf.org/doc/html/rfc9110#name-authorization>
+
+*Samples in the rule file:* 3 / 2 (+/-)
 
 ## sensitive paths
 

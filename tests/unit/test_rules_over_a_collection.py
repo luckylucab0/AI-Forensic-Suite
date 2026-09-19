@@ -43,7 +43,8 @@ from generate import build_home  # noqa: E402
 EXPECTED = {
     "AFX-ANTIFORENSICS-001": "~/.claude/settings.json lowers cleanupPeriodDays below the default",
     "AFX-ANTIFORENSICS-002": "~/.zsh_history holds the export that stops the prompt history "
-    "being written",
+    "being written, and the captured shell environment holds it as a variable that was in "
+    "force",
     "AFX-DANGEROUSCOMMANDS-002": "a transcript holds a command that pipes a download into a shell",
     "AFX-EXFILINDICATORS-004": "~/.zsh_history holds a command that uploaded a named file",
     "AFX-PERMISSIONBYPASS-001": "~/.zsh_history holds the start line that skips the prompts",
@@ -62,6 +63,8 @@ EXPECTED = {
     "for again",
     "AFX-SECRETS-001": "a transcript holds a cloud provider access key",
     "AFX-SECRETS-006": "~/.zsh_history holds a command that carried an API key as a flag",
+    "AFX-SECRETS-007": "a wrapper function in the captured shell environment adds an "
+    "authorization header the transcript never shows",
     "AFX-SUPPLYCHAIN-001": "~/src/app/.mcp.json starts a server through uvx",
     "AFX-SUPPLYCHAIN-002": "~/.claude/settings.json configures a PreToolUse hook",
     "AFX-SUPPLYCHAIN-003": "a hook script on the endpoint fetches code and runs it",

@@ -122,7 +122,7 @@ artifacts:
     Effectively a copy of the analyst-relevant parts of the user's shell environment (.bashrc/.zshrc-derived aliases and functions), captured at a known time, including any function that wraps credentials or internal hostnames. IMPORTANT version note: v1.0.48 'Moved shell snapshots from /tmp to ~/.claude' - on evidence from before that, look in the system temp directory instead, and v1.0.51 fixed handling of home directories containing spaces.
 
     The verification pass could not find this temporary-directory spelling anywhere in the vendor's documentation, which states only the directory under ~/.claude. Kept and marked unsourced rather than dropped, because an extra glob costs nothing while a removed path that turns out to be real costs evidence, but treat a hit under it as needing its own explanation.
-  parser: null
+  parser: shell_snapshot
 - id: claude_code.image_cache
   category: cache
   root: user_profile
