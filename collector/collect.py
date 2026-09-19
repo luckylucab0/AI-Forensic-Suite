@@ -967,7 +967,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
-                    "category": "config",
+                    "category": "instructions",
                     "collect_priority": "durable",
                     "id": "claude_code.agents",
                     "os": [
@@ -1903,7 +1903,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
-                    "category": "config",
+                    "category": "instructions",
                     "collect_priority": "normal",
                     "id": "claude_code.settings_referenced_executables",
                     "os": [
@@ -2279,7 +2279,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "unverified"
                 },
                 {
-                    "category": "config",
+                    "category": "instructions",
                     "collect_priority": "durable",
                     "id": "claude_code.workflows",
                     "os": [
@@ -3117,7 +3117,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
-                    "category": "config",
+                    "category": "instructions",
                     "collect_priority": "normal",
                     "id": "cline.home_config_tree",
                     "os": [
@@ -7612,7 +7612,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
-                    "category": "config",
+                    "category": "project_instructions",
                     "collect_priority": "first",
                     "id": "qwen_code.project_extension_points",
                     "os": [
@@ -7895,7 +7895,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
-                    "category": "config",
+                    "category": "instructions",
                     "collect_priority": "first",
                     "id": "qwen_code.user_extension_points",
                     "os": [
@@ -8822,7 +8822,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "0e365a21fcae64c9429b069d526229e701e1dcfc147604b701e1ad751c914717"
+    "sha256": "88d1e29350a6c3fb07443fa00125dbe390d1d41fecdd96640e04ad67717bae8a"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

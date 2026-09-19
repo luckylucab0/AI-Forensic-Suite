@@ -186,7 +186,7 @@ artifacts:
     createStorageContext() writes globalState.json and per-workspace workspaceState.json under data/workspaces/<hash>/. This is the 4.x replacement for VS Code globalState in state.vscdb - so on 4.x the task index and settings are plain readable JSON on disk instead of SQLite BLOBs. The <hash> is a workspace-isolation hash (not reversible to a path directly; correlate via content).
   parser: json_generic
 - id: cline.home_config_tree
-  category: config
+  category: instructions
   root: user_profile
   os:
   - macos
@@ -210,7 +210,7 @@ artifacts:
   source_kind: source_code
   notes: |-
     Verified resolvers in paths.ts: resolveRulesConfigSearchPaths/resolveWorkflowsConfigSearchPaths/resolveSkillsConfigSearchPaths/resolveHooksConfigSearchPaths/resolveAgentsConfigDirPath/resolvePluginConfigSearchPaths each include join(resolveClineDir(), <name>); resolveGlobalTaskSpecsDir() = join(resolveClineDir(),"tasks"); resolveGlobalCronSpecsDir() = join(resolveClineDir(),"cron"); resolveAgentPluginSearchPaths() = join(HOME, ".agents", "plugins") with AGENT_PLUGIN_MANIFEST_FILE_NAME = "plugin.json". ~/.cline/hooks and ~/.cline/plugins are executable-content artifacts (persistence / tampering interest). ~/.cline/cron plus data/db/cron.db together describe scheduled autonomous agent runs.
-  parser: null
+  parser: instructions
 - id: cline.workspace_specs
   category: config
   root: project

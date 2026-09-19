@@ -744,7 +744,7 @@ artifacts:
   parser: text_log
 - id: qwen_code.user_extension_points
   title: User level executable extension points (skills, commands, subagents, rules, workflows, extensions)
-  category: config
+  category: instructions
   root: user_profile
   os:
   - macos
@@ -776,10 +776,10 @@ artifacts:
     User or extension-installer maintained; not expired.
   notes: |-
     Persistence and capability surface. Skills and subagent definitions are markdown that becomes part of the model's instructions; workflows are JavaScript the product executes; extensions can declare their own MCP servers and context files. Anything planted here affects EVERY project the user opens. Note the second skills root: SKILL_PROVIDER_CONFIG_DIRS is ['.qwen', '.agents'], so ~/.agents/skills is also loaded and is easily missed. Only the .qwen entries move with QWEN_HOME; ~/.agents/skills is resolved from the real home directory.
-  parser: null
+  parser: instructions
 - id: qwen_code.project_extension_points
   title: Project level executable extension points
-  category: config
+  category: project_instructions
   root: project
   os:
   - macos
@@ -803,7 +803,7 @@ artifacts:
     Part of the working copy; git history may hold earlier versions.
   notes: |-
     Repository-supplied instructions and code that the agent will load, and therefore the classic injection route for a hostile or compromised repository. Gated by folder trust: in an untrusted folder the workspace configuration is not loaded, so pair with trustedFolders.json before concluding any of it ran. Project scope wins over user scope when the same workflow or command name exists in both.
-  parser: null
+  parser: instructions
 - id: qwen_code.channels_scheduled_tasks
   title: Channel service state and scheduled tasks
   category: config

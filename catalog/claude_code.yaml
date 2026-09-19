@@ -592,7 +592,7 @@ artifacts:
     Record structure: Per-session directories. Naming not documented - needs verification. Past sessions refer to these files by absolute path in the transcript, so join via the referencing tool call.
   parser: null
 - id: claude_code.agents
-  category: config
+  category: instructions
   root: project
   os:
   - macos
@@ -612,7 +612,7 @@ artifacts:
     Critical: an agent file can carry its own inline MCP server definition and its own permission mode, so it is a self-contained privilege-escalation vehicle that bypasses review of .mcp.json and settings.json. `initialPrompt` auto-submits a first user turn.
 
     Record structure: Subagent definitions. YAML frontmatter fields (exact): `name` (required; lowercase+hyphens, cannot contain `:`; delivered to hooks as `agent_type`), `description` (required), `tools`, `disallowedTools`, `model`, `permissionMode` (`default`|`acceptEdits`|`auto`|`dontAsk`|`bypassPermissions`|`plan`|`manual`), `maxTurns`, `skills`, `mcpServers` (name reference OR full inline MCP server config), `hooks`, `memory` (`user`|`project`|`local`), `background`, `effort`, `isolation` (`worktree`), `color`, `initialPrompt`, `experimental` (with `cacheTtl`). A `permissionMode: bypassPermissions` here is ignored when `permissions.disableBypassPermissionsMode` is set (before v2.1.223 the frontmatter mode applied anyway).
-  parser: null
+  parser: instructions
 - id: claude_code.anthropic_active_config
   category: config
   root: user_profile
@@ -840,7 +840,7 @@ artifacts:
     Documented only as "per-session environment metadata"; the record structure is not published. Listed among the paths with "nothing user-facing" that depend on it, so it is safe to delete from the user's perspective.
   parser: json_generic
 - id: claude_code.settings_referenced_executables
-  category: config
+  category: instructions
   root: project
   os:
   - macos
@@ -865,7 +865,7 @@ artifacts:
     The highest-value execution artifacts in this family are files Claude Code never names: hook scripts and credential helpers. A catalogue of settings files alone misses the payload. CLAUDE_ENV_FILE is a particularly clean persistence primitive - it executes on every single Bash command.
 
     The vendor's example script sits directly in the hooks directory, so the one-level glob is what is sourced. The recursive glob is here because a settings file can point at any path and a script one directory deeper would be walked past by the flat glob, which would mean not collecting an executable the agent runs on every command.
-  parser: null
+  parser: instructions
 - id: claude_code.themes
   category: config
   root: user_profile
@@ -911,7 +911,7 @@ artifacts:
     Record structure: Precedence rank 5 (lowest of the four files). Forensically load-bearing keys, exact spelling: `permissions` object -> `allow`, `ask`, `deny` (arrays of `Tool` or `Tool(specifier)` rules; evaluation order deny > ask > allow, first match wins), `additionalDirectories`, `blockReadsOutsideWorkingDirectories`, `defaultMode`, `disableBypassPermissionsMode` (value is the string "disable"), `disableAutoMode`. Permission mode names: `default`, `acceptEdits`, `plan`, `auto`, `dontAsk`, `bypassPermissions`, and `manual` (alias for `default`, v2.1.200+). `hooks` object keyed by event name; each value an array of `{matcher, hooks}` groups whose entries have `type` of `command`|`prompt`|`agent`|`http`|`mcp_tool`. `env` object (string->string) can set ANTHROPIC_BASE_URL and any env var. Credential/provider keys: `apiKeyHelper` (shell command line, output sent as BOTH X-Api-Key and Authorization: Bearer), `awsAuthRefresh`, `awsCredentialExport`, `gcpAuthRefresh`, `otelHeadersHelper`, `forceLoginMethod`, `forceLoginGatewayUrl`, `forceLoginOrgUUID`. Executable-reference keys worth flagging: `statusLine`, `subagentStatusLine`, `fileSuggestion`, `processWrapper`, `policyHelper`. Plugin/MCP keys: `enabledPlugins` (map "plugin@marketplace"->bool), `extraKnownMarketplaces`, `pluginConfigs` (non-sensitive plugin userConfig answers, keyed by plugin id), `blockedMarketplaces`, `strictKnownMarketplaces`, `managedMcpServers`, `allowedMcpServers`, `deniedMcpServers`, `enabledMcpjsonServers`, `disabledMcpjsonServers`, `enableAllProjectMcpServers`, `allowAllClaudeAiMcps`, `disableClaudeAiConnectors`. Data-retention keys: `cleanupPeriodDays`, `desktopSessionCleanupPeriodDays`. Sandbox tree `sandbox.*` incl. `sandbox.network.allowedDomains`, `sandbox.credentials.files`, `sandbox.credentials.envVars`. Also `sshConfigs`, `sshHostAllowlist` (host/identity leakage), `autoMemoryDirectory`, `plansDirectory`, `claudeMd`, `claudeMdExcludes`, `agent`, `teammateMode`, `worktree.*`. Full key index is at the settings-reference URL.
   parser: json_generic
 - id: claude_code.workflows
-  category: config
+  category: instructions
   root: project
   os:
   - macos
@@ -931,7 +931,7 @@ artifacts:
     This is executable JavaScript sitting in a config directory and invocable by a slash command. Treat every file here as code to be reviewed, not configuration. Strong candidate for a detection rule.
 
     Record structure: JavaScript workflow scripts that orchestrate many subagents; each file becomes a /<name> command. Written by Claude and saved from /workflows. Gated by the `enableWorkflows` / `disableWorkflows` settings and `workflowKeywordTriggerEnabled`; CLAUDE_CODE_DISABLE_WORKFLOWS turns them off.
-  parser: null
+  parser: instructions
 - id: claude_code.worktreeinclude
   category: config
   root: project

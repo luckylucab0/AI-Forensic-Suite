@@ -241,49 +241,49 @@ Targets:
         Recursive: false
     -
         Name: qwen_code.user_extension_points
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.agents\skills
         FileMask: "*"
         Recursive: true
     -
         Name: qwen_code.user_extension_points
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.qwen\agents
         FileMask: "*.md"
         Recursive: false
     -
         Name: qwen_code.user_extension_points
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.qwen\commands
         FileMask: "*"
         Recursive: true
     -
         Name: qwen_code.user_extension_points
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.qwen\extensions
         FileMask: "*"
         Recursive: true
     -
         Name: qwen_code.user_extension_points
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.qwen\locales
         FileMask: "*"
         Recursive: true
     -
         Name: qwen_code.user_extension_points
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.qwen\rules
         FileMask: "*"
         Recursive: true
     -
         Name: qwen_code.user_extension_points
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.qwen\skills
         FileMask: "*"
         Recursive: true
     -
         Name: qwen_code.user_extension_points
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.qwen\workflows
         FileMask: "*.js"
         Recursive: false

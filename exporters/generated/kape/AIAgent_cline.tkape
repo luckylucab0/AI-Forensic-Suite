@@ -368,55 +368,55 @@ Targets:
         Recursive: false
     -
         Name: cline.home_config_tree
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.agents\plugins
         FileMask: "*"
         Recursive: true
     -
         Name: cline.home_config_tree
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.cline\agents
         FileMask: "*"
         Recursive: true
     -
         Name: cline.home_config_tree
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.cline\cron
         FileMask: "*"
         Recursive: true
     -
         Name: cline.home_config_tree
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.cline\hooks
         FileMask: "*"
         Recursive: true
     -
         Name: cline.home_config_tree
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.cline\plugins
         FileMask: "*"
         Recursive: true
     -
         Name: cline.home_config_tree
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.cline\rules
         FileMask: "*"
         Recursive: true
     -
         Name: cline.home_config_tree
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.cline\skills
         FileMask: "*"
         Recursive: true
     -
         Name: cline.home_config_tree
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.cline\tasks
         FileMask: "*"
         Recursive: true
     -
         Name: cline.home_config_tree
-        Category: config
+        Category: instructions
         Path: C:\Users\%user%\.cline\workflows
         FileMask: "*"
         Recursive: true
