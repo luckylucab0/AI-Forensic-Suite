@@ -230,3 +230,74 @@ def test_a_pack_file_is_named_rather_than_expanded(repository: Path) -> None:
     pack.write_bytes(b"PACK\x00\x00\x00\x02" + b"\x00" * 64)
     event = parse(repository, "objects/pack/pack-0123456789abcdef.pack")[0]
     assert "not expanded here" in (event.parse_problem or "")
+
+
+# ---------------------------------------- the claim, held against the catalogue
+
+
+def test_which_repositories_carry_their_objects_is_the_catalogues_answer() -> None:
+    """The sentence on a reference event is derived, not written down twice.
+
+    Whether the commit behind a checkpoint is in the case is a fact about what the
+    catalogue claims, and it was wrong on two of three entries for as long as the reader
+    existed: the text said the object store was not collected and for those two it is. A
+    set in the module is still the shape this project uses, because a parser is handed an
+    artifact id and not a catalogue, so this is what keeps the set honest.
+
+    The candidate below is evidence rather than an answer. It asks the same matcher the
+    ingest uses whether a loose object under this artifact's own directory would be claimed
+    by this artifact, so narrowing an entry to its references flips this test and the
+    module has to follow rather than keep saying the old thing.
+    """
+    import re as _re
+
+    from agentforensics.catalog import load_catalogue
+    from agentforensics.ingest.match import Matcher
+    from agentforensics.parsers.git_checkpoints import OWN_REPOSITORY, STORES
+
+    catalogue = load_catalogue(Path(__file__).resolve().parents[2] / "catalog")
+    matcher = Matcher(catalogue)
+
+    def concrete(pattern: str) -> str:
+        """One catalogue pattern as a path an endpoint could actually have.
+
+        Absolute, because a pattern anchored at a working copy is matched permissively by
+        design: the matcher cannot know where the working copy is, so a relative candidate
+        matches almost anything and the question this test asks would answer itself.
+        """
+        text = pattern.replace("\\", "/").rstrip("/")
+        text = text.replace("<vscode-user>", "/home/alice/.config/Code/User")
+        text = text.replace("<project>", "/home/alice/src/app")
+        text = text.replace("<repo_root>", "/home/alice/src/app")
+        text = _re.sub(r"<[^>]+>", "abc123", text)
+        text = _re.sub(r"/\*+$", "", text)
+        return "/home/alice" + text[1:] if text.startswith("~") else text
+
+    def object_in(pattern: str) -> str:
+        """Where a loose object would sit in the repository this pattern is part of.
+
+        At the repository's root, which is the `.git` directory where there is one and the
+        claimed directory itself where the repository is bare. Appending to the leaf a
+        pattern happens to name would ask about a path no repository has, which is how the
+        first version of this test answered yes for an entry that collects references only.
+        """
+        text = concrete(pattern)
+        parts = text.split("/")
+        if ".git" in parts:
+            text = "/".join(parts[: parts.index(".git") + 1])
+        return f"{text}/objects/ab/{'c' * 38}"
+
+    carries = set()
+    for artifact_id in STORES:
+        for pattern in catalogue.artifact(artifact_id).paths:
+            candidate = object_in(pattern)
+            if any(match.artifact.id == artifact_id for match in matcher.matches(candidate)):
+                carries.add(artifact_id)
+                break
+
+    assert carries == set(OWN_REPOSITORY), {
+        "collects its objects and the module does not say so": sorted(carries - OWN_REPOSITORY),
+        "the module says so and the catalogue no longer collects them": sorted(
+            OWN_REPOSITORY - carries
+        ),
+    }

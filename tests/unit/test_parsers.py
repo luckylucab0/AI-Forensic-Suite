@@ -14,7 +14,7 @@ from pathlib import Path
 import pytest
 
 from agentforensics.model import UNINTERPRETED_MARK
-from agentforensics.parsers import for_artifact
+from agentforensics.parsers import PARSERS, for_artifact
 from agentforensics.parsers.base import ParseContext, iter_lines, normalise_ts, text_of
 from agentforensics.parsers.jsonl_generic import UNINTERPRETED as JSONL_UNINTERPRETED
 
@@ -1491,3 +1491,84 @@ def test_only_the_generic_readers_say_a_record_is_uninterpreted() -> None:
         "windsurf_cascade.py",
     ], writers
     assert UNINTERPRETED_MARK in JSONL_UNINTERPRETED
+
+
+def test_every_parser_claims_at_least_one_artifact_the_catalogue_has() -> None:
+    """A reader that claims nothing is a reader that was never reached.
+
+    This is the sharp end of the check below it, and the case that one cannot see: a set
+    with one name in it, misspelled, claims nothing at all and looks exactly like a set
+    that happens to name no catalogue entry. Asking the parser rather than reading its set
+    needs no rule about which sets are which and no guess about shapes, because handles()
+    is the same question the ingest asks.
+
+    What goes wrong when this fails is quiet in the way this project must not be: the
+    artifact the reader meant to read falls through to a generic floor or to no parser at
+    all, its file arrives in the case as an inventory row, and the reader sits in PARSERS
+    looking as though it were doing something.
+    """
+    from agentforensics.catalog import load_catalogue
+
+    catalogue = load_catalogue(Path(__file__).resolve().parents[2] / "catalog")
+    idle = [
+        parser.name
+        for parser in PARSERS
+        if not any(parser.handles(artifact.id) for artifact in catalogue.artifacts)
+    ]
+    assert not idle, (
+        "these readers are in PARSERS and claim no catalogue entry, so nothing reaches "
+        f"them and nothing says so: {idle}"
+    )
+
+
+def test_no_parser_declares_an_artifact_the_catalogue_does_not_have() -> None:
+    """A typo in one of these sets is silent in exactly the way this project must not be.
+
+    Every reader here is handed an artifact id and decides from a set written out in its
+    own module, which is how a parser can be read without the catalogue open. The cost is
+    that a name which no longer exists, or never did, claims nothing at all: the artifact
+    it meant to read falls through to a generic floor or to no parser, the file arrives in
+    the case as an inventory row, and nothing anywhere says a reader was pointed at a name
+    that is not there. Twenty-two sets across nineteen modules are in that position.
+
+    The opposite direction is already covered: the catalogue's parser field is asserted
+    against the readers that claim each entry. This is the half that was missing, and it is
+    found by walking the package rather than by listing the sets, so a set somebody adds
+    tomorrow is covered without anybody remembering this test.
+    """
+    import importlib
+    import pkgutil
+
+    import agentforensics.parsers as package
+    from agentforensics.catalog import load_catalogue
+
+    catalogue = Path(__file__).resolve().parents[2] / "catalog"
+    known = {artifact.id for artifact in load_catalogue(catalogue).artifacts}
+    wrong: list[str] = []
+    for module_info in sorted(pkgutil.iter_modules(package.__path__), key=lambda m: m.name):
+        module = importlib.import_module(f"agentforensics.parsers.{module_info.name}")
+        for name in dir(module):
+            if not name.isupper():
+                continue
+            value = getattr(module, name)
+            if not isinstance(value, (frozenset, set, dict, tuple)):
+                continue
+            items = list(value.keys() if isinstance(value, dict) else value)
+            if not items or not all(isinstance(item, str) for item in items):
+                continue
+            # Which sets are artifact-id sets is decided by the catalogue rather than by a
+            # shape rule. An event kind is spelled the same way an artifact id is, so a
+            # rule about dots would have flagged every kind in the package; a set that
+            # names no catalogue entry at all is not one of these sets and is passed over.
+            # The cost is that a set whose every name is wrong goes unnoticed here, and
+            # the alternative was a test that cried wolf on its first run. That case is
+            # the one the test above catches, by asking the parser instead of its set.
+            if not any(item in known for item in items):
+                continue
+            missing = sorted(item for item in items if item not in known)
+            wrong.extend(f"{module_info.name}.{name}: {item}" for item in missing)
+
+    assert not wrong, (
+        "these readers name an artifact the catalogue does not have, so they claim nothing "
+        f"and nothing says so: {wrong}"
+    )
