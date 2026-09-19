@@ -48,7 +48,7 @@ artifacts:
     The 'extensions' block is the MCP inventory: which external tools the agent could reach, with full command lines. Provider API keys are documented as NOT belonging here (keyring is preferred) but operators often put them here anyway.
 
     Record structure: Holds provider selection, model, enabled extensions (including MCP servers and their commands/args), context strategy and memory limits. Doubles as the MCP config - there is no separate mcp.json.
-  parser: null
+  parser: yaml_generic
 - id: goose.recipes
   category: config
   root: project
@@ -71,7 +71,7 @@ artifacts:
     Variable location, not globbable: <directories listed in GOOSE_RECIPE_PATH>
 
     Record structure: The recipes doc states recipes are found in 'the current directory or GOOSE_RECIPE_PATH directories' (colon-separated on Unix, semicolon-separated on Windows) but does NOT document a default recipe directory. Resolve GOOSE_RECIPE_PATH from the user's shell profile/environment rather than guessing a path.
-  parser: null
+  parser: yaml_generic
 - id: goose.secrets
   category: credentials
   root: user_profile
@@ -228,7 +228,7 @@ artifacts:
     Directly answers 'was the agent allowed to act without a human in the loop' - the central question in most agent-misuse investigations. A tool moved from 'ask' to 'always allow' with a recent mtime is a key finding.
 
     Record structure: permission.yaml is YAML; permissions/tool_permissions.json is JSON. Records per-tool allow/deny/ask decisions.
-  parser: null
+  parser: yaml_generic
 - id: goose.hints
   category: project_instructions
   root: project

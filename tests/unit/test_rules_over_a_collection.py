@@ -53,6 +53,7 @@ EXPECTED = {
     "AFX-PERMISSIONBYPASS-005": "~/.cline/schedules/nightly-review.json runs in the mode that "
     "approves every tool",
     "AFX-PERMISSIONBYPASS-006": "~/.claude/settings.json starts sessions in acceptEdits",
+    "AFX-PERMISSIONBYPASS-007": "~/.codex/config.toml disables the sandbox entirely",
     "AFX-PROMPTINJECTION-002": "a rules file carries invisible characters",
     "AFX-PROMPTINJECTION-003": "a project instruction file arrived with the work",
     "AFX-SECRETS-001": "a transcript holds a cloud provider access key",

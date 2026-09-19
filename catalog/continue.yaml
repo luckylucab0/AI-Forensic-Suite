@@ -81,7 +81,7 @@ artifacts:
     CORRECTION to the starting brief: the current folder name is agents/, and assistants/ is the PREVIOUS name. Glob both - an old assistants/ directory left behind is exactly the kind of stale configuration evidence that survives a user tidying up the current one. These files commonly embed apiKey values and declare capabilities such as tool_use.
 
     Re-sourced by the verification pass: the handler cited before constructs these directories only in its workspace branch, so the two user-level paths rested on nothing. The loader builds both the workspace and the global spelling.
-  parser: null
+  parser: yaml_generic
 - id: continue.aux_config
   category: config
   root: user_profile
@@ -129,7 +129,7 @@ artifacts:
     Collect ALL of them, not just config.yaml: a stale config.json is a record of an earlier configuration (models, providers, MCP servers) that config.yaml has since superseded. config.ts is executable TypeScript and must be reviewed as code. Model blocks frequently contain inline apiKey values.
 
     Record structure: config.yaml is the current standard for 2026; config.json is the deprecated original format at the same location; config.ts is deprecated programmatic config; .continuerc.json is deprecated workspace config with merge behaviour. If config.yaml exists it is loaded instead of config.json. Windows: %USERPROFILE%\.continue\config.yaml.
-  parser: null
+  parser: yaml_generic
 - id: continue.devbox_env
   category: credentials
   root: user_profile

@@ -1,0 +1,85 @@
+id: AFX-PERMISSIONBYPASS-007
+pack: permission_bypass
+title: A configuration turned the sandbox off for every session
+severity: high
+description: >
+  A configuration disables the sandbox the agent otherwise runs its commands in. Codex
+  spells this sandbox_mode = danger-full-access, with a built-in permission profile of the
+  same name, and its own documentation introduces it as disabling sandboxing entirely and
+  names it as one of the two settings an organization forbids through its managed
+  requirements file.
+rationale: >
+  This is the other half of the question the rest of this pack answers. The approval
+  settings decide whether anybody was asked; this one decides what the agent could reach
+  once it went ahead. With the sandbox on, the vendor keeps a workspace writable and the
+  repository's own git directory and the agent's configuration directory read-only, and
+  outbound network access is off unless it is switched on. With it off, none of that holds,
+  so a command in a transcript could have written anywhere on the disk and could have
+  reached the network whatever the transcript shows.
+
+  It matters most where an analyst would otherwise reason from the defaults. A report that
+  says the agent could not have touched a path because the vendor protects it is wrong on
+  this endpoint, and nothing in the transcript says so.
+applies_to:
+  kinds: [config.snapshot]
+match:
+  any:
+    - field: raw.sandbox_mode
+      equals: danger-full-access
+    - field: payload.sandbox_mode
+      equals: danger-full-access
+    # The same setting in a document rendered by the text views, one leaf per line, with
+    # the file's own quoting gone. Kept on its own line, because \s would cross into the
+    # next field and read an unset mode followed by whatever came after it.
+    - field: event_text
+      regex: '(?m)^[^\S\n]*sandbox_mode[^\S\n]*=[^\S\n]*danger-full-access[^\S\n]*$'
+    # The named profile form of the same thing, where a configuration points its default
+    # permissions at the built-in profile rather than naming the mode.
+    - field: event_text
+      regex: '(?m)^[^\S\n]*default_permissions[^\S\n]*=[^\S\n]*:?danger-full-access[^\S\n]*$'
+tags:
+  - T1562.001
+  - permission-bypass
+false_positives:
+  - >-
+    A container or a disposable virtual machine, which is what the vendor documents the
+    setting for: it says to use it only where the environment already isolates processes.
+    The finding is still correct, and whether it was appropriate depends on where the agent
+    was running.
+  - >-
+    A document that records the setting of a past run rather than setting it for future
+    ones. The finding names the file it came from, which is what tells the two apart.
+references:
+  - https://developers.openai.com/codex/config-basic
+  - https://developers.openai.com/codex/config-advanced
+tests:
+  - name: sandboxing disabled in the configuration file
+    match: true
+    event:
+      kind: config.snapshot
+      agent: codex
+      raw:
+        model: o4-mini
+        approval_policy: never
+        sandbox_mode: danger-full-access
+  - name: the same thing as a named permission profile
+    match: true
+    event:
+      kind: config.snapshot
+      agent: codex
+      raw:
+        default_permissions: ":danger-full-access"
+  - name: the sandbox that lets the workspace be written
+    match: false
+    event:
+      kind: config.snapshot
+      agent: codex
+      raw:
+        sandbox_mode: workspace-write
+  - name: the read-only sandbox
+    match: false
+    event:
+      kind: config.snapshot
+      agent: codex
+      raw:
+        default_permissions: ":read-only"

@@ -46,7 +46,7 @@ artifacts:
   source_kind: official
   notes: |-
     Official docs state the CLI 'maintains compatibility by reading legacy mode files from ~/.kilocode/cli/global/settings/custom_modes.yaml and project-level .kilocodemodes files, with the last loaded source wins' and that 'Project-level .kilocodemodes and workspace-scoped files are handled by the CLI backend that the extension delegates to'. The wider shape of the ~/.kilocode tree (whether transcripts, credentials or MCP config also live there) was NOT established - treat ~/.kilocode as a directory to enumerate wholesale rather than a set of known files.
-  parser: null
+  parser: yaml_generic
 - id: kilo_code.settings
   category: config
   root: user_profile
@@ -69,7 +69,7 @@ artifacts:
     The doc states: 'After the extension migrates on startup, the legacy file is no longer consulted' - so this file can be a stale snapshot of a pre-migration configuration, which is itself dateable evidence.
   notes: |-
     Official Kilo docs give all three OS paths verbatim and label the file LEGACY. Custom modes encode per-mode tool and file-access restrictions, so this is partly a permissions artifact.
-  parser: null
+  parser: yaml_generic
 - id: kilo_code.cli_db
   category: transcript
   root: user_profile

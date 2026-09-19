@@ -53,7 +53,7 @@ artifacts:
     The terminal backend setting (Docker, Singularity, host) tells you how much of the agent's command execution happened inside a container versus directly on the endpoint - which decides where else to look for side effects.
 
     Record structure: Model selection, terminal backend, compression settings, memory limits, context length, active MCP servers, and a skills.config namespace for skill-declared settings. Doubles as the MCP config.
-  parser: null
+  parser: yaml_generic
 - id: hermes.cron
   category: config
   root: user_profile
@@ -75,7 +75,7 @@ artifacts:
     Critical for attribution: a scheduled job means agent activity that occurred with NO human at the keyboard. Any timeline that assumes interactive use will be wrong if this directory is populated.
 
     Record structure: Scheduled jobs and automation tasks. File format not documented - enumerate.
-  parser: null
+  parser: yaml_generic
 - id: hermes.profiles
   category: config
   root: user_profile
@@ -96,7 +96,7 @@ artifacts:
     recollection, needs verification - but check for this directory anyway: if profiles are in use, every other ~/.hermes artifact in this catalogue exists once PER PROFILE, and a single-path collector would capture only the default one.
 
     Record structure: Named profiles are described as allowing multiple isolated concurrent Hermes instances, each bootstrapping its own memories, sessions, skills, skins, logs, plans, workspace, cron and home subdirectories. I saw this in a WebSearch summary of the configuration docs rather than in the page body I fetched, so treat the exact layout as unconfirmed.
-  parser: null
+  parser: yaml_generic
 - id: hermes.auth
   category: credentials
   root: user_profile

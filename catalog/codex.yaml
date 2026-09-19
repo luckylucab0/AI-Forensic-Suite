@@ -275,7 +275,7 @@ artifacts:
     CONFIG_TOML_FILE = "config.toml" in the Codex home, plus per-profile files named <profile>.config.toml (CONFIG_PROFILE_V2_SUFFIX), resolved by resolve_profile_v2_config_path(). A profile can carry its own model provider and its own instructions file, so the active profile decides which of several configurations was in force and reading only config.toml can describe a setup that was not the one used.
 
     Also here: model_catalog_json and model_instructions_file, both paths to files elsewhere on disk that shape the agent's behaviour, and experimental_compact_prompt_file. Follow them: they are prompt-injection surface that lives outside every directory this catalogue names.
-  parser: null
+  parser: toml_generic
 - id: codex.mcp_and_notify
   category: mcp_config
   root: user_profile
@@ -297,7 +297,7 @@ artifacts:
     Codex keeps its MCP servers inside config.toml rather than in a separate file, so the same bytes are both the configuration artifact and the MCP artifact. Listed twice on purpose: a report grouped by category would otherwise show no MCP configuration for an agent that has one.
 
     The notify hook also lives here and runs an external program on agent events, which makes it an execution path configured by a text file.
-  parser: null
+  parser: toml_generic
 - id: codex.requirements_and_permissions
   category: permissions
   root: user_profile
@@ -326,7 +326,7 @@ artifacts:
     The two files that decide what the agent was allowed to do without asking. allow_managed_hooks_only is honoured only in requirements.toml and is ignored in config.toml, so a control that looks configured can have no effect: check which file a restriction is written in before reporting that it was in force.
 
     The verification pass found neither filename resolved to a location in the cited source. The permissions spelling occurs there only as part of a module path, which is the likely origin of the filename, and the requirements file appears in prose and error strings with no directory ever given, described as a layer an administrator sets rather than a per-user file. All four paths are marked unsourced, and the placement under the user's configuration directory is the part to distrust most.
-  parser: null
+  parser: toml_generic
 - id: codex.auth
   category: credentials
   root: user_profile

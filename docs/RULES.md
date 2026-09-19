@@ -34,6 +34,7 @@ Findings are written into the case database next to the events they rest on, and
 |  | [AFX-PERMISSIONBYPASS-004](#afx-permissionbypass-004) | medium |
 |  | [AFX-PERMISSIONBYPASS-005](#afx-permissionbypass-005) | high |
 |  | [AFX-PERMISSIONBYPASS-006](#afx-permissionbypass-006) | medium |
+|  | [AFX-PERMISSIONBYPASS-007](#afx-permissionbypass-007) | high |
 | [`prompt_injection`](#prompt-injection) | [AFX-PROMPTINJECTION-001](#afx-promptinjection-001) | high |
 |  | [AFX-PROMPTINJECTION-002](#afx-promptinjection-002) | high |
 |  | [AFX-PROMPTINJECTION-003](#afx-promptinjection-003) | medium |
@@ -530,12 +531,12 @@ A skill, command, workflow or agent definition on the endpoint declares the tool
 | Pack | `permission_bypass` |
 | Agents | `any` |
 | Event kinds | `config.snapshot` |
-| Fields read | `raw.permissions.defaultMode`, `raw.defaultMode`, `payload.defaultMode`, `event_text`, `raw.approvalMode`, `payload.approvalMode` |
+| Fields read | `raw.permissions.defaultMode`, `raw.defaultMode`, `payload.defaultMode`, `event_text`, `raw.approvalMode`, `payload.approvalMode`, `raw.approval_policy` |
 | Tags | `T1562.001`, `permission-bypass` |
 
-A configuration sets the mode a session starts in to one that approves tool calls without asking. Claude Code spells this defaultMode bypassPermissions in its settings files, and Cline calls the equivalent mode yolo, which its own preset code describes as guaranteeing that tool policies are enabled and auto-approved.
+A configuration sets the mode a session starts in to one that approves tool calls without asking. Claude Code spells this defaultMode bypassPermissions in its settings files, Cline calls the equivalent mode yolo, which its own preset code describes as guaranteeing that tool policies are enabled and auto-approved, and Codex spells it approval_policy = never, which its vendor names as one of the two settings an organization forbids through its managed requirements file.
 
-*What it matches:* `(raw.permissions.defaultMode is 'bypassPermissions' or raw.defaultMode is 'bypassPermissions' or payload.defaultMode is 'bypassPermissions' or event_text matches /(?m)^[^\S\n]*defaultMode[^\S\n]*=[^\S\n]*bypassPermissions[^\S\n]*$/ or event_text matches /(?m)^[^\S\n]*mode[^\S\n]*=[^\S\n]*yolo[^\S\n]*$/ or raw.approvalMode is 'unrestricted' or payload.approvalMode is 'unrestricted' or event_text matches /(?m)^[^\S\n]*approvalMode[^\S\n]*=[^\S\n]*unrestricted[^\S\n]*$/)`
+*What it matches:* `(raw.permissions.defaultMode is 'bypassPermissions' or raw.defaultMode is 'bypassPermissions' or payload.defaultMode is 'bypassPermissions' or event_text matches /(?m)^[^\S\n]*defaultMode[^\S\n]*=[^\S\n]*bypassPermissions[^\S\n]*$/ or event_text matches /(?m)^[^\S\n]*mode[^\S\n]*=[^\S\n]*yolo[^\S\n]*$/ or raw.approvalMode is 'unrestricted' or payload.approvalMode is 'unrestricted' or event_text matches /(?m)^[^\S\n]*approvalMode[^\S\n]*=[^\S\n]*unrestricted[^\S\n]*$/ or raw.approval_policy is 'never' or event_text matches /(?m)^[^\S\n]*approval_policy[^\S\n]*=[^\S\n]*never[^\S\n]*$/)`
 
 *Why an analyst cares:* The two rules beside this one find a bypass somebody typed: a flag on a command line, or a mode changed part way through a session. This one is the version that needs typing once. A line in a settings file or in a schedule the agent wrote for itself means every session from then on starts with the prompt already answered, including the sessions nobody is present for. It also explains an absence twice over. A transcript with no approvals in it reads differently once this is known, and for Cline it removes evidence rather than only approvals: the vendor's own hook documentation states that hooks are disabled in yolo mode, and the hook log is the artifact that dates this agent's prompts. So a scheduled run in yolo mode approves everything and writes no audit line about any of it, and the vendor's cron documentation lists yolo as the default mode for a scheduled run.
 
@@ -551,8 +552,9 @@ A configuration sets the mode a session starts in to one that approves tool call
 - <https://raw.githubusercontent.com/cline/cline/main/sdk/packages/core/src/extensions/tools/presets.ts>
 - <https://raw.githubusercontent.com/cline/cline/main/sdk/examples/hooks/README.md>
 - <https://raw.githubusercontent.com/cline/cline/main/sdk/examples/cron/README.md>
+- <https://developers.openai.com/codex/config-basic>
 
-*Samples in the rule file:* 4 / 4 (+/-)
+*Samples in the rule file:* 5 / 5 (+/-)
 
 #### AFX-PERMISSIONBYPASS-006
 
@@ -581,6 +583,37 @@ A configuration sets the mode a session starts in to acceptEdits, which the vend
 *References:*
 
 - <https://code.claude.com/docs/en/permissions>
+
+*Samples in the rule file:* 2 / 2 (+/-)
+
+#### AFX-PERMISSIONBYPASS-007
+
+**A configuration turned the sandbox off for every session**
+
+| | |
+| --- | --- |
+| Severity | high |
+| Pack | `permission_bypass` |
+| Agents | `any` |
+| Event kinds | `config.snapshot` |
+| Fields read | `raw.sandbox_mode`, `payload.sandbox_mode`, `event_text` |
+| Tags | `T1562.001`, `permission-bypass` |
+
+A configuration disables the sandbox the agent otherwise runs its commands in. Codex spells this sandbox_mode = danger-full-access, with a built-in permission profile of the same name, and its own documentation introduces it as disabling sandboxing entirely and names it as one of the two settings an organization forbids through its managed requirements file.
+
+*What it matches:* `(raw.sandbox_mode is 'danger-full-access' or payload.sandbox_mode is 'danger-full-access' or event_text matches /(?m)^[^\S\n]*sandbox_mode[^\S\n]*=[^\S\n]*danger-full-access[^\S\n]*$/ or event_text matches /(?m)^[^\S\n]*default_permissions[^\S\n]*=[^\S\n]*:?danger-full-access[^\S\n]*$/)`
+
+*Why an analyst cares:* This is the other half of the question the rest of this pack answers. The approval settings decide whether anybody was asked; this one decides what the agent could reach once it went ahead. With the sandbox on, the vendor keeps a workspace writable and the repository's own git directory and the agent's configuration directory read-only, and outbound network access is off unless it is switched on. With it off, none of that holds, so a command in a transcript could have written anywhere on the disk and could have reached the network whatever the transcript shows. It matters most where an analyst would otherwise reason from the defaults. A report that says the agent could not have touched a path because the vendor protects it is wrong on this endpoint, and nothing in the transcript says so.
+
+*Known false positives:*
+
+- A container or a disposable virtual machine, which is what the vendor documents the setting for: it says to use it only where the environment already isolates processes. The finding is still correct, and whether it was appropriate depends on where the agent was running.
+- A document that records the setting of a past run rather than setting it for future ones. The finding names the file it came from, which is what tells the two apart.
+
+*References:*
+
+- <https://developers.openai.com/codex/config-basic>
+- <https://developers.openai.com/codex/config-advanced>
 
 *Samples in the rule file:* 2 / 2 (+/-)
 

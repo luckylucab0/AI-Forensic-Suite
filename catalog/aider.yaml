@@ -92,7 +92,7 @@ artifacts:
     Can relocate every other Aider artifact (history files, model settings). Always parse this BEFORE globbing for transcripts, or you will miss relocated histories. May contain inline api-key entries.
 
     Record structure: HISTORY.md (v0.42.0 entry) states: 'All config/env/yml/json files now load from home, git root, cwd and named command line switch.' So three locations must all be collected; later ones override earlier. Keys mirror CLI flags (model, chat-history-file, input-history-file, auto-commits, weak-model, api-key, etc.). Path string retrieved via GitHub code search content fragment plus the HISTORY.md fragment, not a full page fetch.
-  parser: null
+  parser: yaml_generic
 - id: aider.model_metadata
   category: config
   root: project
@@ -138,7 +138,7 @@ artifacts:
     Records custom/self-hosted model endpoints and edit formats - evidence of which model and which provider (possibly a proxy or local model) was actually driving the agent.
 
     Re-sourced by the verification pass, same cause as the metadata entry: the argument parser states a bare filename, the documentation states the locations.
-  parser: null
+  parser: yaml_generic
 - id: aider.dotenv
   category: credentials
   root: project

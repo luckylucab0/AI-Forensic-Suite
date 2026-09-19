@@ -4,9 +4,11 @@ title: A configuration starts every session in a mode that approves its own tool
 severity: high
 description: >
   A configuration sets the mode a session starts in to one that approves tool calls without
-  asking. Claude Code spells this defaultMode bypassPermissions in its settings files, and
-  Cline calls the equivalent mode yolo, which its own preset code describes as guaranteeing
-  that tool policies are enabled and auto-approved.
+  asking. Claude Code spells this defaultMode bypassPermissions in its settings files, Cline
+  calls the equivalent mode yolo, which its own preset code describes as guaranteeing that
+  tool policies are enabled and auto-approved, and Codex spells it approval_policy = never,
+  which its vendor names as one of the two settings an organization forbids through its
+  managed requirements file.
 rationale: >
   The two rules beside this one find a bypass somebody typed: a flag on a command line, or
   a mode changed part way through a session. This one is the version that needs typing
@@ -50,6 +52,13 @@ match:
       equals: unrestricted
     - field: event_text
       regex: '(?m)^[^\S\n]*approvalMode[^\S\n]*=[^\S\n]*unrestricted[^\S\n]*$'
+    # Codex, whose configuration is TOML. The quotes the file has around the value are not
+    # in the text a rule searches: the text views render a leaf as `key = value`, so the
+    # pattern matches the value bare.
+    - field: raw.approval_policy
+      equals: never
+    - field: event_text
+      regex: '(?m)^[^\S\n]*approval_policy[^\S\n]*=[^\S\n]*never[^\S\n]*$'
 tags:
   - T1562.001
   - permission-bypass
@@ -68,6 +77,7 @@ references:
   - https://raw.githubusercontent.com/cline/cline/main/sdk/packages/core/src/extensions/tools/presets.ts
   - https://raw.githubusercontent.com/cline/cline/main/sdk/examples/hooks/README.md
   - https://raw.githubusercontent.com/cline/cline/main/sdk/examples/cron/README.md
+  - https://developers.openai.com/codex/config-basic
 tests:
   - name: the start mode set in a settings file
     match: true
@@ -113,6 +123,21 @@ tests:
       raw:
         version: 1
         approvalMode: auto-review
+  - name: the approval policy that never asks
+    match: true
+    event:
+      kind: config.snapshot
+      agent: codex
+      raw:
+        model: o4-mini
+        approval_policy: never
+  - name: the approval policy that asks when the agent wants more
+    match: false
+    event:
+      kind: config.snapshot
+      agent: codex
+      raw:
+        approval_policy: on-request
   - name: a schedule that runs in the ordinary mode
     match: false
     event:

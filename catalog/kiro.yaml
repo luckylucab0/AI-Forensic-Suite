@@ -234,7 +234,7 @@ artifacts:
     Edited by the user or written when an approval prompt is answered with a persistent choice. No versioning.
   notes: |-
     This is the central autonomy artifact for Kiro. Capability-based rules over filesystem read and write, shell commands, web requests, MCP servers, subagents, skills, powers and diagnostics, each with effect deny, ask or allow, matched by glob, with deny overriding ask overriding allow across all scopes. An entry such as shell: allow with match 'git *' or 'npm *', or a filesystem write allow over 'src/**', is a pre-authorisation that lets the agent act with no prompt, and is exactly what an analyst needs to distinguish 'the user approved this action' from 'the action ran silently under a standing rule'. Note the vendor-stated hardcoded denials (~/.kiro/settings/, .kiro/settings/, ~/.kiro/workspace-roots/) and always-ask paths (.git/**, .kiro/agents/**, .kiro/hooks/**, .kiroignore): a write to any of those implies an explicit user approval, so it is a strong indicator of deliberate action rather than drift.
-  parser: null
+  parser: yaml_generic
 - id: kiro.permissions_workspace
   title: Kiro per-workspace permission rules
   category: permissions
@@ -262,7 +262,7 @@ artifacts:
     Same as the user rules. Survives deletion of the project itself, because it lives under the home directory and not in the repository.
   notes: |-
     The project-scope permission file is deliberately NOT in the repository: the vendor describes it as 'per-user, outside the repo'. That makes it the single most useful record of what a particular user pre-approved for a particular working copy, and it outlives the working copy. The <hash> keys the workspace root; how it is derived is not documented, so enumerate the directories and correlate them with session metadata rather than trying to compute the hash from a candidate path. Collect the whole ~/.kiro/workspace-roots tree, including directories whose workspace no longer exists on the endpoint, since those are evidence of projects that were worked on and then removed.
-  parser: null
+  parser: yaml_generic
 - id: kiro.managed_settings
   title: Kiro enterprise managed permission policy
   category: permissions

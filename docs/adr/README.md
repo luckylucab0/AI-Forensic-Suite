@@ -35,3 +35,4 @@ Add one with the next free number, using [0000-template.md](0000-template.md).
 | [0025](0025-the-attribution-of-a-file-is-a-hint-not-a-verdict.md) | The entry a source attributed a file to is a hint, and the best claimant wins |
 | [0026](0026-a-store-comparison-is-a-view-not-a-rule.md) | Comparing an agent's stores against each other is a view, and produces no findings |
 | [0027](0027-a-json-document-is-split-by-structure-not-meaning.md) | A whole JSON document is split by its structure, one level deep, and never by a guess at its meaning |
+| [0028](0028-yaml-and-toml-are-read-the-way-json-is.md) | The YAML and TOML documents are read by the same rule, from one shared reader |

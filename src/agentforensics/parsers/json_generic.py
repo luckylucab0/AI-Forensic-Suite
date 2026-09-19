@@ -1,7 +1,10 @@
 """Read a whole JSON document the suite has no verified shape for, without inventing one.
 
-The third and last of the generic readers, and the one that needed a decision rather than
-just a rule. See ADR 0027.
+The first of the whole-document readers, and the one that needed a decision rather than
+just a rule. See ADR 0027. The reading itself now lives in `structured_generic`, because
+the same decision answers the same question for YAML and for TOML, and three copies of it
+would drift; what stays here is which artifacts are JSON, which of them are configurations,
+and how a JSON file is turned into a value. See ADR 0028.
 
 The other two are handed their own records: a SQLite store has rows and a line-delimited
 log has lines, so the honest floor under both is "return each one, read nothing out of it
@@ -32,45 +35,15 @@ event says on itself that nobody has read this format.
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Any
 
-from agentforensics.model import UNINTERPRETED_MARK, Event, unparsed
-from agentforensics.parsers.base import ParseContext, normalise_ts, read_json
-from agentforensics.parsers.jsonl_generic import (
-    TIME_FIELDS,
-    literal_field,
-    literal_project,
-    literal_session,
-    literal_text,
+from agentforensics.model import Event, unparsed
+from agentforensics.parsers.base import ParseContext, read_json
+from agentforensics.parsers.structured_generic import (
+    NOT_SPLIT,
+    SPLIT_LIMIT,
+    UNINTERPRETED,
+    documents,
 )
-
-# A list longer than this stays one event with all of it in `raw`, and the event says how
-# many elements it holds and why it was not split. The rule ADR 0022 applies to an index or
-# a cache store, moved from a list of artifact ids to the data itself: a machine-generated
-# array of a hundred thousand chunks would bury a case's evidence under the agent's own
-# index, and nothing about the array's name says which kind it is.
-SPLIT_LIMIT = 10_000
-
-# What every event out of this module says about itself, in the words the other two generic
-# readers use for the same situation.
-UNINTERPRETED = (
-    "this collection has no verified shape for this document, so the record "
-    f"{UNINTERPRETED_MARK}. Everything it contained is in raw. Re-read this file once a "
-    "parser for it exists."
-)
-
-# Said on a document that was not split, so a reader knows the records are inside the one
-# event rather than missing from the case.
-NOT_SPLIT = (
-    "this list holds {count} elements, more than the {limit} this reader splits, so it is "
-    "one record with all of it in raw rather than one event per element"
-)
-
-# Said where the document held nothing. An empty object in `raw` and an event that says
-# nothing else reads as a parser that came back with nothing, and those are opposite
-# answers: this one is a file that was read and was empty, which for a session marker or a
-# configuration backup is itself a fact about the endpoint.
-EMPTY = "this file was read and holds an empty {shape}, which is what is in raw"
 
 # Every JSON artifact in the catalogue except the credential stores, written out rather
 # than derived from the format field at runtime, for the reason `sqlite_generic.STORES` is
@@ -366,87 +339,11 @@ class JsonGenericParser:
                 host=context.host,
             )
             return
-
-        if document in ([], {}):
-            # A file that was read and was empty. It gets an event of its own, because an
-            # empty session marker or a configuration backup with nothing in it is a fact
-            # about the endpoint, and a list that produced no events at all would leave the
-            # case unable to tell it from a file nobody read.
-            yield self._record(
-                context,
-                "$",
-                document,
-                note=EMPTY.format(shape="list" if isinstance(document, list) else "object"),
-            )
-            return
-        if isinstance(document, list):
-            yield from self._list(context, "$", document)
-            return
-        if not isinstance(document, dict):
-            # A bare string, number or boolean as the whole file. Unusual, and carried
-            # rather than skipped: a file whose content is `null` is a different answer
-            # from a file nobody read.
-            yield self._record(context, "$", document)
-            return
-
-        yield self._record(context, "$", document)
-        for key, value in document.items():
-            if _splittable(value):
-                yield from self._list(context, f"$.{key}", value)
-
-    def _list(self, context: ParseContext, at: str, value: list[Any]) -> Iterator[Event]:
-        """One event per element, unless the list is longer than a case can carry."""
-        if len(value) > SPLIT_LIMIT:
-            yield self._record(
-                context,
-                at,
-                value,
-                note=NOT_SPLIT.format(count=len(value), limit=SPLIT_LIMIT),
-            )
-            return
-        for index, element in enumerate(value):
-            yield self._record(context, f"{at}[{index}]", element)
-
-    def _record(self, context: ParseContext, at: str, value: Any, note: str | None = None) -> Event:
-        """One record, with only what it plainly says read out of it."""
-        # The literal readings apply to an object. A list or a scalar names no fields, so
-        # it carries no time, no session and no text, and it is in `raw` whole.
-        record = value if isinstance(value, dict) else {}
-        field, raw_time = literal_field(record, TIME_FIELDS)
-        when, precision, timing = normalise_ts(raw_time)
-        text = literal_text(record)
-        return Event(
-            # What the record is, where the catalogue says so, and unknown otherwise. The
-            # reading is just as thin either way and the event says so either way: the kind
-            # is the one thing about these documents that rests on something checked.
-            kind="config.snapshot" if context.artifact_id in CONFIGURATIONS else "unparsed.record",
-            provenance=context.provenance(at),
-            agent=context.agent,
-            raw=value,
-            parse_problem=" ".join(part for part in (note, timing, UNINTERPRETED) if part),
-            ts_utc=when,
-            ts_precision=precision,
-            ts_source=f"the field named {field}" if when and field else None,
-            user=context.user,
-            host=context.host,
-            session_id=literal_session(record),
-            project_path=literal_project(record),
-            payload={"text": text} if text is not None else {},
+        yield from documents(
+            context,
+            document,
+            configuration=context.artifact_id in CONFIGURATIONS,
         )
-
-
-def _splittable(value: Any) -> bool:
-    """Whether a top-level value is a list of things rather than a list of loose values.
-
-    A list of objects is a list of things whatever those things are, which is a statement
-    about the bytes. A list of strings is a setting with several values, and one event per
-    string would put a case's evidence beside a list of enabled extensions.
-    """
-    return (
-        isinstance(value, list)
-        and bool(value)
-        and all(isinstance(element, dict) for element in value)
-    )
 
 
 __all__ = [

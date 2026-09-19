@@ -1467,5 +1467,13 @@ def test_only_the_generic_readers_say_a_record_is_uninterpreted() -> None:
         if "UNINTERPRETED_MARK" in module.read_text(encoding="utf-8")
     )
 
-    assert writers == ["json_generic.py", "jsonl_generic.py", "sqlite_generic.py"], writers
+    # structured_generic is where the whole-document reading lives, so the three document
+    # formats that use it (JSON, YAML and TOML) say the words through it rather than each
+    # spelling them out, and the list below is shorter than the number of readers by
+    # design.
+    assert writers == [
+        "jsonl_generic.py",
+        "sqlite_generic.py",
+        "structured_generic.py",
+    ], writers
     assert UNINTERPRETED_MARK in JSONL_UNINTERPRETED

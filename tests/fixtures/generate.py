@@ -1629,6 +1629,20 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         jsonl([{"session_id": SESSION_A, "ts": 1788912000, "text": "check the lockfile"}]),
         RECENT,
     )
+    # The configuration of the same agent, in the format its vendor writes it in and with
+    # the two settings that vendor's own documentation names as the ones an organization
+    # forbids: approvals off and the sandbox disabled. It is here so the rules about them
+    # are held to finding them in a collection rather than only in their own samples.
+    write(
+        codex / "config.toml",
+        'model = "o4-mini"\n'
+        'approval_policy = "never"\n'
+        'sandbox_mode = "danger-full-access"\n'
+        "\n"
+        "[sandbox_workspace_write]\n"
+        "network_access = true\n",
+        RECENT,
+    )
 
     copilot = home / ".copilot"
     write(
