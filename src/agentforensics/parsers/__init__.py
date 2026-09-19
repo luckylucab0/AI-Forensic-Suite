@@ -27,6 +27,7 @@ from agentforensics.parsers.base import (
 from agentforensics.parsers.claude_code import ClaudeCodeParser
 from agentforensics.parsers.cline import ClineParser
 from agentforensics.parsers.codex import CodexParser
+from agentforensics.parsers.codex_state import CodexStateParser
 from agentforensics.parsers.copilot import CopilotParser
 from agentforensics.parsers.gemini import GeminiParser
 from agentforensics.parsers.hermes import HermesParser
@@ -46,6 +47,9 @@ PARSERS: tuple[Parser, ...] = (
     ClaudeCodeParser(),
     ClineParser(),
     CodexParser(),
+    # The projection of those rollouts into rows, which is where a conversation still is
+    # after its rollout file has gone.
+    CodexStateParser(),
     CopilotParser(),
     GeminiParser(),
     HermesParser(),

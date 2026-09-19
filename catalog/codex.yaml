@@ -209,7 +209,7 @@ artifacts:
     memories_1.sqlite and memories_v2_1.sqlite are the agent's persistent memory, which is a different question from what it was told in one session: content here influences future sessions the user may not connect to it, and it is where an injected instruction would persist. thread_history_1.sqlite indexes the rollouts, so it can name conversations whose files have been deleted.
 
     CODEX_SQLITE_HOME moves all seven out of the Codex home.
-  parser: sqlite_generic
+  parser: codex_state
 - id: codex.sqlite_glob
   category: transcript
   root: user_profile
@@ -230,7 +230,7 @@ artifacts:
     As codex.state_databases.
   notes: |-
     Deliberately redundant with codex.state_databases. Every one of those filenames carries a schema version, and the vendor bumps it: an analyst running this tool against a newer Codex than the catalogue knows about would otherwise collect nothing and see a clean directory. The named entries give attribution, this one gives coverage, and the manifest records both claims on a file.
-  parser: sqlite_generic
+  parser: codex_state
 - id: codex.log_dir
   category: log
   root: user_profile

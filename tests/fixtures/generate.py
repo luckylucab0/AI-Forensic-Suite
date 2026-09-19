@@ -36,7 +36,7 @@ from pathlib import Path
 # Fixed instants, so mtimes are stable across runs and machines. Chosen to sit either side
 # of a 30 day retention boundary relative to REFERENCE_NOW, so a test can assert that a
 # sweep would have taken one and not the other.
-REFERENCE_NOW = 1789000000  # 2026-09-08T10:26:40Z
+REFERENCE_NOW = 1789000000  # 2026-09-10T00:26:40Z
 RECENT = REFERENCE_NOW - 3 * 86400
 OLD = REFERENCE_NOW - 45 * 86400
 

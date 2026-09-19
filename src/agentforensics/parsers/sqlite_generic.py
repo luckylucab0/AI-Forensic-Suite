@@ -187,19 +187,29 @@ class SqliteGenericParser:
 
 
 def rows_as_events(
-    context: ParseContext, connection: sqlite3.Connection, table: Table
+    context: ParseContext,
+    connection: sqlite3.Connection,
+    table: Table,
+    note: str | None = None,
 ) -> Iterator[Event]:
     """One table, uninterpreted, as events.
 
     Module level rather than a method because an agent-specific parser needs it too: it maps
     the tables whose schema somebody verified and hands every other table here, so a store
     is never half read with the other half silently absent.
+
+    `note` replaces the reason on the events. Without it the reason is that nobody has read
+    a schema for this store, which is the usual case and is what an analyst needs to know.
+    A parser that has read the schema and is carrying the rows for a different reason, such
+    as a table whose rows the event model has no kind for, says that instead: leaving the
+    default there would tell a case that a store nobody had read was the problem, and the
+    next person would go and read it again.
     """
     for locator, values, problem in rows_of(connection, table):
-        ts, precision, source, note = literal_time(values)
-        problems = [problem or _UNINTERPRETED]
-        if note:
-            problems.append(note)
+        ts, precision, source, timing_note = literal_time(values)
+        problems = [problem or note or _UNINTERPRETED]
+        if timing_note:
+            problems.append(timing_note)
         yield unparsed(
             context.provenance(locator),
             context.agent,
