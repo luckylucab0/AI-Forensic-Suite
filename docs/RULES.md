@@ -42,6 +42,7 @@ Findings are written into the case database next to the events they rest on, and
 |  | [AFX-SECRETS-003](#afx-secrets-003) | high |
 |  | [AFX-SECRETS-004](#afx-secrets-004) | high |
 |  | [AFX-SECRETS-005](#afx-secrets-005) | medium |
+|  | [AFX-SECRETS-006](#afx-secrets-006) | high |
 | [`sensitive_paths`](#sensitive-paths) | [AFX-SENSITIVEPATHS-001](#afx-sensitivepaths-001) | high |
 |  | [AFX-SENSITIVEPATHS-002](#afx-sensitivepaths-002) | high |
 |  | [AFX-SENSITIVEPATHS-003](#afx-sensitivepaths-003) | critical |
@@ -830,6 +831,38 @@ This rule does not quote what it matched. The matched value is a credential, and
 - A key name in a schema or a type definition, where the value is a type rather than a secret.
 
 *Samples in the rule file:* 2 / 2 (+/-)
+
+#### AFX-SECRETS-006
+
+**A credential was passed to a command as a flag**
+
+| | |
+| --- | --- |
+| Severity | high |
+| Pack | `secrets` |
+| Agents | `any` |
+| Event kinds | `any` |
+| Fields read | `event_text` |
+| Tags | `T1552.003`, `credential-in-transcript` |
+
+A command line carries a credential as the value of an option such as --api-key, --token or --password. Cursor's command line agent documents --api-key as one of its two ways of authenticating, and the same shape appears in every tool that offers one.
+
+*What it matches:* `event_text matches /(?i)--(?:api[_-]?key\|access[_-]?token\|auth[_-]?token\|token\|password\|secret)(?:=\|[^\S\n]+)["']?[A-Za-z0-9_/+.][A-Za-z0-9_\-/+.]{11,}/`
+
+This rule does not quote what it matched. The matched value is a credential, and a finding is exported and pasted into reports, so the value stays in the event it came from.
+
+*Why an analyst cares:* A credential given as a flag is written down twice by the operating system before anything the agent does: into the shell history file, which this suite collects, and into the process table, where anything running as any user on the machine could read it while the command ran. Neither copy is deleted when the credential is rotated, so a shell history is a credential store that nobody thinks of as one, and the rule that matches an assignment does not see this shape because a flag and its value are separated by a space rather than by an equals sign. It is high rather than critical because the value may be a placeholder from a document somebody pasted, and because the finding names an exposure rather than a use.
+
+*Known false positives:*
+
+- A placeholder in a README, a runbook or a help text, which this rule cannot tell from a value. It matches because the text is what is on disk.
+- A value that is long enough to look like a credential and is not one, such as a job name or a file name given to an option whose name mentions a token.
+
+*References:*
+
+- <https://cursor.com/docs/cli/reference/authentication>
+
+*Samples in the rule file:* 3 / 3 (+/-)
 
 ## sensitive paths
 

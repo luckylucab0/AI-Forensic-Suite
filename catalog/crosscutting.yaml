@@ -620,7 +620,7 @@ artifacts:
     HISTFILESIZE truncates the file by removing the OLDEST entries whenever it is assigned. Default HISTSIZE is 500 after startup files are read. By default bash writes only at shell exit, so a killed terminal or a crashed box can lose the entire session.
   notes: |-
     HISTFILE default IS documented for bash, unlike zsh: "The name of the file in which command history is saved... The default value is ~/.bash_history. If unset, the command history is not saved when a shell exits." HISTCONTROL suppressions to account for: ignorespace ("lines which begin with a space character are not saved"), ignoredups, erasedups ("causes all previous lines matching the current line to be removed from the history list before that line is saved") - erasedups actively destroys earlier evidence of repeated agent invocations.
-  parser: null
+  parser: shell_history
 - id: crosscutting.shell_fish_history
   category: shell_history
   root: user_profile
@@ -643,7 +643,7 @@ artifacts:
     The `paths` list is a gift no other shell gives: it ties an agent invocation to the specific files in play. Session/file name is controlled by the `fish_history` variable - docs: "The default value (when the variable is unset) is `fish` which corresponds to $XDG_DATA_HOME/fish/fish_history"; setting it to e.g. `fun` yields fun_history, and setting it to the empty string disables history entirely. Glob *_history in that directory rather than assuming one filename.
 
     Record structure: BEST-IN-CLASS FOR TIMELINING - timestamps are unconditional, no opt-in needed. Verbatim source comment: "Our history format is nearly-valid YAML (but isn't quite). Here it is:\n\n  - cmd: ssh blah blah blah\n    when: 2348237\n    added_when: 2348238\n    paths:\n      - /path/to/something\n      - /path/to/something_else\n\nNewlines are replaced by \\n. Backslashes are replaced by \\\\." So: `when` = unix epoch seconds of last add, `added_when` = epoch of first add, and `paths` records file paths referenced by the command. DO NOT USE A STRICT YAML PARSER - the format is deliberately "nearly-valid"; write a line-oriented parser and unescape \\n and \\\\ yourself.
-  parser: null
+  parser: shell_history
 - id: crosscutting.shell_psreadline_history
   category: shell_history
   root: user_profile
@@ -669,7 +669,7 @@ artifacts:
     KEY ADDITION the brief missed: the filename is per-HOST, not fixed. Verbatim: "The filename is stored in a variable `$($Host.Name)_history.txt`, for example `ConsoleHost_history.txt`." So the VS Code integrated terminal, the ISE and other embedders each write their OWN history file in the same directory. Glob *_history.txt - an agent driven from inside VS Code will be invisible if you only read ConsoleHost_history.txt. Documented defaults: Windows "$Env:APPDATA\Microsoft\Windows\PowerShell\PSReadLine\$($Host.Name)_history.txt"; non-Windows "$Env:XDG_DATA_HOME/powershell/PSReadLine/$($Host.Name)_history.txt" or "$HOME/.local/share/powershell/PSReadLine/$($Host.Name)_history.txt".
 
     Record structure: NO TIMESTAMPS AT ALL. Plain UTF-8 text, one command per line, multi-line commands continued with a trailing backtick. This file CANNOT be timelined internally - you get ordering plus the file's own MACB times only. To date a PowerShell agent invocation you must corroborate with Prefetch/Amcache/UserAssist or the agent's own logs.
-  parser: null
+  parser: shell_history
 - id: crosscutting.shell_zsh_history
   category: shell_history
   root: user_profile
@@ -693,7 +693,7 @@ artifacts:
     IMPORTANT CORRECTION to the brief's framing: zsh itself has NO default HISTFILE. The manual says only "The file to save the history in when an interactive shell exits. If unset, the history is not saved" and gives no default. ~/.zsh_history is a convention supplied by the OS/distro rc files (macOS /etc/zshrc, oh-my-zsh, etc.), so the collector must read HISTFILE from the user's dotfiles and follow it rather than hardcoding the name. Likewise the history file is only written when SAVEHIST is non-zero. For aafs this file is the primary proof that a CLI agent was invoked at all (`claude`, `codex`, `gemini`, `ollama run`, `lms`, `aider`, `npx ...`).
 
     Provenance: zsh documents the HISTFILE parameter as "the file to save the history in when an interactive shell exits" and states no default for it. If HISTFILE is unset the history is not saved at all. The two filenames an analyst actually finds, ~/.zsh_history and ~/.zhistory, are set by distribution and framework startup files rather than by the shell, so they are convention and not a vendor-stated location. Read HISTFILE out of the collected startup files before concluding anything from an absent history file.
-  parser: null
+  parser: shell_history
 - id: crosscutting.npm_npx_cache
   category: install_evidence
   root: user_profile

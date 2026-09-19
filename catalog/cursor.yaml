@@ -28,6 +28,7 @@ vendor_sources:
 description: |-
   A closed-source editor derived from VS Code, whose agent keeps its data in two trees: the editor's own user data directory, which follows the layout it inherited, and a per-user agent directory under the home directory. The vendor documents the second tree's configuration files thoroughly and documents nothing at all about where conversations are stored, which is why the transcript entries here rest on independent research and are marked unverified. Two negative findings from the vendor's own pages are worth knowing before an acquisition. There is no first-party statement that privacy mode changes what is written to local disk: it is documented as a control over cloud training and retention, so a privacy-mode user's conversations should still be expected on the endpoint. And there is no documented way to export or delete local conversation history, with account deletion explicitly leaving local data in place, so material can outlive the account it belongs to.
 references:
+- https://cursor.com/docs/agent/overview
 - https://cursor.com/docs/cli/reference/permissions
 - |-
   https://github.com/AltimateAI/vscode-dbt-power-user/blob/5fc912ee821cf1e42feb826ad48f9a01e2e98a80/documentation/docs/setup/cursor_installation_workaround.md
@@ -232,7 +233,9 @@ artifacts:
   volatility: |-
     Bounded by Cursor's own rewind retention (6 checkpoint rows observed in one survey). A sibling workspaceStorage/<hash>/snapshots/ directory is expected by the code but was ABSENT in an audited profile.
   notes: |-
-    PRE-EDIT FILE CONTENT — recovers what a file looked like before the agent touched it, including changes never committed to git. metadata.json.agentRequestId joins to cursorDiskKV agentKv:* and to ai_code_hashes.requestId, giving a file-change → prompt linkage.
+    PRE-EDIT FILE CONTENT, which recovers what a file looked like before the agent touched it, including changes never committed to git. metadata.json.agentRequestId joins to cursorDiskKV agentKv:* and to ai_code_hashes.requestId, giving a file change to prompt linkage.
+
+    The vendor states the behaviour and not the location, so the paths stay unverified and the entry stays collected. What the vendor's agent page does state is worth the acquisition decision on its own: a checkpoint is created automatically before a significant change, it captures every modified file, it is stored locally and separately from git, and restoring one reverts the files WITHOUT removing anything from the conversation. So a transcript can describe an edit that no longer exists in the working tree and say nothing about the restore, and this directory is where the intermediate state went.
 
     Record structure: metadata.json fields: agentRequestId, requestFiles, deduplicatedGitInfos, workspaceId, startTrackingDateUnixMilliseconds. Diff payload fields: fsPath, fileUuid, diffChanges, gitInfo, kind. files/<uuid> are pre-edit file bodies.
   parser: json_generic

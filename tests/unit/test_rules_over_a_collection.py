@@ -12,6 +12,11 @@ views as `key = value` lines with no JSON quoting anywhere. Four rules were writ
 events no collection produced, and two more against a serialisation the text views do not
 use. All six passed their own samples and none of them could fire on a real case.
 
+Three more arrived the same way and from one cause: the shell history was collected and
+nothing read it, so every rule about a start line, an exported variable or a credential on
+a command line had nothing to match in a collection while passing its own samples. The
+parser for those four files closed it, and the three rules are held here.
+
 So this is a floor under the packs: the fixture holds the evidence each of these rules is
 about, and the rule has to find it. It is not a test of how many findings the fixture
 produces, because that number changes whenever the fixture grows.
@@ -37,7 +42,10 @@ from generate import build_home  # noqa: E402
 # collection actually produces, which is the failure its own samples cannot catch.
 EXPECTED = {
     "AFX-ANTIFORENSICS-001": "~/.claude/settings.json lowers cleanupPeriodDays below the default",
+    "AFX-ANTIFORENSICS-002": "~/.zsh_history holds the export that stops the prompt history "
+    "being written",
     "AFX-DANGEROUSCOMMANDS-002": "a transcript holds a command that pipes a download into a shell",
+    "AFX-PERMISSIONBYPASS-001": "~/.zsh_history holds the start line that skips the prompts",
     "AFX-PERMISSIONBYPASS-002": "a transcript holds a mid-session switch to an approval mode "
     "that stops asking",
     "AFX-PERMISSIONBYPASS-003": "~/.claude/settings.json allows Bash(*)",
@@ -48,6 +56,7 @@ EXPECTED = {
     "AFX-PROMPTINJECTION-002": "a rules file carries invisible characters",
     "AFX-PROMPTINJECTION-003": "a project instruction file arrived with the work",
     "AFX-SECRETS-001": "a transcript holds a cloud provider access key",
+    "AFX-SECRETS-006": "~/.zsh_history holds a command that carried an API key as a flag",
     "AFX-SUPPLYCHAIN-001": "~/src/app/.mcp.json starts a server through uvx",
     "AFX-SUPPLYCHAIN-002": "~/.claude/settings.json configures a PreToolUse hook",
     "AFX-SUPPLYCHAIN-003": "a hook script on the endpoint fetches code and runs it",

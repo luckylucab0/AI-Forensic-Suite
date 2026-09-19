@@ -1604,7 +1604,11 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     write(
         home / ".zsh_history",
         ": 1788912000:0;claude --dangerously-skip-permissions\n"
-        ": 1788912060:0;export CLAUDE_CODE_SKIP_PROMPT_HISTORY=1\n",
+        ": 1788912060:0;export CLAUDE_CODE_SKIP_PROMPT_HISTORY=1\n"
+        # A credential typed onto a command line, which the shell then wrote down. The
+        # value is synthetic and is here because the rule that finds this shape has to be
+        # held to finding it in a collection and not only in its own samples.
+        ": 1788912120:0;cursor-agent --api-key sk_live_examplekey0123456789 'ship it'\n",
     )
 
     # Two more agents, so that the parsers for the three formats the viewer already knows

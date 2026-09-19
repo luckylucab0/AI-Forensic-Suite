@@ -42,6 +42,7 @@ Funde werden in die Falldatenbank geschrieben, neben die Ereignisse, auf denen s
 |  | [AFX-SECRETS-003](#afx-secrets-003) | hoch |
 |  | [AFX-SECRETS-004](#afx-secrets-004) | hoch |
 |  | [AFX-SECRETS-005](#afx-secrets-005) | mittel |
+|  | [AFX-SECRETS-006](#afx-secrets-006) | hoch |
 | [`sensitive_paths`](#sensitive-paths) | [AFX-SENSITIVEPATHS-001](#afx-sensitivepaths-001) | hoch |
 |  | [AFX-SENSITIVEPATHS-002](#afx-sensitivepaths-002) | hoch |
 |  | [AFX-SENSITIVEPATHS-003](#afx-sensitivepaths-003) | kritisch |
@@ -832,6 +833,38 @@ Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein
 - [EN] A key name in a schema or a type definition, where the value is a type rather than a secret.
 
 *Stichproben in der Regeldatei:* 2 / 2 (+/-)
+
+#### AFX-SECRETS-006
+
+**A credential was passed to a command as a flag**
+
+| | |
+| --- | --- |
+| Schweregrad | hoch |
+| Paket | `secrets` |
+| Agenten | `any` |
+| Ereignisarten | `any` |
+| Gelesene Felder | `event_text` |
+| Schlagworte | `T1552.003`, `credential-in-transcript` |
+
+[EN] A command line carries a credential as the value of an option such as --api-key, --token or --password. Cursor's command line agent documents --api-key as one of its two ways of authenticating, and the same shape appears in every tool that offers one.
+
+*Worauf sie trifft:* `event_text matches /(?i)--(?:api[_-]?key\|access[_-]?token\|auth[_-]?token\|token\|password\|secret)(?:=\|[^\S\n]+)["']?[A-Za-z0-9_/+.][A-Za-z0-9_\-/+.]{11,}/`
+
+Diese Regel zitiert nicht, worauf sie getroffen hat. Der getroffene Wert ist ein Zugangsdatum, und ein Fund wird exportiert und in Berichte kopiert, deshalb bleibt der Wert in dem Ereignis, aus dem er kommt.
+
+*Warum das für die Analyse zählt:* [EN] A credential given as a flag is written down twice by the operating system before anything the agent does: into the shell history file, which this suite collects, and into the process table, where anything running as any user on the machine could read it while the command ran. Neither copy is deleted when the credential is rotated, so a shell history is a credential store that nobody thinks of as one, and the rule that matches an assignment does not see this shape because a flag and its value are separated by a space rather than by an equals sign. It is high rather than critical because the value may be a placeholder from a document somebody pasted, and because the finding names an exposure rather than a use.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A placeholder in a README, a runbook or a help text, which this rule cannot tell from a value. It matches because the text is what is on disk.
+- [EN] A value that is long enough to look like a credential and is not one, such as a job name or a file name given to an option whose name mentions a token.
+
+*Quellen:*
+
+- <https://cursor.com/docs/cli/reference/authentication>
+
+*Stichproben in der Regeldatei:* 3 / 3 (+/-)
 
 ## sensitive paths
 
