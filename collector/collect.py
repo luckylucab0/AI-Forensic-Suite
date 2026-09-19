@@ -9454,6 +9454,51 @@ def as_posix(path: str) -> str:
     return path.replace("\\", "/")
 
 
+# Names under a Windows "Users" directory that are not users. Two of them, "All Users" and
+# "Default User", are junctions, into ProgramData and into the default profile, so walking
+# them collects another tree under a user name nobody has. Keyed on the parent being named
+# Users rather than on the running platform, so an image of a Windows host collected from a
+# POSIX workstation is treated the same way.
+_PSEUDO_PROFILES = frozenset({"public", "default", "default user", "all users", "defaultuser0"})
+
+
+def live_profile_parents() -> list:
+    """The directories this host keeps its user profiles in.
+
+    Windows keeps them on the system drive, and "/Users" is not a path to them. Measured on
+    a Windows host: ntpath.isabs("/Users") is False, and ntpath.abspath("/Users") resolved
+    it against the working directory's drive, which was D: there. So --all-users looked for
+    D:/Users, found nothing, and returned no profiles at all. The flag collected nothing and
+    reported nothing, which is worse than a flag that is not there.
+
+    This is about the machine the collector is running on, not about the target platform: a
+    mounted image goes through the root branch of discover_users and names its own parents.
+    """
+    if os.name == "nt":
+        # Spelled in capitals for the linter's sake and because that is the convention.
+        # Windows' own environment is case-insensitive and os.environ mirrors that there,
+        # so the lookup finds the variable however the host spells it.
+        drive = (os.environ.get("SYSTEMDRIVE") or "C:").rstrip("/\\")
+        return [as_posix(drive) + "/Users"]
+    return ["/Users", "/home"]
+
+
+def _profiles_under(parent: str, skip_pseudo: bool) -> list:
+    """The profile directories directly under one parent."""
+    found = []
+    try:
+        names = sorted(os.listdir(parent))
+    except OSError:
+        return found
+    for name in names:
+        if skip_pseudo and name.lower() in _PSEUDO_PROFILES:
+            continue
+        home = os.path.join(parent, name)
+        if os.path.isdir(home) and not os.path.islink(home):
+            found.append({"name": name, "home": as_posix(home)})
+    return found
+
+
 def discover_users(root: str | None, all_users: bool, named: list) -> list:
     """Return [{'name', 'home'}] for the profiles to scan."""
     if root:
@@ -9474,13 +9519,7 @@ def discover_users(root: str | None, all_users: bool, named: list) -> list:
             if parent == "root":
                 found.append({"name": "root", "home": as_posix(base)})
                 continue
-            try:
-                for name in sorted(os.listdir(base)):
-                    home = os.path.join(base, name)
-                    if os.path.isdir(home):
-                        found.append({"name": name, "home": as_posix(home)})
-            except OSError:
-                continue
+            found.extend(_profiles_under(base, skip_pseudo=parent == "Users"))
         if not found:
             name = os.path.basename(root.rstrip("/")) or "root"
             found = [{"name": name, "home": as_posix(root)}]
@@ -9490,16 +9529,13 @@ def discover_users(root: str | None, all_users: bool, named: list) -> list:
 
     if all_users:
         found = []
-        for parent in ("/Users", "/home"):
+        for parent in live_profile_parents():
             if not os.path.isdir(parent):
                 continue
-            try:
-                for name in sorted(os.listdir(parent)):
-                    home = os.path.join(parent, name)
-                    if os.path.isdir(home) and not os.path.islink(home):
-                        found.append({"name": name, "home": as_posix(home)})
-            except OSError:
-                continue
+            found.extend(_profiles_under(parent, skip_pseudo=os.path.basename(parent) == "Users"))
+        # The superuser's own home, which is not under the profile parent on either POSIX
+        # platform. Windows has no equivalent: the administrator's profile is under Users
+        # like everybody else's and is already listed above.
         if os.path.isdir("/var/root"):
             found.append({"name": "root", "home": "/var/root"})
         elif os.path.isdir("/root"):
@@ -9523,6 +9559,27 @@ def discover_users(root: str | None, all_users: bool, named: list) -> list:
     except Exception:
         who = os.environ.get("USER") or "unknown"
     return [{"name": who, "home": as_posix(os.path.expanduser("~"))}]
+
+
+def running_elevated():
+    """Whether this process can read another user's profile. None when it cannot be told.
+
+    Three answers rather than two, because "not elevated" and "could not find out" lead to
+    different sentences and a collector must not print the first when it means the second.
+
+    hasattr(os, "geteuid") is False on Windows, so the check that guarded this was skipped
+    there entirely: an unelevated Windows run walked the profile directory, was refused
+    every other user's subtree by the filesystem, and said nothing about why its collection
+    was thin.
+    """
+    if hasattr(os, "geteuid"):
+        return os.geteuid() == 0
+    try:
+        import ctypes
+
+        return bool(ctypes.windll.shell32.IsUserAnAdmin())  # type: ignore[attr-defined]
+    except Exception:
+        return None
 
 
 def discover_project_roots(home: str) -> list:
@@ -9792,6 +9849,27 @@ def run(args: argparse.Namespace) -> dict:
     entries: list = []
     errors: list = []
     project_roots: list = []
+    # A run that found no profile at all collects nothing, and an empty bundle has to say
+    # why it is empty. Without this it was indistinguishable from a host with no user data
+    # on it, which is the one answer this tool must never give by accident. The two ways to
+    # get here are a --all-users run on a platform whose profile parent this collector had
+    # wrong, which is how the Windows case went unnoticed, and a --user naming somebody who
+    # is not on this host.
+    if not users:
+        asked = "--all-users" if args.all_users else ("--user " + ", ".join(args.user or []))
+        where = ", ".join(live_profile_parents()) if not args.root else args.root
+        errors.append(
+            {
+                "path": where,
+                "error": "no_profiles_found",
+                "detail": "%s matched no user profile under %s, so nothing was searched"
+                % (asked if asked.strip() else "this run", where),
+            }
+        )
+        sys.stderr.write(
+            "%s: no user profile was found under %s. Nothing was searched, and the "
+            "manifest records that as an error rather than as an empty host.\n" % (TOOL_NAME, where)
+        )
     used: dict = {}
     # Paths already decided, so a second user's glob cannot re-collect a shared file and a
     # scan over the growing entry list is not needed for every candidate.
@@ -10119,11 +10197,19 @@ def main(argv: list | None = None) -> int:
             )
             return EXIT_USAGE
 
-    if args.all_users and hasattr(os, "geteuid") and os.geteuid() != 0:
-        sys.stderr.write(
-            "%s: --all-users without elevation will miss other users' profiles. "
-            "Continuing, and recording that this run was not elevated.\n" % TOOL_NAME
-        )
+    if args.all_users:
+        elevated = running_elevated()
+        if elevated is False:
+            sys.stderr.write(
+                "%s: --all-users without elevation will miss other users' profiles. "
+                "Continuing, and recording that this run was not elevated.\n" % TOOL_NAME
+            )
+        elif elevated is None:
+            sys.stderr.write(
+                "%s: --all-users, and whether this process is elevated could not be "
+                "determined. If it is not, other users' profiles will be missing from the "
+                "collection without an error against them.\n" % TOOL_NAME
+            )
 
     manifest = run(args)
 

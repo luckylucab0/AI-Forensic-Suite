@@ -10,6 +10,7 @@ wrong answer in an investigation, and no amount of unit testing the loader would
 from __future__ import annotations
 
 import importlib.util
+import json
 import os
 import re
 from pathlib import Path
@@ -991,3 +992,96 @@ def test_a_backslashed_home_or_root_does_not_double_the_profile(monkeypatch) -> 
     assert resolved == ["C:/image/Users/alice/AppData/Roaming/Block/goose/sessions.db"]
     assert not collect.PATTERN_REFUSALS
     collect.PATTERN_REFUSALS.clear()
+
+
+# ------------------------------------------------- --all-users, and where profiles live
+
+
+def test_the_profile_parent_is_the_one_the_platform_uses(monkeypatch) -> None:
+    """Measured on a Windows host rather than assumed, and the measurement was the point.
+
+    "/Users" is not a path to the profiles on Windows. ntpath.isabs("/Users") is False and
+    ntpath.abspath("/Users") resolves it against the working directory's drive, which on
+    the runner was D: while the system was on C:. So --all-users looked for D:/Users and
+    returned no profiles at all: it collected nothing and reported nothing, which is worse
+    than a flag that is not there.
+    """
+    collect = _load_collector()
+
+    monkeypatch.setattr(collect.os, "name", "posix")
+    assert collect.live_profile_parents() == ["/Users", "/home"]
+
+    monkeypatch.setattr(collect.os, "name", "nt")
+    monkeypatch.setenv("SYSTEMDRIVE", "C:")
+    assert collect.live_profile_parents() == ["C:/Users"]
+    # A host whose system is not on C:, which is the case the measurement happened to show
+    # is possible: the runner's working directory was on D:.
+    monkeypatch.setenv("SYSTEMDRIVE", "E:")
+    assert collect.live_profile_parents() == ["E:/Users"]
+    monkeypatch.delenv("SYSTEMDRIVE")
+    assert collect.live_profile_parents() == ["C:/Users"], "a default, not an empty answer"
+
+
+def test_a_windows_pseudo_profile_is_not_a_user(tmp_path) -> None:
+    """Names under a Windows Users directory that are not users.
+
+    "All Users" and "Default User" are junctions, into ProgramData and into the default
+    profile, so walking them collects another tree under a user name nobody has. Keyed on
+    the parent being named Users rather than on the running platform, so an image of a
+    Windows host collected from a POSIX workstation is treated the same way.
+    """
+    collect = _load_collector()
+    users = tmp_path / "Users"
+    for name in ("alice", "Public", "Default", "All Users", "defaultuser0", "Bob"):
+        (users / name).mkdir(parents=True)
+
+    found = collect._profiles_under(str(users), skip_pseudo=True)
+    assert [user["name"] for user in found] == ["Bob", "alice"]
+
+    # And without the flag nothing is filtered, because on POSIX a user may legitimately be
+    # called any of those.
+    assert len(collect._profiles_under(str(users), skip_pseudo=False)) == 6
+
+
+def test_a_run_that_found_no_profile_says_so(tmp_path, capsys) -> None:
+    """An empty bundle has to say why it is empty.
+
+    Without this a --all-users run on a platform whose profile parent the collector had
+    wrong was indistinguishable from a host with no user data on it, which is the one
+    answer this tool must never give by accident. It is how the Windows case stayed
+    unnoticed: zero profiles, zero files, zero errors.
+    """
+    collect = _load_collector()
+    out = tmp_path / "bundle"
+    empty = tmp_path / "empty-image"
+    empty.mkdir()
+
+    # An image root with no profile parent in it at all falls back to treating the root as
+    # one profile, so --user is the way to reach the empty case deliberately.
+    code = collect.main(
+        ["--out", str(out), "--root", str(empty), "--os", "windows", "--user", "nobody"]
+    )
+    printed = capsys.readouterr()
+    manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+
+    reasons = [error["error"] for error in manifest["errors"]]
+    assert "no_profiles_found" in reasons
+    assert "no user profile was found" in printed.err
+    assert code in (collect.EXIT_ERRORS, collect.EXIT_NOTHING_FOUND)
+
+
+@pytest.mark.skipif(os.name != "nt", reason="the answer is only true on a Windows host")
+def test_all_users_finds_the_profiles_on_a_live_windows_host() -> None:
+    """The assertion the measurement earned, on the host that can answer it.
+
+    Before the fix this returned an empty list on the Windows runner. It runs nowhere else,
+    which is the point: the behaviour under test is the platform's.
+    """
+    collect = _load_collector()
+    found = collect.discover_users(None, True, [])
+
+    assert found, "a live Windows host has at least the profile this process runs as"
+    for user in found:
+        assert re.match(r"^[A-Za-z]:/", user["home"]), user
+        assert "\\" not in user["home"], user
+        assert user["name"].lower() not in collect._PSEUDO_PROFILES
