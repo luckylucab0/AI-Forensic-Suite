@@ -151,6 +151,15 @@ gelesen wurde. Das sind verschiedene Lücken mit verschiedenen Gegenmitteln, und
 dessen Ereignisse aus einem dieser Gründe dünn sind, sagt nichts über die Nutzung des
 Agenten aus.
 
+Eine Zeile sagt ausserdem, wenn die Datei Byte für Byte eine andere Datei desselben Falls
+ist. Die Hashes kamen mit der Sammlung, das ist also Gleichheit und keine Auslegung, und es
+beantwortet zwei Fragen. Ein Agent, der ein Transcript beiseitelegt statt es zu löschen,
+hinterlässt die Konversation unter einem Namen, den seine eigene Sitzungsauswahl nicht
+zeigt, und eine Kopie, die eine Löschung überlebt hat, ist genau das, wonach eine
+Untersuchung sucht. Dieselbe Beziehung erklärt einen Fund, der zweimal erscheint, wo es wie
+ein Ereignis aussieht: der Datensatz liegt in zwei Dateien, also sind es zwei Funde und ein
+Vorfall.
+
 ## Filter
 
 Sechs der Ansichten filtern, und alle folgen einer Regel: ein Filter darf Zeilen vom

@@ -141,6 +141,14 @@ collected and a file that was collected and never read. Those are different gaps
 different remedies, and a case whose events are thin for one of those reasons says nothing
 about the agent's use.
 
+A row also says when the file is byte for byte another file in the same case. The hashes
+came with the collection, so this is equality rather than a reading, and it answers two
+questions. An agent that sets a transcript aside rather than deleting it leaves the
+conversation under a name its own session picker does not show, and a copy that survived a
+deletion is what an investigation is looking for. The same relation explains a finding that
+appears twice for what looks like one event: the record is in two files, so it is two
+findings and one incident.
+
 ## Filters
 
 Five of the views filter, and they follow one rule: a filter may take rows off the screen

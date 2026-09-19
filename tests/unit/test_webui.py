@@ -402,6 +402,47 @@ def test_the_artifact_list_separates_not_collected_from_not_read(case: Case) -> 
         assert isinstance(entry["collected"], bool)
 
 
+def test_a_transcript_set_aside_is_visible_as_the_same_bytes(case: Case) -> None:
+    """The copy an agent leaves behind, named as what it is.
+
+    Claude Code sets a transcript aside rather than deleting it, under a name its own
+    session picker does not show. The copy is byte for byte the original, which the
+    collection already recorded as a hash, so the list can say it without interpreting
+    anything. Two questions turn on it: a conversation that survived a deletion is what an
+    investigation is looking for, and a finding that appears twice for one event is one
+    incident rather than two.
+    """
+    listed = api.artifacts(case)
+
+    same = [entry for entry in listed["artifacts"] if entry["identical_to"]]
+
+    assert same, "the synthetic profile holds a transcript that was set aside"
+    assert listed["identical_files"] == len(same)
+    # The relation is symmetric, because it is equality of bytes: a file that names another
+    # has to be named by it, or the list would be telling two different stories about one
+    # pair depending on which row an analyst read first.
+    by_path = {entry["original_path"]: entry for entry in same}
+    for entry in same:
+        for other in entry["identical_to"]:
+            assert entry["original_path"] in by_path[other]["identical_to"]
+    assert any(
+        any("superseded" in other or "orphaned" in other for other in entry["identical_to"])
+        for entry in same
+    )
+
+
+def test_a_file_with_no_twin_says_nothing_rather_than_an_empty_claim(case: Case) -> None:
+    """Most files have no copy, and a list that flagged every row would cost the flag its
+    meaning. An uncollected file is never claimed to be identical to anything either: its
+    content was not read, so there is no hash to compare."""
+    listed = api.artifacts(case)
+
+    assert any(not entry["identical_to"] for entry in listed["artifacts"])
+    for entry in listed["artifacts"]:
+        if not entry["collected"]:
+            assert entry["identical_to"] == []
+
+
 # ----------------------------------------------------------------------- hardening
 
 

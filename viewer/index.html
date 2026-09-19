@@ -2060,6 +2060,14 @@ function drawArtifacts(){
       el('span',{class:'st '+cls,text:stateName}),
       el('span',{class:'ag',text:entry.agent||'unclaimed'}),
       el('span',{class:'pth',text:entry.original_path}),
+      // A file that is byte for byte another file in this case. Worth the room it takes:
+      // an agent that sets a transcript aside rather than deleting it leaves the
+      // conversation under a name it no longer shows, and it explains a finding that
+      // appears twice for what looks like one event.
+      (entry.identical_to||[]).length
+        ? el('span',{class:'mk',title:'byte for byte the same file as:\n'+entry.identical_to.join('\n'),
+                     text:'same bytes as '+entry.identical_to.length+' other'
+                          +(entry.identical_to.length===1?'':'s')}):null,
       el('span',{class:'n',text:(entry.events_parsed||0)+' ev'
         +(entry.records_unparsed?' · '+entry.records_unparsed+' bad':'')}),
     ]));

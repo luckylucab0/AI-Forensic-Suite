@@ -793,11 +793,27 @@ def artifacts(case: Case) -> dict[str, Any]:
             " ORDER BY a.agent IS NULL, a.agent, a.original_path"
         )
     ]
+    # Which collected files are byte for byte the same file under another name. Derived
+    # from the hashes the collection already recorded, so it is a fact rather than a
+    # reading, and it answers two questions at once. One is why a finding appears several
+    # times: the same record in two files is two findings, correctly, and an analyst
+    # counting incidents needs to see that they are one. The other is the one worth more:
+    # an agent that sets a transcript aside rather than deleting it leaves the conversation
+    # under a name it no longer shows, and a copy that survives a deletion is exactly what
+    # an investigation is looking for.
+    copies: dict[str, list[str]] = {}
+    for entry in out:
+        if entry["collected"] and entry["sha256"]:
+            copies.setdefault(entry["sha256"], []).append(entry["original_path"])
+
     for entry in out:
         entry["collected"] = bool(entry["collected"])
         entry["changed_while_reading"] = (
             None if entry["changed_while_reading"] is None else bool(entry["changed_while_reading"])
         )
+        entry["identical_to"] = [
+            path for path in copies.get(entry["sha256"] or "", []) if path != entry["original_path"]
+        ]
     gaps = [
         dict(row)
         for row in case.query(
@@ -810,6 +826,10 @@ def artifacts(case: Case) -> dict[str, Any]:
         "artifacts": out,
         "collection_gaps": gaps,
         "counts": case.counts(),
+        # How many collected files have at least one byte-identical sibling in this case.
+        # Counted rather than left to be noticed, because on a case where an agent keeps
+        # its old transcripts under another name this number is the first sign of it.
+        "identical_files": sum(1 for entry in out if entry["identical_to"]),
     }
 
 
