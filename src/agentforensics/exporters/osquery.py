@@ -31,6 +31,7 @@ from agentforensics.exporters.common import (
     is_registry,
     iter_paths,
     needs_discovery,
+    registry_reason,
     skip_lines,
     wildcard_segments,
 )
@@ -105,7 +106,7 @@ def _translate(path: str, os_name: str) -> str | None:
 
 def _patterns(artifact: Artifact, os_name: str) -> tuple[list[str], str | None]:
     if is_registry(artifact):
-        return [], "a registry key, which osquery reads through its own registry table"
+        return [], registry_reason("osquery's registry table")
     if needs_discovery(artifact):
         return [], (
             "anchored at a working copy, whose location only the agent's own state file "

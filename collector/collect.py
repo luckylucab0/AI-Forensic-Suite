@@ -9628,7 +9628,9 @@ def expand_paths(pattern: str, home: str, target_os: str, root: str | None) -> l
             # of evidence was never collected. Two of these keys are the managed policy
             # that says what an agent was allowed to do, so reading the refusal correctly
             # is the difference between "no policy was in force" and "nobody looked".
-            # The generated Velociraptor and KAPE rules do read them.
+            # Nothing in this suite reads the registry either: not the other collector
+            # and not one of the five collection-rule exporters, each of which names
+            # these keys in its own header as something it does not cover.
             return refuse_pattern(pattern, text, "registry_key")
         if text.startswith("$"):
             if variable_name(text) in _POSIX_ONLY_VARIABLES:

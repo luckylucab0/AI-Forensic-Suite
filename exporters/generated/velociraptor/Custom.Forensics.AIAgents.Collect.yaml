@@ -13,7 +13,7 @@
 # every endpoint creates a worse problem than the one it investigates.
 #
 # Not covered by this rule:
-#   a registry key, which this artifact reads through a separate source
+#   a registry key, and this rule addresses files. Nothing in this suite reads the registry, so it is not collected anywhere else either: query these keys with Velociraptor's own registry accessor. docs/ARTIFACTS.md names them
 #     claude_code.managed_settings_registry
 #     claude_desktop.managed_policy_windows
 #     crosscutting.windows_execution_evidence_registry

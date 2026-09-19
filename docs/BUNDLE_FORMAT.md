@@ -133,8 +133,10 @@ Field notes that are not obvious:
   `profile_is_a_symlink` or `registry_key`. The last one is a whole class rather than a
   defect in one pattern: both collectors read the filesystem and neither reads the
   registry, so a catalogued key is declined by name. Two of those keys are the managed
-  policy that says what an agent was allowed to do, and the generated Velociraptor and
-  KAPE rules are what reads them. It exists because a pattern nobody searched is a hole in the
+  policy that says what an agent was allowed to do, and no generated rule covers them
+  either: each one names these keys in its own header as something it does not do. A key
+  in this catalogue is evidence somebody has to go and get with the tool's own registry
+  facility. It exists because a pattern nobody searched is a hole in the
   coverage, and a bundle that is silent about it looks exactly like a bundle from a host
   where the artifact was absent.
 

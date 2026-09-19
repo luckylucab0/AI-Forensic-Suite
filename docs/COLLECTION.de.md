@@ -268,8 +268,8 @@ wiederkehrenden Gründe:
 - **Nur über eine Verschiebungsvariable erreichbar.** Der Baum des Agenten wurde per
   Umgebungsvariable verschoben, sein Ort ist also, was die Variable sagt. Ein Agent
   schreibt ein komplettes zweites Transkript an einen Pfad, den der Betreiber wählt.
-- **Ein Registry-Schlüssel**, der in jedem Werkzeug eine andere Tabelle oder ein anderer
-  Zieltyp ist.
+- **Ein Registry-Schlüssel**, den jedes dieser Werkzeuge ansprechen kann und keine dieser
+  generierten Regeln anspricht.
 - **Plattformumfang.** KAPE und das Live-Response-Paket sind nur Windows, und sie sagen,
   wie viel des Katalogs damit außer Reichweite liegt.
 
@@ -279,8 +279,13 @@ Ein Registry-Schlüssel ist keine: beide Collectors lesen das Dateisystem und ke
 die Registry, also wird ein katalogisierter Schlüssel namentlich abgelehnt und erscheint in
 `refused_patterns` des Bundles als `registry_key`. Sechs Katalogeinträge sind
 Registry-Schlüssel, und zwei davon sind die verwaltete Richtlinie, die sagt, was ein Agent
-durfte. Für die sind die generierten Regeln also kein Weg, Hosts zu finden, die man ansehen
-muss: sie sind das Einzige in dieser Suite, das die Beweise holt.
+durfte. Auch sonst holt sie in dieser Suite nichts: jeder der fünf Exporter kann die
+Registry in seiner eigenen Sprache ansprechen, und keine der generierten Regeln tut es, was
+jede von ihnen im eigenen Kopf sagt. Ein Schlüssel in diesem Katalog ist also
+Beweismaterial, das jemand von Hand holen muss, mit der Registry-Fähigkeit des Werkzeugs,
+das er ohnehin schon laufen hat. Unter Windows kann diese Richtlinie allein in der Registry
+stehen, ganz ohne Datei, und ein Fall, der darüber schwiege, läse sich als Host ohne
+Richtlinie statt als Host, auf dem niemand nachgesehen hat.
 
 Für die anderen drei ist das die ehrliche Arbeitsteilung: eine generierte Regel findet die
 Hosts, die man ansehen muss, der Collector holt die Beweise.

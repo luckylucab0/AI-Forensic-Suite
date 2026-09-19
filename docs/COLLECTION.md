@@ -253,7 +253,8 @@ the reason for each. Read that section before you read the results. The recurrin
 - **Reachable only through a relocation variable.** The agent's tree was moved by an
   environment variable, so its location is whatever that variable says. One agent writes an
   entire second transcript to a path the operator chooses.
-- **A registry key**, which is a different table or a different target type in each tool.
+- **A registry key**, which every one of these tools can address and none of these
+  generated rules does.
 - **Platform scope.** KAPE and the live response package are Windows only, and they say how
   much of the catalogue that puts out of reach.
 
@@ -262,8 +263,13 @@ Windows-only path are all filesystem questions and it answers them. A registry k
 both collectors read the filesystem and neither reads the registry, so a catalogued key is
 declined by name and appears in the bundle's `refused_patterns` as `registry_key`. Six
 catalogue entries are registry keys, and two of them are the managed policy that says what
-an agent was allowed to do, so for those the generated rules are not a way of finding hosts
-worth looking at: they are the only thing in this suite that gets the evidence.
+an agent was allowed to do. Nothing else in this suite gets them either: every one of the
+five exporters can address the registry in its own language, and not one of the generated
+rules does, which each of them says in its own header. So a key in this catalogue is
+evidence somebody has to go and get by hand, with the registry facility of whichever tool
+they are already running. On Windows that policy can exist in the registry alone, with no
+file anywhere, and a case that stayed quiet about it would read as a host where no policy
+was in force rather than as one where nobody looked.
 
 For the other three that is the honest division of labour: a generated rule finds the hosts
 worth looking at, the collector gets the evidence.

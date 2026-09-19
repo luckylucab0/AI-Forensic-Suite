@@ -72,7 +72,9 @@ Fassungen nicht auseinanderlaufen. Die Felder, die nicht selbsterklärend sind:
   Defekt an einem einzelnen Muster: beide Collectors lesen das Dateisystem und keiner
   liest die Registry, also wird ein katalogisierter Schlüssel namentlich abgelehnt. Zwei
   dieser Schlüssel sind die verwaltete Richtlinie, die sagt, was ein Agent durfte, und
-  gelesen werden sie von den generierten Velociraptor- und KAPE-Regeln. Das Feld gibt es, weil ein nicht durchsuchtes Muster
+  auch keine generierte Regel deckt sie ab: jede nennt diese Schlüssel im eigenen Kopf als
+  etwas, das sie nicht tut. Ein Schlüssel in diesem Katalog ist also Beweismaterial, das
+  jemand mit der Registry-Fähigkeit des jeweiligen Werkzeugs selbst holen muss. Das Feld gibt es, weil ein nicht durchsuchtes Muster
   eine Lücke in der Abdeckung ist und ein Bundle, das darüber schweigt, genauso aussieht
   wie ein Bundle von einem Host, auf dem das Artefakt gar nicht vorhanden war.
 

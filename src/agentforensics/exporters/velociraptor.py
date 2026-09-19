@@ -29,6 +29,7 @@ from agentforensics.exporters.common import (
     is_registry,
     iter_paths,
     needs_discovery,
+    registry_reason,
     skip_lines,
     wildcard_segments,
 )
@@ -113,7 +114,7 @@ def _recurse(glob: str) -> str:
 def _covered(artifact: Artifact, os_name: str) -> tuple[list[str], str | None]:
     """The globs for one artifact, or the reason there are none."""
     if is_registry(artifact):
-        return [], "a registry key, which this artifact reads through a separate source"
+        return [], registry_reason("Velociraptor's own registry accessor")
     if needs_discovery(artifact):
         return [], (
             "anchored at a working copy, whose location only the agent's own state file "

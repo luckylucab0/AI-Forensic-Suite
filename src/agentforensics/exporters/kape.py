@@ -32,6 +32,7 @@ from agentforensics.exporters.common import (
     is_registry,
     iter_paths,
     needs_discovery,
+    registry_reason,
     skip_lines,
     wildcard_segments,
 )
@@ -94,7 +95,7 @@ def _split(path: str) -> tuple[str, str, bool] | None:
 
 def _rows(artifact: Artifact) -> tuple[list[tuple[str, str, bool]], str | None]:
     if is_registry(artifact):
-        return [], "a registry key, which is a KAPE registry target rather than a file target"
+        return [], registry_reason("a KAPE registry target of your own")
     if needs_discovery(artifact):
         return [], (
             "anchored at a working copy, whose location only the agent's own state file "

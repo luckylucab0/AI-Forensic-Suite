@@ -241,3 +241,40 @@ def test_posix_only_paths_do_not_reach_a_windows_target(catalogue: Catalogue) ->
             lowered = path.lower()
             assert "library/application support" not in lowered, f"{artifact.id}: {path}"
             assert not lowered.startswith("~/.config/"), f"{artifact.id}: {path}"
+
+
+def test_no_generated_rule_claims_something_else_collects_the_registry(
+    catalogue: Catalogue,
+) -> None:
+    """Six catalogue entries are registry keys and nothing in this suite reads one.
+
+    Each exporter used to explain that in its own words, and each of the three sentences
+    sent the reader somewhere: that this Velociraptor artifact reads the key through a
+    separate source, which it does not and never did; that it is a KAPE registry target;
+    that osquery has a registry table. The last two are true about the tool and were read
+    as true about the generated file, which ships no such target and no such query.
+
+    Two of those six entries are the managed policy that says what an agent was allowed to
+    do, and on Windows that policy can exist in the registry alone, with no file anywhere.
+    A reader who believed any of the three sentences would conclude that no policy was in
+    force when the truth is that nobody looked, which is the confusion this project exists
+    to prevent. So the rules say it plainly, and this holds them to it.
+    """
+    rendered = "\n".join(one.text for one in render(catalogue)).lower()
+    for claim in (
+        "reads through a separate source",
+        "which is a kape registry target rather than",
+        "which osquery reads through its own registry table",
+    ):
+        assert claim not in rendered, f"a generated rule still says: {claim}"
+    assert "nothing in this suite reads the registry" in rendered
+
+
+def test_every_registry_entry_is_named_as_uncovered_somewhere(catalogue: Catalogue) -> None:
+    """Named rather than merely absent, because an entry nobody mentions reads as an entry
+    nobody needed."""
+    rendered = "\n".join(one.text for one in render(catalogue))
+    keys = [artifact.id for artifact in catalogue.artifacts if artifact.root == "registry"]
+    assert len(keys) >= 6
+    missing = [key for key in keys if key not in rendered]
+    assert not missing, missing

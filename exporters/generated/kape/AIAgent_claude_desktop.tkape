@@ -14,7 +14,7 @@
 # endpoint use the Velociraptor artifact or this suite's own collector.
 #
 # Not covered by this rule:
-#   a registry key, which is a KAPE registry target rather than a file target
+#   a registry key, and this rule addresses files. Nothing in this suite reads the registry, so it is not collected anywhere else either: query these keys with a KAPE registry target of your own. docs/ARTIFACTS.md names them
 #     claude_desktop.managed_policy_windows
 #   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
 #     claude_desktop.code_launch_config

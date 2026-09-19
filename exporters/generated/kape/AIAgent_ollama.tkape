@@ -14,7 +14,7 @@
 # endpoint use the Velociraptor artifact or this suite's own collector.
 #
 # Not covered by this rule:
-#   a registry key, which is a KAPE registry target rather than a file target
+#   a registry key, and this rule addresses files. Nothing in this suite reads the registry, so it is not collected anywhere else either: query these keys with a KAPE registry target of your own. docs/ARTIFACTS.md names them
 #     ollama.env_overrides_registry
 Description: AI coding agent artifacts, Ollama
 Author: agentforensics
