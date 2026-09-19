@@ -42,7 +42,11 @@ def parse(path: Path, artifact: str = MEMORY, original: str | None = None) -> li
 
 
 def write(path: Path, text: str) -> Path:
-    path.write_text(text, encoding="utf-8")
+    # newline="" so the file holds the bytes the test says it holds. Without it the suite's
+    # Windows simulation writes CRLF, the parser correctly returns what is in the file, and
+    # a test that compares the text byte for byte fails for the right reason in the wrong
+    # place.
+    path.write_text(text, encoding="utf-8", newline="")
     return path
 
 

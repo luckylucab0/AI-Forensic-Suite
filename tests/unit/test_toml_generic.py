@@ -40,7 +40,9 @@ def parse(path: Path, artifact: str = CONFIG) -> list:
 
 
 def write(path: Path, text: str) -> Path:
-    path.write_text(text, encoding="utf-8")
+    # newline="" for the reason the other readers' tests give: the suite can simulate
+    # Windows text-mode writes, and a document is read from the bytes on disk.
+    path.write_text(text, encoding="utf-8", newline="")
     return path
 
 
