@@ -550,3 +550,61 @@ def test_the_other_claimants_are_tried_in_a_stable_order(
         also_claimed_by=("gemini_cli.chats", "gemini_cli.home_tree", "aider.tags_cache"),
     )
     assert _other_claimants(off_tree, matcher) == ["aider.tags_cache", "gemini_cli.chats"]
+
+
+def test_a_database_that_arrived_without_its_log_is_a_gap_in_the_case(
+    catalogue: Catalogue, tmp_path: Path
+) -> None:
+    """The reading that looks complete and is not, recorded where the case keeps them.
+
+    A gap rather than an event, because it is a statement about what the collection carried
+    and not about a record in a file. The store opens, its tables are all there, and SQLite
+    reports nothing at all about the transactions that stayed behind in a log nobody was
+    asked to take, so the case has to say it instead.
+    """
+    import sqlite3
+
+    home = tmp_path / "home" / "alice"
+    store = home / ".local" / "share" / "opencode" / "opencode.db"
+    store.parent.mkdir(parents=True)
+    connection = sqlite3.connect(store)
+    connection.execute("PRAGMA journal_mode=WAL")
+    connection.execute("CREATE TABLE session (id TEXT)")
+    connection.commit()
+    # Closed, so the log is folded in and deleted, which is the state a dead-box collection
+    # finds. The point of the check is not that a log is missing here but that this
+    # catalogue entry never asks for one, so no collection of it could ever carry it.
+    connection.close()
+
+    with Case.open(tmp_path / "case.db") as case:
+        report = ingest(case, home, catalogue)
+        kinds = {row["kind"] for row in case.query("SELECT kind FROM collection_gaps")}
+
+    assert report.databases_without_their_log == ["~/.local/share/opencode/opencode.db"]
+    assert "sqlite_write_ahead_log_not_collected" in kinds
+
+
+def test_a_store_whose_log_the_catalogue_does_ask_for_is_not_flagged(
+    catalogue: Catalogue, tmp_path: Path
+) -> None:
+    """Otherwise the gap would fire for almost every database in almost every collection.
+
+    A cleanly closed application leaves no log at all, and most databases in a dead-box
+    collection are in that state. Warning about each of them would train an analyst to
+    scroll past the one collection where the log really was left behind.
+    """
+    import sqlite3
+
+    home = tmp_path / "home" / "alice"
+    store = home / ".copilot" / "session-store.db"
+    store.parent.mkdir(parents=True)
+    connection = sqlite3.connect(store)
+    connection.execute("PRAGMA journal_mode=WAL")
+    connection.execute("CREATE TABLE sessions (id TEXT)")
+    connection.commit()
+    connection.close()
+
+    with Case.open(tmp_path / "case.db") as case:
+        report = ingest(case, home, catalogue)
+
+    assert report.databases_without_their_log == []

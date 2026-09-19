@@ -1269,3 +1269,63 @@ def test_a_windows_roaming_path_is_also_searched_where_the_package_puts_it(
         "redirects it to, so a store install reads as an agent that left nothing: "
         f"{missing}"
     )
+
+
+# --------------------------------------- the write-ahead log beside a database
+
+
+# Every catalogue entry whose databases arrive without the log that holds their newest
+# transactions, with what is lost when they do. Declared rather than tolerated: the test
+# below fails on any SQLite path not listed here and not covered, so a new database enters
+# the catalogue with somebody having decided about its log.
+#
+# Why this list is not simply fixed: a sidecar's name follows from SQLite's own rule and
+# needs no vendor to state it, but adding a hundred and twenty paths to the catalogue by
+# hand is a different decision from writing them down once, and it is not this test's to
+# make. See the gap the analyzer records for what an analyst is told meanwhile.
+WAL_NOT_COLLECTED = {
+    "amazonq.cli_state_database",
+    "cline.sqlite_dbs",
+    "continue.index",
+    "cursor.ai_code_tracking_db",
+    "cursor.chat_store_db",
+    "cursor.conversation_search_db",
+    "cursor.global_state_vscdb",
+    "cursor.workspace_state_vscdb",
+    "devin.sessions_db",
+    "goose.sessions_db",
+    "goose.sessions_db_windows",
+    "hermes.state_db",
+    "kilo_code.cli_db",
+    "kiro.cli_session_database",
+    "ollama.app_chat_database",
+    "opencode.db",
+    "vscode.state_vscdb",
+    "warp.sqlite",
+    "windsurf.embedding_database",
+    "windsurf.ide_global_state_vscdb",
+    "windsurf.ide_workspace_state_vscdb",
+    "zed.sidebar_threads",
+    "zed.threads_db",
+}
+
+
+def test_a_database_either_has_its_log_claimed_or_is_declared_without_one() -> None:
+    """A database collected without its write-ahead log reads short and says nothing.
+
+    SQLite reports no error: the store opens, every table is there, and the conversation
+    stops before its newest messages. That is the one failure in this pipeline that looks
+    exactly like success, so which entries have it is written down rather than discovered
+    by an analyst quoting a last message that was not the last message.
+
+    Asserted in both directions. An entry that gains its sidecar paths and stays on the
+    list fails here, so the list shrinks as the catalogue is fixed instead of going stale.
+    The answer comes from the catalogue's own query, which is what the ingest asks at run
+    time, so the two can never disagree about which stores are affected.
+    """
+    without = set(load_catalogue(CATALOG_DIR).databases_without_a_claimed_log())
+    assert without == WAL_NOT_COLLECTED, (
+        "the set of entries whose databases arrive without their write-ahead log changed.\n"
+        f"newly without a log: {sorted(without - WAL_NOT_COLLECTED)}\n"
+        f"now covered, remove from the list: {sorted(WAL_NOT_COLLECTED - without)}"
+    )

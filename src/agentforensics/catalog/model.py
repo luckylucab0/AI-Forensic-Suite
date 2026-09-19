@@ -8,6 +8,7 @@ entry rather than a silently skipped artifact.
 
 from __future__ import annotations
 
+import fnmatch
 import json
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
@@ -37,6 +38,12 @@ CollectPriority = Literal["live_only", "first", "normal", "durable"]
 COLLECT_PRIORITY_ORDER: tuple[CollectPriority, ...] = ("live_only", "first", "normal", "durable")
 
 _SCHEMA_NAME = "catalog.schema.json"
+
+
+# What a file name has to end in for this catalogue to treat it as a database rather than
+# as a directory or a glob. Deliberately literal: a rule that guessed from the format field
+# alone would ask for the write-ahead log of a directory.
+DATABASE_SUFFIXES = (".db", ".sqlite", ".sqlite3", ".vscdb")
 
 
 class CatalogueError(Exception):
@@ -204,6 +211,44 @@ class Catalogue:
                 key=lambda a: (COLLECT_PRIORITY_ORDER.index(a.collect_priority), a.id),
             )
         )
+
+    def databases_without_a_claimed_log(self) -> dict[str, tuple[str, ...]]:
+        """The SQLite entries whose write-ahead log no pattern in this catalogue asks for.
+
+        A database in write-ahead-log mode keeps its newest transactions in a file named
+        after it with `-wal` appended, and nowhere else. Collect the database alone and it
+        opens, every table is there, every row reads, and the conversation stops before its
+        last messages. SQLite reports no error, so this is the one failure in the pipeline
+        that looks exactly like success.
+
+        Whether a log existed on an endpoint cannot be told from the database afterwards:
+        an application that closed cleanly folds the log in and deletes it, leaving a header
+        that still says write-ahead logging. What can be told, and is what this answers, is
+        whether the collection was even asked to take one. An entry listed here could never
+        have carried its log, whatever was on the disk.
+
+        The naming rule is SQLite's own and needs no vendor to state it, which is why this
+        can be computed rather than catalogued:
+        https://sqlite.org/tempfiles.html#write_ahead_log_files
+        """
+        every = {path for artifact in self.artifacts for path in artifact.paths}
+        globs = sorted(path for path in every if "*" in path)
+        found: dict[str, tuple[str, ...]] = {}
+        for artifact in self.artifacts:
+            if artifact.format != "sqlite":
+                continue
+            missing = tuple(
+                path
+                for path in artifact.paths
+                if path.endswith(DATABASE_SUFFIXES)
+                and path + "-wal" not in every
+                # A glob elsewhere in the catalogue covers it: several agents catalogue the
+                # logs as an entry of their own, with one pattern over the directory.
+                and not any(fnmatch.fnmatchcase(path + "-wal", pattern) for pattern in globs)
+            )
+            if missing:
+                found[artifact.id] = missing
+        return found
 
     def by_priority(self, os_name: str) -> dict[CollectPriority, tuple[Artifact, ...]]:
         groups: dict[CollectPriority, list[Artifact]] = {p: [] for p in COLLECT_PRIORITY_ORDER}

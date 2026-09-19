@@ -137,7 +137,13 @@ ist, dass das nicht *unbemerkt* geht.
   - **SQLite-Speicher.** Nur lesend aus einer Kopie geöffnet und Tabelle für Tabelle, Zeile
     für Zeile zurückgegeben, ohne aus einer Zeile mehr zu lesen, als sie wörtlich sagt. Ein
     zstd-Frame in einem BLOB wird vorher entpackt, denn so legt ein Editor ganze Threads ab,
-    und deshalb ist der Python-Boden 3.14 (ADR 0024).
+    und deshalb ist der Python-Boden 3.14 (ADR 0024). Die Kopie nimmt die Geschwister `-wal`
+    und `-shm` mit, denn eine Datenbank im Write-Ahead-Log-Modus hält ihre neuesten
+    Transaktionen im Log und sonst nirgends. Wo der Katalog dieses Log nie angefordert hat,
+    vermerkt der Fall eine Lücke: der Speicher öffnet sich, alle Tabellen sind da, und das
+    Gespräch hört vor seinen letzten Nachrichten auf, ohne dass SQLite irgendeinen Fehler
+    meldet. Das ist der einzige Fehlschlag in dieser Kette, der genau wie Erfolg aussieht
+    (ADR 0032).
   - **Zeilenbegrenzte Logs.** Jedes JSON-Lines-Artefakt, das kein verifizierter Parser
     beansprucht, Datensatz für Datensatz. Dieser Boden existiert, weil die beiden Erzeuger
     des einheitlichen Formats auseinandergelaufen waren und der Analyzer die Seite war, die

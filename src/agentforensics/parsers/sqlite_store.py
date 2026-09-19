@@ -52,6 +52,15 @@ from agentforensics.parsers.base import ParseContext, normalise_ts, text_of
 # because the newest transactions can be in the log and nowhere else.
 SIBLINGS = ("-wal", "-shm", "-journal")
 
+# The first sixteen bytes of every SQLite file, and the two header bytes that say how the
+# store journals. Byte 18 is the write format version and byte 19 the read format version;
+# the value 2 in either means write-ahead logging.
+# Source: https://sqlite.org/fileformat2.html#the_database_header
+MAGIC = b"SQLite format 3\x00"
+HEADER_LENGTH = 100
+_FORMAT_VERSIONS = (18, 19)
+WAL_FORMAT = 2
+
 # How many rows of one table are read before the reader stops and says so. A chat store can
 # hold hundreds of thousands of rows, and one event per row is the right shape for evidence
 # right up to the point where it stops fitting in a case. The limit is visible in the output
@@ -96,6 +105,61 @@ class Table:
 
 class StoreError(Exception):
     """The file could not be opened as a database at all."""
+
+
+@dataclass(frozen=True, slots=True)
+class Journal:
+    """How a database journals, and whether its log was collected with it.
+
+    The pair is what decides whether a reading of the store is complete. A database in
+    write-ahead-log mode keeps its newest transactions in the log and nowhere else, so a
+    collection that took the database alone returns a conversation that stops early, and
+    SQLite reports no error at all about it. That silence is the whole reason this exists.
+    """
+
+    wal_mode: bool
+    # The size of the `-wal` beside the database, or None when there is none. Zero is a
+    # third answer: a log that was collected and was empty, which means nothing is missing.
+    log_bytes: int | None
+
+
+def journal(path: Path) -> Journal | None:
+    """How one collected file journals, or None when it is not a SQLite database.
+
+    Read from the header rather than from a connection, because the question has to be
+    answerable for a file this suite is about to fail to open.
+    """
+    try:
+        with path.open("rb") as handle:
+            header = handle.read(HEADER_LENGTH)
+    except OSError:
+        return None
+    if not header.startswith(MAGIC) or len(header) < HEADER_LENGTH:
+        return None
+    wal = any(header[at] == WAL_FORMAT for at in _FORMAT_VERSIONS)
+    log = path.with_name(path.name + "-wal")
+    try:
+        size = log.stat().st_size if log.is_file() else None
+    except OSError:
+        size = None
+    return Journal(wal_mode=wal, log_bytes=size)
+
+
+# What the case is told when a database journals ahead and its log did not travel with it.
+# Both readings are given because the evidence cannot distinguish them: an application that
+# closed cleanly checkpoints the log and deletes it, leaving a database whose header still
+# says write-ahead logging, and that is indistinguishable from a log that existed and was
+# not collected.
+MISSING_LOG = (
+    "These databases journal ahead, their newest transactions live in a file named after "
+    "them with '-wal' appended, and no pattern in the catalogue asks for that file, so this "
+    "collection could not have carried one whatever was on the endpoint. Whether one "
+    "existed cannot be told from the database afterwards: an application that closed "
+    "cleanly folds the log in and deletes it, leaving a header that still says write-ahead "
+    "logging. So the reading of these stores is either complete or stops before their last "
+    "records, and SQLite reported no error either way. To settle it, collect each path with "
+    "'-wal' and '-shm' appended and ingest again."
+)
 
 
 @contextmanager
@@ -350,13 +414,19 @@ def describe(context: ParseContext, store_problem: str) -> Event:
 
 __all__ = [
     "BLOB_NOTE",
+    "HEADER_LENGTH",
+    "MAGIC",
     "MAX_DECOMPRESSED",
     "MAX_ROWS",
+    "MISSING_LOG",
     "SIBLINGS",
+    "WAL_FORMAT",
     "ZSTD_MAGIC",
+    "Journal",
     "StoreError",
     "Table",
     "describe",
+    "journal",
     "literal_text",
     "literal_time",
     "open_store",

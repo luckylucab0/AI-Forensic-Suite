@@ -37,6 +37,7 @@ from agentforensics.ingest.source import Source, SourceEntry
 from agentforensics.ingest.tree import CollectedTree
 from agentforensics.model import Case, Event, Provenance, is_uninterpreted
 from agentforensics.parsers import ParseContext, for_artifact
+from agentforensics.parsers.sqlite_store import MISSING_LOG, journal
 
 
 @dataclass
@@ -76,6 +77,11 @@ class IngestReport:
     # Paths nothing in the catalogue claimed. Kept as a list rather than a count because
     # each one is a lead: an agent nobody has catalogued, or a gap in the catalogue.
     unclaimed_paths: list[str] = field(default_factory=list)
+    # Databases that journal ahead and arrived without their log. Their reading is complete
+    # or it stops short of the newest transactions, and the file alone cannot say which, so
+    # the paths are listed rather than counted: each one is a store somebody may have to go
+    # back to the endpoint for.
+    databases_without_their_log: list[str] = field(default_factory=list)
 
     def summary(self) -> str:
         lines = [
@@ -107,6 +113,18 @@ class IngestReport:
             lines.extend(f"    {line}" for line in shown)
             if len(self.reattributed) > len(shown):
                 lines.append(f"    ... and {len(self.reattributed) - len(shown)} more")
+        if self.databases_without_their_log:
+            shown = self.databases_without_their_log[:5]
+            lines.append(
+                f"  {len(self.databases_without_their_log)} database(s) journal ahead and "
+                "arrived without their write-ahead log, so the newest transactions may be "
+                "missing from what was read out of them:"
+            )
+            lines.extend(f"    {path}" for path in shown)
+            if len(self.databases_without_their_log) > len(shown):
+                lines.append(
+                    f"    ... and {len(self.databases_without_their_log) - len(shown)} more"
+                )
         if self.gaps:
             lines.append(f"  {self.gaps} gap(s) in the collection, recorded in the case")
         if self.unclaimed_paths:
@@ -227,6 +245,11 @@ def ingest(
     encrypted store rather than read. See ADR 0029.
     """
     matcher = Matcher(catalogue)
+    # The entries whose write-ahead log no pattern in the catalogue asks for. Computed once,
+    # because the question below is only worth asking for those: a database whose log the
+    # catalogue does claim and that arrived without one had nothing to carry, which is what
+    # a cleanly closed application leaves behind.
+    unasked_for_logs = set(catalogue.databases_without_a_claimed_log())
     source = open_source(path, catalogue, kind, matcher)
     record = source.bundle()
     # Only a native bundle carries them: no adapter over a plain tree can recover which
@@ -253,6 +276,15 @@ def ingest(
                 report.unattributed += 1
                 if entry.collected:
                     report.unclaimed_paths.append(entry.original_path)
+
+            if (
+                entry.collected
+                and entry.local_path is not None
+                and entry.artifact_id in unasked_for_logs
+            ):
+                how = journal(entry.local_path)
+                if how is not None and how.wal_mode and how.log_bytes is None:
+                    report.databases_without_their_log.append(entry.original_path)
 
             read = events_for(record.bundle_uuid, entry, roots, matcher, keys)
             if read.parsed_as:
@@ -296,6 +328,20 @@ def ingest(
                 "read under that entry. The manifest's attribution is unchanged, so the two "
                 "can be compared: a file that keeps appearing here is a catalogue entry "
                 "whose claim is broader than it should be.",
+            )
+            report.gaps += 1
+
+        if report.databases_without_their_log:
+            # A gap rather than an event, because it is a statement about what the
+            # collection carried and not about a record in a file. It is the one failure in
+            # this pipeline that SQLite itself reports as success: the store opens, the
+            # tables are all there, and the conversation just stops early.
+            case.add_gap(
+                record.bundle_uuid,
+                "sqlite_write_ahead_log_not_collected",
+                f"{len(report.databases_without_their_log)} database(s): "
+                + "; ".join(report.databases_without_their_log[:5]),
+                MISSING_LOG,
             )
             report.gaps += 1
 
