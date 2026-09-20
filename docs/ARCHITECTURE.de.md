@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 36 Module lesen 383 der 474
+  zählt diese Dateien und sagt, welche es sind. 37 Module lesen 384 der 474
   Katalogartefakte, und was der Rest ist, wird behauptet und nicht angenommen: jeder Eintrag
   in einem Format, das diese Suite liest, wird entweder gelesen oder trägt einen
   aufgeschriebenen Grund, warum nicht, und die Anmeldedatenspeicher sind als Klasse
@@ -262,7 +262,11 @@ ist, dass das nicht *unbemerkt* geht.
     Seiten, auf die der Baum nicht mehr zeigt, frühere Fassungen von Prompts und die
     gelöschten. Auch die werden gelesen, und jede sagt, was sie ist: ein Prompt, den jemand
     letzte Woche entfernt hat, gehört zur Antwort darauf, was dem Agenten aufgetragen war,
-    und steht in keinem anderen Artefakt auf dem Endpunkt (ADR 0035).
+    und steht in keinem anderen Artefakt auf dem Endpunkt (ADR 0035). Ein weiterer Eintrag
+    ist ein Speicher desselben Formats, für den niemand eine Quelle hat: dort soll ein
+    älterer Build desselben Editors seine Gespräche abgelegt haben. Er geht an den
+    uninterpretierten Boden für dieses Format, der jeden Datensatz mit Schlüssel und Wert
+    zurückgibt und auf jedem sagt, dass darüber nichts entschieden wurde.
 
   **Die Schatten-Repositories** sind ein eigener Teil der Antwort auf die Frage nach
   Datei-Momentaufnahmen. Zwei Agenten sichern, was sie ändern wollen, indem sie es in ein

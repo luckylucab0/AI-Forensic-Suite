@@ -1481,6 +1481,7 @@ def test_only_the_generic_readers_say_a_record_is_uninterpreted() -> None:
     assert writers == [
         "jsonl_generic.py",
         "leveldb_store.py",
+        "lmdb_generic.py",
         "prose_document.py",
         # Not a generic reader. It maps the three declarations a shell script states
         # unambiguously and says the mark on every other line, because a reader that

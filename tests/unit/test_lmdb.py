@@ -385,3 +385,88 @@ def test_the_reader_agrees_with_the_c_library(tmp_path: Path) -> None:
 
     # And the record the library no longer returns is in the pages it left behind.
     assert any(record.key == b"key-0000" for record in lmdb.stale(raw, store))
+
+
+# ------------------------------------------- the floor under a store nobody has mapped
+
+
+def _floor(raw: bytes, tmp_path: Path, name: str = "data.mdb") -> list:
+    """The generic reader, over a store written to a file the way a collection holds one."""
+    from agentforensics.parsers import ParseContext, for_artifact
+
+    where = tmp_path / "threads-db.1.mdb"
+    where.mkdir(parents=True, exist_ok=True)
+    (where / name).write_bytes(raw)
+    parser = for_artifact("zed.flatpak_legacy_threads")
+    assert parser is not None and parser.name == "lmdb_generic"
+    return list(
+        parser.parse(
+            ParseContext(
+                bundle_uuid="b1",
+                original_path=f"/home/alice/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/{name}",
+                local_path=where / name,
+                sha256="aa",
+                artifact_id="zed.flatpak_legacy_threads",
+                agent="zed",
+                user="alice",
+            )
+        )
+    )
+
+
+def test_a_store_nobody_has_a_schema_for_gives_up_its_records_anyway(tmp_path: Path) -> None:
+    """The floor, and the whole reason the entry stopped saying it needs a reader.
+
+    Nothing in this suite has a source for what is in this store, so nothing is decided
+    about a record: the key and the value come out as they are, the value is offered as
+    text where it is text, and every event says the reading is uninterpreted. A case with
+    that in it is evidence somebody has to look at; a case with a directory in it and
+    nothing else reads as a store that held nothing.
+    """
+    raw = _named({"threads": [(b"thread-1", b"what did we decide"), (b"thread-2", b"\x00\x01")]})
+    events = _floor(raw, tmp_path)
+
+    described, records = events[0], events[1:]
+    assert "2 record(s) in threads" in (described.parse_problem or "")
+    assert all(event.kind == "unparsed.record" for event in events)
+    assert [event.raw["key"] for event in records] == ["thread-1", "thread-2"]
+    assert records[0].payload["text"] == "what did we decide"
+    assert all("is returned uninterpreted" in (event.parse_problem or "") for event in records)
+    # A value that is not text is not offered as text, and its bytes are still in the case.
+    assert records[1].raw["value"] == "0001"
+    assert records[1].payload["text"] is None
+
+
+def test_the_floor_reads_the_pages_the_store_no_longer_points_at(tmp_path: Path) -> None:
+    """For a store nobody has a schema for this matters more rather than less: if the entry
+    is what its notes say, those pages hold conversations somebody deleted."""
+    orphan = _leaf(4, [(b"thread-0", b"the conversation that was deleted")])
+    raw = _named({"threads": [(b"thread-1", b"live")]}, extra=[orphan])
+    events = _floor(raw, tmp_path)
+
+    recovered = [event for event in events if lmdb.STALE in (event.parse_problem or "")]
+    assert [event.raw["value"] for event in recovered] == ["the conversation that was deleted"]
+    assert "is returned uninterpreted" in (recovered[0].parse_problem or "")
+
+
+def test_every_record_of_one_store_has_its_own_identity(tmp_path: Path) -> None:
+    """A key is unique within a database and not within a store, and the same key can be in
+    a freed page as well. Two events with one locator are one row in a case."""
+    orphan = _leaf(4, [(b"same", b"the earlier one")])
+    raw = _named(
+        {"a": [(b"same", b"one")], "b": [(b"same", b"two")]},
+        extra=[orphan],
+    )
+    events = _floor(raw, tmp_path)
+    identities = [(event.provenance.locator, event.kind) for event in events]
+    assert len(set(identities)) == len(identities)
+
+
+def test_the_lock_file_and_a_stranger_in_the_directory_are_named(tmp_path: Path) -> None:
+    lock = _floor(b"", tmp_path, "lock.mdb")
+    assert len(lock) == 1
+    assert "lock file" in (lock[0].parse_problem or "")
+
+    stranger = _floor(b"not a database\n", tmp_path, "notes.txt")
+    assert len(stranger) == 1
+    assert "is not one" in (stranger[0].parse_problem or "")

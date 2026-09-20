@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  36 modules read 383 of the catalogue's 474 artifacts, and what the rest is gets asserted
+  37 modules read 384 of the catalogue's 474 artifacts, and what the rest is gets asserted
   rather than assumed: every entry in a format this suite reads is either read or carries a
   written reason why not, and the credential stores are exempt as a class because the
   collector withholds their content, which a test pins to credential stores alone. What is
@@ -235,7 +235,11 @@ it cannot be rewritten *quietly*.
     page, so the pages its tree no longer points at hold earlier versions of prompts and
     the prompts somebody deleted. Those are read as well and every one of them says which
     it is, because a prompt that was removed last week is part of the answer to what the
-    agent was told to obey and it is in no other artifact on the endpoint (ADR 0035).
+    agent was told to obey and it is in no other artifact on the endpoint (ADR 0035). One
+    further entry is a store of the same format that nobody has a source for, reported to
+    be where an older build of that editor kept its conversations. It goes to the
+    uninterpreted floor for the format, which returns every record with its key and its
+    value and says on each one that nothing was decided about it.
 
   **The shadow repositories** are their own piece of the file-snapshot answer. Two agents
   snapshot what they are about to change by committing it into a repository, and where that

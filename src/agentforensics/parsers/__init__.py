@@ -40,6 +40,7 @@ from agentforensics.parsers.instructions import InstructionsParser
 from agentforensics.parsers.json_generic import JsonGenericParser
 from agentforensics.parsers.jsonl_generic import JsonlGenericParser
 from agentforensics.parsers.leveldb_store import LevelDbStoreParser
+from agentforensics.parsers.lmdb_generic import LmdbGenericParser
 from agentforensics.parsers.memory import MemoryParser
 from agentforensics.parsers.opencode import OpencodeParser
 from agentforensics.parsers.pi import PiParser
@@ -148,6 +149,9 @@ PARSERS: tuple[Parser, ...] = (
     # holds which agent ran them, which of them were archived out of the sidebar, and what
     # each one was left doing to a git worktree.
     ZedSidebarParser(),
+    # The floor under the memory-mapped stores, which claims the one entry nobody has a
+    # schema for. The prompt library above it has one, which is why it comes first.
+    LmdbGenericParser(),
     # The last seven claim every store, every log and every whole document in
     # the catalogue, so they have to stay last: a parser with a verified schema placed after
     # one of them would never be reached. They read nothing out of a record but what it

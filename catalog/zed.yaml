@@ -184,18 +184,21 @@ artifacts:
   - linux
   paths:
   - ~/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/
-  format: binary
+  format: lmdb
   sensitivity: normal
   collect_priority: normal
   status: unverified
   source: recollection
   source_kind: community
-  volatility: Unknown.
+  volatility: |-
+    Unknown. If it is what it is reported to be, nothing in the current product manages or deletes it, so it outlives the conversations it holds.
   notes: |-
-    recollection, needs verification. Still worth globbing for on Linux images: if present it is a pre-SQLite thread corpus that no current Zed code manages or deletes. Note the Flatpak sandbox relocates the whole Zed tree under ~/.var/app/dev.zed.Zed/, which also breaks every other Zed path in this catalogue.
+    Unverified and worth globbing for on Linux images anyway: if present it is a pre-SQLite thread corpus that no current Zed code manages or deletes. Note the Flatpak sandbox relocates the whole Zed tree under ~/.var/app/dev.zed.Zed/, which also breaks every other Zed path in this catalogue.
 
-    Record structure: An LMDB (heed) store rather than SQLite, reported for the Flatpak build and/or older Zed versions. I saw this only in a WebSearch summary of a zed-industries GitHub discussion; I did not fetch the discussion itself and found no LMDB thread store in current main. Would require an LMDB reader, not sqlite3.
-  parser: null
+    Record structure: an LMDB store rather than SQLite, reported for the Flatpak build and/or older versions. What can be checked against the vendor's source was checked, and it neither confirms nor refutes this path. Current main keeps threads in SQLite at data_dir()/threads/threads.db (crates/agent/src/db.rs, which is the source of zed.threads_db), and the one crate that still depends on heed, which is the Rust binding for LMDB, is prompt_store: it opens paths::prompts_dir()/prompts-library-db.0.mdb, which is zed.prompt_library. So an .mdb under threads/ is not something current code writes, and the file name pattern is the one heed produces, which is consistent with an older build having written it and with nobody having removed it.
+
+    The original claim comes from a user's report in a zed-industries GitHub discussion, retrieved as a search summary rather than fetched, which is why this stays unverified and community. It is read by the uninterpreted floor for this format: nobody here has a schema for what is in it, so a collection of one produces its records with their keys and values and says on every event that nothing was decided about them.
+  parser: lmdb_generic
 - id: zed.sidebar_threads
   category: transcript
   root: user_profile

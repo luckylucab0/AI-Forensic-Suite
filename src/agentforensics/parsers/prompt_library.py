@@ -37,7 +37,7 @@ from typing import Any
 
 from agentforensics.model import Event, unparsed
 from agentforensics.parsers import lmdb
-from agentforensics.parsers.base import ParseContext, normalise_ts
+from agentforensics.parsers.base import ParseContext, looks_binary, normalise_ts
 from agentforensics.parsers.instructions import MAX_TEXT
 
 # The artifacts this reader claims.
@@ -433,7 +433,14 @@ def _prompt_text(raw: bytes) -> tuple[str, str | None]:
 
 
 def _text(raw: bytes) -> str:
-    """Bytes as something an analyst can read, without pretending they are text."""
+    """Bytes as something an analyst can read, without pretending they are text.
+
+    Asked the same way as everywhere else in this package: bytes that decode are not
+    thereby text, because a packed structure decodes as control characters and would reach
+    a case looking like an empty value.
+    """
+    if looks_binary(raw):
+        return raw.hex()
     try:
         return raw.decode("utf-8")
     except UnicodeDecodeError:

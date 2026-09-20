@@ -128,6 +128,10 @@ UNINTERPRETED: dict[str, str] = {
     "are in a browser engine's key-value store, which is a set of binary table files and a "
     "write-ahead log rather than records this query can read a line at a time. The analyzer "
     "opens one key by key, so collect the tree and ingest it",
+    "zed.flatpak_legacy_threads": "a memory-mapped B-tree database, which this query does "
+    "not open: it reads a file line at a time and this one is a tree of pages. The suite "
+    "analyzer reads every record of one, and the pages it no longer points at as well, so "
+    "collect the directory whole and ingest it",
     "codex.sqlite_write_ahead_logs": "a database's write-ahead log and shared-memory "
     "index, which hold changed pages rather than records, so nothing comes out of one a "
     "line at a time. The analyzer names them for what they are and reads what is in the "
