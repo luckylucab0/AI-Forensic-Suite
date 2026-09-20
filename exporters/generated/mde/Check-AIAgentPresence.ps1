@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 8c8a4ecb7852
+# Catalogue digest: 7ce0d8166f8c
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -195,7 +195,6 @@ $targets = @(
     @{ Agent = 'amazonq'; Id = 'amazonq.ide_chat_history'; Path = '$profile\.aws\amazonq\history\chat-history-no-workspace.json' }
     @{ Agent = 'amazonq'; Id = 'amazonq.ide_extension_install'; Path = '$profile\.vscode\extensions\amazonwebservices.amazon-q-vscode-' }
     @{ Agent = 'amazonq'; Id = 'amazonq.ide_extension_install'; Path = '$profile\.vscode\extensions\amazonwebservices.aws-toolkit-vscode-' }
-    @{ Agent = 'amazonq'; Id = 'amazonq.ide_extension_install'; Path = '$profile\.vscode\extensions\extensions.json' }
     @{ Agent = 'amazonq'; Id = 'amazonq.knowledge_bases'; Path = '$profile\.aws\amazonq\knowledge_bases' }
     @{ Agent = 'amazonq'; Id = 'amazonq.legacy_profiles_and_context'; Path = '$profile\.aws\amazonq\global_context.json' }
     @{ Agent = 'amazonq'; Id = 'amazonq.legacy_profiles_and_context'; Path = '$profile\.aws\amazonq\profiles' }

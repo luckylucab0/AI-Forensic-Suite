@@ -370,7 +370,6 @@ artifacts:
   paths:
   - ~/Cline/Rules/
   - ~/Documents/Cline/Hooks/
-  - ~/Documents/Cline/MCP/
   - ~/Documents/Cline/Rules/
   - ~/Documents/Cline/Workflows/
   format: markdown
@@ -383,6 +382,10 @@ artifacts:
     disk.ts helper functions resolve 'Cline/Rules', 'Cline/Workflows', 'Cline/MCP' and 'Cline/Hooks' inside the user's Documents folder - an unusual choice that a home-directory-dotfile-only collector will miss entirely. docs/customization/cline-rules.mdx adds: 'Linux/WSL users: If you don't find global rules in ~/Documents/Cline/Rules, check ~/Cline/Rules.' The CHANGELOG 4.1.16 entry explains why: the VS Code Rules tab resolves Documents with `xdg-user-dir DOCUMENTS`, which prints bare $HOME on WSL and headless installs. Collect BOTH. On macOS/Windows also account for a redirected/iCloud Documents folder.
 
     Re-sourced by the verification pass: the documents-directory rules path is absent from the disk module cited before and present in the path resolver.
+
+    The server directory left this entry. It is resolved by the same helper as the other three, which is why it was copied in with them, but it holds server configuration rather than instruction text and it has its own entry, cline.mcp_settings, which claims it and reads it as the JSON it is. With both claiming it, this entry won and a server inventory was read as prose.
+
+        The hook directory stays. It is instruction surface in the sense that matters here, a second entry claims it as well, and both read it with the same reader, so nothing is lost either way.
   parser: instructions
 - id: cline.connector_settings_and_logs
   category: log

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 8c8a4ecb7852
+# Catalogue digest: 7ce0d8166f8c
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -205,7 +205,6 @@ sources:
     amazonq,amazonq.ide_chat_history,C:/Users/*/.aws/amazonq/history/chat-history-no-workspace.json
     amazonq,amazonq.ide_extension_install,C:/Users/*/.vscode/extensions/amazonwebservices.amazon-q-vscode-*/**
     amazonq,amazonq.ide_extension_install,C:/Users/*/.vscode/extensions/amazonwebservices.aws-toolkit-vscode-*/**
-    amazonq,amazonq.ide_extension_install,C:/Users/*/.vscode/extensions/extensions.json
     amazonq,amazonq.knowledge_bases,C:/Users/*/.aws/amazonq/knowledge_bases/**
     amazonq,amazonq.knowledge_bases,C:/Users/*/.aws/amazonq/knowledge_bases/*/*/bm25_data.json
     amazonq,amazonq.knowledge_bases,C:/Users/*/.aws/amazonq/knowledge_bases/*/*/data.json
@@ -1538,10 +1537,8 @@ sources:
     amazonq,amazonq.ide_chat_history,/var/root/.aws/amazonq/history/chat-history-no-workspace.json
     amazonq,amazonq.ide_extension_install,/Users/*/.vscode/extensions/amazonwebservices.amazon-q-vscode-*/**
     amazonq,amazonq.ide_extension_install,/Users/*/.vscode/extensions/amazonwebservices.aws-toolkit-vscode-*/**
-    amazonq,amazonq.ide_extension_install,/Users/*/.vscode/extensions/extensions.json
     amazonq,amazonq.ide_extension_install,/var/root/.vscode/extensions/amazonwebservices.amazon-q-vscode-*/**
     amazonq,amazonq.ide_extension_install,/var/root/.vscode/extensions/amazonwebservices.aws-toolkit-vscode-*/**
-    amazonq,amazonq.ide_extension_install,/var/root/.vscode/extensions/extensions.json
     amazonq,amazonq.knowledge_bases,/Users/*/.aws/amazonq/knowledge_bases/*/*/bm25_data.json
     amazonq,amazonq.knowledge_bases,/Users/*/.aws/amazonq/knowledge_bases/*/*/data.json
     amazonq,amazonq.knowledge_bases,/Users/*/.aws/amazonq/knowledge_bases/*/contexts.json
@@ -2145,12 +2142,10 @@ sources:
     cline,cline.provider_settings,/var/root/.cline/data/settings/providers.json
     cline,cline.rules_global,/Users/*/Cline/Rules/**
     cline,cline.rules_global,/Users/*/Documents/Cline/Hooks/**
-    cline,cline.rules_global,/Users/*/Documents/Cline/MCP/**
     cline,cline.rules_global,/Users/*/Documents/Cline/Rules/**
     cline,cline.rules_global,/Users/*/Documents/Cline/Workflows/**
     cline,cline.rules_global,/var/root/Cline/Rules/**
     cline,cline.rules_global,/var/root/Documents/Cline/Hooks/**
-    cline,cline.rules_global,/var/root/Documents/Cline/MCP/**
     cline,cline.rules_global,/var/root/Documents/Cline/Rules/**
     cline,cline.rules_global,/var/root/Documents/Cline/Workflows/**
     cline,cline.secrets_json,/Users/*/.cline/data/secrets.json
@@ -3986,7 +3981,6 @@ sources:
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Devin/User/workspaceStorage/*/state.vscdb-wal
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Devin/User/workspaceStorage/*/state.vscdb.backup
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Devin/User/workspaceStorage/*/workspace.json
-    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/settings.json
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
@@ -4005,7 +3999,6 @@ sources:
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Devin/User/workspaceStorage/*/state.vscdb-wal
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Devin/User/workspaceStorage/*/state.vscdb.backup
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Devin/User/workspaceStorage/*/workspace.json
-    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/settings.json
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
@@ -4182,10 +4175,8 @@ sources:
     amazonq,amazonq.ide_chat_history,/root/.aws/amazonq/history/chat-history-no-workspace.json
     amazonq,amazonq.ide_extension_install,/home/*/.vscode/extensions/amazonwebservices.amazon-q-vscode-*/**
     amazonq,amazonq.ide_extension_install,/home/*/.vscode/extensions/amazonwebservices.aws-toolkit-vscode-*/**
-    amazonq,amazonq.ide_extension_install,/home/*/.vscode/extensions/extensions.json
     amazonq,amazonq.ide_extension_install,/root/.vscode/extensions/amazonwebservices.amazon-q-vscode-*/**
     amazonq,amazonq.ide_extension_install,/root/.vscode/extensions/amazonwebservices.aws-toolkit-vscode-*/**
-    amazonq,amazonq.ide_extension_install,/root/.vscode/extensions/extensions.json
     amazonq,amazonq.knowledge_bases,/home/*/.aws/amazonq/knowledge_bases/*/*/bm25_data.json
     amazonq,amazonq.knowledge_bases,/home/*/.aws/amazonq/knowledge_bases/*/*/data.json
     amazonq,amazonq.knowledge_bases,/home/*/.aws/amazonq/knowledge_bases/*/contexts.json
@@ -4709,12 +4700,10 @@ sources:
     cline,cline.provider_settings,/root/.cline/data/settings/providers.json
     cline,cline.rules_global,/home/*/Cline/Rules/**
     cline,cline.rules_global,/home/*/Documents/Cline/Hooks/**
-    cline,cline.rules_global,/home/*/Documents/Cline/MCP/**
     cline,cline.rules_global,/home/*/Documents/Cline/Rules/**
     cline,cline.rules_global,/home/*/Documents/Cline/Workflows/**
     cline,cline.rules_global,/root/Cline/Rules/**
     cline,cline.rules_global,/root/Documents/Cline/Hooks/**
-    cline,cline.rules_global,/root/Documents/Cline/MCP/**
     cline,cline.rules_global,/root/Documents/Cline/Rules/**
     cline,cline.rules_global,/root/Documents/Cline/Workflows/**
     cline,cline.secrets_json,/home/*/.cline/data/secrets.json
@@ -6493,7 +6482,6 @@ sources:
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Devin/User/workspaceStorage/*/state.vscdb-wal
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Devin/User/workspaceStorage/*/state.vscdb.backup
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Devin/User/workspaceStorage/*/workspace.json
-    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/settings.json
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
@@ -6512,7 +6500,6 @@ sources:
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Devin/User/workspaceStorage/*/state.vscdb-wal
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Devin/User/workspaceStorage/*/state.vscdb.backup
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Devin/User/workspaceStorage/*/workspace.json
-    windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/settings.json
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal

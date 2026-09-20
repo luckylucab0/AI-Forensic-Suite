@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 8c8a4ecb7852
+// Catalogue digest: 7ce0d8166f8c
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -223,10 +223,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "amazonq", "amazonq.ide_chat_history", ".aws\\amazonq\\history\\chat-history-no-workspace.json",
     "amazonq", "amazonq.ide_extension_install", ".vscode/extensions/amazonwebservices.amazon-q-vscode-",
     "amazonq", "amazonq.ide_extension_install", ".vscode/extensions/amazonwebservices.aws-toolkit-vscode-",
-    "amazonq", "amazonq.ide_extension_install", ".vscode/extensions/extensions.json",
     "amazonq", "amazonq.ide_extension_install", ".vscode\\extensions\\amazonwebservices.amazon-q-vscode-",
     "amazonq", "amazonq.ide_extension_install", ".vscode\\extensions\\amazonwebservices.aws-toolkit-vscode-",
-    "amazonq", "amazonq.ide_extension_install", ".vscode\\extensions\\extensions.json",
     "amazonq", "amazonq.knowledge_bases", ".aws/amazonq/knowledge_bases",
     "amazonq", "amazonq.knowledge_bases", ".aws\\amazonq\\knowledge_bases",
     "amazonq", "amazonq.legacy_profiles_and_context", ".aws/amazonq/global_context.json",
@@ -765,11 +763,9 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cline", "cline.rules_global", "Cline/Rules",
     "cline", "cline.rules_global", "Cline\\Rules",
     "cline", "cline.rules_global", "Documents/Cline/Hooks",
-    "cline", "cline.rules_global", "Documents/Cline/MCP",
     "cline", "cline.rules_global", "Documents/Cline/Rules",
     "cline", "cline.rules_global", "Documents/Cline/Workflows",
     "cline", "cline.rules_global", "Documents\\Cline\\Hooks",
-    "cline", "cline.rules_global", "Documents\\Cline\\MCP",
     "cline", "cline.rules_global", "Documents\\Cline\\Rules",
     "cline", "cline.rules_global", "Documents\\Cline\\Workflows",
     "cline", "cline.secrets_json", ".cline/data/secrets.json",
@@ -2557,10 +2553,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "windsurf", "windsurf.ide_user_data", "Windsurf\\User\\settings.json",
     "windsurf", "windsurf.ide_user_data", "Windsurf\\argv.json",
     "windsurf", "windsurf.ide_workspace_state_vscdb", ".config/Devin/User/workspaceStorage",
-    "windsurf", "windsurf.ide_workspace_state_vscdb", ".config/Windsurf/User/settings.json",
     "windsurf", "windsurf.ide_workspace_state_vscdb", ".config/Windsurf/User/workspaceStorage",
     "windsurf", "windsurf.ide_workspace_state_vscdb", ".config\\Devin\\User\\workspaceStorage",
-    "windsurf", "windsurf.ide_workspace_state_vscdb", ".config\\Windsurf\\User\\settings.json",
     "windsurf", "windsurf.ide_workspace_state_vscdb", ".config\\Windsurf\\User\\workspaceStorage",
     "windsurf", "windsurf.ide_workspace_state_vscdb", "Devin/User/workspaceStorage",
     "windsurf", "windsurf.ide_workspace_state_vscdb", "Devin\\User\\workspaceStorage",

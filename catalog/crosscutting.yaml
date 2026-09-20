@@ -605,22 +605,21 @@ artifacts:
   paths:
   - <project>/**/GEMINI.md
   - <project>/GEMINI.md
-  - <project>/.gemini/settings.json
   - ~/.gemini/GEMINI.md
-  - ~/.gemini/settings.json
   format: markdown
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/gemini-md.md
   source_kind: official
-  unsourced_paths:
-  - <project>/.gemini/settings.json
-  - ~/.gemini/settings.json
   notes: |-
     Confirmed via GitHub code search content match against google-gemini/gemini-cli docs. Also read by Copilot CLI ("GEMINI.md | In Git root and cwd"), so again not vendor-exclusive. Two high-value neighbours spotted in the same repo and worth flagging to the Gemini family owner: ~/.gemini/tmp/<project>/chats/ holds session transcripts (docs/cli/auto-memory.md: "The service indexes recent sessions from ~/.gemini/tmp/<project>/chats/"), and an Auto Memory feature can REWRITE ~/.gemini/GEMINI.md on its own - meaning the instruction file's contents may be machine-authored rather than user-authored, which matters for any injection finding. Plans dir: .gemini/plans.
 
     The verification pass confirmed the instruction file locations and found that the cited page states nothing about the settings file, which has its own sourced entry in that agent's catalogue file.
+
+    The two settings file paths left this entry, and the note above already said why they should: the page this rests on states nothing about that file, and it has a sourced entry of its own under its agent. What made it worth acting on rather than leaving is which entry won the path. This one is an instruction entry, so it was read as instruction text, and it is the more literal claim, so it beat the configuration entry. The result was that a settings file holding the permissions, the server list and the model endpoint reached a case as prose and as no configuration snapshot at all, and the four rules that read a configuration could not fire on it.
+
+        The file is still worth knowing about from here, which is why this says so: it is where the name of the instruction file itself is configured, so a host whose instruction file is not called what this entry expects has said so in that file.
   parser: instructions
 - id: crosscutting.instructions_junie_guidelines
   category: project_instructions

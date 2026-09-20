@@ -531,7 +531,6 @@ artifacts:
   - ~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-wal
   - ~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb.backup
   - ~/.config/Devin/User/workspaceStorage/<workspace-hash>/workspace.json
-  - ~/.config/Windsurf/User/settings.json
   - ~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb
   - ~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-shm
   - ~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-wal
@@ -566,6 +565,8 @@ artifacts:
     The write ahead log and shared memory spellings are in this entry although neither measured host had them, and the reason is worth stating once: which sidecars existed on an endpoint cannot be read back off the database afterwards, so an entry that does not ask for a log could never have carried one whatever was on the disk. Asking costs two globs.
 
     The file that maps the directory name back to the folder is now claimed for the paths spelled with the old product name too, not only for the current ones. A host that carried the predecessor has its stores there, and without that file beside them the parser has nothing to attribute their rows to (ADR 0038).
+
+    A settings file was in this entry's path list and is gone. It is not a per-workspace state store under any reading, it is claimed correctly by windsurf.ide_user_data, and while both claimed it this entry's reader was one of the two that could have taken it.
   parser: vscode_state
 - id: windsurf.auth_credentials
   category: credentials

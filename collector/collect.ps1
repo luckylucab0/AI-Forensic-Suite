@@ -609,8 +609,7 @@ $EmbeddedCatalogueJson = @'
                     "paths": [
                         "%USERPROFILE%\\.vscode\\extensions\\amazonwebservices.amazon-q-vscode-*\\**",
                         "~/.vscode/extensions/amazonwebservices.amazon-q-vscode-*/**",
-                        "~/.vscode/extensions/amazonwebservices.aws-toolkit-vscode-*/**",
-                        "~/.vscode/extensions/extensions.json"
+                        "~/.vscode/extensions/amazonwebservices.aws-toolkit-vscode-*/**"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -3333,7 +3332,6 @@ $EmbeddedCatalogueJson = @'
                     "paths": [
                         "~/Cline/Rules/",
                         "~/Documents/Cline/Hooks/",
-                        "~/Documents/Cline/MCP/",
                         "~/Documents/Cline/Rules/",
                         "~/Documents/Cline/Workflows/"
                     ],
@@ -4606,9 +4604,7 @@ $EmbeddedCatalogueJson = @'
                     "paths": [
                         "<project>/**/GEMINI.md",
                         "<project>/GEMINI.md",
-                        "<project>/.gemini/settings.json",
-                        "~/.gemini/GEMINI.md",
-                        "~/.gemini/settings.json"
+                        "~/.gemini/GEMINI.md"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -11056,7 +11052,6 @@ $EmbeddedCatalogueJson = @'
                         "~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-wal",
                         "~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb.backup",
                         "~/.config/Devin/User/workspaceStorage/<workspace-hash>/workspace.json",
-                        "~/.config/Windsurf/User/settings.json",
                         "~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb",
                         "~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-shm",
                         "~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-wal",
@@ -11598,7 +11593,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "681e3eec5f32b4c71c16a93ea8fb99eec66cc0560dcea9b6137e5da54575e3e7"
+    "sha256": "d4211859034b8cdc727f4d589eb312ed4100b677c03d4db6be12cf4856345748"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

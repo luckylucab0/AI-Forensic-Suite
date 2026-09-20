@@ -624,7 +624,6 @@ artifacts:
   - '%USERPROFILE%\.vscode\extensions\amazonwebservices.amazon-q-vscode-*\**'
   - ~/.vscode/extensions/amazonwebservices.amazon-q-vscode-*/**
   - ~/.vscode/extensions/amazonwebservices.aws-toolkit-vscode-*/**
-  - ~/.vscode/extensions/extensions.json
   format: directory
   sensitivity: normal
   collect_priority: normal
@@ -635,4 +634,8 @@ artifacts:
     Replaced on extension update; the previous version directory is normally removed, so only the current version is present.
   notes: |-
     What is actually verified here is the extension identifiers, declared in the vendor's source as awstoolkit: 'amazonwebservices.aws-toolkit-vscode' and amazonq: 'amazonwebservices.amazon-q-vscode'. The extension directory layout (~/.vscode/extensions/<publisher>.<name>-<version>/ and the extensions.json index) is standard VS Code behaviour that the vendor does not state, which is why every path is flagged unsourced and the entry is unverified. Match on the identifier prefix, not on a full path, and expect variants for VS Code Insiders, Cursor, code-server and other VS Code derivatives, each with its own extensions root. The JetBrains plugin is a separate install whose location is not covered here, but note from the shared history schema that it writes conversations into the same ~/.aws/amazonq/history store with clientType IDE_JetBrains, so IDE chat history can exist with no VS Code extension installed at all.
+
+    The editor's own extension index left this entry. It is not this vendor's file: it lists every extension installed in that editor, it is written by the editor, and it has an entry under the editor's own agent that reads it. This entry's own note says to match on the identifier prefix rather than on a full path, and that is what is left here.
+
+        Leaving it did real harm rather than none. This entry has no parser, so the index was attributed to this agent and then read by whichever other claimant could, which put an editor-wide inventory under one vendor's name in a case. The identifier prefixed directories beside it are this vendor's and stay.
   parser: null
