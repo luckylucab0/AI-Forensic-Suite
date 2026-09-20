@@ -63,6 +63,7 @@ STORES = frozenset(
         "continue.index",
         "copilot.session_store",
         "cursor.acp_session_store",
+        "cursor.agent_store_sync",
         "cursor.ai_code_tracking_db",
         "cursor.chat_store_db",
         "cursor.conversation_search_db",

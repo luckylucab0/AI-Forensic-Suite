@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 8537054e578a
+# Catalogue digest: b0420e330ecb
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 33 of the 558 catalogue artifacts declare
+# KAPE is Windows only. 33 of the 563 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -91,12 +91,6 @@ Targets:
     -
         Name: cursor.agent_cli_state
         Category: config
-        Path: C:\Users\%user%\.cursor\skills-cursor
-        FileMask: "*"
-        Recursive: true
-    -
-        Name: cursor.agent_cli_state
-        Category: config
         Path: C:\Users\%user%\.cursor\snapshots
         FileMask: "*"
         Recursive: true
@@ -104,6 +98,54 @@ Targets:
         Name: cursor.agent_cli_state
         Category: config
         Path: C:\Users\%user%\.cursor\worktrees
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.agent_data_cleanup_marker
+        Category: log
+        Path: C:\Users\%user%\.cursor\projects
+        FileMask: ".agent-data-cleanup-*"
+        Recursive: false
+    -
+        Name: cursor.agent_store_sync
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\Cursor\AgentStores\cursor_agent_stores\*
+        FileMask: "mount.json"
+        Recursive: false
+    -
+        Name: cursor.agent_store_sync
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\Cursor\AgentStores\cursor_agent_stores\*\.sync
+        FileMask: "index.sqlite"
+        Recursive: false
+    -
+        Name: cursor.agent_store_sync
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\Cursor\AgentStores\cursor_agent_stores\*\.sync
+        FileMask: "index.sqlite-wal"
+        Recursive: false
+    -
+        Name: cursor.agent_store_sync
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\Cursor\AgentStores\cursor_agent_stores\*\files
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.agent_store_sync
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\Cursor\AgentStores\cursor_agent_stores\u*\.sync
+        FileMask: "index.sqlite"
+        Recursive: false
+    -
+        Name: cursor.agent_store_sync
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\Cursor\AgentStores\cursor_agent_stores\u*\.sync
+        FileMask: "index.sqlite-wal"
+        Recursive: false
+    -
+        Name: cursor.agent_store_sync
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\Cursor\AgentStores\cursor_agent_stores\u*\files
         FileMask: "*"
         Recursive: true
     -
@@ -177,6 +219,18 @@ Targets:
         Category: credentials
         Path: C:\Users\%user%\.cursor
         FileMask: "auth.json"
+        Recursive: false
+    -
+        Name: cursor.bundled_skills
+        Category: instructions
+        Path: C:\Users\%user%\.cursor\skills-cursor
+        FileMask: ".sync-manifest.json"
+        Recursive: false
+    -
+        Name: cursor.bundled_skills
+        Category: instructions
+        Path: C:\Users\%user%\.cursor\skills-cursor\*
+        FileMask: "SKILL.md"
         Recursive: false
     -
         Name: cursor.chat_session_meta_json
@@ -275,6 +329,12 @@ Targets:
         FileMask: "extensions.json"
         Recursive: false
     -
+        Name: cursor.feature_flag_cache
+        Category: cache
+        Path: C:\Users\%user%\.cursor
+        FileMask: "statsig-cache.json"
+        Recursive: false
+    -
         Name: cursor.global_prompt_history
         Category: prompt_history
         Path: C:\Users\%user%\.cursor
@@ -302,6 +362,30 @@ Targets:
         Name: cursor.install_dirs
         Category: install_evidence
         Path: C:\Users\%user%\AppData\Local\Programs\cursor
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.install_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\cursor-agent
+        FileMask: "*.cmd"
+        Recursive: false
+    -
+        Name: cursor.install_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\cursor-agent
+        FileMask: "*.ps1"
+        Recursive: false
+    -
+        Name: cursor.install_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\cursor-agent\versions
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: cursor.install_dirs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\cursor-compile-cache
         FileMask: "*"
         Recursive: true
     -
@@ -381,6 +465,12 @@ Targets:
         Category: config
         Path: C:\Users\%user%\.cursor\projects\*
         FileMask: "repo.json"
+        Recursive: false
+    -
+        Name: cursor.runtime_arguments
+        Category: config
+        Path: C:\Users\%user%\.cursor
+        FileMask: "argv.json"
         Recursive: false
     -
         Name: cursor.subagent_output

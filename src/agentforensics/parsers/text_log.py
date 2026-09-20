@@ -54,6 +54,7 @@ LOGS = frozenset(
         "continue.logs",
         "copilot.logs",
         "crosscutting.npm_debug_logs",
+        "cursor.agent_data_cleanup_marker",
         "cursor.logs",
         "factory_droid.logs",
         "goose.cli_logs",

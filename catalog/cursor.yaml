@@ -277,7 +277,6 @@ artifacts:
   - ~/.cursor/browser-logs/
   - ~/.cursor/hooks.json
   - ~/.cursor/sandbox-policies/
-  - ~/.cursor/skills-cursor/
   - ~/.cursor/snapshots/
   - ~/.cursor/worktrees/
   format: json
@@ -295,6 +294,10 @@ artifacts:
     Three paths left this entry when the vendor documentation became reachable and could carry them: the subagent definitions are cursor.subagents, the skills are cursor.skills, and the plugin folder is cursor.plugins. What is left here is the state that still rests on a teardown of one machine.
 
     Record structure: skills-cursor/.sync-manifest.json is skill-sync bookkeeping. hooks.json configures preToolUse / beforeReadFile style gates and is the record of what interception was active. sandbox-policies/ and worktrees/ appear in a container-seeding script's list of cursor-agent state dirs.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16, one installation and one trivial conversation each. Of the paths left in this grab-bag, none existed on either host: no command directory, no command line state file, no browser log directory, no hook file, no sandbox policy directory, no snapshot directory and no worktree directory. The shipped skills directory, which did exist on both, is now its own entry as cursor.bundled_skills.
+
+        That is not a reason to drop any of them, and the distinction is the one ADR 0037 draws. Each of these is a feature directory: the hook file exists once somebody writes a hook, the worktree directory once the agent makes itself a working copy, the sandbox policies once a policy is set. An installation where none of them exists is an installation where none of those features was used, which is itself an answer to give an analyst. What it does mean is that the teardown these paths came from was of a machine somebody had worked on for a while, and a fresh endpoint will not look like it.
   parser: json_generic
 - id: cursor.project_metadata
   category: config
@@ -470,6 +473,10 @@ artifacts:
   - windows
   paths:
   - '%LOCALAPPDATA%\Programs\cursor\'
+  - '%LOCALAPPDATA%\cursor-agent\*.cmd'
+  - '%LOCALAPPDATA%\cursor-agent\*.ps1'
+  - '%LOCALAPPDATA%\cursor-agent\versions\<version>\'
+  - '%LOCALAPPDATA%\cursor-compile-cache\'
   - '%LOCALAPPDATA%\cursor-updater\'
   format: directory
   sensitivity: normal
@@ -482,6 +489,14 @@ artifacts:
     Split out of cursor.install_and_machine_identity, which declared root: registry and was therefore skipped whole by the analyzer's path matcher.
 
     Record structure: bundle version dating comes from the application's own product.json under the install directory.
+
+    Measured first hand on a clean Windows 11 26200 host running product version 3.21.16 with command line agent 2026.09.18-9a7762b. Four Windows paths are new here and one catalogued path was not found.
+
+        The command line agent is not where this catalogue had it. On macOS and Linux it installs under the user's share directory, which cursor.worker_data covers; on Windows it installs into its own directory under the local application data, with the executable one level down under a directory named for the version and batch and script wrappers at the top. The version in that directory name is the install evidence: it dates the installation without any file needing to be opened. The compile cache beside it is created on the first invocation, so it separates an installation from an installation that was used.
+
+        The updater directory this entry claimed did not exist on the measured host and no path of that name was found anywhere in the profile. It stays, unverified as it already was, because a product that updates itself on some other version or channel would put it exactly there, and because this measurement covered a user scope installation that was never updated.
+
+        Two Windows residues are not files and are catalogued nowhere else, so they are recorded here until they have an entry of their own: the installer adds the program directory and the command line directory to the user's own path variable, and neither uninstalling the product nor deleting the command line directory removes those entries. A path variable that points at a directory that is not there is evidence of an installation that was removed.
   parser: null
 - id: cursor.machine_identity_storage
   category: install_evidence
@@ -580,6 +595,7 @@ artifacts:
   - '%APPDATA%\Cursor\logs\'
   - ~/.config/Cursor/logs/
   - ~/Library/Application Support/Cursor/User/process-monitor/
+  - ~/Library/Application Support/Cursor/process-monitor/
   - ~/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log
   - ~/Library/Application Support/Cursor/logs/<launch-timestamp>/
   format: text
@@ -595,6 +611,10 @@ artifacts:
     Note the log directory is a SIBLING of User/, not inside it (…/Cursor/logs, not …/Cursor/User/logs) — the UAC artifact file collects both paths explicitly.
 
     Record structure: Per-launch subdirectories containing window, renderer, extension-host, terminal, Git, MCP, grep and indexing/retrieval logs. workbench.mcp.*.log records MCP connect/oauth/allowlist events — unstructured text but the only timeline of MCP server startup and authorisation. process-monitor/ holds 1.5 MB of timestamped process logs.
+
+    Measured first hand on a clean macOS 26.5 host running product version 3.21.16. The process monitor directory is a sibling of the user directory, not a child of it, which is one level higher than the path this entry carried, and the spelling that was measured is in the entry now beside the catalogued one. It appeared only after the account was signed in.
+
+        The launch directories were confirmed on both measured operating systems, and the Windows host had one hundred and fifty two files in them after two launches. The directory name is a timestamp, so the set of directory names is a launch history that survives the deletion of the logs themselves, and on the Windows host it survived the uninstall as well.
   parser: text_log
 - id: cursor.mcp_config
   category: mcp_config
@@ -877,6 +897,143 @@ artifacts:
 
     A team marketplace is a repository the team points the product at, and the product re-indexes it on a push, so the content of a plugin can change on the endpoint without anyone on the endpoint doing anything.
   parser: json_generic
+- id: cursor.bundled_skills
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.cursor\skills-cursor\.sync-manifest.json'
+  - '%USERPROFILE%\.cursor\skills-cursor\<skill-name>\SKILL.md'
+  - ~/.cursor/skills-cursor/.sync-manifest.json
+  - ~/.cursor/skills-cursor/<skill-name>/SKILL.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on Windows 11 26200 and macOS 26.5
+  source_kind: observed
+  volatility: |-
+    Synchronised from the vendor rather than written by the user, so the set here follows the product version and the account's entitlements and changes under the user without any local action. The manifest beside it records that synchronisation.
+  notes: |-
+    INSTRUCTION TEXT THE PRODUCT BRINGS WITH IT, separated from cursor.skills, which is the directory a user writes their own skills into. Both measured hosts had this one populated in the shipped state and the user's one absent, which is the wrong way round from how an analyst would guess it.
+
+    Why it is worth reading rather than counting. A skill is instruction text that the agent loads and follows, so a shipped skill is an instruction the endpoint's owner did not write and did not see. The two measurements found twenty nine of them on macOS and forty nine files on Windows for the same product version, which also makes the contents of this directory a version and entitlement signal: two endpoints of the same version with different skill sets were entitled differently.
+
+    It was split out of cursor.agent_cli_state, where it sat among paths none of which existed on either measured host.
+  parser: instructions
+- id: cursor.feature_flag_cache
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.cursor\statsig-cache.json'
+  - ~/.cursor/statsig-cache.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on Windows 11 26200 and macOS 26.5
+  source_kind: observed
+  volatility: |-
+    Refreshed from the vendor on start and overwritten wholesale, so it describes the account's entitlements at the last launch and holds no history.
+  notes: |-
+    WHAT THIS ACCOUNT WAS ALLOWED TO DO, which is a different question from what it did and is answerable without opening a transcript. A feature flag cache names the capabilities the vendor had switched on for this installation, and on macOS it was the largest single file in the agent directory at 818 kilobytes.
+
+    Read it against the configuration rather than on its own. A flag that enables a capability the permission file does not allow, or the other way round, is the gap between what the product could do and what the endpoint's owner thought it could do.
+
+    Distinct from the file of the same product name under the editor's global storage, which this catalogue carries as cursor.machine_identity_storage: that one is keyed to the device, this one sits in the agent directory and was found on both operating systems.
+  parser: json_generic
+- id: cursor.runtime_arguments
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.cursor\argv.json'
+  - ~/.cursor/argv.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on Windows 11 26200 and macOS 26.5
+  source_kind: observed
+  volatility: |-
+    Written once at installation and then only when somebody edits it, so its modification time is either the install date or the date somebody changed how the product starts.
+  notes: |-
+    THE FLAGS THE PRODUCT STARTS ITSELF WITH, inherited from the editor this product is derived from and present on both measured hosts at the same size in the shipped state. It is the file that turns on proposed and unreleased behaviour, disables the sandbox of the runtime, or points the crash reporter somewhere else, and none of that is visible anywhere in the interface.
+
+    A file that is the shipped size and shipped content says nobody touched how the product starts. A file that differs from it is a deliberate change to the runtime by somebody with write access to the profile, and worth reading in full before anything else in the directory.
+  parser: json_generic
+- id: cursor.agent_data_cleanup_marker
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.cursor\projects\.agent-data-cleanup-<yyyy-mm-dd>'
+  - ~/.cursor/projects/.agent-data-cleanup-<yyyy-mm-dd>
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on Windows 11 26200 and macOS 26.5
+  source_kind: observed
+  volatility: |-
+    The file is empty and its evidentiary content is its own name, so it survives everything except deletion of the directory and it cannot be aged out by a retention setting that only prunes content.
+  notes: |-
+    A DATE IN A FILENAME, WRITTEN BY THE PRODUCT'S OWN CLEANUP. Both measured hosts had a zero byte file in the per-project directory whose name ends in a calendar date, left behind by whatever the product does when it tidies agent data.
+
+    This is the one artifact in this entry's category whose content is worth nothing and whose name is worth a timeline entry. It says the product ran a cleanup on that date, which is a bound on what can still be expected in the directories beside it: material older than the date may be gone because the product removed it rather than because anybody tried to hide anything. An analyst who finds a transcript directory thinner than the conversation it describes should look here first.
+
+    Nobody has read the cleanup's rules, so do not infer what it deleted, only that it ran. Collect every one of these files: more than one date means more than one cleanup, and the set of dates is the schedule.
+  parser: text_log
+- id: cursor.agent_store_sync
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%LOCALAPPDATA%\Cursor\AgentStores\cursor_agent_stores\<session-uuid>\.sync\index.sqlite'
+  - '%LOCALAPPDATA%\Cursor\AgentStores\cursor_agent_stores\<session-uuid>\.sync\index.sqlite-wal'
+  - '%LOCALAPPDATA%\Cursor\AgentStores\cursor_agent_stores\<session-uuid>\files\**'
+  - '%LOCALAPPDATA%\Cursor\AgentStores\cursor_agent_stores\<session-uuid>\mount.json'
+  - '%LOCALAPPDATA%\Cursor\AgentStores\cursor_agent_stores\u<account-id>\.sync\index.sqlite'
+  - '%LOCALAPPDATA%\Cursor\AgentStores\cursor_agent_stores\u<account-id>\.sync\index.sqlite-wal'
+  - '%LOCALAPPDATA%\Cursor\AgentStores\cursor_agent_stores\u<account-id>\files\**'
+  - ~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/<session-uuid>/.sync/index.sqlite
+  - ~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/<session-uuid>/.sync/index.sqlite-wal
+  - ~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/<session-uuid>/files/**
+  - ~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/<session-uuid>/mount.json
+  - ~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u<account-id>/.sync/index.sqlite
+  - ~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u<account-id>/.sync/index.sqlite-wal
+  - ~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u<account-id>/files/**
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on Windows 11 26200 and macOS 26.5
+  source_kind: observed
+  volatility: |-
+    The index is in write ahead log mode and the log held more than the database on the measured hosts, so the sidecar has to travel with the file. Rows in the pending delete tables are by definition about to stop existing.
+  notes: |-
+    A FILE SYNCHRONISATION INDEX PER AGENT SESSION, and the directory name is half the evidence. One directory is named with the same session identifier as the transcript directory of that session, which joins this store to that conversation without opening either. A second directory is named with the vendor's account identifier, prefixed, which puts the account on the endpoint in a path rather than inside a database.
+
+    The tables are the reason this is filed as a file snapshot rather than as a cache. They are a file list, a metadata table, and two tables of pending deletions, one for files and one for directories. That is the record of what the agent had staged into its own store and what it was about to remove from it, and a pending deletion that never completed is the most useful row in a directory like this one.
+
+    Both were empty of files on the measured hosts, which had one trivial conversation each. Do not read that as the normal case. Neither measurement opened these databases beyond counting rows, so the field names are unknown and the meaning of the metadata table is unknown.
+  parser: sqlite_generic
 - id: cursor.chat_session_prompt_history
   category: prompt_history
   root: user_profile

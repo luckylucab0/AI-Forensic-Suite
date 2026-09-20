@@ -4897,9 +4897,54 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.cursor/browser-logs/",
                         "~/.cursor/hooks.json",
                         "~/.cursor/sandbox-policies/",
-                        "~/.cursor/skills-cursor/",
                         "~/.cursor/snapshots/",
                         "~/.cursor/worktrees/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "cursor.agent_data_cleanup_marker",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.cursor\\projects\\.agent-data-cleanup-<yyyy-mm-dd>",
+                        "~/.cursor/projects/.agent-data-cleanup-<yyyy-mm-dd>"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "normal",
+                    "id": "cursor.agent_store_sync",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Cursor\\AgentStores\\cursor_agent_stores\\<session-uuid>\\.sync\\index.sqlite",
+                        "%LOCALAPPDATA%\\Cursor\\AgentStores\\cursor_agent_stores\\<session-uuid>\\.sync\\index.sqlite-wal",
+                        "%LOCALAPPDATA%\\Cursor\\AgentStores\\cursor_agent_stores\\<session-uuid>\\files\\**",
+                        "%LOCALAPPDATA%\\Cursor\\AgentStores\\cursor_agent_stores\\<session-uuid>\\mount.json",
+                        "%LOCALAPPDATA%\\Cursor\\AgentStores\\cursor_agent_stores\\u<account-id>\\.sync\\index.sqlite",
+                        "%LOCALAPPDATA%\\Cursor\\AgentStores\\cursor_agent_stores\\u<account-id>\\.sync\\index.sqlite-wal",
+                        "%LOCALAPPDATA%\\Cursor\\AgentStores\\cursor_agent_stores\\u<account-id>\\files\\**",
+                        "~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/<session-uuid>/.sync/index.sqlite",
+                        "~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/<session-uuid>/.sync/index.sqlite-wal",
+                        "~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/<session-uuid>/files/**",
+                        "~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/<session-uuid>/mount.json",
+                        "~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u<account-id>/.sync/index.sqlite",
+                        "~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u<account-id>/.sync/index.sqlite-wal",
+                        "~/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u<account-id>/files/**"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -4967,6 +5012,25 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "secret",
+                    "status": "unverified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "cursor.bundled_skills",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.cursor\\skills-cursor\\.sync-manifest.json",
+                        "%USERPROFILE%\\.cursor\\skills-cursor\\<skill-name>\\SKILL.md",
+                        "~/.cursor/skills-cursor/.sync-manifest.json",
+                        "~/.cursor/skills-cursor/<skill-name>/SKILL.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
                     "status": "unverified"
                 },
                 {
@@ -5164,6 +5228,23 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "unverified"
                 },
                 {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "cursor.feature_flag_cache",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.cursor\\statsig-cache.json",
+                        "~/.cursor/statsig-cache.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
                     "category": "prompt_history",
                     "collect_priority": "normal",
                     "id": "cursor.global_prompt_history",
@@ -5252,6 +5333,10 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "%LOCALAPPDATA%\\Programs\\cursor\\",
+                        "%LOCALAPPDATA%\\cursor-agent\\*.cmd",
+                        "%LOCALAPPDATA%\\cursor-agent\\*.ps1",
+                        "%LOCALAPPDATA%\\cursor-agent\\versions\\<version>\\",
+                        "%LOCALAPPDATA%\\cursor-compile-cache\\",
                         "%LOCALAPPDATA%\\cursor-updater\\"
                     ],
                     "root": "user_profile",
@@ -5289,6 +5374,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "%APPDATA%\\Cursor\\logs\\",
                         "~/.config/Cursor/logs/",
                         "~/Library/Application Support/Cursor/User/process-monitor/",
+                        "~/Library/Application Support/Cursor/process-monitor/",
                         "~/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log",
                         "~/Library/Application Support/Cursor/logs/<launch-timestamp>/"
                     ],
@@ -5496,6 +5582,23 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/anysphere.cursor-retrieval/embeddable_files.txt",
                         "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/anysphere.cursor-retrieval/high_level_folder_description.txt",
                         "~/Library/Caches/cursor-compile-cache/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "cursor.runtime_arguments",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.cursor\\argv.json",
+                        "~/.cursor/argv.json"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -11027,7 +11130,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "ed28bcfe7e48a78549c24eb2da644ba9616882f44b3fa3f1151adb5126595ee0"
+    "sha256": "b9512af0ad1f87efda3902509a2940142d50a66eef308e2c6d141031590965b9"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

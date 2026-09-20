@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 8537054e578a
+# Catalogue digest: b0420e330ecb
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -542,15 +542,19 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\commands' }
     @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\hooks.json' }
     @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\sandbox-policies' }
-    @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\skills-cursor' }
     @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\snapshots' }
     @{ Agent = 'cursor'; Id = 'cursor.agent_cli_state'; Path = '$profile\.cursor\worktrees' }
+    @{ Agent = 'cursor'; Id = 'cursor.agent_data_cleanup_marker'; Path = '$profile\.cursor\projects\.agent-data-cleanup-' }
+    @{ Agent = 'cursor'; Id = 'cursor.agent_store_sync'; Path = '$profile\AppData\Local\Cursor\AgentStores\cursor_agent_stores' }
+    @{ Agent = 'cursor'; Id = 'cursor.agent_store_sync'; Path = '$profile\AppData\Local\Cursor\AgentStores\cursor_agent_stores\u' }
     @{ Agent = 'cursor'; Id = 'cursor.agent_transcripts_jsonl'; Path = '$profile\.cursor\projects' }
     @{ Agent = 'cursor'; Id = 'cursor.ai_code_tracking_db'; Path = '$profile\.cursor\ai-tracking' }
     @{ Agent = 'cursor'; Id = 'cursor.ai_code_tracking_db'; Path = '$profile\.cursor\ai-tracking\ai-code-tracking.db' }
     @{ Agent = 'cursor'; Id = 'cursor.ai_code_tracking_db'; Path = '$profile\.cursor\ai-tracking\ai-code-tracking.db-shm' }
     @{ Agent = 'cursor'; Id = 'cursor.ai_code_tracking_db'; Path = '$profile\.cursor\ai-tracking\ai-code-tracking.db-wal' }
     @{ Agent = 'cursor'; Id = 'cursor.auth_credentials'; Path = '$profile\.cursor\auth.json' }
+    @{ Agent = 'cursor'; Id = 'cursor.bundled_skills'; Path = '$profile\.cursor\skills-cursor' }
+    @{ Agent = 'cursor'; Id = 'cursor.bundled_skills'; Path = '$profile\.cursor\skills-cursor\.sync-manifest.json' }
     @{ Agent = 'cursor'; Id = 'cursor.chat_session_meta_json'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.chat_session_prompt_history'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.chat_store_db'; Path = '$profile\.cursor\chats' }
@@ -565,11 +569,15 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.extensions'; Path = '$profile\.cursor-server\extensions' }
     @{ Agent = 'cursor'; Id = 'cursor.extensions'; Path = '$profile\.cursor\extensions' }
     @{ Agent = 'cursor'; Id = 'cursor.extensions'; Path = '$profile\.cursor\extensions\extensions.json' }
+    @{ Agent = 'cursor'; Id = 'cursor.feature_flag_cache'; Path = '$profile\.cursor\statsig-cache.json' }
     @{ Agent = 'cursor'; Id = 'cursor.global_prompt_history'; Path = '$profile\.cursor\prompt_history.json' }
     @{ Agent = 'cursor'; Id = 'cursor.global_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\state.vscdb' }
     @{ Agent = 'cursor'; Id = 'cursor.global_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\state.vscdb-shm' }
     @{ Agent = 'cursor'; Id = 'cursor.global_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\state.vscdb-wal' }
     @{ Agent = 'cursor'; Id = 'cursor.install_dirs'; Path = '$profile\AppData\Local\Programs\cursor' }
+    @{ Agent = 'cursor'; Id = 'cursor.install_dirs'; Path = '$profile\AppData\Local\cursor-agent' }
+    @{ Agent = 'cursor'; Id = 'cursor.install_dirs'; Path = '$profile\AppData\Local\cursor-agent\versions' }
+    @{ Agent = 'cursor'; Id = 'cursor.install_dirs'; Path = '$profile\AppData\Local\cursor-compile-cache' }
     @{ Agent = 'cursor'; Id = 'cursor.install_dirs'; Path = '$profile\AppData\Local\cursor-updater' }
     @{ Agent = 'cursor'; Id = 'cursor.local_file_history'; Path = '$profile\AppData\Roaming\Cursor\User\History' }
     @{ Agent = 'cursor'; Id = 'cursor.logs'; Path = '$profile\AppData\Roaming\Cursor\logs' }
@@ -581,6 +589,7 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.project_mcp_instructions'; Path = '$profile\.cursor\projects' }
     @{ Agent = 'cursor'; Id = 'cursor.project_metadata'; Path = '$profile\.cursor\projects' }
     @{ Agent = 'cursor'; Id = 'cursor.project_metadata'; Path = '$profile\.cursor\projects-metadata.json' }
+    @{ Agent = 'cursor'; Id = 'cursor.runtime_arguments'; Path = '$profile\.cursor\argv.json' }
     @{ Agent = 'cursor'; Id = 'cursor.subagent_output'; Path = '$profile\.cursor\subagents' }
     @{ Agent = 'cursor'; Id = 'cursor.workspace_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\workspaceStorage' }
     @{ Agent = 'cursor'; Id = 'cursor.worktrees'; Path = '$profile\.cursor\worktrees' }

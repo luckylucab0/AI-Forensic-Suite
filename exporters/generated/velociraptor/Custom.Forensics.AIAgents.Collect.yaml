@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 8537054e578a
+# Catalogue digest: b0420e330ecb
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -612,9 +612,16 @@ sources:
     cursor,cursor.agent_cli_state,C:/Users/*/.cursor/commands/*.md
     cursor,cursor.agent_cli_state,C:/Users/*/.cursor/hooks.json
     cursor,cursor.agent_cli_state,C:/Users/*/.cursor/sandbox-policies/**
-    cursor,cursor.agent_cli_state,C:/Users/*/.cursor/skills-cursor/**
     cursor,cursor.agent_cli_state,C:/Users/*/.cursor/snapshots/**
     cursor,cursor.agent_cli_state,C:/Users/*/.cursor/worktrees/**
+    cursor,cursor.agent_data_cleanup_marker,C:/Users/*/.cursor/projects/.agent-data-cleanup-*
+    cursor,cursor.agent_store_sync,C:/Users/*/AppData/Local/Cursor/AgentStores/cursor_agent_stores/*/.sync/index.sqlite
+    cursor,cursor.agent_store_sync,C:/Users/*/AppData/Local/Cursor/AgentStores/cursor_agent_stores/*/.sync/index.sqlite-wal
+    cursor,cursor.agent_store_sync,C:/Users/*/AppData/Local/Cursor/AgentStores/cursor_agent_stores/*/files/**
+    cursor,cursor.agent_store_sync,C:/Users/*/AppData/Local/Cursor/AgentStores/cursor_agent_stores/*/mount.json
+    cursor,cursor.agent_store_sync,C:/Users/*/AppData/Local/Cursor/AgentStores/cursor_agent_stores/u*/.sync/index.sqlite
+    cursor,cursor.agent_store_sync,C:/Users/*/AppData/Local/Cursor/AgentStores/cursor_agent_stores/u*/.sync/index.sqlite-wal
+    cursor,cursor.agent_store_sync,C:/Users/*/AppData/Local/Cursor/AgentStores/cursor_agent_stores/u*/files/**
     cursor,cursor.agent_transcripts_jsonl,C:/Users/*/.cursor/projects/*/agent-tools/*.txt
     cursor,cursor.agent_transcripts_jsonl,C:/Users/*/.cursor/projects/*/agent-transcripts/*.jsonl
     cursor,cursor.agent_transcripts_jsonl,C:/Users/*/.cursor/projects/*/agent-transcripts/*.txt
@@ -627,6 +634,8 @@ sources:
     cursor,cursor.ai_code_tracking_db,C:/Users/*/.cursor/ai-tracking/ai-code-tracking.db-shm
     cursor,cursor.ai_code_tracking_db,C:/Users/*/.cursor/ai-tracking/ai-code-tracking.db-wal
     cursor,cursor.auth_credentials,C:/Users/*/.cursor/auth.json
+    cursor,cursor.bundled_skills,C:/Users/*/.cursor/skills-cursor/*/SKILL.md
+    cursor,cursor.bundled_skills,C:/Users/*/.cursor/skills-cursor/.sync-manifest.json
     cursor,cursor.chat_session_meta_json,C:/Users/*/.cursor/chats/*/*/meta.json
     cursor,cursor.chat_session_prompt_history,C:/Users/*/.cursor/chats/*/*/prompt_history.json
     cursor,cursor.chat_store_db,C:/Users/*/.cursor/chats/*/*/store.db
@@ -643,11 +652,16 @@ sources:
     cursor,cursor.extensions,C:/Users/*/.cursor-server/extensions/**
     cursor,cursor.extensions,C:/Users/*/.cursor/extensions/**
     cursor,cursor.extensions,C:/Users/*/.cursor/extensions/extensions.json
+    cursor,cursor.feature_flag_cache,C:/Users/*/.cursor/statsig-cache.json
     cursor,cursor.global_prompt_history,C:/Users/*/.cursor/prompt_history.json
     cursor,cursor.global_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/state.vscdb
     cursor,cursor.global_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/state.vscdb-shm
     cursor,cursor.global_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/state.vscdb-wal
     cursor,cursor.install_dirs,C:/Users/*/AppData/Local/Programs/cursor/**
+    cursor,cursor.install_dirs,C:/Users/*/AppData/Local/cursor-agent/*.cmd
+    cursor,cursor.install_dirs,C:/Users/*/AppData/Local/cursor-agent/*.ps1
+    cursor,cursor.install_dirs,C:/Users/*/AppData/Local/cursor-agent/versions/*/**
+    cursor,cursor.install_dirs,C:/Users/*/AppData/Local/cursor-compile-cache/**
     cursor,cursor.install_dirs,C:/Users/*/AppData/Local/cursor-updater/**
     cursor,cursor.local_file_history,C:/Users/*/AppData/Roaming/Cursor/User/History/**
     cursor,cursor.logs,C:/Users/*/AppData/Roaming/Cursor/logs/**
@@ -661,6 +675,7 @@ sources:
     cursor,cursor.project_metadata,C:/Users/*/.cursor/projects-metadata.json
     cursor,cursor.project_metadata,C:/Users/*/.cursor/projects/*/mcp-approvals.json
     cursor,cursor.project_metadata,C:/Users/*/.cursor/projects/*/repo.json
+    cursor,cursor.runtime_arguments,C:/Users/*/.cursor/argv.json
     cursor,cursor.subagent_output,C:/Users/*/.cursor/subagents/**
     cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-shm
@@ -2406,7 +2421,6 @@ sources:
     cursor,cursor.agent_cli_state,/Users/*/.cursor/commands/*.md
     cursor,cursor.agent_cli_state,/Users/*/.cursor/hooks.json
     cursor,cursor.agent_cli_state,/Users/*/.cursor/sandbox-policies/**
-    cursor,cursor.agent_cli_state,/Users/*/.cursor/skills-cursor/**
     cursor,cursor.agent_cli_state,/Users/*/.cursor/snapshots/**
     cursor,cursor.agent_cli_state,/Users/*/.cursor/worktrees/**
     cursor,cursor.agent_cli_state,/var/root/.cursor/agent-cli-state.json
@@ -2414,9 +2428,24 @@ sources:
     cursor,cursor.agent_cli_state,/var/root/.cursor/commands/*.md
     cursor,cursor.agent_cli_state,/var/root/.cursor/hooks.json
     cursor,cursor.agent_cli_state,/var/root/.cursor/sandbox-policies/**
-    cursor,cursor.agent_cli_state,/var/root/.cursor/skills-cursor/**
     cursor,cursor.agent_cli_state,/var/root/.cursor/snapshots/**
     cursor,cursor.agent_cli_state,/var/root/.cursor/worktrees/**
+    cursor,cursor.agent_data_cleanup_marker,/Users/*/.cursor/projects/.agent-data-cleanup-*
+    cursor,cursor.agent_data_cleanup_marker,/var/root/.cursor/projects/.agent-data-cleanup-*
+    cursor,cursor.agent_store_sync,/Users/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/.sync/index.sqlite
+    cursor,cursor.agent_store_sync,/Users/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/.sync/index.sqlite-wal
+    cursor,cursor.agent_store_sync,/Users/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/files/**
+    cursor,cursor.agent_store_sync,/Users/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/mount.json
+    cursor,cursor.agent_store_sync,/Users/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u*/.sync/index.sqlite
+    cursor,cursor.agent_store_sync,/Users/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u*/.sync/index.sqlite-wal
+    cursor,cursor.agent_store_sync,/Users/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u*/files/**
+    cursor,cursor.agent_store_sync,/var/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/.sync/index.sqlite
+    cursor,cursor.agent_store_sync,/var/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/.sync/index.sqlite-wal
+    cursor,cursor.agent_store_sync,/var/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/files/**
+    cursor,cursor.agent_store_sync,/var/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/mount.json
+    cursor,cursor.agent_store_sync,/var/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u*/.sync/index.sqlite
+    cursor,cursor.agent_store_sync,/var/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u*/.sync/index.sqlite-wal
+    cursor,cursor.agent_store_sync,/var/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u*/files/**
     cursor,cursor.agent_transcripts_jsonl,/Users/*/.cursor/projects/*/agent-tools/*.txt
     cursor,cursor.agent_transcripts_jsonl,/Users/*/.cursor/projects/*/agent-transcripts/*.jsonl
     cursor,cursor.agent_transcripts_jsonl,/Users/*/.cursor/projects/*/agent-transcripts/*.txt
@@ -2443,6 +2472,10 @@ sources:
     cursor,cursor.auth_credentials,/Users/*/.cursor/auth.json
     cursor,cursor.auth_credentials,/var/root/.config/cursor/auth.json
     cursor,cursor.auth_credentials,/var/root/.cursor/auth.json
+    cursor,cursor.bundled_skills,/Users/*/.cursor/skills-cursor/*/SKILL.md
+    cursor,cursor.bundled_skills,/Users/*/.cursor/skills-cursor/.sync-manifest.json
+    cursor,cursor.bundled_skills,/var/root/.cursor/skills-cursor/*/SKILL.md
+    cursor,cursor.bundled_skills,/var/root/.cursor/skills-cursor/.sync-manifest.json
     cursor,cursor.chat_session_meta_json,/Users/*/.cursor/chats/*/*/meta.json
     cursor,cursor.chat_session_meta_json,/var/root/.cursor/chats/*/*/meta.json
     cursor,cursor.chat_session_prompt_history,/Users/*/.cursor/chats/*/*/prompt_history.json
@@ -2491,6 +2524,8 @@ sources:
     cursor,cursor.extensions,/var/root/.cursor/extensions/**
     cursor,cursor.extensions,/var/root/.cursor/extensions/extensions.json
     cursor,cursor.extensions,/var/root/Library/Application Support/Cursor/extensions/**
+    cursor,cursor.feature_flag_cache,/Users/*/.cursor/statsig-cache.json
+    cursor,cursor.feature_flag_cache,/var/root/.cursor/statsig-cache.json
     cursor,cursor.global_prompt_history,/Users/*/.cursor/prompt_history.json
     cursor,cursor.global_prompt_history,/var/root/.cursor/prompt_history.json
     cursor,cursor.global_state_vscdb,/Users/*/.config/Cursor/User/globalStorage/state.vscdb
@@ -2515,10 +2550,12 @@ sources:
     cursor,cursor.logs,/Users/*/Library/Application Support/Cursor/User/process-monitor/**
     cursor,cursor.logs,/Users/*/Library/Application Support/Cursor/logs/*/**
     cursor,cursor.logs,/Users/*/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log
+    cursor,cursor.logs,/Users/*/Library/Application Support/Cursor/process-monitor/**
     cursor,cursor.logs,/var/root/.config/Cursor/logs/**
     cursor,cursor.logs,/var/root/Library/Application Support/Cursor/User/process-monitor/**
     cursor,cursor.logs,/var/root/Library/Application Support/Cursor/logs/*/**
     cursor,cursor.logs,/var/root/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log
+    cursor,cursor.logs,/var/root/Library/Application Support/Cursor/process-monitor/**
     cursor,cursor.machine_identity_file,/Users/*/Library/Application Support/Cursor/machineid
     cursor,cursor.machine_identity_file,/var/root/Library/Application Support/Cursor/machineid
     cursor,cursor.machine_identity_storage,/Users/*/Library/Application Support/Cursor/User/globalStorage/statsig-cache.json
@@ -2555,6 +2592,8 @@ sources:
     cursor,cursor.retrieval_index,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,cursor.retrieval_index,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,cursor.retrieval_index,/var/root/Library/Caches/cursor-compile-cache/**
+    cursor,cursor.runtime_arguments,/Users/*/.cursor/argv.json
+    cursor,cursor.runtime_arguments,/var/root/.cursor/argv.json
     cursor,cursor.subagent_output,/Users/*/.cursor/subagents/**
     cursor,cursor.subagent_output,/var/root/.cursor/subagents/**
     cursor,cursor.worker_data,/Users/*/.local/share/cursor-agent/**
@@ -4777,7 +4816,6 @@ sources:
     cursor,cursor.agent_cli_state,/home/*/.cursor/commands/*.md
     cursor,cursor.agent_cli_state,/home/*/.cursor/hooks.json
     cursor,cursor.agent_cli_state,/home/*/.cursor/sandbox-policies/**
-    cursor,cursor.agent_cli_state,/home/*/.cursor/skills-cursor/**
     cursor,cursor.agent_cli_state,/home/*/.cursor/snapshots/**
     cursor,cursor.agent_cli_state,/home/*/.cursor/worktrees/**
     cursor,cursor.agent_cli_state,/root/.cursor/agent-cli-state.json
@@ -4785,9 +4823,24 @@ sources:
     cursor,cursor.agent_cli_state,/root/.cursor/commands/*.md
     cursor,cursor.agent_cli_state,/root/.cursor/hooks.json
     cursor,cursor.agent_cli_state,/root/.cursor/sandbox-policies/**
-    cursor,cursor.agent_cli_state,/root/.cursor/skills-cursor/**
     cursor,cursor.agent_cli_state,/root/.cursor/snapshots/**
     cursor,cursor.agent_cli_state,/root/.cursor/worktrees/**
+    cursor,cursor.agent_data_cleanup_marker,/home/*/.cursor/projects/.agent-data-cleanup-*
+    cursor,cursor.agent_data_cleanup_marker,/root/.cursor/projects/.agent-data-cleanup-*
+    cursor,cursor.agent_store_sync,/home/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/.sync/index.sqlite
+    cursor,cursor.agent_store_sync,/home/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/.sync/index.sqlite-wal
+    cursor,cursor.agent_store_sync,/home/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/files/**
+    cursor,cursor.agent_store_sync,/home/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/mount.json
+    cursor,cursor.agent_store_sync,/home/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u*/.sync/index.sqlite
+    cursor,cursor.agent_store_sync,/home/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u*/.sync/index.sqlite-wal
+    cursor,cursor.agent_store_sync,/home/*/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u*/files/**
+    cursor,cursor.agent_store_sync,/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/.sync/index.sqlite
+    cursor,cursor.agent_store_sync,/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/.sync/index.sqlite-wal
+    cursor,cursor.agent_store_sync,/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/files/**
+    cursor,cursor.agent_store_sync,/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/*/mount.json
+    cursor,cursor.agent_store_sync,/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u*/.sync/index.sqlite
+    cursor,cursor.agent_store_sync,/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u*/.sync/index.sqlite-wal
+    cursor,cursor.agent_store_sync,/root/Library/Application Support/Cursor/AgentStores/cursor_agent_stores/u*/files/**
     cursor,cursor.agent_transcripts_jsonl,/home/*/.cursor/projects/*/agent-tools/*.txt
     cursor,cursor.agent_transcripts_jsonl,/home/*/.cursor/projects/*/agent-transcripts/*.jsonl
     cursor,cursor.agent_transcripts_jsonl,/home/*/.cursor/projects/*/agent-transcripts/*.txt
@@ -4814,6 +4867,10 @@ sources:
     cursor,cursor.auth_credentials,/home/*/.cursor/auth.json
     cursor,cursor.auth_credentials,/root/.config/cursor/auth.json
     cursor,cursor.auth_credentials,/root/.cursor/auth.json
+    cursor,cursor.bundled_skills,/home/*/.cursor/skills-cursor/*/SKILL.md
+    cursor,cursor.bundled_skills,/home/*/.cursor/skills-cursor/.sync-manifest.json
+    cursor,cursor.bundled_skills,/root/.cursor/skills-cursor/*/SKILL.md
+    cursor,cursor.bundled_skills,/root/.cursor/skills-cursor/.sync-manifest.json
     cursor,cursor.chat_session_meta_json,/home/*/.cursor/chats/*/*/meta.json
     cursor,cursor.chat_session_meta_json,/root/.cursor/chats/*/*/meta.json
     cursor,cursor.chat_session_prompt_history,/home/*/.cursor/chats/*/*/prompt_history.json
@@ -4862,6 +4919,8 @@ sources:
     cursor,cursor.extensions,/root/.cursor/extensions/**
     cursor,cursor.extensions,/root/.cursor/extensions/extensions.json
     cursor,cursor.extensions,/root/Library/Application Support/Cursor/extensions/**
+    cursor,cursor.feature_flag_cache,/home/*/.cursor/statsig-cache.json
+    cursor,cursor.feature_flag_cache,/root/.cursor/statsig-cache.json
     cursor,cursor.global_prompt_history,/home/*/.cursor/prompt_history.json
     cursor,cursor.global_prompt_history,/root/.cursor/prompt_history.json
     cursor,cursor.global_state_vscdb,/home/*/.config/Cursor/User/globalStorage/state.vscdb
@@ -4886,10 +4945,12 @@ sources:
     cursor,cursor.logs,/home/*/Library/Application Support/Cursor/User/process-monitor/**
     cursor,cursor.logs,/home/*/Library/Application Support/Cursor/logs/*/**
     cursor,cursor.logs,/home/*/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log
+    cursor,cursor.logs,/home/*/Library/Application Support/Cursor/process-monitor/**
     cursor,cursor.logs,/root/.config/Cursor/logs/**
     cursor,cursor.logs,/root/Library/Application Support/Cursor/User/process-monitor/**
     cursor,cursor.logs,/root/Library/Application Support/Cursor/logs/*/**
     cursor,cursor.logs,/root/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log
+    cursor,cursor.logs,/root/Library/Application Support/Cursor/process-monitor/**
     cursor,cursor.mdm_policy,/home/*/.cursor/policy.json
     cursor,cursor.mdm_policy,/root/.cursor/policy.json
     cursor,cursor.pasted_text,/home/*/.cursor/chats/*/*/pasted_text.json
@@ -4918,6 +4979,8 @@ sources:
     cursor,cursor.retrieval_index,/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,cursor.retrieval_index,/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,cursor.retrieval_index,/root/Library/Caches/cursor-compile-cache/**
+    cursor,cursor.runtime_arguments,/home/*/.cursor/argv.json
+    cursor,cursor.runtime_arguments,/root/.cursor/argv.json
     cursor,cursor.subagent_output,/home/*/.cursor/subagents/**
     cursor,cursor.subagent_output,/root/.cursor/subagents/**
     cursor,cursor.worker_data,/home/*/.local/share/cursor-agent/**
