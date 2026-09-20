@@ -9101,6 +9101,23 @@ $EmbeddedCatalogueJson = @'
             "agent": "pi",
             "artifacts": [
                 {
+                    "category": "instructions",
+                    "collect_priority": "first",
+                    "id": "pi.agents_skills",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.agents/skills/**",
+                        "<project>/.agents/skills/**"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "credentials",
                     "collect_priority": "normal",
                     "id": "pi.auth",
@@ -9160,10 +9177,13 @@ $EmbeddedCatalogueJson = @'
                         "windows"
                     ],
                     "paths": [
-                        "~/.pi/agent/extensions/*.ts",
-                        "~/.pi/agent/tools/"
+                        "$PI_CODING_AGENT_DIR/extensions/**",
+                        "$PI_CODING_AGENT_DIR/tools/**",
+                        "~/.pi/agent/extensions/**",
+                        "~/.pi/agent/tools/**",
+                        "<project>/.pi/extensions/**"
                     ],
-                    "root": "user_profile",
+                    "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -9193,9 +9213,11 @@ $EmbeddedCatalogueJson = @'
                         "windows"
                     ],
                     "paths": [
-                        "~/.pi/agent/prompts/"
+                        "$PI_CODING_AGENT_DIR/prompts/**",
+                        "~/.pi/agent/prompts/**",
+                        "<project>/.pi/prompts/**"
                     ],
-                    "root": "user_profile",
+                    "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -9228,6 +9250,24 @@ $EmbeddedCatalogueJson = @'
                     "paths": [
                         "<project>/.pi/",
                         "~/.pi/agent/settings.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "first",
+                    "id": "pi.skills",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$PI_CODING_AGENT_DIR/skills/**",
+                        "~/.pi/agent/skills/**",
+                        "<project>/.pi/skills/**"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -10839,7 +10879,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "988c39b5f336545dc2c5883a7322153b867fec85b495957b9f6816d40d1066b3"
+    "sha256": "9de07de4887cd51c95eac57a4cc6c4db2cc45658df3c781a0a54ae9318ed3a2a"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

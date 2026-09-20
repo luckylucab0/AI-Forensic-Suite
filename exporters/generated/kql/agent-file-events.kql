@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 02ce5fb23489
+// Catalogue digest: 9536266a9a00
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -121,7 +121,11 @@
 //     opencode.agents_commands
 //     opencode.config
 //     opencode.tui_config
+//     pi.agents_skills
+//     pi.extensions
+//     pi.prompts
 //     pi.settings
+//     pi.skills
 //     qwen_code.auto_memory
 //     qwen_code.env_files
 //     qwen_code.ignore_files
@@ -2085,14 +2089,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "pi", "pi.bin", ".pi\\server",
     "pi", "pi.debug_log", ".pi/agent/pi-debug.log",
     "pi", "pi.debug_log", ".pi\\agent\\pi-debug.log",
-    "pi", "pi.extensions", ".pi/agent/extensions",
-    "pi", "pi.extensions", ".pi/agent/tools",
-    "pi", "pi.extensions", ".pi\\agent\\extensions",
-    "pi", "pi.extensions", ".pi\\agent\\tools",
     "pi", "pi.models", ".pi/agent/models.json",
     "pi", "pi.models", ".pi\\agent\\models.json",
-    "pi", "pi.prompts", ".pi/agent/prompts",
-    "pi", "pi.prompts", ".pi\\agent\\prompts",
     "pi", "pi.sessions", ".pi/agent/sessions/--",
     "pi", "pi.sessions", ".pi\\agent\\sessions\\--",
     "qwen_code", "qwen_code.channels_scheduled_tasks", ".qwen/channels/cron.json",

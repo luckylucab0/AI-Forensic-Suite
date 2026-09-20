@@ -2,7 +2,7 @@
 
 <!-- Generated from the artifact catalogue. Do not edit by hand:
 <!-- run `afx export-collection` and commit the result.
-<!-- Catalogue digest: 02ce5fb23489
+<!-- Catalogue digest: 9536266a9a00
 <!--
 <!-- An empty result from this rule means the paths it searched held nothing. It does
 <!-- not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -94,7 +94,7 @@ Windows-relevant catalogue entries, as a sense of what a collection will cover:
 | Warp | `warp` | 1 |
 | Windsurf | `windsurf` | 24 |
 | Zed | `zed` | 6 |
-| pi | `pi` | 8 |
+| pi | `pi` | 10 |
 
 The count is entries, not files: one entry can be a directory holding a thousand
 transcripts, or a file that is not there on this host.

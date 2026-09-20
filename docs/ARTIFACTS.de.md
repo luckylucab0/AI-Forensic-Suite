@@ -6,7 +6,7 @@
 
 Erzeugt aus catalog/ durch scripts/gen_artifact_docs.py. Nicht von Hand bearbeiten: die CI erzeugt diese Datei neu und schlägt fehl, wenn sie abweicht.
 
-545 Artefakte über 31 Agent(en), davon 440 auf einer abgerufenen Herstellerquelle beruhend.
+547 Artefakte über 31 Agent(en), davon 442 auf einer abgerufenen Herstellerquelle beruhend.
 
 Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
 
@@ -1247,7 +1247,19 @@ Vendor: pi
 
 ### Verschiebende Variablen
 
+- `PI_CODING_AGENT_DIR`: [EN] Relocates the agent's whole directory: its credentials, its model list, its settings, its extensions, its tools, its prompts, its skills, its themes, its managed binaries, its debug log and its sessions all hang off it. Every path in this file has a spelling rooted at this variable for that reason. The variable that was declared here before it moves the sessions alone, so a tree relocated with this one was collected as nothing at all while the collection reported success.
+
+The name itself is not fixed. The product builds it from its own application name, so a fork published under another name reads another variable, keeps its directory under another dot directory and writes a debug log under another file name. Read the installed package's own configuration before concluding a host has none of this.
 - `PI_CODING_AGENT_SESSION_DIR`: [EN] Relocates the session transcripts. The variable's name is defined in the agent's configuration module; the documentation page that describes the session format does not state it, which is why the path rooted at it is marked unsourced.
+
+### first
+
+**Zuerst sichern.** Rotieren oder verfallen aggressiv, nach Anzahl oder bei jedem Aufräumlauf statt nach einer bequemen Frist. Einige davon zerstört die Benutzerin schon dadurch, dass sie eine weitere Sitzung startet.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `pi.agents_skills` | agents skills | instructions | macOS, Linux, Windows | `~/.agents/skills/**`<br>`<project>/.agents/skills/**` | markdown | normal | [EN] Persistent until removed. Belongs to no single product, so no product's uninstall removes it. | bestätigt | [source_code](https://github.com/earendil-works/pi/blob/19451accdeec671c1f4da9eafac8fc270f510ef4/packages/coding-agent/src/core/package-manager.ts) |
+| `pi.skills` | skills | instructions | macOS, Linux, Windows | `$PI_CODING_AGENT_DIR/skills/**`<br>`~/.pi/agent/skills/**`<br>`<project>/.pi/skills/**` | markdown | normal | [EN] Persistent until removed. | bestätigt | [source_code](https://github.com/earendil-works/pi/blob/19451accdeec671c1f4da9eafac8fc270f510ef4/packages/coding-agent/src/core/package-manager.ts) |
 
 ### normal
 
@@ -1258,9 +1270,9 @@ Vendor: pi
 | `pi.auth` | auth | credentials | macOS, Linux, Windows | `~/.pi/agent/auth.json` | json | secret | [EN] Persistent until logout. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
 | `pi.bin` | bin | install_evidence | macOS, Linux, Windows | `~/.pi/agent/bin/`<br>`~/.pi/agent/themes/`<br>`~/.pi/server/` [unbelegt] | binary | normal | [EN] Persistent until removed. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
 | `pi.debug_log` | debug log | log | macOS, Linux, Windows | `~/.pi/agent/pi-debug.log` | text | normal | [EN] Only written when debug logging is enabled; rotation not implemented in the code reviewed. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
-| `pi.extensions` | extensions | instructions | macOS, Linux, Windows | `~/.pi/agent/extensions/*.ts` [unbelegt]<br>`~/.pi/agent/tools/` | text | normal | [EN] Persistent until removed. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
+| `pi.extensions` | extensions | instructions | macOS, Linux, Windows | `$PI_CODING_AGENT_DIR/extensions/**`<br>`$PI_CODING_AGENT_DIR/tools/**`<br>`~/.pi/agent/extensions/**`<br>`~/.pi/agent/tools/**`<br>`<project>/.pi/extensions/**` | text | normal | [EN] Persistent until removed. | bestätigt | [source_code](https://github.com/earendil-works/pi/blob/19451accdeec671c1f4da9eafac8fc270f510ef4/packages/coding-agent/src/core/package-manager.ts) |
 | `pi.models` | models | config | macOS, Linux, Windows | `~/.pi/agent/models.json` | json | normal | [EN] Persistent until edited. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
-| `pi.prompts` | prompts | instructions | macOS, Linux, Windows | `~/.pi/agent/prompts/` | text | normal | [EN] Persistent until edited. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
+| `pi.prompts` | prompts | instructions | macOS, Linux, Windows | `$PI_CODING_AGENT_DIR/prompts/**`<br>`~/.pi/agent/prompts/**`<br>`<project>/.pi/prompts/**` | text | normal | [EN] Persistent until edited. | bestätigt | [source_code](https://github.com/earendil-works/pi/blob/19451accdeec671c1f4da9eafac8fc270f510ef4/packages/coding-agent/src/core/package-manager.ts) |
 | `pi.sessions` | sessions | transcript | macOS, Linux, Windows | `$PI_CODING_AGENT_SESSION_DIR/**/*.jsonl` [unbelegt]<br>`~/.pi/agent/sessions/--<encoded-cwd>--/<iso-timestamp>_<session-id>.jsonl` | jsonl | normal | [EN] Auto-saved and retained; no documented expiry. Nothing is written at all when --no-session is used. | bestätigt | [official](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/session-format.md) |
 | `pi.settings` | settings | config | macOS, Linux, Windows | `<project>/.pi/` [unbelegt]<br>`~/.pi/agent/settings.json` | json | normal | [EN] Persistent until edited. | bestätigt | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
 

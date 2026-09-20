@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 02ce5fb23489
+# Catalogue digest: 9536266a9a00
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -124,7 +124,11 @@
 #     opencode.agents_commands
 #     opencode.config
 #     opencode.tui_config
+#     pi.agents_skills
+#     pi.extensions
+#     pi.prompts
 #     pi.settings
+#     pi.skills
 #     qwen_code.auto_memory
 #     qwen_code.env_files
 #     qwen_code.ignore_files
@@ -978,10 +982,7 @@ $targets = @(
     @{ Agent = 'pi'; Id = 'pi.bin'; Path = '$profile\.pi\agent\themes' }
     @{ Agent = 'pi'; Id = 'pi.bin'; Path = '$profile\.pi\server' }
     @{ Agent = 'pi'; Id = 'pi.debug_log'; Path = '$profile\.pi\agent\pi-debug.log' }
-    @{ Agent = 'pi'; Id = 'pi.extensions'; Path = '$profile\.pi\agent\extensions' }
-    @{ Agent = 'pi'; Id = 'pi.extensions'; Path = '$profile\.pi\agent\tools' }
     @{ Agent = 'pi'; Id = 'pi.models'; Path = '$profile\.pi\agent\models.json' }
-    @{ Agent = 'pi'; Id = 'pi.prompts'; Path = '$profile\.pi\agent\prompts' }
     @{ Agent = 'pi'; Id = 'pi.sessions'; Path = '$profile\.pi\agent\sessions\--' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.channels_scheduled_tasks'; Path = '$profile\.qwen\channels\cron.json' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.channels_scheduled_tasks'; Path = '$profile\.qwen\channels\daemon' }

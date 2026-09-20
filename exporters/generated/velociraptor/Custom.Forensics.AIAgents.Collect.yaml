@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 02ce5fb23489
+# Catalogue digest: 9536266a9a00
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -115,7 +115,11 @@
 #     opencode.agents_commands
 #     opencode.config
 #     opencode.tui_config
+#     pi.agents_skills
+#     pi.extensions
+#     pi.prompts
 #     pi.settings
+#     pi.skills
 #     qwen_code.auto_memory
 #     qwen_code.env_files
 #     qwen_code.ignore_files
@@ -1161,10 +1165,7 @@ sources:
     pi,pi.bin,C:/Users/*/.pi/agent/themes/**
     pi,pi.bin,C:/Users/*/.pi/server/**
     pi,pi.debug_log,C:/Users/*/.pi/agent/pi-debug.log
-    pi,pi.extensions,C:/Users/*/.pi/agent/extensions/*.ts
-    pi,pi.extensions,C:/Users/*/.pi/agent/tools/**
     pi,pi.models,C:/Users/*/.pi/agent/models.json
-    pi,pi.prompts,C:/Users/*/.pi/agent/prompts/**
     pi,pi.sessions,C:/Users/*/.pi/agent/sessions/--*--/*_*.jsonl
     qwen_code,qwen_code.channels_scheduled_tasks,C:/Users/*/.qwen/channels/cron.json
     qwen_code,qwen_code.channels_scheduled_tasks,C:/Users/*/.qwen/channels/daemon/*/*
@@ -3287,14 +3288,8 @@ sources:
     pi,pi.bin,/var/root/.pi/server/**
     pi,pi.debug_log,/Users/*/.pi/agent/pi-debug.log
     pi,pi.debug_log,/var/root/.pi/agent/pi-debug.log
-    pi,pi.extensions,/Users/*/.pi/agent/extensions/*.ts
-    pi,pi.extensions,/Users/*/.pi/agent/tools/**
-    pi,pi.extensions,/var/root/.pi/agent/extensions/*.ts
-    pi,pi.extensions,/var/root/.pi/agent/tools/**
     pi,pi.models,/Users/*/.pi/agent/models.json
     pi,pi.models,/var/root/.pi/agent/models.json
-    pi,pi.prompts,/Users/*/.pi/agent/prompts/**
-    pi,pi.prompts,/var/root/.pi/agent/prompts/**
     pi,pi.sessions,/Users/*/.pi/agent/sessions/--*--/*_*.jsonl
     pi,pi.sessions,/var/root/.pi/agent/sessions/--*--/*_*.jsonl
     qwen_code,qwen_code.channels_scheduled_tasks,/Users/*/.qwen/channels/cron.json
@@ -5599,14 +5594,8 @@ sources:
     pi,pi.bin,/root/.pi/server/**
     pi,pi.debug_log,/home/*/.pi/agent/pi-debug.log
     pi,pi.debug_log,/root/.pi/agent/pi-debug.log
-    pi,pi.extensions,/home/*/.pi/agent/extensions/*.ts
-    pi,pi.extensions,/home/*/.pi/agent/tools/**
-    pi,pi.extensions,/root/.pi/agent/extensions/*.ts
-    pi,pi.extensions,/root/.pi/agent/tools/**
     pi,pi.models,/home/*/.pi/agent/models.json
     pi,pi.models,/root/.pi/agent/models.json
-    pi,pi.prompts,/home/*/.pi/agent/prompts/**
-    pi,pi.prompts,/root/.pi/agent/prompts/**
     pi,pi.sessions,/home/*/.pi/agent/sessions/--*--/*_*.jsonl
     pi,pi.sessions,/root/.pi/agent/sessions/--*--/*_*.jsonl
     qwen_code,qwen_code.channels_scheduled_tasks,/home/*/.qwen/channels/cron.json

@@ -6,7 +6,7 @@ English | [Deutsch](ARTIFACTS.de.md)
 
 Generated from catalog/ by scripts/gen_artifact_docs.py. Do not edit by hand: CI regenerates this file and fails if it differs.
 
-545 artifacts across 31 agent(s), 440 of them resting on a fetched vendor source.
+547 artifacts across 31 agent(s), 442 of them resting on a fetched vendor source.
 
 Entries marked unverified are collected anyway, but no vendor source confirms the path. Treat the absence of such an artifact as inconclusive rather than as evidence that the agent was not used.
 
@@ -1247,7 +1247,19 @@ Vendor: pi
 
 ### Relocating variables
 
+- `PI_CODING_AGENT_DIR`: Relocates the agent's whole directory: its credentials, its model list, its settings, its extensions, its tools, its prompts, its skills, its themes, its managed binaries, its debug log and its sessions all hang off it. Every path in this file has a spelling rooted at this variable for that reason. The variable that was declared here before it moves the sessions alone, so a tree relocated with this one was collected as nothing at all while the collection reported success.
+
+The name itself is not fixed. The product builds it from its own application name, so a fork published under another name reads another variable, keeps its directory under another dot directory and writes a debug log under another file name. Read the installed package's own configuration before concluding a host has none of this.
 - `PI_CODING_AGENT_SESSION_DIR`: Relocates the session transcripts. The variable's name is defined in the agent's configuration module; the documentation page that describes the session format does not state it, which is why the path rooted at it is marked unsourced.
+
+### first
+
+**Collect first.** Rotated or swept aggressively, by count or on every sweep rather than after a comfortable interval. Some of these can be destroyed by the user simply starting another session.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `pi.agents_skills` | agents skills | instructions | macOS, Linux, Windows | `~/.agents/skills/**`<br>`<project>/.agents/skills/**` | markdown | normal | Persistent until removed. Belongs to no single product, so no product's uninstall removes it. | verified | [source_code](https://github.com/earendil-works/pi/blob/19451accdeec671c1f4da9eafac8fc270f510ef4/packages/coding-agent/src/core/package-manager.ts) |
+| `pi.skills` | skills | instructions | macOS, Linux, Windows | `$PI_CODING_AGENT_DIR/skills/**`<br>`~/.pi/agent/skills/**`<br>`<project>/.pi/skills/**` | markdown | normal | Persistent until removed. | verified | [source_code](https://github.com/earendil-works/pi/blob/19451accdeec671c1f4da9eafac8fc270f510ef4/packages/coding-agent/src/core/package-manager.ts) |
 
 ### normal
 
@@ -1258,9 +1270,9 @@ Vendor: pi
 | `pi.auth` | auth | credentials | macOS, Linux, Windows | `~/.pi/agent/auth.json` | json | secret | Persistent until logout. | verified | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
 | `pi.bin` | bin | install_evidence | macOS, Linux, Windows | `~/.pi/agent/bin/`<br>`~/.pi/agent/themes/`<br>`~/.pi/server/` [unsourced] | binary | normal | Persistent until removed. | verified | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
 | `pi.debug_log` | debug log | log | macOS, Linux, Windows | `~/.pi/agent/pi-debug.log` | text | normal | Only written when debug logging is enabled; rotation not implemented in the code reviewed. | verified | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
-| `pi.extensions` | extensions | instructions | macOS, Linux, Windows | `~/.pi/agent/extensions/*.ts` [unsourced]<br>`~/.pi/agent/tools/` | text | normal | Persistent until removed. | verified | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
+| `pi.extensions` | extensions | instructions | macOS, Linux, Windows | `$PI_CODING_AGENT_DIR/extensions/**`<br>`$PI_CODING_AGENT_DIR/tools/**`<br>`~/.pi/agent/extensions/**`<br>`~/.pi/agent/tools/**`<br>`<project>/.pi/extensions/**` | text | normal | Persistent until removed. | verified | [source_code](https://github.com/earendil-works/pi/blob/19451accdeec671c1f4da9eafac8fc270f510ef4/packages/coding-agent/src/core/package-manager.ts) |
 | `pi.models` | models | config | macOS, Linux, Windows | `~/.pi/agent/models.json` | json | normal | Persistent until edited. | verified | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
-| `pi.prompts` | prompts | instructions | macOS, Linux, Windows | `~/.pi/agent/prompts/` | text | normal | Persistent until edited. | verified | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
+| `pi.prompts` | prompts | instructions | macOS, Linux, Windows | `$PI_CODING_AGENT_DIR/prompts/**`<br>`~/.pi/agent/prompts/**`<br>`<project>/.pi/prompts/**` | text | normal | Persistent until edited. | verified | [source_code](https://github.com/earendil-works/pi/blob/19451accdeec671c1f4da9eafac8fc270f510ef4/packages/coding-agent/src/core/package-manager.ts) |
 | `pi.sessions` | sessions | transcript | macOS, Linux, Windows | `$PI_CODING_AGENT_SESSION_DIR/**/*.jsonl` [unsourced]<br>`~/.pi/agent/sessions/--<encoded-cwd>--/<iso-timestamp>_<session-id>.jsonl` | jsonl | normal | Auto-saved and retained; no documented expiry. Nothing is written at all when --no-session is used. | verified | [official](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/session-format.md) |
 | `pi.settings` | settings | config | macOS, Linux, Windows | `<project>/.pi/` [unsourced]<br>`~/.pi/agent/settings.json` | json | normal | Persistent until edited. | verified | [source_code](https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/config.ts) |
 
