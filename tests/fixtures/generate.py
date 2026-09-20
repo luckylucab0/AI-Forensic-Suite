@@ -30,11 +30,13 @@ import compression.zstd as zstd
 import hashlib
 import json
 import os
+import plistlib
 import re
 import sqlite3
 import struct
 import sys
 import zlib
+from datetime import datetime
 from pathlib import Path
 
 # Fixed instants, so mtimes are stable across runs and machines. Chosen to sit either side
@@ -1696,6 +1698,238 @@ BUNDLE_REGISTRY_KEYS = {
         ],
     ),
 }
+
+
+def write_agent_stores(home: Path, mtime: int = RECENT) -> list[Path]:
+    """The six stores whose readers the profile never reached.
+
+    Each of these has a reader with its own tests, and each reader was tested against a
+    file the test built and handed to it directly. Between a catalogue entry and that
+    reader sit the pattern, the glob, the claim order and the attribution, and none of it
+    was exercised for these six: their agents were in the catalogue and not in this tree.
+
+    The schemas are the vendors' own, copied from the readers' tests rather than imported,
+    for the reason given there: when an agent changes its schema, a fixture that quietly
+    followed it would hide the change instead of showing it. One row each, because what is
+    exercised here is the path from a file on disk to an event and not the volume.
+
+    A tree of its own rather than part of build_home, and that is a decision rather than
+    tidiness. The main profile is curated: it has a story running through it, several tests
+    assert what it contains, and one of them builds a store at one of these very paths and
+    failed outright when this function put a file there first. Six more agents would also
+    change which stores name a conversation, which is what the corroboration view is about.
+    So this stands beside it and the reach test ingests both.
+    """
+    written = []
+
+    def store(path: Path, statements: list[str], rows: list[tuple[str, tuple]]) -> Path:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if path.exists():
+            path.unlink()
+        connection = sqlite3.connect(path)
+        try:
+            for statement in statements:
+                connection.execute(statement)
+            for sql, values in rows:
+                connection.execute(sql, values)
+            connection.commit()
+        finally:
+            connection.close()
+        os.utime(path, (mtime, mtime))
+        written.append(path)
+        return path
+
+    project = str(home / "src" / "app")
+
+    # One agent keeps its whole conversation history in a single database under its home,
+    # with the shell history of the commands it ran beside it in the same file.
+    store(
+        home / ".local" / "share" / "amazon-q" / "data.sqlite3",
+        [
+            "CREATE TABLE history (id INTEGER PRIMARY KEY, command TEXT, shell TEXT, "
+            "pid INTEGER, session_id TEXT, cwd TEXT, start_time INTEGER, in_ssh INTEGER, "
+            "in_docker INTEGER, hostname TEXT, exit_code INTEGER, end_time INTEGER, "
+            "duration INTEGER)",
+            "CREATE TABLE state (key TEXT PRIMARY KEY, value BLOB)",
+            "CREATE TABLE auth_kv (key TEXT PRIMARY KEY, value TEXT)",
+            "CREATE TABLE conversations (key TEXT PRIMARY KEY, value TEXT)",
+        ],
+        [
+            (
+                "INSERT INTO history (command, shell, cwd, start_time, exit_code) "
+                "VALUES (?,?,?,?,?)",
+                ("git status", "zsh", project, 1788912000, 0),
+            )
+        ],
+    )
+
+    # Another keeps a database per concern beside its transcripts, and the one that holds
+    # the turns is the one a case needs.
+    store(
+        home / ".codex" / "thread_history_1.sqlite",
+        [
+            "CREATE TABLE thread_turns (thread_id TEXT NOT NULL, turn_id TEXT NOT NULL, "
+            "rollout_ordinal INTEGER NOT NULL, status TEXT NOT NULL, error_json TEXT, "
+            "started_at INTEGER, completed_at INTEGER, duration_ms INTEGER, "
+            "first_user_item_id TEXT, final_agent_item_id TEXT, "
+            "rollout_byte_offset INTEGER, rollout_end_ordinal INTEGER, "
+            "rollout_end_byte_offset INTEGER, PRIMARY KEY (thread_id, turn_id))",
+            "CREATE TABLE thread_items (thread_id TEXT NOT NULL, turn_id TEXT NOT NULL, "
+            "item_id TEXT NOT NULL, rollout_ordinal INTEGER NOT NULL, "
+            "created_at_ms INTEGER NOT NULL, item_json TEXT NOT NULL, "
+            "item_type TEXT NOT NULL DEFAULT '', "
+            "updated_at_ordinal INTEGER NOT NULL DEFAULT 0, "
+            "PRIMARY KEY (thread_id, turn_id, item_id))",
+        ],
+        [
+            (
+                "INSERT INTO thread_turns (thread_id, turn_id, rollout_ordinal, status, "
+                "started_at) VALUES (?,?,?,?,?)",
+                (SESSION_A, "turn-1", 0, "completed", 1788912000000),
+            ),
+            (
+                "INSERT INTO thread_items (thread_id, turn_id, item_id, rollout_ordinal, "
+                "created_at_ms, item_json, item_type) VALUES (?,?,?,?,?,?,?)",
+                (
+                    SESSION_A,
+                    "turn-1",
+                    "item-1",
+                    0,
+                    1788912000000,
+                    json.dumps({"type": "message", "role": "user", "text": "bump the lockfile"}),
+                    "message",
+                ),
+            ),
+        ],
+    )
+
+    # A third keeps sessions and messages in one database, with the working copy and the
+    # branch on the session row, which is what makes a conversation attributable.
+    store(
+        home / ".hermes" / "state.db",
+        [
+            "CREATE TABLE sessions (id TEXT PRIMARY KEY, source TEXT NOT NULL, user_id TEXT, "
+            "model TEXT, model_config TEXT, system_prompt TEXT, parent_session_id TEXT, "
+            "started_at REAL NOT NULL, ended_at REAL, end_reason TEXT, "
+            "message_count INTEGER DEFAULT 0, tool_call_count INTEGER DEFAULT 0, "
+            "input_tokens INTEGER DEFAULT 0, output_tokens INTEGER DEFAULT 0, title TEXT, "
+            "cwd TEXT, git_branch TEXT, git_repo_root TEXT)",
+            "CREATE TABLE messages (id INTEGER PRIMARY KEY AUTOINCREMENT, "
+            "session_id TEXT NOT NULL, role TEXT NOT NULL, content TEXT, tool_call_id TEXT, "
+            "tool_calls TEXT, tool_name TEXT, timestamp REAL NOT NULL, token_count INTEGER, "
+            "finish_reason TEXT, reasoning TEXT, reasoning_content TEXT, "
+            "codex_message_items TEXT, active INTEGER DEFAULT 1, compacted INTEGER DEFAULT 0)",
+        ],
+        [
+            (
+                "INSERT INTO sessions (id, source, started_at, cwd, git_branch, model) "
+                "VALUES (?,?,?,?,?,?)",
+                (SESSION_A, "cli", 1788912000.0, project, "main", "example-model-1"),
+            ),
+            (
+                "INSERT INTO messages (session_id, role, content, timestamp) VALUES (?,?,?,?)",
+                (SESSION_A, "user", "bump the lockfile", 1788912000.0),
+            ),
+        ],
+    )
+
+    # A fourth under the share directory, with the prompt split out of the message table
+    # into one of its own.
+    store(
+        home / ".local" / "share" / "opencode" / "opencode.db",
+        [
+            "CREATE TABLE session (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, "
+            "workspace_id TEXT, parent_id TEXT, slug TEXT NOT NULL, directory TEXT NOT NULL, "
+            "path TEXT, title TEXT NOT NULL, version TEXT NOT NULL, share_url TEXT, "
+            "summary_additions INTEGER, summary_deletions INTEGER, summary_files INTEGER, "
+            "summary_diffs TEXT, metadata TEXT, cost REAL DEFAULT 0 NOT NULL, "
+            "tokens_input INTEGER DEFAULT 0 NOT NULL, tokens_output INTEGER DEFAULT 0 NOT NULL, "
+            "tokens_reasoning INTEGER DEFAULT 0 NOT NULL, "
+            "tokens_cache_read INTEGER DEFAULT 0 NOT NULL, "
+            "tokens_cache_write INTEGER DEFAULT 0 NOT NULL, revert TEXT, permission TEXT, "
+            "agent TEXT, model TEXT, time_created INTEGER NOT NULL, "
+            "time_updated INTEGER NOT NULL, time_compacting INTEGER, time_archived INTEGER)",
+            "CREATE TABLE session_input (id TEXT PRIMARY KEY, session_id TEXT NOT NULL, "
+            "prompt TEXT NOT NULL, delivery TEXT NOT NULL, admitted_seq INTEGER NOT NULL, "
+            "promoted_seq INTEGER, time_created INTEGER NOT NULL)",
+        ],
+        [
+            (
+                "INSERT INTO session (id, project_id, slug, directory, title, version, "
+                "time_created, time_updated) VALUES (?,?,?,?,?,?,?,?)",
+                (
+                    "ses_0000000000000001",
+                    "prj_0000000000000001",
+                    "app",
+                    project,
+                    "bump the lockfile",
+                    "1.0.0",
+                    1788912000000,
+                    1788912000000,
+                ),
+            ),
+            (
+                "INSERT INTO session_input (id, session_id, prompt, delivery, admitted_seq, "
+                "time_created) VALUES (?,?,?,?,?,?)",
+                (
+                    "inp_0000000000000001",
+                    "ses_0000000000000001",
+                    "bump the lockfile",
+                    "enqueue",
+                    1,
+                    1788912000000,
+                ),
+            ),
+        ],
+    )
+
+    # A fifth keeps the index its interface lists conversations from in a database of its
+    # own, separate from the store that holds them, so the two can disagree.
+    store(
+        home / ".local" / "share" / "zed" / "db" / "0-stable" / "db.sqlite",
+        [
+            "CREATE TABLE sidebar_threads(thread_id BLOB PRIMARY KEY, session_id TEXT, "
+            "agent_id TEXT, title TEXT NOT NULL, updated_at TEXT NOT NULL, created_at TEXT, "
+            "folder_paths TEXT, folder_paths_order TEXT, archived INTEGER DEFAULT 0, "
+            "main_worktree_paths TEXT, main_worktree_paths_order TEXT, "
+            "remote_connection TEXT, interacted_at TEXT, title_override TEXT) STRICT"
+        ],
+        [
+            (
+                "INSERT INTO sidebar_threads (thread_id, session_id, title, updated_at, "
+                "created_at, folder_paths) VALUES (?,?,?,?,?,?)",
+                (
+                    b"\x01\x02\x03\x04",
+                    SESSION_A,
+                    "bump the lockfile",
+                    "2026-09-06T09:00:00Z",
+                    "2026-09-06T08:59:00Z",
+                    json.dumps([project]),
+                ),
+            )
+        ],
+    )
+
+    # And the preference domain of a desktop product, which on its own platform is where
+    # the settings an interface never shows are kept. The path is that platform's and the
+    # profile is collected by profile rather than by platform, so it belongs here.
+    preferences = home / "Library" / "Preferences" / "com.todesktop.230313mzl4w4u92.plist"
+    preferences.parent.mkdir(parents=True, exist_ok=True)
+    with preferences.open("wb") as handle:
+        plistlib.dump(
+            {
+                "SUEnableAutomaticChecks": False,
+                # Naive on purpose: the binary format stores a date as seconds from
+                # its own epoch and the writer refuses an aware one.
+                "SULastCheckTime": datetime(2026, 9, 6, 9, 0, 0),
+                "telemetry.machineId": "00000000-0000-4000-8000-000000000001",
+            },
+            handle,
+            fmt=plistlib.FMT_BINARY,
+        )
+    os.utime(preferences, (mtime, mtime))
+    written.append(preferences)
+    return written
 
 
 def build_registry_bundle(root: Path) -> dict:
