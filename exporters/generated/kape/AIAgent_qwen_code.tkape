@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 2d2d8d7463b1
+# Catalogue digest: 194c9b5a85c3
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 33 of the 482 catalogue artifacts declare
+# KAPE is Windows only. 33 of the 484 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -312,20 +312,20 @@ Targets:
         FileMask: "settings.json"
         Recursive: false
     -
-        Name: qwen_code.workflow_runs
-        Category: log
-        Path: C:\Users\%user%\.qwen\projects\*\workflows
-        FileMask: "*.json"
-        Recursive: false
+        Name: qwen_code.workflow_generated_scripts
+        Category: instructions
+        Path: C:\Users\%user%\.qwen\projects\*\workflows\generated
+        FileMask: "*"
+        Recursive: true
     -
-        Name: qwen_code.workflow_runs
+        Name: qwen_code.workflow_run_journals
         Category: log
         Path: C:\Users\%user%\.qwen\projects\*\workflows\*
         FileMask: "journal.jsonl"
         Recursive: false
     -
-        Name: qwen_code.workflow_runs
+        Name: qwen_code.workflow_run_snapshots
         Category: log
-        Path: C:\Users\%user%\.qwen\projects\*\workflows\generated
-        FileMask: "*"
-        Recursive: true
+        Path: C:\Users\%user%\.qwen\projects\*\workflows
+        FileMask: "*.json"
+        Recursive: false

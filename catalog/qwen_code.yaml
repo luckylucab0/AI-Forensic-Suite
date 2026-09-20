@@ -698,8 +698,8 @@ artifacts:
   notes: |-
     Normally absent - almost every debugLogger call is a no-op unless QWEN_DEBUG_LOG_FILE is set, so absence is the expected state and carries no meaning. When present it holds internal diagnostics including resolved storage and session-writer lock paths, which is the reliable way to learn where a daemon-hosted session actually wrote (the project's own recovery documentation tells operators not to guess that path from the default home directory).
   parser: text_log
-- id: qwen_code.workflow_runs
-  title: Workflow run snapshots, resume journals and the scripts a run generated
+- id: qwen_code.workflow_run_journals
+  title: Workflow resume journals
   category: log
   root: user_profile
   os:
@@ -707,33 +707,75 @@ artifacts:
   - windows
   - linux
   paths:
-  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\workflows\<run-id>.json'
-  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\workflows\<run-id>\journal.jsonl'
-  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\workflows\generated\**'
-  - ~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>.json
+  - '%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\<run-id>\\journal.jsonl'
   - ~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>/journal.jsonl
-  - ~/.qwen/projects/<sanitized-project-path>/workflows/generated/**
-  format: directory
+  format: jsonl
   sensitivity: normal
   collect_priority: durable
   status: verified
   source: https://github.com/QwenLM/qwen-code/blob/main/packages/core/src/config/storage.ts
   source_kind: source_code
   record_types:
-  - 'one JSON snapshot per completed run'
-  - 'one JSONL journal per resumable run'
-  - 'JavaScript, one file per inline run, written by the model'
+  - one JSON object per step of a workflow run
   volatility: |-
-    No sweep is documented for any of the three. A journal belongs to a run that can be resumed, so it outlives the run it was written for.
+    No sweep is documented. A journal belongs to a run that can be resumed, so it outlives the run it was written for.
   notes: |-
-    What a workflow actually did, as against what a workflow could do. The entries above this one collect the saved workflow scripts, which are the definitions; this collects the runs. getWorkflowRunsDir() is <projectDir>/workflows, holding a <run-id>.json snapshot per completed run for the recent list and a <run-id>/journal.jsonl resume journal per run in progress.
+    What a workflow actually did, step by step. getWorkflowRunJournalPath() is <projectDir>/workflows/<run-id>/journal.jsonl and the code calls it the resume journal for an in-progress or resumable run, so it is the record the product itself reads to carry on where it stopped.
 
-    The generated directory is the find. getGeneratedWorkflowsDir() is <projectDir>/workflows/generated and the code's own comment calls it a trusted root for Workflow({scriptPath}), never listed as a slash command and not reachable by name. Under it, getInlineWorkflowScriptPath() persists the script of an inline run at generated/inline/<run-id>.js, and the comment states what that is: a model-authored script, kept apart from the one-run scripts other tooling emits into the same root. So this directory is JavaScript the model wrote and the product executed, on disk, tied to a run id that the snapshot and the journal beside it date.
+    The project directory here is the runtime one, ~/.qwen/projects/<cwd with non-alphanumerics replaced by hyphens>, which moves with QWEN_RUNTIME_DIR. The chats and subagents directories of the entries above are its siblings, so a run and the conversation that started it are found together.
+  parser: jsonl_generic
+- id: qwen_code.workflow_run_snapshots
+  title: Workflow run snapshots
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\<run-id>.json'
+  - ~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>.json
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/main/packages/core/src/config/storage.ts
+  source_kind: source_code
+  record_types:
+  - one JSON document per completed run
+  volatility: |-
+    No sweep is documented. The product keeps them for its own recent-runs list, so they accumulate.
+  notes: |-
+    One document per completed workflow run, which getWorkflowRunSnapshotPath() writes as <projectDir>/workflows/<run-id>.json and which the code describes as the snapshot behind the recent list. Where the journal beside it says what each step did, this says how the run ended.
+  parser: json_generic
+- id: qwen_code.workflow_generated_scripts
+  title: Workflow scripts the product generated and ran
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\generated\\**'
+  - ~/.qwen/projects/<sanitized-project-path>/workflows/generated/**
+  format: text
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/main/packages/core/src/config/storage.ts
+  source_kind: source_code
+  record_types:
+  - JavaScript, one file per inline run, written by the model
+  volatility: |-
+    Persisted so a run can be resumed or re-run, and nothing sweeps it. The comment in the source says the copy is kept editable before a resume, so a script here can also have been changed after it ran.
+  notes: |-
+    The find in this family. getGeneratedWorkflowsDir() is <projectDir>/workflows/generated and the vendor's own comment calls it a trusted root for a workflow started from a script path: never listed as a slash command and not reachable by name. Under it, getInlineWorkflowScriptPath() persists the script of an inline run at generated/inline/<run-id>.js, and the same comment says what that is, a model-authored script kept apart from the one-run scripts other tooling emits into the same root.
 
-    A subprocess reaches the same root through QWEN_CODE_PROJECT_DIR, so a script there can also be pointed at from outside the product.
+    So this is JavaScript the model wrote and the product executed, on disk, with a run id that ties it to the journal and the snapshot beside it. It is filed as instructions rather than as a log because that is the question it answers: what the agent was going to run, in its own words.
 
-    The project directory here is the runtime one: ~/.qwen/projects/<cwd with non-alphanumerics replaced by hyphens>, which moves with QWEN_RUNTIME_DIR, and the chats and subagents directories of the entries above are its siblings.
-  parser: null
+    A subprocess reaches the same root through QWEN_CODE_PROJECT_DIR, so a script there can also be pointed at from outside the product, and the root is trusted by the loader whatever wrote it.
+  parser: instructions
 - id: qwen_code.usage_history
   title: Per-session usage ledger
   category: log

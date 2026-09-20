@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 2d2d8d7463b1
+# Catalogue digest: 194c9b5a85c3
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -719,7 +719,12 @@ $targets = @(
     @{ Agent = 'qwen_code'; Id = 'qwen_code.user_instructions'; Path = '$profile\.qwen\QWEN.md' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.user_instructions'; Path = '$profile\.qwen\memory.md' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.user_settings'; Path = '$profile\.qwen\settings.json' }
-    @{ Agent = 'qwen_code'; Id = 'qwen_code.workflow_runs'; Path = '$profile\.qwen\projects' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.workflow_generated_scripts'; Path = '$profile\.qwen\projects' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.workflow_generated_scripts'; Path = '$profile\\.qwen\\projects' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.workflow_run_journals'; Path = '$profile\.qwen\projects' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.workflow_run_journals'; Path = '$profile\\.qwen\\projects' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.workflow_run_snapshots'; Path = '$profile\.qwen\projects' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.workflow_run_snapshots'; Path = '$profile\\.qwen\\projects' }
     @{ Agent = 'roo_code'; Id = 'roo_code.checkpoints'; Path = '$profile\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints' }
     @{ Agent = 'roo_code'; Id = 'roo_code.checkpoints'; Path = '$profile\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline\tasks' }
     @{ Agent = 'roo_code'; Id = 'roo_code.checkpoints'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints' }

@@ -78,6 +78,7 @@ LOGS = frozenset(
         "qwen_code.conversation_transcript",
         "qwen_code.prompt_terminal_ledger",
         "qwen_code.usage_history",
+        "qwen_code.workflow_run_journals",
         "windsurf.cascade_transcripts",
     }
 )

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 2d2d8d7463b1
+# Catalogue digest: 194c9b5a85c3
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -817,9 +817,12 @@ sources:
     qwen_code,qwen_code.user_instructions,C:/Users/*/.qwen/QWEN.md
     qwen_code,qwen_code.user_instructions,C:/Users/*/.qwen/memory.md
     qwen_code,qwen_code.user_settings,C:/Users/*/.qwen/settings.json
-    qwen_code,qwen_code.workflow_runs,C:/Users/*/.qwen/projects/*/workflows/*.json
-    qwen_code,qwen_code.workflow_runs,C:/Users/*/.qwen/projects/*/workflows/*/journal.jsonl
-    qwen_code,qwen_code.workflow_runs,C:/Users/*/.qwen/projects/*/workflows/generated/**
+    qwen_code,qwen_code.workflow_generated_scripts,C:/Users/*/.qwen//projects//*//workflows//generated//**
+    qwen_code,qwen_code.workflow_generated_scripts,C:/Users/*/.qwen/projects/*/workflows/generated/**
+    qwen_code,qwen_code.workflow_run_journals,C:/Users/*/.qwen//projects//*//workflows//*//journal.jsonl
+    qwen_code,qwen_code.workflow_run_journals,C:/Users/*/.qwen/projects/*/workflows/*/journal.jsonl
+    qwen_code,qwen_code.workflow_run_snapshots,C:/Users/*/.qwen//projects//*//workflows//*.json
+    qwen_code,qwen_code.workflow_run_snapshots,C:/Users/*/.qwen/projects/*/workflows/*.json
     roo_code,roo_code.checkpoints,C:/Users/*/AppData/Roaming/Code - Insiders/User/globalStorage/rooveterinaryinc.roo-cline/checkpoints/*/.git/**
     roo_code,roo_code.checkpoints,C:/Users/*/AppData/Roaming/Code - Insiders/User/globalStorage/rooveterinaryinc.roo-cline/checkpoints/*/.git/info/exclude
     roo_code,roo_code.checkpoints,C:/Users/*/AppData/Roaming/Code - Insiders/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/checkpoints/**
@@ -2608,12 +2611,12 @@ sources:
     qwen_code,qwen_code.user_instructions,/var/root/.qwen/memory.md
     qwen_code,qwen_code.user_settings,/Users/*/.qwen/settings.json
     qwen_code,qwen_code.user_settings,/var/root/.qwen/settings.json
-    qwen_code,qwen_code.workflow_runs,/Users/*/.qwen/projects/*/workflows/*.json
-    qwen_code,qwen_code.workflow_runs,/Users/*/.qwen/projects/*/workflows/*/journal.jsonl
-    qwen_code,qwen_code.workflow_runs,/Users/*/.qwen/projects/*/workflows/generated/**
-    qwen_code,qwen_code.workflow_runs,/var/root/.qwen/projects/*/workflows/*.json
-    qwen_code,qwen_code.workflow_runs,/var/root/.qwen/projects/*/workflows/*/journal.jsonl
-    qwen_code,qwen_code.workflow_runs,/var/root/.qwen/projects/*/workflows/generated/**
+    qwen_code,qwen_code.workflow_generated_scripts,/Users/*/.qwen/projects/*/workflows/generated/**
+    qwen_code,qwen_code.workflow_generated_scripts,/var/root/.qwen/projects/*/workflows/generated/**
+    qwen_code,qwen_code.workflow_run_journals,/Users/*/.qwen/projects/*/workflows/*/journal.jsonl
+    qwen_code,qwen_code.workflow_run_journals,/var/root/.qwen/projects/*/workflows/*/journal.jsonl
+    qwen_code,qwen_code.workflow_run_snapshots,/Users/*/.qwen/projects/*/workflows/*.json
+    qwen_code,qwen_code.workflow_run_snapshots,/var/root/.qwen/projects/*/workflows/*.json
     roo_code,roo_code.checkpoints,/Users/*/Library/Application Support/Code - Insiders/User/globalStorage/rooveterinaryinc.roo-cline/checkpoints/*/.git/**
     roo_code,roo_code.checkpoints,/Users/*/Library/Application Support/Code - Insiders/User/globalStorage/rooveterinaryinc.roo-cline/checkpoints/*/.git/info/exclude
     roo_code,roo_code.checkpoints,/Users/*/Library/Application Support/Code - Insiders/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/checkpoints/**
@@ -4534,12 +4537,12 @@ sources:
     qwen_code,qwen_code.user_instructions,/root/.qwen/memory.md
     qwen_code,qwen_code.user_settings,/home/*/.qwen/settings.json
     qwen_code,qwen_code.user_settings,/root/.qwen/settings.json
-    qwen_code,qwen_code.workflow_runs,/home/*/.qwen/projects/*/workflows/*.json
-    qwen_code,qwen_code.workflow_runs,/home/*/.qwen/projects/*/workflows/*/journal.jsonl
-    qwen_code,qwen_code.workflow_runs,/home/*/.qwen/projects/*/workflows/generated/**
-    qwen_code,qwen_code.workflow_runs,/root/.qwen/projects/*/workflows/*.json
-    qwen_code,qwen_code.workflow_runs,/root/.qwen/projects/*/workflows/*/journal.jsonl
-    qwen_code,qwen_code.workflow_runs,/root/.qwen/projects/*/workflows/generated/**
+    qwen_code,qwen_code.workflow_generated_scripts,/home/*/.qwen/projects/*/workflows/generated/**
+    qwen_code,qwen_code.workflow_generated_scripts,/root/.qwen/projects/*/workflows/generated/**
+    qwen_code,qwen_code.workflow_run_journals,/home/*/.qwen/projects/*/workflows/*/journal.jsonl
+    qwen_code,qwen_code.workflow_run_journals,/root/.qwen/projects/*/workflows/*/journal.jsonl
+    qwen_code,qwen_code.workflow_run_snapshots,/home/*/.qwen/projects/*/workflows/*.json
+    qwen_code,qwen_code.workflow_run_snapshots,/root/.qwen/projects/*/workflows/*.json
     roo_code,roo_code.checkpoints,/home/*/.config/Code - Insiders/User/globalStorage/rooveterinaryinc.roo-cline/checkpoints/*/.git/**
     roo_code,roo_code.checkpoints,/home/*/.config/Code - Insiders/User/globalStorage/rooveterinaryinc.roo-cline/checkpoints/*/.git/info/exclude
     roo_code,roo_code.checkpoints,/home/*/.config/Code - Insiders/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/checkpoints/**

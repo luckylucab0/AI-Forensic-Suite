@@ -191,6 +191,7 @@ DOCUMENTS = frozenset(
         "qwen_code.system_settings",
         "qwen_code.trusted_folders",
         "qwen_code.user_settings",
+        "qwen_code.workflow_run_snapshots",
         "roo_code.custom_storage_path",
         "roo_code.settings",
         "roo_code.tasks",

@@ -8228,21 +8228,51 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
-                    "category": "log",
+                    "category": "instructions",
                     "collect_priority": "durable",
-                    "id": "qwen_code.workflow_runs",
+                    "id": "qwen_code.workflow_generated_scripts",
                     "os": [
                         "macos",
                         "windows",
                         "linux"
                     ],
                     "paths": [
-                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\<run-id>.json",
-                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\<run-id>\\journal.jsonl",
-                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\generated\\**",
-                        "~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>.json",
-                        "~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>/journal.jsonl",
+                        "%USERPROFILE%\\\\.qwen\\\\projects\\\\<sanitized-project-path>\\\\workflows\\\\generated\\\\**",
                         "~/.qwen/projects/<sanitized-project-path>/workflows/generated/**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "durable",
+                    "id": "qwen_code.workflow_run_journals",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\\\.qwen\\\\projects\\\\<sanitized-project-path>\\\\workflows\\\\<run-id>\\\\journal.jsonl",
+                        "~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>/journal.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "durable",
+                    "id": "qwen_code.workflow_run_snapshots",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\\\.qwen\\\\projects\\\\<sanitized-project-path>\\\\workflows\\\\<run-id>.json",
+                        "~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>.json"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -9216,7 +9246,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "6b9dfcc45f64af18575b810e9114eb8596aaea58320216c213e25794f36b6a0b"
+    "sha256": "930a9efb28f66710bc8b628f3c395e1e1a2cda6926b3245294edfd041e050055"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

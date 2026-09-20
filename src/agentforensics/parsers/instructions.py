@@ -133,6 +133,7 @@ SOURCES = frozenset(
         "qwen_code.project_instructions",
         "qwen_code.user_extension_points",
         "qwen_code.user_instructions",
+        "qwen_code.workflow_generated_scripts",
         "roo_code.global_dirs",
         "roo_code.rules",
         "windsurf.global_rules",
