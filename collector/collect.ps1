@@ -8262,6 +8262,27 @@ $EmbeddedCatalogueJson = @'
                     "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "durable",
+                    "id": "qwen_code.workflow_runs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\<run-id>.json",
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\<run-id>\\journal.jsonl",
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\generated\\**",
+                        "~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>.json",
+                        "~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>/journal.jsonl",
+                        "~/.qwen/projects/<sanitized-project-path>/workflows/generated/**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 }
             ]
         },
@@ -9231,7 +9252,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "8bbd5e98e7fa476ef85703a416c580adef6a18c78a6f350fa5c52107291e5058"
+    "sha256": "dc28e1760428a2a355c6c0dcbc3c966d933c83e52d2ec66451dfa592947d7a41"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

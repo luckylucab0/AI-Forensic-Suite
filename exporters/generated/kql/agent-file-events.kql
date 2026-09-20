@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 5b90322dd6ef
+// Catalogue digest: 74e68d4f0b9a
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1580,6 +1580,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "qwen_code", "qwen_code.user_instructions", ".qwen\\memory.md",
     "qwen_code", "qwen_code.user_settings", ".qwen/settings.json",
     "qwen_code", "qwen_code.user_settings", ".qwen\\settings.json",
+    "qwen_code", "qwen_code.workflow_runs", ".qwen/projects",
+    "qwen_code", "qwen_code.workflow_runs", ".qwen\\projects",
     "roo_code", "roo_code.global_dirs", ".roo/rules",
     "roo_code", "roo_code.global_dirs", ".roo/rules-",
     "roo_code", "roo_code.global_dirs", ".roo\\rules",

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 5b90322dd6ef
+# Catalogue digest: 74e68d4f0b9a
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -9,7 +9,7 @@
 # relocation variables and the agents' own state files, which no static rule can.
 #
 # Scope: the 90 artifacts the catalogue files under transcript and prompt_history.
-# The other 390 are configuration, credentials, caches, logs and install
+# The other 391 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
 # credential store what an analyst wants is the file, which is what the Collect

@@ -6,7 +6,7 @@
 
 Erzeugt aus catalog/ durch scripts/gen_artifact_docs.py. Nicht von Hand bearbeiten: die CI erzeugt diese Datei neu und schlägt fehl, wenn sie abweicht.
 
-480 Artefakte über 31 Agent(en), davon 375 auf einer abgerufenen Herstellerquelle beruhend.
+481 Artefakte über 31 Agent(en), davon 376 auf einer abgerufenen Herstellerquelle beruhend.
 
 Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
 
@@ -1222,6 +1222,7 @@ Vendor: Qwen Team, Alibaba Group
 | Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `qwen_code.install_evidence` | Installation identity, install source and downloaded versions | install_evidence | macOS, Windows, Linux | `%USERPROFILE%\.qwen\bin\**`<br>`%USERPROFILE%\.qwen\installation_id`<br>`%USERPROFILE%\.qwen\source.json` [unbelegt]<br>`%USERPROFILE%\.qwen\updates\npm\<launcher-id>\versions\<version>\**` [unbelegt]<br>`~/.qwen/bin/**`<br>`~/.qwen/installation_id`<br>`~/.qwen/source.json` [unbelegt]<br>`~/.qwen/updates/npm/<launcher-id>/versions/<version>/**` [unbelegt] | text | normal | [EN] installation_id is written once and then stable, which makes it a durable pseudonymous identifier for the install. Older version directories under updates/npm are pruned by the updater. | bestätigt | [source_code](https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/packages/core/src/config/storage.ts) |
+| `qwen_code.workflow_runs` | Workflow run snapshots, resume journals and the scripts a run generated | log | macOS, Windows, Linux | `%USERPROFILE%\.qwen\projects\<sanitized-project-path>\workflows\<run-id>.json`<br>`%USERPROFILE%\.qwen\projects\<sanitized-project-path>\workflows\<run-id>\journal.jsonl`<br>`%USERPROFILE%\.qwen\projects\<sanitized-project-path>\workflows\generated\**`<br>`~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>.json`<br>`~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>/journal.jsonl`<br>`~/.qwen/projects/<sanitized-project-path>/workflows/generated/**` | directory | normal | [EN] No sweep is documented for any of the three. A journal belongs to a run that can be resumed, so it outlives the run it was written for. | bestätigt | [source_code](https://github.com/QwenLM/qwen-code/blob/main/packages/core/src/config/storage.ts) |
 
 ## Roo Code
 
