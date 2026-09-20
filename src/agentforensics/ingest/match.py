@@ -225,15 +225,29 @@ def _pattern_regexes(path: str) -> list[tuple[str, int]]:
         # an ingest of a developer's home directory attributed their agent's configuration
         # and none of the files that told the agent what to do.
         #
-        # Same distinctiveness floor as a relocated tree below, for the same reason: a
-        # pattern that reduces to a bare file extension would claim every file of that type
-        # on the disk.
+        # A distinctiveness floor, for the same reason as the relocated tree below and with
+        # a different rule, because the two are not the same problem. The collector knows
+        # where the working copies are, out of the agent's own state, so collecting
+        # `<project>/*.yaml` there is collecting the yaml files of one repository. This
+        # module has no state file and matches below any directory, so the same pattern
+        # would claim every yaml file on the disk for one agent.
+        #
+        # What makes a pattern safe here is therefore not how much literal text it has but
+        # whether it names something. A single segment that begins with a wildcard reduces
+        # to a file extension and is refused; anything that names a file or a directory is
+        # kept, however short. A length floor was the first attempt at this and it was
+        # wrong in both directions at once: it let `*.yaml` through at exactly five
+        # characters, so one agent claimed every yaml file anywhere, and it refused
+        # `<project>/.env` at four, so the project environment file, which is a credential
+        # store in most repositories, was attributed to nothing at all.
         _, _, tail = text.partition("/")
         if not tail:
             return []
         named = [segment for segment in tail.split("/") if segment not in ("", "**")]
         body, literal = _tail_regex(tail)
-        if not named or literal < 5:
+        if not named or literal == 0:
+            return []
+        if len(named) == 1 and named[0].startswith("*"):
             return []
         return [(f".*/{body}", literal)]
 

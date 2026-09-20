@@ -101,6 +101,41 @@ def test_a_relocated_tree_does_not_claim_every_file(matcher: Matcher) -> None:
     assert found == ["claude_code.transcripts"], found
 
 
+def test_a_project_pattern_that_is_only_an_extension_claims_nothing(matcher: Matcher) -> None:
+    """One catalogue entry says a recipe is any yaml file in the working copy, which is
+    true and is not something this module can act on.
+
+    The collector knows where the working copies are, out of the agent's own state, so
+    collecting that pattern there collects one repository's yaml files. This module has no
+    state file and matches below any directory, so the same pattern would hand every yaml
+    file on the disk to one agent: a build configuration, a deployment manifest, another
+    agent's own settings. A length floor used to let it through at exactly five characters.
+
+    Unattributed is the honest answer and the file is still carried forward. A
+    mis-attributed file is an error nobody sees; an unattributed one is a question somebody
+    answers.
+    """
+    for path in (
+        "/home/alice/src/app/docker-compose.yaml",
+        "/home/alice/src/other/.github/workflows/ci.yaml",
+    ):
+        assert "goose.recipes" not in ids(matcher, path), path
+
+
+def test_a_project_file_named_in_full_is_claimed_however_short_its_name(
+    matcher: Matcher,
+) -> None:
+    """The other half of the same defect, and the more expensive one.
+
+    A project's environment file is four literal characters, so the length floor refused
+    it, and in most repositories it is the credential store. It was collected and
+    attributed to nothing, which reads in a case as a file no catalogue entry claims: a
+    lead somebody has to chase rather than the answer the catalogue already had.
+    """
+    found = ids(matcher, "/home/alice/src/app/.env")
+    assert "aider.dotenv" in found or "qwen_code.env_files" in found, found
+
+
 def test_an_unrelated_file_is_claimed_by_nothing(matcher: Matcher) -> None:
     assert ids(matcher, "/home/alice/src/app/README.md") == []
     assert ids(matcher, "/home/alice/holiday-photos/beach.jpg") == []
