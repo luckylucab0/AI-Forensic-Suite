@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 74e68d4f0b9a
+// Catalogue digest: 2d2d8d7463b1
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1456,6 +1456,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "opencode", "opencode.db", ".local\\share\\opencode\\opencode.db",
     "opencode", "opencode.db", ".local\\share\\opencode\\opencode.db-shm",
     "opencode", "opencode.db", ".local\\share\\opencode\\opencode.db-wal",
+    "opencode", "opencode.install_and_runtime_trees", ".cache/opencode/bin",
+    "opencode", "opencode.install_and_runtime_trees", ".cache\\opencode\\bin",
     "opencode", "opencode.legacy_json_storage", ".local/share/opencode/storage/message",
     "opencode", "opencode.legacy_json_storage", ".local/share/opencode/storage/part",
     "opencode", "opencode.legacy_json_storage", ".local/share/opencode/storage/session",

@@ -7434,6 +7434,24 @@ $EmbeddedCatalogueJson = @'
                     "status": "verified"
                 },
                 {
+                    "category": "install_evidence",
+                    "collect_priority": "durable",
+                    "id": "opencode.install_and_runtime_trees",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_CACHE_HOME/opencode/bin/**",
+                        "%USERPROFILE%\\.cache\\opencode\\bin\\**",
+                        "~/.cache/opencode/bin/**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "transcript",
                     "collect_priority": "normal",
                     "id": "opencode.legacy_json_storage",
@@ -9252,7 +9270,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "dc28e1760428a2a355c6c0dcbc3c966d933c83e52d2ec66451dfa592947d7a41"
+    "sha256": "6b9dfcc45f64af18575b810e9114eb8596aaea58320216c213e25794f36b6a0b"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

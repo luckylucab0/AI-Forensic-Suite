@@ -196,6 +196,30 @@ artifacts:
 
     The verification pass confirmed everything except the cross-vendor instruction file, which the vendor states on its rules page rather than on the configuration page cited here.
   parser: instructions
+- id: opencode.install_and_runtime_trees
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_CACHE_HOME/opencode/bin/**
+  - '%USERPROFILE%\.cache\opencode\bin\**'
+  - ~/.cache/opencode/bin/**
+  format: binary
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts
+  source_kind: source_code
+  volatility: |-
+    Replaced when the product downloads a newer one. Nothing sweeps it, so an older one stays until it is overwritten.
+  notes: |-
+    What this product put on the machine to run. The same file that gives the data and configuration directories of the other entries here declares bin as a join on the cache directory, which is the XDG cache directory or, where that variable is unset, the home directory joined with .cache on every platform: the helper it uses has no branch for a Windows application-data root, which is the correction an earlier pass made to the log entry for the same reason.
+
+    That file names two more directories no entry here claims, and they are named rather than collected because what goes into them is not established anywhere this pass could read: state, which is the XDG state directory joined with the product name and which the same file hands to a file-locking helper, and tmp, which is the system temporary directory joined with the product name. If an examiner finds tool output or spill under either on a real endpoint, they belong in this catalogue and this note is where to start.
+  parser: null
 - id: opencode.log
   category: log
   root: user_profile

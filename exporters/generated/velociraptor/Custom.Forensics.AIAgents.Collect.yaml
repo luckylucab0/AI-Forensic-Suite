@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 74e68d4f0b9a
+# Catalogue digest: 2d2d8d7463b1
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -759,6 +759,7 @@ sources:
     opencode,opencode.db,C:/Users/*/.local/share/opencode/opencode.db
     opencode,opencode.db,C:/Users/*/.local/share/opencode/opencode.db-shm
     opencode,opencode.db,C:/Users/*/.local/share/opencode/opencode.db-wal
+    opencode,opencode.install_and_runtime_trees,C:/Users/*/.cache/opencode/bin/**
     opencode,opencode.log,C:/Users/*/.local/share/opencode/log/**
     opencode,opencode.managed_config,C:/ProgramData/opencode
     pi,pi.auth,C:/Users/*/.pi/agent/auth.json
@@ -2477,6 +2478,8 @@ sources:
     opencode,opencode.db,/var/root/.local/share/opencode/opencode.db
     opencode,opencode.db,/var/root/.local/share/opencode/opencode.db-shm
     opencode,opencode.db,/var/root/.local/share/opencode/opencode.db-wal
+    opencode,opencode.install_and_runtime_trees,/Users/*/.cache/opencode/bin/**
+    opencode,opencode.install_and_runtime_trees,/var/root/.cache/opencode/bin/**
     opencode,opencode.legacy_json_storage,/Users/*/.local/share/opencode/storage/message/*/*.json
     opencode,opencode.legacy_json_storage,/Users/*/.local/share/opencode/storage/part/*/*.json
     opencode,opencode.legacy_json_storage,/Users/*/.local/share/opencode/storage/session/*/ses_*.json
@@ -4401,6 +4404,8 @@ sources:
     opencode,opencode.db,/root/.local/share/opencode/opencode.db
     opencode,opencode.db,/root/.local/share/opencode/opencode.db-shm
     opencode,opencode.db,/root/.local/share/opencode/opencode.db-wal
+    opencode,opencode.install_and_runtime_trees,/home/*/.cache/opencode/bin/**
+    opencode,opencode.install_and_runtime_trees,/root/.cache/opencode/bin/**
     opencode,opencode.legacy_json_storage,/home/*/.local/share/opencode/storage/message/*/*.json
     opencode,opencode.legacy_json_storage,/home/*/.local/share/opencode/storage/part/*/*.json
     opencode,opencode.legacy_json_storage,/home/*/.local/share/opencode/storage/session/*/ses_*.json

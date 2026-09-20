@@ -6,7 +6,7 @@ English | [Deutsch](ARTIFACTS.de.md)
 
 Generated from catalog/ by scripts/gen_artifact_docs.py. Do not edit by hand: CI regenerates this file and fails if it differs.
 
-481 artifacts across 31 agent(s), 376 of them resting on a fetched vendor source.
+482 artifacts across 31 agent(s), 377 of them resting on a fetched vendor source.
 
 Entries marked unverified are collected anyway, but no vendor source confirms the path. Treat the absence of such an artifact as inconclusive rather than as evidence that the agent was not used.
 
@@ -1108,6 +1108,14 @@ Vendor: OpenCode
 | `opencode.mcp_auth` | mcp auth | credentials | macOS, Linux, Windows | `$XDG_DATA_HOME/opencode/mcp-auth.json`<br>`~/.local/share/opencode/mcp-auth.json` | json | secret | Persistent until the MCP OAuth grant is revoked. | verified | [source_code](https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/mcp/auth.ts) |
 | `opencode.repos_cache` | repos cache | file_snapshot | macOS, Linux, Windows | `$XDG_DATA_HOME/opencode/repos/`<br>`~/.local/share/opencode/repos/` | binary | normal | Unknown; not documented. | verified | [source_code](https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts) |
 | `opencode.tui_config` | tui config | config | macOS, Linux, Windows | `<project>/tui.json`<br>`~/.config/opencode/tui.json` | json | normal | Persistent until edited. | verified | [official](https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx) |
+
+### durable
+
+**Usually still there.** Not covered by the retention sweep, so these routinely outlive the transcripts they describe. When the transcripts are already gone, this group is what is left, and it is often enough to establish that an agent ran, what it was allowed to do, and what the user asked.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `opencode.install_and_runtime_trees` | install and runtime trees | install_evidence | macOS, Linux, Windows | `$XDG_CACHE_HOME/opencode/bin/**`<br>`%USERPROFILE%\.cache\opencode\bin\**`<br>`~/.cache/opencode/bin/**` | binary | normal | Replaced when the product downloads a newer one. Nothing sweeps it, so an older one stays until it is overwritten. | verified | [source_code](https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts) |
 
 ### Legacy paths
 

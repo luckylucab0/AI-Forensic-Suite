@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 74e68d4f0b9a
+# Catalogue digest: 2d2d8d7463b1
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -666,6 +666,7 @@ $targets = @(
     @{ Agent = 'opencode'; Id = 'opencode.db'; Path = '$profile\.local\share\opencode\opencode.db' }
     @{ Agent = 'opencode'; Id = 'opencode.db'; Path = '$profile\.local\share\opencode\opencode.db-shm' }
     @{ Agent = 'opencode'; Id = 'opencode.db'; Path = '$profile\.local\share\opencode\opencode.db-wal' }
+    @{ Agent = 'opencode'; Id = 'opencode.install_and_runtime_trees'; Path = '$profile\.cache\opencode\bin' }
     @{ Agent = 'opencode'; Id = 'opencode.log'; Path = '$profile\.local\share\opencode\log' }
     @{ Agent = 'opencode'; Id = 'opencode.managed_config'; Path = 'C:\ProgramData\opencode' }
     @{ Agent = 'pi'; Id = 'pi.auth'; Path = '$profile\.pi\agent\auth.json' }
