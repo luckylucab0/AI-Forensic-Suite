@@ -1659,3 +1659,48 @@ def test_a_withheld_artifact_is_the_only_thing_excused_without_a_reason() -> Non
         "these entries withhold their content and are not credential stores, so they are "
         f"excused from being read for a reason that does not apply to them: {wrong}"
     )
+
+
+def test_the_documented_coverage_is_the_one_the_code_has() -> None:
+    """The count in the architecture document, held against what is actually in the box.
+
+    Three numbers stand in one sentence of `docs/ARCHITECTURE.md` and in its German
+    sibling: how many reader modules there are, how many catalogue entries they read, and
+    how many entries the catalogue has. All three were true the day somebody typed them,
+    and the English sentence had been wrong for two commits when this test was written
+    while the German one beside it was right, which is the shape of defect this project
+    keeps finding: a claim in one place about another place, written once and never
+    checked again.
+
+    Counting them here rather than generating the sentence keeps the paragraph prose, which
+    is what the rest of the document is, and still makes the numbers fail rather than age.
+    """
+    import re
+
+    from agentforensics.catalog import load_catalogue
+
+    root = Path(__file__).resolve().parents[2]
+    catalogue = load_catalogue(root / "catalog")
+    counted = (
+        len(PARSERS),
+        sum(1 for artifact in catalogue.artifacts if for_artifact(artifact.id) is not None),
+        len(catalogue.artifacts),
+    )
+
+    # The two sentences, in the two languages the docs are written in. Both are matched
+    # against one set of numbers, so the pair cannot drift apart either.
+    written = {
+        "docs/ARCHITECTURE.md": r"(\d+) modules read (\d+) of the catalogue's (\d+) artifacts",
+        "docs/ARCHITECTURE.de.md": r"(\d+) Module lesen (\d+) der (\d+) Katalogartefakte",
+    }
+    for name, pattern in written.items():
+        # The documents wrap their paragraphs, so a sentence can hold a newline anywhere.
+        text = " ".join((root / name).read_text(encoding="utf-8").split())
+        found = re.search(pattern, text)
+        assert found is not None, (
+            f"{name} no longer states its coverage in the shape a test can read"
+        )
+        assert tuple(int(number) for number in found.groups()) == counted, (
+            f"{name} says {found.group(0)!r} and the code has "
+            f"{counted[0]} modules reading {counted[1]} of {counted[2]} artifacts"
+        )

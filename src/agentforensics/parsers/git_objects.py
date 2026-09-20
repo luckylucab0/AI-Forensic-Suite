@@ -25,13 +25,18 @@ then the body. Three of the four types are worth reading and this module reads a
   tag      read as far as the object it points at, because an agent's checkpoint namespace
            can hold one and a reader that stopped there would lose the chain.
 
-**A packed object is not read.** Once git packs a repository the objects are deltas inside
-one file addressed by an index, and resolving those needs the pack format and its two
-delta encodings. That is a larger piece of work than this and it is deliberately not
-guessed at: a pack file is reported by name and size so the case says the objects are there
-and this suite did not expand them, which is a different answer from a repository that had
-nothing in it. In practice these repositories are written and never garbage collected, so
-their objects are loose, and one entry in the catalogue says so in as many words.
+**A packed object is read by the module beside this one.** Once git packs a repository the
+objects move into one file as a stream, most of them stored as a difference against another
+object in the same file, which is a format of its own and lives in `git_pack`. What the two
+share is this module's `interpret`, which takes a type and the bytes and reads the commit,
+the tree or the tag out of them: a pack stores the same content without the loose wrapper,
+and two implementations of the commit header, one of them exercised only by packed
+repositories, is how the two would come to disagree.
+
+One catalogue entry states the part of this that is sourced: an agent's checkpoint
+repository is never garbage collected by the agent, so what it wrote stays. Nothing
+anywhere says the objects stay loose, and a repository somebody ran git in is packed like
+any other, which is why both readers exist.
 
 Format reference, read while writing this:
 https://raw.githubusercontent.com/git/git/master/Documentation/gitformat-pack.adoc
@@ -137,7 +142,19 @@ def read(raw: bytes, limit: int = MAX_OBJECT) -> GitObject:
         raise GitObjectError("this file expanded and does not begin with an object header")
     kind = found.group("type").decode("ascii")
     size = int(found.group("size"))
-    content = body[found.end() :]
+    return interpret(kind, body[found.end() :], size)
+
+
+def interpret(kind: str, content: bytes, size: int | None = None) -> GitObject:
+    """One object read according to its type, from its content without the loose header.
+
+    Split out from the reader above because a pack stores the type and the length in its
+    own header and only the content in the stream, so the reader for packs needs this
+    without the wrapper. Two implementations of the commit and the tree, one of them only
+    ever exercised by packed repositories, is how the two would come to disagree.
+    """
+    if size is None:
+        size = len(content)
     if kind == "tree":
         return GitObject(kind=kind, size=size, body=content, entries=tuple(_tree(content)))
     if kind in ("commit", "tag"):
@@ -225,6 +242,7 @@ __all__ = [
     "GitObject",
     "GitObjectError",
     "TreeEntry",
+    "interpret",
     "looks_like_loose_object",
     "read",
 ]

@@ -31,7 +31,8 @@ The files, and what each one is:
 - the packed references file, where git moves a reference once it packs them, which is why
   a checkpoint can be absent from `refs/` and still exist
 - an object under `objects/`, in a repository the agent owns: a commit, a tree or a file,
-  read by the module beside this one. A pack file is named and not expanded, and says so
+  read by the module beside this one, whether it sits there loose or inside a pack file,
+  which is expanded by the module beside that one
 
 The identity in a reference log is the repository's own git identity, which is a person's
 name and address. It is carried because it is evidence of who the commit was attributed to
@@ -46,7 +47,7 @@ from collections.abc import Iterator
 from typing import Any
 
 from agentforensics.model import Event, unparsed
-from agentforensics.parsers import git_index, git_objects
+from agentforensics.parsers import git_index, git_objects, git_pack
 from agentforensics.parsers.base import ParseContext, looks_binary, normalise_ts, text_lines
 from agentforensics.parsers.instructions import BINARY_FILE, MAX_TEXT
 
@@ -92,19 +93,50 @@ IN_THE_BUNDLE = (
     "contents are in this case: look for the object id on this event"
 )
 
-# A pack file. Reported rather than expanded, because resolving a packed object needs the
-# pack format and its two delta encodings, which this suite does not implement and will not
-# guess at. Said out loud because a repository whose objects are packed and unread is a
-# different answer from a repository that held nothing.
-PACKED = (
-    "this is a git pack file and its objects are not expanded here: they are deltas "
-    "addressed by the index beside them, and this suite reads loose objects only. The "
-    "objects are in this file, in the bundle, under this event's hash. These repositories "
-    "are normally never garbage collected, so a pack in one is itself worth a look"
+# Said on every object that came out of a pack, because a packed object is evidence with a
+# step in front of it: the bundle holds the pack and the content on the event was computed
+# from it here. An analyst who wants to reproduce it needs to know that.
+FROM_A_PACK = (
+    "this object was expanded out of the pack file at this event's path, at the byte "
+    "offset in this event's locator. It is not a file of its own in the bundle: git "
+    "stores it as a difference against another object in the same pack, and what is on "
+    "this event is the result of applying it"
+)
+
+# What else lives in a pack directory. All of it is derived from the pack beside it and
+# holds nothing the pack does not, which is worth saying rather than leaving a file in the
+# bundle that no event mentions.
+PACK_DERIVED = (
+    "this file belongs to the pack file beside it rather than holding objects of its own: "
+    "an index, a reverse index, a bitmap or one of the markers git keeps there. What the "
+    "pack holds is on the events from the pack, and this file's own name is on this event"
+)
+
+NOT_A_PACK = (
+    "this file is named as a git pack and does not read as one: {reason}. It is in the "
+    "bundle, whole, at the path in this event's provenance"
+)
+
+# A pack whose own header counts no objects. Said out loud because the alternative is the
+# one failure this suite must not have: every object of a pack is an event of its own, so a
+# pack that yields none would otherwise leave a file in the bundle that no event mentions,
+# and a case that says nothing about a file reads as a file that held nothing.
+EMPTY_PACK = (
+    "this pack's own header counts no objects, so there was nothing in it to expand. A "
+    "repository writes a pack when it packs its objects, and one counting none is either "
+    "a pack that was truncated or one written and never filled"
 )
 
 NOT_AN_OBJECT = (
     "this file sits under a repository's objects directory and is not a loose object: {reason}"
+)
+
+# A packed object that expanded and then did not read as the type the pack says it is. The
+# expansion is the part this suite does, so the bytes are worth carrying even when the
+# reading of them failed.
+NOT_THE_TYPE = (
+    "this object was expanded out of a pack and does not read as the {kind} the pack says "
+    "it is: {reason}"
 )
 
 # What a repository holds besides its references and its objects. Named rather than read,
@@ -342,14 +374,7 @@ class GitCheckpointsParser:
     def _object(self, context: ParseContext, name: str) -> Iterator[Event]:
         """One file under a repository's object store, read for what it is."""
         if "/objects/pack/" in name:
-            yield unparsed(
-                context.provenance("file"),
-                context.agent,
-                {"file": context.local_path.name, "bytes": _size(context)},
-                PACKED,
-                user=context.user,
-                host=context.host,
-            )
+            yield from self._pack(context)
             return
         try:
             raw = context.local_path.read_bytes()
@@ -377,13 +402,125 @@ class GitCheckpointsParser:
             return
         yield self._read_object(context, found, _object_id(name))
 
+    def _pack(self, context: ParseContext) -> Iterator[Event]:
+        """A pack file, expanded object by object, or one of the files derived from it.
+
+        A repository that has been packed holds its objects here and nowhere else, so this
+        is the same evidence as a loose object with one step in front of it. Every object
+        becomes its own event, located by its byte offset in the pack, and an object that
+        did not expand becomes an event too: the difference between a repository that held
+        nothing and one whose objects this suite could not read is the whole point.
+        """
+        name = context.local_path.name
+        if not name.endswith(".pack"):
+            yield unparsed(
+                context.provenance("file"),
+                context.agent,
+                {"file": name, "bytes": _size(context)},
+                PACK_DERIVED,
+                user=context.user,
+                host=context.host,
+            )
+            return
+        try:
+            raw = context.local_path.read_bytes()
+        except OSError as error:
+            yield unparsed(
+                context.provenance("file"),
+                context.agent,
+                None,
+                f"this file could not be read: {error}",
+                user=context.user,
+                host=context.host,
+            )
+            return
+        try:
+            pack = git_pack.read(raw)
+        except git_pack.GitPackError as error:
+            yield unparsed(
+                context.provenance("file"),
+                context.agent,
+                {"file": name, "bytes": len(raw)},
+                NOT_A_PACK.format(reason=error),
+                user=context.user,
+                host=context.host,
+            )
+            return
+        for found in pack.objects:
+            yield self._packed_object(context, found)
+        if not pack.objects:
+            yield unparsed(
+                context.provenance("file"),
+                context.agent,
+                {"file": name, "bytes": len(raw), "objects": pack.count},
+                pack.stopped or EMPTY_PACK,
+                user=context.user,
+                host=context.host,
+            )
+            return
+        if pack.stopped:
+            # The walk ended before the pack's own count of objects. Reported as its own
+            # record, because the objects that did come out are events of their own and an
+            # analyst counting them has no other way to learn that the count is short.
+            yield unparsed(
+                context.provenance("file"),
+                context.agent,
+                {"file": name, "objects": pack.count, "read": len(pack.objects)},
+                pack.stopped,
+                user=context.user,
+                host=context.host,
+            )
+
+    def _packed_object(self, context: ParseContext, found: git_pack.PackedObject) -> Event:
+        """One object out of a pack, read as the object it is or reported as what stopped it."""
+        locator = f"offset:{found.offset}"
+        where: dict[str, Any] = {"pack_offset": found.offset}
+        if found.depth:
+            # How many deltas stand between this object and one stored whole. Carried
+            # because it is the difference between bytes read out of the file and bytes
+            # this suite computed, which an analyst reproducing the object needs.
+            where["delta_depth"] = found.depth
+        if found.base:
+            where["delta_base"] = found.base
+        if found.problem:
+            return unparsed(
+                context.provenance(locator),
+                context.agent,
+                {"type": found.kind, "bytes": len(found.body), **where},
+                found.problem,
+                user=context.user,
+                host=context.host,
+            )
+        try:
+            object_ = git_objects.interpret(found.kind, found.body)
+        except git_objects.GitObjectError as error:
+            return unparsed(
+                context.provenance(locator),
+                context.agent,
+                {"object_id": found.object_id, "bytes": len(found.body), **where},
+                NOT_THE_TYPE.format(kind=found.kind, reason=error),
+                user=context.user,
+                host=context.host,
+            )
+        return self._read_object(
+            context, object_, found.object_id, locator=locator, note=FROM_A_PACK, extra=where
+        )
+
     def _read_object(
-        self, context: ParseContext, found: git_objects.GitObject, object_id: str | None
+        self,
+        context: ParseContext,
+        found: git_objects.GitObject,
+        object_id: str | None,
+        *,
+        locator: str | None = None,
+        note: str | None = None,
+        extra: dict[str, Any] | None = None,
     ) -> Event:
         """One object as an event, with the time a commit carries and the content a blob is."""
         record: dict[str, Any] = {"type": found.kind, "size": found.size}
         if object_id:
             record["object_id"] = object_id
+        record.update(extra or {})
         when = precision = source = None
         timing = None
         text: str | None = None
@@ -419,20 +556,20 @@ class GitCheckpointsParser:
             record.update({"target": found.target, "message": found.message})
             text = found.message
         else:
-            content, note = _blob_text(found.body)
+            content, unread = _blob_text(found.body)
             record["content"] = content
-            if note:
-                record["problem"] = note
+            if unread:
+                record["problem"] = unread
             text = content
 
         return self._event(
             context,
-            f"object:{object_id}" if object_id else "file",
+            locator or (f"object:{object_id}" if object_id else "file"),
             record,
             when=when,
             precision=precision or "absent",
             source=source,
-            note=timing,
+            note=" ".join(part for part in (timing, note) if part) or None,
             text=text,
         )
 

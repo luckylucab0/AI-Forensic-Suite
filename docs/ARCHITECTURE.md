@@ -107,9 +107,13 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  Thirty-four modules read 370 of the catalogue's 473 artifacts; the rest are the credential
-  stores nothing reads on purpose, the install evidence the filesystem event answers, and
-  the binary stores that still need their own formats.
+  35 modules read 380 of the catalogue's 473 artifacts, and what the rest is gets asserted
+  rather than assumed: every entry in a format this suite reads is either read or carries a
+  written reason why not, and the credential stores are exempt as a class because the
+  collector withholds their content, which a test pins to credential stores alone. What is
+  left needs format work, and until somebody does it the filesystem event is the honest
+  answer. The three numbers in this paragraph are held against the catalogue and the parser
+  registry by a test, because a count written into prose is true on the day it is written.
 
   **The agent parsers** are the ones written against a vendor source: Claude Code, Codex CLI
   and its projection into rows, Copilot CLI, Gemini CLI and Qwen Code (one module, because
@@ -224,9 +228,14 @@ it cannot be rewritten *quietly*.
   read here: a loose object is zlib around a type, a length and a body, and the commits, the
   trees and the file contents behind every checkpoint are in the bundle. A commit carries
   its own clock, which dates the capture where the reference log dates only the write. A
-  packed object is named and not expanded, because resolving one needs the pack format and
-  its two delta encodings and this suite will not guess at them; these repositories are
-  normally never garbage collected, so a pack in one is itself worth a look. A hook that is
+  packed repository is expanded: the pack format and its two delta encodings are
+  implemented here, every object comes out as its own event located by its byte offset in
+  the pack, and the ids come out the way git prints them, which is what ties a packed
+  object to the reference that names it. An object that does not expand, a delta against a
+  base the pack does not carry, is an event too, because the difference between a
+  repository that held nothing and one this suite could not read is the whole point. These
+  repositories are normally never garbage collected, so a pack in one is itself worth a
+  look. A hook that is
   not one of git's disabled templates is filed as an instruction rather than as
   configuration, because it is a script the endpoint runs on its own. The same reader takes
   the git index one agent keeps beside each checkpoint, in a scratch directory it holds out

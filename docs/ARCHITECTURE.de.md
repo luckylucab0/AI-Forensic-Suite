@@ -120,7 +120,9 @@ ist, dass das nicht *unbemerkt* geht.
   aufgeschriebenen Grund, warum nicht, und die Anmeldedatenspeicher sind als Klasse
   ausgenommen, weil der Collector ihren Inhalt zurückhält, was ein Test darauf festnagelt,
   nur für Anmeldedatenspeicher zu gelten. Was bleibt, braucht Formatarbeit, und dafür ist
-  das Dateisystem-Ereignis die ehrliche Antwort, bis sie jemand macht.
+  das Dateisystem-Ereignis die ehrliche Antwort, bis sie jemand macht. Die drei Zahlen in
+  diesem Absatz werden von einem Test gegen den Katalog und die Parser-Registry gehalten,
+  denn eine in Prosa geschriebene Zahl stimmt an dem Tag, an dem sie geschrieben wird.
 
   **Die Agenten-Parser** sind die, die gegen eine Herstellerquelle geschrieben wurden:
   Claude Code, Codex CLI und dessen Projektion in Zeilen, Copilot CLI, Gemini CLI und Qwen
@@ -251,9 +253,15 @@ ist, dass das nicht *unbemerkt* geht.
   Typ, eine Länge und einen Rumpf, und die Commits, die Bäume und die Dateiinhalte hinter
   jedem Checkpoint liegen im Bundle. Ein Commit trägt seine eigene Uhr, die den Zeitpunkt
   der Aufnahme datiert, wo das Referenzlog nur den Schreibvorgang datiert. Ein gepacktes
-  Objekt wird benannt und nicht entpackt, denn eines aufzulösen braucht das Pack-Format und
-  seine beiden Delta-Kodierungen, und die rät diese Suite nicht; solche Repositories werden
-  normalerweise nie aufgeräumt, also ist ein Pack darin selbst einen Blick wert. Ein Hook,
+  Repository wird entpackt: das Pack-Format und seine beiden Delta-Kodierungen sind hier
+  umgesetzt, jedes Objekt kommt als eigenes Ereignis heraus, verortet über seinen
+  Byte-Offset im Pack, und die Objekt-Ids kommen so heraus, wie git sie schreibt, was ein
+  gepacktes Objekt an die Referenz bindet, die es nennt. Ein Objekt, das sich nicht
+  entpacken lässt, ein Delta gegen eine Basis, die das Pack nicht mitbringt, ist ebenfalls
+  ein Ereignis, denn der Unterschied zwischen einem Repository, das nichts enthielt, und
+  einem, das diese Suite nicht lesen konnte, ist der ganze Punkt. Solche Repositories
+  werden normalerweise nie aufgeräumt, also ist ein Pack darin selbst einen Blick wert.
+  Ein Hook,
   der keine von gits abgeschalteten Vorlagen ist, wird als Instruktion abgelegt und nicht
   als Konfiguration, denn er ist ein Skript, das der Endpunkt von sich aus ausführt.
   Derselbe Leser nimmt den git-Index, den ein Agent neben jeden Checkpoint legt, in einem

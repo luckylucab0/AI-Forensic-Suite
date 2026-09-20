@@ -221,15 +221,17 @@ def test_gits_own_template_hooks_are_configuration_and_not_unread_records(
     assert "disabled hook templates" in (event.parse_problem or "")
 
 
-def test_a_pack_file_is_named_rather_than_expanded(repository: Path) -> None:
-    """A repository whose objects are packed and unread is a different answer from one that
-    held nothing, and these repositories are normally never garbage collected, so a pack in
-    one is itself worth a look."""
+def test_a_pack_goes_to_the_pack_reader_and_not_to_this_one(repository: Path) -> None:
+    """The dispatch, which is this file's half of it: a pack sits under `objects/` like an
+    object and is not one, so reading it as a loose object would report a repository's
+    whole object store as a file that is not an object. What the pack reader then makes of
+    it is tested beside it, against packs git wrote."""
     pack = repository / ".git" / "objects" / "pack" / "pack-0123456789abcdef.pack"
     pack.parent.mkdir(parents=True, exist_ok=True)
     pack.write_bytes(b"PACK\x00\x00\x00\x02" + b"\x00" * 64)
     event = parse(repository, "objects/pack/pack-0123456789abcdef.pack")[0]
-    assert "not expanded here" in (event.parse_problem or "")
+    assert "not a loose object" not in (event.parse_problem or "")
+    assert "counts no objects" in (event.parse_problem or "")
 
 
 # ---------------------------------------- the claim, held against the catalogue
