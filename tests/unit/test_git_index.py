@@ -60,6 +60,12 @@ def workspace(root: Path, version: int = 2) -> bytes:
     deploy.write_text("#!/bin/sh\n", encoding="utf-8", newline="")
     deploy.chmod(0o755)
     _git(root, "add", "-A")
+    # The mode belongs to the index rather than to the filesystem, and setting it there is
+    # the only way that works everywhere: Windows has no execute bit, so the chmod above is
+    # a no-op and git records 100644 for a file this test is about being 100755. That made
+    # this test fail on the one platform where every defect this project has had was
+    # silent. It is a no-op on a POSIX host, where the chmod already did it.
+    _git(root, "update-index", "--chmod=+x", "deploy.sh")
     return (root / ".git" / "index").read_bytes()
 
 
@@ -94,6 +100,34 @@ def test_an_executable_is_told_apart_from_an_ordinary_file(tmp_path: Path, versi
     assert entries["deploy.sh"].executable
     assert entries["deploy.sh"].mode == 0o100755
     assert not entries["settings.json"].executable
+
+
+@needs_git
+def test_the_mode_survives_a_filesystem_with_no_execute_bit(tmp_path: Path) -> None:
+    """Windows has none, and git records 100644 for a file a POSIX host records as 100755.
+
+    This is here rather than left to the Windows job because that is how it was found: the
+    test above passed everywhere a developer runs it and failed on the one platform where
+    every defect this project has had has been silent, for a whole afternoon of commits
+    before anybody looked at the run. Setting core.fileMode off reproduces it on any host.
+
+    What it pins is the reader rather than the fixture. The mode is a property of the index,
+    the index can carry the bit whatever the filesystem can express, and the reader has to
+    take it from there.
+    """
+    root = tmp_path / "nofilemode"
+    root.mkdir(parents=True)
+    _git(root, "init", "-q", "-b", "main")
+    _git(root, "config", "core.fileMode", "false")
+    deploy = root / "deploy.sh"
+    deploy.write_text("#!/bin/sh\n", encoding="utf-8", newline="")
+    deploy.chmod(0o644)
+    _git(root, "add", "-A")
+    _git(root, "update-index", "--chmod=+x", "deploy.sh")
+    entries = {entry.path: entry for entry in read((root / ".git" / "index").read_bytes())}
+
+    assert entries["deploy.sh"].mode == 0o100755
+    assert entries["deploy.sh"].executable
 
 
 @needs_git
