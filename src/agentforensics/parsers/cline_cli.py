@@ -137,7 +137,8 @@ class ClineCliParser:
     # ------------------------------------------------------------ the messages file
 
     def _messages(self, context: ParseContext) -> Iterator[Event]:
-        document, problem = read_json(context.local_path)
+        document, problem, relaxed = read_json(context.local_path)
+        problem = problem or relaxed
         if problem is not None or not isinstance(document, dict):
             yield unparsed(
                 context.provenance("document"),
@@ -442,7 +443,8 @@ class ClineCliParser:
     # ---------------------------------------------------------------- the manifest
 
     def _manifest(self, context: ParseContext) -> Iterator[Event]:
-        document, problem = read_json(context.local_path)
+        document, problem, relaxed = read_json(context.local_path)
+        problem = problem or relaxed
         if problem is not None or not isinstance(document, dict):
             yield unparsed(
                 context.provenance("document"),

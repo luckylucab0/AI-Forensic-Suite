@@ -122,7 +122,8 @@ class ContinueSessionsParser:
         The index has a fixed name and the session files are named by their id, which is
         also where the vendor recovers an id from when a file will not parse.
         """
-        document, problem = read_json(context.local_path)
+        document, problem, relaxed = read_json(context.local_path)
+        problem = problem or relaxed
         if problem is not None:
             yield unparsed(
                 context.provenance("$"),

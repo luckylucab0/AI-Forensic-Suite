@@ -153,7 +153,13 @@ it cannot be rewritten *quietly*.
     it means. What a record *is* comes from the catalogue rather than from the document: an
     entry filed as configuration produces `config.snapshot` and everything else produces
     `unparsed.record`. That distinction is what lets a rule about a setting find one, and it
-    was worth four shipped rules that could not fire on a real collection at all.
+    was worth four shipped rules that could not fire on a real collection at all. A JSON
+    document that is not strict JSON is read the way the product that wrote it reads it,
+    with comments taken out and a trailing comma allowed, and the event says which of those
+    it needed and carries the text as it stood on disk (ADR 0036). That is not a nicety:
+    every editor here writes its settings in that dialect, and a strict reading answered
+    with one sentence about the file and put the permissions, the servers and the endpoints
+    in it into no event at all.
   - **Text logs.** One line is one record, dated only where the line begins with its own
     timestamp, because a line that mentions a date is not a line that happened then. The
     reading stops after a set number of lines and says so in an event of its own.

@@ -370,7 +370,8 @@ def read_document(
             payload["declared_tools"] = tools
 
     if path.name.lower().endswith(".json"):
-        document, json_problem = read_json(path)
+        document, json_problem, relaxed = read_json(path)
+        json_problem = json_problem or relaxed
         if json_problem:
             problems.append(f"the file has a .json name but {json_problem}")
         else:

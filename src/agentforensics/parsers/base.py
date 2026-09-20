@@ -230,18 +230,120 @@ def iter_lines(path: Path, *, limit: int | None = None) -> Iterator[Line]:
         yield Line(0, "", problem=f"could not be read: {exc}")
 
 
-def read_json(path: Path) -> tuple[Any, str | None]:
-    """A whole JSON document, or the reason it is not one."""
+# Said on a document that is not strict JSON and reads as the shape its own vendor writes.
+# The two relaxations are the ones every editor in this catalogue allows in a settings file,
+# and they are the reason a settings file with a comment in it used to reach a case as one
+# line saying it was not JSON, with the settings themselves in no event at all.
+JSON_WITH_COMMENTS = (
+    "this document is not strict JSON and was read the way the product that wrote it reads "
+    "it: {relaxations}. The text as it stood on disk is on this event as well, because a "
+    "comment in a settings file is somebody's note about why a setting is what it is"
+)
+
+
+def read_json(path: Path) -> tuple[Any, str | None, str | None]:
+    """A whole JSON document, the reason it is not one, and what had to be relaxed to read it.
+
+    Three answers rather than two, because there is a third state and it is common. Every
+    editor here writes its settings in the dialect with comments and trailing commas in it,
+    VS Code's own default settings file has comments in it, and a reader that insisted on
+    strict JSON reported the most important configuration files in this catalogue as
+    unreadable. The relaxed reading is offered second and it says so: a document that
+    needed it is not the document its extension claims.
+    """
     try:
         text = path.read_text(encoding="utf-8", errors="replace")
     except OSError as exc:
-        return None, f"could not be read: {exc}"
+        return None, f"could not be read: {exc}", None
     if "�" in text:
-        return None, "the file did not decode as UTF-8"
+        return None, "the file did not decode as UTF-8", None
+    text = text.lstrip("﻿")
     try:
-        return json.loads(text.lstrip("﻿")), None
-    except json.JSONDecodeError as exc:
-        return None, f"not valid JSON: {exc}"
+        return json.loads(text), None, None
+    except json.JSONDecodeError as strict:
+        relaxed, relaxations = _relaxed_json(text)
+        if relaxations:
+            try:
+                return (
+                    json.loads(relaxed),
+                    None,
+                    JSON_WITH_COMMENTS.format(relaxations=" and ".join(relaxations)),
+                )
+            except json.JSONDecodeError:
+                pass
+        return None, f"not valid JSON: {strict}", None
+
+
+def _relaxed_json(text: str) -> tuple[str, list[str]]:
+    """The same document with the two things a strict reader refuses taken out.
+
+    Comments are blanked rather than deleted so every offset stays where it was: a decoder
+    error then points at the place in the file an analyst would open, not at a place in a
+    string this function built.
+    """
+    out = list(text)
+    done: list[str] = []
+    index = 0
+    in_string = False
+    while index < len(text):
+        character = text[index]
+        if in_string:
+            if character == "\\":
+                index += 2
+                continue
+            in_string = character != '"'
+            index += 1
+            continue
+        if character == '"':
+            in_string = True
+            index += 1
+            continue
+        if character == "/" and text[index + 1 : index + 2] == "/":
+            while index < len(text) and text[index] not in "\r\n":
+                out[index] = " "
+                index += 1
+            done.append("its line comments removed")
+            continue
+        if character == "/" and text[index + 1 : index + 2] == "*":
+            end = text.find("*/", index + 2)
+            end = len(text) if end < 0 else end + 2
+            for at in range(index, end):
+                if text[at] not in "\r\n":
+                    out[at] = " "
+            index = end
+            done.append("its block comments removed")
+            continue
+        index += 1
+
+    # A comma that has nothing after it but whitespace and a closing brace or bracket. Done
+    # on the comment-free text, because a comma before a comment before a brace is the
+    # commonest way this shape occurs.
+    blanked = "".join(out)
+    index = 0
+    in_string = False
+    trailing = False
+    while index < len(blanked):
+        character = blanked[index]
+        if in_string:
+            if character == "\\":
+                index += 2
+                continue
+            in_string = character != '"'
+            index += 1
+            continue
+        if character == '"':
+            in_string = True
+        elif character == ",":
+            after = index + 1
+            while after < len(blanked) and blanked[after].isspace():
+                after += 1
+            if after < len(blanked) and blanked[after] in "}]":
+                out[index] = " "
+                trailing = True
+        index += 1
+    if trailing:
+        done.append("a trailing comma allowed")
+    return "".join(out), sorted(set(done))
 
 
 _ISO = re.compile(
@@ -379,6 +481,7 @@ def text_of(value: Any) -> str:
 __all__ = [
     "BINARY_SHARE",
     "BINARY_SNIFF_BYTES",
+    "JSON_WITH_COMMENTS",
     "Line",
     "ParseContext",
     "Parser",

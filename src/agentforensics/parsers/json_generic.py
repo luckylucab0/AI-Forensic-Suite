@@ -35,6 +35,7 @@ event says on itself that nobody has read this format.
 from __future__ import annotations
 
 from collections.abc import Iterator
+from pathlib import Path
 
 from agentforensics.model import Event, unparsed
 from agentforensics.parsers.base import ParseContext, read_json
@@ -328,15 +329,17 @@ class JsonGenericParser:
         return artifact_id in DOCUMENTS
 
     def parse(self, context: ParseContext) -> Iterator[Event]:
-        document, problem = read_json(context.local_path)
+        document, problem, relaxed = read_json(context.local_path)
         if problem is not None:
             # A truncated write, another encoding, or a file that is not JSON at all. The
             # reason is the event, because "we collected this and could not read it" is
-            # something an analyst has to see rather than a blank.
+            # something an analyst has to see rather than a blank. The text goes with it:
+            # this branch used to put the reason in a case and nothing else, so a settings
+            # file that would not parse reached an analyst as a sentence about itself.
             yield unparsed(
                 context.provenance("$"),
                 context.agent,
-                None,
+                {"file": context.local_path.name, "text": _text_of(context.local_path)},
                 problem,
                 user=context.user,
                 host=context.host,
@@ -346,7 +349,23 @@ class JsonGenericParser:
             context,
             document,
             configuration=context.artifact_id in CONFIGURATIONS,
+            note=relaxed,
         )
+
+
+def _text_of(path: Path) -> str | None:
+    """As much of a file as a case carries, for the branch where it did not parse."""
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    return text[:MAX_UNPARSED_TEXT]
+
+
+# How much of a document that would not parse travels on its event. The whole file is in
+# the bundle; this is what an analyst sees without going back to it, and it is generous
+# because a settings file that failed to parse is usually small and always interesting.
+MAX_UNPARSED_TEXT = 200_000
 
 
 __all__ = [

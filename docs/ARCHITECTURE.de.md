@@ -168,7 +168,13 @@ ist, dass das nicht *unbemerkt* geht.
     Katalog und nicht aus dem Dokument: ein als Konfiguration geführter Eintrag erzeugt
     `config.snapshot`, alles andere `unparsed.record`. Genau diese Unterscheidung lässt eine
     Regel über eine Einstellung sie auch finden, und sie war vier ausgelieferte Regeln wert,
-    die auf einer echten Sammlung überhaupt nicht feuern konnten.
+    die auf einer echten Sammlung überhaupt nicht feuern konnten. Ein JSON-Dokument, das
+    kein striktes JSON ist, wird so gelesen, wie das Produkt es liest, das es geschrieben
+    hat: Kommentare heraus, ein abschließendes Komma erlaubt. Das Ereignis sagt, welches
+    von beidem nötig war, und trägt den Text so, wie er auf der Platte stand (ADR 0036).
+    Das ist keine Feinheit: jeder Editor hier schreibt seine Einstellungen in diesem
+    Dialekt, und eine strikte Lesung antwortete mit einem Satz über die Datei und brachte
+    die Berechtigungen, die Server und die Endpunkte darin in gar kein Ereignis.
   - **Textlogs.** Eine Zeile ist ein Datensatz, datiert nur dort, wo die Zeile mit ihrem
     eigenen Zeitstempel beginnt, denn eine Zeile, die ein Datum erwähnt, ist keine Zeile,
     die damals passiert ist. Die Lesung stoppt nach einer festen Zeilenzahl und sagt das in

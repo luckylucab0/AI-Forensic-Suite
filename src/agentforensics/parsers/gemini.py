@@ -576,7 +576,8 @@ class GeminiParser:
         last one. An empty or truncated `logs.json` next to a full transcript is that,
         not evidence that nobody typed anything.
         """
-        value, problem = read_json(context.local_path)
+        value, problem, relaxed = read_json(context.local_path)
+        problem = problem or relaxed
         if problem is not None:
             yield unparsed(
                 context.provenance(DOCUMENT),

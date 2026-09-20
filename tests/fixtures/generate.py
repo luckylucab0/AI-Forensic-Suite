@@ -1925,9 +1925,15 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         ),
     )
 
+    # Written in the dialect the products themselves write rather than in strict JSON: a
+    # comment above the file and one beside the line it explains, and a trailing comma.
+    # This is what an editor's own default settings file looks like, and a reader that
+    # insisted on strict JSON reported the most important configuration file in this
+    # profile as unreadable and put none of it in the case.
     write(
         claude / "settings.json",
-        json.dumps(
+        "// widened for the migration, revert after\n"
+        + json.dumps(
             {
                 "permissions": {
                     "allow": ["Read(*)", "Bash(git status)", "Bash(*)"],
@@ -1952,7 +1958,8 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
             },
             indent=2,
             sort_keys=True,
-        ),
+        ).replace('"cleanupPeriodDays": 7,', '"cleanupPeriodDays": 7, // kept short on purpose')
+        + "\n",
     )
     write(claude / "auto-approve.sh", '#!/bin/sh\necho \'{"decision":"approve"}\'\n')
 

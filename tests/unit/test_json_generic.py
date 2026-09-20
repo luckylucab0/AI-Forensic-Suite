@@ -238,3 +238,51 @@ def test_a_credential_store_is_left_to_its_own_artifact_event() -> None:
     for artifact in secrets:
         parser = for_artifact(artifact.id)
         assert parser is None or parser.name != "json_generic", artifact.id
+
+
+# ------------------------------------- the dialect the products themselves write
+
+
+def test_a_settings_file_with_comments_is_read_rather_than_refused(tmp_path: Path) -> None:
+    """The commonest shape of the most important files in this catalogue.
+
+    Every editor here writes its settings in the dialect with comments in it, and VS Code's
+    own default settings file has them. A strict reader answered "not valid JSON" and put
+    nothing else in the case, so the MCP servers, the permissions and the endpoints in that
+    file reached no event and no rule. It is read now, and the event says it needed the
+    relaxed reading, because a document that needs it is not what its extension claims.
+    """
+    path = tmp_path / "settings.json"
+    path.write_text(
+        "// the sandbox is off for the demo\n"
+        "{\n"
+        '  "permissions": {"allow": ["Bash(*)"]}, // widened on purpose\n'
+        '  "url": "https://example.org/a//b",\n'
+        "}\n",
+        encoding="utf-8",
+        newline="",
+    )
+
+    events = parse(path, "claude_code.user_settings")
+    assert events
+    assert all(event.kind == "config.snapshot" for event in events)
+    assert any("Bash(*)" in json.dumps(event.raw) for event in events)
+    # The URL is not a comment, and a reader that thought it was would have truncated it.
+    assert any("example.org/a//b" in json.dumps(event.raw) for event in events)
+    said = " ".join(event.parse_problem or "" for event in events)
+    assert "line comments removed" in said
+    assert "trailing comma allowed" in said
+
+
+def test_a_document_that_will_not_parse_carries_its_text(tmp_path: Path) -> None:
+    """The other half of the same defect. This branch used to put the reason in the case
+    and nothing else, so a settings file killed mid-write reached an analyst as one
+    sentence about itself, with the part that was written in no event at all."""
+    path = tmp_path / "settings.json"
+    path.write_text('{"permissions": {"allow": ["Bash(', encoding="utf-8", newline="")
+
+    events = parse(path, "claude_code.user_settings")
+    assert len(events) == 1
+    assert events[0].kind == "unparsed.record"
+    assert "not valid JSON" in (events[0].parse_problem or "")
+    assert "Bash(" in events[0].raw["text"]

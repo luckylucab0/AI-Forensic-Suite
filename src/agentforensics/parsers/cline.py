@@ -544,7 +544,8 @@ class ClineParser:
         truncated write costs the file. Returning an event rather than raising keeps that
         visible in the case as a record rather than as a parser failure with no detail.
         """
-        value, problem = read_json(context.local_path)
+        value, problem, relaxed = read_json(context.local_path)
+        problem = problem or relaxed
         if problem is not None:
             return None, unparsed(
                 context.provenance(DOCUMENT),
@@ -589,7 +590,8 @@ def _evidence(context: ParseContext) -> Any:
     does not, which is the case that matters most, because a truncated write is what a
     reader has to be able to look at.
     """
-    value, problem = read_json(context.local_path)
+    value, problem, relaxed = read_json(context.local_path)
+    problem = problem or relaxed
     if problem is None:
         return value
     try:
