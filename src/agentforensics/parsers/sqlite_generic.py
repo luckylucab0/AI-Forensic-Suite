@@ -234,6 +234,8 @@ def rows_as_events(
     connection: sqlite3.Connection,
     table: Table,
     note: str | None = None,
+    *,
+    project_path: str | None = None,
 ) -> Iterator[Event]:
     """One table, uninterpreted, as events.
 
@@ -247,6 +249,10 @@ def rows_as_events(
     as a table whose rows the event model has no kind for, says that instead: leaving the
     default there would tell a case that a store nobody had read was the problem, and the
     next person would go and read it again.
+
+    `project_path` is the folder the whole store belongs to, for a store that is per
+    workspace and whose rows do not name one. A column that names a path wins over it,
+    because a row about one project inside a store about another is the row's own answer.
     """
     for locator, values, problem in rows_of(connection, table):
         ts, precision, source, timing_note = literal_time(values)
@@ -266,7 +272,7 @@ def rows_as_events(
             user=context.user,
             host=context.host,
             session_id=_literal(values, _SESSION_COLUMNS),
-            project_path=_literal(values, _PROJECT_COLUMNS),
+            project_path=_literal(values, _PROJECT_COLUMNS) or project_path,
             payload={"table": table.name, "text": literal_text(values)},
         )
 

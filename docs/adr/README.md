@@ -45,3 +45,4 @@ Add one with the next free number, using [0000-template.md](0000-template.md).
 | [0035](0035-a-deleted-prompt-is-evidence-and-is-read-out-of-the-free-pages.md) | One editor's prompt library is read out of its page format, and the prompts in the pages its tree no longer points at are instruction sources that say they are gone |
 | [0036](0036-a-settings-file-is-read-the-way-its-own-product-reads-it.md) | A JSON document that is not strict JSON is read the way the product that wrote it reads it, with the relaxation named on the event and the text carried with it |
 | [0037](0037-a-first-hand-measurement-may-refute-a-path-but-never-verifies-one.md) | A first-hand measurement may add, correct or refute a catalogue path, and never makes one verified |
+| [0038](0038-a-store-is-read-with-the-file-that-says-which-project-it-is.md) | A per-workspace store is read with the file beside it that names its folder, and every row carries that folder |

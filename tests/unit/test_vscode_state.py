@@ -248,3 +248,160 @@ def test_every_product_that_keeps_this_file_is_read_by_this_parser(artifact: str
     parser = for_artifact(artifact)
     assert parser is not None
     assert parser.name == "vscode_state"
+
+
+# -------------------------------------------- the folder a per-workspace store belongs to
+
+WORKSPACE_STORE = "C:/Users/alice/AppData/Roaming/Cursor/User/workspaceStorage/abc/state.vscdb"
+WORKSPACE_JSON = "C:/Users/alice/AppData/Roaming/Cursor/User/workspaceStorage/abc/workspace.json"
+
+
+def parse_at(path: Path, original: str, artifact: str = "cursor.workspace_state_vscdb") -> list:
+    """Like `parse`, but the original path decides whether the store is per workspace."""
+    parser = for_artifact(artifact)
+    assert parser is not None, artifact
+    return list(
+        parser.parse(
+            ParseContext(
+                bundle_uuid="b",
+                original_path=original,
+                local_path=path,
+                sha256="f" * 64,
+                artifact_id=artifact,
+                agent="cursor",
+                user="alice",
+            )
+        )
+    )
+
+
+def workspace(tmp_path: Path, document: Any) -> Path:
+    """The file the editor writes beside a per-workspace store."""
+    path = tmp_path / "workspace.json"
+    path.write_text(document if isinstance(document, str) else json.dumps(document))
+    return path
+
+
+def test_the_file_that_names_the_folder_is_read_rather_than_opened_as_a_database(
+    tmp_path: Path,
+) -> None:
+    """It reached a case as a complaint with its content in no field at all.
+
+    The catalogue claims it under the same entry as the store beside it, so it arrived at
+    this parser, was opened as a database, failed, and produced one event saying the file is
+    not a database. The URI it holds is the only way back from the store's directory name to
+    a folder, and it was nowhere in the case.
+    """
+    path = workspace(tmp_path, {"folder": "file:///Users/alice/repos/proj"})
+    events = parse_at(path, WORKSPACE_JSON)
+
+    assert len(events) == 1
+    assert events[0].project_path == "/Users/alice/repos/proj"
+    assert "repos/proj" in events[0].payload["text"]
+    assert events[0].payload["value"] == {"folder": "file:///Users/alice/repos/proj"}
+    assert not events[0].parse_problem
+
+
+def test_every_row_of_a_per_workspace_store_carries_the_folder(tmp_path: Path) -> None:
+    """On the rows and not only on the store, because that is the field a rule groups by.
+
+    A rule sees one event at a time and groups by a field on it. A folder recorded once on
+    the store's own event answers nothing about the three thousand rows beside it.
+    """
+    workspace(tmp_path, {"folder": "file:///Users/alice/repos/proj"})
+    path = store(tmp_path / "state.vscdb", [("aiService.prompts", '["hi"]')])
+    events = parse_at(path, WORKSPACE_STORE)
+
+    assert events
+    assert all(event.project_path == "/Users/alice/repos/proj" for event in events)
+
+
+def test_a_windows_drive_letter_survives_the_uri_decoding(tmp_path: Path) -> None:
+    """file:///c%3A/... is a real spelling, and a reader that skipped the decoding would
+    produce a path with a percent escape in it that no filesystem has."""
+    workspace(tmp_path, {"folder": "file:///c%3A/Users/alice/repos/proj"})
+    path = store(tmp_path / "state.vscdb", [("k", "v")])
+
+    assert parse_at(path, WORKSPACE_STORE)[0].project_path == "c:/Users/alice/repos/proj"
+
+
+def test_a_remote_workspace_is_not_reported_as_a_local_path(tmp_path: Path) -> None:
+    """The URI names another machine. Shortening it to its path component would send an
+    analyst to a directory that was never on this endpoint."""
+    workspace(tmp_path, {"folder": "vscode-remote://ssh-remote%2Bexample/srv/app"})
+    path = store(tmp_path / "state.vscdb", [("k", "v")])
+    event = parse_at(path, WORKSPACE_STORE)[0]
+
+    assert event.project_path == "vscode-remote://ssh-remote%2Bexample/srv/app"
+    assert "another machine" in (event.parse_problem or "")
+
+
+def test_a_multi_root_workspace_file_is_the_folder_too(tmp_path: Path) -> None:
+    """The editor writes one key or the other and never both."""
+    workspace(tmp_path, {"workspace": "file:///Users/alice/repos/all.code-workspace"})
+    path = store(tmp_path / "state.vscdb", [("k", "v")])
+
+    assert parse_at(path, WORKSPACE_STORE)[0].project_path == (
+        "/Users/alice/repos/all.code-workspace"
+    )
+
+
+def test_a_store_with_no_file_beside_it_says_the_name_cannot_be_reversed(
+    tmp_path: Path,
+) -> None:
+    """The directory name is not a digest of the path, so nothing can compute it back.
+
+    Saying so on the store is the difference between an analyst going to look for the file
+    and an analyst assuming the parser simply does not fill the field.
+    """
+    path = store(tmp_path / "state.vscdb", [("k", "v")])
+    events = parse_at(path, WORKSPACE_STORE)
+
+    assert events[0].project_path is None
+    assert "cannot be resolved" in (events[0].parse_problem or "")
+
+
+def test_a_global_store_is_not_given_a_neighbours_folder(tmp_path: Path) -> None:
+    """A global store belongs to no single folder, and a file beside one would be somebody
+    else's. Attributing every global row to whatever happened to sit next to it would be
+    worse than leaving the field empty."""
+    workspace(tmp_path, {"folder": "file:///Users/alice/repos/proj"})
+    path = store(tmp_path / "state.vscdb", [("k", "v")])
+    events = parse_at(
+        path,
+        "C:/Users/alice/AppData/Roaming/Cursor/User/globalStorage/state.vscdb",
+        artifact="cursor.global_state_vscdb",
+    )
+
+    assert all(event.project_path is None for event in events)
+
+
+def test_a_workspace_file_that_is_not_json_keeps_its_text(tmp_path: Path) -> None:
+    """A file killed mid-write is the ordinary way to get one. Its text is what is left of
+    the answer, and a case that held only the complaint would have none of it."""
+    path = workspace(tmp_path, '{"folder": "file:///Users/alice/repo')
+    events = parse_at(path, WORKSPACE_JSON)
+
+    assert len(events) == 1
+    assert events[0].project_path is None
+    assert "file:///Users/alice/repo" in events[0].payload["text"]
+    assert "not valid JSON" in (events[0].parse_problem or "")
+
+
+def test_a_column_that_names_a_path_wins_over_the_stores_folder(tmp_path: Path) -> None:
+    """A table this parser has not read goes through the uninterpreted reader, which reads
+    a path out of a column when one is there. A row that names its own project is the row's
+    own answer and beats the folder the store as a whole belongs to."""
+    workspace(tmp_path, {"folder": "file:///Users/alice/repos/proj"})
+    path = store(
+        tmp_path / "state.vscdb",
+        [("k", "v")],
+        extra=(
+            "CREATE TABLE other (cwd TEXT);"
+            "INSERT INTO other VALUES ('/Users/alice/repos/elsewhere');"
+        ),
+    )
+    events = parse_at(path, WORKSPACE_STORE)
+    other = [event for event in events if (event.payload or {}).get("table") == "other"]
+
+    assert other and other[0].project_path == "/Users/alice/repos/elsewhere"
