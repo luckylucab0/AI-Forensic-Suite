@@ -240,12 +240,24 @@ artifacts:
   - linux
   - windows
   paths:
+  - '%APPDATA%\Devin\User\chatLanguageModels.json'
   - '%APPDATA%\Devin\User\settings.json'
+  - '%APPDATA%\Devin\Workspaces\<epoch-ms>\workspace.json'
+  - '%APPDATA%\Devin\config.json'
+  - '%USERPROFILE%\.devin\.devin-argv-precopy'
+  - '%USERPROFILE%\.devin\argv.json'
+  - '%USERPROFILE%\.devin\extensions\extensions.json'
   - '%APPDATA%\Windsurf\User\keybindings.json'
   - '%APPDATA%\Windsurf\User\settings.json'
   - '%APPDATA%\Windsurf\argv.json'
   - ~/.config/Windsurf/User/settings.json
+  - ~/.devin/.devin-argv-precopy
+  - ~/.devin/argv.json
+  - ~/.devin/extensions/extensions.json
+  - ~/Library/Application Support/Devin/User/chatLanguageModels.json
   - ~/Library/Application Support/Devin/User/settings.json
+  - ~/Library/Application Support/Devin/Workspaces/<epoch-ms>/workspace.json
+  - ~/Library/Application Support/Devin/config.json
   - ~/Library/Application Support/Windsurf/User/keybindings.json
   - ~/Library/Application Support/Windsurf/User/settings.json
   - ~/Library/Application Support/Windsurf/User/snippets/
@@ -263,6 +275,12 @@ artifacts:
     Added by the vendor verification pass, which also settled where this product's settings file actually lives. It is the editor's own user data directory, inherited from the editor this product is derived from, and it is a different tree from the agent configuration directory under .codeium. An entry here used to claim a settings file under the agent configuration directory, which was wrong.
 
     The workspace list is the part worth reading first: it is the record of which projects were opened in this editor, which is how a collection finds the working copies the agent's project-anchored artifacts hang off.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.10.31, one installation and one trivial conversation each. Eight paths are new in this entry and one catalogued assumption is dead.
+
+        The assumption first, because it decides whether a collection finds anything. There is no application data directory under the old product name on either operating system. Not an empty one, not a legacy one: the recursive searches for it returned nothing. On a host where only the renamed product was ever installed, every path in this entry spelled with the old name matches nothing, and only the paths under the current name are real. Those spellings stay, because a host that carried the predecessor will have them and this catalogue is read against both, but an analyst should not read their absence as a wiped profile.
+
+        What is new. The runtime argument file and its precopy sit in a dot directory under the home rather than under the application data directory, which is where this entry looked for them, and the precopy is a second copy of the arguments from before something rewrote them, which is the more interesting of the two. The workspace directories are named with a Unix timestamp in milliseconds, so the directory listing dates each workspace without any filesystem time. And a small file names the chat models the editor offered, which is the record of which model an agent could have been talking to.
   parser: json_generic
 - id: windsurf.global_rules
   category: instructions
@@ -326,8 +344,20 @@ artifacts:
   - linux
   paths:
   - '%USERPROFILE%\.codeium\user_settings.pb'
+  - '%USERPROFILE%\.codeium\windsurf\brain\'
+  - '%USERPROFILE%\.codeium\windsurf\code_tracker\'
+  - '%USERPROFILE%\.codeium\windsurf\codemaps\codemapindex.json'
+  - '%USERPROFILE%\.codeium\windsurf\context_state\'
+  - '%USERPROFILE%\.codeium\windsurf\installation_id'
+  - '%USERPROFILE%\.codeium\windsurf\user_settings.pb'
   - ~/.codeium/user_settings.pb
+  - ~/.codeium/windsurf/bin/devin-desktop
+  - ~/.codeium/windsurf/brain/
   - ~/.codeium/windsurf/code_tracker/
+  - ~/.codeium/windsurf/code_tracker/active/
+  - ~/.codeium/windsurf/code_tracker/history/
+  - ~/.codeium/windsurf/codemaps/codemapindex.json
+  - ~/.codeium/windsurf/context_state/
   - ~/.codeium/windsurf/installation_id
   - ~/.codeium/windsurf/user_settings.pb
   format: binary
@@ -337,13 +367,25 @@ artifacts:
   source: https://docs.devin.ai/desktop/devin-desktop-faq
   source_kind: official
   unsourced_paths:
+  - ~/.codeium/windsurf/bin/devin-desktop
+  - ~/.codeium/windsurf/brain/
   - ~/.codeium/windsurf/code_tracker/
+  - ~/.codeium/windsurf/code_tracker/active/
+  - ~/.codeium/windsurf/code_tracker/history/
+  - ~/.codeium/windsurf/codemaps/codemapindex.json
+  - ~/.codeium/windsurf/context_state/
   - ~/.codeium/windsurf/installation_id
   - ~/.codeium/windsurf/user_settings.pb
   notes: |-
     installation_id is the stable per-install identifier for correlating a host to server-side records — the Windsurf analogue of Cursor's machineid. code_tracker/ is the AI-vs-human edit-attribution analogue of Cursor's ai-code-tracking.db, but its internal format is not documented in any source I could reach.
 
     Path correction from the vendor verification pass: the vendor's own table of the per-user configuration directory puts the settings file one level above where this entry had it, directly under .codeium rather than under the channel directory. A collector globbing only the channel directory would have missed it, so both spellings are listed and the deeper one is marked unsourced. The code tracker directory and the installation identifier do not occur anywhere in either of the vendor's documentation corpora or in any of its repositories, so they rest on independent research alone and are marked unsourced too.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.10.31, one installation and one trivial conversation each. The directory under the old brand is alive on both operating systems and it is the largest single piece of evidence that the rename did not move anything. It is created by a fresh installation of the renamed product, on a host where the predecessor was never installed.
+
+        Six directories and one symbolic link are new in this entry, all of them measured and none of them documented anywhere: a code map index, a code tracker split into an active and a history directory, a brain directory, a context state directory and a link to the current executable. All were empty or near empty after one trivial conversation, which says what they are for rather than what they hold, and an endpoint with real use behind it should be expected to have content in them. The Windows spellings were missing from this entry entirely, so the whole of this tree was uncollectable on Windows.
+
+        The installation identifier here is the one to reach for first. It is one of three identifiers this product writes, it is under the old brand, and it survived the uninstall on both operating systems. A search of an endpoint for the current product name finds neither this directory nor this identifier.
   parser: null
 - id: windsurf.hooks
   category: config
@@ -555,6 +597,10 @@ artifacts:
     The citation is the product's own installable package rather than a page: this vendor publishes no source and its documentation does not state these paths. The package is fetchable from the repository the vendor's own install instructions add, and what is quoted above is in the product.json and the bundled JavaScript inside it, so the finding is reproducible by unpacking the same file.
 
     Record structure: the server's own tree, with its logs under a data directory named by the time the server started.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.10.31, one installation and one trivial conversation each. Neither directory was created on either measured host, under either spelling, and the product's own shipped configuration explains why: the value that names this directory is a declaration of what to create on the far side of a remote connection, and both measurements were of a purely local installation. The Windows measurement read the same value out of the installed application and reached the same conclusion.
+
+        So an empty result here means nobody used the product against a remote host, a container or a Linux subsystem from this machine. It does not mean the entry is wrong, and it is a reason to ask where else the work might have been done rather than to stop.
   parser: null
 - id: windsurf.language_server_binaries_and_logs
   category: install_evidence
@@ -636,6 +682,12 @@ artifacts:
     The single most widely corroborated Windsurf path — attested verbatim in dozens of vendor-neutral MCP server READMEs, an MCP security scanner, an enterprise MCP config sweep, and a DFIR catalogue. Also reachable by deep link windsurf://windsurf-mcp-registry?serverName=<name>, which makes silent server registration a real attack path.
 
     Record structure: { "mcpServers": { "<name>": { "command", "args", "env", "serverUrl" } } }. Per-server `env` blocks carry plaintext API keys and bearer tokens — hash those values, keep the rest. An empty install reads exactly {"mcpServers":{}}.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.10.31, one installation and one trivial conversation each. No file of this name existed on either host, at this path or anywhere else: both measurements searched the whole agent configuration directory and the whole editor profile recursively for the filename and found nothing.
+
+        That is not a refutation, and the distinction is the one ADR 0037 draws. This is the file a user or an administrator writes to add a tool server, so an installation that has never had one configured has no reason to hold it. Read an absent file here as no server configured rather than as the wrong location.
+
+        What the Windows host did have, once the account was signed in, is an authorisation directory for tool servers under the editor profile, which this catalogue now carries as windsurf.mcp_oauth_state. So the two questions come apart: this entry answers which servers were configured, and that one answers which servers the product actually held an authorisation for. An endpoint can answer the second with the first missing.
   parser: json_generic
 - id: windsurf.enterprise_policy
   category: permissions
@@ -720,6 +772,10 @@ artifacts:
     Installed by an administrator and left alone by the product, so their presence dates the moment somebody set this machine up to be managed.
   notes: |-
     Split out of windsurf.enterprise_policy for the reason given there. These are the group-policy templates, not the policy: they tell an administrative console which settings exist and say nothing about which were set. Their presence is still evidence, because it means somebody deliberately brought this product under machine-wide management, and the values that were set are in the registry keys of the entry above.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.10.31, one installation and one trivial conversation each. Neither template file was present on the Windows host, in the policy definition directory or in any language subdirectory of it, and neither policy key existed under the user or the machine hive.
+
+        Nothing about that weakens this entry. An administrative template is installed by whoever manages the endpoint, not by the product, so a machine nobody manages has none, and that is the answer an analyst wants: this endpoint was running the product with no managed policy in force. The entry stays verified on the vendor's own page, and what the measurement adds is the reading of an empty result.
   parser: null
 - id: windsurf.project_instructions
   category: project_instructions

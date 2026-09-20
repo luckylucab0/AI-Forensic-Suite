@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 8559b7bb3fe5
+# Catalogue digest: a79339ed4b97
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -581,6 +581,8 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.install_dirs'; Path = '$profile\AppData\Local\cursor-updater' }
     @{ Agent = 'cursor'; Id = 'cursor.local_file_history'; Path = '$profile\AppData\Roaming\Cursor\User\History' }
     @{ Agent = 'cursor'; Id = 'cursor.logs'; Path = '$profile\AppData\Roaming\Cursor\logs' }
+    @{ Agent = 'cursor'; Id = 'cursor.machine_identity_file'; Path = '$profile\AppData\Roaming\Cursor\SharedStorage' }
+    @{ Agent = 'cursor'; Id = 'cursor.machine_identity_file'; Path = '$profile\AppData\Roaming\Cursor\machineid' }
     @{ Agent = 'cursor'; Id = 'cursor.mdm_policy'; Path = '$profile\.cursor\policy.json' }
     @{ Agent = 'cursor'; Id = 'cursor.pasted_text'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.plugins'; Path = '$profile\.cursor\plugins' }
@@ -1149,7 +1151,13 @@ $targets = @(
     @{ Agent = 'windsurf'; Id = 'windsurf.cli_sessions_db'; Path = '$profile\AppData\Roaming\Devin\cli\sessions.db-shm' }
     @{ Agent = 'windsurf'; Id = 'windsurf.cli_sessions_db'; Path = '$profile\AppData\Roaming\Devin\cli\sessions.db-wal' }
     @{ Agent = 'windsurf'; Id = 'windsurf.code_tracker_and_settings'; Path = '$profile\.codeium\user_settings.pb' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.code_tracker_and_settings'; Path = '$profile\.codeium\windsurf\bin\devin-desktop' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.code_tracker_and_settings'; Path = '$profile\.codeium\windsurf\brain' }
     @{ Agent = 'windsurf'; Id = 'windsurf.code_tracker_and_settings'; Path = '$profile\.codeium\windsurf\code_tracker' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.code_tracker_and_settings'; Path = '$profile\.codeium\windsurf\code_tracker\active' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.code_tracker_and_settings'; Path = '$profile\.codeium\windsurf\code_tracker\history' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.code_tracker_and_settings'; Path = '$profile\.codeium\windsurf\codemaps\codemapindex.json' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.code_tracker_and_settings'; Path = '$profile\.codeium\windsurf\context_state' }
     @{ Agent = 'windsurf'; Id = 'windsurf.code_tracker_and_settings'; Path = '$profile\.codeium\windsurf\installation_id' }
     @{ Agent = 'windsurf'; Id = 'windsurf.code_tracker_and_settings'; Path = '$profile\.codeium\windsurf\user_settings.pb' }
     @{ Agent = 'windsurf'; Id = 'windsurf.device_identity'; Path = '$profile\.codeium\windsurf\native_storage_migrations.lock' }
@@ -1175,7 +1183,13 @@ $targets = @(
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf\User\globalStorage\state.vscdb' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf\User\globalStorage\state.vscdb-shm' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf\User\globalStorage\state.vscdb-wal' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\.devin\.devin-argv-precopy' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\.devin\argv.json' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\.devin\extensions\extensions.json' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\AppData\Roaming\Devin\User\chatLanguageModels.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\AppData\Roaming\Devin\User\settings.json' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\AppData\Roaming\Devin\Workspaces' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\AppData\Roaming\Devin\config.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\AppData\Roaming\Windsurf\User\keybindings.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\AppData\Roaming\Windsurf\User\settings.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\AppData\Roaming\Windsurf\argv.json' }

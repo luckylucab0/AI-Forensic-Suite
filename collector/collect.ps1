@@ -5441,9 +5441,15 @@ $EmbeddedCatalogueJson = @'
                     "collect_priority": "normal",
                     "id": "cursor.machine_identity_file",
                     "os": [
-                        "macos"
+                        "macos",
+                        "windows",
+                        "linux"
                     ],
                     "paths": [
+                        "%APPDATA%\\Cursor\\SharedStorage",
+                        "%APPDATA%\\Cursor\\machineid",
+                        "~/.config/Cursor/machineid",
+                        "~/Library/Application Support/Cursor/SharedStorage",
                         "~/Library/Application Support/Cursor/machineid"
                     ],
                     "root": "user_profile",
@@ -10671,8 +10677,20 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "%USERPROFILE%\\.codeium\\user_settings.pb",
+                        "%USERPROFILE%\\.codeium\\windsurf\\brain\\",
+                        "%USERPROFILE%\\.codeium\\windsurf\\code_tracker\\",
+                        "%USERPROFILE%\\.codeium\\windsurf\\codemaps\\codemapindex.json",
+                        "%USERPROFILE%\\.codeium\\windsurf\\context_state\\",
+                        "%USERPROFILE%\\.codeium\\windsurf\\installation_id",
+                        "%USERPROFILE%\\.codeium\\windsurf\\user_settings.pb",
                         "~/.codeium/user_settings.pb",
+                        "~/.codeium/windsurf/bin/devin-desktop",
+                        "~/.codeium/windsurf/brain/",
                         "~/.codeium/windsurf/code_tracker/",
+                        "~/.codeium/windsurf/code_tracker/active/",
+                        "~/.codeium/windsurf/code_tracker/history/",
+                        "~/.codeium/windsurf/codemaps/codemapindex.json",
+                        "~/.codeium/windsurf/context_state/",
                         "~/.codeium/windsurf/installation_id",
                         "~/.codeium/windsurf/user_settings.pb"
                     ],
@@ -10881,12 +10899,24 @@ $EmbeddedCatalogueJson = @'
                         "windows"
                     ],
                     "paths": [
+                        "%APPDATA%\\Devin\\User\\chatLanguageModels.json",
                         "%APPDATA%\\Devin\\User\\settings.json",
+                        "%APPDATA%\\Devin\\Workspaces\\<epoch-ms>\\workspace.json",
+                        "%APPDATA%\\Devin\\config.json",
+                        "%USERPROFILE%\\.devin\\.devin-argv-precopy",
+                        "%USERPROFILE%\\.devin\\argv.json",
+                        "%USERPROFILE%\\.devin\\extensions\\extensions.json",
                         "%APPDATA%\\Windsurf\\User\\keybindings.json",
                         "%APPDATA%\\Windsurf\\User\\settings.json",
                         "%APPDATA%\\Windsurf\\argv.json",
                         "~/.config/Windsurf/User/settings.json",
+                        "~/.devin/.devin-argv-precopy",
+                        "~/.devin/argv.json",
+                        "~/.devin/extensions/extensions.json",
+                        "~/Library/Application Support/Devin/User/chatLanguageModels.json",
                         "~/Library/Application Support/Devin/User/settings.json",
+                        "~/Library/Application Support/Devin/Workspaces/<epoch-ms>/workspace.json",
+                        "~/Library/Application Support/Devin/config.json",
                         "~/Library/Application Support/Windsurf/User/keybindings.json",
                         "~/Library/Application Support/Windsurf/User/settings.json",
                         "~/Library/Application Support/Windsurf/User/snippets/",
@@ -11376,7 +11406,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "e4ba393418c382b833813831ab8b60d13ad71bada236a2aeef59defb47946838"
+    "sha256": "38714476bcdf6dcbd45997416ee8d385bf58d187a334b3558a0b85892d2ac4ed"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

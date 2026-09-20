@@ -85,6 +85,10 @@ artifacts:
     Added by the vendor verification pass. Three scopes, and the machine-wide one is the reason to collect this even when the user's own directories look complete: an administrator can place a hook there that the user cannot see or remove, and a blocking hook explains an action the analyst expected to find attempted and did not.
 
     The scripts matter more than the configuration. A hook is an executable the agent runs at a lifecycle point, so the script directory is where a persistence mechanism or an exfiltration step would live, and it is content this catalogue cannot predict: collect the directory whole rather than a list of filenames. The hook interface is also how a collector learns where a conversation transcript is, since the vendor states no path for one and passes it to the script instead.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16, one installation and one trivial conversation each. No hook file and no hook directory existed on either host, at any of the seven paths in this entry, and recursive searches for the filename across both user profiles found nothing.
+
+        That is the expected result and it is worth recording rather than assuming. A hook is something somebody writes, and both measurements were of installations nobody had configured. The value of the empty result is what it rules out: on these endpoints there was no interception of the agent's tool calls, nothing rewriting what it read, and nothing running on the endpoint's behalf between the model and the tools. On an endpoint under investigation, a populated hook file is one of the first things to read, and an empty one is now a measured baseline rather than a guess.
   parser: json_generic
 - id: cursor.worktrees
   title: Agent-created git worktrees
@@ -107,6 +111,8 @@ artifacts:
     The vendor documents cleanup settings and a limit for these, so agent-written code here is removed on a schedule rather than kept.
   notes: |-
     Added by the vendor verification pass. The agent creates git worktrees under the home directory, organized by repository name, so the code it wrote is not in the checkout an analyst is looking at. A diff of the user's repository can show nothing while the agent wrote a great deal, and this is where the difference is.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16, one installation and one trivial conversation each. The directory was not present on either host and a recursive search for its name found it nowhere. It is created when the agent makes itself a working copy, which neither measurement did, so this is a feature nobody used rather than a path that is wrong. The entry is the vendor's own and stays verified.
   parser: null
 - id: cursor.retrieval_index
   category: cache
@@ -160,6 +166,10 @@ artifacts:
     The citation is the product's own command line package rather than a page or a repository: this vendor publishes no source and its documentation does not mention this path. The package is a pinned build, it is fetchable by anybody, and the construction quoted above is in its bundled JavaScript, so the finding is reproducible by unpacking it and searching for the same literal. The installer at the vendor's install URL names whichever build is current.
 
     Record structure: a JSON document. The variant delivered by the variable carries the same document as a value.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16, one installation and one trivial conversation each. The file was not present on either host and a recursive search for its name across the whole user profile found it nowhere.
+
+        The entry is unchanged and stays verified, because the path comes from the product's own shipped code rather than from a write-up, and because a managed policy file is written by whoever manages the endpoint rather than by the product. An unmanaged machine has none. What the measurement adds is how to read the empty result: no policy was in force on this endpoint, which is an answer, and not that the collector looked in the wrong place.
   parser: json_generic
 - id: cursor.cli_workspaces
   category: config
@@ -186,6 +196,10 @@ artifacts:
     The second is the state the command line reads to find out what the editor beside it is doing. It is how the two halves of this product join up, and for an analyst it is the link between a terminal session and an editor window.
 
     The citation is the product's own command line package rather than a page or a repository: this vendor publishes no source and its documentation does not mention this path. The package is a pinned build, it is fetchable by anybody, and the construction quoted above is in its bundled JavaScript, so the finding is reproducible by unpacking it and searching for the same literal. The installer at the vendor's install URL names whichever build is current.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16, one installation and one trivial conversation each. Neither file was present on either host and a recursive search for both names across the whole user profile found neither.
+
+        Both paths are built by the product's own shipped command line package, so they stay, and this is the case ADR 0037 keeps a measurement away from. The reading of the absence is that the command line interface was installed on both hosts but never signed in and never used against a workspace, which is exactly the state that produces no workspace list and no editor state file. An endpoint where somebody used the command line agent should have them.
   parser: json_generic
 - id: cursor.computer_use_sidecar
   category: install_evidence
@@ -211,6 +225,10 @@ artifacts:
     Its presence dates when the machine gained that capability. An environment variable can point the product at a different application, which the code reads before falling back to this path, so an absence here is not an absence of the capability.
 
     The citation is the product's own command line package rather than a page or a repository: this vendor publishes no source and its documentation does not mention this path. The package is a pinned build, it is fetchable by anybody, and the construction quoted above is in its bundled JavaScript, so the finding is reproducible by unpacking it and searching for the same literal. The installer at the vendor's install URL names whichever build is current.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16, one installation and one trivial conversation each. The directory was not present on either host and a recursive search for its name found it nowhere. It stays, because the path is from the product's own shipped package, and because what it would prove is worth a glob: a populated directory here is an endpoint where the agent was driving the screen and the keyboard rather than only the files.
+
+        The related finding from the same measurements is in cursor.project_mcp_definitions and it is the stronger one. The tool definitions for screen control were present on both hosts in the shipped state, under the per-project agent directory, without anybody enabling anything. The capability was configured and the sidecar had not run.
   parser: null
 - id: cursor.worktree_setup
   category: instructions
@@ -525,7 +543,13 @@ artifacts:
   root: user_profile
   os:
   - macos
+  - windows
+  - linux
   paths:
+  - '%APPDATA%\Cursor\SharedStorage'
+  - '%APPDATA%\Cursor\machineid'
+  - ~/.config/Cursor/machineid
+  - ~/Library/Application Support/Cursor/SharedStorage
   - ~/Library/Application Support/Cursor/machineid
   format: text
   sensitivity: normal
@@ -538,6 +562,12 @@ artifacts:
     Stable across launches and rewritten by account-resetter tools, so a mismatch with the telemetry identifiers in storage.json is a tamper indicator.
   notes: |-
     Split out of cursor.install_and_machine_identity for the reason given there. One identifier on one line, and its value only means something next to the telemetry identifiers in storage.json.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16, one installation and one trivial conversation each. The device identifier is a thirty six byte value in the shape of an identifier and it exists on Windows as well as on macOS, directly under the editor's application data directory, which this entry did not say. So a Windows collection keyed on this entry took nothing, and the identifier that ties an endpoint to the vendor's server side records was not in the bundle. Both spellings are here now, and the Linux one beside them by the same layout.
+
+        It survived a normal uninstall on both operating systems. On a machine where the product appears never to have been installed, this file is the thing that says otherwise, and it is thirty six bytes.
+
+        The shared storage file beside it is new here for the same reason: it is part of the same runtime profile, it was present on both hosts, and it is one of the files a wipe of the installation directory does not touch.
   parser: text_config
 - id: cursor.macos_preferences
   category: install_evidence
@@ -583,6 +613,12 @@ artifacts:
     The single best Cursor artifact for AI-vs-human code attribution per commit, and conversation_summaries is a lightweight session index that avoids re-parsing every JSONL. ai_code_hashes.conversationId and the checkpoint metadata.agentRequestId cross-join with cursorDiskKV composerData/agentKv ids — this is the pivot that ties a commit to a specific prompt. Confirmed by three independent sources.
 
     Record structure: Six tables. ai_code_hashes: links code hashes to a source category ('cli' or 'composer'), file name/extension, requestId, conversationId, timestamp, model. scored_commits: commitHash, branchName, tabLinesAdded, composerLinesAdded, humanLinesAdded, v1AiPercentage, v2AiPercentage, message/date. tracked_file_content: git path, conversation, model, timestamp. conversation_summaries: title, TLDR, overview, bullets, model, mode. ai_deleted_files. tracking_state.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16, one installation and one trivial conversation each. Present on both hosts, and present before the account was signed in, which is the part worth knowing. The Windows host had it at seventy three kilobytes and the macOS host at seventy two after one trivial conversation each.
+
+        The table names were read and they say what the database is for: hashes of code attributed to the model, a table of files the model deleted, conversation summaries, scored commits, tracked file content and a tracking state row. Two of those are evidence nothing else in this catalogue holds. A table of deleted files is a record of what is not on the disk any more, and conversation summaries are transcript material in a store an analyst would file under telemetry and skip.
+
+        Both hosts had the deleted file table and the summary table empty after one conversation, so nobody has seen what a row in them looks like. Neither measurement opened one.
   parser: sqlite_generic
 - id: cursor.logs
   category: log

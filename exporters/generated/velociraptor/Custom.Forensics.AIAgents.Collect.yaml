@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 8559b7bb3fe5
+# Catalogue digest: a79339ed4b97
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -665,6 +665,8 @@ sources:
     cursor,cursor.install_dirs,C:/Users/*/AppData/Local/cursor-updater/**
     cursor,cursor.local_file_history,C:/Users/*/AppData/Roaming/Cursor/User/History/**
     cursor,cursor.logs,C:/Users/*/AppData/Roaming/Cursor/logs/**
+    cursor,cursor.machine_identity_file,C:/Users/*/AppData/Roaming/Cursor/SharedStorage
+    cursor,cursor.machine_identity_file,C:/Users/*/AppData/Roaming/Cursor/machineid
     cursor,cursor.mdm_policy,C:/Users/*/.cursor/policy.json
     cursor,cursor.pasted_text,C:/Users/*/.cursor/chats/*/*/pasted_text.json
     cursor,cursor.plugins,C:/Users/*/.cursor/plugins/**
@@ -1387,7 +1389,13 @@ sources:
     windsurf,windsurf.cli_sessions_db,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db-shm
     windsurf,windsurf.cli_sessions_db,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db-wal
     windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/user_settings.pb
+    windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/windsurf/bin/devin-desktop
+    windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/windsurf/brain/**
     windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/windsurf/code_tracker/**
+    windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/windsurf/code_tracker/active/**
+    windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/windsurf/code_tracker/history/**
+    windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/windsurf/codemaps/codemapindex.json
+    windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/windsurf/context_state/**
     windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/windsurf/installation_id
     windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/windsurf/user_settings.pb
     windsurf,windsurf.device_identity,C:/Users/*/.codeium/windsurf/native_storage_migrations.lock
@@ -1414,7 +1422,13 @@ sources:
     windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/state.vscdb-wal
+    windsurf,windsurf.ide_user_data,C:/Users/*/.devin/.devin-argv-precopy
+    windsurf,windsurf.ide_user_data,C:/Users/*/.devin/argv.json
+    windsurf,windsurf.ide_user_data,C:/Users/*/.devin/extensions/extensions.json
+    windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Devin/User/chatLanguageModels.json
     windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Devin/User/settings.json
+    windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Devin/Workspaces/*/workspace.json
+    windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Devin/config.json
     windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Windsurf/User/keybindings.json
     windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Windsurf/User/settings.json
     windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Windsurf/argv.json
@@ -2583,7 +2597,11 @@ sources:
     cursor,cursor.logs,/var/root/Library/Application Support/Cursor/logs/*/**
     cursor,cursor.logs,/var/root/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log
     cursor,cursor.logs,/var/root/Library/Application Support/Cursor/process-monitor/**
+    cursor,cursor.machine_identity_file,/Users/*/.config/Cursor/machineid
+    cursor,cursor.machine_identity_file,/Users/*/Library/Application Support/Cursor/SharedStorage
     cursor,cursor.machine_identity_file,/Users/*/Library/Application Support/Cursor/machineid
+    cursor,cursor.machine_identity_file,/var/root/.config/Cursor/machineid
+    cursor,cursor.machine_identity_file,/var/root/Library/Application Support/Cursor/SharedStorage
     cursor,cursor.machine_identity_file,/var/root/Library/Application Support/Cursor/machineid
     cursor,cursor.machine_identity_storage,/Users/*/Library/Application Support/Cursor/User/globalStorage/statsig-cache.json
     cursor,cursor.machine_identity_storage,/Users/*/Library/Application Support/Cursor/User/globalStorage/storage.json
@@ -3814,11 +3832,23 @@ sources:
     windsurf,windsurf.cli_sessions_db,/var/root/Library/Application Support/Devin/cli/sessions.db-shm
     windsurf,windsurf.cli_sessions_db,/var/root/Library/Application Support/Devin/cli/sessions.db-wal
     windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/user_settings.pb
+    windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/windsurf/bin/devin-desktop
+    windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/windsurf/brain/**
     windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/windsurf/code_tracker/**
+    windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/windsurf/code_tracker/active/**
+    windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/windsurf/code_tracker/history/**
+    windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/windsurf/codemaps/codemapindex.json
+    windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/windsurf/context_state/**
     windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/windsurf/installation_id
     windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/windsurf/user_settings.pb
     windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/user_settings.pb
+    windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/windsurf/bin/devin-desktop
+    windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/windsurf/brain/**
     windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/windsurf/code_tracker/**
+    windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/windsurf/code_tracker/active/**
+    windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/windsurf/code_tracker/history/**
+    windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/windsurf/codemaps/codemapindex.json
+    windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/windsurf/context_state/**
     windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/windsurf/installation_id
     windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/windsurf/user_settings.pb
     windsurf,windsurf.device_identity,/Users/*/.codeium/windsurf/native_storage_migrations.lock
@@ -3891,14 +3921,26 @@ sources:
     windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Windsurf/User/globalStorage/storage.json
     windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Windsurf/machineId
     windsurf,windsurf.ide_user_data,/Users/*/.config/Windsurf/User/settings.json
+    windsurf,windsurf.ide_user_data,/Users/*/.devin/.devin-argv-precopy
+    windsurf,windsurf.ide_user_data,/Users/*/.devin/argv.json
+    windsurf,windsurf.ide_user_data,/Users/*/.devin/extensions/extensions.json
+    windsurf,windsurf.ide_user_data,/Users/*/Library/Application Support/Devin/User/chatLanguageModels.json
     windsurf,windsurf.ide_user_data,/Users/*/Library/Application Support/Devin/User/settings.json
+    windsurf,windsurf.ide_user_data,/Users/*/Library/Application Support/Devin/Workspaces/*/workspace.json
+    windsurf,windsurf.ide_user_data,/Users/*/Library/Application Support/Devin/config.json
     windsurf,windsurf.ide_user_data,/Users/*/Library/Application Support/Windsurf/User/keybindings.json
     windsurf,windsurf.ide_user_data,/Users/*/Library/Application Support/Windsurf/User/settings.json
     windsurf,windsurf.ide_user_data,/Users/*/Library/Application Support/Windsurf/User/snippets/**
     windsurf,windsurf.ide_user_data,/Users/*/Library/Application Support/Windsurf/Workspaces/**
     windsurf,windsurf.ide_user_data,/Users/*/Library/Application Support/Windsurf/argv.json
     windsurf,windsurf.ide_user_data,/var/root/.config/Windsurf/User/settings.json
+    windsurf,windsurf.ide_user_data,/var/root/.devin/.devin-argv-precopy
+    windsurf,windsurf.ide_user_data,/var/root/.devin/argv.json
+    windsurf,windsurf.ide_user_data,/var/root/.devin/extensions/extensions.json
+    windsurf,windsurf.ide_user_data,/var/root/Library/Application Support/Devin/User/chatLanguageModels.json
     windsurf,windsurf.ide_user_data,/var/root/Library/Application Support/Devin/User/settings.json
+    windsurf,windsurf.ide_user_data,/var/root/Library/Application Support/Devin/Workspaces/*/workspace.json
+    windsurf,windsurf.ide_user_data,/var/root/Library/Application Support/Devin/config.json
     windsurf,windsurf.ide_user_data,/var/root/Library/Application Support/Windsurf/User/keybindings.json
     windsurf,windsurf.ide_user_data,/var/root/Library/Application Support/Windsurf/User/settings.json
     windsurf,windsurf.ide_user_data,/var/root/Library/Application Support/Windsurf/User/snippets/**
@@ -5070,6 +5112,12 @@ sources:
     cursor,cursor.logs,/root/Library/Application Support/Cursor/logs/*/**
     cursor,cursor.logs,/root/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log
     cursor,cursor.logs,/root/Library/Application Support/Cursor/process-monitor/**
+    cursor,cursor.machine_identity_file,/home/*/.config/Cursor/machineid
+    cursor,cursor.machine_identity_file,/home/*/Library/Application Support/Cursor/SharedStorage
+    cursor,cursor.machine_identity_file,/home/*/Library/Application Support/Cursor/machineid
+    cursor,cursor.machine_identity_file,/root/.config/Cursor/machineid
+    cursor,cursor.machine_identity_file,/root/Library/Application Support/Cursor/SharedStorage
+    cursor,cursor.machine_identity_file,/root/Library/Application Support/Cursor/machineid
     cursor,cursor.mdm_policy,/home/*/.cursor/policy.json
     cursor,cursor.mdm_policy,/root/.cursor/policy.json
     cursor,cursor.pasted_text,/home/*/.cursor/chats/*/*/pasted_text.json
@@ -6269,11 +6317,23 @@ sources:
     windsurf,windsurf.cli_sessions_db,/root/Library/Application Support/Devin/cli/sessions.db-shm
     windsurf,windsurf.cli_sessions_db,/root/Library/Application Support/Devin/cli/sessions.db-wal
     windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/user_settings.pb
+    windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/windsurf/bin/devin-desktop
+    windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/windsurf/brain/**
     windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/windsurf/code_tracker/**
+    windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/windsurf/code_tracker/active/**
+    windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/windsurf/code_tracker/history/**
+    windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/windsurf/codemaps/codemapindex.json
+    windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/windsurf/context_state/**
     windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/windsurf/installation_id
     windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/windsurf/user_settings.pb
     windsurf,windsurf.code_tracker_and_settings,/root/.codeium/user_settings.pb
+    windsurf,windsurf.code_tracker_and_settings,/root/.codeium/windsurf/bin/devin-desktop
+    windsurf,windsurf.code_tracker_and_settings,/root/.codeium/windsurf/brain/**
     windsurf,windsurf.code_tracker_and_settings,/root/.codeium/windsurf/code_tracker/**
+    windsurf,windsurf.code_tracker_and_settings,/root/.codeium/windsurf/code_tracker/active/**
+    windsurf,windsurf.code_tracker_and_settings,/root/.codeium/windsurf/code_tracker/history/**
+    windsurf,windsurf.code_tracker_and_settings,/root/.codeium/windsurf/codemaps/codemapindex.json
+    windsurf,windsurf.code_tracker_and_settings,/root/.codeium/windsurf/context_state/**
     windsurf,windsurf.code_tracker_and_settings,/root/.codeium/windsurf/installation_id
     windsurf,windsurf.code_tracker_and_settings,/root/.codeium/windsurf/user_settings.pb
     windsurf,windsurf.device_identity,/home/*/.codeium/windsurf/native_storage_migrations.lock
@@ -6346,14 +6406,26 @@ sources:
     windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Windsurf/User/globalStorage/storage.json
     windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Windsurf/machineId
     windsurf,windsurf.ide_user_data,/home/*/.config/Windsurf/User/settings.json
+    windsurf,windsurf.ide_user_data,/home/*/.devin/.devin-argv-precopy
+    windsurf,windsurf.ide_user_data,/home/*/.devin/argv.json
+    windsurf,windsurf.ide_user_data,/home/*/.devin/extensions/extensions.json
+    windsurf,windsurf.ide_user_data,/home/*/Library/Application Support/Devin/User/chatLanguageModels.json
     windsurf,windsurf.ide_user_data,/home/*/Library/Application Support/Devin/User/settings.json
+    windsurf,windsurf.ide_user_data,/home/*/Library/Application Support/Devin/Workspaces/*/workspace.json
+    windsurf,windsurf.ide_user_data,/home/*/Library/Application Support/Devin/config.json
     windsurf,windsurf.ide_user_data,/home/*/Library/Application Support/Windsurf/User/keybindings.json
     windsurf,windsurf.ide_user_data,/home/*/Library/Application Support/Windsurf/User/settings.json
     windsurf,windsurf.ide_user_data,/home/*/Library/Application Support/Windsurf/User/snippets/**
     windsurf,windsurf.ide_user_data,/home/*/Library/Application Support/Windsurf/Workspaces/**
     windsurf,windsurf.ide_user_data,/home/*/Library/Application Support/Windsurf/argv.json
     windsurf,windsurf.ide_user_data,/root/.config/Windsurf/User/settings.json
+    windsurf,windsurf.ide_user_data,/root/.devin/.devin-argv-precopy
+    windsurf,windsurf.ide_user_data,/root/.devin/argv.json
+    windsurf,windsurf.ide_user_data,/root/.devin/extensions/extensions.json
+    windsurf,windsurf.ide_user_data,/root/Library/Application Support/Devin/User/chatLanguageModels.json
     windsurf,windsurf.ide_user_data,/root/Library/Application Support/Devin/User/settings.json
+    windsurf,windsurf.ide_user_data,/root/Library/Application Support/Devin/Workspaces/*/workspace.json
+    windsurf,windsurf.ide_user_data,/root/Library/Application Support/Devin/config.json
     windsurf,windsurf.ide_user_data,/root/Library/Application Support/Windsurf/User/keybindings.json
     windsurf,windsurf.ide_user_data,/root/Library/Application Support/Windsurf/User/settings.json
     windsurf,windsurf.ide_user_data,/root/Library/Application Support/Windsurf/User/snippets/**
