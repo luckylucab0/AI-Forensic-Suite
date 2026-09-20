@@ -36,6 +36,8 @@
 #   - cline.data_tasks: a task directory of whole JSON documents
 #   - cline.vscode_task_transcripts: a task directory of whole JSON documents
 #   - codex.rollouts_compressed: a transcript compressed in place after seven days, which this query cannot expand on the endpoint. Everything older than a week is in these files, so collect them and ingest them: the analyzer reads them line by line exactly as it reads an uncompressed one
+#   - codex.sqlite_write_ahead_logs: a database's write-ahead log and shared-memory index, which hold changed pages rather than records, so nothing comes out of one a line at a time. The analyzer names them for what they are and reads what is in the log through the database beside it, so collect all three files and ingest them together
+#   - copilot.session_store_sidecars: the same two files for another product's store, for the same reason
 #   - cursor.subagent_output: what a background subagent wrote for its parent, in a format the vendor documents nothing about, so a line of it is a fragment of a report
 #   - gemini_cli.chats: a chats directory this artifact will not narrow to an extension
 #   - hermes.sessions_dir: a sessions directory this artifact will not narrow to an extension
@@ -98,7 +100,7 @@ description: |
       read rather than as an agent that left nothing behind.
 
     - Some of what the suite's own analyzer reads is not read here, or is read
-      only in part: 23 artifacts, named in the notes below. Where
+      only in part: 25 artifacts, named in the notes below. Where
       one of them is not read, a row says the file was there, with its hash and its
       timestamps, and nothing about the conversation in it. Collect those files
       with the Collect artifact and ingest them.

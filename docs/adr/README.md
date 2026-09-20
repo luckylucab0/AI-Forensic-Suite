@@ -41,3 +41,4 @@ Add one with the next free number, using [0000-template.md](0000-template.md).
 | [0031](0031-the-browser-engines-store-is-implemented-rather-than-depended-on.md) | The browser engine's key-value store and the Snappy its blocks use are implemented here, with no new dependency |
 | [0032](0032-a-database-without-its-log-is-a-gap-not-a-silence.md) | Every catalogued database claims the siblings holding its newest records, and a store without them is a gap rather than a silence |
 | [0033](0033-a-registry-key-is-collected-as-a-document.md) | A registry key is collected as a JSON document with its own manifest entry, from a live host only, for four catalogue entries |
+| [0034](0034-a-databases-sidecar-is-named-rather-than-opened.md) | A database's write-ahead log is named for what it is and says whether its database came with it, instead of being reported as a store that could not be read |

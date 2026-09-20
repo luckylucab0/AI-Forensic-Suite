@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  35 modules read 380 of the catalogue's 473 artifacts, and what the rest is gets asserted
+  35 modules read 382 of the catalogue's 473 artifacts, and what the rest is gets asserted
   rather than assumed: every entry in a format this suite reads is either read or carries a
   written reason why not, and the credential stores are exempt as a class because the
   collector withholds their content, which a test pins to credential stores alone. What is
@@ -137,7 +137,12 @@ it cannot be rewritten *quietly*.
     case records a gap rather than staying quiet: such a store opens, every table is there,
     and the conversation stops before its last messages with SQLite reporting no error at
     all, which is the only failure in this pipeline that looks exactly like success
-    (ADR 0032).
+    (ADR 0032). A collection also carries a log as a file of its own, so one arrives at the
+    parser that opens databases and is not one: it is named for what it is, and says
+    whether the database it belongs to came with it, because a log whose database is here
+    holds records the case already has and a log whose database is not holds records
+    nothing can reach. Reporting it as a store that could not be read, which is what it
+    used to get, is a loss claimed where there was none on two dozen entries at once.
   - **Line-delimited logs.** Every JSON Lines artifact no verified parser claims, record by
     record. That floor exists because the two producers of the unified format had drifted
     apart and the analyzer was the side reading less; a test fails now when the gap opens

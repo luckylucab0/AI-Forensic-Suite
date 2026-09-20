@@ -43,6 +43,7 @@ from agentforensics.parsers.sqlite_store import (
     literal_time,
     open_store,
     rows_of,
+    sidecar,
     tables,
 )
 
@@ -81,6 +82,20 @@ STORES = frozenset(
         "windsurf.ide_workspace_state_vscdb",
         "zed.sidebar_threads",
         "zed.threads_db",
+    }
+)
+
+
+# The two catalogue entries that are a database's sidecars and nothing else. Every other
+# entry claims a store's log in the same entry as the store, so that log reaches the store's
+# own parser; these two arrive on their own, and until they were claimed here they became an
+# inventory row that said a file was there and nothing about what it was. A write-ahead log
+# that nothing explains is the one file in a collection most likely to be read as evidence
+# that was lost, when in both of these cases the records in it are already in the case.
+SIDECAR_STORES = frozenset(
+    {
+        "codex.sqlite_write_ahead_logs",
+        "copilot.session_store_sidecars",
     }
 )
 
@@ -126,9 +141,16 @@ class SqliteGenericParser:
     name = "sqlite_generic"
 
     def handles(self, artifact_id: str | None) -> bool:
-        return artifact_id in STORES
+        return artifact_id in STORES or artifact_id in SIDECAR_STORES
 
     def parse(self, context: ParseContext) -> Iterator[Event]:
+        beside = sidecar(context)
+        if beside is not None:
+            # A database's own log or shared-memory file, which this entry claims along
+            # with the database. It is not a store and must not be reported as one that
+            # could not be read.
+            yield beside
+            return
         try:
             with open_store(context.local_path) as connection:
                 listed = tables(connection)
@@ -245,4 +267,10 @@ def _literal(values: dict[str, Any], columns: tuple[str, ...]) -> str | None:
     return None
 
 
-__all__ = ["INVENTORY_ONLY", "STORES", "SqliteGenericParser", "rows_as_events"]
+__all__ = [
+    "INVENTORY_ONLY",
+    "SIDECAR_STORES",
+    "STORES",
+    "SqliteGenericParser",
+    "rows_as_events",
+]

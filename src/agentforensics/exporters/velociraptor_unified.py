@@ -128,6 +128,13 @@ UNINTERPRETED: dict[str, str] = {
     "are in a browser engine's key-value store, which is a set of binary table files and a "
     "write-ahead log rather than records this query can read a line at a time. The analyzer "
     "opens one key by key, so collect the tree and ingest it",
+    "codex.sqlite_write_ahead_logs": "a database's write-ahead log and shared-memory "
+    "index, which hold changed pages rather than records, so nothing comes out of one a "
+    "line at a time. The analyzer names them for what they are and reads what is in the "
+    "log through the database beside it, so collect all three files and ingest them "
+    "together",
+    "copilot.session_store_sidecars": "the same two files for another product's store, for "
+    "the same reason",
     "codex.rollouts_compressed": "a transcript compressed in place after seven days, which "
     "this query cannot expand on the endpoint. Everything older than a week is in these "
     "files, so collect them and ingest them: the analyzer reads them line by line exactly "

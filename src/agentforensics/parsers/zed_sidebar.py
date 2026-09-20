@@ -62,6 +62,7 @@ from agentforensics.parsers.sqlite_store import (
     describe,
     open_store,
     rows_of,
+    sidecar,
     tables,
 )
 from agentforensics.parsers.zed import folders
@@ -93,6 +94,13 @@ class ZedSidebarParser:
         return artifact_id in self._STORES
 
     def parse(self, context: ParseContext) -> Iterator[Event]:
+        beside = sidecar(context)
+        if beside is not None:
+            # A database's own log or shared-memory file, which this entry claims along
+            # with the database. It is not a store and must not be reported as one that
+            # could not be read.
+            yield beside
+            return
         try:
             with open_store(context.local_path) as connection:
                 listed = {table.name: table for table in tables(connection)}

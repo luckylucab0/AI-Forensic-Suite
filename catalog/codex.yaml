@@ -75,7 +75,7 @@ artifacts:
     Not an artifact in its own right so much as the missing half of every other .sqlite entry here. A bundle holding state_5.sqlite without state_5.sqlite-wal can be internally consistent and still be missing the last session, and nothing in the database says so.
 
     The verification pass confirmed that the databases are opened in write-ahead logging mode and found no mention of the sidecar filenames. They follow from the journal mode rather than from anything the vendor published, so they are marked unsourced. Collect them regardless: uncommitted transcript records live in the write-ahead log and are lost if only the main database file is taken.
-  parser: null
+  parser: sqlite_generic
 - id: codex.rollouts
   category: transcript
   root: user_profile

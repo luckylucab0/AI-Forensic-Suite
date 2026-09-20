@@ -92,7 +92,7 @@ artifacts:
     Deliberately unverified. GitHub documents session-store.db and says nothing about journal mode, so whether these sidecars exist depends on how the database is opened, which no vendor page read here states. They are collected anyway because the cost of collecting two files that do not exist is nothing and the cost of leaving the newest records behind is the investigation.
 
     Their absence therefore means either that Copilot was shut down cleanly or that it does not use write-ahead logging at all. Do not report it as either.
-  parser: null
+  parser: sqlite_generic
 - id: copilot.logs
   category: log
   root: user_profile

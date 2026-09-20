@@ -30,10 +30,11 @@ import pytest
 from agentforensics.catalog import load_catalogue
 from agentforensics.parsers import PARSERS, for_artifact
 from agentforensics.parsers.base import ParseContext
-from agentforensics.parsers.sqlite_generic import INVENTORY_ONLY, STORES
+from agentforensics.parsers.sqlite_generic import INVENTORY_ONLY, SIDECAR_STORES, STORES
 from agentforensics.parsers.sqlite_store import (
     BLOB_NOTE,
     SHORT_BLOB,
+    SIDECAR_SUFFIXES,
     open_store,
     rows_of,
     tables,
@@ -566,3 +567,27 @@ def test_a_short_binary_column_keeps_its_bytes(tmp_path: Path) -> None:
     # should not be fillable by one column.
     assert "hex" not in values[0]["big"]
     assert values[0]["big"]["bytes"] == SHORT_BLOB + 1
+
+
+def test_the_entries_that_are_only_a_sidecar_are_claimed_too() -> None:
+    """Two catalogue entries hold a database's log and nothing else.
+
+    Every other entry claims a store's log in the same entry as the store, so the log
+    reaches that store's parser. These two arrive on their own, and until they were claimed
+    they became an inventory row: a file was there, and nothing about what it was. A
+    write-ahead log that nothing explains is the file in a collection most likely to be
+    read as evidence that went missing, when in both of these cases its records are in the
+    case already.
+
+    Derived from the catalogue, because a new entry of this shape is exactly what would be
+    added and forgotten.
+    """
+    catalogue = load_catalogue(CATALOG_DIR)
+    only_a_sidecar = {
+        artifact.id
+        for artifact in catalogue.artifacts
+        if artifact.paths and all(path.endswith(SIDECAR_SUFFIXES) for path in artifact.paths)
+    }
+    assert only_a_sidecar == SIDECAR_STORES
+    for artifact_id in sorted(SIDECAR_STORES):
+        assert for_artifact(artifact_id) is not None, artifact_id

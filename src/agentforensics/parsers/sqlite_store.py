@@ -210,7 +210,7 @@ def tables(connection: sqlite3.Connection) -> list[Table]:
             "SELECT name, sql FROM sqlite_master WHERE type = 'table' ORDER BY name"
         ).fetchall()
     except sqlite3.DatabaseError as exc:
-        raise StoreError(f"the table list could not be read: {exc}") from exc
+        raise StoreError(f"has no readable table list: {exc}") from exc
 
     out = []
     for row in listed:
@@ -400,6 +400,80 @@ def literal_text(values: dict[str, Any]) -> str:
     return ""
 
 
+# The files SQLite keeps beside a database, and what each one is. They are catalogued and
+# collected on purpose: the newest writes of a store taken from a running agent are in the
+# log and nowhere else. What was missing is this: a collection carries them as files of
+# their own, so one reaches a parser that opens databases, fails to open it, and the case
+# says a store could not be read. That is a loss reported where there was none, on up to
+# twenty-four entries at once, and an analyst who believes it goes looking for a corrupt
+# database that does not exist.
+SIDECAR_SUFFIXES = ("-wal", "-shm", "-journal")
+
+WAL_WITH_DATABASE = (
+    "this is the write-ahead log of {database}, which is in this collection beside it. The "
+    "records in here are the newest writes the store took, and they are on that database's "
+    "events already: a store is copied together with its log and the two are opened the way "
+    "SQLite opens them. Nothing in this file is missing from the case"
+)
+WAL_WITHOUT_DATABASE = (
+    "this is the write-ahead log of {database}, and that database is not in this "
+    "collection. The records in here are the newest writes the store took and they cannot "
+    "be read without it, because a log holds changed pages rather than rows. Get the "
+    "database from the endpoint or from an image and ingest the two together"
+)
+SHARED_MEMORY = (
+    "this is the shared-memory index SQLite keeps beside a database in write-ahead mode. It "
+    "holds no records of its own and is rebuilt from the log. What its presence says is "
+    "that the store was open when it was collected, because a clean shutdown removes it"
+)
+ROLLBACK_JOURNAL = (
+    "this is a rollback journal, which SQLite writes before it changes a database and "
+    "removes when the change is done. It holds the pages as they stood before the "
+    "transaction that was in flight, so its presence says the store was mid write when it "
+    "was collected. It is copied with the database, so the store reads the way SQLite "
+    "would read it"
+)
+
+
+def sidecar(context: ParseContext) -> Event | None:
+    """The event one of a database's own sidecars becomes, or None when this is not one.
+
+    Called first by every parser that opens a SQLite store, because a catalogue entry that
+    claims a database usually claims its log in the same entry, so the log arrives at that
+    entry's parser. What it must not become is a store that could not be read.
+    """
+    name = context.local_path.name
+    for suffix in SIDECAR_SUFFIXES:
+        if not name.endswith(suffix):
+            continue
+        database = name[: -len(suffix)]
+        beside = context.local_path.with_name(database)
+        if suffix == "-shm":
+            problem = SHARED_MEMORY
+        elif suffix == "-journal":
+            problem = ROLLBACK_JOURNAL
+        else:
+            whole = WAL_WITH_DATABASE if beside.is_file() else WAL_WITHOUT_DATABASE
+            problem = whole.format(database=database)
+        return unparsed(
+            context.provenance("file"),
+            context.agent,
+            {
+                "file": name,
+                "database": database,
+                # Whether the database this belongs to is in the collection. It is the
+                # difference between a log whose records are already in the case and one
+                # whose records nothing can reach, and an analyst should not have to work
+                # it out from the file list.
+                "database_collected": beside.is_file(),
+            },
+            problem,
+            user=context.user,
+            host=context.host,
+        )
+    return None
+
+
 def describe(context: ParseContext, store_problem: str) -> Event:
     """The event a store that could not be opened at all becomes."""
     return unparsed(
@@ -419,8 +493,13 @@ __all__ = [
     "MAX_DECOMPRESSED",
     "MAX_ROWS",
     "MISSING_LOG",
+    "ROLLBACK_JOURNAL",
+    "SHARED_MEMORY",
     "SIBLINGS",
+    "SIDECAR_SUFFIXES",
     "WAL_FORMAT",
+    "WAL_WITHOUT_DATABASE",
+    "WAL_WITH_DATABASE",
     "ZSTD_MAGIC",
     "Journal",
     "StoreError",
@@ -431,5 +510,6 @@ __all__ = [
     "literal_time",
     "open_store",
     "rows_of",
+    "sidecar",
     "tables",
 ]

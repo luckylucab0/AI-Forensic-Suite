@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 35 Module lesen 380 der 473
+  zählt diese Dateien und sagt, welche es sind. 35 Module lesen 382 der 473
   Katalogartefakte, und was der Rest ist, wird behauptet und nicht angenommen: jeder Eintrag
   in einem Format, das diese Suite liest, wird entweder gelesen oder trägt einen
   aufgeschriebenen Grund, warum nicht, und die Anmeldedatenspeicher sind als Klasse
@@ -147,8 +147,15 @@ ist, dass das nicht *unbemerkt* geht.
     Transaktionen im Log und sonst nirgends. Jede katalogisierte Datenbank beansprucht diese
     Geschwister inzwischen, und wo eine das nicht tut, vermerkt der Fall eine Lücke, statt
     zu schweigen: ein solcher Speicher öffnet sich, alle Tabellen sind da, und das Gespräch
-    hört vor seinen letzten Nachrichten auf, ohne dass SQLite irgendeinen Fehler meldet. Das ist der einzige Fehlschlag in dieser Kette, der genau wie Erfolg aussieht
-    (ADR 0032).
+    hört vor seinen letzten Nachrichten auf, ohne dass SQLite irgendeinen Fehler meldet.
+    Das ist der einzige Fehlschlag in dieser Kette, der genau wie Erfolg aussieht
+    (ADR 0032). Eine Sammlung trägt ein Log auch als eigene Datei, also erreicht eines den
+    Parser, der Datenbanken öffnet, und ist keine: es wird als das benannt, was es ist, und
+    sagt, ob die Datenbank, zu der es gehört, mitgekommen ist. Denn ein Log, dessen
+    Datenbank hier ist, enthält Datensätze, die der Fall schon hat, und ein Log ohne seine
+    Datenbank enthält Datensätze, die niemand erreicht. Es als Speicher zu melden, der
+    nicht gelesen werden konnte, was es vorher bekam, behauptet einen Verlust, den es nicht
+    gab, auf zwei Dutzend Einträgen gleichzeitig.
   - **Zeilenbegrenzte Logs.** Jedes JSON-Lines-Artefakt, das kein verifizierter Parser
     beansprucht, Datensatz für Datensatz. Dieser Boden existiert, weil die beiden Erzeuger
     des einheitlichen Formats auseinandergelaufen waren und der Analyzer die Seite war, die

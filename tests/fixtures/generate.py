@@ -1137,6 +1137,55 @@ def write_shadow_repository(root: Path, mtime: int = RECENT) -> dict[str, str]:
     }
 
 
+def write_wal_store(path: Path, mtime: int = RECENT) -> str:
+    """A database in the state a live collection finds one in: the newest row only in the log.
+
+    The three files SQLite keeps in write-ahead mode, copied out from under an open
+    connection, which is what a collector on a running endpoint gets. Closing the
+    connection first would fold the log into the database and destroy the one state this is
+    here for: a store that opens cleanly, reads every row, and stops one message early.
+
+    That was covered by a unit test over two files in a directory and by nothing else. The
+    path this exercises instead is the whole of it: the catalogue claims the log in a
+    different entry from the database, the collector takes them as two files, the bundle
+    holds them as two files, and the reader has to put them back together.
+
+    The schema is not the vendor's. Nothing documents what is in this product's store, so
+    the fixture holds a plainly named table the uninterpreted reading describes, rather
+    than a shape somebody made up and a case could mistake for a source.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    scratch = path.parent / f".{path.name}.building"
+    scratch.parent.mkdir(parents=True, exist_ok=True)
+    connection = sqlite3.connect(scratch)
+    try:
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("CREATE TABLE messages (id INTEGER PRIMARY KEY, role TEXT, text TEXT)")
+        connection.execute(
+            "INSERT INTO messages VALUES (1, 'user', 'this message was checkpointed into "
+            "the database')"
+        )
+        connection.commit()
+        # Everything so far goes into the database file, so what follows is in the log and
+        # in nothing else.
+        connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        connection.execute(
+            "INSERT INTO messages VALUES (2, 'user', 'this message is only in the write ahead log')"
+        )
+        connection.commit()
+        for suffix in ("", "-wal", "-shm"):
+            source = scratch.with_name(scratch.name + suffix)
+            if source.is_file():
+                write(path.with_name(path.name + suffix), source.read_bytes(), mtime)
+    finally:
+        connection.close()
+    for suffix in ("", "-wal", "-shm"):
+        leftover = scratch.with_name(scratch.name + suffix)
+        if leftover.is_file():
+            leftover.unlink()
+    return "this message is only in the write ahead log"
+
+
 def write_vscode_state(path: Path, mtime: int = RECENT) -> Path:
     """The editor's key/value state store, holding what an agent extension left in it.
 
@@ -2110,6 +2159,11 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         copilot_events(SESSION_A, str(project)),
         RECENT,
     )
+    # The store this product keeps beside that log, in write-ahead mode, with its newest
+    # message in the log and nowhere else. The catalogue claims the database and its two
+    # sidecars in separate entries, so this is the one artifact in the profile that only
+    # reads correctly if all three travel and the reader puts them back together.
+    only_in_the_log = write_wal_store(copilot / "session-store.db")
 
     # Gemini CLI keys its per-project state on a hash of the working directory, which is
     # why the fixture uses a hash-shaped directory name rather than an encoded path.
@@ -2190,6 +2244,9 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         # the pre-edit content of a file by name rather than by a hash this generator
         # decides and nobody else can predict.
         "shadow_repository": shadow,
+        # The row that exists only in a write-ahead log, so a test can ask the case for it
+        # rather than repeating the sentence.
+        "only_in_the_write_ahead_log": only_in_the_log,
         "encoded_project_dir": encoded,
         "sessions": [SESSION_A, SESSION_B],
         "agents": [

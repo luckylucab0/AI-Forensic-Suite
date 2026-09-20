@@ -69,7 +69,14 @@ from typing import Any
 from agentforensics.model import Event, TsPrecision, unparsed
 from agentforensics.parsers.base import ParseContext, normalise_ts, text_of
 from agentforensics.parsers.sqlite_generic import rows_as_events
-from agentforensics.parsers.sqlite_store import StoreError, describe, open_store, rows_of, tables
+from agentforensics.parsers.sqlite_store import (
+    StoreError,
+    describe,
+    open_store,
+    rows_of,
+    sidecar,
+    tables,
+)
 
 # The tables this module claims to understand. Everything else, the FTS5 shadows included,
 # goes through the uninterpreted reading.
@@ -97,6 +104,13 @@ class HermesParser:
         return artifact_id in self._STORES
 
     def parse(self, context: ParseContext) -> Iterator[Event]:
+        beside = sidecar(context)
+        if beside is not None:
+            # A database's own log or shared-memory file, which this entry claims along
+            # with the database. It is not a store and must not be reported as one that
+            # could not be read.
+            yield beside
+            return
         try:
             with open_store(context.local_path) as connection:
                 listed = {table.name: table for table in tables(connection)}
