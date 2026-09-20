@@ -1659,6 +1659,132 @@ WINDOWS_ARTIFACTS = {
 }
 
 
+# The registry keys the fixture bundle carries, as {catalogue id: (key, category, values)}.
+# The category is the catalogue's own for that entry rather than one value for both: a
+# manifest that said otherwise would be a fixture asserting something the catalogue denies. Two of
+# the six the collector reads, chosen because they are the two a rule is written against
+# and because between them they cover both hives: a policy under the machine hive is one an
+# administrator set, and the same policy under the user's own is one a non-administrator
+# could have written, which is a finding rather than a configuration.
+BUNDLE_REGISTRY_KEYS = {
+    "claude_code.managed_settings_registry": (
+        r"HKCU\SOFTWARE\Policies\ClaudeCode",
+        "permissions",
+        [
+            {
+                "name": "Settings",
+                "type": "REG_SZ",
+                "data": json.dumps({"permissions": {"allow": ["Bash(*)"]}}, sort_keys=True),
+            }
+        ],
+    ),
+    "cursor.url_handler": (
+        r"HKCU\Software\Classes\cursor\shell\open\command",
+        "install_evidence",
+        [
+            {
+                "name": "",
+                "type": "REG_SZ",
+                # The path the uninstaller leaves behind pointing at nothing. Whether the
+                # executable is still there is the analyst's next step and not something a
+                # fixture can decide, which is what the rule says too.
+                "data": (
+                    r'"C:\Users\alice\AppData\Local\Programs\cursor\Cursor.exe" '
+                    r'--open-url -- "%1"'
+                ),
+            }
+        ],
+    ),
+}
+
+
+def build_registry_bundle(root: Path) -> dict:
+    """A minimal native bundle carrying registry documents and nothing else.
+
+    It exists because a registry key is not a path and a profile tree therefore cannot hold
+    one. Two shipped rules are about keys, and without this they are tested against events
+    somebody wrote by hand: one says a managed policy sits in a hive a non-administrator can
+    write, the other says a URL handler proves a product was installed on this account.
+
+    Minimal on purpose. The profile fixture is where the breadth is; this is the one shape
+    that fixture cannot express, written the way ADR 0033 specifies it and read back through
+    the ordinary ingest rather than through the parser directly.
+    """
+    files = root / "files"
+    entries = []
+    for artifact_id, (key, category, values) in sorted(BUNDLE_REGISTRY_KEYS.items()):
+        document = json.dumps(
+            {
+                "format_version": 1,
+                "key": key,
+                "last_write_utc": "2026-09-05T08:00:00.000000Z",
+                "values": values,
+                "subkeys": [],
+            },
+            sort_keys=True,
+        ).encode()
+        bundle_path = "files/registry/" + key.replace("\\", "/") + ".json"
+        path = root / bundle_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(document)
+        entries.append(
+            {
+                "artifact_id": artifact_id,
+                "agent": artifact_id.split(".")[0],
+                "category": category,
+                "user": "alice",
+                "original_path": key,
+                "bundle_path": bundle_path,
+                "size": len(document),
+                "sha256": hashlib.sha256(document).hexdigest(),
+                "mtime_utc": "2026-09-05T08:00:00.000000Z",
+                "collected": True,
+                "reason": None,
+                "status": "verified",
+                "source_kind": "registry",
+                "symlink": None,
+                "reparse_point": False,
+                "changed_while_reading": False,
+            }
+        )
+    files.mkdir(parents=True, exist_ok=True)
+    manifest = {
+        "format_version": 1,
+        "tool": {
+            "name": "generate.py",
+            "version": "0.1.0",
+            "sha256": "0" * 64,
+            "catalogue_version": "synthetic",
+        },
+        "collection": {
+            "uuid": "4f8c1e2a-0000-4000-8000-00000000f001",
+            "started_utc": "2026-09-05T08:00:00.000000Z",
+            "finished_utc": "2026-09-05T08:00:01.000000Z",
+            "local_timezone": "+00:00",
+            "local_timezone_name": "UTC",
+            "hostname": "example-host",
+            "os": "windows",
+            "os_version": "10.0.26200",
+            "architecture": "AMD64",
+            "collector_user": "alice",
+            "elevated": False,
+            "argv": ["generate.py"],
+            "include_secrets": False,
+            "max_file_size": 268435456,
+            "root": None,
+            "agents_filter": None,
+        },
+        "users": [{"name": "alice", "home": r"C:\Users\alice", "collected": True}],
+        "project_roots": [],
+        "files": entries,
+        "counts": {"hit": len(entries), "collected": len(entries), "skipped": 0, "errors": 0},
+        "errors": [],
+        "refused_patterns": [],
+    }
+    write(root / "manifest.json", json.dumps(manifest, indent=2, sort_keys=True))
+    return {"root": str(root), "keys": sorted(BUNDLE_REGISTRY_KEYS)}
+
+
 def build_windows_home(home: Path) -> dict:
     """Create a synthetic Windows profile under a mounted-image root. Returns a summary.
 

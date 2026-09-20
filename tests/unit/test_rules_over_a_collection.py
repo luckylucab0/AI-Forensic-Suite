@@ -27,6 +27,18 @@ passed their own samples throughout, because a sample is written by whoever wrot
 So this is a floor under the packs: the fixture holds the evidence each of these rules is
 about, and the rule has to find it. It is not a test of how many findings the fixture
 produces, because that number changes whenever the fixture grows.
+
+Three tables, and together they have to name every shipped rule. EXPECTED is the floor
+above. FROM_A_BUNDLE is the one shape a profile tree cannot hold, because a registry key is
+not a path and reaches a case as a document the collector wrote. SILENT is for a rule the
+fixtures do not exercise at all, with a sentence saying what they would have to carry; it
+is empty today and the sentence is the work item whenever it is not.
+
+The pair of guards at the end is what makes the tables worth having. Without them a rule
+can be added to a pack, pass its own samples, and never meet a collection, with nothing in
+the suite saying so. That was the state AFX-COLLECTIONINTEGRITY-004 was in, and when the
+evidence was finally put in front of it, the catalogue turned out to be wrong about one
+operating system and the parser had never set the field the rule groups by.
 """
 
 from __future__ import annotations
@@ -138,11 +150,19 @@ EXPECTED = {
 # events somebody wrote by hand. AFX-COLLECTIONINTEGRITY-004 was in that state days ago,
 # and when the evidence was finally put in front of it, two things between the catalogue
 # and the parser turned out to be wrong.
-SILENT = {
-    "AFX-COLLECTIONINTEGRITY-003": "the profile carries no registry document, so the URL "
-    "handler a product registers under the user's class keys is in no case this builds",
-    "AFX-PERMISSIONBYPASS-009": "a policy under the user's own hive is a registry document, "
-    "and the profile carries none. The Windows profile is where one would go",
+SILENT: dict[str, str] = {}
+
+# The rules a profile tree cannot exercise, with the bundle that does. A registry key is
+# not a path, so no directory of files can hold one, and the two rules that are about keys
+# would otherwise sit in SILENT forever with a reason that is really a limitation of the
+# fixture shape rather than of the rules.
+FROM_A_BUNDLE = {
+    "AFX-COLLECTIONINTEGRITY-003": "a URL handler under the user's own class keys names an "
+    "executable, which is what proves the product was installed on this account and, when "
+    "the path is gone, that it was later removed",
+    "AFX-PERMISSIONBYPASS-009": "the managed settings document sits under the user's hive "
+    "rather than the machine's, so a non-administrator could have written the policy that "
+    "allows every command",
 }
 
 
@@ -259,7 +279,7 @@ def test_every_rule_is_either_exercised_here_or_declared_unexercised() -> None:
     item.
     """
     shipped = {rule.id for rule in load(REPO_ROOT / "rules")}
-    covered = set(EXPECTED) | set(SILENT)
+    covered = set(EXPECTED) | set(SILENT) | set(FROM_A_BUNDLE)
     assert shipped - covered == set(), (
         "these rules are neither exercised over the synthetic profile nor declared as not "
         f"exercised, so nothing says whether they can fire at all: {sorted(shipped - covered)}"
@@ -267,7 +287,11 @@ def test_every_rule_is_either_exercised_here_or_declared_unexercised() -> None:
     assert covered - shipped == set(), (
         f"these table entries name rules that no longer exist: {sorted(covered - shipped)}"
     )
-    assert set(EXPECTED) & set(SILENT) == set(), "a rule cannot be in both tables"
+    tables = (set(EXPECTED), set(SILENT), set(FROM_A_BUNDLE))
+    for left in tables:
+        for right in tables:
+            if left is not right:
+                assert left & right == set(), "a rule belongs in exactly one table"
 
 
 @pytest.mark.slow
@@ -283,4 +307,38 @@ def test_a_rule_declared_unexercised_really_does_not_fire(findings: set[str]) ->
         "these rules are declared as not exercised by the synthetic profile and they fired "
         f"over it, so the profile now holds what they are about: {started}. Move them to "
         "EXPECTED with the evidence named"
+    )
+
+
+@pytest.fixture(scope="module")
+def bundle_findings(tmp_path_factory: pytest.TempPathFactory) -> set[str]:
+    """Every rule id that fired over the synthetic bundle of registry documents."""
+    from generate import build_registry_bundle
+
+    from agentforensics.catalog import load_catalogue
+    from agentforensics.ingest import ingest
+
+    root = tmp_path_factory.mktemp("bundle")
+    build_registry_bundle(root)
+    with Case.open(tmp_path_factory.mktemp("case") / "case.db") as case:
+        ingest(case, root, load_catalogue(REPO_ROOT / "catalog"))
+        report = scan(case, load(REPO_ROOT / "rules"), store=False)
+    return {finding.rule.id for finding in report.findings}
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(("rule_id", "evidence"), sorted(FROM_A_BUNDLE.items()))
+def test_a_rule_about_a_registry_key_finds_it_in_a_bundle(
+    bundle_findings: set[str], rule_id: str, evidence: str
+) -> None:
+    """The same floor as the profile gives the other rules, for the shape it cannot hold.
+
+    A key is not a path, so it reaches a case as a document the collector wrote and a
+    manifest entry that says so. Between the catalogue entry and the finding sit that
+    document's format, the manifest's registry entry kind, the ingest reading a bundle
+    rather than a tree, and a reader that turns one key into one event per value. None of
+    that is exercised by a rule's own samples.
+    """
+    assert rule_id in bundle_findings, (
+        f"{rule_id} did not fire over a bundle that carries what it is about: {evidence}"
     )
