@@ -289,6 +289,84 @@ artifacts:
 
     Two of these came from Eric Zimmerman's RECmd batch files rather than from the ForensicArtifacts set, namely UserAssist and the scheduled-task TaskCache keys. Treat them as community sourced.
   parser: null
+- id: crosscutting.windows_removed_product_registry
+  category: install_evidence
+  root: registry
+  os:
+  - windows
+  paths:
+  - HKEY_CURRENT_USER\Software\Classes\<url-scheme>
+  - HKEY_CURRENT_USER\Software\Classes\<url-scheme>\shell\open\command
+  - HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\*
+  - HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\*
+  format: registry
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on Windows 11 26200
+  source_kind: observed
+  volatility: |-
+    The uninstall key is written by the installer and removed by the uninstaller, so it is present only while the product is installed. The protocol handler and the path variable entry are written by the installer and removed by nothing, so they are what is left afterwards. That asymmetry is the whole value of this entry.
+  notes: |-
+    WHAT A REMOVED PRODUCT LEAVES IN THE REGISTRY. Measured by installing two agent products on a clean Windows 11 26200 host, using them, uninstalling them through their own uninstallers, and reading the registry again.
+
+    The uninstall keys were gone. The protocol handlers were not. Each product had registered a scheme of its own under the user's class keys, with the command value naming the executable, and after the uninstall all of them were still there pointing at executables that no longer exist. A protocol handler whose target is missing is a strong, compact finding: it says the product was installed on this account and was later removed, in one key, on a machine where the program directory, the uninstall key and the start menu entry are all gone.
+
+    Read the scheme names rather than the product names. One of the two products registered three schemes, one of them the scheme of the product it used to be called, pointing at the current executable. So a handler under the old name is not evidence that the old product was ever installed, and a search for the current name misses two of the three keys.
+
+    The user's own path variable is the second residue and it works the same way. Both installers appended their program directories to it and a separate command line installer appended a third, and uninstalling removed none of them. A path entry naming a directory that is not there is evidence of a removed installation, and on the measured host it outlived the directory by the whole rest of the test. The key that holds it is claimed once in this catalogue, under ollama.env_overrides, because one path is one manifest entry; read it for this too.
+
+    Registry keys, so only the PowerShell collector can read them, and only on the host itself rather than from a mounted image.
+  parser: null
+- id: crosscutting.macos_launch_services_registrations
+  category: install_evidence
+  root: system
+  os:
+  - macos
+  paths:
+  - /private/var/folders/*/*/0/com.apple.LaunchServices-*.csstore
+  - ~/Library/Preferences/com.apple.LaunchServices/com.apple.launchservices.secure.plist
+  format: binary
+  sensitivity: normal
+  collect_priority: durable
+  status: unverified
+  source: observed on macOS 26.5
+  source_kind: observed
+  volatility: |-
+    Entries are added when an application is first seen and are not removed when it is deleted. They go only when the database is rebuilt, which is a deliberate act and not something a cleanup script does. Measured: the entries for both products survived deleting the applications and survived the removal of every other residue.
+  notes: |-
+    THE ONE MACOS SOURCE THAT ANSWERS WHICH APPLICATIONS THIS MACHINE HAS SEEN, after everything else has been cleaned. On the measured host, the registration database still held twenty one entries for two agent products whose bundles, caches, preference domains and keychain items had all been removed.
+
+    That makes it the macOS counterpart of a stale protocol handler in the Windows registry, and it is stronger, because it records the bundle identifier, the declared URL schemes and the path the bundle was at. On a machine where somebody removed an agent product deliberately, this is where the claim that it was never there falls apart.
+
+    Two practical notes. The file under the temporary folders hierarchy is per user and its intermediate directory names are generated, so it has to be globbed rather than named, and a collection that runs as a different user reads a different one. And the contents are a binary store rather than a document: the usual way to read it is the system's own registration tool with its dump option, which this suite does not run because it runs nothing on the endpoint, so the file is collected and read afterwards.
+  parser: null
+- id: crosscutting.macos_download_provenance
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2
+  - ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2-shm
+  - ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2-wal
+  format: sqlite
+  sensitivity: normal
+  collect_priority: durable
+  status: unverified
+  source: observed on macOS 26.5
+  source_kind: observed
+  volatility: |-
+    Appended per download and not pruned by anything the user does in the normal course, so it holds downloads long after the files themselves are gone.
+  notes: |-
+    WHERE AN AGENT PRODUCT WAS DOWNLOADED FROM, AND WHEN. Measured by downloading and installing two agent products on a clean macOS 26.5 host and reading the attributes afterwards.
+
+    Both installers carried the quarantine and provenance attributes, which hold the time of the download, the application that did the downloading and an event identifier, and both carried the metadata attribute that holds the full download URL. This database is the persistent side of the same record: one row per download, keyed by that event identifier, surviving the deletion of the file it describes.
+
+    Why this matters beyond dating an installation. The delivery domain of one of the two products is neither its own current domain nor its current name: it still ships from the infrastructure of the company and the product it was before the rename. So a network detection written against the current product name misses the download entirely, and a row in this database is the local evidence of a transfer that no name based rule would have flagged.
+
+    The two extended attributes themselves are not paths and cannot be catalogued as such. They travel with the file, so any collection that takes an installer or an application bundle takes them too, and the collector's manifest is where they have to be read from.
+  parser: sqlite_generic
 - id: crosscutting.hook_scripts
   category: instructions
   root: project

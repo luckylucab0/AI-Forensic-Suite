@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: df155331d8d0
+# Catalogue digest: 7beb4f66bf30
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -26,6 +26,7 @@
 #     claude_code.managed_settings_registry
 #     claude_desktop.managed_policy_windows
 #     crosscutting.windows_execution_evidence_registry
+#     crosscutting.windows_removed_product_registry
 #     cursor.install_and_machine_identity
 #     ollama.env_overrides_registry
 #     windsurf.enterprise_policy

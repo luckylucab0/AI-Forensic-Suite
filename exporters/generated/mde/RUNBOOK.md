@@ -2,7 +2,7 @@
 
 <!-- Generated from the artifact catalogue. Do not edit by hand:
 <!-- run `afx export-collection` and commit the result.
-<!-- Catalogue digest: df155331d8d0
+<!-- Catalogue digest: 7beb4f66bf30
 <!--
 <!-- An empty result from this rule means the paths it searched held nothing. It does
 <!-- not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -72,7 +72,7 @@ Windows-relevant catalogue entries, as a sense of what a collection will cover:
 | Claude Desktop | `claude_desktop` | 25 |
 | Cline | `cline` | 24 |
 | Continue | `continue` | 17 |
-| Cross-cutting evidence | `crosscutting` | 20 |
+| Cross-cutting evidence | `crosscutting` | 21 |
 | Cursor | `cursor` | 44 |
 | Devin | `devin` | 2 |
 | Factory Droid | `factory_droid` | 9 |

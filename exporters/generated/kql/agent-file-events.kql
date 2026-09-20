@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: df155331d8d0
+// Catalogue digest: 7beb4f66bf30
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -23,6 +23,7 @@
 //     claude_code.managed_settings_registry
 //     claude_desktop.managed_policy_windows
 //     crosscutting.windows_execution_evidence_registry
+//     crosscutting.windows_removed_product_registry
 //     cursor.install_and_machine_identity
 //     ollama.env_overrides_registry
 //     windsurf.enterprise_policy
@@ -960,6 +961,11 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "crosscutting", "crosscutting.homebrew_prefixes", "/opt/homebrew/bin",
     "crosscutting", "crosscutting.homebrew_prefixes", "/usr/local",
     "crosscutting", "crosscutting.homebrew_prefixes", "/usr/local/Cellar",
+    "crosscutting", "crosscutting.macos_download_provenance", "Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2",
+    "crosscutting", "crosscutting.macos_download_provenance", "Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2-shm",
+    "crosscutting", "crosscutting.macos_download_provenance", "Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2-wal",
+    "crosscutting", "crosscutting.macos_launch_services_registrations", "/private/var/folders",
+    "crosscutting", "crosscutting.macos_launch_services_registrations", "Library/Preferences/com.apple.LaunchServices/com.apple.launchservices.secure.plist",
     "crosscutting", "crosscutting.npm_debug_logs", ".npm/_logs",
     "crosscutting", "crosscutting.npm_debug_logs", ".npm\\_logs",
     "crosscutting", "crosscutting.npm_debug_logs", "npm-cache/_logs",

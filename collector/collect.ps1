@@ -4668,6 +4668,37 @@ $EmbeddedCatalogueJson = @'
                     "status": "unverified"
                 },
                 {
+                    "category": "install_evidence",
+                    "collect_priority": "durable",
+                    "id": "crosscutting.macos_download_provenance",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2",
+                        "~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2-shm",
+                        "~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "durable",
+                    "id": "crosscutting.macos_launch_services_registrations",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "/private/var/folders/*/*/0/com.apple.LaunchServices-*.csstore",
+                        "~/Library/Preferences/com.apple.LaunchServices/com.apple.launchservices.secure.plist"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
                     "category": "mcp_config",
                     "collect_priority": "normal",
                     "id": "crosscutting.mcp_config_files",
@@ -4907,6 +4938,23 @@ $EmbeddedCatalogueJson = @'
                         "HKEY_USERS\\<sid>\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\*\\Count",
                         "HKEY_USERS\\<sid>\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
                         "HKEY_USERS\\<sid>\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce"
+                    ],
+                    "root": "registry",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "crosscutting.windows_removed_product_registry",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "HKEY_CURRENT_USER\\Software\\Classes\\<url-scheme>",
+                        "HKEY_CURRENT_USER\\Software\\Classes\\<url-scheme>\\shell\\open\\command",
+                        "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*",
+                        "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*"
                     ],
                     "root": "registry",
                     "sensitivity": "normal",
@@ -11492,7 +11540,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "4e4e02376d62dc249fd88eaa3084177d24264e8f47ffc6b5abc80391f4598f3f"
+    "sha256": "88d0b5542b774327126790e2bd92b40619e04163e5de83a1260e4cb77cad8694"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json
