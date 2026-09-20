@@ -6,7 +6,7 @@ English | [Deutsch](ARTIFACTS.de.md)
 
 Generated from catalog/ by scripts/gen_artifact_docs.py. Do not edit by hand: CI regenerates this file and fails if it differs.
 
-541 artifacts across 31 agent(s), 437 of them resting on a fetched vendor source.
+545 artifacts across 31 agent(s), 440 of them resting on a fetched vendor source.
 
 Entries marked unverified are collected anyway, but no vendor source confirms the path. Treat the absence of such an artifact as inconclusive rather than as evidence that the agent was not used.
 
@@ -28,6 +28,15 @@ Vendor: Aider
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `aider.tags_cache` | tags cache | cache | macOS, Windows, Linux | `<project>/.aider.tags.cache.v3/`<br>`<project>/.aider.tags.cache.v4/` | sqlite | normal | Rebuilt on demand. If the on-disk cache cannot be opened aider silently falls back to an in-memory dict and writes nothing, so absence does not mean aider was not used. | verified | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/repomap.py) |
 
+### first
+
+**Collect first.** Rotated or swept aggressively, by count or on every sweep rather than after a comfortable interval. Some of these can be destroyed by the user simply starting another session.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `aider.ignore` | ignore | config | macOS, Linux, Windows | `<project>/.aiderignore` | text | normal | Persistent until edited. When a pattern was added is not in the file: the filesystem event dates the last write to the whole of it. | verified | [source_code](https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/args.py) |
+| `aider.llm_history` | llm history | transcript | macOS, Linux, Windows | `<project>/.aider.llm.history` | text | normal | Appended to for as long as the option is set, and never rotated. Absent entirely unless somebody asked for it. | **unverified** | [official](https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/args.py) |
+
 ### normal
 
 **Collect normally.** Subject to the agent's ordinary retention period, which for several agents defaults to 30 days.
@@ -40,8 +49,10 @@ Vendor: Aider
 | `aider.config` | config | config | macOS, Windows, Linux | `<project>/.aider.conf.yml`<br>`~/.aider.conf.yml` | yaml | normal | Persistent until edited. | verified | [source_code](https://github.com/Aider-AI/aider/blob/main/HISTORY.md) |
 | `aider.dotenv` | dotenv | credentials | macOS, Windows, Linux | `<project>/.env`<br>`~/.env` | text | secret | Persistent until edited. | verified | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/website/docs/config/dotenv.md) |
 | `aider.input_history` | input history | prompt_history | macOS, Windows, Linux | `<project>/.aider.input.history` | text | normal | Append-only readline-style history; survives across sessions and is not rotated. | verified | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py) |
+| `aider.installs` | installs | install_evidence | macOS, Linux, Windows | `~/.aider/installs.json` | json | normal | Appended to on the first run of each new combination and never pruned, so it is a history rather than a current state. | verified | [source_code](https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/main.py) |
 | `aider.model_metadata` | model metadata | config | macOS, Windows, Linux | `<project>/.aider.model.metadata.json`<br>`~/.aider.model.metadata.json` | json | normal | Persistent until edited. | verified | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/website/docs/config/adv-model-settings.md) |
 | `aider.model_settings` | model settings | config | macOS, Windows, Linux | `<project>/.aider.model.settings.yml`<br>`~/.aider.model.settings.yml` | yaml | normal | Persistent until edited. | verified | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/website/docs/config/adv-model-settings.md) |
+| `aider.oauth_keys` | oauth keys | credentials | macOS, Linux, Windows | `~/.aider/oauth-keys.env` | text | secret | Written by the sign-in flow and left. Loaded before every other environment file the product reads, so it is in force until it is deleted. | verified | [source_code](https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/main.py) |
 
 ## Amazon Q Developer (CLI and IDE extension)
 

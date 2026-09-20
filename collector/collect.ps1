@@ -215,6 +215,22 @@ $EmbeddedCatalogueJson = @'
                     "status": "verified"
                 },
                 {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "aider.ignore",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.aiderignore"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "prompt_history",
                     "collect_priority": "normal",
                     "id": "aider.input_history",
@@ -229,6 +245,38 @@ $EmbeddedCatalogueJson = @'
                     "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "aider.installs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.aider/installs.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "aider.llm_history",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.aider.llm.history"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "unverified"
                 },
                 {
                     "category": "config",
@@ -262,6 +310,22 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "root": "project",
                     "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "aider.oauth_keys",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.aider/oauth-keys.env"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
                     "status": "verified"
                 },
                 {
@@ -10775,7 +10839,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "b47ae71db79b6c55ff9e77cca16d1d4c3db4f66cbc2321829449902c57a615ba"
+    "sha256": "988c39b5f336545dc2c5883a7322153b867fec85b495957b9f6816d40d1066b3"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

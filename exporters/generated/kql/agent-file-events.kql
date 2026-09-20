@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 39479776ddef
+// Catalogue digest: 02ce5fb23489
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -30,7 +30,9 @@
 //     aider.chat_history
 //     aider.config
 //     aider.dotenv
+//     aider.ignore
 //     aider.input_history
+//     aider.llm_history
 //     aider.model_metadata
 //     aider.model_settings
 //     aider.tags_cache
@@ -165,6 +167,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "aider", "aider.analytics", ".aider\\analytics.json",
     "aider", "aider.caches", ".aider/caches",
     "aider", "aider.caches", ".aider\\caches",
+    "aider", "aider.installs", ".aider/installs.json",
+    "aider", "aider.installs", ".aider\\installs.json",
+    "aider", "aider.oauth_keys", ".aider/oauth-keys.env",
+    "aider", "aider.oauth_keys", ".aider\\oauth-keys.env",
     "amazonq", "amazonq.cli_checkpoints", ".aws/amazonq/cli-checkouts",
     "amazonq", "amazonq.cli_checkpoints", ".aws\\amazonq\\cli-checkouts",
     "amazonq", "amazonq.cli_logs", "/tmp/qlog",

@@ -6,7 +6,7 @@
 
 Erzeugt aus catalog/ durch scripts/gen_artifact_docs.py. Nicht von Hand bearbeiten: die CI erzeugt diese Datei neu und schlägt fehl, wenn sie abweicht.
 
-541 Artefakte über 31 Agent(en), davon 437 auf einer abgerufenen Herstellerquelle beruhend.
+545 Artefakte über 31 Agent(en), davon 440 auf einer abgerufenen Herstellerquelle beruhend.
 
 Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
 
@@ -28,6 +28,15 @@ Vendor: Aider
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `aider.tags_cache` | tags cache | cache | macOS, Windows, Linux | `<project>/.aider.tags.cache.v3/`<br>`<project>/.aider.tags.cache.v4/` | sqlite | normal | [EN] Rebuilt on demand. If the on-disk cache cannot be opened aider silently falls back to an in-memory dict and writes nothing, so absence does not mean aider was not used. | bestätigt | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/repomap.py) |
 
+### first
+
+**Zuerst sichern.** Rotieren oder verfallen aggressiv, nach Anzahl oder bei jedem Aufräumlauf statt nach einer bequemen Frist. Einige davon zerstört die Benutzerin schon dadurch, dass sie eine weitere Sitzung startet.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `aider.ignore` | ignore | config | macOS, Linux, Windows | `<project>/.aiderignore` | text | normal | [EN] Persistent until edited. When a pattern was added is not in the file: the filesystem event dates the last write to the whole of it. | bestätigt | [source_code](https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/args.py) |
+| `aider.llm_history` | llm history | transcript | macOS, Linux, Windows | `<project>/.aider.llm.history` | text | normal | [EN] Appended to for as long as the option is set, and never rotated. Absent entirely unless somebody asked for it. | **unbestätigt** | [official](https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/args.py) |
+
 ### normal
 
 **Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
@@ -40,8 +49,10 @@ Vendor: Aider
 | `aider.config` | config | config | macOS, Windows, Linux | `<project>/.aider.conf.yml`<br>`~/.aider.conf.yml` | yaml | normal | [EN] Persistent until edited. | bestätigt | [source_code](https://github.com/Aider-AI/aider/blob/main/HISTORY.md) |
 | `aider.dotenv` | dotenv | credentials | macOS, Windows, Linux | `<project>/.env`<br>`~/.env` | text | secret | [EN] Persistent until edited. | bestätigt | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/website/docs/config/dotenv.md) |
 | `aider.input_history` | input history | prompt_history | macOS, Windows, Linux | `<project>/.aider.input.history` | text | normal | [EN] Append-only readline-style history; survives across sessions and is not rotated. | bestätigt | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py) |
+| `aider.installs` | installs | install_evidence | macOS, Linux, Windows | `~/.aider/installs.json` | json | normal | [EN] Appended to on the first run of each new combination and never pruned, so it is a history rather than a current state. | bestätigt | [source_code](https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/main.py) |
 | `aider.model_metadata` | model metadata | config | macOS, Windows, Linux | `<project>/.aider.model.metadata.json`<br>`~/.aider.model.metadata.json` | json | normal | [EN] Persistent until edited. | bestätigt | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/website/docs/config/adv-model-settings.md) |
 | `aider.model_settings` | model settings | config | macOS, Windows, Linux | `<project>/.aider.model.settings.yml`<br>`~/.aider.model.settings.yml` | yaml | normal | [EN] Persistent until edited. | bestätigt | [source_code](https://raw.githubusercontent.com/Aider-AI/aider/main/aider/website/docs/config/adv-model-settings.md) |
+| `aider.oauth_keys` | oauth keys | credentials | macOS, Linux, Windows | `~/.aider/oauth-keys.env` | text | secret | [EN] Written by the sign-in flow and left. Loaded before every other environment file the product reads, so it is in force until it is deleted. | bestätigt | [source_code](https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/main.py) |
 
 ## Amazon Q Developer (CLI and IDE extension)
 

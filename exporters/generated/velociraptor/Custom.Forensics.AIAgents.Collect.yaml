@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 39479776ddef
+# Catalogue digest: 02ce5fb23489
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -24,7 +24,9 @@
 #     aider.chat_history
 #     aider.config
 #     aider.dotenv
+#     aider.ignore
 #     aider.input_history
+#     aider.llm_history
 #     aider.model_metadata
 #     aider.model_settings
 #     aider.tags_cache
@@ -177,6 +179,8 @@ sources:
       filename='''agent,artifact_id,glob
     aider,aider.analytics,C:/Users/*/.aider/analytics.json
     aider,aider.caches,C:/Users/*/.aider/caches/**
+    aider,aider.installs,C:/Users/*/.aider/installs.json
+    aider,aider.oauth_keys,C:/Users/*/.aider/oauth-keys.env
     amazonq,amazonq.cli_checkpoints,C:/Users/*/.aws/amazonq/cli-checkouts/*/**
     amazonq,amazonq.cli_logs,C:/Users/*/AppData/Local/Temp/amazon-q/logs/*.log
     amazonq,amazonq.cli_logs,C:/Users/*/AppData/Local/Temp/qlog/*.log
@@ -1418,6 +1422,10 @@ sources:
     aider,aider.analytics,/var/root/.aider/analytics.json
     aider,aider.caches,/Users/*/.aider/caches/**
     aider,aider.caches,/var/root/.aider/caches/**
+    aider,aider.installs,/Users/*/.aider/installs.json
+    aider,aider.installs,/var/root/.aider/installs.json
+    aider,aider.oauth_keys,/Users/*/.aider/oauth-keys.env
+    aider,aider.oauth_keys,/var/root/.aider/oauth-keys.env
     amazonq,amazonq.cli_checkpoints,/Users/*/.aws/amazonq/cli-checkouts/*/**
     amazonq,amazonq.cli_checkpoints,/var/root/.aws/amazonq/cli-checkouts/*/**
     amazonq,amazonq.cli_logs,/tmp/qlog/*.log
@@ -3836,6 +3844,10 @@ sources:
     aider,aider.analytics,/root/.aider/analytics.json
     aider,aider.caches,/home/*/.aider/caches/**
     aider,aider.caches,/root/.aider/caches/**
+    aider,aider.installs,/home/*/.aider/installs.json
+    aider,aider.installs,/root/.aider/installs.json
+    aider,aider.oauth_keys,/home/*/.aider/oauth-keys.env
+    aider,aider.oauth_keys,/root/.aider/oauth-keys.env
     amazonq,amazonq.cli_checkpoints,/home/*/.aws/amazonq/cli-checkouts/*/**
     amazonq,amazonq.cli_checkpoints,/root/.aws/amazonq/cli-checkouts/*/**
     amazonq,amazonq.cli_logs,/tmp/qlog/*.log

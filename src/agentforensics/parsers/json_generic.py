@@ -61,6 +61,7 @@ DOCUMENTS = frozenset(
     {
         "aider.analytics",
         "aider.caches",
+        "aider.installs",
         "aider.model_metadata",
         "amazonq.cli_agents",
         "amazonq.cli_mcp_config",

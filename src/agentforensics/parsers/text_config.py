@@ -54,6 +54,7 @@ from agentforensics.parsers.instructions import BINARY_FILE, MAX_TEXT
 # not a catalogue entry. tests/unit/test_text_config.py holds this against the catalogue.
 SOURCES = frozenset(
     {
+        "aider.ignore",
         "claude_code.anthropic_active_config",
         "claude_code.changelog_cache",
         "claude_code.git_global_excludes",
@@ -89,6 +90,7 @@ PER_LINE = {
 # Files that are a list whichever entry claimed them. Two of these entries claim a whole
 # directory with a list among the things in it, so the entry alone cannot say.
 _BY_NAME = {
+    ".aiderignore": "ignore",
     ".continueignore": "ignore",
     ".codeiumignore": "ignore",
     ".devinignore": "ignore",

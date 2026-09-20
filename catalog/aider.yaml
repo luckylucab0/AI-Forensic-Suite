@@ -27,6 +27,108 @@ references:
 - https://raw.githubusercontent.com/Aider-AI/aider/main/aider/args.py
 - https://raw.githubusercontent.com/Aider-AI/aider/main/aider/repomap.py
 artifacts:
+- id: aider.oauth_keys
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.aider/oauth-keys.env
+  format: text
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/main.py
+  source_kind: source_code
+  volatility: |-
+    Written by the sign-in flow and left. Loaded before every other environment file the product reads, so it is in force until it is deleted.
+  notes: |-
+    Record metadata and a hash only. The key names are still worth recording: they name the provider the user signed in to.
+
+    The catalogue had one credential entry for this agent and it was the environment file in the project and in the home, which is the one a user writes by hand. This is the one the product writes by itself when somebody signs in through it, in a directory of its own, and a collection built around the other two does not touch it.
+
+    It is also loaded first of all the environment files, which matters for a different question: a key here is what the agent used, whatever a project environment file appears to say.
+  parser: null
+- id: aider.installs
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.aider/installs.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/main.py
+  source_kind: source_code
+  volatility: |-
+    Appended to on the first run of each new combination and never pruned, so it is a history rather than a current state.
+  notes: |-
+    Which versions of this agent ran on the endpoint, and under which interpreter.
+
+    The product keys this file on the version together with the path of the Python executable running it, so a key is one install. That gives an analyst two things: the list of versions this machine has seen, which dates the use of the agent across upgrades, and the interpreter paths, which say where each install lived and distinguishes a system install from a virtual environment or a packaged one.
+
+    Development versions are deliberately not recorded, so an absence does not mean the agent never ran.
+
+    Record structure: a JSON object keyed by the version and the executable path.
+  parser: json_generic
+- id: aider.llm_history
+  category: transcript
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.aider.llm.history
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/args.py
+  source_kind: official
+  volatility: |-
+    Appended to for as long as the option is set, and never rotated. Absent entirely unless somebody asked for it.
+  notes: |-
+    The conversation with the model, as it was sent, rather than as it was shown.
+
+    The chat history this catalogue already carries is the rendered conversation: what the user saw. This is the other side of the same turn, every message exchanged with the provider written out as it went, and where it exists it is the strongest record on the endpoint of what the model was actually given.
+
+    It is unverified on purpose and the reason matters. The product builds no default location for this file: the option has no default value and the path here is the example the vendor's own help text gives. A run that named a different file put it somewhere this catalogue cannot predict, so a miss at this path is inconclusive rather than an absence. Where the option was set in the configuration file, that file names the real path, and on a live endpoint the command line of the running process does.
+
+    Record structure: plain text, one block per message, appended in order.
+  parser: prose_document
+- id: aider.ignore
+  category: config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.aiderignore
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/Aider-AI/aider/blob/5dc9490bb35f9729ef2c95d00a19ccd30c26339c/aider/args.py
+  source_kind: source_code
+  volatility: |-
+    Persistent until edited. When a pattern was added is not in the file: the filesystem event dates the last write to the whole of it.
+  notes: |-
+    What this agent was configured never to read, which is the inverse of everything else collected for it.
+
+    A file matching a pattern here is one the agent could not add to a conversation, so a file somebody expected it to have touched and which it did not may be explained here rather than by the agent's behaviour. And a pattern added shortly before the period under investigation keeps material out of every conversation the agent had after that.
+
+    The product resolves the file at the repository root unless a run named another one, so the same caution applies as to any of its path options: the configuration file and the running process's arguments are what say where it really was.
+
+    Record structure: one pattern per line, in the ignore syntax the product's version control uses. Each line reaches the case as an event of its own so a pattern can be compared against a path.
+  parser: text_config
 - id: aider.tags_cache
   category: cache
   root: project

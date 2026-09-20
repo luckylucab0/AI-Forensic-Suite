@@ -36,6 +36,7 @@ from agentforensics.parsers.instructions import BINARY_FILE, MAX_TEXT
 # and not a catalogue entry. tests/unit/test_prose_document.py compares this against the
 # catalogue, so a prose transcript added there fails CI until it is listed here.
 SOURCES = {
+    "aider.llm_history": "unparsed.record",
     "amazonq.ide_chat_export": "unparsed.record",
     # The text behind a [Pasted text #N] placeholder. The transcript and the prompt history
     # carry the placeholder and not the text, and the vendor's own changelog notes that a

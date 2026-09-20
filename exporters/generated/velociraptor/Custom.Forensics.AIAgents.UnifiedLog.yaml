@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 39479776ddef
+# Catalogue digest: 02ce5fb23489
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,8 +8,8 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# Scope: the 101 artifacts the catalogue files under transcript and prompt_history.
-# The other 440 are configuration, credentials, caches, logs and install
+# Scope: the 102 artifacts the catalogue files under transcript and prompt_history.
+# The other 443 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
 # credential store what an analyst wants is the file, which is what the Collect
@@ -67,6 +67,7 @@
 #   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
 #     aider.chat_history
 #     aider.input_history
+#     aider.llm_history
 #     amazonq.ide_chat_export
 #     factory_droid.sessions
 #     windsurf.plans

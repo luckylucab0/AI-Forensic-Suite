@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 39479776ddef
+# Catalogue digest: 02ce5fb23489
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -33,7 +33,9 @@
 #     aider.chat_history
 #     aider.config
 #     aider.dotenv
+#     aider.ignore
 #     aider.input_history
+#     aider.llm_history
 #     aider.model_metadata
 #     aider.model_settings
 #     aider.tags_cache
@@ -167,6 +169,8 @@ try {
 $targets = @(
     @{ Agent = 'aider'; Id = 'aider.analytics'; Path = '$profile\.aider\analytics.json' }
     @{ Agent = 'aider'; Id = 'aider.caches'; Path = '$profile\.aider\caches' }
+    @{ Agent = 'aider'; Id = 'aider.installs'; Path = '$profile\.aider\installs.json' }
+    @{ Agent = 'aider'; Id = 'aider.oauth_keys'; Path = '$profile\.aider\oauth-keys.env' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_checkpoints'; Path = '$profile\.aws\amazonq\cli-checkouts' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_logs'; Path = '$profile\AppData\Local\Temp\amazon-q\logs' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_logs'; Path = '$profile\AppData\Local\Temp\qlog' }
