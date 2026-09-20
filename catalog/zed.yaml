@@ -87,8 +87,8 @@ artifacts:
   - '%LOCALAPPDATA%\Zed\prompt_overrides\'
   - ~/Library/Application Support/Zed/debug_adapters/
   - ~/Library/Application Support/Zed/extensions/
+  - ~/.config/zed/prompt_overrides/
   - ~/Library/Application Support/Zed/external_agents/
-  - ~/Library/Application Support/Zed/prompt_overrides/
   format: binary
   sensitivity: normal
   collect_priority: normal
@@ -102,6 +102,8 @@ artifacts:
     Path correction from the source verification pass: this entry rooted four of its five paths at a data directory environment variable that the editor does not read. The only override is a function call inside the process, so the variable is unset on every host and all four patterns resolved to nothing, on every platform, without any error. They are written out per platform now, from the defaults the path crate states.
 
     The prompts directory used to be the fifth path here, with the macOS spelling only, on the reasoning that prompts_dir sits under the configuration directory. That is true on macOS and false everywhere else: prompts_dir is config_dir/prompts on macOS and data_dir/prompts on Linux and Windows, so the one spelling collected nothing on two platforms. It is zed.prompt_library now, in its own entry, because what is in it is the user's own instruction text rather than evidence that something was installed.
+
+    Checked helper by helper against the path crate at the same time, because that is where the mistake above came from: extensions_dir, debug_adapters_dir and external_agents_dir are all data_dir joins, so the three spellings of each are right. prompt_overrides_dir is not: like prompts_dir it is config_dir/prompt_overrides on macOS and data_dir/prompt_overrides elsewhere, and the macOS spelling here pointed at the data directory, where the editor never writes it. It is ~/.config/zed/prompt_overrides/ now. The directory matters because a file in it silently replaces one of the prompts the product ships.
   parser: null
 - id: zed.logs
   category: log

@@ -8984,8 +8984,8 @@ $EmbeddedCatalogueJson = @'
                         "%LOCALAPPDATA%\\Zed\\prompt_overrides\\",
                         "~/Library/Application Support/Zed/debug_adapters/",
                         "~/Library/Application Support/Zed/extensions/",
-                        "~/Library/Application Support/Zed/external_agents/",
-                        "~/Library/Application Support/Zed/prompt_overrides/"
+                        "~/.config/zed/prompt_overrides/",
+                        "~/Library/Application Support/Zed/external_agents/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -9115,7 +9115,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "7907b83d718527bad2b545c3a5a01941d733a6ccac24abcf0fce54e1d1d2adc5"
+    "sha256": "92554d6a0cd301b6c3aa472e3914543ebd332ab95e57b7dc3cb178eb4e387259"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

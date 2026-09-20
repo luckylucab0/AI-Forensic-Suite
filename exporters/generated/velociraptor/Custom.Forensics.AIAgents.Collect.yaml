@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: ad813e31f5da
+# Catalogue digest: 9f2742c33e48
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -2980,14 +2980,14 @@ sources:
     windsurf,windsurf.worktrees,/Users/*/.windsurf/worktrees/*
     windsurf,windsurf.worktrees,/var/root/.devin/worktrees/*
     windsurf,windsurf.worktrees,/var/root/.windsurf/worktrees/*
+    zed,zed.extensions,/Users/*/.config/zed/prompt_overrides/**
     zed,zed.extensions,/Users/*/Library/Application Support/Zed/debug_adapters/**
     zed,zed.extensions,/Users/*/Library/Application Support/Zed/extensions/**
     zed,zed.extensions,/Users/*/Library/Application Support/Zed/external_agents/**
-    zed,zed.extensions,/Users/*/Library/Application Support/Zed/prompt_overrides/**
+    zed,zed.extensions,/var/root/.config/zed/prompt_overrides/**
     zed,zed.extensions,/var/root/Library/Application Support/Zed/debug_adapters/**
     zed,zed.extensions,/var/root/Library/Application Support/Zed/extensions/**
     zed,zed.extensions,/var/root/Library/Application Support/Zed/external_agents/**
-    zed,zed.extensions,/var/root/Library/Application Support/Zed/prompt_overrides/**
     zed,zed.logs,/Users/*/Library/Logs/Zed/**
     zed,zed.logs,/var/root/Library/Logs/Zed/**
     zed,zed.prompt_library,/Users/*/.config/zed/prompts/**
@@ -4888,14 +4888,14 @@ sources:
     windsurf,windsurf.worktrees,/home/*/.windsurf/worktrees/*
     windsurf,windsurf.worktrees,/root/.devin/worktrees/*
     windsurf,windsurf.worktrees,/root/.windsurf/worktrees/*
+    zed,zed.extensions,/home/*/.config/zed/prompt_overrides/**
     zed,zed.extensions,/home/*/Library/Application Support/Zed/debug_adapters/**
     zed,zed.extensions,/home/*/Library/Application Support/Zed/extensions/**
     zed,zed.extensions,/home/*/Library/Application Support/Zed/external_agents/**
-    zed,zed.extensions,/home/*/Library/Application Support/Zed/prompt_overrides/**
+    zed,zed.extensions,/root/.config/zed/prompt_overrides/**
     zed,zed.extensions,/root/Library/Application Support/Zed/debug_adapters/**
     zed,zed.extensions,/root/Library/Application Support/Zed/extensions/**
     zed,zed.extensions,/root/Library/Application Support/Zed/external_agents/**
-    zed,zed.extensions,/root/Library/Application Support/Zed/prompt_overrides/**
     zed,zed.flatpak_legacy_threads,/home/*/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/**
     zed,zed.flatpak_legacy_threads,/root/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/**
     zed,zed.logs,/home/*/Library/Logs/Zed/**
