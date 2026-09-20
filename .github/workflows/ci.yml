@@ -199,6 +199,27 @@ jobs:
           }
           Write-Host "parsed clean, $($tokens.Count) tokens"
 
+      - name: Parse the generated presence script under 5.1
+        shell: powershell
+        # The other PowerShell this project ships, and the one nothing was parsing. It is
+        # generated from the catalogue, which means a path with a quote, a backtick or a
+        # dollar sign in it can break it, and it is pushed to an endpoint through live
+        # response, so the first place a syntax error would appear is on somebody's
+        # evidence with a responder waiting for output.
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $errors = $null
+          $tokens = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            "exporters/generated/mde/Check-AIAgentPresence.ps1", [ref]$tokens, [ref]$errors) |
+            Out-Null
+          if ($errors -and $errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Host $_.Message }
+            Write-Error "the generated presence script does not parse under PowerShell $($PSVersionTable.PSVersion)"
+            exit 1
+          }
+          Write-Host "parsed clean, $($tokens.Count) tokens"
+
       - name: Serializer parity under 5.1
         shell: powershell
         # The manifest is diffed between the two collectors, so the JSON has to be

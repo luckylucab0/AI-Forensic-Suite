@@ -17,6 +17,7 @@ import pytest
 import yaml
 
 from agentforensics.catalog import Catalogue, load_catalogue
+from agentforensics.catalog.model import AgentCatalog, Artifact
 from agentforensics.exporters import FORMATS, render
 from agentforensics.exporters.common import bare_variable, iter_paths
 
@@ -291,3 +292,97 @@ def test_every_registry_entry_is_named_as_uncovered_somewhere(catalogue: Catalog
     assert len(keys) >= 6
     missing = [key for key in keys if key not in rendered]
     assert not missing, missing
+
+
+# ------------------------------------------------- the quoting nothing was exercising
+
+
+def awkward_catalogue() -> Catalogue:
+    """One agent whose paths carry every character that can break out of a generated file.
+
+    No catalogue path holds any of these today, which is exactly why this exists: three of
+    the five renderers escape a quote before writing a path into a string literal, and with
+    no path to escape, all three would keep passing if the escaping were deleted. The
+    generated files are a PowerShell script pushed to an endpoint through live response, a
+    query pack and a hunting query, so a path that breaks out of its literal is either a
+    script that does not parse or a query that means something other than what it says.
+
+    The apostrophe is the realistic one: a Windows profile directory is the account's
+    display name, and an account named for a person can carry one.
+    """
+    paths = (
+        r"%USERPROFILE%\O'Brien\notes.json",
+        r"%USERPROFILE%\a\"b\c.json",
+        r"%USERPROFILE%\back`tick\d.json",
+        r"%USERPROFILE%\dollar$sign\e.json",
+    )
+    artifact = Artifact(
+        id="example.awkward",
+        category="config",
+        os=("windows",),
+        paths=paths,
+        format="json",
+        sensitivity="normal",
+        status="unverified",
+        source="observed on a host whose account name has an apostrophe in it",
+        source_kind="observed",
+    )
+    return Catalogue(
+        agents=(AgentCatalog(agent="example", title="Example", artifacts=(artifact,)),)
+    )
+
+
+# Which renderers put a path inside a quoted literal, and what closing it looks like.
+# The other two do not: one writes an unquoted scalar, where an apostrophe is an ordinary
+# character, and writing this test taught that difference rather than assuming it.
+QUOTED_LITERALS = {
+    "mde": "a PowerShell single-quoted string, where a lone quote ends the literal and the "
+    "rest of the path becomes code",
+    "osquery": "a SQL single-quoted string inside a JSON document, where a lone quote ends "
+    "the pattern and the rest becomes syntax",
+}
+
+
+def test_a_quote_in_a_path_cannot_break_out_of_a_generated_literal() -> None:
+    """Every renderer that writes a path into a single-quoted literal has to close it.
+
+    Checked per format so a failure names which file would have been broken.
+    """
+    catalogue = awkward_catalogue()
+    checked = set()
+    for name in sorted(QUOTED_LITERALS):
+        for item in FORMATS[name](catalogue):
+            for line in item.text.splitlines():
+                if "Brien" not in line:
+                    continue
+                checked.add(name)
+                assert "O''Brien" in line, (
+                    f"{name} wrote an apostrophe into {QUOTED_LITERALS[name]} without "
+                    f"doubling it: {line.strip()[:120]}"
+                )
+    assert checked == set(QUOTED_LITERALS), (
+        "a renderer stopped writing the awkward path at all, so this test stopped checking "
+        f"it: {sorted(set(QUOTED_LITERALS) - checked)}"
+    )
+
+
+def test_every_rendered_file_is_still_well_formed_with_awkward_paths() -> None:
+    """The same catalogue through the checks the committed output already has to pass.
+
+    Those checks run over the real catalogue, which holds none of these characters, so they
+    say nothing about what happens when one arrives. Here they run over a catalogue made of
+    nothing else.
+    """
+    catalogue = awkward_catalogue()
+    for item in render(catalogue):
+        if item.path.endswith(".yaml"):
+            yaml.safe_load(item.text)
+        elif item.path.endswith(".conf"):
+            json.loads(item.text)
+        # A PowerShell single-quoted literal: every line that opens one has to close it.
+        for line in item.text.splitlines():
+            if item.path.endswith(".ps1") and "Path = '" in line:
+                assert line.count("'") % 2 == 0, (
+                    f"{item.path} has an unbalanced quote, so the script stops parsing "
+                    f"there: {line.strip()[:120]}"
+                )
