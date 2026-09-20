@@ -366,7 +366,11 @@ def parse(root: Path, relative: str) -> list:
             ParseContext(
                 bundle_uuid="b1",
                 original_path=f"/home/alice/.aws/amazonq/cli-checkouts/{SESSION}/.git/{relative}",
-                local_path=root / ".git" / relative,
+                # A repository the agent owns is bare, so its files sit at the root rather
+                # than under a `.git` directory. Both shapes reach this parser.
+                local_path=(
+                    root / ".git" / relative if (root / ".git").is_dir() else root / relative
+                ),
                 sha256="aa",
                 artifact_id=ARTIFACT,
                 agent="amazonq",
@@ -454,3 +458,43 @@ def test_a_chain_whose_root_did_not_expand_says_that_and_not_that_it_is_absent()
     pack = git_pack.read(_pack(absent, against_it))
     assert "not in this pack" in pack.objects[0].problem
     assert "did not expand either" in pack.objects[1].problem
+
+
+# ------------------------------------------ the pack the fixture generator writes
+
+
+def test_the_synthetic_profile_carries_a_packed_repository_and_it_reads(tmp_path: Path) -> None:
+    """The fixture's own shadow repository, read the way a case reads one.
+
+    This is the case that needs no git, which is the point of it: the suite's synthetic
+    profile is what the conformance run, the rule packs and the end to end tests are built
+    on, and until this repository was in it the whole pack path was exercised only where
+    git happened to be installed. It also holds the generator to its word, because a
+    fixture that writes a pack nothing can read is a fixture that proves nothing.
+
+    The blob asserted on is the version of the file before the agent changed it, and in the
+    pack it is a difference against the version after. Nothing else in the profile carries
+    it, and on an endpoint nothing else carries it either.
+    """
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tests" / "fixtures"))
+    from generate import write_shadow_repository
+
+    ids = write_shadow_repository(tmp_path / "repository")
+    found = sorted((tmp_path / "repository" / "objects" / "pack").glob("*.pack"))
+    pack = git_pack.read(found[0].read_bytes())
+    assert [object_.problem for object_ in pack.objects] == [""] * 6
+    # The ids the generator says it wrote are the ids this reader computes from the bytes.
+    # The generator hashes what it is about to store and this hashes what came back out, so
+    # agreeing means the round trip through the pack and its delta kept the content.
+    assert set(ids.values()) - {ids["pack"]} <= {object_.object_id for object_ in pack.objects}
+
+    events = parse(tmp_path / "repository", f"objects/pack/{found[0].name}")
+    before = [event for event in events if event.raw.get("object_id") == ids["blob_before"]]
+    assert len(before) == 1
+    # It came out of a delta, so these bytes were computed here and read nowhere.
+    assert before[0].raw["delta_depth"] == 1
+    assert "listen_port = 8003" in before[0].raw["content"]
+    after = [event for event in events if event.raw.get("object_id") == ids["blob_after"]]
+    assert "listen_port = 9999" in after[0].raw["content"]

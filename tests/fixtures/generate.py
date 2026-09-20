@@ -27,11 +27,14 @@ import argparse
 # module, so their own 3.8 floor is untouched.
 import base64
 import compression.zstd as zstd
+import hashlib
 import json
 import os
 import re
 import sqlite3
+import struct
 import sys
+import zlib
 from pathlib import Path
 
 # Fixed instants, so mtimes are stable across runs and machines. Chosen to sit either side
@@ -53,6 +56,9 @@ SESSION_B = "4f8c1e2a-0000-4000-8000-000000000002"
 # directory per session holding a versioned messages file and a manifest, with the hook
 # audit log beside it under the data directory.
 CLI_SESSION = "4f8c1e2a-0000-4000-8000-000000000003"
+# The conversation whose shadow repository is below. One agent keeps a bare git repository
+# per conversation, so this id is the directory name and the tie back to the transcript.
+Q_CONVERSATION = "4f8c1e2a-0000-4000-8000-000000000006"
 # Continue keeps one file per session named by its id, and an index beside them. The index
 # is the only thing in that store with a clock in it.
 CONTINUE_SESSION = "4f8c1e2a-0000-4000-8000-000000000004"
@@ -938,6 +944,199 @@ def write_leveldb_store(directory: Path, mtime: int = RECENT) -> Path:
     return write(directory / "LOCK", b"", mtime)
 
 
+# The object types, in the numbers a git pack file's own object headers use.
+_COMMIT, _TREE, _BLOB, _OFS_DELTA = 1, 2, 3, 6
+
+
+def write_shadow_repository(root: Path, mtime: int = RECENT) -> dict[str, str]:
+    """A bare git repository of the shape an agent's checkpoint store has, objects packed.
+
+    Written to the pack format rather than by running git, because this generator has no
+    dependencies and the machine building a fixture is not guaranteed to have git on it.
+    What it produces is a real repository: `git verify-pack` and `git fsck` both pass on
+    it, which was checked while writing this and is the only reason to trust a file built
+    from a specification by hand.
+
+    Packed rather than loose on purpose. The catalogue collects this directory whole, and a
+    fixture of loose objects leaves the half of the reader that matters most untouched: a
+    repository somebody ran git in stores the older version of a file as a difference
+    against the newer one, and that older version is the pre-edit content of a checkpointed
+    file, which exists nowhere else on the endpoint.
+
+    Returns the ids the case should be able to name, so a test can ask for them rather than
+    hard-coding a hash that this function decides.
+    """
+    lines = [f"listen_port = {8000 + number}\n" for number in range(40)]
+    before = "".join(lines).encode()
+    lines[3] = "listen_port = 9999\n"
+    after = "".join(lines).encode()
+
+    def identify(kind: str, content: bytes) -> str:
+        """The id git gives an object: the hash of its type, its length and its bytes."""
+        return hashlib.sha1(
+            f"{kind} {len(content)}".encode("ascii") + b"\x00" + content, usedforsecurity=False
+        ).hexdigest()
+
+    def header(kind: int, size: int) -> bytes:
+        """An object's header in a pack: the type in three bits, the size in the rest."""
+        out = bytearray([(kind << 4) | (size & 0x0F)])
+        size >>= 4
+        while size:
+            out[-1] |= 0x80
+            out.append(size & 0x7F)
+            size >>= 7
+        return bytes(out)
+
+    def varint(value: int) -> bytes:
+        out = bytearray()
+        while True:
+            byte = value & 0x7F
+            value >>= 7
+            out.append(byte | (0x80 if value else 0))
+            if not value:
+                return bytes(out)
+
+    def distance(value: int) -> bytes:
+        """How a delta spells the way back to its base, which is not the ordinary
+        variable-length integer: every byte after the first adds one before shifting, so a
+        distance has exactly one spelling."""
+        out = [value & 0x7F]
+        value >>= 7
+        while value:
+            value -= 1
+            out.insert(0, (value & 0x7F) | 0x80)
+            value >>= 7
+        return bytes(out)
+
+    def copy(offset: int, length: int) -> bytes:
+        """A copy instruction with all four offset bytes and two length bytes present."""
+        return bytes([0x80 | 0x0F | 0x30]) + struct.pack("<I", offset) + struct.pack("<H", length)
+
+    def difference(base: bytes, result: bytes) -> bytes:
+        """The common prefix copied, the changed line inserted, the common suffix copied."""
+        prefix = 0
+        while prefix < min(len(base), len(result)) and base[prefix] == result[prefix]:
+            prefix += 1
+        suffix = 0
+        while (
+            suffix < min(len(base), len(result)) - prefix
+            and base[len(base) - 1 - suffix] == result[len(result) - 1 - suffix]
+        ):
+            suffix += 1
+        out = bytearray(varint(len(base)) + varint(len(result)))
+        if prefix:
+            out += copy(0, prefix)
+        middle = result[prefix : len(result) - suffix]
+        while middle:
+            out += bytes([min(len(middle), 127)]) + middle[:127]
+            middle = middle[127:]
+        if suffix:
+            out += copy(len(base) - suffix, suffix)
+        return bytes(out)
+
+    def listing(blob: str) -> bytes:
+        return b"100644 service.conf\x00" + bytes.fromhex(blob)
+
+    blob_before, blob_after = identify("blob", before), identify("blob", after)
+    tree_before, tree_after = listing(blob_before), listing(blob_after)
+    id_tree_before, id_tree_after = identify("tree", tree_before), identify("tree", tree_after)
+    commit_before = (
+        f"tree {id_tree_before}\n"
+        "author alice <alice@example.org> 1788912000 +0000\n"
+        "committer alice <alice@example.org> 1788912000 +0000\n"
+        "\ncheckpoint before the agent edited service.conf\n"
+    ).encode()
+    id_before = identify("commit", commit_before)
+    commit_after = (
+        f"tree {id_tree_after}\n"
+        f"parent {id_before}\n"
+        "author alice <alice@example.org> 1788912300 +0000\n"
+        "committer alice <alice@example.org> 1788912300 +0000\n"
+        "\ncheckpoint after the agent edited service.conf\n"
+    ).encode()
+    id_after = identify("commit", commit_after)
+
+    spans: dict[str, tuple[int, int]] = {}
+    body = bytearray()
+
+    def whole(kind: int, identifier: str, content: bytes) -> None:
+        start = 12 + len(body)
+        body.extend(header(kind, len(content)) + zlib.compress(content, 9))
+        spans[identifier] = (start, 12 + len(body))
+
+    whole(_COMMIT, id_before, commit_before)
+    whole(_COMMIT, id_after, commit_after)
+    whole(_TREE, id_tree_after, tree_after)
+    whole(_TREE, id_tree_before, tree_before)
+    whole(_BLOB, blob_after, after)
+
+    # The older version of the file, stored the way git stores it: as the difference from
+    # the newer one, which is the object a reader has to compute rather than read.
+    delta = difference(after, before)
+    start = 12 + len(body)
+    body.extend(
+        header(_OFS_DELTA, len(delta))
+        + distance(start - spans[blob_after][0])
+        + zlib.compress(delta, 9)
+    )
+    spans[blob_before] = (start, 12 + len(body))
+
+    pack = b"PACK" + struct.pack(">II", 2, len(spans)) + bytes(body)
+    pack += hashlib.sha1(pack, usedforsecurity=False).digest()
+    name = "pack-" + hashlib.sha1(pack, usedforsecurity=False).hexdigest()
+
+    # The index beside it. Nothing in this suite reads one, which is the reason to get it
+    # right rather than to fill it with zeros: a fixture holding a file that claims to be
+    # an index and is not would be found by the next person who runs git against it,
+    # before they found their own mistake.
+    ordered = sorted(spans)
+    index = bytearray(b"\xfftOc" + struct.pack(">I", 2))
+    running = 0
+    for first in range(256):
+        running += sum(1 for identifier in ordered if int(identifier[:2], 16) == first)
+        index += struct.pack(">I", running)
+    for identifier in ordered:
+        index += bytes.fromhex(identifier)
+    for identifier in ordered:
+        index += struct.pack(">I", zlib.crc32(pack[slice(*spans[identifier])]))
+    for identifier in ordered:
+        index += struct.pack(">I", spans[identifier][0])
+    # The pack's own trailing hash, then the index's, over everything before it.
+    index += pack[-20:]
+    index += hashlib.sha1(bytes(index), usedforsecurity=False).digest()
+
+    write(root / "objects" / "pack" / f"{name}.pack", pack, mtime)
+    write(root / "objects" / "pack" / f"{name}.idx", bytes(index), mtime)
+    write(root / "HEAD", "ref: refs/heads/main\n", mtime)
+    # A bare repository's configuration. It is collected as bookkeeping and it is the one
+    # file here that could name a remote, which would mean the snapshots left the device.
+    write(
+        root / "config",
+        "[core]\n\trepositoryformatversion = 0\n\tbare = true\n",
+        mtime,
+    )
+    # One tag per checkpoint, which is how the agent names them, and the reference log that
+    # dates the writes. The log is the only clock in the store that is not the commit's own.
+    write(root / "refs" / "heads" / "main", f"{id_after}\n", mtime)
+    write(root / "refs" / "tags" / "checkpoint-0001", f"{id_before}\n", mtime)
+    write(root / "refs" / "tags" / "checkpoint-0002", f"{id_after}\n", mtime)
+    write(
+        root / "logs" / "refs" / "heads" / "main",
+        f"{'0' * 40} {id_before} alice <alice@example.org> 1788912000 +0000\t"
+        "commit (initial): checkpoint before the agent edited service.conf\n"
+        f"{id_before} {id_after} alice <alice@example.org> 1788912300 +0000\t"
+        "commit: checkpoint after the agent edited service.conf\n",
+        mtime,
+    )
+    return {
+        "commit_before": id_before,
+        "commit_after": id_after,
+        "blob_before": blob_before,
+        "blob_after": blob_after,
+        "pack": name,
+    }
+
+
 def write_vscode_state(path: Path, mtime: int = RECENT) -> Path:
     """The editor's key/value state store, holding what an agent extension left in it.
 
@@ -1780,6 +1979,13 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     # hundred entries, so an absent early prompt is the ring rather than a deletion.
     write(home / ".ollama" / "history", "summarise this file\nwhat models do i have\n")
 
+    # One agent's checkpoint store: a bare git repository per conversation, holding a commit
+    # of the user's working tree at each turn. It is the only artifact in this fixture that
+    # carries the content of a file as it stood before an agent changed it, and its objects
+    # are packed, which is the shape that content is actually in once anybody has run git in
+    # the repository.
+    shadow = write_shadow_repository(home / ".aws" / "amazonq" / "cli-checkouts" / Q_CONVERSATION)
+
     # The shell profile, which is what every future session starts from rather than a
     # record of one that happened. Both exported variables here are the ones the vendor's
     # own troubleshooting page says to look for, and both change what a collection means:
@@ -1980,6 +2186,10 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
     summary = {
         "home": str(home),
         "project": str(project),
+        # The ids of the objects in the shadow repository, so a test can ask the case for
+        # the pre-edit content of a file by name rather than by a hash this generator
+        # decides and nobody else can predict.
+        "shadow_repository": shadow,
         "encoded_project_dir": encoded,
         "sessions": [SESSION_A, SESSION_B],
         "agents": [
