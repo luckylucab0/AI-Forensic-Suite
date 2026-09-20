@@ -9,6 +9,7 @@ still produces a usable, honest timeline is the actual requirement.
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
@@ -1582,22 +1583,57 @@ def test_no_parser_declares_an_artifact_the_catalogue_does_not_have() -> None:
 # records those by metadata and hash and does not copy the content unless it is told to, so
 # there is nothing for a parser to read and a list of them would be a list of the same
 # sentence twenty-six times.
+@dataclass(frozen=True)
+class Excused:
+    """Why one readable entry is read by nothing, and what carries its evidence instead.
+
+    Most of these reasons say the evidence is somewhere else in the catalogue. That is a
+    claim about another entry, written once, and this project keeps finding out the hard
+    way what happens to those: the last line of the last reason here said nothing in this
+    suite reads the registry, which stopped being true the week the registry reader was
+    written, in a commit that corrected the same sentence in eight other places and did not
+    look in a test. So the entries a reason leans on are named rather than described, and
+    the test below holds them to being in the catalogue and being read.
+    """
+
+    reason: str
+    # The entries that carry this one's evidence, if that is the reason. Each one has to be
+    # in the catalogue and has to be read by something, or the reason has outlived its
+    # truth and somebody has to look at this entry again.
+    covered_by: tuple[str, ...] = ()
+
+
 READABLE_AND_UNREAD = {
-    "cline.extension_id": "the entry is the extension's storage directory, and what is "
-    "under it is claimed by the entries for the task tree and the checkpoints. The id "
-    "itself is the evidence and it is in the path, which the artifact event carries",
-    "crosscutting.homebrew_prefixes": "an installation prefix, so the evidence is which "
-    "directories exist under it rather than what any one file says",
-    "crosscutting.uv_tool_dir": "declared and deliberately not read by the reader for this "
-    "format, which says why in its own module: the manifests here describe the installer's "
-    "own bookkeeping rather than an agent's activity",
-    "jetbrains_ai.base_directories": "the entry is the product's directory layout, which "
-    "is what makes the other entries for this family resolvable. The files under it are "
-    "claimed by those",
-    "roo_code.extension_id": "the same shape as the other extension id entry above",
-    "windsurf.enterprise_policy_templates": "group-policy templates, which are XML and say "
-    "which settings exist rather than which were set. What was set is in the registry keys "
-    "of the entry beside this one, and nothing in this suite reads the registry",
+    "cline.extension_id": Excused(
+        "the entry is the extension's storage directory, and what is under it is claimed "
+        "by the entries for the task tree and the checkpoints. The id itself is the "
+        "evidence and it is in the path, which the artifact event carries",
+        ("cline.vscode_task_transcripts", "cline.checkpoints_shadow_git_legacy"),
+    ),
+    "crosscutting.homebrew_prefixes": Excused(
+        "an installation prefix, so the evidence is which directories exist under it "
+        "rather than what any one file says"
+    ),
+    "crosscutting.uv_tool_dir": Excused(
+        "declared and deliberately not read by the reader for this format, which says why "
+        "in its own module: the manifests here describe the installer's own bookkeeping "
+        "rather than an agent's activity"
+    ),
+    "jetbrains_ai.base_directories": Excused(
+        "the entry is the product's directory layout, which is what makes the other "
+        "entries for this family resolvable. The files under it are claimed by those",
+        ("jetbrains_ai.aia_task_history", "jetbrains_ai.mcp_config", "jetbrains_ai.ide_logs"),
+    ),
+    "roo_code.extension_id": Excused(
+        "the same shape as the other extension id entry above",
+        ("roo_code.tasks", "roo_code.checkpoints"),
+    ),
+    "windsurf.enterprise_policy_templates": Excused(
+        "group-policy templates, which are XML and say which settings exist rather than "
+        "which were set. What was set is in the registry key of the entry beside this "
+        "one, which a Windows collection carries as a document and this suite reads",
+        ("windsurf.enterprise_policy",),
+    ),
 }
 
 # The formats this suite has a reader for. A catalogue entry in one of these and claimed by
@@ -1634,8 +1670,18 @@ def test_a_readable_artifact_is_read_or_says_why_not() -> None:
         "readable, read by nothing, and no reason given": sorted(unread - set(READABLE_AND_UNREAD)),
         "now read, or gone from the catalogue": sorted(set(READABLE_AND_UNREAD) - unread),
     }
-    for artifact_id, reason in READABLE_AND_UNREAD.items():
-        assert reason.strip(), artifact_id
+    known = {artifact.id for artifact in catalogue.artifacts}
+    for artifact_id, excused in READABLE_AND_UNREAD.items():
+        assert excused.reason.strip(), artifact_id
+        for other in excused.covered_by:
+            assert other in known, (
+                f"{artifact_id} is excused because {other} carries its evidence, and the "
+                "catalogue has no such entry"
+            )
+            assert for_artifact(other) is not None, (
+                f"{artifact_id} is excused because {other} carries its evidence, and "
+                "nothing reads that either, so the evidence is in no case at all"
+            )
 
 
 def test_a_withheld_artifact_is_the_only_thing_excused_without_a_reason() -> None:

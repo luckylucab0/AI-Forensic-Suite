@@ -246,7 +246,13 @@ def test_posix_only_paths_do_not_reach_a_windows_target(catalogue: Catalogue) ->
 def test_no_generated_rule_claims_something_else_collects_the_registry(
     catalogue: Catalogue,
 ) -> None:
-    """Six catalogue entries are registry keys and nothing in this suite reads one.
+    """The catalogue's registry keys, and what the generated rules may say about them.
+
+    No rule generated here addresses a key: the exporters produce file targets, and a
+    reader of one is deciding what they still have to go and get with the tool's own
+    registry facility. The collectors read four of the keys themselves (ADR 0033), which
+    is a different statement about a different tool and does not make a generated rule
+    cover one.
 
     Each exporter used to explain that in its own words, and each of the three sentences
     sent the reader somewhere: that this Velociraptor artifact reads the key through a
