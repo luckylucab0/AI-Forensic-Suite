@@ -553,6 +553,14 @@ def instructions(case: Case) -> dict[str, Any]:
                 # was still read: counting it as unreadable told an analyst the collection
                 # had failed when it had not.
                 "scope_problem": payload.get("scope_problem"),
+                # Where this instruction came from, where that is not simply the file. One
+                # store keeps its prompts in a database that never overwrites a page, so a
+                # prompt somebody deleted is still readable out of it: this says which half
+                # of it was recovered and whether it is gone from the library or is an
+                # earlier version of one still in it. A separate field from parse_problem
+                # for the same reason as the one above, because such a record was read
+                # completely and counting it as unreadable would be false.
+                "recovery_note": payload.get("recovery_note"),
                 "title": payload.get("title"),
                 "declared_name": payload.get("declared_name"),
                 "declared_description": payload.get("declared_description"),
@@ -613,6 +621,11 @@ def instructions(case: Case) -> dict[str, Any]:
             "executable": sum(1 for row in out if row["executable"]),
             "unreadable": sum(1 for row in out if row["parse_problem"]),
             "scope_unknown": sum(1 for row in out if row["scope"] == "unknown"),
+            # Instructions read out of the pages a store no longer points at: prompts that
+            # were deleted, and earlier versions of ones that were not. An analyst reading
+            # this view for what the agent was told to obey has to be able to see at a
+            # glance that some of these rows are no longer in force.
+            "recovered": sum(1 for row in out if row["recovery_note"]),
             # Instructions that were recorded somewhere other than in the file they name:
             # a rule a product says applied to a turn, a prompt persisted with a session.
             # An analyst reading this view for which files shaped an agent needs to know

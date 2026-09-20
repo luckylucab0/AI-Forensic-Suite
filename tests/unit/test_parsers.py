@@ -1640,7 +1640,7 @@ READABLE_AND_UNREAD = {
 # nobody is the case worth catching: the others need format work and the filesystem event
 # is the honest answer for them until somebody does it.
 _READABLE_FORMATS = frozenset(
-    {"json", "jsonl", "leveldb", "markdown", "plist", "sqlite", "text", "toml", "yaml"}
+    {"json", "jsonl", "leveldb", "lmdb", "markdown", "plist", "sqlite", "text", "toml", "yaml"}
 )
 
 

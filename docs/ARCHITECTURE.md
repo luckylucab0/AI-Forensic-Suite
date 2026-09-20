@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  35 modules read 382 of the catalogue's 473 artifacts, and what the rest is gets asserted
+  36 modules read 383 of the catalogue's 474 artifacts, and what the rest is gets asserted
   rather than assumed: every entry in a format this suite reads is either read or carries a
   written reason why not, and the credential stores are exempt as a class because the
   collector withholds their content, which a test pins to credential stores alone. What is
@@ -226,6 +226,16 @@ it cannot be rewritten *quietly*.
     says it was extracted rather than decoded. The format is implemented in this package
     rather than taken from a dependency, together with the Snappy its blocks are
     compressed with (ADR 0031).
+  - **The prompt library.** One editor keeps the prompts a user wrote for the agent in a
+    memory-mapped B-tree store rather than in files, which makes it the one instruction
+    artifact in this catalogue that a case could not show the text of. The page format is
+    implemented here for the same reason as the one above: two named sub-databases, one
+    mapping a prompt id to its title and the time it was last saved, the other mapping the
+    same id to the text, and a prompt is the join of the two. The store never overwrites a
+    page, so the pages its tree no longer points at hold earlier versions of prompts and
+    the prompts somebody deleted. Those are read as well and every one of them says which
+    it is, because a prompt that was removed last week is part of the answer to what the
+    agent was told to obey and it is in no other artifact on the endpoint (ADR 0035).
 
   **The shadow repositories** are their own piece of the file-snapshot answer. Two agents
   snapshot what they are about to change by committing it into a repository, and where that

@@ -146,6 +146,7 @@
             "directory",
             "plist",
             "leveldb",
+          "lmdb",
             "registry"
           ]
         },

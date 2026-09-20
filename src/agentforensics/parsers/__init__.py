@@ -45,6 +45,7 @@ from agentforensics.parsers.opencode import OpencodeParser
 from agentforensics.parsers.pi import PiParser
 from agentforensics.parsers.plist_generic import PlistGenericParser
 from agentforensics.parsers.prompt_history import PromptHistoryParser
+from agentforensics.parsers.prompt_library import PromptLibraryParser
 from agentforensics.parsers.prose_document import ProseDocumentParser
 from agentforensics.parsers.registry import RegistryParser
 from agentforensics.parsers.shell_history import ShellHistoryParser
@@ -137,6 +138,11 @@ PARSERS: tuple[Parser, ...] = (
     # product. Read only when the analyst supplies the product's key, and reported as an
     # encrypted store otherwise. See ADR 0029.
     WindsurfCascadeParser(),
+    # The one instruction artifact in this catalogue that is not a file: one editor keeps
+    # the prompts a user wrote for the agent in a memory-mapped B-tree store, so the text
+    # of them reaches a case through the format reader beside this module and not through
+    # the one every other instruction file goes to.
+    PromptLibraryParser(),
     ZedParser(),
     # The other half of Zed on disk: threads.db holds the conversations and this store
     # holds which agent ran them, which of them were archived out of the sidebar, and what

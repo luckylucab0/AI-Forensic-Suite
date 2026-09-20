@@ -69,6 +69,13 @@ class IngestReport:
     # a store nobody has read a schema for is intact evidence with no reading yet.
     uninterpreted_records: int = 0
     gaps: int = 0
+    # Files whose parser produced two events with the same identity. An event is identified
+    # by its provenance and its kind, so two of them out of one file with the same locator
+    # are one row in the case and the second is dropped by the insert without a word. That
+    # is this suite losing a record rather than the evidence lacking one, which makes it
+    # worse than anything else on this report: it is counted and named here, and a test
+    # holds the list at empty for the synthetic profile.
+    colliding_events: list[str] = field(default_factory=list)
     # Files parsed under a claimant other than the source's own attribution. Reported
     # because it is a disagreement between two readings of the catalogue, and a case that
     # hides it would answer "which entry is this file" differently from the manifest it
@@ -102,6 +109,14 @@ class IngestReport:
             lines.append(
                 f"  {self.uninterpreted_records} record(s) read but in a format nobody has "
                 "mapped, kept in the case with their content in raw and no reading of it"
+            )
+        if self.colliding_events:
+            shown = self.colliding_events[:5]
+            lines.append(
+                f"  {len(self.colliding_events)} file(s) produced events sharing an "
+                "identity, so a record this suite read is not in the case. This is a "
+                "defect in a parser rather than in the evidence and it has to be fixed: "
+                + "; ".join(shown)
             )
         if self.reattributed:
             shown = self.reattributed[:5]
@@ -291,6 +306,16 @@ def ingest(
                 report.reattributed.append(
                     f"{entry.original_path}: attributed to {entry.artifact_id}, "
                     f"read as {read.parsed_as}"
+                )
+            # Checked before the insert rather than from what the insert did, because a
+            # second ingest of one bundle legitimately adds nothing and would look the
+            # same. Two events with one identity inside a single file's reading cannot be
+            # anything but a parser handing out a locator that does not identify a record.
+            identities = {event.event_id for event in read.events}
+            if len(identities) < len(read.events):
+                report.colliding_events.append(
+                    f"{entry.original_path}: {len(read.events) - len(identities)} of "
+                    f"{len(read.events)} event(s) share another's identity"
                 )
             report.events += case.add_events(read.events)
             report.parsed_records += read.parser_events - read.unparsed_records

@@ -1192,6 +1192,149 @@ def write_wal_store(path: Path, mtime: int = RECENT) -> str:
     return "this message is only in the write ahead log"
 
 
+# The pages of a memory-mapped B-tree store: the two meta pages first, then the leaves.
+_LMDB_PAGE = 4096
+_LMDB_MAGIC = 0xBEEFC0DE
+_LMDB_NO_PAGE = 0xFFFFFFFFFFFFFFFF
+_P_LEAF, _P_META = 0x02, 0x08
+_F_SUBDATA = 0x02
+
+
+def write_prompt_library(root: Path, mtime: int = RECENT) -> dict[str, str]:
+    """One editor's prompt library: an LMDB store holding the text a user told the agent to
+    obey, with a prompt in it that was deleted and is still in the file.
+
+    Written to the page format by hand, because this generator has no dependencies and the
+    library that writes these stores is a C one. What it produces is a real store: liblmdb
+    0.9.35 opens it, lists both sub-databases and reads every live record, which was checked
+    while writing this and is the only reason to trust a file built from a specification.
+
+    The deleted prompt is the point of the fixture. This format never overwrites a page, so
+    a removed record stays in a page the tree no longer points at until the space is reused,
+    and a reader that only walks the tree would report the library as it is now and say
+    nothing about what was taken out of it. Here that is two pages the tree does not
+    reference, which is exactly the state a real store is left in.
+
+    The prompt ids and the record shapes are the vendor's: an internally tagged id, and a
+    metadata document carrying the title, a default flag and the time the prompt was last
+    saved. Returns the text of the deleted prompt so a test can ask a case for it.
+    """
+
+    def descriptor(entries: int, root: int, *, pad: int = 0) -> bytes:
+        """A tree descriptor: what a meta page holds two of and a sub-database node one."""
+        leaves = 1 if root != _LMDB_NO_PAGE else 0
+        return struct.pack("<IHHQQQQQ", pad, 0, 1 if leaves else 0, 0, leaves, 0, entries, root)
+
+    def leaf(number: int, rows: list[tuple[bytes, bytes, int]]) -> bytes:
+        """One leaf page: the offsets of its nodes from the top, the nodes from the bottom.
+
+        A node is a header of four sixteen-bit fields, the key, then the value, and its
+        total length is rounded up to an even number because the format requires the next
+        offset to be aligned.
+        """
+        page = bytearray(b"\x00" * _LMDB_PAGE)
+        struct.pack_into("<QHH", page, 0, number, 0, _P_LEAF)
+        upper = _LMDB_PAGE
+        offsets = []
+        for key, value, flags in rows:
+            upper -= (8 + len(key) + len(value) + 1) & ~1
+            struct.pack_into(
+                "<HHHH", page, upper, len(value) & 0xFFFF, len(value) >> 16, flags, len(key)
+            )
+            page[upper + 8 : upper + 8 + len(key)] = key
+            page[upper + 8 + len(key) : upper + 8 + len(key) + len(value)] = value
+            offsets.append(upper)
+        for index, offset in enumerate(offsets):
+            struct.pack_into("<H", page, 16 + index * 2, offset)
+        # The two bounds of the free space in the middle of the page, which is how the
+        # format says how many nodes there are.
+        struct.pack_into("<HH", page, 12, 16 + 2 * len(offsets), upper)
+        return bytes(page)
+
+    def meta(number: int, main_root: int, entries: int, last_page: int) -> bytes:
+        page = bytearray(b"\x00" * _LMDB_PAGE)
+        struct.pack_into("<QHH", page, 0, number, 0, _P_META)
+        struct.pack_into("<II", page, 16, _LMDB_MAGIC, 1)
+        struct.pack_into("<QQ", page, 24, 0, 1024 * 1024 * 1024)
+        # The free page tree, which is empty here, and whose key-size field is where this
+        # format keeps the page size.
+        page[40:88] = descriptor(0, _LMDB_NO_PAGE, pad=_LMDB_PAGE)
+        page[88:136] = descriptor(entries, main_root)
+        struct.pack_into("<QQ", page, 136, last_page, 1)
+        return bytes(page)
+
+    def key(uuid: str) -> bytes:
+        return json.dumps({"kind": "User", "uuid": uuid}, separators=(",", ":")).encode()
+
+    def metadata(uuid: str, title: str, saved: str) -> bytes:
+        return json.dumps(
+            {
+                "id": {"kind": "User", "uuid": uuid},
+                "title": title,
+                "default": False,
+                "saved_at": saved,
+            },
+            separators=(",", ":"),
+        ).encode()
+
+    live = [
+        (
+            "3a7f1e2c-0000-4000-8000-000000000001",
+            "Release notes",
+            "2026-09-01T09:00:00Z",
+            "Write the release notes for this repository. Always name the ticket id.\n",
+        ),
+        (
+            "3a7f1e2c-0000-4000-8000-000000000002",
+            "House rules",
+            "2026-09-05T16:20:00Z",
+            "Never edit the generated files under exporters/. Change the catalogue instead.\n",
+        ),
+    ]
+    # The prompt that is not in the library any more. It is the one worth recovering: it
+    # tells the agent to do without the step a human would have been in.
+    removed_text = "When the tests pass, push straight to the default branch and skip the review.\n"
+    removed = ("3a7f1e2c-0000-4000-8000-000000000009", "Ship it", "2026-08-20T11:45:00Z")
+
+    databases = {
+        "bodies.v2": [(key(uuid), body.encode(), 0) for uuid, _, _, body in live],
+        "metadata.v2": [
+            (key(uuid), metadata(uuid, title, saved), 0) for uuid, title, saved, _ in live
+        ],
+    }
+    pages: list[bytes] = []
+    main: list[tuple[bytes, bytes, int]] = []
+    number = 2
+    for name in sorted(databases):
+        rows = sorted(databases[name])
+        pages.append(leaf(number, rows))
+        main.append((name.encode(), descriptor(len(rows), number), _F_SUBDATA))
+        number += 1
+    main_page = number
+    pages.append(leaf(main_page, main))
+    number += 1
+    # The two pages nothing points at: the halves of the deleted prompt, in the two shapes
+    # the store keeps, each in the page its own database left behind.
+    for rows in (
+        [(key(removed[0]), metadata(*removed), 0)],
+        [(key(removed[0]), removed_text.encode(), 0)],
+    ):
+        pages.append(leaf(number, rows))
+        number += 1
+
+    store = root / "prompts-library-db.0.mdb"
+    out = bytearray()
+    out += meta(0, main_page, len(main), number - 1)
+    out += meta(1, main_page, len(main), number - 1)
+    for page in pages:
+        out += page
+    write(store / "data.mdb", bytes(out), mtime)
+    # The reader and writer table the store keeps beside itself. It holds no records, and
+    # its presence is what says the store was opened.
+    write(store / "lock.mdb", bytes(8192), mtime)
+    return {"removed_prompt": removed_text.strip(), "removed_title": removed[1]}
+
+
 def write_vscode_state(path: Path, mtime: int = RECENT) -> Path:
     """The editor's key/value state store, holding what an agent extension left in it.
 
@@ -2243,6 +2386,12 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         RECENT,
     )
 
+    # One editor's prompt library, which is the only instruction artifact in this catalogue
+    # that is not a file: an LMDB store holding the prompts a user wrote for the agent. The
+    # store here is in the state a real one is in after an edit and a deletion, so the
+    # pages the tree no longer points at hold a prompt that is not in the library any more.
+    library = write_prompt_library(home / ".local" / "share" / "zed" / "prompts")
+
     summary = {
         "home": str(home),
         "project": str(project),
@@ -2253,6 +2402,9 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         # The row that exists only in a write-ahead log, so a test can ask the case for it
         # rather than repeating the sentence.
         "only_in_the_write_ahead_log": only_in_the_log,
+        # The prompt that was deleted from the library and is still in the store's free
+        # pages, for the same reason: a test asks the case for it by text.
+        "prompt_library": library,
         "encoded_project_dir": encoded,
         "sessions": [SESSION_A, SESSION_B],
         "agents": [

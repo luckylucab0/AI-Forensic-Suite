@@ -85,7 +85,6 @@ artifacts:
   - '%LOCALAPPDATA%\Zed\extensions\'
   - '%LOCALAPPDATA%\Zed\external_agents\'
   - '%LOCALAPPDATA%\Zed\prompt_overrides\'
-  - ~/.config/zed/prompts/
   - ~/Library/Application Support/Zed/debug_adapters/
   - ~/Library/Application Support/Zed/extensions/
   - ~/Library/Application Support/Zed/external_agents/
@@ -100,7 +99,9 @@ artifacts:
   notes: |-
     external_agents/ is the important one: it records ACP (Agent Client Protocol) agents installed into Zed. Those agents write their OWN transcripts elsewhere - e.g. a Claude-based ACP agent writes to ~/.claude/projects/<normalized-path>/*.jsonl - so this directory tells you which OTHER agent families to go and collect. prompt_overrides/ can silently replace Zed's built-in prompts.
 
-    Path correction from the source verification pass: this entry rooted four of its five paths at a data directory environment variable that the editor does not read. The only override is a function call inside the process, so the variable is unset on every host and all four patterns resolved to nothing, on every platform, without any error. They are written out per platform now, from the defaults the path crate states. Note the platform split the pass confirmed: on macOS the prompts directory sits under the configuration directory and not under the data directory, which is why the prompts path has only the one spelling.
+    Path correction from the source verification pass: this entry rooted four of its five paths at a data directory environment variable that the editor does not read. The only override is a function call inside the process, so the variable is unset on every host and all four patterns resolved to nothing, on every platform, without any error. They are written out per platform now, from the defaults the path crate states.
+
+    The prompts directory used to be the fifth path here, with the macOS spelling only, on the reasoning that prompts_dir sits under the configuration directory. That is true on macOS and false everywhere else: prompts_dir is config_dir/prompts on macOS and data_dir/prompts on Linux and Windows, so the one spelling collected nothing on two platforms. It is zed.prompt_library now, in its own entry, because what is in it is the user's own instruction text rather than evidence that something was installed.
   parser: null
 - id: zed.logs
   category: log
@@ -125,6 +126,33 @@ artifacts:
 
     Record structure: crates/paths/src/paths.rs logs_dir(): macOS home_dir().join('Library/Logs').join('Zed'); all other platforms data_dir().join('logs'). Filenames not enumerated - list the directory.
   parser: text_log
+- id: zed.prompt_library
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_DATA_HOME/zed/prompts/
+  - '%LOCALAPPDATA%\Zed\prompts\'
+  - ~/.config/zed/prompts/
+  - ~/.local/share/zed/prompts/
+  format: lmdb
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/prompt_store/src/prompt_store.rs
+  source_kind: source_code
+  volatility: |-
+    Persistent until the user deletes a prompt. Nothing rotates or sweeps this store, and a deleted prompt leaves its bytes in the free pages of the database file until they are reused.
+  notes: |-
+    The editor's prompt library: the text a user wrote for the agent to obey, with a title and the time each one was last saved. It is the instruction surface of this agent and it is in no transcript: a thread records that a prompt was used, and this is what the prompt said.
+
+    Record structure: crates/prompt_store/src/prompt_store.rs init() builds the path as paths::prompts_dir().join('prompts-library-db.0.mdb'), then PromptStore::new does create_dir_all on it and opens it with heed::EnvOpenOptions (LMDB) without NO_SUBDIR, so the path is a directory holding data.mdb and lock.mdb. Two named sub-databases: 'metadata.v2' maps a JSON PromptId to a JSON PromptMetadata (id, title, default, saved_at as an RFC 3339 UTC time), and 'bodies.v2' maps the same key to the prompt text as a plain UTF-8 string. max_dbs is 4 because v1 of both can still be present. The whole store is one directory, so collect it whole: data.mdb is the database and lock.mdb carries no records.
+
+    per-OS prompts_dir from crates/paths/src/paths.rs: prompts_dir() is config_dir().join('prompts') on macOS and data_dir().join('prompts') everywhere else. config_dir() on macOS falls to the last branch, home_dir().join('.config').join('zed'), so the macOS store is under ~/.config/zed and not under Library. data_dir() is dirs::data_local_dir().join('zed') on Linux, with a FLATPAK_XDG_DATA_HOME override, and dirs::data_local_dir().join('Zed') on Windows. So the Linux and Windows stores are under the data directory and the macOS one is not, which is the split that cost this artifact two platforms while it was a path inside zed.extensions.
+  parser: prompt_library
 - id: zed.settings
   category: mcp_config
   root: project

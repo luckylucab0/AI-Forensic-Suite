@@ -648,3 +648,33 @@ def test_the_committed_catalogue_leaves_no_database_without_its_log(catalogue: C
     short with nothing but this saying so.
     """
     assert not catalogue.databases_without_a_claimed_log()
+
+
+@pytest.mark.slow
+def test_no_parser_hands_out_two_events_with_one_identity(tmp_path: Path) -> None:
+    """A record this suite read, gone from the case, with nothing saying so.
+
+    An event is identified by its provenance and its kind, so two events out of one file
+    that share a locator are one row: the insert takes the first and drops the second
+    without a word. It is the worst shape of defect this project has, because the reading
+    worked and the case is short, and it happened: a reader of a prompt library located
+    every event by the prompt id, and a prompt's live version, an earlier version of it and
+    the two halves of a recovered one all carry the same id, so three of four events
+    disappeared into one row.
+
+    The ingest counts them now, and this holds the count at zero over the whole synthetic
+    profile, which is the only place every parser in the suite runs at once.
+    """
+    import sys
+
+    from agentforensics.catalog import load_catalogue
+
+    root = Path(__file__).resolve().parents[2]
+    sys.path.insert(0, str(root / "tests" / "fixtures"))
+    from generate import build_home
+
+    home = tmp_path / "profile"
+    build_home(home, with_edge_cases=False)
+    with Case.open(tmp_path / "case.db") as case:
+        report = ingest(case, home, load_catalogue(root / "catalog"))
+    assert report.colliding_events == []

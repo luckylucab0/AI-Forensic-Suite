@@ -6,7 +6,7 @@
 
 Erzeugt aus catalog/ durch scripts/gen_artifact_docs.py. Nicht von Hand bearbeiten: die CI erzeugt diese Datei neu und schlägt fehl, wenn sie abweicht.
 
-473 Artefakte über 31 Agent(en), davon 368 auf einer abgerufenen Herstellerquelle beruhend.
+474 Artefakte über 31 Agent(en), davon 369 auf einer abgerufenen Herstellerquelle beruhend.
 
 Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
 
@@ -1369,8 +1369,16 @@ Vendor: Zed Industries
 
 | Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `zed.extensions` | extensions | install_evidence | macOS, Linux, Windows | `$XDG_DATA_HOME/zed/debug_adapters/`<br>`$XDG_DATA_HOME/zed/extensions/`<br>`$XDG_DATA_HOME/zed/external_agents/`<br>`$XDG_DATA_HOME/zed/prompt_overrides/`<br>`%LOCALAPPDATA%\Zed\debug_adapters\`<br>`%LOCALAPPDATA%\Zed\extensions\`<br>`%LOCALAPPDATA%\Zed\external_agents\`<br>`%LOCALAPPDATA%\Zed\prompt_overrides\`<br>`~/.config/zed/prompts/`<br>`~/Library/Application Support/Zed/debug_adapters/`<br>`~/Library/Application Support/Zed/extensions/`<br>`~/Library/Application Support/Zed/external_agents/`<br>`~/Library/Application Support/Zed/prompt_overrides/` | binary | normal | [EN] Persistent until removed. | bestätigt | [source_code](https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs) |
+| `zed.extensions` | extensions | install_evidence | macOS, Linux, Windows | `$XDG_DATA_HOME/zed/debug_adapters/`<br>`$XDG_DATA_HOME/zed/extensions/`<br>`$XDG_DATA_HOME/zed/external_agents/`<br>`$XDG_DATA_HOME/zed/prompt_overrides/`<br>`%LOCALAPPDATA%\Zed\debug_adapters\`<br>`%LOCALAPPDATA%\Zed\extensions\`<br>`%LOCALAPPDATA%\Zed\external_agents\`<br>`%LOCALAPPDATA%\Zed\prompt_overrides\`<br>`~/Library/Application Support/Zed/debug_adapters/`<br>`~/Library/Application Support/Zed/extensions/`<br>`~/Library/Application Support/Zed/external_agents/`<br>`~/Library/Application Support/Zed/prompt_overrides/` | binary | normal | [EN] Persistent until removed. | bestätigt | [source_code](https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs) |
 | `zed.flatpak_legacy_threads` | flatpak legacy threads | transcript | Linux | `~/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/` | binary | normal | [EN] Unknown. | **unbestätigt** | recollection |
 | `zed.logs` | logs | log | macOS, Linux, Windows | `$XDG_DATA_HOME/zed/logs/`<br>`%LOCALAPPDATA%\Zed\logs\`<br>`~/Library/Logs/Zed/` | text | normal | [EN] Rotation not established from the source reviewed; treat as volatile. | bestätigt | [source_code](https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs) |
 | `zed.settings` | settings | mcp_config | macOS, Linux, Windows | `$XDG_CONFIG_HOME/zed/settings.json`<br>`%APPDATA%\Zed\settings.json`<br>`<project>/.zed/settings.json`<br>`~/.config/zed/settings.json` | json | normal | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/zed-industries/zed/main/docs/src/configuring-zed.md) |
 | `zed.sidebar_threads` | sidebar threads | transcript | macOS, Linux, Windows | `$XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite`<br>`$XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite-shm` [unbelegt]<br>`$XDG_DATA_HOME/zed/db/0-<release_channel>/db.sqlite-wal` [unbelegt]<br>`%LOCALAPPDATA%\Zed\db\0-<release_channel>\db.sqlite`<br>`%LOCALAPPDATA%\Zed\db\0-<release_channel>\db.sqlite-shm` [unbelegt]<br>`%LOCALAPPDATA%\Zed\db\0-<release_channel>\db.sqlite-wal` [unbelegt]<br>`~/Library/Application Support/Zed/db/0-stable/db.sqlite`<br>`~/Library/Application Support/Zed/db/0-stable/db.sqlite-shm` [unbelegt]<br>`~/Library/Application Support/Zed/db/0-stable/db.sqlite-wal` [unbelegt] | sqlite | normal | [EN] Migration-populated. The migration only unarchives the 5 most recent threads per project and archives the rest; draft threads with no project are archived by default; threads with no project are excluded from migration entirely. | bestätigt | [source_code](https://raw.githubusercontent.com/zed-industries/zed/main/crates/db/src/db.rs) |
+
+### durable
+
+**Meist noch vorhanden.** Vom Aufräumlauf nicht erfasst und überleben damit regelmässig die Transkripte, die sie beschreiben. Sind die Transkripte schon weg, ist diese Gruppe das, was bleibt, und sie genügt oft, um zu belegen, dass ein Agent lief, was er durfte und was gefragt wurde.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `zed.prompt_library` | prompt library | instructions | macOS, Linux, Windows | `$XDG_DATA_HOME/zed/prompts/`<br>`%LOCALAPPDATA%\Zed\prompts\`<br>`~/.config/zed/prompts/`<br>`~/.local/share/zed/prompts/` | lmdb | normal | [EN] Persistent until the user deletes a prompt. Nothing rotates or sweeps this store, and a deleted prompt leaves its bytes in the free pages of the database file until they are reused. | bestätigt | [source_code](https://raw.githubusercontent.com/zed-industries/zed/main/crates/prompt_store/src/prompt_store.rs) |

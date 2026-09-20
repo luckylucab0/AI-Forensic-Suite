@@ -8928,7 +8928,6 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "%LOCALAPPDATA%\\Zed\\extensions\\",
                         "%LOCALAPPDATA%\\Zed\\external_agents\\",
                         "%LOCALAPPDATA%\\Zed\\prompt_overrides\\",
-                        "~/.config/zed/prompts/",
                         "~/Library/Application Support/Zed/debug_adapters/",
                         "~/Library/Application Support/Zed/extensions/",
                         "~/Library/Application Support/Zed/external_agents/",
@@ -8965,6 +8964,25 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "$XDG_DATA_HOME/zed/logs/",
                         "%LOCALAPPDATA%\\Zed\\logs\\",
                         "~/Library/Logs/Zed/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "zed.prompt_library",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/zed/prompts/",
+                        "%LOCALAPPDATA%\\Zed\\prompts\\",
+                        "~/.config/zed/prompts/",
+                        "~/.local/share/zed/prompts/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -9043,7 +9061,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "73ec1b2c7a93c4c5d6c9a051c383bf06b0cdc07767c186978616562711d1b622"
+    "sha256": "7907b83d718527bad2b545c3a5a01941d733a6ccac24abcf0fce54e1d1d2adc5"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

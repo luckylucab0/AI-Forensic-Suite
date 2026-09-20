@@ -539,6 +539,11 @@ def cmd_instructions(args: argparse.Namespace) -> int:
             _write(sys.stdout, f"           {mark}")
         if row["scope_problem"]:
             _write(sys.stdout, f"           scope not settled: {row['scope_problem']}")
+        if row["recovery_note"]:
+            # A prompt read out of a page its store no longer points at. Printed with the
+            # instruction rather than under it, because the difference between a prompt in
+            # force and one somebody deleted is the finding.
+            _write(sys.stdout, f"           not in the library: {row['recovery_note']}")
         if row["parse_problem"]:
             _write(sys.stdout, f"           not fully read: {row['parse_problem']}")
 

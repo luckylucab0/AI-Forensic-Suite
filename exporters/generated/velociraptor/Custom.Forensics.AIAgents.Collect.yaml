@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 03d2e4d3dcba
+# Catalogue digest: 3022e9597df5
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -987,6 +987,7 @@ sources:
     zed,zed.extensions,C:/Users/*/AppData/Local/Zed/external_agents/**
     zed,zed.extensions,C:/Users/*/AppData/Local/Zed/prompt_overrides/**
     zed,zed.logs,C:/Users/*/AppData/Local/Zed/logs/**
+    zed,zed.prompt_library,C:/Users/*/AppData/Local/Zed/prompts/**
     zed,zed.sidebar_threads,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite
     zed,zed.sidebar_threads,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite-shm
     zed,zed.sidebar_threads,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite-wal
@@ -2979,18 +2980,20 @@ sources:
     windsurf,windsurf.worktrees,/Users/*/.windsurf/worktrees/*
     windsurf,windsurf.worktrees,/var/root/.devin/worktrees/*
     windsurf,windsurf.worktrees,/var/root/.windsurf/worktrees/*
-    zed,zed.extensions,/Users/*/.config/zed/prompts/**
     zed,zed.extensions,/Users/*/Library/Application Support/Zed/debug_adapters/**
     zed,zed.extensions,/Users/*/Library/Application Support/Zed/extensions/**
     zed,zed.extensions,/Users/*/Library/Application Support/Zed/external_agents/**
     zed,zed.extensions,/Users/*/Library/Application Support/Zed/prompt_overrides/**
-    zed,zed.extensions,/var/root/.config/zed/prompts/**
     zed,zed.extensions,/var/root/Library/Application Support/Zed/debug_adapters/**
     zed,zed.extensions,/var/root/Library/Application Support/Zed/extensions/**
     zed,zed.extensions,/var/root/Library/Application Support/Zed/external_agents/**
     zed,zed.extensions,/var/root/Library/Application Support/Zed/prompt_overrides/**
     zed,zed.logs,/Users/*/Library/Logs/Zed/**
     zed,zed.logs,/var/root/Library/Logs/Zed/**
+    zed,zed.prompt_library,/Users/*/.config/zed/prompts/**
+    zed,zed.prompt_library,/Users/*/.local/share/zed/prompts/**
+    zed,zed.prompt_library,/var/root/.config/zed/prompts/**
+    zed,zed.prompt_library,/var/root/.local/share/zed/prompts/**
     zed,zed.sidebar_threads,/Users/*/Library/Application Support/Zed/db/0-stable/db.sqlite
     zed,zed.sidebar_threads,/Users/*/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
     zed,zed.sidebar_threads,/Users/*/Library/Application Support/Zed/db/0-stable/db.sqlite-wal
@@ -4885,12 +4888,10 @@ sources:
     windsurf,windsurf.worktrees,/home/*/.windsurf/worktrees/*
     windsurf,windsurf.worktrees,/root/.devin/worktrees/*
     windsurf,windsurf.worktrees,/root/.windsurf/worktrees/*
-    zed,zed.extensions,/home/*/.config/zed/prompts/**
     zed,zed.extensions,/home/*/Library/Application Support/Zed/debug_adapters/**
     zed,zed.extensions,/home/*/Library/Application Support/Zed/extensions/**
     zed,zed.extensions,/home/*/Library/Application Support/Zed/external_agents/**
     zed,zed.extensions,/home/*/Library/Application Support/Zed/prompt_overrides/**
-    zed,zed.extensions,/root/.config/zed/prompts/**
     zed,zed.extensions,/root/Library/Application Support/Zed/debug_adapters/**
     zed,zed.extensions,/root/Library/Application Support/Zed/extensions/**
     zed,zed.extensions,/root/Library/Application Support/Zed/external_agents/**
@@ -4899,6 +4900,10 @@ sources:
     zed,zed.flatpak_legacy_threads,/root/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/**
     zed,zed.logs,/home/*/Library/Logs/Zed/**
     zed,zed.logs,/root/Library/Logs/Zed/**
+    zed,zed.prompt_library,/home/*/.config/zed/prompts/**
+    zed,zed.prompt_library,/home/*/.local/share/zed/prompts/**
+    zed,zed.prompt_library,/root/.config/zed/prompts/**
+    zed,zed.prompt_library,/root/.local/share/zed/prompts/**
     zed,zed.sidebar_threads,/home/*/Library/Application Support/Zed/db/0-stable/db.sqlite
     zed,zed.sidebar_threads,/home/*/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
     zed,zed.sidebar_threads,/home/*/Library/Application Support/Zed/db/0-stable/db.sqlite-wal

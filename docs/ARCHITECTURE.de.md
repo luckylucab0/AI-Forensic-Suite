@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 35 Module lesen 382 der 473
+  zählt diese Dateien und sagt, welche es sind. 36 Module lesen 383 der 474
   Katalogartefakte, und was der Rest ist, wird behauptet und nicht angenommen: jeder Eintrag
   in einem Format, das diese Suite liest, wird entweder gelesen oder trägt einen
   aufgeschriebenen Grund, warum nicht, und die Anmeldedatenspeicher sind als Klasse
@@ -252,6 +252,17 @@ ist, dass das nicht *unbemerkt* geht.
     dekodiert wurde. Das Format ist in diesem Paket implementiert statt aus einer
     Abhängigkeit genommen, zusammen mit dem Snappy, mit dem seine Blöcke komprimiert
     sind (ADR 0031).
+  - **Die Prompt-Bibliothek.** Ein Editor legt die Prompts, die eine Person für den Agenten
+    geschrieben hat, in einem speichergemappten B-Baum-Speicher ab statt in Dateien. Damit
+    ist es das eine Instruktionsartefakt in diesem Katalog, dessen Text ein Fall nicht
+    zeigen konnte. Das Seitenformat ist hier umgesetzt, aus demselben Grund wie das
+    darüber: zwei benannte Unterdatenbanken, eine bildet eine Prompt-Id auf Titel und
+    letzte Speicherzeit ab, die andere dieselbe Id auf den Text, und ein Prompt ist die
+    Verbindung der beiden. Der Speicher überschreibt nie eine Seite, also halten die
+    Seiten, auf die der Baum nicht mehr zeigt, frühere Fassungen von Prompts und die
+    gelöschten. Auch die werden gelesen, und jede sagt, was sie ist: ein Prompt, den jemand
+    letzte Woche entfernt hat, gehört zur Antwort darauf, was dem Agenten aufgetragen war,
+    und steht in keinem anderen Artefakt auf dem Endpunkt (ADR 0035).
 
   **Die Schatten-Repositories** sind ein eigener Teil der Antwort auf die Frage nach
   Datei-Momentaufnahmen. Zwei Agenten sichern, was sie ändern wollen, indem sie es in ein

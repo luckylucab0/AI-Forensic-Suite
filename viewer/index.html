@@ -1981,6 +1981,9 @@ async function toggleInstruction(row,detail){
   // The two are different claims about the same file: one says the tier it applied at is
   // unknown, the other says the file was not read. See the API note on scope_problem.
   if(row.scope_problem) head.push('scope not settled: '+row.scope_problem);
+  // A prompt out of a page its store no longer points at: read completely, and not in the
+  // library any more. Neither of the two above, and the difference is the finding.
+  if(row.recovery_note) head.push('not in the library: '+row.recovery_note);
   if(row.parse_problem) head.push('not fully read: '+row.parse_problem);
   if(head.length) detail.appendChild(el('div',{class:'tool-io-label',text:head.join(' — ')}));
   let text=row.preview;

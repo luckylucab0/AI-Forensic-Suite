@@ -381,6 +381,27 @@ def test_a_file_whose_scope_is_unknown_is_not_counted_as_unreadable(case: Case) 
     ]
 
 
+def test_a_prompt_out_of_a_freed_page_is_shown_and_is_not_called_unreadable(case: Case) -> None:
+    """The instruction surface has to show a prompt that is no longer in the library.
+
+    One editor keeps its prompts in a store that never overwrites a page, so a prompt
+    somebody deleted is still readable out of it, and it is part of the answer to what the
+    agent was told to obey. What it must not do is sit here looking like a prompt that is
+    in force, and what the view must not do is count it as a file it failed to read: the
+    reading worked, and the sentence on the row is about where the record came from.
+    """
+    view = api.instructions(case)
+    recovered = [row for row in view["instructions"] if row["recovery_note"]]
+
+    assert recovered, "the synthetic profile holds a prompt that was deleted from a library"
+    assert view["counts"]["recovered"] == len(recovered)
+    assert view["counts"]["unreadable"] == 0
+    for row in recovered:
+        assert row["parse_problem"] is None
+        assert "no longer points at" in row["recovery_note"]
+    assert any("skip the review" in (row["preview"] or "") for row in recovered)
+
+
 def test_a_preview_says_whether_it_is_the_whole_file(case: Case) -> None:
     """A preview mistaken for a whole file is a wrong reading of evidence, so the row says
     which it is rather than leaving it to be inferred from a length."""

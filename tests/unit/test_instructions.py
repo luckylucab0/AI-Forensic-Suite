@@ -362,9 +362,25 @@ def test_an_empty_file_is_still_an_event(tmp_path: Path) -> None:
 # --------------------------------------------- the catalogue staying in step
 
 
-def test_the_parser_claims_every_instruction_artifact_in_the_catalogue() -> None:
+# The instruction artifacts another module reads, with the module. This reader takes files
+# of prose, and one entry in the catalogue is not a file: one editor keeps the prompts a
+# user wrote in a memory-mapped B-tree store, so the format reader for that has its own
+# parser. Named here rather than excluded by format, so an instruction artifact can never
+# be left claimed by nobody: the test below holds every name to the parser that has it.
+ELSEWHERE = {
+    "zed.prompt_library": "prompt_library",
+}
+
+
+def test_every_instruction_artifact_in_the_catalogue_is_claimed() -> None:
     """The omission no other test would catch: an unclaimed instruction file is collected,
-    passes ingest as unsupported, and leaves a case where nothing looks wrong."""
+    passes ingest as unsupported, and leaves a case where nothing looks wrong.
+
+    Both directions, and in two parts. Every instruction entry this reader does not take
+    has to be named above with the module that does take it, and that module has to be the
+    one the dispatcher actually returns. An entry that quietly stopped being read would
+    otherwise look exactly like one somebody decided to read elsewhere.
+    """
     catalogue = load_catalogue(CATALOG_DIR)
     in_catalogue = {
         artifact.id
@@ -372,7 +388,12 @@ def test_the_parser_claims_every_instruction_artifact_in_the_catalogue() -> None
         if artifact.category in ("instructions", "project_instructions")
     }
 
-    assert in_catalogue == SOURCES
+    assert in_catalogue - set(ELSEWHERE) == SOURCES
+    assert set(ELSEWHERE) <= in_catalogue
+    for artifact_id, module in ELSEWHERE.items():
+        parser = for_artifact(artifact_id)
+        assert parser is not None, artifact_id
+        assert parser.name == module, f"{artifact_id} is read by {parser.name}, not {module}"
 
 
 @pytest.mark.parametrize("artifact_id", sorted(SOURCES))

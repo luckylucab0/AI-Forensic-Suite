@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 03d2e4d3dcba
+// Catalogue digest: 3022e9597df5
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1811,8 +1811,6 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "windsurf", "windsurf.worktrees", ".devin\\worktrees",
     "windsurf", "windsurf.worktrees", ".windsurf/worktrees",
     "windsurf", "windsurf.worktrees", ".windsurf\\worktrees",
-    "zed", "zed.extensions", ".config/zed/prompts",
-    "zed", "zed.extensions", ".config\\zed\\prompts",
     "zed", "zed.extensions", "Library/Application Support/Zed/debug_adapters",
     "zed", "zed.extensions", "Library/Application Support/Zed/extensions",
     "zed", "zed.extensions", "Library/Application Support/Zed/external_agents",
@@ -1834,6 +1832,12 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "zed", "zed.logs", "Library\\Logs\\Zed",
     "zed", "zed.logs", "Zed/logs",
     "zed", "zed.logs", "Zed\\logs",
+    "zed", "zed.prompt_library", ".config/zed/prompts",
+    "zed", "zed.prompt_library", ".config\\zed\\prompts",
+    "zed", "zed.prompt_library", ".local/share/zed/prompts",
+    "zed", "zed.prompt_library", ".local\\share\\zed\\prompts",
+    "zed", "zed.prompt_library", "Zed/prompts",
+    "zed", "zed.prompt_library", "Zed\\prompts",
     "zed", "zed.sidebar_threads", "Library/Application Support/Zed/db/0-stable/db.sqlite",
     "zed", "zed.sidebar_threads", "Library/Application Support/Zed/db/0-stable/db.sqlite-shm",
     "zed", "zed.sidebar_threads", "Library/Application Support/Zed/db/0-stable/db.sqlite-wal",
