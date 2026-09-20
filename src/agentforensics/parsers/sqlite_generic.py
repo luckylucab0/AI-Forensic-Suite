@@ -71,6 +71,7 @@ STORES = frozenset(
         "goose.sessions_db",
         "goose.sessions_db_windows",
         "hermes.state_db",
+        "hermes.state_snapshot_transcripts",
         "kilo_code.cli_db",
         "kiro.cli_session_database",
         "ollama.app_chat_database",

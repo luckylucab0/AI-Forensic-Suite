@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 864dcd9f72b2
+# Catalogue digest: cd86baac2010
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,8 +8,8 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# Scope: the 90 artifacts the catalogue files under transcript and prompt_history.
-# The other 398 are configuration, credentials, caches, logs and install
+# Scope: the 91 artifacts the catalogue files under transcript and prompt_history.
+# The other 402 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
 # credential store what an analyst wants is the file, which is what the Collect
@@ -308,6 +308,10 @@ sources:
       hermes,hermes.state_db,file_only,C:/Users/*/AppData/Local/hermes/state.db
       hermes,hermes.state_db,file_only,C:/Users/*/AppData/Local/hermes/state.db-shm
       hermes,hermes.state_db,file_only,C:/Users/*/AppData/Local/hermes/state.db-wal
+      hermes,hermes.state_snapshot_transcripts,file_only,C:/Users/*/.hermes/profiles/*/state-snapshots/*/state.db
+      hermes,hermes.state_snapshot_transcripts,file_only,C:/Users/*/.hermes/state-snapshots/*/state.db
+      hermes,hermes.state_snapshot_transcripts,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/state-snapshots/*/state.db
+      hermes,hermes.state_snapshot_transcripts,file_only,C:/Users/*/AppData/Local/hermes/state-snapshots/*/state.db
       jetbrains_ai,jetbrains_ai.aia_task_history,file_only,C:/Users/*/AppData/Roaming/JetBrains/**/aia-task-history/**
       junie,junie.cli_sessions,file_only,C:/Users/*/.junie/sessions/*/**
       junie,junie.cli_sessions,file_only,C:/Users/*/.junie/sessions/*/subagents/**
@@ -1140,6 +1144,10 @@ sources:
       hermes,hermes.state_db,file_only,/var/root/.hermes/state.db
       hermes,hermes.state_db,file_only,/var/root/.hermes/state.db-shm
       hermes,hermes.state_db,file_only,/var/root/.hermes/state.db-wal
+      hermes,hermes.state_snapshot_transcripts,file_only,/Users/*/.hermes/profiles/*/state-snapshots/*/state.db
+      hermes,hermes.state_snapshot_transcripts,file_only,/Users/*/.hermes/state-snapshots/*/state.db
+      hermes,hermes.state_snapshot_transcripts,file_only,/var/root/.hermes/profiles/*/state-snapshots/*/state.db
+      hermes,hermes.state_snapshot_transcripts,file_only,/var/root/.hermes/state-snapshots/*/state.db
       jetbrains_ai,jetbrains_ai.aia_task_history,file_only,/Users/*/.config/JetBrains/**/aia-task-history/**
       jetbrains_ai,jetbrains_ai.aia_task_history,file_only,/Users/*/Library/Application Support/JetBrains/**/aia-task-history/*.agentsession
       jetbrains_ai,jetbrains_ai.aia_task_history,file_only,/Users/*/Library/Application Support/JetBrains/**/aia-task-history/*.checkpoints
@@ -2078,6 +2086,10 @@ sources:
       hermes,hermes.state_db,file_only,/root/.hermes/state.db
       hermes,hermes.state_db,file_only,/root/.hermes/state.db-shm
       hermes,hermes.state_db,file_only,/root/.hermes/state.db-wal
+      hermes,hermes.state_snapshot_transcripts,file_only,/home/*/.hermes/profiles/*/state-snapshots/*/state.db
+      hermes,hermes.state_snapshot_transcripts,file_only,/home/*/.hermes/state-snapshots/*/state.db
+      hermes,hermes.state_snapshot_transcripts,file_only,/root/.hermes/profiles/*/state-snapshots/*/state.db
+      hermes,hermes.state_snapshot_transcripts,file_only,/root/.hermes/state-snapshots/*/state.db
       jetbrains_ai,jetbrains_ai.aia_task_history,file_only,/home/*/.config/JetBrains/**/aia-task-history/**
       jetbrains_ai,jetbrains_ai.aia_task_history,file_only,/home/*/Library/Application Support/JetBrains/**/aia-task-history/*.agentsession
       jetbrains_ai,jetbrains_ai.aia_task_history,file_only,/home/*/Library/Application Support/JetBrains/**/aia-task-history/*.checkpoints

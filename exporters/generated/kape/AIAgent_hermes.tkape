@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 864dcd9f72b2
+# Catalogue digest: cd86baac2010
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 33 of the 488 catalogue artifacts declare
+# KAPE is Windows only. 33 of the 493 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -44,6 +44,126 @@ Targets:
         Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
         FileMask: "auth.json"
         Recursive: false
+    -
+        Name: hermes.backups
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\backups
+        FileMask: "*.zip"
+        Recursive: false
+    -
+        Name: hermes.backups
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\profiles\*\backups
+        FileMask: "*.zip"
+        Recursive: false
+    -
+        Name: hermes.backups
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\backups
+        FileMask: "*.zip"
+        Recursive: false
+    -
+        Name: hermes.backups
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\backups
+        FileMask: "*.zip"
+        Recursive: false
+    -
+        Name: hermes.checkpoint_projects
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\checkpoints\store\ledgers
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: hermes.checkpoint_projects
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\checkpoints\store\projects
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: hermes.checkpoint_projects
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\profiles\*\checkpoints\store\ledgers
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: hermes.checkpoint_projects
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\profiles\*\checkpoints\store\projects
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: hermes.checkpoint_projects
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\checkpoints\store\ledgers
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: hermes.checkpoint_projects
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\checkpoints\store\projects
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: hermes.checkpoint_projects
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\checkpoints\store\ledgers
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: hermes.checkpoint_projects
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\checkpoints\store\projects
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: hermes.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\checkpoints
+        FileMask: "legacy-*"
+        Recursive: true
+    -
+        Name: hermes.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\checkpoints\store
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\profiles\*\checkpoints
+        FileMask: "legacy-*"
+        Recursive: true
+    -
+        Name: hermes.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\profiles\*\checkpoints\store
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\checkpoints
+        FileMask: "legacy-*"
+        Recursive: true
+    -
+        Name: hermes.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\checkpoints\store
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\checkpoints
+        FileMask: "legacy-*"
+        Recursive: true
+    -
+        Name: hermes.checkpoints
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\checkpoints\store
+        FileMask: "*"
+        Recursive: true
     -
         Name: hermes.config
         Category: config
@@ -404,3 +524,51 @@ Targets:
         Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
         FileMask: "state.db-wal"
         Recursive: false
+    -
+        Name: hermes.state_snapshot_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\.hermes\profiles\*\state-snapshots\*
+        FileMask: "state.db"
+        Recursive: false
+    -
+        Name: hermes.state_snapshot_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\.hermes\state-snapshots\*
+        FileMask: "state.db"
+        Recursive: false
+    -
+        Name: hermes.state_snapshot_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\state-snapshots\*
+        FileMask: "state.db"
+        Recursive: false
+    -
+        Name: hermes.state_snapshot_transcripts
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\hermes\state-snapshots\*
+        FileMask: "state.db"
+        Recursive: false
+    -
+        Name: hermes.state_snapshots
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\profiles\*\state-snapshots
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.state_snapshots
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\state-snapshots
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.state_snapshots
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\state-snapshots
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.state_snapshots
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\state-snapshots
+        FileMask: "*"
+        Recursive: true

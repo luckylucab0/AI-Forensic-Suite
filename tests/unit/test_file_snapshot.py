@@ -143,7 +143,11 @@ NOT_CLAIMED = {
     "claude_desktop.ssh_remote_artifacts": "what the agent left on another host",
     "cline.chat_workspace": "a working directory of arbitrary files",
     "cursor.worktrees": "a whole working copy, not a copy of one file",
+    "hermes.backups": "a zip of the whole home, which is a container of copies of "
+    "artifacts this catalogue lists individually rather than a copy of one file",
     "hermes.sandboxes": "a sandbox tree of arbitrary files",
+    "hermes.state_snapshots": "the product's own copy of its critical state, whose one "
+    "readable member has an entry and a reader of its own",
     "ollama.backup_dir": "a backup of the product's own data, not of a user's file",
     "opencode.repos_cache": "a clone the agent made, not a copy of a file it replaced",
     "windsurf.worktrees": "a whole working copy, not a copy of one file",

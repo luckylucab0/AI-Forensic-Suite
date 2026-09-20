@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 864dcd9f72b2
+# Catalogue digest: cd86baac2010
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -671,6 +671,26 @@ sources:
     hermes,hermes.auth,C:/Users/*/.hermes/profiles/*/auth.json
     hermes,hermes.auth,C:/Users/*/AppData/Local/hermes/auth.json
     hermes,hermes.auth,C:/Users/*/AppData/Local/hermes/profiles/*/auth.json
+    hermes,hermes.backups,C:/Users/*/.hermes/backups/*.zip
+    hermes,hermes.backups,C:/Users/*/.hermes/profiles/*/backups/*.zip
+    hermes,hermes.backups,C:/Users/*/AppData/Local/hermes/backups/*.zip
+    hermes,hermes.backups,C:/Users/*/AppData/Local/hermes/profiles/*/backups/*.zip
+    hermes,hermes.checkpoint_projects,C:/Users/*/.hermes/checkpoints/store/ledgers/*.json
+    hermes,hermes.checkpoint_projects,C:/Users/*/.hermes/checkpoints/store/projects/*.json
+    hermes,hermes.checkpoint_projects,C:/Users/*/.hermes/profiles/*/checkpoints/store/ledgers/*.json
+    hermes,hermes.checkpoint_projects,C:/Users/*/.hermes/profiles/*/checkpoints/store/projects/*.json
+    hermes,hermes.checkpoint_projects,C:/Users/*/AppData/Local/hermes/checkpoints/store/ledgers/*.json
+    hermes,hermes.checkpoint_projects,C:/Users/*/AppData/Local/hermes/checkpoints/store/projects/*.json
+    hermes,hermes.checkpoint_projects,C:/Users/*/AppData/Local/hermes/profiles/*/checkpoints/store/ledgers/*.json
+    hermes,hermes.checkpoint_projects,C:/Users/*/AppData/Local/hermes/profiles/*/checkpoints/store/projects/*.json
+    hermes,hermes.checkpoints,C:/Users/*/.hermes/checkpoints/legacy-*/**
+    hermes,hermes.checkpoints,C:/Users/*/.hermes/checkpoints/store/**
+    hermes,hermes.checkpoints,C:/Users/*/.hermes/profiles/*/checkpoints/legacy-*/**
+    hermes,hermes.checkpoints,C:/Users/*/.hermes/profiles/*/checkpoints/store/**
+    hermes,hermes.checkpoints,C:/Users/*/AppData/Local/hermes/checkpoints/legacy-*/**
+    hermes,hermes.checkpoints,C:/Users/*/AppData/Local/hermes/checkpoints/store/**
+    hermes,hermes.checkpoints,C:/Users/*/AppData/Local/hermes/profiles/*/checkpoints/legacy-*/**
+    hermes,hermes.checkpoints,C:/Users/*/AppData/Local/hermes/profiles/*/checkpoints/store/**
     hermes,hermes.config,C:/Users/*/.hermes/config.yaml
     hermes,hermes.config,C:/Users/*/.hermes/profiles/*/config.yaml
     hermes,hermes.config,C:/Users/*/AppData/Local/hermes/config.yaml
@@ -731,6 +751,14 @@ sources:
     hermes,hermes.state_db,C:/Users/*/AppData/Local/hermes/state.db
     hermes,hermes.state_db,C:/Users/*/AppData/Local/hermes/state.db-shm
     hermes,hermes.state_db,C:/Users/*/AppData/Local/hermes/state.db-wal
+    hermes,hermes.state_snapshot_transcripts,C:/Users/*/.hermes/profiles/*/state-snapshots/*/state.db
+    hermes,hermes.state_snapshot_transcripts,C:/Users/*/.hermes/state-snapshots/*/state.db
+    hermes,hermes.state_snapshot_transcripts,C:/Users/*/AppData/Local/hermes/profiles/*/state-snapshots/*/state.db
+    hermes,hermes.state_snapshot_transcripts,C:/Users/*/AppData/Local/hermes/state-snapshots/*/state.db
+    hermes,hermes.state_snapshots,C:/Users/*/.hermes/profiles/*/state-snapshots/**
+    hermes,hermes.state_snapshots,C:/Users/*/.hermes/state-snapshots/**
+    hermes,hermes.state_snapshots,C:/Users/*/AppData/Local/hermes/profiles/*/state-snapshots/**
+    hermes,hermes.state_snapshots,C:/Users/*/AppData/Local/hermes/state-snapshots/**
     jetbrains_ai,jetbrains_ai.aia_task_history,C:/Users/*/AppData/Roaming/JetBrains/**/aia-task-history/**
     jetbrains_ai,jetbrains_ai.base_directories,C:/Users/*/AppData/Local/JetBrains/**/**
     jetbrains_ai,jetbrains_ai.base_directories,C:/Users/*/AppData/Local/JetBrains/**/log/**
@@ -2263,6 +2291,26 @@ sources:
     hermes,hermes.auth,/Users/*/.hermes/profiles/*/auth.json
     hermes,hermes.auth,/var/root/.hermes/auth.json
     hermes,hermes.auth,/var/root/.hermes/profiles/*/auth.json
+    hermes,hermes.backups,/Users/*/.hermes/backups/*.zip
+    hermes,hermes.backups,/Users/*/.hermes/profiles/*/backups/*.zip
+    hermes,hermes.backups,/var/root/.hermes/backups/*.zip
+    hermes,hermes.backups,/var/root/.hermes/profiles/*/backups/*.zip
+    hermes,hermes.checkpoint_projects,/Users/*/.hermes/checkpoints/store/ledgers/*.json
+    hermes,hermes.checkpoint_projects,/Users/*/.hermes/checkpoints/store/projects/*.json
+    hermes,hermes.checkpoint_projects,/Users/*/.hermes/profiles/*/checkpoints/store/ledgers/*.json
+    hermes,hermes.checkpoint_projects,/Users/*/.hermes/profiles/*/checkpoints/store/projects/*.json
+    hermes,hermes.checkpoint_projects,/var/root/.hermes/checkpoints/store/ledgers/*.json
+    hermes,hermes.checkpoint_projects,/var/root/.hermes/checkpoints/store/projects/*.json
+    hermes,hermes.checkpoint_projects,/var/root/.hermes/profiles/*/checkpoints/store/ledgers/*.json
+    hermes,hermes.checkpoint_projects,/var/root/.hermes/profiles/*/checkpoints/store/projects/*.json
+    hermes,hermes.checkpoints,/Users/*/.hermes/checkpoints/legacy-*/**
+    hermes,hermes.checkpoints,/Users/*/.hermes/checkpoints/store/**
+    hermes,hermes.checkpoints,/Users/*/.hermes/profiles/*/checkpoints/legacy-*/**
+    hermes,hermes.checkpoints,/Users/*/.hermes/profiles/*/checkpoints/store/**
+    hermes,hermes.checkpoints,/var/root/.hermes/checkpoints/legacy-*/**
+    hermes,hermes.checkpoints,/var/root/.hermes/checkpoints/store/**
+    hermes,hermes.checkpoints,/var/root/.hermes/profiles/*/checkpoints/legacy-*/**
+    hermes,hermes.checkpoints,/var/root/.hermes/profiles/*/checkpoints/store/**
     hermes,hermes.config,/Users/*/.hermes/config.yaml
     hermes,hermes.config,/Users/*/.hermes/profiles/*/config.yaml
     hermes,hermes.config,/var/root/.hermes/config.yaml
@@ -2323,6 +2371,14 @@ sources:
     hermes,hermes.state_db,/var/root/.hermes/state.db
     hermes,hermes.state_db,/var/root/.hermes/state.db-shm
     hermes,hermes.state_db,/var/root/.hermes/state.db-wal
+    hermes,hermes.state_snapshot_transcripts,/Users/*/.hermes/profiles/*/state-snapshots/*/state.db
+    hermes,hermes.state_snapshot_transcripts,/Users/*/.hermes/state-snapshots/*/state.db
+    hermes,hermes.state_snapshot_transcripts,/var/root/.hermes/profiles/*/state-snapshots/*/state.db
+    hermes,hermes.state_snapshot_transcripts,/var/root/.hermes/state-snapshots/*/state.db
+    hermes,hermes.state_snapshots,/Users/*/.hermes/profiles/*/state-snapshots/**
+    hermes,hermes.state_snapshots,/Users/*/.hermes/state-snapshots/**
+    hermes,hermes.state_snapshots,/var/root/.hermes/profiles/*/state-snapshots/**
+    hermes,hermes.state_snapshots,/var/root/.hermes/state-snapshots/**
     jetbrains_ai,jetbrains_ai.aia_task_history,/Users/*/.config/JetBrains/**/aia-task-history/**
     jetbrains_ai,jetbrains_ai.aia_task_history,/Users/*/Library/Application Support/JetBrains/**/aia-task-history/*.agentsession
     jetbrains_ai,jetbrains_ai.aia_task_history,/Users/*/Library/Application Support/JetBrains/**/aia-task-history/*.checkpoints
@@ -4243,6 +4299,26 @@ sources:
     hermes,hermes.auth,/home/*/.hermes/profiles/*/auth.json
     hermes,hermes.auth,/root/.hermes/auth.json
     hermes,hermes.auth,/root/.hermes/profiles/*/auth.json
+    hermes,hermes.backups,/home/*/.hermes/backups/*.zip
+    hermes,hermes.backups,/home/*/.hermes/profiles/*/backups/*.zip
+    hermes,hermes.backups,/root/.hermes/backups/*.zip
+    hermes,hermes.backups,/root/.hermes/profiles/*/backups/*.zip
+    hermes,hermes.checkpoint_projects,/home/*/.hermes/checkpoints/store/ledgers/*.json
+    hermes,hermes.checkpoint_projects,/home/*/.hermes/checkpoints/store/projects/*.json
+    hermes,hermes.checkpoint_projects,/home/*/.hermes/profiles/*/checkpoints/store/ledgers/*.json
+    hermes,hermes.checkpoint_projects,/home/*/.hermes/profiles/*/checkpoints/store/projects/*.json
+    hermes,hermes.checkpoint_projects,/root/.hermes/checkpoints/store/ledgers/*.json
+    hermes,hermes.checkpoint_projects,/root/.hermes/checkpoints/store/projects/*.json
+    hermes,hermes.checkpoint_projects,/root/.hermes/profiles/*/checkpoints/store/ledgers/*.json
+    hermes,hermes.checkpoint_projects,/root/.hermes/profiles/*/checkpoints/store/projects/*.json
+    hermes,hermes.checkpoints,/home/*/.hermes/checkpoints/legacy-*/**
+    hermes,hermes.checkpoints,/home/*/.hermes/checkpoints/store/**
+    hermes,hermes.checkpoints,/home/*/.hermes/profiles/*/checkpoints/legacy-*/**
+    hermes,hermes.checkpoints,/home/*/.hermes/profiles/*/checkpoints/store/**
+    hermes,hermes.checkpoints,/root/.hermes/checkpoints/legacy-*/**
+    hermes,hermes.checkpoints,/root/.hermes/checkpoints/store/**
+    hermes,hermes.checkpoints,/root/.hermes/profiles/*/checkpoints/legacy-*/**
+    hermes,hermes.checkpoints,/root/.hermes/profiles/*/checkpoints/store/**
     hermes,hermes.config,/home/*/.hermes/config.yaml
     hermes,hermes.config,/home/*/.hermes/profiles/*/config.yaml
     hermes,hermes.config,/root/.hermes/config.yaml
@@ -4303,6 +4379,14 @@ sources:
     hermes,hermes.state_db,/root/.hermes/state.db
     hermes,hermes.state_db,/root/.hermes/state.db-shm
     hermes,hermes.state_db,/root/.hermes/state.db-wal
+    hermes,hermes.state_snapshot_transcripts,/home/*/.hermes/profiles/*/state-snapshots/*/state.db
+    hermes,hermes.state_snapshot_transcripts,/home/*/.hermes/state-snapshots/*/state.db
+    hermes,hermes.state_snapshot_transcripts,/root/.hermes/profiles/*/state-snapshots/*/state.db
+    hermes,hermes.state_snapshot_transcripts,/root/.hermes/state-snapshots/*/state.db
+    hermes,hermes.state_snapshots,/home/*/.hermes/profiles/*/state-snapshots/**
+    hermes,hermes.state_snapshots,/home/*/.hermes/state-snapshots/**
+    hermes,hermes.state_snapshots,/root/.hermes/profiles/*/state-snapshots/**
+    hermes,hermes.state_snapshots,/root/.hermes/state-snapshots/**
     jetbrains_ai,jetbrains_ai.aia_task_history,/home/*/.config/JetBrains/**/aia-task-history/**
     jetbrains_ai,jetbrains_ai.aia_task_history,/home/*/Library/Application Support/JetBrains/**/aia-task-history/*.agentsession
     jetbrains_ai,jetbrains_ai.aia_task_history,/home/*/Library/Application Support/JetBrains/**/aia-task-history/*.checkpoints

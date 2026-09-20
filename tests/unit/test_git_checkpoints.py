@@ -1,9 +1,10 @@
 """Tests for the checkpoint reference reader.
 
-An agent that can undo its own edits writes a snapshot before it changes a file, and two
+An agent that can undo its own edits writes a snapshot before it changes a file, and three
 of the agents here do it with git. The modern shape puts the commit in the developer's own
 repository under a private reference namespace, so a collection of those paths carries the
-references and not the objects.
+references and not the objects. A third keeps one shared repository of its own and names
+each project by a hash of its working directory.
 
 That gap is the thing to get right. The events have to be a timeline of when checkpoints
 were taken and for which conversation, and they have to say that the content behind them is
@@ -123,3 +124,32 @@ def test_a_line_that_is_not_a_reference_log_entry_is_kept(tmp_path: Path) -> Non
     )
     assert [event.kind for event in events] == ["unparsed.record"]
     assert events[0].raw == "this is not a reflog line"
+
+
+def test_a_shared_store_names_the_project_and_not_a_conversation(tmp_path: Path) -> None:
+    """The third shape's reference segment is a project, not a session.
+
+    Read as a session id it would put a working directory into the case as a conversation,
+    and every checkpoint the agent ever took in that directory would join to it. The hash
+    travels under its own name, which is what the store's project index resolves.
+    """
+    parser = for_artifact("hermes.checkpoints")
+    assert parser is not None
+    events = list(
+        parser.parse(
+            ParseContext(
+                bundle_uuid="b",
+                original_path="/home/alice/.hermes/checkpoints/store/refs/hermes/0123456789abcdef",
+                local_path=write(tmp_path / "0123456789abcdef", COMMIT + "\n"),
+                sha256="f" * 64,
+                artifact_id="hermes.checkpoints",
+                agent="hermes",
+                user="alice",
+            )
+        )
+    )
+    assert [event.kind for event in events] == ["file.snapshot"]
+    assert events[0].raw["project_hash"] == "0123456789abcdef"
+    assert events[0].session_id is None
+    # And the objects came with it, so the event must not send the analyst back to the host.
+    assert NO_CONTENT not in (events[0].parse_problem or "")

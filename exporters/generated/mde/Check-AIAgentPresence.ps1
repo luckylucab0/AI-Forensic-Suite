@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 864dcd9f72b2
+# Catalogue digest: cd86baac2010
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -589,6 +589,22 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\AppData\Local\hermes\auth.json' }
     @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.backups'; Path = '$profile\.hermes\backups' }
+    @{ Agent = 'hermes'; Id = 'hermes.backups'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.backups'; Path = '$profile\AppData\Local\hermes\backups' }
+    @{ Agent = 'hermes'; Id = 'hermes.backups'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.checkpoint_projects'; Path = '$profile\.hermes\checkpoints\store\ledgers' }
+    @{ Agent = 'hermes'; Id = 'hermes.checkpoint_projects'; Path = '$profile\.hermes\checkpoints\store\projects' }
+    @{ Agent = 'hermes'; Id = 'hermes.checkpoint_projects'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.checkpoint_projects'; Path = '$profile\AppData\Local\hermes\checkpoints\store\ledgers' }
+    @{ Agent = 'hermes'; Id = 'hermes.checkpoint_projects'; Path = '$profile\AppData\Local\hermes\checkpoints\store\projects' }
+    @{ Agent = 'hermes'; Id = 'hermes.checkpoint_projects'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.checkpoints'; Path = '$profile\.hermes\checkpoints\legacy-' }
+    @{ Agent = 'hermes'; Id = 'hermes.checkpoints'; Path = '$profile\.hermes\checkpoints\store' }
+    @{ Agent = 'hermes'; Id = 'hermes.checkpoints'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.checkpoints'; Path = '$profile\AppData\Local\hermes\checkpoints\legacy-' }
+    @{ Agent = 'hermes'; Id = 'hermes.checkpoints'; Path = '$profile\AppData\Local\hermes\checkpoints\store' }
+    @{ Agent = 'hermes'; Id = 'hermes.checkpoints'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.config'; Path = '$profile\.hermes\config.yaml' }
     @{ Agent = 'hermes'; Id = 'hermes.config'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.config'; Path = '$profile\AppData\Local\hermes\config.yaml' }
@@ -641,6 +657,14 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\AppData\Local\hermes\state.db' }
     @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\AppData\Local\hermes\state.db-shm' }
     @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\AppData\Local\hermes\state.db-wal' }
+    @{ Agent = 'hermes'; Id = 'hermes.state_snapshot_transcripts'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.state_snapshot_transcripts'; Path = '$profile\.hermes\state-snapshots' }
+    @{ Agent = 'hermes'; Id = 'hermes.state_snapshot_transcripts'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.state_snapshot_transcripts'; Path = '$profile\AppData\Local\hermes\state-snapshots' }
+    @{ Agent = 'hermes'; Id = 'hermes.state_snapshots'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.state_snapshots'; Path = '$profile\.hermes\state-snapshots' }
+    @{ Agent = 'hermes'; Id = 'hermes.state_snapshots'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.state_snapshots'; Path = '$profile\AppData\Local\hermes\state-snapshots' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.aia_task_history'; Path = '$profile\AppData\Roaming\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.base_directories'; Path = '$profile\AppData\Local\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.base_directories'; Path = '$profile\AppData\Roaming\JetBrains' }

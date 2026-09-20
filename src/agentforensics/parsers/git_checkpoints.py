@@ -1,11 +1,18 @@
-"""Read the checkpoint references two agents write into a git repository.
+"""Read the checkpoint references three agents write into a git repository.
 
 An agent that can undo its own edits keeps a snapshot of the files it is about to change.
-Two of the agents here do it with git, and the modern shape is the one worth reading: the
-extension runs `git stash create` in the user's own repository and then writes the commit
-it got under a private reference namespace, `refs/cline/checkpoints/<session>/<run>`. So a
-checkpoint is a commit in the developer's own object store, pointed at by a file of
-forty-one bytes that nothing else on the endpoint explains.
+Three of the agents here do it with git, in three shapes. The one worth reading first is
+the modern extension shape: it runs `git stash create` in the user's own repository and
+then writes the commit it got under a private reference namespace,
+`refs/cline/checkpoints/<session>/<run>`. So a checkpoint is a commit in the developer's
+own object store, pointed at by a file of forty-one bytes that nothing else on the
+endpoint explains.
+
+The third shape is one shared bare repository under the agent's home for every project it
+has ever worked in, with one reference per project named after a hash of that project's
+absolute path, `refs/hermes/<hash>`. It reads like the second shape, because the agent
+owns the repository and the collection takes it whole, and the hash is carried on the
+events so the store's own project index can name the directory behind it.
 
 What this reader takes from a collection depends on which of the two shapes it is, and
 getting that wrong is what this reader used to do. Where only the references are in the
@@ -60,6 +67,7 @@ STORES = frozenset(
         "cline.checkpoint_refs_in_workspace",
         "cline.checkpoint_scratch",
         "cline.checkpoints_shadow_git_legacy",
+        "hermes.checkpoints",
         "roo_code.checkpoints",
     }
 )
@@ -72,6 +80,7 @@ OWN_REPOSITORY = frozenset(
     {
         "amazonq.cli_checkpoints",
         "cline.checkpoints_shadow_git_legacy",
+        "hermes.checkpoints",
         "roo_code.checkpoints",
     }
 )
@@ -186,6 +195,11 @@ _REFLOG = re.compile(
 # a file named for the rest. Both hash lengths, so a repository written with either reads.
 _LOOSE_PREFIX = re.compile(r"^[0-9a-f]{2}$")
 _LOOSE_REST = re.compile(r"^[0-9a-f]{38}$|^[0-9a-f]{62}$")
+
+# The project segment of the shared store's reference namespace: sixteen hex characters,
+# the front of the sha256 of the working directory's absolute path. Matched rather than
+# assumed so a reference that merely happens to sit under refs/hermes/ is not relabelled.
+_PROJECT_HASH = re.compile(r"[0-9a-f]{16}")
 
 # An object id on its own, which is what a loose reference file holds.
 _OBJECT_ID = re.compile(r"^(?P<id>[0-9a-f]{40}|[0-9a-f]{64})$")
@@ -784,8 +798,15 @@ def _ref_parts(path: str) -> dict[str, Any]:
 
     The namespace one of these agents documents is `refs/cline/checkpoints/<session>/<run>`,
     so the last two segments carry the conversation the snapshot belongs to and which turn
-    of it. Read positionally and only from that shape: a reference under another layout
-    keeps its name and claims nothing.
+    of it. Another documents `refs/hermes/<hash>`, where the segment is not a conversation
+    but a project: the first sixteen characters of the sha256 of the absolute path of the
+    working directory the snapshot was taken in. It is carried under its own name because
+    it is not a session id and reading it as one would put a project into the case as a
+    conversation. The store's own project index names the directory behind the hash, and
+    this suite reads that file as a document of its own.
+
+    Read positionally and only from those shapes: a reference under another layout keeps
+    its name and claims nothing.
     """
     text = path.replace("\\", "/")
     at = text.find("refs/")
@@ -798,6 +819,8 @@ def _ref_parts(path: str) -> dict[str, Any]:
     if len(parts) >= 5 and parts[2] == "checkpoints":
         out["session_id"] = parts[3]
         out["run"] = parts[4]
+    elif len(parts) == 3 and parts[1] == "hermes" and _PROJECT_HASH.fullmatch(parts[2]):
+        out["project_hash"] = parts[2]
     return out
 
 

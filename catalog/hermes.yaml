@@ -41,6 +41,173 @@ env_overrides:
   source: |-
     https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
 artifacts:
+- id: hermes.checkpoints
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/checkpoints/store/**
+  - $HERMES_HOME/profiles/<name>/checkpoints/store/**
+  - ~/.hermes/checkpoints/store/**
+  - ~/.hermes/profiles/<name>/checkpoints/store/**
+  - '%LOCALAPPDATA%\hermes\checkpoints\store\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\checkpoints\store\**'
+  - $HERMES_HOME/checkpoints/legacy-*/**
+  - $HERMES_HOME/profiles/<name>/checkpoints/legacy-*/**
+  - ~/.hermes/checkpoints/legacy-*/**
+  - ~/.hermes/profiles/<name>/checkpoints/legacy-*/**
+  - '%LOCALAPPDATA%\hermes\checkpoints\legacy-*\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\checkpoints\legacy-*\**'
+  format: binary
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/checkpoints-and-rollback.md
+  source_kind: official
+  record_types:
+  - 'bare git repository: HEAD, objects, refs/hermes/<hash>, indexes/<hash>, info/exclude'
+  volatility: |-
+    Swept by the agent itself. A periodic prune drops projects whose last_touch is older than retention_days, seven by default, and projects whose working directory no longer exists. A total size cap, 500 MB by default, drops the oldest commit of each project that still has more than one, never below one. After refs are rewritten the store is marked and the next prune runs a git collection with immediate pruning, so a dropped commit really goes. The whole base can be removed in one command, and the legacy archives in another.
+  notes: |-
+    The richest artifact this agent has, and it is not a transcript. Before a tool call that changes files, once per directory per turn, the agent commits the working directory into a bare git repository of its own under its home. So the content of files the agent created, changed or deleted is recoverable from the object store after the working copy has moved on, after the branch is gone and after the project directory itself has been deleted, and the commit sequence is an ordered timeline dated by the endpoint's own clock.
+
+    One store is shared by every project, so the object database deduplicates across projects and across turns, and one reference per project points at its tip. The project is named by a hash of the absolute path of its working directory rather than by the path, which is what the entry beside this one is for: the store's own project file carries the path in clear, so the hash never has to be reversed.
+
+    Two things follow that are findings in their own right. Source code left the project directory and now sits in a second place under the user's home, which is a data-at-rest and scoping answer. And the default exclusions are wide: dependency and build output, virtualenvs, compiled binaries, media, and .env and .env.* by name. A secret the agent wrote into an environment file is the one thing this store will not hold, so an absence here is not an absence on the endpoint.
+
+    Copy the store before running git against it. The collector takes it whole and never runs a binary on the target.
+
+    Record structure: store/ is a bare repository: HEAD, objects/ loose and packed, refs/hermes/<hash> per project, indexes/<hash>, info/exclude. legacy-<timestamp>/ holds the per-project repositories of the layout that preceded the shared store, each a complete repository of its own, and they are still readable with git.
+  parser: git_checkpoints
+- id: hermes.checkpoint_projects
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/checkpoints/store/projects/*.json
+  - $HERMES_HOME/profiles/<name>/checkpoints/store/projects/*.json
+  - ~/.hermes/checkpoints/store/projects/*.json
+  - ~/.hermes/profiles/<name>/checkpoints/store/projects/*.json
+  - '%LOCALAPPDATA%\hermes\checkpoints\store\projects\*.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\checkpoints\store\projects\*.json'
+  - $HERMES_HOME/checkpoints/store/ledgers/*.json
+  - $HERMES_HOME/profiles/<name>/checkpoints/store/ledgers/*.json
+  - ~/.hermes/checkpoints/store/ledgers/*.json
+  - ~/.hermes/profiles/<name>/checkpoints/store/ledgers/*.json
+  - '%LOCALAPPDATA%\hermes\checkpoints\store\ledgers\*.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\checkpoints\store\ledgers\*.json'
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/tools/checkpoint_manager.py
+  source_kind: source_code
+  volatility: |-
+    Written beside the snapshot store and removed with the project it describes when the prune drops that project. The ledger keeps only the newest 2000 entries per project.
+  notes: |-
+    The index that makes the snapshot store readable, and an answer no transcript gives.
+
+    A project file names the absolute working directory behind a project hash, with the time the agent first worked there and the time it last did. The hash is the first sixteen hex characters of the sha256 of that absolute path, so a project file also lets an analyst confirm a directory from the hash alone when the file itself is gone. Either way the directory is named here after it has been deleted from the endpoint.
+
+    A ledger file is the store's own record of which writes were the agent's. It is a mapping from the absolute path of each file the agent wrote to the sha256 of what it wrote and the time it wrote it. That is attribution: a changed file on disk is not by itself an agent edit, and this says which ones were. The hashes are also how a copy found somewhere else, in a staging directory or a backup, is matched back to a write the agent made.
+
+    Record structure: projects/<hash>.json carries the working directory and the created and last-touched timestamps. ledgers/<hash>.json is an object keyed by absolute path, each value holding sha256 and ts, capped at the 2000 newest writes.
+  parser: json_generic
+- id: hermes.state_snapshots
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/state-snapshots/**
+  - $HERMES_HOME/profiles/<name>/state-snapshots/**
+  - ~/.hermes/state-snapshots/**
+  - ~/.hermes/profiles/<name>/state-snapshots/**
+  - '%LOCALAPPDATA%\hermes\state-snapshots\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\state-snapshots\**'
+  format: directory
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/hermes_cli/backup.py
+  source_kind: source_code
+  volatility: |-
+    Written before every update, for every profile on the install, and kept twenty deep by default. A snapshot whose database copy failed or was skipped for size suppresses the prune, so an older and more complete one survives rather than being rotated out.
+  notes: |-
+    A stack of point-in-time copies of everything this agent's state is kept in, taken by the product itself and left on the endpoint.
+
+    That matters because the live stores can be emptied. The transcript database archives compacted history rather than deleting it, but an explicit prune really removes sessions, and a deleted profile takes its whole home. A snapshot taken before any of that still holds what was there. The one that matters most is the transcript database, which has an entry of its own beside this one so it is read rather than merely collected; the rest of the snapshot is here.
+
+    Record structure: state-snapshots/<timestamp>[-label]/ per snapshot, with a manifest.json naming every file captured and its size, plus the failed and oversized files the snapshot could not take, and beside it the captured files at their original relative paths. The captured set is the product's own list of critical state: the transcript database, the configuration, the environment file, the credential file, the scheduled jobs and their execution database, the gateway state and channel directory, the project, response, memory, verification and board databases, and the platform pairing stores. A directory beginning with a dot and ending in .partial is a snapshot that was interrupted while being written.
+  parser: null
+- id: hermes.state_snapshot_transcripts
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/state-snapshots/*/state.db
+  - $HERMES_HOME/profiles/<name>/state-snapshots/*/state.db
+  - ~/.hermes/state-snapshots/*/state.db
+  - ~/.hermes/profiles/<name>/state-snapshots/*/state.db
+  - '%LOCALAPPDATA%\hermes\state-snapshots\*\state.db'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\state-snapshots\*\state.db'
+  format: sqlite
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/hermes_cli/backup.py
+  source_kind: source_code
+  volatility: |-
+    One copy per snapshot, up to twenty. Each is a copy of the transcript database as it stood before an update, so a session pruned or a profile deleted after that point is still whole here.
+  notes: |-
+    The same schema as the live transcript database and therefore read the same way, which is the entire point of giving it an entry of its own: collected under the snapshot entry alone it would have reached a case as a file nobody opened.
+
+    This is where a conversation that was deleted is still to be found. Deletion in this product is real where it is explicit: prune_sessions removes rows and deleting a profile removes its home. Neither reaches a copy taken earlier and left in this directory.
+
+    Compare the sessions in each copy against the live database. A session present here and absent there is a deletion, and the copy dates it to somewhere between two snapshots.
+
+    Record structure: identical to the live store, so see the entry for it. The copy is made page by page rather than by renaming a file, and it carries no write-ahead log of its own.
+  parser: hermes
+- id: hermes.backups
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/backups/*.zip
+  - $HERMES_HOME/profiles/<name>/backups/*.zip
+  - ~/.hermes/backups/*.zip
+  - ~/.hermes/profiles/<name>/backups/*.zip
+  - '%LOCALAPPDATA%\hermes\backups\*.zip'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\backups\*.zip'
+  format: binary
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/hermes_cli/backup.py
+  source_kind: source_code
+  volatility: |-
+    Written before an update when the full mode is configured, and before a schema migration, each pruned to the five newest of its kind. A backup the user made by hand is not pruned at all.
+  notes: |-
+    A zip of the whole home, taken by the product before it changed itself. Where the snapshot beside it captures a list of critical files, this is everything: the transcripts, the memories, the skills, the scheduled jobs, the configuration and the credential files as they stood at that moment.
+
+    Treat it as an evidence container rather than a file. It holds copies of artifacts this catalogue lists individually, so what an analyst is holding after expanding one is a second complete case from an earlier date, and the credential files inside it are live credentials the endpoint may no longer use.
+
+    Record structure: backups/pre-update-<date>-<time>.zip before an update, backups/pre-migration-<date>-<time>.zip before a schema migration, and whatever name a user chose for one they made themselves. Earlier backups and the snapshot directory are not nested inside a new one.
+  parser: null
 - id: hermes.config
   category: config
   root: user_profile

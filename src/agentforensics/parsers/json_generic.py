@@ -156,6 +156,7 @@ DOCUMENTS = frozenset(
         "gemini_cli.system_settings",
         "gemini_cli.trusted_folders",
         "gemini_cli.user_settings",
+        "hermes.checkpoint_projects",
         "jetbrains_ai.mcp_config",
         "junie.allowlist",
         "junie.home_config",

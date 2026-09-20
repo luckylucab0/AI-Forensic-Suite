@@ -5942,6 +5942,81 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "file_snapshot",
+                    "collect_priority": "durable",
+                    "id": "hermes.backups",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/backups/*.zip",
+                        "$HERMES_HOME/profiles/<name>/backups/*.zip",
+                        "~/.hermes/backups/*.zip",
+                        "~/.hermes/profiles/<name>/backups/*.zip",
+                        "%LOCALAPPDATA%\\hermes\\backups\\*.zip",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\backups\\*.zip"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "durable",
+                    "id": "hermes.checkpoint_projects",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/checkpoints/store/projects/*.json",
+                        "$HERMES_HOME/profiles/<name>/checkpoints/store/projects/*.json",
+                        "~/.hermes/checkpoints/store/projects/*.json",
+                        "~/.hermes/profiles/<name>/checkpoints/store/projects/*.json",
+                        "%LOCALAPPDATA%\\hermes\\checkpoints\\store\\projects\\*.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\checkpoints\\store\\projects\\*.json",
+                        "$HERMES_HOME/checkpoints/store/ledgers/*.json",
+                        "$HERMES_HOME/profiles/<name>/checkpoints/store/ledgers/*.json",
+                        "~/.hermes/checkpoints/store/ledgers/*.json",
+                        "~/.hermes/profiles/<name>/checkpoints/store/ledgers/*.json",
+                        "%LOCALAPPDATA%\\hermes\\checkpoints\\store\\ledgers\\*.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\checkpoints\\store\\ledgers\\*.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "durable",
+                    "id": "hermes.checkpoints",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/checkpoints/store/**",
+                        "$HERMES_HOME/profiles/<name>/checkpoints/store/**",
+                        "~/.hermes/checkpoints/store/**",
+                        "~/.hermes/profiles/<name>/checkpoints/store/**",
+                        "%LOCALAPPDATA%\\hermes\\checkpoints\\store\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\checkpoints\\store\\**",
+                        "$HERMES_HOME/checkpoints/legacy-*/**",
+                        "$HERMES_HOME/profiles/<name>/checkpoints/legacy-*/**",
+                        "~/.hermes/checkpoints/legacy-*/**",
+                        "~/.hermes/profiles/<name>/checkpoints/legacy-*/**",
+                        "%LOCALAPPDATA%\\hermes\\checkpoints\\legacy-*\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\checkpoints\\legacy-*\\**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "config",
                     "collect_priority": "normal",
                     "id": "hermes.config",
@@ -6202,6 +6277,48 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.hermes/profiles/<name>/state.db-wal",
                         "%LOCALAPPDATA%\\hermes\\state.db-wal",
                         "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\state.db-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "durable",
+                    "id": "hermes.state_snapshot_transcripts",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/state-snapshots/*/state.db",
+                        "$HERMES_HOME/profiles/<name>/state-snapshots/*/state.db",
+                        "~/.hermes/state-snapshots/*/state.db",
+                        "~/.hermes/profiles/<name>/state-snapshots/*/state.db",
+                        "%LOCALAPPDATA%\\hermes\\state-snapshots\\*\\state.db",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\state-snapshots\\*\\state.db"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "durable",
+                    "id": "hermes.state_snapshots",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/state-snapshots/**",
+                        "$HERMES_HOME/profiles/<name>/state-snapshots/**",
+                        "~/.hermes/state-snapshots/**",
+                        "~/.hermes/profiles/<name>/state-snapshots/**",
+                        "%LOCALAPPDATA%\\hermes\\state-snapshots\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\state-snapshots\\**"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -9380,7 +9497,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "f0c05580db2662bf477c06549f5c9ad2fbf8d92eb55fdae1289a28fecf9a9506"
+    "sha256": "be122df83d00feacf86e7b564b5fdc8397b082179f14b012a8c958aa5f2774ed"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

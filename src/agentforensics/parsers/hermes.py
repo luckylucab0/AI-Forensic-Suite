@@ -98,7 +98,7 @@ class HermesParser:
 
     name = "hermes"
 
-    _STORES = frozenset({"hermes.state_db"})
+    _STORES = frozenset({"hermes.state_db", "hermes.state_snapshot_transcripts"})
 
     def handles(self, artifact_id: str | None) -> bool:
         return artifact_id in self._STORES
