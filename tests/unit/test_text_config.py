@@ -117,3 +117,30 @@ def test_the_reader_claims_what_somebody_decided_it_should() -> None:
     assert {a.id for a in catalogue.artifacts} >= SOURCES
     for artifact_id in SOURCES:
         assert catalogue.artifact(artifact_id).parser == "text_config", artifact_id
+
+
+def test_a_tombstone_names_the_profile_rather_than_the_file(tmp_path: Path) -> None:
+    """The file name is the evidence, so it is what a rule gets to match on.
+
+    Read as ordinary configuration this file is the word 'deleted' and says nothing. The
+    name beside it is the name of an agent whose transcripts, credentials, memories and
+    scheduled jobs were removed with its home, and that is the whole of what survives.
+    """
+    path = write(tmp_path / "coder", "deleted\n")
+    events = parse(
+        path, "hermes.profile_tombstones", original="/home/alice/.hermes/profiles/.deleted/coder"
+    )
+    assert keys(events) == ["deleted-profile:coder"]
+    assert events[0].kind == "config.snapshot"
+
+
+def test_a_tombstone_does_not_read_as_a_settings_file(tmp_path: Path) -> None:
+    """The reason it has a message of its own: the configuration wording would tell an
+    analyst nothing was mapped, when what is in front of them is a deletion."""
+    path = write(tmp_path / "coder", "deleted\n")
+    problem = parse(path, "hermes.profile_tombstones")[0].parse_problem or ""
+    assert "tombstone" in problem
+    assert "deleted or renamed" in problem
+    # It does not claim to date the deletion itself, because the file does not say.
+    assert "dates the last write to it" in problem
+    assert "no parser has mapped" not in problem

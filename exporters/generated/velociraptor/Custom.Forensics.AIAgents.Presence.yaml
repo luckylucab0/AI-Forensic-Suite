@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7e1b6b26bd64
+# Catalogue digest: 864dcd9f72b2
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -580,6 +580,12 @@ sources:
     goose,/root/.local/state/goose/logs/llm_request.*.jsonl
     goose,/var/root/.local/state/goose/logs/llm_request.*.jsonl
     goose,C:/Users/*/AppData/Roaming/Block/goose/data/logs/llm_request.*.jsonl
+    hermes,/Users/*/.hermes/profiles/.deleted/**
+    hermes,/home/*/.hermes/profiles/.deleted/**
+    hermes,/root/.hermes/profiles/.deleted/**
+    hermes,/var/root/.hermes/profiles/.deleted/**
+    hermes,C:/Users/*/.hermes/profiles/.deleted/**
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/.deleted/**
     kiro,/Users/*/.kiro/*.sqlite3
     kiro,/Users/*/.kiro/*.sqlite3-shm
     kiro,/Users/*/.kiro/*.sqlite3-wal

@@ -1,13 +1,13 @@
-"""Read the small text files that say how an agent was set up, and two that say more.
+"""Read the small text files that say how an agent was set up, and three that say more.
 
-Eight catalogue entries are plain text configuration and nothing read any of them, so a
-collected file reached a case as a file name. Most of them are one line or a handful: which
-identity was in use, where a product put its data directory, which per-install identifier a
-vendor's server can join this host to. They are read whole and filed as configuration, and
-that is the end of it.
+Most catalogue entries in this reader's set are plain text configuration that nothing read,
+so a collected file reached a case as a file name. Most of them are one line or a handful:
+which identity was in use, where a product put its data directory, which per-install
+identifier a vendor's server can join this host to. They are read whole and filed as
+configuration, and that is the end of it.
 
-Two of the eight are not that, and they are the reason this module exists rather than
-another line in a generic reader.
+Three of them are not that, and they are the reason this module exists rather than another
+line in a generic reader.
 
 **An ignore file is the inverse of every other artifact in this suite.** It does not record
 what the agent did. It records what the agent was configured never to read, write or index,
@@ -25,6 +25,16 @@ and documents .env and secrets configuration as the examples. So a name in this 
 statement that copies of that file exist in every worktree on the machine, which is where
 to look for them and is a finding in its own right. One event per entry, for the same
 reason.
+
+**A tombstone is the last statement that something existed.** One agent keeps each of its
+profiles in a complete home of its own, and deleting a profile removes that home entirely:
+its transcripts, its credentials, its memories and its scheduled jobs go with it. What
+stays behind is one file named after the profile, holding the single word deleted. Read as
+configuration it would say nothing; read for what it is, it is the only evidence on the
+endpoint that the profile was ever there, and the filesystem event for the same file dates
+the removal. So it gets a reading of its own, with the profile's name lifted out of the
+file name into the event key, because the name is the evidence and a rule has to be able to
+match it.
 
 Nothing else is read out of any of these. A line is a line, and what a pattern would have
 matched on the endpoint is not knowable from the file.
@@ -57,10 +67,16 @@ SOURCES = frozenset(
         "cursor.machine_identity_file",
         "cursor.retrieval_index",
         "ollama.env_overrides",
+        "hermes.profile_tombstones",
         "qwen_code.install_evidence",
         "windsurf.ignore_files",
     }
 )
+
+# Entries whose files are deletion markers rather than settings: the file name is the name
+# of the thing that is gone, and the content is a fixed word. Kept as a set rather than a
+# branch on one id so a second product with the same habit is one line.
+TOMBSTONES = frozenset({"hermes.profile_tombstones"})
 
 # The entries whose files are read line by line rather than whole, and what a line is.
 PER_LINE = {
@@ -115,6 +131,14 @@ INDEXED = (
 CONFIGURATION = (
     "this is a configuration file read whole. Nothing is read out of it beyond the text it "
     "holds, because no parser has mapped this product's settings to an event"
+)
+
+DELETED = (
+    "this file is a tombstone, and the name of this file is the name of a profile that was "
+    "deleted or renamed. Deleting a profile removes its whole home, so its transcripts, "
+    "its credentials, its memories and its scheduled jobs are gone and this marker is what "
+    "is left. When it happened is not in the file: the filesystem event for this same path "
+    "dates the last write to it, which is the deletion"
 )
 
 # How many lines of one list are turned into events. The index list is the reason there is
@@ -228,7 +252,8 @@ class TextConfigParser:
     def _whole(self, context: ParseContext, raw: bytes) -> Event:
         """The file as it stands, which for most of these is one line."""
         text = raw.decode("utf-8", "replace")
-        problems = [CONFIGURATION]
+        tombstone = str(context.artifact_id) in TOMBSTONES
+        problems = [DELETED if tombstone else CONFIGURATION]
         if "�" in text:
             problems.append(
                 "the file did not decode as UTF-8 and was read with replacement characters, "
@@ -245,7 +270,16 @@ class TextConfigParser:
             user=context.user,
             host=context.host,
             raw={"file": context.local_path.name, "content": text},
-            payload={"key": f"file:{context.local_path.name}", "text": text},
+            # The key is what a rule matches on, so for a tombstone it carries the name of
+            # the profile rather than the name of the file that happens to hold it.
+            payload={
+                "key": (
+                    f"deleted-profile:{context.local_path.name}"
+                    if tombstone
+                    else f"file:{context.local_path.name}"
+                ),
+                "text": text,
+            },
             parse_problem=" ".join(problems),
         )
 
@@ -265,6 +299,7 @@ def _per_line(context: ParseContext) -> str | None:
 
 __all__ = [
     "CONFIGURATION",
+    "DELETED",
     "EXCLUDED",
     "IGNORED",
     "INCLUDED",
@@ -273,6 +308,7 @@ __all__ = [
     "PER_LINE",
     "SOURCES",
     "STOPPED",
+    "TOMBSTONES",
     "TRUNCATED",
     "TextConfigParser",
 ]

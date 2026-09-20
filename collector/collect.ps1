@@ -5985,7 +5985,11 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$HERMES_HOME/auth.json",
-                        "~/.hermes/auth.json"
+                        "$HERMES_HOME/profiles/<name>/auth.json",
+                        "~/.hermes/auth.json",
+                        "~/.hermes/profiles/<name>/auth.json",
+                        "%LOCALAPPDATA%\\hermes\\auth.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\auth.json"
                     ],
                     "root": "user_profile",
                     "sensitivity": "secret",
@@ -6002,7 +6006,11 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$HERMES_HOME/config.yaml",
-                        "~/.hermes/config.yaml"
+                        "$HERMES_HOME/profiles/<name>/config.yaml",
+                        "~/.hermes/config.yaml",
+                        "~/.hermes/profiles/<name>/config.yaml",
+                        "%LOCALAPPDATA%\\hermes\\config.yaml",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\config.yaml"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6019,7 +6027,11 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$HERMES_HOME/cron/",
-                        "~/.hermes/cron/"
+                        "$HERMES_HOME/profiles/<name>/cron/",
+                        "~/.hermes/cron/",
+                        "~/.hermes/profiles/<name>/cron/",
+                        "%LOCALAPPDATA%\\hermes\\cron\\",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\cron\\"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6036,7 +6048,11 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$HERMES_HOME/.env",
-                        "~/.hermes/.env"
+                        "$HERMES_HOME/profiles/<name>/.env",
+                        "~/.hermes/.env",
+                        "~/.hermes/profiles/<name>/.env",
+                        "%LOCALAPPDATA%\\hermes\\.env",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\.env"
                     ],
                     "root": "user_profile",
                     "sensitivity": "secret",
@@ -6053,8 +6069,15 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$HERMES_HOME/logs/",
+                        "$HERMES_HOME/profiles/<name>/logs/",
                         "~/.hermes/logs/errors.log",
-                        "~/.hermes/logs/gateway.log"
+                        "~/.hermes/profiles/<name>/logs/errors.log",
+                        "%LOCALAPPDATA%\\hermes\\logs\\errors.log",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\logs\\errors.log",
+                        "~/.hermes/logs/gateway.log",
+                        "~/.hermes/profiles/<name>/logs/gateway.log",
+                        "%LOCALAPPDATA%\\hermes\\logs\\gateway.log",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\logs\\gateway.log"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6071,8 +6094,33 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$HERMES_HOME/memories/",
+                        "$HERMES_HOME/profiles/<name>/memories/",
                         "~/.hermes/memories/MEMORY.md",
-                        "~/.hermes/memories/USER.md"
+                        "~/.hermes/profiles/<name>/memories/MEMORY.md",
+                        "%LOCALAPPDATA%\\hermes\\memories\\MEMORY.md",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\memories\\MEMORY.md",
+                        "~/.hermes/memories/USER.md",
+                        "~/.hermes/profiles/<name>/memories/USER.md",
+                        "%LOCALAPPDATA%\\hermes\\memories\\USER.md",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\memories\\USER.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "hermes.profile_tombstones",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/profiles/.deleted/",
+                        "~/.hermes/profiles/.deleted/",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\.deleted\\"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6088,11 +6136,13 @@ $EmbeddedCatalogueJson = @'
                         "windows"
                     ],
                     "paths": [
-                        "~/.hermes/profiles/<name>/"
+                        "$HERMES_HOME/profiles/<name>/profile.yaml",
+                        "~/.hermes/profiles/<name>/profile.yaml",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\profile.yaml"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "file_snapshot",
@@ -6105,7 +6155,11 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$HERMES_HOME/sandboxes/",
-                        "~/.hermes/sandboxes/"
+                        "$HERMES_HOME/profiles/<name>/sandboxes/",
+                        "~/.hermes/sandboxes/",
+                        "~/.hermes/profiles/<name>/sandboxes/",
+                        "%LOCALAPPDATA%\\hermes\\sandboxes\\",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\sandboxes\\"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6122,7 +6176,11 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$HERMES_HOME/sessions/",
-                        "~/.hermes/sessions/"
+                        "$HERMES_HOME/profiles/<name>/sessions/",
+                        "~/.hermes/sessions/",
+                        "~/.hermes/profiles/<name>/sessions/",
+                        "%LOCALAPPDATA%\\hermes\\sessions\\",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\sessions\\"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6139,7 +6197,11 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$HERMES_HOME/skills/",
-                        "~/.hermes/skills/"
+                        "$HERMES_HOME/profiles/<name>/skills/",
+                        "~/.hermes/skills/",
+                        "~/.hermes/profiles/<name>/skills/",
+                        "%LOCALAPPDATA%\\hermes\\skills\\",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\skills\\"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6156,7 +6218,11 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$HERMES_HOME/SOUL.md",
-                        "~/.hermes/SOUL.md"
+                        "$HERMES_HOME/profiles/<name>/SOUL.md",
+                        "~/.hermes/SOUL.md",
+                        "~/.hermes/profiles/<name>/SOUL.md",
+                        "%LOCALAPPDATA%\\hermes\\SOUL.md",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\SOUL.md"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6173,11 +6239,23 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$HERMES_HOME/state.db",
+                        "$HERMES_HOME/profiles/<name>/state.db",
                         "$HERMES_HOME/state.db-shm",
+                        "$HERMES_HOME/profiles/<name>/state.db-shm",
                         "$HERMES_HOME/state.db-wal",
+                        "$HERMES_HOME/profiles/<name>/state.db-wal",
                         "~/.hermes/state.db",
+                        "~/.hermes/profiles/<name>/state.db",
+                        "%LOCALAPPDATA%\\hermes\\state.db",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\state.db",
                         "~/.hermes/state.db-shm",
-                        "~/.hermes/state.db-wal"
+                        "~/.hermes/profiles/<name>/state.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\state.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\state.db-shm",
+                        "~/.hermes/state.db-wal",
+                        "~/.hermes/profiles/<name>/state.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\state.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\state.db-wal"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -9356,7 +9434,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "b62061c6c69648d67e098241bc0987172211845137ebe9c88fb6dbe7ecc10d86"
+    "sha256": "f0c05580db2662bf477c06549f5c9ad2fbf8d92eb55fdae1289a28fecf9a9506"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

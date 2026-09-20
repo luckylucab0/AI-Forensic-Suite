@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7e1b6b26bd64
+# Catalogue digest: 864dcd9f72b2
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -668,21 +668,69 @@ sources:
     goose,goose.sessions_db_windows,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db-wal
     goose,goose.sessions_jsonl_legacy,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/*.jsonl
     hermes,hermes.auth,C:/Users/*/.hermes/auth.json
+    hermes,hermes.auth,C:/Users/*/.hermes/profiles/*/auth.json
+    hermes,hermes.auth,C:/Users/*/AppData/Local/hermes/auth.json
+    hermes,hermes.auth,C:/Users/*/AppData/Local/hermes/profiles/*/auth.json
     hermes,hermes.config,C:/Users/*/.hermes/config.yaml
+    hermes,hermes.config,C:/Users/*/.hermes/profiles/*/config.yaml
+    hermes,hermes.config,C:/Users/*/AppData/Local/hermes/config.yaml
+    hermes,hermes.config,C:/Users/*/AppData/Local/hermes/profiles/*/config.yaml
     hermes,hermes.cron,C:/Users/*/.hermes/cron/**
+    hermes,hermes.cron,C:/Users/*/.hermes/profiles/*/cron/**
+    hermes,hermes.cron,C:/Users/*/AppData/Local/hermes/cron/**
+    hermes,hermes.cron,C:/Users/*/AppData/Local/hermes/profiles/*/cron/**
     hermes,hermes.env,C:/Users/*/.hermes/.env
+    hermes,hermes.env,C:/Users/*/.hermes/profiles/*/.env
+    hermes,hermes.env,C:/Users/*/AppData/Local/hermes/.env
+    hermes,hermes.env,C:/Users/*/AppData/Local/hermes/profiles/*/.env
     hermes,hermes.logs,C:/Users/*/.hermes/logs/errors.log
     hermes,hermes.logs,C:/Users/*/.hermes/logs/gateway.log
+    hermes,hermes.logs,C:/Users/*/.hermes/profiles/*/logs/errors.log
+    hermes,hermes.logs,C:/Users/*/.hermes/profiles/*/logs/gateway.log
+    hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/logs/errors.log
+    hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/logs/gateway.log
+    hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/profiles/*/logs/errors.log
+    hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/profiles/*/logs/gateway.log
     hermes,hermes.memories,C:/Users/*/.hermes/memories/MEMORY.md
     hermes,hermes.memories,C:/Users/*/.hermes/memories/USER.md
-    hermes,hermes.profiles,C:/Users/*/.hermes/profiles/*/**
+    hermes,hermes.memories,C:/Users/*/.hermes/profiles/*/memories/MEMORY.md
+    hermes,hermes.memories,C:/Users/*/.hermes/profiles/*/memories/USER.md
+    hermes,hermes.memories,C:/Users/*/AppData/Local/hermes/memories/MEMORY.md
+    hermes,hermes.memories,C:/Users/*/AppData/Local/hermes/memories/USER.md
+    hermes,hermes.memories,C:/Users/*/AppData/Local/hermes/profiles/*/memories/MEMORY.md
+    hermes,hermes.memories,C:/Users/*/AppData/Local/hermes/profiles/*/memories/USER.md
+    hermes,hermes.profile_tombstones,C:/Users/*/.hermes/profiles/.deleted/**
+    hermes,hermes.profile_tombstones,C:/Users/*/AppData/Local/hermes/profiles/.deleted/**
+    hermes,hermes.profiles,C:/Users/*/.hermes/profiles/*/profile.yaml
+    hermes,hermes.profiles,C:/Users/*/AppData/Local/hermes/profiles/*/profile.yaml
+    hermes,hermes.sandboxes,C:/Users/*/.hermes/profiles/*/sandboxes/**
     hermes,hermes.sandboxes,C:/Users/*/.hermes/sandboxes/**
+    hermes,hermes.sandboxes,C:/Users/*/AppData/Local/hermes/profiles/*/sandboxes/**
+    hermes,hermes.sandboxes,C:/Users/*/AppData/Local/hermes/sandboxes/**
+    hermes,hermes.sessions_dir,C:/Users/*/.hermes/profiles/*/sessions/**
     hermes,hermes.sessions_dir,C:/Users/*/.hermes/sessions/**
+    hermes,hermes.sessions_dir,C:/Users/*/AppData/Local/hermes/profiles/*/sessions/**
+    hermes,hermes.sessions_dir,C:/Users/*/AppData/Local/hermes/sessions/**
+    hermes,hermes.skills,C:/Users/*/.hermes/profiles/*/skills/**
     hermes,hermes.skills,C:/Users/*/.hermes/skills/**
+    hermes,hermes.skills,C:/Users/*/AppData/Local/hermes/profiles/*/skills/**
+    hermes,hermes.skills,C:/Users/*/AppData/Local/hermes/skills/**
     hermes,hermes.soul,C:/Users/*/.hermes/SOUL.md
+    hermes,hermes.soul,C:/Users/*/.hermes/profiles/*/SOUL.md
+    hermes,hermes.soul,C:/Users/*/AppData/Local/hermes/SOUL.md
+    hermes,hermes.soul,C:/Users/*/AppData/Local/hermes/profiles/*/SOUL.md
+    hermes,hermes.state_db,C:/Users/*/.hermes/profiles/*/state.db
+    hermes,hermes.state_db,C:/Users/*/.hermes/profiles/*/state.db-shm
+    hermes,hermes.state_db,C:/Users/*/.hermes/profiles/*/state.db-wal
     hermes,hermes.state_db,C:/Users/*/.hermes/state.db
     hermes,hermes.state_db,C:/Users/*/.hermes/state.db-shm
     hermes,hermes.state_db,C:/Users/*/.hermes/state.db-wal
+    hermes,hermes.state_db,C:/Users/*/AppData/Local/hermes/profiles/*/state.db
+    hermes,hermes.state_db,C:/Users/*/AppData/Local/hermes/profiles/*/state.db-shm
+    hermes,hermes.state_db,C:/Users/*/AppData/Local/hermes/profiles/*/state.db-wal
+    hermes,hermes.state_db,C:/Users/*/AppData/Local/hermes/state.db
+    hermes,hermes.state_db,C:/Users/*/AppData/Local/hermes/state.db-shm
+    hermes,hermes.state_db,C:/Users/*/AppData/Local/hermes/state.db-wal
     jetbrains_ai,jetbrains_ai.aia_task_history,C:/Users/*/AppData/Roaming/JetBrains/**/aia-task-history/**
     jetbrains_ai,jetbrains_ai.base_directories,C:/Users/*/AppData/Local/JetBrains/**/**
     jetbrains_ai,jetbrains_ai.base_directories,C:/Users/*/AppData/Local/JetBrains/**/log/**
@@ -2212,34 +2260,66 @@ sources:
     goose,goose.sessions_jsonl_legacy,/Users/*/.local/share/goose/sessions/*.jsonl
     goose,goose.sessions_jsonl_legacy,/var/root/.local/share/goose/sessions/*.jsonl
     hermes,hermes.auth,/Users/*/.hermes/auth.json
+    hermes,hermes.auth,/Users/*/.hermes/profiles/*/auth.json
     hermes,hermes.auth,/var/root/.hermes/auth.json
+    hermes,hermes.auth,/var/root/.hermes/profiles/*/auth.json
     hermes,hermes.config,/Users/*/.hermes/config.yaml
+    hermes,hermes.config,/Users/*/.hermes/profiles/*/config.yaml
     hermes,hermes.config,/var/root/.hermes/config.yaml
+    hermes,hermes.config,/var/root/.hermes/profiles/*/config.yaml
     hermes,hermes.cron,/Users/*/.hermes/cron/**
+    hermes,hermes.cron,/Users/*/.hermes/profiles/*/cron/**
     hermes,hermes.cron,/var/root/.hermes/cron/**
+    hermes,hermes.cron,/var/root/.hermes/profiles/*/cron/**
     hermes,hermes.env,/Users/*/.hermes/.env
+    hermes,hermes.env,/Users/*/.hermes/profiles/*/.env
     hermes,hermes.env,/var/root/.hermes/.env
+    hermes,hermes.env,/var/root/.hermes/profiles/*/.env
     hermes,hermes.logs,/Users/*/.hermes/logs/errors.log
     hermes,hermes.logs,/Users/*/.hermes/logs/gateway.log
+    hermes,hermes.logs,/Users/*/.hermes/profiles/*/logs/errors.log
+    hermes,hermes.logs,/Users/*/.hermes/profiles/*/logs/gateway.log
     hermes,hermes.logs,/var/root/.hermes/logs/errors.log
     hermes,hermes.logs,/var/root/.hermes/logs/gateway.log
+    hermes,hermes.logs,/var/root/.hermes/profiles/*/logs/errors.log
+    hermes,hermes.logs,/var/root/.hermes/profiles/*/logs/gateway.log
     hermes,hermes.memories,/Users/*/.hermes/memories/MEMORY.md
     hermes,hermes.memories,/Users/*/.hermes/memories/USER.md
+    hermes,hermes.memories,/Users/*/.hermes/profiles/*/memories/MEMORY.md
+    hermes,hermes.memories,/Users/*/.hermes/profiles/*/memories/USER.md
     hermes,hermes.memories,/var/root/.hermes/memories/MEMORY.md
     hermes,hermes.memories,/var/root/.hermes/memories/USER.md
-    hermes,hermes.profiles,/Users/*/.hermes/profiles/*/**
-    hermes,hermes.profiles,/var/root/.hermes/profiles/*/**
+    hermes,hermes.memories,/var/root/.hermes/profiles/*/memories/MEMORY.md
+    hermes,hermes.memories,/var/root/.hermes/profiles/*/memories/USER.md
+    hermes,hermes.profile_tombstones,/Users/*/.hermes/profiles/.deleted/**
+    hermes,hermes.profile_tombstones,/var/root/.hermes/profiles/.deleted/**
+    hermes,hermes.profiles,/Users/*/.hermes/profiles/*/profile.yaml
+    hermes,hermes.profiles,/var/root/.hermes/profiles/*/profile.yaml
+    hermes,hermes.sandboxes,/Users/*/.hermes/profiles/*/sandboxes/**
     hermes,hermes.sandboxes,/Users/*/.hermes/sandboxes/**
+    hermes,hermes.sandboxes,/var/root/.hermes/profiles/*/sandboxes/**
     hermes,hermes.sandboxes,/var/root/.hermes/sandboxes/**
+    hermes,hermes.sessions_dir,/Users/*/.hermes/profiles/*/sessions/**
     hermes,hermes.sessions_dir,/Users/*/.hermes/sessions/**
+    hermes,hermes.sessions_dir,/var/root/.hermes/profiles/*/sessions/**
     hermes,hermes.sessions_dir,/var/root/.hermes/sessions/**
+    hermes,hermes.skills,/Users/*/.hermes/profiles/*/skills/**
     hermes,hermes.skills,/Users/*/.hermes/skills/**
+    hermes,hermes.skills,/var/root/.hermes/profiles/*/skills/**
     hermes,hermes.skills,/var/root/.hermes/skills/**
     hermes,hermes.soul,/Users/*/.hermes/SOUL.md
+    hermes,hermes.soul,/Users/*/.hermes/profiles/*/SOUL.md
     hermes,hermes.soul,/var/root/.hermes/SOUL.md
+    hermes,hermes.soul,/var/root/.hermes/profiles/*/SOUL.md
+    hermes,hermes.state_db,/Users/*/.hermes/profiles/*/state.db
+    hermes,hermes.state_db,/Users/*/.hermes/profiles/*/state.db-shm
+    hermes,hermes.state_db,/Users/*/.hermes/profiles/*/state.db-wal
     hermes,hermes.state_db,/Users/*/.hermes/state.db
     hermes,hermes.state_db,/Users/*/.hermes/state.db-shm
     hermes,hermes.state_db,/Users/*/.hermes/state.db-wal
+    hermes,hermes.state_db,/var/root/.hermes/profiles/*/state.db
+    hermes,hermes.state_db,/var/root/.hermes/profiles/*/state.db-shm
+    hermes,hermes.state_db,/var/root/.hermes/profiles/*/state.db-wal
     hermes,hermes.state_db,/var/root/.hermes/state.db
     hermes,hermes.state_db,/var/root/.hermes/state.db-shm
     hermes,hermes.state_db,/var/root/.hermes/state.db-wal
@@ -4160,34 +4240,66 @@ sources:
     goose,goose.sessions_jsonl_legacy,/home/*/.local/share/goose/sessions/*.jsonl
     goose,goose.sessions_jsonl_legacy,/root/.local/share/goose/sessions/*.jsonl
     hermes,hermes.auth,/home/*/.hermes/auth.json
+    hermes,hermes.auth,/home/*/.hermes/profiles/*/auth.json
     hermes,hermes.auth,/root/.hermes/auth.json
+    hermes,hermes.auth,/root/.hermes/profiles/*/auth.json
     hermes,hermes.config,/home/*/.hermes/config.yaml
+    hermes,hermes.config,/home/*/.hermes/profiles/*/config.yaml
     hermes,hermes.config,/root/.hermes/config.yaml
+    hermes,hermes.config,/root/.hermes/profiles/*/config.yaml
     hermes,hermes.cron,/home/*/.hermes/cron/**
+    hermes,hermes.cron,/home/*/.hermes/profiles/*/cron/**
     hermes,hermes.cron,/root/.hermes/cron/**
+    hermes,hermes.cron,/root/.hermes/profiles/*/cron/**
     hermes,hermes.env,/home/*/.hermes/.env
+    hermes,hermes.env,/home/*/.hermes/profiles/*/.env
     hermes,hermes.env,/root/.hermes/.env
+    hermes,hermes.env,/root/.hermes/profiles/*/.env
     hermes,hermes.logs,/home/*/.hermes/logs/errors.log
     hermes,hermes.logs,/home/*/.hermes/logs/gateway.log
+    hermes,hermes.logs,/home/*/.hermes/profiles/*/logs/errors.log
+    hermes,hermes.logs,/home/*/.hermes/profiles/*/logs/gateway.log
     hermes,hermes.logs,/root/.hermes/logs/errors.log
     hermes,hermes.logs,/root/.hermes/logs/gateway.log
+    hermes,hermes.logs,/root/.hermes/profiles/*/logs/errors.log
+    hermes,hermes.logs,/root/.hermes/profiles/*/logs/gateway.log
     hermes,hermes.memories,/home/*/.hermes/memories/MEMORY.md
     hermes,hermes.memories,/home/*/.hermes/memories/USER.md
+    hermes,hermes.memories,/home/*/.hermes/profiles/*/memories/MEMORY.md
+    hermes,hermes.memories,/home/*/.hermes/profiles/*/memories/USER.md
     hermes,hermes.memories,/root/.hermes/memories/MEMORY.md
     hermes,hermes.memories,/root/.hermes/memories/USER.md
-    hermes,hermes.profiles,/home/*/.hermes/profiles/*/**
-    hermes,hermes.profiles,/root/.hermes/profiles/*/**
+    hermes,hermes.memories,/root/.hermes/profiles/*/memories/MEMORY.md
+    hermes,hermes.memories,/root/.hermes/profiles/*/memories/USER.md
+    hermes,hermes.profile_tombstones,/home/*/.hermes/profiles/.deleted/**
+    hermes,hermes.profile_tombstones,/root/.hermes/profiles/.deleted/**
+    hermes,hermes.profiles,/home/*/.hermes/profiles/*/profile.yaml
+    hermes,hermes.profiles,/root/.hermes/profiles/*/profile.yaml
+    hermes,hermes.sandboxes,/home/*/.hermes/profiles/*/sandboxes/**
     hermes,hermes.sandboxes,/home/*/.hermes/sandboxes/**
+    hermes,hermes.sandboxes,/root/.hermes/profiles/*/sandboxes/**
     hermes,hermes.sandboxes,/root/.hermes/sandboxes/**
+    hermes,hermes.sessions_dir,/home/*/.hermes/profiles/*/sessions/**
     hermes,hermes.sessions_dir,/home/*/.hermes/sessions/**
+    hermes,hermes.sessions_dir,/root/.hermes/profiles/*/sessions/**
     hermes,hermes.sessions_dir,/root/.hermes/sessions/**
+    hermes,hermes.skills,/home/*/.hermes/profiles/*/skills/**
     hermes,hermes.skills,/home/*/.hermes/skills/**
+    hermes,hermes.skills,/root/.hermes/profiles/*/skills/**
     hermes,hermes.skills,/root/.hermes/skills/**
     hermes,hermes.soul,/home/*/.hermes/SOUL.md
+    hermes,hermes.soul,/home/*/.hermes/profiles/*/SOUL.md
     hermes,hermes.soul,/root/.hermes/SOUL.md
+    hermes,hermes.soul,/root/.hermes/profiles/*/SOUL.md
+    hermes,hermes.state_db,/home/*/.hermes/profiles/*/state.db
+    hermes,hermes.state_db,/home/*/.hermes/profiles/*/state.db-shm
+    hermes,hermes.state_db,/home/*/.hermes/profiles/*/state.db-wal
     hermes,hermes.state_db,/home/*/.hermes/state.db
     hermes,hermes.state_db,/home/*/.hermes/state.db-shm
     hermes,hermes.state_db,/home/*/.hermes/state.db-wal
+    hermes,hermes.state_db,/root/.hermes/profiles/*/state.db
+    hermes,hermes.state_db,/root/.hermes/profiles/*/state.db-shm
+    hermes,hermes.state_db,/root/.hermes/profiles/*/state.db-wal
     hermes,hermes.state_db,/root/.hermes/state.db
     hermes,hermes.state_db,/root/.hermes/state.db-shm
     hermes,hermes.state_db,/root/.hermes/state.db-wal

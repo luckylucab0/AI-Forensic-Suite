@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7e1b6b26bd64
+# Catalogue digest: 864dcd9f72b2
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 33 of the 487 catalogue artifacts declare
+# KAPE is Windows only. 33 of the 488 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -27,9 +27,45 @@ Targets:
         FileMask: "auth.json"
         Recursive: false
     -
+        Name: hermes.auth
+        Category: credentials
+        Path: C:\Users\%user%\.hermes\profiles\*
+        FileMask: "auth.json"
+        Recursive: false
+    -
+        Name: hermes.auth
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Local\hermes
+        FileMask: "auth.json"
+        Recursive: false
+    -
+        Name: hermes.auth
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
+        FileMask: "auth.json"
+        Recursive: false
+    -
         Name: hermes.config
         Category: config
         Path: C:\Users\%user%\.hermes
+        FileMask: "config.yaml"
+        Recursive: false
+    -
+        Name: hermes.config
+        Category: config
+        Path: C:\Users\%user%\.hermes\profiles\*
+        FileMask: "config.yaml"
+        Recursive: false
+    -
+        Name: hermes.config
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\hermes
+        FileMask: "config.yaml"
+        Recursive: false
+    -
+        Name: hermes.config
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
         FileMask: "config.yaml"
         Recursive: false
     -
@@ -39,9 +75,45 @@ Targets:
         FileMask: "*"
         Recursive: true
     -
+        Name: hermes.cron
+        Category: config
+        Path: C:\Users\%user%\.hermes\profiles\*\cron
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.cron
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\hermes\cron
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.cron
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\cron
+        FileMask: "*"
+        Recursive: true
+    -
         Name: hermes.env
         Category: credentials
         Path: C:\Users\%user%\.hermes
+        FileMask: ".env"
+        Recursive: false
+    -
+        Name: hermes.env
+        Category: credentials
+        Path: C:\Users\%user%\.hermes\profiles\*
+        FileMask: ".env"
+        Recursive: false
+    -
+        Name: hermes.env
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Local\hermes
+        FileMask: ".env"
+        Recursive: false
+    -
+        Name: hermes.env
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
         FileMask: ".env"
         Recursive: false
     -
@@ -57,6 +129,42 @@ Targets:
         FileMask: "gateway.log"
         Recursive: false
     -
+        Name: hermes.logs
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*\logs
+        FileMask: "errors.log"
+        Recursive: false
+    -
+        Name: hermes.logs
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*\logs
+        FileMask: "gateway.log"
+        Recursive: false
+    -
+        Name: hermes.logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\logs
+        FileMask: "errors.log"
+        Recursive: false
+    -
+        Name: hermes.logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\logs
+        FileMask: "gateway.log"
+        Recursive: false
+    -
+        Name: hermes.logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\logs
+        FileMask: "errors.log"
+        Recursive: false
+    -
+        Name: hermes.logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\logs
+        FileMask: "gateway.log"
+        Recursive: false
+    -
         Name: hermes.memories
         Category: memory
         Path: C:\Users\%user%\.hermes\memories
@@ -69,15 +177,93 @@ Targets:
         FileMask: "USER.md"
         Recursive: false
     -
-        Name: hermes.profiles
+        Name: hermes.memories
+        Category: memory
+        Path: C:\Users\%user%\.hermes\profiles\*\memories
+        FileMask: "MEMORY.md"
+        Recursive: false
+    -
+        Name: hermes.memories
+        Category: memory
+        Path: C:\Users\%user%\.hermes\profiles\*\memories
+        FileMask: "USER.md"
+        Recursive: false
+    -
+        Name: hermes.memories
+        Category: memory
+        Path: C:\Users\%user%\AppData\Local\hermes\memories
+        FileMask: "MEMORY.md"
+        Recursive: false
+    -
+        Name: hermes.memories
+        Category: memory
+        Path: C:\Users\%user%\AppData\Local\hermes\memories
+        FileMask: "USER.md"
+        Recursive: false
+    -
+        Name: hermes.memories
+        Category: memory
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\memories
+        FileMask: "MEMORY.md"
+        Recursive: false
+    -
+        Name: hermes.memories
+        Category: memory
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\memories
+        FileMask: "USER.md"
+        Recursive: false
+    -
+        Name: hermes.profile_tombstones
         Category: config
         Path: C:\Users\%user%\.hermes\profiles
-        FileMask: "*"
+        FileMask: ".deleted"
+        Recursive: false
+    -
+        Name: hermes.profile_tombstones
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles
+        FileMask: ".deleted"
+        Recursive: false
+    -
+        Name: hermes.profiles
+        Category: config
+        Path: C:\Users\%user%\.hermes\profiles\*
+        FileMask: "profile.yaml"
+        Recursive: false
+    -
+        Name: hermes.profiles
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
+        FileMask: "profile.yaml"
         Recursive: false
     -
         Name: hermes.sandboxes
         Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\profiles\*\sandboxes
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.sandboxes
+        Category: file_snapshot
         Path: C:\Users\%user%\.hermes\sandboxes
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.sandboxes
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\sandboxes
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.sandboxes
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\sandboxes
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.sessions_dir
+        Category: transcript
+        Path: C:\Users\%user%\.hermes\profiles\*\sessions
         FileMask: "*"
         Recursive: true
     -
@@ -87,15 +273,63 @@ Targets:
         FileMask: "*"
         Recursive: true
     -
+        Name: hermes.sessions_dir
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\sessions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.sessions_dir
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\hermes\sessions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.skills
+        Category: instructions
+        Path: C:\Users\%user%\.hermes\profiles\*\skills
+        FileMask: "*"
+        Recursive: true
+    -
         Name: hermes.skills
         Category: instructions
         Path: C:\Users\%user%\.hermes\skills
         FileMask: "*"
         Recursive: true
     -
+        Name: hermes.skills
+        Category: instructions
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\skills
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.skills
+        Category: instructions
+        Path: C:\Users\%user%\AppData\Local\hermes\skills
+        FileMask: "*"
+        Recursive: true
+    -
         Name: hermes.soul
         Category: instructions
         Path: C:\Users\%user%\.hermes
+        FileMask: "SOUL.md"
+        Recursive: false
+    -
+        Name: hermes.soul
+        Category: instructions
+        Path: C:\Users\%user%\.hermes\profiles\*
+        FileMask: "SOUL.md"
+        Recursive: false
+    -
+        Name: hermes.soul
+        Category: instructions
+        Path: C:\Users\%user%\AppData\Local\hermes
+        FileMask: "SOUL.md"
+        Recursive: false
+    -
+        Name: hermes.soul
+        Category: instructions
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
         FileMask: "SOUL.md"
         Recursive: false
     -
@@ -114,5 +348,59 @@ Targets:
         Name: hermes.state_db
         Category: transcript
         Path: C:\Users\%user%\.hermes
+        FileMask: "state.db-wal"
+        Recursive: false
+    -
+        Name: hermes.state_db
+        Category: transcript
+        Path: C:\Users\%user%\.hermes\profiles\*
+        FileMask: "state.db"
+        Recursive: false
+    -
+        Name: hermes.state_db
+        Category: transcript
+        Path: C:\Users\%user%\.hermes\profiles\*
+        FileMask: "state.db-shm"
+        Recursive: false
+    -
+        Name: hermes.state_db
+        Category: transcript
+        Path: C:\Users\%user%\.hermes\profiles\*
+        FileMask: "state.db-wal"
+        Recursive: false
+    -
+        Name: hermes.state_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\hermes
+        FileMask: "state.db"
+        Recursive: false
+    -
+        Name: hermes.state_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\hermes
+        FileMask: "state.db-shm"
+        Recursive: false
+    -
+        Name: hermes.state_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\hermes
+        FileMask: "state.db-wal"
+        Recursive: false
+    -
+        Name: hermes.state_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
+        FileMask: "state.db"
+        Recursive: false
+    -
+        Name: hermes.state_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
+        FileMask: "state.db-shm"
+        Recursive: false
+    -
+        Name: hermes.state_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
         FileMask: "state.db-wal"
         Recursive: false

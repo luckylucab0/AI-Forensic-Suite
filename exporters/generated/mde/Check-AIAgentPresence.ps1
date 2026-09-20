@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7e1b6b26bd64
+# Catalogue digest: 864dcd9f72b2
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -586,21 +586,61 @@ $targets = @(
     @{ Agent = 'goose'; Id = 'goose.sessions_db_windows'; Path = '$profile\AppData\Roaming\Block\goose\data\sessions\sessions.db-wal' }
     @{ Agent = 'goose'; Id = 'goose.sessions_jsonl_legacy'; Path = '$profile\AppData\Roaming\Block\goose\data\sessions' }
     @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\.hermes\auth.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\AppData\Local\hermes\auth.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.config'; Path = '$profile\.hermes\config.yaml' }
+    @{ Agent = 'hermes'; Id = 'hermes.config'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.config'; Path = '$profile\AppData\Local\hermes\config.yaml' }
+    @{ Agent = 'hermes'; Id = 'hermes.config'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.cron'; Path = '$profile\.hermes\cron' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron'; Path = '$profile\AppData\Local\hermes\cron' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.env'; Path = '$profile\.hermes\.env' }
+    @{ Agent = 'hermes'; Id = 'hermes.env'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.env'; Path = '$profile\AppData\Local\hermes\.env' }
+    @{ Agent = 'hermes'; Id = 'hermes.env'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\.hermes\logs\errors.log' }
     @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\.hermes\logs\gateway.log' }
+    @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\AppData\Local\hermes\logs\errors.log' }
+    @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\AppData\Local\hermes\logs\gateway.log' }
+    @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\.hermes\memories\MEMORY.md' }
     @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\.hermes\memories\USER.md' }
+    @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\AppData\Local\hermes\memories\MEMORY.md' }
+    @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\AppData\Local\hermes\memories\USER.md' }
+    @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.profile_tombstones'; Path = '$profile\.hermes\profiles\.deleted' }
+    @{ Agent = 'hermes'; Id = 'hermes.profile_tombstones'; Path = '$profile\AppData\Local\hermes\profiles\.deleted' }
     @{ Agent = 'hermes'; Id = 'hermes.profiles'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.profiles'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.sandboxes'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.sandboxes'; Path = '$profile\.hermes\sandboxes' }
+    @{ Agent = 'hermes'; Id = 'hermes.sandboxes'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.sandboxes'; Path = '$profile\AppData\Local\hermes\sandboxes' }
+    @{ Agent = 'hermes'; Id = 'hermes.sessions_dir'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.sessions_dir'; Path = '$profile\.hermes\sessions' }
+    @{ Agent = 'hermes'; Id = 'hermes.sessions_dir'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.sessions_dir'; Path = '$profile\AppData\Local\hermes\sessions' }
+    @{ Agent = 'hermes'; Id = 'hermes.skills'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.skills'; Path = '$profile\.hermes\skills' }
+    @{ Agent = 'hermes'; Id = 'hermes.skills'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.skills'; Path = '$profile\AppData\Local\hermes\skills' }
     @{ Agent = 'hermes'; Id = 'hermes.soul'; Path = '$profile\.hermes\SOUL.md' }
+    @{ Agent = 'hermes'; Id = 'hermes.soul'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.soul'; Path = '$profile\AppData\Local\hermes\SOUL.md' }
+    @{ Agent = 'hermes'; Id = 'hermes.soul'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\.hermes\state.db' }
     @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\.hermes\state.db-shm' }
     @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\.hermes\state.db-wal' }
+    @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\AppData\Local\hermes\state.db' }
+    @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\AppData\Local\hermes\state.db-shm' }
+    @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\AppData\Local\hermes\state.db-wal' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.aia_task_history'; Path = '$profile\AppData\Roaming\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.base_directories'; Path = '$profile\AppData\Local\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.base_directories'; Path = '$profile\AppData\Roaming\JetBrains' }

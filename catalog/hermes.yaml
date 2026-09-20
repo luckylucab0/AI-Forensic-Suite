@@ -21,10 +21,19 @@ vendor_sources:
 - https://github.com/NousResearch/
 - https://raw.githubusercontent.com/NousResearch/
 - https://nousresearch.com/
+description: |-
+  A self-hosted agent that runs as a long-lived process rather than as a command a person types, which is why its evidence is shaped the way it is: one home directory holds everything, and the same home is reachable from a chat platform as well as from the terminal.
+
+  Where that home is decides whether a collection finds anything at all, and it is not the same on every platform. The agent resolves it as an in-process override, then the HERMES_HOME variable, then a platform default, and the platform default is ~/.hermes on macOS and Linux but %LOCALAPPDATA%\hermes on Windows. The user guide says ~/.hermes throughout and never mentions the Windows location, so a catalogue built from the documentation alone points every Windows path at a directory the product never creates and reports a clean endpoint. Both spellings are listed on every entry for that reason. Installed inside WSL2 the agent is a Linux install and lives at ~/.hermes inside the distribution's filesystem, which a collection of the Windows volume does not reach.
+
+  The home can also exist several times over. A named profile is a complete second home at <home>/profiles/<name>/, with its own configuration, credentials, memories, skills, sessions and logs, and the agent serves every live one of them at once. A collection that takes only the default home takes one agent out of however many were running, and the others look like they were never there.
 references:
 - |-
   https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/developer-guide/session-storage.md
 - https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+- https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/hermes_constants.py
+- https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/multi-profile-gateways.md
+- https://raw.githubusercontent.com/NousResearch/hermes-agent/main/README.md
 env_overrides:
 - name: HERMES_HOME
   effect: |-
@@ -41,7 +50,11 @@ artifacts:
   - windows
   paths:
   - $HERMES_HOME/config.yaml
+  - $HERMES_HOME/profiles/<name>/config.yaml
   - ~/.hermes/config.yaml
+  - ~/.hermes/profiles/<name>/config.yaml
+  - '%LOCALAPPDATA%\hermes\config.yaml'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\config.yaml'
   format: yaml
   sensitivity: normal
   collect_priority: normal
@@ -63,7 +76,11 @@ artifacts:
   - windows
   paths:
   - $HERMES_HOME/cron/
+  - $HERMES_HOME/profiles/<name>/cron/
   - ~/.hermes/cron/
+  - ~/.hermes/profiles/<name>/cron/
+  - '%LOCALAPPDATA%\hermes\cron\'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\cron\'
   format: yaml
   sensitivity: normal
   collect_priority: normal
@@ -84,19 +101,53 @@ artifacts:
   - linux
   - windows
   paths:
-  - ~/.hermes/profiles/<name>/
+  - $HERMES_HOME/profiles/<name>/profile.yaml
+  - ~/.hermes/profiles/<name>/profile.yaml
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\profile.yaml'
   format: yaml
   sensitivity: normal
   collect_priority: normal
-  status: unverified
-  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/bot-mode.md
   source_kind: official
-  volatility: Unknown.
+  volatility: Persistent for as long as the profile exists. Removed with the profile directory.
   notes: |-
-    recollection, needs verification - but check for this directory anyway: if profiles are in use, every other ~/.hermes artifact in this catalogue exists once PER PROFILE, and a single-path collector would capture only the default one.
+    This file is how you enumerate the agents on the endpoint. A named profile is a second complete home under profiles/<name>/, with its own configuration, credentials, memories, skills, sessions, scheduled jobs, logs and transcript database, and the agent serves every live one of them at the same time. Every other entry in this file therefore carries a profiles/<name>/ spelling beside its default-home one, because an analyst who collects only the default home collects one agent out of however many ran.
 
-    Record structure: Named profiles are described as allowing multiple isolated concurrent Hermes instances, each bootstrapping its own memories, sessions, skills, skins, logs, plans, workspace, cron and home subdirectories. I saw this in a WebSearch summary of the configuration docs rather than in the page body I fetched, so treat the exact layout as unconfirmed.
+    The vendor's own test for whether a directory under profiles/ is a profile rather than a leftover is the presence of one of six marker files: config.yaml, .env, SOUL.md, profile.yaml, auth.json or state.db. Read that the other way round for a collection: a directory under profiles/ that carries none of them is a shell the product itself will not list, and it is worth looking at for exactly that reason.
+
+    Record structure: The chat-facing product calls a profile a bot, and profile.yaml is its marker file; the vendor's example is an empty block, so expect the file to carry little or nothing and treat its existence rather than its content as the evidence.
   parser: yaml_generic
+- id: hermes.profile_tombstones
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/profiles/.deleted/
+  - ~/.hermes/profiles/.deleted/
+  - '%LOCALAPPDATA%\hermes\profiles\.deleted\'
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: |-
+    https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/hermes_constants.py
+  source_kind: source_code
+  volatility: |-
+    Outlives the profile it names. Deleting the profile removes its directory and writes this marker; only re-creating a profile of the same name removes the marker again.
+  notes: |-
+    The highest-value small file this agent has. Deleting a profile removes the whole profile directory, which takes its transcripts, its credentials, its memories and its scheduled jobs with it, and leaves behind one file here named after the profile. That file is the only remaining statement on the endpoint that the profile ever existed, and its own mtime dates the deletion.
+
+    A tombstone is also written when a profile is renamed while a gateway is serving it, under the old name. So a name here means the profile was deleted or renamed, not deleted alone, and a name here that also exists as a live directory under profiles/ is a re-created profile rather than a contradiction.
+
+    Collect this before anything else in the tree. It is a few bytes, it survives the removal of everything it refers to, and a collection that finds a name here and no matching directory has found evidence of destruction rather than an empty result.
+
+    Record structure: One file per deleted profile, named after the profile and holding the single word deleted. The directory is created on the first deletion, so its absence means no profile was ever deleted under this home.
+  parser: text_config
 - id: hermes.auth
   category: credentials
   root: user_profile
@@ -106,7 +157,11 @@ artifacts:
   - windows
   paths:
   - $HERMES_HOME/auth.json
+  - $HERMES_HOME/profiles/<name>/auth.json
   - ~/.hermes/auth.json
+  - ~/.hermes/profiles/<name>/auth.json
+  - '%LOCALAPPDATA%\hermes\auth.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\auth.json'
   format: json
   sensitivity: secret
   collect_priority: normal
@@ -128,7 +183,11 @@ artifacts:
   - windows
   paths:
   - $HERMES_HOME/.env
+  - $HERMES_HOME/profiles/<name>/.env
   - ~/.hermes/.env
+  - ~/.hermes/profiles/<name>/.env
+  - '%LOCALAPPDATA%\hermes\.env'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\.env'
   format: text
   sensitivity: secret
   collect_priority: normal
@@ -150,7 +209,11 @@ artifacts:
   - windows
   paths:
   - $HERMES_HOME/sandboxes/
+  - $HERMES_HOME/profiles/<name>/sandboxes/
   - ~/.hermes/sandboxes/
+  - ~/.hermes/profiles/<name>/sandboxes/
+  - '%LOCALAPPDATA%\hermes\sandboxes\'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\sandboxes\'
   format: binary
   sensitivity: normal
   collect_priority: normal
@@ -172,7 +235,11 @@ artifacts:
   - windows
   paths:
   - $HERMES_HOME/skills/
+  - $HERMES_HOME/profiles/<name>/skills/
   - ~/.hermes/skills/
+  - ~/.hermes/profiles/<name>/skills/
+  - '%LOCALAPPDATA%\hermes\skills\'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\skills\'
   format: markdown
   sensitivity: normal
   collect_priority: normal
@@ -194,7 +261,11 @@ artifacts:
   - windows
   paths:
   - $HERMES_HOME/SOUL.md
+  - $HERMES_HOME/profiles/<name>/SOUL.md
   - ~/.hermes/SOUL.md
+  - ~/.hermes/profiles/<name>/SOUL.md
+  - '%LOCALAPPDATA%\hermes\SOUL.md'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\SOUL.md'
   format: markdown
   sensitivity: normal
   collect_priority: normal
@@ -216,8 +287,15 @@ artifacts:
   - windows
   paths:
   - $HERMES_HOME/logs/
+  - $HERMES_HOME/profiles/<name>/logs/
   - ~/.hermes/logs/errors.log
+  - ~/.hermes/profiles/<name>/logs/errors.log
+  - '%LOCALAPPDATA%\hermes\logs\errors.log'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\logs\errors.log'
   - ~/.hermes/logs/gateway.log
+  - ~/.hermes/profiles/<name>/logs/gateway.log
+  - '%LOCALAPPDATA%\hermes\logs\gateway.log'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\logs\gateway.log'
   format: text
   sensitivity: normal
   collect_priority: normal
@@ -239,8 +317,15 @@ artifacts:
   - windows
   paths:
   - $HERMES_HOME/memories/
+  - $HERMES_HOME/profiles/<name>/memories/
   - ~/.hermes/memories/MEMORY.md
+  - ~/.hermes/profiles/<name>/memories/MEMORY.md
+  - '%LOCALAPPDATA%\hermes\memories\MEMORY.md'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\memories\MEMORY.md'
   - ~/.hermes/memories/USER.md
+  - ~/.hermes/profiles/<name>/memories/USER.md
+  - '%LOCALAPPDATA%\hermes\memories\USER.md'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\memories\USER.md'
   format: markdown
   sensitivity: normal
   collect_priority: normal
@@ -262,7 +347,11 @@ artifacts:
   - windows
   paths:
   - $HERMES_HOME/sessions/
+  - $HERMES_HOME/profiles/<name>/sessions/
   - ~/.hermes/sessions/
+  - ~/.hermes/profiles/<name>/sessions/
+  - '%LOCALAPPDATA%\hermes\sessions\'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\sessions\'
   format: jsonl
   sensitivity: normal
   collect_priority: normal
@@ -285,11 +374,23 @@ artifacts:
   - windows
   paths:
   - $HERMES_HOME/state.db
+  - $HERMES_HOME/profiles/<name>/state.db
   - $HERMES_HOME/state.db-shm
+  - $HERMES_HOME/profiles/<name>/state.db-shm
   - $HERMES_HOME/state.db-wal
+  - $HERMES_HOME/profiles/<name>/state.db-wal
   - ~/.hermes/state.db
+  - ~/.hermes/profiles/<name>/state.db
+  - '%LOCALAPPDATA%\hermes\state.db'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\state.db'
   - ~/.hermes/state.db-shm
+  - ~/.hermes/profiles/<name>/state.db-shm
+  - '%LOCALAPPDATA%\hermes\state.db-shm'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\state.db-shm'
   - ~/.hermes/state.db-wal
+  - ~/.hermes/profiles/<name>/state.db-wal
+  - '%LOCALAPPDATA%\hermes\state.db-wal'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\state.db-wal'
   format: sqlite
   sensitivity: normal
   collect_priority: normal
@@ -299,7 +400,9 @@ artifacts:
   source_kind: official
   unsourced_paths:
   - $HERMES_HOME/state.db-shm
+  - $HERMES_HOME/profiles/<name>/state.db-shm
   - $HERMES_HOME/state.db-wal
+  - $HERMES_HOME/profiles/<name>/state.db-wal
   volatility: |-
     Journal mode is configurable (WAL or delete) - capture -wal and -shm. Compaction ARCHIVES old rows by setting active=0 rather than deleting them, so compacted history is still fully present. Real deletion only happens via explicit prune_sessions(older_than_days=N) (the docs example uses 90) or clear_messages().
   notes: |-
