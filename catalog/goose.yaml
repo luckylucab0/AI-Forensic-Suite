@@ -183,6 +183,63 @@ artifacts:
 
     Record structure: Captures goosed daemon activity, JSON-RPC traffic and extension (MCP) initialisation.
   parser: text_log
+- id: goose.llm_request_logs
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\data\logs\llm_request.*.jsonl'
+  - ~/.local/state/goose/logs/llm_request.*.jsonl
+  format: jsonl
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md
+  source_kind: official
+  record_types:
+  - 'one request and response per file: model configuration, input payload, response data, token usage'
+  volatility: |-
+    A numbered rotation of ten. The vendor states the files keep the ten most recent completed requests, llm_request.0.jsonl through llm_request.9.jsonl, so the eleventh request back is overwritten rather than aged out. On a machine that has kept working after the incident these hold minutes rather than days.
+  notes: |-
+    The one place on the endpoint where the prompt as the model received it exists. A session record holds the conversation as the product keeps it; this holds the raw payload that was sent, which is what an instruction injected from a file, a rule or a tool result actually turned into. The vendor's own description is 'the raw request and response data sent to language model providers', with the model configuration, the input payload, the response and the token usage in each file.
+
+    It sits directly under the logs directory rather than in the cli/ or server/ subdirectory, which is why the two entries for those do not reach it: their patterns end at the subdirectory. Collect it first, because ten files is a very short window.
+
+    Caution on reading it: this is what left the device. An analyst asking which data was sent to a provider can answer that question from these files and from nothing else in this family.
+  parser: jsonl_generic
+- id: goose.command_history
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\data\history.txt'
+  - ~/.config/goose/history.txt
+  - ~/.local/state/goose/history.txt
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md
+  source_kind: official
+  record_types:
+  - one typed line per entry
+  volatility: |-
+    Persistent across sessions by design, and no expiry is documented. Deleting a session does not touch it.
+  notes: |-
+    What the user typed, kept across sessions so the product can recall previous commands. The vendor's logs guide states the purpose in as many words and gives two of the three paths.
+
+    Forensically this is the prompt history of this agent and it survives the deletion of the session it belongs to, which makes it the one place a question the user asked stays after they have removed the conversation.
+
+    Three paths because the product reads two and writes one. crates/goose-cli/src/session/mod.rs sets history_file to Paths::state_dir().join('history.txt') and old_history_file to Paths::config_dir().join('history.txt'), then loads whichever of the two exists and always saves to the first. So the current Unix-like location is ~/.local/state/goose/history.txt and ~/.config/goose/history.txt is the older one, which the documentation still gives and which is still read where it exists. On Windows the state directory does not exist in the library this product builds its paths with, so state falls back to data and the one Windows path is the documented one.
+
+    Written by rustyline, which is in the lockfile and whose API this file calls: add_history_entry while typing and save_history on exit. That library writes either plain lines or its escaped v2 format with a #V2 first line, and the reader here takes whichever the file is in.
+  parser: prompt_history
 - id: goose.memory
   category: memory
   root: project
@@ -280,7 +337,11 @@ artifacts:
   volatility: |-
     No automatic expiry documented. Deleting a session in Goose Desktop also removes it from the CLI and the docs state the action cannot be undone - i.e. a SQL delete, so carving the SQLite freelist and the -wal file may still recover it.
   notes: |-
-    macOS is ambiguous and must be checked in BOTH places: the sessions doc gives ~/.local/share/goose/... for 'macOS and Linux', while the environment-variables doc gives ~/Library/Application Support/Block/goose/ as the macOS root. Goose picks an XDG-style or Apple-style strategy depending on version and on whether ~/.config/goose already exists. Collect both trees.
+    macOS is ambiguous in the vendor's own documentation and must be checked in BOTH places: the sessions doc gives ~/.local/share/goose/... for 'macOS and Linux', while the environment-variables doc gives ~/Library/Application Support/Block/goose/ as the macOS root. Collect both trees.
+
+    What the code says, which neither doc does. crates/goose/src/config/paths.rs calls etcetera's choose_app_strategy with top_level_domain 'Block', author 'Block' and app_name 'goose', and takes config_dir, data_dir and state_dir from it, with state falling back to data. At the version the lockfile pins, 0.11.0, choose_app_strategy is the Windows strategy on Windows and the XDG strategy on every other platform including macOS: the library has a separate choose_native_strategy for the Apple layout and this is not it. So current code puts macOS on the same ~/.config/goose, ~/.local/share/goose and ~/.local/state/goose as Linux, and the Windows tree is %APPDATA%\Block\goose\ with a config, data or cache segment appended, which is where that shape comes from.
+
+    That leaves the application-support tree as a legacy one rather than a current one, which is why both are still worth collecting: goose's own source keeps the author string 'Block' with the comment that changing it would orphan existing user directories, naming ~/Library/Application Support/Block/goose/ as the example, so a machine that has been upgraded can hold both.
 
     Re-sourced by the verification pass, which found the base path on the cited page only inside command examples. The environment variable guide states the path root and its per-platform defaults. Note the contradiction the pass surfaced: that guide puts the macOS tree under the application support directory while the logs guide maps macOS to the same .local/share path as Linux, so search both. The two sidecars follow from the journal mode and are marked unsourced.
   parser: sqlite_generic

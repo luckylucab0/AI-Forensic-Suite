@@ -58,6 +58,7 @@ RUSTYLINE_V2 = "#V2"
 SHAPES = {
     "aider.input_history": "prompt_toolkit",
     "amazonq.cli_prompt_history": "rustyline",
+    "goose.command_history": "rustyline",
     "ollama.cli_prompt_history": "plain",
 }
 

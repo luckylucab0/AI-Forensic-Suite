@@ -6,7 +6,7 @@
 
 Erzeugt aus catalog/ durch scripts/gen_artifact_docs.py. Nicht von Hand bearbeiten: die CI erzeugt diese Datei neu und schlägt fehl, wenn sie abweicht.
 
-474 Artefakte über 31 Agent(en), davon 369 auf einer abgerufenen Herstellerquelle beruhend.
+476 Artefakte über 31 Agent(en), davon 371 auf einer abgerufenen Herstellerquelle beruhend.
 
 Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
 
@@ -795,6 +795,14 @@ Vendor: Block
 
 <https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md>, <https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md>, <https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md>, <https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/recipes/session-recipes.md>
 
+### first
+
+**Zuerst sichern.** Rotieren oder verfallen aggressiv, nach Anzahl oder bei jedem Aufräumlauf statt nach einer bequemen Frist. Einige davon zerstört die Benutzerin schon dadurch, dass sie eine weitere Sitzung startet.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `goose.llm_request_logs` | llm request logs | transcript | macOS, Linux, Windows | `%APPDATA%\Block\goose\data\logs\llm_request.*.jsonl`<br>`~/.local/state/goose/logs/llm_request.*.jsonl` | jsonl | normal | [EN] A numbered rotation of ten. The vendor states the files keep the ten most recent completed requests, llm_request.0.jsonl through llm_request.9.jsonl, so the eleventh request back is overwritten rather than aged out. On a machine that has kept working after the incident these hold minutes rather than days. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md) |
+
 ### normal
 
 **Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
@@ -802,6 +810,7 @@ Vendor: Block
 | Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `goose.cli_logs` | cli logs | log | macOS, Linux, Windows | `%APPDATA%\Block\goose\data\logs\cli\`<br>`~/.local/state/goose/logs/cli/`<br>`~/.local/state/goose/logs/cli/YYYY-MM-DD/` | text | normal | [EN] SELF-DELETING: organised into date-based subdirectories with automatic deletion of entries older than two weeks. Collect first. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md) |
+| `goose.command_history` | command history | prompt_history | macOS, Linux, Windows | `%APPDATA%\Block\goose\data\history.txt`<br>`~/.config/goose/history.txt`<br>`~/.local/state/goose/history.txt` | text | normal | [EN] Persistent across sessions by design, and no expiry is documented. Deleting a session does not touch it. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md) |
 | `goose.config` | config | config | macOS, Linux, Windows | `%APPDATA%\Block\goose\config\config.yaml`<br>`~/.config/goose/config.yaml` | yaml | normal | [EN] Persistent until edited. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md) |
 | `goose.desktop_log` | desktop log | log | macOS, Windows | `%APPDATA%\Block\goose\logs\main.log`<br>`~/Library/Application Support/Goose/logs/main.log` | text | normal | [EN] Electron main-process log; rotation behaviour not documented. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md) |
 | `goose.hints` | hints | project_instructions | macOS, Linux, Windows | `<project>/.goosehints`<br>`<project>/AGENTS.md` | text | normal | [EN] Lives in the repo; recoverable from git history even when the working copy is clean. | bestätigt | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/context-engineering/using-goosehints.md) |

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 9f2742c33e48
+# Catalogue digest: 9a6c8edb3219
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# Scope: the 88 artifacts the catalogue files under transcript and prompt_history.
+# Scope: the 90 artifacts the catalogue files under transcript and prompt_history.
 # The other 386 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
@@ -40,6 +40,7 @@
 #   - copilot.session_store_sidecars: the same two files for another product's store, for the same reason
 #   - cursor.subagent_output: what a background subagent wrote for its parent, in a format the vendor documents nothing about, so a line of it is a fragment of a report
 #   - gemini_cli.chats: a chats directory this artifact will not narrow to an extension
+#   - goose.command_history: a line editor's history file, which is a line each until the writer chooses its escaped format, and the analyzer reads whichever of the two the file is in
 #   - hermes.sessions_dir: a sessions directory this artifact will not narrow to an extension
 #   - jetbrains_ai.aia_task_history: a session file of prose rather than records, so a line of it is a fragment of a conversation
 #   - junie.cli_sessions: read in part: its own event log comes back record by record and the subagent transcripts beside it sit in a subtree this artifact will not narrow to an extension
@@ -101,7 +102,7 @@ description: |
       read rather than as an agent that left nothing behind.
 
     - Some of what the suite's own analyzer reads is not read here, or is read
-      only in part: 26 artifacts, named in the notes below. Where
+      only in part: 27 artifacts, named in the notes below. Where
       one of them is not read, a row says the file was there, with its hash and its
       timestamps, and nothing about the conversation in it. Collect those files
       with the Collect artifact and ingest them.
@@ -285,6 +286,8 @@ sources:
       devin,devin.sessions_db,file_only,C:/Users/*/.local/share/devin/cli/sessions.db-wal
       gemini_cli,gemini_cli.chats,file_only,C:/Users/*/.gemini/sessions/**
       gemini_cli,gemini_cli.chats,file_only,C:/Users/*/.gemini/tmp/*/chats/**
+      goose,goose.command_history,file_only,C:/Users/*/AppData/Roaming/Block/goose/data/history.txt
+      goose,goose.llm_request_logs,generic_jsonl,C:/Users/*/AppData/Roaming/Block/goose/data/logs/llm_request.*.jsonl
       goose,goose.sessions_db_windows,file_only,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db
       goose,goose.sessions_db_windows,file_only,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db-shm
       goose,goose.sessions_db_windows,file_only,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db-wal
@@ -1089,6 +1092,12 @@ sources:
       gemini_cli,gemini_cli.chats,file_only,/var/root/.cache/.gemini/tmp/*/chats/**
       gemini_cli,gemini_cli.chats,file_only,/var/root/.gemini/sessions/**
       gemini_cli,gemini_cli.chats,file_only,/var/root/.gemini/tmp/*/chats/**
+      goose,goose.command_history,file_only,/Users/*/.config/goose/history.txt
+      goose,goose.command_history,file_only,/Users/*/.local/state/goose/history.txt
+      goose,goose.command_history,file_only,/var/root/.config/goose/history.txt
+      goose,goose.command_history,file_only,/var/root/.local/state/goose/history.txt
+      goose,goose.llm_request_logs,generic_jsonl,/Users/*/.local/state/goose/logs/llm_request.*.jsonl
+      goose,goose.llm_request_logs,generic_jsonl,/var/root/.local/state/goose/logs/llm_request.*.jsonl
       goose,goose.sessions_db,file_only,/Users/*/.local/share/goose/sessions/sessions.db
       goose,goose.sessions_db,file_only,/Users/*/.local/share/goose/sessions/sessions.db-shm
       goose,goose.sessions_db,file_only,/Users/*/.local/share/goose/sessions/sessions.db-wal
@@ -2013,6 +2022,12 @@ sources:
       gemini_cli,gemini_cli.chats,file_only,/root/.cache/.gemini/tmp/*/chats/**
       gemini_cli,gemini_cli.chats,file_only,/root/.gemini/sessions/**
       gemini_cli,gemini_cli.chats,file_only,/root/.gemini/tmp/*/chats/**
+      goose,goose.command_history,file_only,/home/*/.config/goose/history.txt
+      goose,goose.command_history,file_only,/home/*/.local/state/goose/history.txt
+      goose,goose.command_history,file_only,/root/.config/goose/history.txt
+      goose,goose.command_history,file_only,/root/.local/state/goose/history.txt
+      goose,goose.llm_request_logs,generic_jsonl,/home/*/.local/state/goose/logs/llm_request.*.jsonl
+      goose,goose.llm_request_logs,generic_jsonl,/root/.local/state/goose/logs/llm_request.*.jsonl
       goose,goose.sessions_db,file_only,/home/*/.local/share/goose/sessions/sessions.db
       goose,goose.sessions_db,file_only,/home/*/.local/share/goose/sessions/sessions.db-shm
       goose,goose.sessions_db,file_only,/home/*/.local/share/goose/sessions/sessions.db-wal

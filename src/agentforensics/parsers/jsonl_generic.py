@@ -66,6 +66,7 @@ LOGS = frozenset(
         "cursor.agent_transcripts_jsonl",
         "devin.acp_events",
         "factory_droid.sessions",
+        "goose.llm_request_logs",
         "goose.sessions_jsonl_legacy",
         "hermes.sessions_dir",
         "junie.cli_sessions",

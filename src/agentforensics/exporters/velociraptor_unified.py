@@ -162,6 +162,9 @@ UNINTERPRETED: dict[str, str] = {
     "record by record and the tree around them, which is where this product's Windows "
     "paths lead, is returned as files",
     "kilo_code.extension_id_legacy_tree": "a task directory of whole JSON documents",
+    "goose.command_history": "a line editor's history file, which is a line each until the "
+    "writer chooses its escaped format, and the analyzer reads whichever of the two the "
+    "file is in",
     "ollama.cli_prompt_history": "a line editor's history file, which is a line each and "
     "carries no timestamp, agent or session for a record to be built from",
     "qwen_code.prompt_history_log": "one JSON document rewritten whole on every append",

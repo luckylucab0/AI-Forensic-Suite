@@ -5594,6 +5594,24 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "prompt_history",
+                    "collect_priority": "normal",
+                    "id": "goose.command_history",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\data\\history.txt",
+                        "~/.config/goose/history.txt",
+                        "~/.local/state/goose/history.txt"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "config",
                     "collect_priority": "normal",
                     "id": "goose.config",
@@ -5640,6 +5658,23 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "<project>/AGENTS.md"
                     ],
                     "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "goose.llm_request_logs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\data\\logs\\llm_request.*.jsonl",
+                        "~/.local/state/goose/logs/llm_request.*.jsonl"
+                    ],
+                    "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -9061,7 +9096,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "92554d6a0cd301b6c3aa472e3914543ebd332ab95e57b7dc3cb178eb4e387259"
+    "sha256": "74548e8707965237db94883857330736bf0218066728c7dafde6274013d09363"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

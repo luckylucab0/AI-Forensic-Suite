@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 9f2742c33e48
+# Catalogue digest: 9a6c8edb3219
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -646,8 +646,10 @@ sources:
     gemini_cli,gemini_cli.trusted_folders,C:/Users/*/.gemini/trustedFolders.json
     gemini_cli,gemini_cli.user_settings,C:/Users/*/.gemini/settings.json
     goose,goose.cli_logs,C:/Users/*/AppData/Roaming/Block/goose/data/logs/cli/**
+    goose,goose.command_history,C:/Users/*/AppData/Roaming/Block/goose/data/history.txt
     goose,goose.config,C:/Users/*/AppData/Roaming/Block/goose/config/config.yaml
     goose,goose.desktop_log,C:/Users/*/AppData/Roaming/Block/goose/logs/main.log
+    goose,goose.llm_request_logs,C:/Users/*/AppData/Roaming/Block/goose/data/logs/llm_request.*.jsonl
     goose,goose.permissions,C:/Users/*/AppData/Roaming/Block/goose/config/permission.yaml
     goose,goose.permissions,C:/Users/*/AppData/Roaming/Block/goose/config/permissions/tool_permissions.json
     goose,goose.prompts,C:/Users/*/AppData/Roaming/Block/goose/config/prompts/**
@@ -2156,10 +2158,16 @@ sources:
     goose,goose.cli_logs,/Users/*/.local/state/goose/logs/cli/YYYY-MM-DD/**
     goose,goose.cli_logs,/var/root/.local/state/goose/logs/cli/**
     goose,goose.cli_logs,/var/root/.local/state/goose/logs/cli/YYYY-MM-DD/**
+    goose,goose.command_history,/Users/*/.config/goose/history.txt
+    goose,goose.command_history,/Users/*/.local/state/goose/history.txt
+    goose,goose.command_history,/var/root/.config/goose/history.txt
+    goose,goose.command_history,/var/root/.local/state/goose/history.txt
     goose,goose.config,/Users/*/.config/goose/config.yaml
     goose,goose.config,/var/root/.config/goose/config.yaml
     goose,goose.desktop_log,/Users/*/Library/Application Support/Goose/logs/main.log
     goose,goose.desktop_log,/var/root/Library/Application Support/Goose/logs/main.log
+    goose,goose.llm_request_logs,/Users/*/.local/state/goose/logs/llm_request.*.jsonl
+    goose,goose.llm_request_logs,/var/root/.local/state/goose/logs/llm_request.*.jsonl
     goose,goose.permissions,/Users/*/.config/goose/permission.yaml
     goose,goose.permissions,/Users/*/.config/goose/permissions/tool_permissions.json
     goose,goose.permissions,/var/root/.config/goose/permission.yaml
@@ -4088,8 +4096,14 @@ sources:
     goose,goose.cli_logs,/home/*/.local/state/goose/logs/cli/YYYY-MM-DD/**
     goose,goose.cli_logs,/root/.local/state/goose/logs/cli/**
     goose,goose.cli_logs,/root/.local/state/goose/logs/cli/YYYY-MM-DD/**
+    goose,goose.command_history,/home/*/.config/goose/history.txt
+    goose,goose.command_history,/home/*/.local/state/goose/history.txt
+    goose,goose.command_history,/root/.config/goose/history.txt
+    goose,goose.command_history,/root/.local/state/goose/history.txt
     goose,goose.config,/home/*/.config/goose/config.yaml
     goose,goose.config,/root/.config/goose/config.yaml
+    goose,goose.llm_request_logs,/home/*/.local/state/goose/logs/llm_request.*.jsonl
+    goose,goose.llm_request_logs,/root/.local/state/goose/logs/llm_request.*.jsonl
     goose,goose.permissions,/home/*/.config/goose/permission.yaml
     goose,goose.permissions,/home/*/.config/goose/permissions/tool_permissions.json
     goose,goose.permissions,/root/.config/goose/permission.yaml

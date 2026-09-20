@@ -6,7 +6,7 @@ English | [Deutsch](ARTIFACTS.de.md)
 
 Generated from catalog/ by scripts/gen_artifact_docs.py. Do not edit by hand: CI regenerates this file and fails if it differs.
 
-474 artifacts across 31 agent(s), 369 of them resting on a fetched vendor source.
+476 artifacts across 31 agent(s), 371 of them resting on a fetched vendor source.
 
 Entries marked unverified are collected anyway, but no vendor source confirms the path. Treat the absence of such an artifact as inconclusive rather than as evidence that the agent was not used.
 
@@ -795,6 +795,14 @@ Vendor: Block
 
 <https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md>, <https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md>, <https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md>, <https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/recipes/session-recipes.md>
 
+### first
+
+**Collect first.** Rotated or swept aggressively, by count or on every sweep rather than after a comfortable interval. Some of these can be destroyed by the user simply starting another session.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `goose.llm_request_logs` | llm request logs | transcript | macOS, Linux, Windows | `%APPDATA%\Block\goose\data\logs\llm_request.*.jsonl`<br>`~/.local/state/goose/logs/llm_request.*.jsonl` | jsonl | normal | A numbered rotation of ten. The vendor states the files keep the ten most recent completed requests, llm_request.0.jsonl through llm_request.9.jsonl, so the eleventh request back is overwritten rather than aged out. On a machine that has kept working after the incident these hold minutes rather than days. | verified | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md) |
+
 ### normal
 
 **Collect normally.** Subject to the agent's ordinary retention period, which for several agents defaults to 30 days.
@@ -802,6 +810,7 @@ Vendor: Block
 | Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `goose.cli_logs` | cli logs | log | macOS, Linux, Windows | `%APPDATA%\Block\goose\data\logs\cli\`<br>`~/.local/state/goose/logs/cli/`<br>`~/.local/state/goose/logs/cli/YYYY-MM-DD/` | text | normal | SELF-DELETING: organised into date-based subdirectories with automatic deletion of entries older than two weeks. Collect first. | verified | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md) |
+| `goose.command_history` | command history | prompt_history | macOS, Linux, Windows | `%APPDATA%\Block\goose\data\history.txt`<br>`~/.config/goose/history.txt`<br>`~/.local/state/goose/history.txt` | text | normal | Persistent across sessions by design, and no expiry is documented. Deleting a session does not touch it. | verified | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md) |
 | `goose.config` | config | config | macOS, Linux, Windows | `%APPDATA%\Block\goose\config\config.yaml`<br>`~/.config/goose/config.yaml` | yaml | normal | Persistent until edited. | verified | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md) |
 | `goose.desktop_log` | desktop log | log | macOS, Windows | `%APPDATA%\Block\goose\logs\main.log`<br>`~/Library/Application Support/Goose/logs/main.log` | text | normal | Electron main-process log; rotation behaviour not documented. | verified | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md) |
 | `goose.hints` | hints | project_instructions | macOS, Linux, Windows | `<project>/.goosehints`<br>`<project>/AGENTS.md` | text | normal | Lives in the repo; recoverable from git history even when the working copy is clean. | verified | [official](https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/context-engineering/using-goosehints.md) |
