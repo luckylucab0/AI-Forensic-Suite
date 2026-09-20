@@ -372,6 +372,10 @@ ELSEWHERE = {
     # skill file itself, so it is read as a document. The skills that were installed are
     # read here; these are the ones that were held at the approval gate.
     "hermes.pending_skills": "json_generic",
+    # The rendered skills section of a system prompt, kept beside a signature of every file
+    # it was built from. The prompt text is one field of a JSON document rather than the
+    # file, so the document reader takes it and the text travels in the record.
+    "hermes.skills_prompt_snapshot": "json_generic",
     "zed.prompt_library": "prompt_library",
 }
 

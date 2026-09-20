@@ -862,6 +862,271 @@ artifacts:
 
     Record structure: one directory per installed server, named after the server, each an ordinary checkout.
   parser: null
+- id: hermes.response_store
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/response_store.db
+  - $HERMES_HOME/profiles/<name>/response_store.db
+  - ~/.hermes/response_store.db
+  - ~/.hermes/profiles/<name>/response_store.db
+  - '%LOCALAPPDATA%\hermes\response_store.db'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\response_store.db'
+  - $HERMES_HOME/response_store.db-wal
+  - $HERMES_HOME/profiles/<name>/response_store.db-wal
+  - ~/.hermes/response_store.db-wal
+  - ~/.hermes/profiles/<name>/response_store.db-wal
+  - '%LOCALAPPDATA%\hermes\response_store.db-wal'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\response_store.db-wal'
+  - $HERMES_HOME/response_store.db-shm
+  - $HERMES_HOME/profiles/<name>/response_store.db-shm
+  - ~/.hermes/response_store.db-shm
+  - ~/.hermes/profiles/<name>/response_store.db-shm
+  - '%LOCALAPPDATA%\hermes\response_store.db-shm'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\response_store.db-shm'
+  format: sqlite
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/features/api-server.md
+  source_kind: official
+  volatility: |-
+    Written by the product's own programming interface rather than by its chat surfaces, so it exists only where something spoke to this agent over that interface. Captured by the pre-update snapshot, which means older copies of it can be under the snapshot directory.
+  notes: |-
+    A second complete conversation store, holding what the session database does not.
+
+    Where something drives this agent through its programming interface rather than through a chat platform or the terminal, the exchange is recorded here. The vendor states what each record holds and it is the strong part: every stored response embeds the whole cumulative conversation up to that point, including every tool output verbatim, because that history is what gets replayed to the model on the next chained turn.
+
+    So this is a store where tool output is not summarised, not truncated by the context and not spilled to a file: it is in the record. The vendor documents a setting that caps it, whose default is to store everything verbatim, so the cap is the exception rather than the rule.
+
+    Read it beside the session database rather than instead of it. A conversation driven through the interface may be here and not there.
+  parser: sqlite_generic
+- id: hermes.memory_store
+  category: memory
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/memory_store.db
+  - $HERMES_HOME/profiles/<name>/memory_store.db
+  - ~/.hermes/memory_store.db
+  - ~/.hermes/profiles/<name>/memory_store.db
+  - '%LOCALAPPDATA%\hermes\memory_store.db'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\memory_store.db'
+  - $HERMES_HOME/memory_store.db-wal
+  - $HERMES_HOME/profiles/<name>/memory_store.db-wal
+  - ~/.hermes/memory_store.db-wal
+  - ~/.hermes/profiles/<name>/memory_store.db-wal
+  - '%LOCALAPPDATA%\hermes\memory_store.db-wal'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\memory_store.db-wal'
+  - $HERMES_HOME/memory_store.db-shm
+  - $HERMES_HOME/profiles/<name>/memory_store.db-shm
+  - ~/.hermes/memory_store.db-shm
+  - ~/.hermes/profiles/<name>/memory_store.db-shm
+  - '%LOCALAPPDATA%\hermes\memory_store.db-shm'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\memory_store.db-shm'
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/plugins/memory/holographic/store.py
+  source_kind: source_code
+  volatility: |-
+    Exists where one of the external memory providers is configured. Independent of the conversations that produced it, so it survives their pruning.
+  notes: |-
+    What the agent decided to remember, as facts rather than as prose.
+
+    The two markdown memory files this catalogue already had are the built-in memory. This is what one of the configurable providers writes instead: a database of facts and the entities they are about, with a trust value on each.
+
+    Its forensic value is the same as the markdown files' and larger. It outlives the conversations it was extracted from, so where transcripts were pruned it is the surviving statement of what the agent believed about the person and their work. And because each fact carries a trust value, it also shows what the agent was more and less willing to act on.
+
+    The configuration names which provider is in use, and only one can be at a time, so a database here with a different provider configured is the remains of an earlier arrangement.
+  parser: sqlite_generic
+- id: hermes.projects_db
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/projects.db
+  - $HERMES_HOME/profiles/<name>/projects.db
+  - ~/.hermes/projects.db
+  - ~/.hermes/profiles/<name>/projects.db
+  - '%LOCALAPPDATA%\hermes\projects.db'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\projects.db'
+  - $HERMES_HOME/projects.db-wal
+  - $HERMES_HOME/profiles/<name>/projects.db-wal
+  - ~/.hermes/projects.db-wal
+  - ~/.hermes/profiles/<name>/projects.db-wal
+  - '%LOCALAPPDATA%\hermes\projects.db-wal'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\projects.db-wal'
+  - $HERMES_HOME/projects.db-shm
+  - $HERMES_HOME/profiles/<name>/projects.db-shm
+  - ~/.hermes/projects.db-shm
+  - ~/.hermes/profiles/<name>/projects.db-shm
+  - '%LOCALAPPDATA%\hermes\projects.db-shm'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\projects.db-shm'
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/hermes_cli/projects_db.py
+  source_kind: source_code
+  volatility: |-
+    Per profile, and captured by the pre-update snapshot. A project is archived with a flag rather than deleted, so an archived project is still a row.
+  notes: |-
+    What the person told this agent their work was.
+
+    Each row is a project with a name, a description and a path on disk, created at a recorded time. That is the map between the directories in the checkpoint store and the work they belonged to, and it is stated by the user rather than inferred.
+
+    The archive flag is the part to read carefully. Archiving does not remove the row, so this store names projects that are no longer current and, where the directory is gone, projects that are no longer on disk at all.
+
+    Record structure: a projects table with id, slug, name, description, icon, colour, an associated board, the primary path, the creation time and an archived flag.
+  parser: sqlite_generic
+- id: hermes.verification_evidence
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/verification_evidence.db
+  - $HERMES_HOME/profiles/<name>/verification_evidence.db
+  - ~/.hermes/verification_evidence.db
+  - ~/.hermes/profiles/<name>/verification_evidence.db
+  - '%LOCALAPPDATA%\hermes\verification_evidence.db'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\verification_evidence.db'
+  - $HERMES_HOME/verification_evidence.db-wal
+  - $HERMES_HOME/profiles/<name>/verification_evidence.db-wal
+  - ~/.hermes/verification_evidence.db-wal
+  - ~/.hermes/profiles/<name>/verification_evidence.db-wal
+  - '%LOCALAPPDATA%\hermes\verification_evidence.db-wal'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\verification_evidence.db-wal'
+  - $HERMES_HOME/verification_evidence.db-shm
+  - $HERMES_HOME/profiles/<name>/verification_evidence.db-shm
+  - ~/.hermes/verification_evidence.db-shm
+  - ~/.hermes/profiles/<name>/verification_evidence.db-shm
+  - '%LOCALAPPDATA%\hermes\verification_evidence.db-shm'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\verification_evidence.db-shm'
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: |-
+    Written only while the guard that consumes it is enabled. The vendor states that with the guard off nothing is recorded and an existing file can be deleted freely, so an absence says the guard was off and not that no work was done.
+  notes: |-
+    A record of which commands the agent ran to check its own work, and which files it had edited when it ran them.
+
+    The guard this feeds asks, at the end of a turn, whether the agent actually verified what it changed. The evidence it reasons over is kept here: the test, lint and build commands that ran, and the edits since.
+
+    For an analyst that is a command execution record with an unusual property. It is scoped to the agent's own verification rather than to everything it ran, so it is narrow, but it is joined to the files that were changed, which is the join the transcripts make hardest to reconstruct.
+
+    Read the setting before reading an absence. The vendor is explicit that the file is only written while the guard is on.
+  parser: sqlite_generic
+- id: hermes.terminal_sessions
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/terminal-sessions/*.json
+  - $HERMES_HOME/profiles/<name>/terminal-sessions/*.json
+  - ~/.hermes/terminal-sessions/*.json
+  - ~/.hermes/profiles/<name>/terminal-sessions/*.json
+  - '%LOCALAPPDATA%\hermes\terminal-sessions\*.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\terminal-sessions\*.json'
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/sessions.md
+  source_kind: official
+  volatility: |-
+    Pruned opportunistically when a new one is written, at thirty days. So this is a month of terminal identities and no more.
+  notes: |-
+    Which conversation belonged to which terminal window.
+
+    When a session is started from the command line the product drops a small file here keyed by the terminal it runs in, so that resuming in the same window continues that window's own conversation rather than the most recent one anywhere.
+
+    The key is the evidence. It is the terminal device path, or the pane identifier of whichever multiplexer or terminal emulator was in use, and the file name carries it in a sanitised form. That gives an analyst two things no transcript gives: that several conversations were running side by side, and the terminal each one was typed into. On a machine where more than one person had a shell, that is an attribution lead.
+
+    Record structure: one file per terminal identity, naming the session it should resume.
+  parser: json_generic
+- id: hermes.skills_prompt_snapshot
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/.skills_prompt_snapshot.json
+  - $HERMES_HOME/profiles/<name>/.skills_prompt_snapshot.json
+  - ~/.hermes/.skills_prompt_snapshot.json
+  - ~/.hermes/profiles/<name>/.skills_prompt_snapshot.json
+  - '%LOCALAPPDATA%\hermes\.skills_prompt_snapshot.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\.skills_prompt_snapshot.json'
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/agent/prompt_builder.py
+  source_kind: source_code
+  volatility: |-
+    Rebuilt whenever the signatures of the skill files change, so it reflects the last state of the skills directory rather than a history of it. Removed when the cache is cleared.
+  notes: |-
+    The skills section of the system prompt, as it was actually rendered, kept beside a signature of every file it was rendered from.
+
+    This is the instruction surface written down. The skills directory says which skills exist now; this says what the model was told about them, in the words it was told, at the point the snapshot was taken. Where a skill has since been edited or removed, the text here is the surviving copy of what was in force.
+
+    The manifest beside it is the other half: a signature for every skill description file that went into the rendering. Compare it against the files on disk and a difference says a skill changed after this prompt was last built, which dates the change against the prompt rather than against the filesystem alone.
+
+    Record structure: a version, the rendered prompt text, and a manifest mapping each skill description file to a file signature. A marker naming the active organization takes part in the manifest, so switching organization invalidates the snapshot by itself.
+  parser: json_generic
+- id: hermes.model_traces
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/moa-traces/*.jsonl
+  - $HERMES_HOME/profiles/<name>/moa-traces/*.jsonl
+  - ~/.hermes/moa-traces/*.jsonl
+  - ~/.hermes/profiles/<name>/moa-traces/*.jsonl
+  - '%LOCALAPPDATA%\hermes\moa-traces\*.jsonl'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\moa-traces\*.jsonl'
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/agent/moa_trace.py
+  source_kind: source_code
+  volatility: |-
+    Written only where the setting that produces it is on, which it is not by default, and appended to without rotation. A configuration key can move the directory elsewhere, so an absence at this path is not an absence on the endpoint.
+  notes: |-
+    The highest-fidelity record of a model call this agent produces, and by the product's own description it is in no other store.
+
+    Where the agent consults several models and combines their answers, each of those calls is a side channel: its source says the records never enter the message table, the history or the replay. So a conversation in the session database shows the answer the agent gave and nothing about the calls behind it, while a line here carries what each model was actually sent, in full, and what it sent back.
+
+    In full is the part that matters. The line holds the complete input messages rather than the truncated preview a display would show, which makes it the one place on the endpoint where the assembled prompt, system instructions and context together, can be read as the model received it. For the question of whether an agent was steered by injected instructions, that is the difference between inferring what the model saw and reading it.
+
+    Record structure: one file per session, named after the session identifier with everything but letters, digits, dash, underscore and dot replaced. One JSON line per turn, each holding a record per model with its label, the model, the provider, the temperature, the full input messages, the output, the token counts and the cost.
+  parser: jsonl_generic
 - id: hermes.retired_wal_transcripts
   category: transcript
   root: user_profile
@@ -1586,16 +1851,12 @@ artifacts:
   - linux
   - windows
   paths:
-  - $HERMES_HOME/logs/
-  - $HERMES_HOME/profiles/<name>/logs/
-  - ~/.hermes/logs/errors.log
-  - ~/.hermes/profiles/<name>/logs/errors.log
-  - '%LOCALAPPDATA%\hermes\logs\errors.log'
-  - '%LOCALAPPDATA%\hermes\profiles\<name>\logs\errors.log'
-  - ~/.hermes/logs/gateway.log
-  - ~/.hermes/profiles/<name>/logs/gateway.log
-  - '%LOCALAPPDATA%\hermes\logs\gateway.log'
-  - '%LOCALAPPDATA%\hermes\profiles\<name>\logs\gateway.log'
+  - $HERMES_HOME/logs/**
+  - $HERMES_HOME/profiles/<name>/logs/**
+  - ~/.hermes/logs/**
+  - ~/.hermes/profiles/<name>/logs/**
+  - '%LOCALAPPDATA%\hermes\logs\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\logs\**'
   format: text
   sensitivity: normal
   collect_priority: normal

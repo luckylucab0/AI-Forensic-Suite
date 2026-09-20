@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 1c3de2ec5a69
+# Catalogue digest: ec8e4be59eb1
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -795,14 +795,10 @@ sources:
     hermes,hermes.hooks,C:/Users/*/.hermes/profiles/*/hooks/**
     hermes,hermes.hooks,C:/Users/*/AppData/Local/hermes/hooks/**
     hermes,hermes.hooks,C:/Users/*/AppData/Local/hermes/profiles/*/hooks/**
-    hermes,hermes.logs,C:/Users/*/.hermes/logs/errors.log
-    hermes,hermes.logs,C:/Users/*/.hermes/logs/gateway.log
-    hermes,hermes.logs,C:/Users/*/.hermes/profiles/*/logs/errors.log
-    hermes,hermes.logs,C:/Users/*/.hermes/profiles/*/logs/gateway.log
-    hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/logs/errors.log
-    hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/logs/gateway.log
-    hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/profiles/*/logs/errors.log
-    hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/profiles/*/logs/gateway.log
+    hermes,hermes.logs,C:/Users/*/.hermes/logs/**
+    hermes,hermes.logs,C:/Users/*/.hermes/profiles/*/logs/**
+    hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/logs/**
+    hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/profiles/*/logs/**
     hermes,hermes.mcp_installs,C:/Users/*/.hermes/mcp-installs/**
     hermes,hermes.mcp_installs,C:/Users/*/.hermes/profiles/*/mcp-installs/**
     hermes,hermes.mcp_installs,C:/Users/*/AppData/Local/hermes/mcp-installs/**
@@ -823,6 +819,22 @@ sources:
     hermes,hermes.memories,C:/Users/*/AppData/Local/hermes/memories/USER.md
     hermes,hermes.memories,C:/Users/*/AppData/Local/hermes/profiles/*/memories/MEMORY.md
     hermes,hermes.memories,C:/Users/*/AppData/Local/hermes/profiles/*/memories/USER.md
+    hermes,hermes.memory_store,C:/Users/*/.hermes/memory_store.db
+    hermes,hermes.memory_store,C:/Users/*/.hermes/memory_store.db-shm
+    hermes,hermes.memory_store,C:/Users/*/.hermes/memory_store.db-wal
+    hermes,hermes.memory_store,C:/Users/*/.hermes/profiles/*/memory_store.db
+    hermes,hermes.memory_store,C:/Users/*/.hermes/profiles/*/memory_store.db-shm
+    hermes,hermes.memory_store,C:/Users/*/.hermes/profiles/*/memory_store.db-wal
+    hermes,hermes.memory_store,C:/Users/*/AppData/Local/hermes/memory_store.db
+    hermes,hermes.memory_store,C:/Users/*/AppData/Local/hermes/memory_store.db-shm
+    hermes,hermes.memory_store,C:/Users/*/AppData/Local/hermes/memory_store.db-wal
+    hermes,hermes.memory_store,C:/Users/*/AppData/Local/hermes/profiles/*/memory_store.db
+    hermes,hermes.memory_store,C:/Users/*/AppData/Local/hermes/profiles/*/memory_store.db-shm
+    hermes,hermes.memory_store,C:/Users/*/AppData/Local/hermes/profiles/*/memory_store.db-wal
+    hermes,hermes.model_traces,C:/Users/*/.hermes/moa-traces/*.jsonl
+    hermes,hermes.model_traces,C:/Users/*/.hermes/profiles/*/moa-traces/*.jsonl
+    hermes,hermes.model_traces,C:/Users/*/AppData/Local/hermes/moa-traces/*.jsonl
+    hermes,hermes.model_traces,C:/Users/*/AppData/Local/hermes/profiles/*/moa-traces/*.jsonl
     hermes,hermes.oauth_tokens,C:/Users/*/.hermes/.anthropic_oauth.json
     hermes,hermes.oauth_tokens,C:/Users/*/.hermes/cache/bws_cache.enc.json
     hermes,hermes.oauth_tokens,C:/Users/*/.hermes/cache/bws_cache.json
@@ -907,6 +919,18 @@ sources:
     hermes,hermes.profile_tombstones,C:/Users/*/AppData/Local/hermes/profiles/.deleted/**
     hermes,hermes.profiles,C:/Users/*/.hermes/profiles/*/profile.yaml
     hermes,hermes.profiles,C:/Users/*/AppData/Local/hermes/profiles/*/profile.yaml
+    hermes,hermes.projects_db,C:/Users/*/.hermes/profiles/*/projects.db
+    hermes,hermes.projects_db,C:/Users/*/.hermes/profiles/*/projects.db-shm
+    hermes,hermes.projects_db,C:/Users/*/.hermes/profiles/*/projects.db-wal
+    hermes,hermes.projects_db,C:/Users/*/.hermes/projects.db
+    hermes,hermes.projects_db,C:/Users/*/.hermes/projects.db-shm
+    hermes,hermes.projects_db,C:/Users/*/.hermes/projects.db-wal
+    hermes,hermes.projects_db,C:/Users/*/AppData/Local/hermes/profiles/*/projects.db
+    hermes,hermes.projects_db,C:/Users/*/AppData/Local/hermes/profiles/*/projects.db-shm
+    hermes,hermes.projects_db,C:/Users/*/AppData/Local/hermes/profiles/*/projects.db-wal
+    hermes,hermes.projects_db,C:/Users/*/AppData/Local/hermes/projects.db
+    hermes,hermes.projects_db,C:/Users/*/AppData/Local/hermes/projects.db-shm
+    hermes,hermes.projects_db,C:/Users/*/AppData/Local/hermes/projects.db-wal
     hermes,hermes.remote_sandbox_snapshots,C:/Users/*/.hermes/modal_snapshots.json
     hermes,hermes.remote_sandbox_snapshots,C:/Users/*/.hermes/profiles/*/modal_snapshots.json
     hermes,hermes.remote_sandbox_snapshots,C:/Users/*/.hermes/profiles/*/singularity_snapshots.json
@@ -919,6 +943,18 @@ sources:
     hermes,hermes.remote_sandbox_snapshots,C:/Users/*/AppData/Local/hermes/profiles/*/vercel_sandbox_snapshots.json
     hermes,hermes.remote_sandbox_snapshots,C:/Users/*/AppData/Local/hermes/singularity_snapshots.json
     hermes,hermes.remote_sandbox_snapshots,C:/Users/*/AppData/Local/hermes/vercel_sandbox_snapshots.json
+    hermes,hermes.response_store,C:/Users/*/.hermes/profiles/*/response_store.db
+    hermes,hermes.response_store,C:/Users/*/.hermes/profiles/*/response_store.db-shm
+    hermes,hermes.response_store,C:/Users/*/.hermes/profiles/*/response_store.db-wal
+    hermes,hermes.response_store,C:/Users/*/.hermes/response_store.db
+    hermes,hermes.response_store,C:/Users/*/.hermes/response_store.db-shm
+    hermes,hermes.response_store,C:/Users/*/.hermes/response_store.db-wal
+    hermes,hermes.response_store,C:/Users/*/AppData/Local/hermes/profiles/*/response_store.db
+    hermes,hermes.response_store,C:/Users/*/AppData/Local/hermes/profiles/*/response_store.db-shm
+    hermes,hermes.response_store,C:/Users/*/AppData/Local/hermes/profiles/*/response_store.db-wal
+    hermes,hermes.response_store,C:/Users/*/AppData/Local/hermes/response_store.db
+    hermes,hermes.response_store,C:/Users/*/AppData/Local/hermes/response_store.db-shm
+    hermes,hermes.response_store,C:/Users/*/AppData/Local/hermes/response_store.db-wal
     hermes,hermes.retired_wal_generations,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,hermes.retired_wal_generations,C:/Users/*/.hermes/state.db.retired-wal-*/**
     hermes,hermes.retired_wal_generations,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/**
@@ -963,6 +999,10 @@ sources:
     hermes,hermes.skills,C:/Users/*/.hermes/skills/**
     hermes,hermes.skills,C:/Users/*/AppData/Local/hermes/profiles/*/skills/**
     hermes,hermes.skills,C:/Users/*/AppData/Local/hermes/skills/**
+    hermes,hermes.skills_prompt_snapshot,C:/Users/*/.hermes/.skills_prompt_snapshot.json
+    hermes,hermes.skills_prompt_snapshot,C:/Users/*/.hermes/profiles/*/.skills_prompt_snapshot.json
+    hermes,hermes.skills_prompt_snapshot,C:/Users/*/AppData/Local/hermes/.skills_prompt_snapshot.json
+    hermes,hermes.skills_prompt_snapshot,C:/Users/*/AppData/Local/hermes/profiles/*/.skills_prompt_snapshot.json
     hermes,hermes.soul,C:/Users/*/.hermes/SOUL.md
     hermes,hermes.soul,C:/Users/*/.hermes/profiles/*/SOUL.md
     hermes,hermes.soul,C:/Users/*/AppData/Local/hermes/SOUL.md
@@ -991,6 +1031,10 @@ sources:
     hermes,hermes.state_snapshots,C:/Users/*/.hermes/state-snapshots/**
     hermes,hermes.state_snapshots,C:/Users/*/AppData/Local/hermes/profiles/*/state-snapshots/**
     hermes,hermes.state_snapshots,C:/Users/*/AppData/Local/hermes/state-snapshots/**
+    hermes,hermes.terminal_sessions,C:/Users/*/.hermes/profiles/*/terminal-sessions/*.json
+    hermes,hermes.terminal_sessions,C:/Users/*/.hermes/terminal-sessions/*.json
+    hermes,hermes.terminal_sessions,C:/Users/*/AppData/Local/hermes/profiles/*/terminal-sessions/*.json
+    hermes,hermes.terminal_sessions,C:/Users/*/AppData/Local/hermes/terminal-sessions/*.json
     hermes,hermes.vault,C:/Users/*/.hermes/profiles/*/vault/vault.json.enc
     hermes,hermes.vault,C:/Users/*/.hermes/profiles/*/vault/vault.key
     hermes,hermes.vault,C:/Users/*/.hermes/vault/vault.json.enc
@@ -999,6 +1043,18 @@ sources:
     hermes,hermes.vault,C:/Users/*/AppData/Local/hermes/profiles/*/vault/vault.key
     hermes,hermes.vault,C:/Users/*/AppData/Local/hermes/vault/vault.json.enc
     hermes,hermes.vault,C:/Users/*/AppData/Local/hermes/vault/vault.key
+    hermes,hermes.verification_evidence,C:/Users/*/.hermes/profiles/*/verification_evidence.db
+    hermes,hermes.verification_evidence,C:/Users/*/.hermes/profiles/*/verification_evidence.db-shm
+    hermes,hermes.verification_evidence,C:/Users/*/.hermes/profiles/*/verification_evidence.db-wal
+    hermes,hermes.verification_evidence,C:/Users/*/.hermes/verification_evidence.db
+    hermes,hermes.verification_evidence,C:/Users/*/.hermes/verification_evidence.db-shm
+    hermes,hermes.verification_evidence,C:/Users/*/.hermes/verification_evidence.db-wal
+    hermes,hermes.verification_evidence,C:/Users/*/AppData/Local/hermes/profiles/*/verification_evidence.db
+    hermes,hermes.verification_evidence,C:/Users/*/AppData/Local/hermes/profiles/*/verification_evidence.db-shm
+    hermes,hermes.verification_evidence,C:/Users/*/AppData/Local/hermes/profiles/*/verification_evidence.db-wal
+    hermes,hermes.verification_evidence,C:/Users/*/AppData/Local/hermes/verification_evidence.db
+    hermes,hermes.verification_evidence,C:/Users/*/AppData/Local/hermes/verification_evidence.db-shm
+    hermes,hermes.verification_evidence,C:/Users/*/AppData/Local/hermes/verification_evidence.db-wal
     jetbrains_ai,jetbrains_ai.aia_task_history,C:/Users/*/AppData/Roaming/JetBrains/**/aia-task-history/**
     jetbrains_ai,jetbrains_ai.base_directories,C:/Users/*/AppData/Local/JetBrains/**/**
     jetbrains_ai,jetbrains_ai.base_directories,C:/Users/*/AppData/Local/JetBrains/**/log/**
@@ -2655,14 +2711,10 @@ sources:
     hermes,hermes.hooks,/Users/*/.hermes/profiles/*/hooks/**
     hermes,hermes.hooks,/var/root/.hermes/hooks/**
     hermes,hermes.hooks,/var/root/.hermes/profiles/*/hooks/**
-    hermes,hermes.logs,/Users/*/.hermes/logs/errors.log
-    hermes,hermes.logs,/Users/*/.hermes/logs/gateway.log
-    hermes,hermes.logs,/Users/*/.hermes/profiles/*/logs/errors.log
-    hermes,hermes.logs,/Users/*/.hermes/profiles/*/logs/gateway.log
-    hermes,hermes.logs,/var/root/.hermes/logs/errors.log
-    hermes,hermes.logs,/var/root/.hermes/logs/gateway.log
-    hermes,hermes.logs,/var/root/.hermes/profiles/*/logs/errors.log
-    hermes,hermes.logs,/var/root/.hermes/profiles/*/logs/gateway.log
+    hermes,hermes.logs,/Users/*/.hermes/logs/**
+    hermes,hermes.logs,/Users/*/.hermes/profiles/*/logs/**
+    hermes,hermes.logs,/var/root/.hermes/logs/**
+    hermes,hermes.logs,/var/root/.hermes/profiles/*/logs/**
     hermes,hermes.mcp_installs,/Users/*/.hermes/mcp-installs/**
     hermes,hermes.mcp_installs,/Users/*/.hermes/profiles/*/mcp-installs/**
     hermes,hermes.mcp_installs,/var/root/.hermes/mcp-installs/**
@@ -2683,6 +2735,22 @@ sources:
     hermes,hermes.memories,/var/root/.hermes/memories/USER.md
     hermes,hermes.memories,/var/root/.hermes/profiles/*/memories/MEMORY.md
     hermes,hermes.memories,/var/root/.hermes/profiles/*/memories/USER.md
+    hermes,hermes.memory_store,/Users/*/.hermes/memory_store.db
+    hermes,hermes.memory_store,/Users/*/.hermes/memory_store.db-shm
+    hermes,hermes.memory_store,/Users/*/.hermes/memory_store.db-wal
+    hermes,hermes.memory_store,/Users/*/.hermes/profiles/*/memory_store.db
+    hermes,hermes.memory_store,/Users/*/.hermes/profiles/*/memory_store.db-shm
+    hermes,hermes.memory_store,/Users/*/.hermes/profiles/*/memory_store.db-wal
+    hermes,hermes.memory_store,/var/root/.hermes/memory_store.db
+    hermes,hermes.memory_store,/var/root/.hermes/memory_store.db-shm
+    hermes,hermes.memory_store,/var/root/.hermes/memory_store.db-wal
+    hermes,hermes.memory_store,/var/root/.hermes/profiles/*/memory_store.db
+    hermes,hermes.memory_store,/var/root/.hermes/profiles/*/memory_store.db-shm
+    hermes,hermes.memory_store,/var/root/.hermes/profiles/*/memory_store.db-wal
+    hermes,hermes.model_traces,/Users/*/.hermes/moa-traces/*.jsonl
+    hermes,hermes.model_traces,/Users/*/.hermes/profiles/*/moa-traces/*.jsonl
+    hermes,hermes.model_traces,/var/root/.hermes/moa-traces/*.jsonl
+    hermes,hermes.model_traces,/var/root/.hermes/profiles/*/moa-traces/*.jsonl
     hermes,hermes.oauth_tokens,/Users/*/.hermes/.anthropic_oauth.json
     hermes,hermes.oauth_tokens,/Users/*/.hermes/cache/bws_cache.enc.json
     hermes,hermes.oauth_tokens,/Users/*/.hermes/cache/bws_cache.json
@@ -2767,6 +2835,18 @@ sources:
     hermes,hermes.profile_tombstones,/var/root/.hermes/profiles/.deleted/**
     hermes,hermes.profiles,/Users/*/.hermes/profiles/*/profile.yaml
     hermes,hermes.profiles,/var/root/.hermes/profiles/*/profile.yaml
+    hermes,hermes.projects_db,/Users/*/.hermes/profiles/*/projects.db
+    hermes,hermes.projects_db,/Users/*/.hermes/profiles/*/projects.db-shm
+    hermes,hermes.projects_db,/Users/*/.hermes/profiles/*/projects.db-wal
+    hermes,hermes.projects_db,/Users/*/.hermes/projects.db
+    hermes,hermes.projects_db,/Users/*/.hermes/projects.db-shm
+    hermes,hermes.projects_db,/Users/*/.hermes/projects.db-wal
+    hermes,hermes.projects_db,/var/root/.hermes/profiles/*/projects.db
+    hermes,hermes.projects_db,/var/root/.hermes/profiles/*/projects.db-shm
+    hermes,hermes.projects_db,/var/root/.hermes/profiles/*/projects.db-wal
+    hermes,hermes.projects_db,/var/root/.hermes/projects.db
+    hermes,hermes.projects_db,/var/root/.hermes/projects.db-shm
+    hermes,hermes.projects_db,/var/root/.hermes/projects.db-wal
     hermes,hermes.remote_sandbox_snapshots,/Users/*/.hermes/modal_snapshots.json
     hermes,hermes.remote_sandbox_snapshots,/Users/*/.hermes/profiles/*/modal_snapshots.json
     hermes,hermes.remote_sandbox_snapshots,/Users/*/.hermes/profiles/*/singularity_snapshots.json
@@ -2779,6 +2859,18 @@ sources:
     hermes,hermes.remote_sandbox_snapshots,/var/root/.hermes/profiles/*/vercel_sandbox_snapshots.json
     hermes,hermes.remote_sandbox_snapshots,/var/root/.hermes/singularity_snapshots.json
     hermes,hermes.remote_sandbox_snapshots,/var/root/.hermes/vercel_sandbox_snapshots.json
+    hermes,hermes.response_store,/Users/*/.hermes/profiles/*/response_store.db
+    hermes,hermes.response_store,/Users/*/.hermes/profiles/*/response_store.db-shm
+    hermes,hermes.response_store,/Users/*/.hermes/profiles/*/response_store.db-wal
+    hermes,hermes.response_store,/Users/*/.hermes/response_store.db
+    hermes,hermes.response_store,/Users/*/.hermes/response_store.db-shm
+    hermes,hermes.response_store,/Users/*/.hermes/response_store.db-wal
+    hermes,hermes.response_store,/var/root/.hermes/profiles/*/response_store.db
+    hermes,hermes.response_store,/var/root/.hermes/profiles/*/response_store.db-shm
+    hermes,hermes.response_store,/var/root/.hermes/profiles/*/response_store.db-wal
+    hermes,hermes.response_store,/var/root/.hermes/response_store.db
+    hermes,hermes.response_store,/var/root/.hermes/response_store.db-shm
+    hermes,hermes.response_store,/var/root/.hermes/response_store.db-wal
     hermes,hermes.retired_wal_generations,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,hermes.retired_wal_generations,/Users/*/.hermes/state.db.retired-wal-*/**
     hermes,hermes.retired_wal_generations,/var/root/.hermes/profiles/*/state.db.retired-wal-*/**
@@ -2823,6 +2915,10 @@ sources:
     hermes,hermes.skills,/Users/*/.hermes/skills/**
     hermes,hermes.skills,/var/root/.hermes/profiles/*/skills/**
     hermes,hermes.skills,/var/root/.hermes/skills/**
+    hermes,hermes.skills_prompt_snapshot,/Users/*/.hermes/.skills_prompt_snapshot.json
+    hermes,hermes.skills_prompt_snapshot,/Users/*/.hermes/profiles/*/.skills_prompt_snapshot.json
+    hermes,hermes.skills_prompt_snapshot,/var/root/.hermes/.skills_prompt_snapshot.json
+    hermes,hermes.skills_prompt_snapshot,/var/root/.hermes/profiles/*/.skills_prompt_snapshot.json
     hermes,hermes.soul,/Users/*/.hermes/SOUL.md
     hermes,hermes.soul,/Users/*/.hermes/profiles/*/SOUL.md
     hermes,hermes.soul,/var/root/.hermes/SOUL.md
@@ -2851,6 +2947,10 @@ sources:
     hermes,hermes.state_snapshots,/Users/*/.hermes/state-snapshots/**
     hermes,hermes.state_snapshots,/var/root/.hermes/profiles/*/state-snapshots/**
     hermes,hermes.state_snapshots,/var/root/.hermes/state-snapshots/**
+    hermes,hermes.terminal_sessions,/Users/*/.hermes/profiles/*/terminal-sessions/*.json
+    hermes,hermes.terminal_sessions,/Users/*/.hermes/terminal-sessions/*.json
+    hermes,hermes.terminal_sessions,/var/root/.hermes/profiles/*/terminal-sessions/*.json
+    hermes,hermes.terminal_sessions,/var/root/.hermes/terminal-sessions/*.json
     hermes,hermes.vault,/Users/*/.hermes/profiles/*/vault/vault.json.enc
     hermes,hermes.vault,/Users/*/.hermes/profiles/*/vault/vault.key
     hermes,hermes.vault,/Users/*/.hermes/vault/vault.json.enc
@@ -2859,6 +2959,18 @@ sources:
     hermes,hermes.vault,/var/root/.hermes/profiles/*/vault/vault.key
     hermes,hermes.vault,/var/root/.hermes/vault/vault.json.enc
     hermes,hermes.vault,/var/root/.hermes/vault/vault.key
+    hermes,hermes.verification_evidence,/Users/*/.hermes/profiles/*/verification_evidence.db
+    hermes,hermes.verification_evidence,/Users/*/.hermes/profiles/*/verification_evidence.db-shm
+    hermes,hermes.verification_evidence,/Users/*/.hermes/profiles/*/verification_evidence.db-wal
+    hermes,hermes.verification_evidence,/Users/*/.hermes/verification_evidence.db
+    hermes,hermes.verification_evidence,/Users/*/.hermes/verification_evidence.db-shm
+    hermes,hermes.verification_evidence,/Users/*/.hermes/verification_evidence.db-wal
+    hermes,hermes.verification_evidence,/var/root/.hermes/profiles/*/verification_evidence.db
+    hermes,hermes.verification_evidence,/var/root/.hermes/profiles/*/verification_evidence.db-shm
+    hermes,hermes.verification_evidence,/var/root/.hermes/profiles/*/verification_evidence.db-wal
+    hermes,hermes.verification_evidence,/var/root/.hermes/verification_evidence.db
+    hermes,hermes.verification_evidence,/var/root/.hermes/verification_evidence.db-shm
+    hermes,hermes.verification_evidence,/var/root/.hermes/verification_evidence.db-wal
     jetbrains_ai,jetbrains_ai.aia_task_history,/Users/*/.config/JetBrains/**/aia-task-history/**
     jetbrains_ai,jetbrains_ai.aia_task_history,/Users/*/Library/Application Support/JetBrains/**/aia-task-history/*.agentsession
     jetbrains_ai,jetbrains_ai.aia_task_history,/Users/*/Library/Application Support/JetBrains/**/aia-task-history/*.checkpoints
@@ -4903,14 +5015,10 @@ sources:
     hermes,hermes.hooks,/home/*/.hermes/profiles/*/hooks/**
     hermes,hermes.hooks,/root/.hermes/hooks/**
     hermes,hermes.hooks,/root/.hermes/profiles/*/hooks/**
-    hermes,hermes.logs,/home/*/.hermes/logs/errors.log
-    hermes,hermes.logs,/home/*/.hermes/logs/gateway.log
-    hermes,hermes.logs,/home/*/.hermes/profiles/*/logs/errors.log
-    hermes,hermes.logs,/home/*/.hermes/profiles/*/logs/gateway.log
-    hermes,hermes.logs,/root/.hermes/logs/errors.log
-    hermes,hermes.logs,/root/.hermes/logs/gateway.log
-    hermes,hermes.logs,/root/.hermes/profiles/*/logs/errors.log
-    hermes,hermes.logs,/root/.hermes/profiles/*/logs/gateway.log
+    hermes,hermes.logs,/home/*/.hermes/logs/**
+    hermes,hermes.logs,/home/*/.hermes/profiles/*/logs/**
+    hermes,hermes.logs,/root/.hermes/logs/**
+    hermes,hermes.logs,/root/.hermes/profiles/*/logs/**
     hermes,hermes.mcp_installs,/home/*/.hermes/mcp-installs/**
     hermes,hermes.mcp_installs,/home/*/.hermes/profiles/*/mcp-installs/**
     hermes,hermes.mcp_installs,/root/.hermes/mcp-installs/**
@@ -4931,6 +5039,22 @@ sources:
     hermes,hermes.memories,/root/.hermes/memories/USER.md
     hermes,hermes.memories,/root/.hermes/profiles/*/memories/MEMORY.md
     hermes,hermes.memories,/root/.hermes/profiles/*/memories/USER.md
+    hermes,hermes.memory_store,/home/*/.hermes/memory_store.db
+    hermes,hermes.memory_store,/home/*/.hermes/memory_store.db-shm
+    hermes,hermes.memory_store,/home/*/.hermes/memory_store.db-wal
+    hermes,hermes.memory_store,/home/*/.hermes/profiles/*/memory_store.db
+    hermes,hermes.memory_store,/home/*/.hermes/profiles/*/memory_store.db-shm
+    hermes,hermes.memory_store,/home/*/.hermes/profiles/*/memory_store.db-wal
+    hermes,hermes.memory_store,/root/.hermes/memory_store.db
+    hermes,hermes.memory_store,/root/.hermes/memory_store.db-shm
+    hermes,hermes.memory_store,/root/.hermes/memory_store.db-wal
+    hermes,hermes.memory_store,/root/.hermes/profiles/*/memory_store.db
+    hermes,hermes.memory_store,/root/.hermes/profiles/*/memory_store.db-shm
+    hermes,hermes.memory_store,/root/.hermes/profiles/*/memory_store.db-wal
+    hermes,hermes.model_traces,/home/*/.hermes/moa-traces/*.jsonl
+    hermes,hermes.model_traces,/home/*/.hermes/profiles/*/moa-traces/*.jsonl
+    hermes,hermes.model_traces,/root/.hermes/moa-traces/*.jsonl
+    hermes,hermes.model_traces,/root/.hermes/profiles/*/moa-traces/*.jsonl
     hermes,hermes.oauth_tokens,/home/*/.hermes/.anthropic_oauth.json
     hermes,hermes.oauth_tokens,/home/*/.hermes/cache/bws_cache.enc.json
     hermes,hermes.oauth_tokens,/home/*/.hermes/cache/bws_cache.json
@@ -5015,6 +5139,18 @@ sources:
     hermes,hermes.profile_tombstones,/root/.hermes/profiles/.deleted/**
     hermes,hermes.profiles,/home/*/.hermes/profiles/*/profile.yaml
     hermes,hermes.profiles,/root/.hermes/profiles/*/profile.yaml
+    hermes,hermes.projects_db,/home/*/.hermes/profiles/*/projects.db
+    hermes,hermes.projects_db,/home/*/.hermes/profiles/*/projects.db-shm
+    hermes,hermes.projects_db,/home/*/.hermes/profiles/*/projects.db-wal
+    hermes,hermes.projects_db,/home/*/.hermes/projects.db
+    hermes,hermes.projects_db,/home/*/.hermes/projects.db-shm
+    hermes,hermes.projects_db,/home/*/.hermes/projects.db-wal
+    hermes,hermes.projects_db,/root/.hermes/profiles/*/projects.db
+    hermes,hermes.projects_db,/root/.hermes/profiles/*/projects.db-shm
+    hermes,hermes.projects_db,/root/.hermes/profiles/*/projects.db-wal
+    hermes,hermes.projects_db,/root/.hermes/projects.db
+    hermes,hermes.projects_db,/root/.hermes/projects.db-shm
+    hermes,hermes.projects_db,/root/.hermes/projects.db-wal
     hermes,hermes.remote_sandbox_snapshots,/home/*/.hermes/modal_snapshots.json
     hermes,hermes.remote_sandbox_snapshots,/home/*/.hermes/profiles/*/modal_snapshots.json
     hermes,hermes.remote_sandbox_snapshots,/home/*/.hermes/profiles/*/singularity_snapshots.json
@@ -5027,6 +5163,18 @@ sources:
     hermes,hermes.remote_sandbox_snapshots,/root/.hermes/profiles/*/vercel_sandbox_snapshots.json
     hermes,hermes.remote_sandbox_snapshots,/root/.hermes/singularity_snapshots.json
     hermes,hermes.remote_sandbox_snapshots,/root/.hermes/vercel_sandbox_snapshots.json
+    hermes,hermes.response_store,/home/*/.hermes/profiles/*/response_store.db
+    hermes,hermes.response_store,/home/*/.hermes/profiles/*/response_store.db-shm
+    hermes,hermes.response_store,/home/*/.hermes/profiles/*/response_store.db-wal
+    hermes,hermes.response_store,/home/*/.hermes/response_store.db
+    hermes,hermes.response_store,/home/*/.hermes/response_store.db-shm
+    hermes,hermes.response_store,/home/*/.hermes/response_store.db-wal
+    hermes,hermes.response_store,/root/.hermes/profiles/*/response_store.db
+    hermes,hermes.response_store,/root/.hermes/profiles/*/response_store.db-shm
+    hermes,hermes.response_store,/root/.hermes/profiles/*/response_store.db-wal
+    hermes,hermes.response_store,/root/.hermes/response_store.db
+    hermes,hermes.response_store,/root/.hermes/response_store.db-shm
+    hermes,hermes.response_store,/root/.hermes/response_store.db-wal
     hermes,hermes.retired_wal_generations,/home/*/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,hermes.retired_wal_generations,/home/*/.hermes/state.db.retired-wal-*/**
     hermes,hermes.retired_wal_generations,/root/.hermes/profiles/*/state.db.retired-wal-*/**
@@ -5071,6 +5219,10 @@ sources:
     hermes,hermes.skills,/home/*/.hermes/skills/**
     hermes,hermes.skills,/root/.hermes/profiles/*/skills/**
     hermes,hermes.skills,/root/.hermes/skills/**
+    hermes,hermes.skills_prompt_snapshot,/home/*/.hermes/.skills_prompt_snapshot.json
+    hermes,hermes.skills_prompt_snapshot,/home/*/.hermes/profiles/*/.skills_prompt_snapshot.json
+    hermes,hermes.skills_prompt_snapshot,/root/.hermes/.skills_prompt_snapshot.json
+    hermes,hermes.skills_prompt_snapshot,/root/.hermes/profiles/*/.skills_prompt_snapshot.json
     hermes,hermes.soul,/home/*/.hermes/SOUL.md
     hermes,hermes.soul,/home/*/.hermes/profiles/*/SOUL.md
     hermes,hermes.soul,/root/.hermes/SOUL.md
@@ -5099,6 +5251,10 @@ sources:
     hermes,hermes.state_snapshots,/home/*/.hermes/state-snapshots/**
     hermes,hermes.state_snapshots,/root/.hermes/profiles/*/state-snapshots/**
     hermes,hermes.state_snapshots,/root/.hermes/state-snapshots/**
+    hermes,hermes.terminal_sessions,/home/*/.hermes/profiles/*/terminal-sessions/*.json
+    hermes,hermes.terminal_sessions,/home/*/.hermes/terminal-sessions/*.json
+    hermes,hermes.terminal_sessions,/root/.hermes/profiles/*/terminal-sessions/*.json
+    hermes,hermes.terminal_sessions,/root/.hermes/terminal-sessions/*.json
     hermes,hermes.vault,/home/*/.hermes/profiles/*/vault/vault.json.enc
     hermes,hermes.vault,/home/*/.hermes/profiles/*/vault/vault.key
     hermes,hermes.vault,/home/*/.hermes/vault/vault.json.enc
@@ -5107,6 +5263,18 @@ sources:
     hermes,hermes.vault,/root/.hermes/profiles/*/vault/vault.key
     hermes,hermes.vault,/root/.hermes/vault/vault.json.enc
     hermes,hermes.vault,/root/.hermes/vault/vault.key
+    hermes,hermes.verification_evidence,/home/*/.hermes/profiles/*/verification_evidence.db
+    hermes,hermes.verification_evidence,/home/*/.hermes/profiles/*/verification_evidence.db-shm
+    hermes,hermes.verification_evidence,/home/*/.hermes/profiles/*/verification_evidence.db-wal
+    hermes,hermes.verification_evidence,/home/*/.hermes/verification_evidence.db
+    hermes,hermes.verification_evidence,/home/*/.hermes/verification_evidence.db-shm
+    hermes,hermes.verification_evidence,/home/*/.hermes/verification_evidence.db-wal
+    hermes,hermes.verification_evidence,/root/.hermes/profiles/*/verification_evidence.db
+    hermes,hermes.verification_evidence,/root/.hermes/profiles/*/verification_evidence.db-shm
+    hermes,hermes.verification_evidence,/root/.hermes/profiles/*/verification_evidence.db-wal
+    hermes,hermes.verification_evidence,/root/.hermes/verification_evidence.db
+    hermes,hermes.verification_evidence,/root/.hermes/verification_evidence.db-shm
+    hermes,hermes.verification_evidence,/root/.hermes/verification_evidence.db-wal
     jetbrains_ai,jetbrains_ai.aia_task_history,/home/*/.config/JetBrains/**/aia-task-history/**
     jetbrains_ai,jetbrains_ai.aia_task_history,/home/*/Library/Application Support/JetBrains/**/aia-task-history/*.agentsession
     jetbrains_ai,jetbrains_ai.aia_task_history,/home/*/Library/Application Support/JetBrains/**/aia-task-history/*.checkpoints

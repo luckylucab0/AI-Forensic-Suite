@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 1c3de2ec5a69
+# Catalogue digest: ec8e4be59eb1
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -614,6 +614,9 @@ sources:
     hermes,/Users/*/.hermes/profiles/*/pastes/pending.json
     hermes,/Users/*/.hermes/profiles/*/pending/skills/*.json
     hermes,/Users/*/.hermes/profiles/*/platforms/pairing/**
+    hermes,/Users/*/.hermes/profiles/*/response_store.db
+    hermes,/Users/*/.hermes/profiles/*/response_store.db-shm
+    hermes,/Users/*/.hermes/profiles/*/response_store.db-wal
     hermes,/Users/*/.hermes/profiles/*/singularity_snapshots.json
     hermes,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
@@ -622,6 +625,9 @@ sources:
     hermes,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
     hermes,/Users/*/.hermes/profiles/*/vercel_sandbox_snapshots.json
     hermes,/Users/*/.hermes/profiles/.deleted/**
+    hermes,/Users/*/.hermes/response_store.db
+    hermes,/Users/*/.hermes/response_store.db-shm
+    hermes,/Users/*/.hermes/response_store.db-wal
     hermes,/Users/*/.hermes/singularity_snapshots.json
     hermes,/Users/*/.hermes/state.db.retired-wal-*/**
     hermes,/Users/*/.hermes/state.db.retired-wal-*/manifest.json
@@ -663,6 +669,9 @@ sources:
     hermes,/home/*/.hermes/profiles/*/pastes/pending.json
     hermes,/home/*/.hermes/profiles/*/pending/skills/*.json
     hermes,/home/*/.hermes/profiles/*/platforms/pairing/**
+    hermes,/home/*/.hermes/profiles/*/response_store.db
+    hermes,/home/*/.hermes/profiles/*/response_store.db-shm
+    hermes,/home/*/.hermes/profiles/*/response_store.db-wal
     hermes,/home/*/.hermes/profiles/*/singularity_snapshots.json
     hermes,/home/*/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,/home/*/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
@@ -671,6 +680,9 @@ sources:
     hermes,/home/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
     hermes,/home/*/.hermes/profiles/*/vercel_sandbox_snapshots.json
     hermes,/home/*/.hermes/profiles/.deleted/**
+    hermes,/home/*/.hermes/response_store.db
+    hermes,/home/*/.hermes/response_store.db-shm
+    hermes,/home/*/.hermes/response_store.db-wal
     hermes,/home/*/.hermes/singularity_snapshots.json
     hermes,/home/*/.hermes/state.db.retired-wal-*/**
     hermes,/home/*/.hermes/state.db.retired-wal-*/manifest.json
@@ -712,6 +724,9 @@ sources:
     hermes,/root/.hermes/profiles/*/pastes/pending.json
     hermes,/root/.hermes/profiles/*/pending/skills/*.json
     hermes,/root/.hermes/profiles/*/platforms/pairing/**
+    hermes,/root/.hermes/profiles/*/response_store.db
+    hermes,/root/.hermes/profiles/*/response_store.db-shm
+    hermes,/root/.hermes/profiles/*/response_store.db-wal
     hermes,/root/.hermes/profiles/*/singularity_snapshots.json
     hermes,/root/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,/root/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
@@ -720,6 +735,9 @@ sources:
     hermes,/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
     hermes,/root/.hermes/profiles/*/vercel_sandbox_snapshots.json
     hermes,/root/.hermes/profiles/.deleted/**
+    hermes,/root/.hermes/response_store.db
+    hermes,/root/.hermes/response_store.db-shm
+    hermes,/root/.hermes/response_store.db-wal
     hermes,/root/.hermes/singularity_snapshots.json
     hermes,/root/.hermes/state.db.retired-wal-*/**
     hermes,/root/.hermes/state.db.retired-wal-*/manifest.json
@@ -761,6 +779,9 @@ sources:
     hermes,/var/root/.hermes/profiles/*/pastes/pending.json
     hermes,/var/root/.hermes/profiles/*/pending/skills/*.json
     hermes,/var/root/.hermes/profiles/*/platforms/pairing/**
+    hermes,/var/root/.hermes/profiles/*/response_store.db
+    hermes,/var/root/.hermes/profiles/*/response_store.db-shm
+    hermes,/var/root/.hermes/profiles/*/response_store.db-wal
     hermes,/var/root/.hermes/profiles/*/singularity_snapshots.json
     hermes,/var/root/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,/var/root/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
@@ -769,6 +790,9 @@ sources:
     hermes,/var/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
     hermes,/var/root/.hermes/profiles/*/vercel_sandbox_snapshots.json
     hermes,/var/root/.hermes/profiles/.deleted/**
+    hermes,/var/root/.hermes/response_store.db
+    hermes,/var/root/.hermes/response_store.db-shm
+    hermes,/var/root/.hermes/response_store.db-wal
     hermes,/var/root/.hermes/singularity_snapshots.json
     hermes,/var/root/.hermes/state.db.retired-wal-*/**
     hermes,/var/root/.hermes/state.db.retired-wal-*/manifest.json
@@ -810,6 +834,9 @@ sources:
     hermes,C:/Users/*/.hermes/profiles/*/pastes/pending.json
     hermes,C:/Users/*/.hermes/profiles/*/pending/skills/*.json
     hermes,C:/Users/*/.hermes/profiles/*/platforms/pairing/**
+    hermes,C:/Users/*/.hermes/profiles/*/response_store.db
+    hermes,C:/Users/*/.hermes/profiles/*/response_store.db-shm
+    hermes,C:/Users/*/.hermes/profiles/*/response_store.db-wal
     hermes,C:/Users/*/.hermes/profiles/*/singularity_snapshots.json
     hermes,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
@@ -818,6 +845,9 @@ sources:
     hermes,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
     hermes,C:/Users/*/.hermes/profiles/*/vercel_sandbox_snapshots.json
     hermes,C:/Users/*/.hermes/profiles/.deleted/**
+    hermes,C:/Users/*/.hermes/response_store.db
+    hermes,C:/Users/*/.hermes/response_store.db-shm
+    hermes,C:/Users/*/.hermes/response_store.db-wal
     hermes,C:/Users/*/.hermes/singularity_snapshots.json
     hermes,C:/Users/*/.hermes/state.db.retired-wal-*/**
     hermes,C:/Users/*/.hermes/state.db.retired-wal-*/manifest.json
@@ -859,6 +889,9 @@ sources:
     hermes,C:/Users/*/AppData/Local/hermes/profiles/*/pastes/pending.json
     hermes,C:/Users/*/AppData/Local/hermes/profiles/*/pending/skills/*.json
     hermes,C:/Users/*/AppData/Local/hermes/profiles/*/platforms/pairing/**
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/response_store.db
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/response_store.db-shm
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/response_store.db-wal
     hermes,C:/Users/*/AppData/Local/hermes/profiles/*/singularity_snapshots.json
     hermes,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/**
     hermes,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/manifest.json
@@ -867,6 +900,9 @@ sources:
     hermes,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/state.db-wal
     hermes,C:/Users/*/AppData/Local/hermes/profiles/*/vercel_sandbox_snapshots.json
     hermes,C:/Users/*/AppData/Local/hermes/profiles/.deleted/**
+    hermes,C:/Users/*/AppData/Local/hermes/response_store.db
+    hermes,C:/Users/*/AppData/Local/hermes/response_store.db-shm
+    hermes,C:/Users/*/AppData/Local/hermes/response_store.db-wal
     hermes,C:/Users/*/AppData/Local/hermes/singularity_snapshots.json
     hermes,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/**
     hermes,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/manifest.json

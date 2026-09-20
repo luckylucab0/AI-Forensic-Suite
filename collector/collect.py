@@ -6437,16 +6437,12 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
-                        "$HERMES_HOME/logs/",
-                        "$HERMES_HOME/profiles/<name>/logs/",
-                        "~/.hermes/logs/errors.log",
-                        "~/.hermes/profiles/<name>/logs/errors.log",
-                        "%LOCALAPPDATA%\\hermes\\logs\\errors.log",
-                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\logs\\errors.log",
-                        "~/.hermes/logs/gateway.log",
-                        "~/.hermes/profiles/<name>/logs/gateway.log",
-                        "%LOCALAPPDATA%\\hermes\\logs\\gateway.log",
-                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\logs\\gateway.log"
+                        "$HERMES_HOME/logs/**",
+                        "$HERMES_HOME/profiles/<name>/logs/**",
+                        "~/.hermes/logs/**",
+                        "~/.hermes/profiles/<name>/logs/**",
+                        "%LOCALAPPDATA%\\hermes\\logs\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\logs\\**"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6520,6 +6516,60 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.hermes/profiles/<name>/memories/USER.md",
                         "%LOCALAPPDATA%\\hermes\\memories\\USER.md",
                         "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\memories\\USER.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "memory",
+                    "collect_priority": "normal",
+                    "id": "hermes.memory_store",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/memory_store.db",
+                        "$HERMES_HOME/profiles/<name>/memory_store.db",
+                        "~/.hermes/memory_store.db",
+                        "~/.hermes/profiles/<name>/memory_store.db",
+                        "%LOCALAPPDATA%\\hermes\\memory_store.db",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\memory_store.db",
+                        "$HERMES_HOME/memory_store.db-wal",
+                        "$HERMES_HOME/profiles/<name>/memory_store.db-wal",
+                        "~/.hermes/memory_store.db-wal",
+                        "~/.hermes/profiles/<name>/memory_store.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\memory_store.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\memory_store.db-wal",
+                        "$HERMES_HOME/memory_store.db-shm",
+                        "$HERMES_HOME/profiles/<name>/memory_store.db-shm",
+                        "~/.hermes/memory_store.db-shm",
+                        "~/.hermes/profiles/<name>/memory_store.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\memory_store.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\memory_store.db-shm"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "hermes.model_traces",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/moa-traces/*.jsonl",
+                        "$HERMES_HOME/profiles/<name>/moa-traces/*.jsonl",
+                        "~/.hermes/moa-traces/*.jsonl",
+                        "~/.hermes/profiles/<name>/moa-traces/*.jsonl",
+                        "%LOCALAPPDATA%\\hermes\\moa-traces\\*.jsonl",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\moa-traces\\*.jsonl"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6787,6 +6837,39 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "hermes.projects_db",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/projects.db",
+                        "$HERMES_HOME/profiles/<name>/projects.db",
+                        "~/.hermes/projects.db",
+                        "~/.hermes/profiles/<name>/projects.db",
+                        "%LOCALAPPDATA%\\hermes\\projects.db",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\projects.db",
+                        "$HERMES_HOME/projects.db-wal",
+                        "$HERMES_HOME/profiles/<name>/projects.db-wal",
+                        "~/.hermes/projects.db-wal",
+                        "~/.hermes/profiles/<name>/projects.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\projects.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\projects.db-wal",
+                        "$HERMES_HOME/projects.db-shm",
+                        "$HERMES_HOME/profiles/<name>/projects.db-shm",
+                        "~/.hermes/projects.db-shm",
+                        "~/.hermes/profiles/<name>/projects.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\projects.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\projects.db-shm"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "log",
                     "collect_priority": "first",
                     "id": "hermes.remote_sandbox_snapshots",
@@ -6814,6 +6897,39 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.hermes/profiles/<name>/vercel_sandbox_snapshots.json",
                         "%LOCALAPPDATA%\\hermes\\vercel_sandbox_snapshots.json",
                         "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\vercel_sandbox_snapshots.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "hermes.response_store",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/response_store.db",
+                        "$HERMES_HOME/profiles/<name>/response_store.db",
+                        "~/.hermes/response_store.db",
+                        "~/.hermes/profiles/<name>/response_store.db",
+                        "%LOCALAPPDATA%\\hermes\\response_store.db",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\response_store.db",
+                        "$HERMES_HOME/response_store.db-wal",
+                        "$HERMES_HOME/profiles/<name>/response_store.db-wal",
+                        "~/.hermes/response_store.db-wal",
+                        "~/.hermes/profiles/<name>/response_store.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\response_store.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\response_store.db-wal",
+                        "$HERMES_HOME/response_store.db-shm",
+                        "$HERMES_HOME/profiles/<name>/response_store.db-shm",
+                        "~/.hermes/response_store.db-shm",
+                        "~/.hermes/profiles/<name>/response_store.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\response_store.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\response_store.db-shm"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -7008,6 +7124,27 @@ EMBEDDED_CATALOGUE_JSON = r"""
                 {
                     "category": "instructions",
                     "collect_priority": "normal",
+                    "id": "hermes.skills_prompt_snapshot",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/.skills_prompt_snapshot.json",
+                        "$HERMES_HOME/profiles/<name>/.skills_prompt_snapshot.json",
+                        "~/.hermes/.skills_prompt_snapshot.json",
+                        "~/.hermes/profiles/<name>/.skills_prompt_snapshot.json",
+                        "%LOCALAPPDATA%\\hermes\\.skills_prompt_snapshot.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\.skills_prompt_snapshot.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
                     "id": "hermes.soul",
                     "os": [
                         "macos",
@@ -7123,6 +7260,27 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "hermes.terminal_sessions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/terminal-sessions/*.json",
+                        "$HERMES_HOME/profiles/<name>/terminal-sessions/*.json",
+                        "~/.hermes/terminal-sessions/*.json",
+                        "~/.hermes/profiles/<name>/terminal-sessions/*.json",
+                        "%LOCALAPPDATA%\\hermes\\terminal-sessions\\*.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\terminal-sessions\\*.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "credentials",
                     "collect_priority": "normal",
                     "id": "hermes.vault",
@@ -7147,6 +7305,39 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "hermes.verification_evidence",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/verification_evidence.db",
+                        "$HERMES_HOME/profiles/<name>/verification_evidence.db",
+                        "~/.hermes/verification_evidence.db",
+                        "~/.hermes/profiles/<name>/verification_evidence.db",
+                        "%LOCALAPPDATA%\\hermes\\verification_evidence.db",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\verification_evidence.db",
+                        "$HERMES_HOME/verification_evidence.db-wal",
+                        "$HERMES_HOME/profiles/<name>/verification_evidence.db-wal",
+                        "~/.hermes/verification_evidence.db-wal",
+                        "~/.hermes/profiles/<name>/verification_evidence.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\verification_evidence.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\verification_evidence.db-wal",
+                        "$HERMES_HOME/verification_evidence.db-shm",
+                        "$HERMES_HOME/profiles/<name>/verification_evidence.db-shm",
+                        "~/.hermes/verification_evidence.db-shm",
+                        "~/.hermes/profiles/<name>/verification_evidence.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\verification_evidence.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\verification_evidence.db-shm"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
                     "status": "verified"
                 }
             ]
@@ -10322,7 +10513,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "e58408da69c77dbc8888785a2016e72eaeaa0f465bf19ac9d87b995c99141576"
+    "sha256": "d825ae285ef0b67f0f2648ec8e50dd95efd1d2a48c7226bf3ce71b1209cc0559"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

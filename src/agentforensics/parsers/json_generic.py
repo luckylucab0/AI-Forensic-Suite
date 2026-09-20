@@ -168,6 +168,8 @@ DOCUMENTS = frozenset(
         "hermes.remote_sandbox_snapshots",
         "hermes.retired_wal_manifests",
         "hermes.saved_sessions",
+        "hermes.skills_prompt_snapshot",
+        "hermes.terminal_sessions",
         "jetbrains_ai.mcp_config",
         "junie.allowlist",
         "junie.home_config",

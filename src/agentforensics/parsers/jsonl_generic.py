@@ -71,6 +71,7 @@ LOGS = frozenset(
         "hermes.cron_usage_audit",
         "hermes.a2a_audit",
         "hermes.a2a_conversations",
+        "hermes.model_traces",
         "hermes.sessions_dir",
         "junie.cli_sessions",
         "junie.matterhorn_project_logs",

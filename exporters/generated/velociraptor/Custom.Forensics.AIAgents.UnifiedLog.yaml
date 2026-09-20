@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 1c3de2ec5a69
+# Catalogue digest: ec8e4be59eb1
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,8 +8,8 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# Scope: the 98 artifacts the catalogue files under transcript and prompt_history.
-# The other 426 are configuration, credentials, caches, logs and install
+# Scope: the 100 artifacts the catalogue files under transcript and prompt_history.
+# The other 431 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
 # credential store what an analyst wants is the file, which is what the Collect
@@ -299,10 +299,26 @@ sources:
       hermes,hermes.a2a_conversations,generic_jsonl,C:/Users/*/.hermes/profiles/*/a2a_conversations/*.jsonl
       hermes,hermes.a2a_conversations,generic_jsonl,C:/Users/*/AppData/Local/hermes/a2a_conversations/*.jsonl
       hermes,hermes.a2a_conversations,generic_jsonl,C:/Users/*/AppData/Local/hermes/profiles/*/a2a_conversations/*.jsonl
+      hermes,hermes.model_traces,generic_jsonl,C:/Users/*/.hermes/moa-traces/*.jsonl
+      hermes,hermes.model_traces,generic_jsonl,C:/Users/*/.hermes/profiles/*/moa-traces/*.jsonl
+      hermes,hermes.model_traces,generic_jsonl,C:/Users/*/AppData/Local/hermes/moa-traces/*.jsonl
+      hermes,hermes.model_traces,generic_jsonl,C:/Users/*/AppData/Local/hermes/profiles/*/moa-traces/*.jsonl
       hermes,hermes.pastes,file_only,C:/Users/*/.hermes/pastes/paste_*.txt
       hermes,hermes.pastes,file_only,C:/Users/*/.hermes/profiles/*/pastes/paste_*.txt
       hermes,hermes.pastes,file_only,C:/Users/*/AppData/Local/hermes/pastes/paste_*.txt
       hermes,hermes.pastes,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/pastes/paste_*.txt
+      hermes,hermes.response_store,file_only,C:/Users/*/.hermes/profiles/*/response_store.db
+      hermes,hermes.response_store,file_only,C:/Users/*/.hermes/profiles/*/response_store.db-shm
+      hermes,hermes.response_store,file_only,C:/Users/*/.hermes/profiles/*/response_store.db-wal
+      hermes,hermes.response_store,file_only,C:/Users/*/.hermes/response_store.db
+      hermes,hermes.response_store,file_only,C:/Users/*/.hermes/response_store.db-shm
+      hermes,hermes.response_store,file_only,C:/Users/*/.hermes/response_store.db-wal
+      hermes,hermes.response_store,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/response_store.db
+      hermes,hermes.response_store,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/response_store.db-shm
+      hermes,hermes.response_store,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/response_store.db-wal
+      hermes,hermes.response_store,file_only,C:/Users/*/AppData/Local/hermes/response_store.db
+      hermes,hermes.response_store,file_only,C:/Users/*/AppData/Local/hermes/response_store.db-shm
+      hermes,hermes.response_store,file_only,C:/Users/*/AppData/Local/hermes/response_store.db-wal
       hermes,hermes.retired_wal_generations,file_only,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
       hermes,hermes.retired_wal_generations,file_only,C:/Users/*/.hermes/state.db.retired-wal-*/**
       hermes,hermes.retired_wal_generations,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/**
@@ -1175,10 +1191,26 @@ sources:
       hermes,hermes.a2a_conversations,generic_jsonl,/Users/*/.hermes/profiles/*/a2a_conversations/*.jsonl
       hermes,hermes.a2a_conversations,generic_jsonl,/var/root/.hermes/a2a_conversations/*.jsonl
       hermes,hermes.a2a_conversations,generic_jsonl,/var/root/.hermes/profiles/*/a2a_conversations/*.jsonl
+      hermes,hermes.model_traces,generic_jsonl,/Users/*/.hermes/moa-traces/*.jsonl
+      hermes,hermes.model_traces,generic_jsonl,/Users/*/.hermes/profiles/*/moa-traces/*.jsonl
+      hermes,hermes.model_traces,generic_jsonl,/var/root/.hermes/moa-traces/*.jsonl
+      hermes,hermes.model_traces,generic_jsonl,/var/root/.hermes/profiles/*/moa-traces/*.jsonl
       hermes,hermes.pastes,file_only,/Users/*/.hermes/pastes/paste_*.txt
       hermes,hermes.pastes,file_only,/Users/*/.hermes/profiles/*/pastes/paste_*.txt
       hermes,hermes.pastes,file_only,/var/root/.hermes/pastes/paste_*.txt
       hermes,hermes.pastes,file_only,/var/root/.hermes/profiles/*/pastes/paste_*.txt
+      hermes,hermes.response_store,file_only,/Users/*/.hermes/profiles/*/response_store.db
+      hermes,hermes.response_store,file_only,/Users/*/.hermes/profiles/*/response_store.db-shm
+      hermes,hermes.response_store,file_only,/Users/*/.hermes/profiles/*/response_store.db-wal
+      hermes,hermes.response_store,file_only,/Users/*/.hermes/response_store.db
+      hermes,hermes.response_store,file_only,/Users/*/.hermes/response_store.db-shm
+      hermes,hermes.response_store,file_only,/Users/*/.hermes/response_store.db-wal
+      hermes,hermes.response_store,file_only,/var/root/.hermes/profiles/*/response_store.db
+      hermes,hermes.response_store,file_only,/var/root/.hermes/profiles/*/response_store.db-shm
+      hermes,hermes.response_store,file_only,/var/root/.hermes/profiles/*/response_store.db-wal
+      hermes,hermes.response_store,file_only,/var/root/.hermes/response_store.db
+      hermes,hermes.response_store,file_only,/var/root/.hermes/response_store.db-shm
+      hermes,hermes.response_store,file_only,/var/root/.hermes/response_store.db-wal
       hermes,hermes.retired_wal_generations,file_only,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
       hermes,hermes.retired_wal_generations,file_only,/Users/*/.hermes/state.db.retired-wal-*/**
       hermes,hermes.retired_wal_generations,file_only,/var/root/.hermes/profiles/*/state.db.retired-wal-*/**
@@ -2157,10 +2189,26 @@ sources:
       hermes,hermes.a2a_conversations,generic_jsonl,/home/*/.hermes/profiles/*/a2a_conversations/*.jsonl
       hermes,hermes.a2a_conversations,generic_jsonl,/root/.hermes/a2a_conversations/*.jsonl
       hermes,hermes.a2a_conversations,generic_jsonl,/root/.hermes/profiles/*/a2a_conversations/*.jsonl
+      hermes,hermes.model_traces,generic_jsonl,/home/*/.hermes/moa-traces/*.jsonl
+      hermes,hermes.model_traces,generic_jsonl,/home/*/.hermes/profiles/*/moa-traces/*.jsonl
+      hermes,hermes.model_traces,generic_jsonl,/root/.hermes/moa-traces/*.jsonl
+      hermes,hermes.model_traces,generic_jsonl,/root/.hermes/profiles/*/moa-traces/*.jsonl
       hermes,hermes.pastes,file_only,/home/*/.hermes/pastes/paste_*.txt
       hermes,hermes.pastes,file_only,/home/*/.hermes/profiles/*/pastes/paste_*.txt
       hermes,hermes.pastes,file_only,/root/.hermes/pastes/paste_*.txt
       hermes,hermes.pastes,file_only,/root/.hermes/profiles/*/pastes/paste_*.txt
+      hermes,hermes.response_store,file_only,/home/*/.hermes/profiles/*/response_store.db
+      hermes,hermes.response_store,file_only,/home/*/.hermes/profiles/*/response_store.db-shm
+      hermes,hermes.response_store,file_only,/home/*/.hermes/profiles/*/response_store.db-wal
+      hermes,hermes.response_store,file_only,/home/*/.hermes/response_store.db
+      hermes,hermes.response_store,file_only,/home/*/.hermes/response_store.db-shm
+      hermes,hermes.response_store,file_only,/home/*/.hermes/response_store.db-wal
+      hermes,hermes.response_store,file_only,/root/.hermes/profiles/*/response_store.db
+      hermes,hermes.response_store,file_only,/root/.hermes/profiles/*/response_store.db-shm
+      hermes,hermes.response_store,file_only,/root/.hermes/profiles/*/response_store.db-wal
+      hermes,hermes.response_store,file_only,/root/.hermes/response_store.db
+      hermes,hermes.response_store,file_only,/root/.hermes/response_store.db-shm
+      hermes,hermes.response_store,file_only,/root/.hermes/response_store.db-wal
       hermes,hermes.retired_wal_generations,file_only,/home/*/.hermes/profiles/*/state.db.retired-wal-*/**
       hermes,hermes.retired_wal_generations,file_only,/home/*/.hermes/state.db.retired-wal-*/**
       hermes,hermes.retired_wal_generations,file_only,/root/.hermes/profiles/*/state.db.retired-wal-*/**
