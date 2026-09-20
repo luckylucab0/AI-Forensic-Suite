@@ -160,6 +160,7 @@ DOCUMENTS = frozenset(
         "junie.allowlist",
         "junie.home_config",
         "junie.mcp_config",
+        "kilo_code.config",
         "kilo_code.extension_id_legacy_tree",
         "kiro.agents",
         "kiro.cli_settings",

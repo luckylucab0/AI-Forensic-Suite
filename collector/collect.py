@@ -6446,6 +6446,26 @@ EMBEDDED_CATALOGUE_JSON = r"""
             "agent": "kilo_code",
             "artifacts": [
                 {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "kilo_code.agents",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.config\\kilo\\agent\\**\\*.md",
+                        "<project>/.kilo/agent/**/*.md",
+                        "<project>/.kilo/agents/**/*.md",
+                        "<project>/.kilocode/agents/**/*.md",
+                        "~/.config/kilo/agent/**/*.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "transcript",
                     "collect_priority": "normal",
                     "id": "kilo_code.cli_db",
@@ -6463,6 +6483,25 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.local/share/kilo/kilo.db-wal"
                     ],
                     "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "kilo_code.config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/kilo/kilo.jsonc",
+                        "%USERPROFILE%\\.config\\kilo\\kilo.jsonc",
+                        "<project>/kilo.jsonc",
+                        "~/.config/kilo/kilo.jsonc"
+                    ],
+                    "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -6499,6 +6538,23 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "<project>/.kilocodemodes",
                         "~/.kilocode/cli/global/settings/custom_modes.yaml"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "durable",
+                    "id": "kilo_code.rules",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.kilo/rules/**/*.md",
+                        "<project>/.kilocode/rules/**/*.md"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -9246,7 +9302,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "930a9efb28f66710bc8b628f3c395e1e1a2cda6926b3245294edfd041e050055"
+    "sha256": "b62061c6c69648d67e098241bc0987172211845137ebe9c88fb6dbe7ecc10d86"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

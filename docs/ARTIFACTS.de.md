@@ -6,7 +6,7 @@
 
 Erzeugt aus catalog/ durch scripts/gen_artifact_docs.py. Nicht von Hand bearbeiten: die CI erzeugt diese Datei neu und schlägt fehl, wenn sie abweicht.
 
-484 Artefakte über 31 Agent(en), davon 379 auf einer abgerufenen Herstellerquelle beruhend.
+487 Artefakte über 31 Agent(en), davon 382 auf einer abgerufenen Herstellerquelle beruhend.
 
 Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
 
@@ -937,6 +937,13 @@ Vendor: Kilo Code
 
 <https://github.com/kenn-io/agentsview/blob/main/docs/configuration.md>, <https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/code-with-ai/agents/session-history.md>, <https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-modes.md>
 
+### Verschiebende Variablen
+
+- `KILO_DB`: [EN] Moves the session database away from the documented default, so a collection keyed on the default path finds nothing on such a host. The vendor's own guidance is to ask the product where its database is rather than to assume the path.
+- `XDG_DATA_HOME`: [EN] Moves the session database, which the vendor documents as living under the XDG data directory on every platform including Windows, where the documented default is the user profile joined with .local\\share.
+- `XDG_CONFIG_HOME`: [EN] Moves the global configuration file and the global agent definitions beside it, which the vendor documents as living under the XDG configuration directory.
+- `KILO_CONFIG_CONTENT`: [EN] Supplies configuration as the content of an environment variable rather than as a file, and the vendor's precedence list puts it above every file. A host configured this way has the highest-priority configuration in no file at all, so a collection can be complete and still not hold what the agent was actually run with. Look for it in the shell profiles and in whatever started the process.
+
 ### normal
 
 **Normal sichern.** Unterliegen der üblichen Aufbewahrungsfrist des Agenten, die bei mehreren Agenten standardmässig 30 Tage beträgt.
@@ -944,9 +951,19 @@ Vendor: Kilo Code
 | Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `kilo_code.cli_db` | cli db | transcript | macOS, Windows, Linux | `%USERPROFILE%\.local\share\kilo\kilo.db`<br>`%USERPROFILE%\.local\share\kilo\kilo.db-shm` [unbelegt]<br>`%USERPROFILE%\.local\share\kilo\kilo.db-wal` [unbelegt]<br>`~/.local/share/kilo/kilo.db`<br>`~/.local/share/kilo/kilo.db-shm`<br>`~/.local/share/kilo/kilo.db-wal` | sqlite | normal | [EN] Official doc warns 'resetting the database removes local session history, so back it up before recovery work'. WAL means the newest messages may be only in kilo.db-wal - acquire all three files together. | bestätigt | [official](https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/code-with-ai/agents/session-history.md) |
+| `kilo_code.config` | Kilo Code configuration file | config | macOS, Windows, Linux | `$XDG_CONFIG_HOME/kilo/kilo.jsonc`<br>`%USERPROFILE%\.config\kilo\kilo.jsonc` [unbelegt]<br>`<project>/kilo.jsonc`<br>`~/.config/kilo/kilo.jsonc` | json | normal | [EN] User-edited. The project one is normally under version control and the global one is not. | bestätigt | [official](https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-rules.md) |
 | `kilo_code.extension_id_legacy_tree` | extension id legacy tree | transcript | macOS, Windows, Linux | `%APPDATA%\Code\User\globalStorage\kilocode.kilo-code\tasks\`<br>`~/.config/Code/User/globalStorage/kilocode.kilo-code/tasks/`<br>`~/.vscode-server/data/User/globalStorage/kilocode.kilo-code/tasks/`<br>`~/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/tasks/<taskId>/api_conversation_history.json`<br>`~/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/tasks/<taskId>/task_metadata.json`<br>`~/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/tasks/<taskId>/ui_messages.json` | json | normal | [EN] LEGACY STORE. Kilo has migrated to a SQLite store (see kilo_code.cli_db); the extension 'migrates on startup' for modes and the old tree is then no longer consulted. Expect stale-but-present task dirs on upgraded endpoints. | **unbestätigt** | [community](https://github.com/kenn-io/agentsview/blob/main/docs/configuration.md) |
 | `kilo_code.home_dir` | home dir | config | macOS, Windows, Linux | `<project>/.kilocodemodes`<br>`~/.kilocode/cli/global/settings/custom_modes.yaml` | yaml | normal |  | bestätigt | [official](https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-modes.md) |
 | `kilo_code.settings` | settings | config | macOS, Windows, Linux | `%APPDATA%\Code\User\globalStorage\kilocode.kilo-code\settings\custom_modes.yaml`<br>`~/.config/Code/User/globalStorage/kilocode.kilo-code/settings/custom_modes.yaml`<br>`~/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/settings/custom_modes.yaml` | yaml | normal | [EN] The doc states: 'After the extension migrates on startup, the legacy file is no longer consulted' - so this file can be a stale snapshot of a pre-migration configuration, which is itself dateable evidence. | bestätigt | [official](https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-modes.md) |
+
+### durable
+
+**Meist noch vorhanden.** Vom Aufräumlauf nicht erfasst und überleben damit regelmässig die Transkripte, die sie beschreiben. Sind die Transkripte schon weg, ist diese Gruppe das, was bleibt, und sie genügt oft, um zu belegen, dass ein Agent lief, was er durfte und was gefragt wurde.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `kilo_code.agents` | Kilo Code agent definitions | instructions | macOS, Windows, Linux | `%USERPROFILE%\.config\kilo\agent\**\*.md` [unbelegt]<br>`<project>/.kilo/agent/**/*.md`<br>`<project>/.kilo/agents/**/*.md`<br>`<project>/.kilocode/agents/**/*.md`<br>`~/.config/kilo/agent/**/*.md` | markdown | normal | [EN] User-authored, and the product writes one itself when somebody asks it to create an agent. Not swept. | bestätigt | [official](https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-modes.md) |
+| `kilo_code.rules` | Kilo Code rule files | project_instructions | macOS, Windows, Linux | `<project>/.kilo/rules/**/*.md`<br>`<project>/.kilocode/rules/**/*.md` | markdown | normal | [EN] Ordinary project files, normally under version control, so a superseded rule is usually recoverable from git. | bestätigt | [official](https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-rules.md) |
 
 ### Veraltete Pfade
 

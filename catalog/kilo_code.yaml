@@ -26,7 +26,109 @@ references:
 - |-
   https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/code-with-ai/agents/session-history.md
 - https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-modes.md
+env_overrides:
+- name: KILO_DB
+  effect: |-
+    Moves the session database away from the documented default, so a collection keyed on the default path finds nothing on such a host. The vendor's own guidance is to ask the product where its database is rather than to assume the path.
+  source: https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/code-with-ai/agents/session-history.md
+- name: XDG_DATA_HOME
+  effect: |-
+    Moves the session database, which the vendor documents as living under the XDG data directory on every platform including Windows, where the documented default is the user profile joined with .local\\share.
+  source: https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/code-with-ai/agents/session-history.md
+- name: XDG_CONFIG_HOME
+  effect: |-
+    Moves the global configuration file and the global agent definitions beside it, which the vendor documents as living under the XDG configuration directory.
+  source: https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-rules.md
+- name: KILO_CONFIG_CONTENT
+  effect: |-
+    Supplies configuration as the content of an environment variable rather than as a file, and the vendor's precedence list puts it above every file. A host configured this way has the highest-priority configuration in no file at all, so a collection can be complete and still not hold what the agent was actually run with. Look for it in the shell profiles and in whatever started the process.
+  source: https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-modes.md
 artifacts:
+- id: kilo_code.config
+  title: Kilo Code configuration file
+  category: config
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - $XDG_CONFIG_HOME/kilo/kilo.jsonc
+  - '%USERPROFILE%\.config\kilo\kilo.jsonc'
+  - <project>/kilo.jsonc
+  - ~/.config/kilo/kilo.jsonc
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-rules.md
+  source_kind: official
+  unsourced_paths:
+  - '%USERPROFILE%\.config\kilo\kilo.jsonc'
+  volatility: |-
+    User-edited. The project one is normally under version control and the global one is not.
+  notes: |-
+    The configuration of the current product, which the entries beside this one did not have: they cover the legacy extension's custom_modes.yaml and .kilocodemodes, and this is what replaced them. The vendor's rules page gives the global path as ~/.config/kilo/kilo.jsonc and the modes page gives the project one as kilo.jsonc at the project root, with the precedence built-in, then global, then project, then the .kilo and legacy .kilocode directories, then an environment variable.
+
+    Two things in it are evidence in their own right. The instructions key names the rule files that are loaded, so this file is the index of the instruction surface even where the rule files themselves are elsewhere. The agent key defines agents inline, including their permissions, so a permission decision can live here rather than in any of the directories the entries below collect.
+
+    It is JSON with comments, which is what the extension says and what the file name says. The reader for this format takes the dialect and says on the event when it had to.
+
+    The Windows spelling is unsourced: the vendor documents the Windows database path as the user profile joined with .local\\share, which is the XDG layout spelled literally rather than an application-data path, so the configuration directory is written the same way here and marked as not stated by the source.
+  parser: json_generic
+- id: kilo_code.agents
+  title: Kilo Code agent definitions
+  category: instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.config\kilo\agent\**\*.md'
+  - <project>/.kilo/agent/**/*.md
+  - <project>/.kilo/agents/**/*.md
+  - <project>/.kilocode/agents/**/*.md
+  - ~/.config/kilo/agent/**/*.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-modes.md
+  source_kind: official
+  unsourced_paths:
+  - '%USERPROFILE%\.config\kilo\agent\**\*.md'
+  volatility: |-
+    User-authored, and the product writes one itself when somebody asks it to create an agent. Not swept.
+  notes: |-
+    An agent definition is a Markdown file with YAML frontmatter, and the frontmatter is where this stops being only an instruction: it carries a permission block with edit globs set to allow or deny and a bash key, so a file in a project directory decides what the agent may do. The vendor's own example denies everything but Markdown edits and denies bash; the same shape grants.
+
+    The filename is the agent name and nested directories namespace it. Four directories are read, .kilo/agents and .kilo/agent in the project, the legacy .kilocode/agents beside them, and the global one under the configuration directory, and the vendor also states that asking the product to create an agent writes it into the project.
+  parser: instructions
+- id: kilo_code.rules
+  title: Kilo Code rule files
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.kilo/rules/**/*.md
+  - <project>/.kilocode/rules/**/*.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/Kilo-Org/kilocode/main/packages/kilo-docs/pages/customize/custom-rules.md
+  source_kind: official
+  volatility: |-
+    Ordinary project files, normally under version control, so a superseded rule is usually recoverable from git.
+  notes: |-
+    Standing instructions for a project, which is the injected-instruction surface anybody who can commit to the repository can write. The current shape is a .kilo/rules directory named by the instructions key of the configuration file; the legacy .kilocode/rules directory is still read for backward compatibility and the vendor says so.
+
+    Which of them were in force for a given turn is not decidable from the files: the configuration names them and the transcript is the arbiter.
+  parser: instructions
 - id: kilo_code.home_dir
   category: config
   root: project

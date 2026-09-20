@@ -2,7 +2,7 @@
 
 <!-- Generated from the artifact catalogue. Do not edit by hand:
 <!-- run `afx export-collection` and commit the result.
-<!-- Catalogue digest: 194c9b5a85c3
+<!-- Catalogue digest: 7e1b6b26bd64
 <!--
 <!-- An empty result from this rule means the paths it searched held nothing. It does
 <!-- not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -82,7 +82,7 @@ Windows-relevant catalogue entries, as a sense of what a collection will cover:
 | Hermes | `hermes` | 12 |
 | JetBrains AI Assistant | `jetbrains_ai` | 6 |
 | Junie | `junie` | 9 |
-| Kilo Code | `kilo_code` | 4 |
+| Kilo Code | `kilo_code` | 7 |
 | Kiro | `kiro` | 21 |
 | LM Studio | `lmstudio` | 6 |
 | Ollama | `ollama` | 11 |

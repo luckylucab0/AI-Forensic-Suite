@@ -117,6 +117,8 @@ SOURCES = frozenset(
         "hermes.skills",
         "hermes.soul",
         "junie.project_dir",
+        "kilo_code.agents",
+        "kilo_code.rules",
         "kiro.kiroignore",
         "kiro.prompt_library",
         "kiro.skills_powers",
