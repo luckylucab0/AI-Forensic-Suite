@@ -707,7 +707,7 @@ artifacts:
   - windows
   - linux
   paths:
-  - '%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\<run-id>\\journal.jsonl'
+  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\workflows\<run-id>\journal.jsonl'
   - ~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>/journal.jsonl
   format: jsonl
   sensitivity: normal
@@ -733,7 +733,7 @@ artifacts:
   - windows
   - linux
   paths:
-  - '%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\<run-id>.json'
+  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\workflows\<run-id>.json'
   - ~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>.json
   format: json
   sensitivity: normal
@@ -757,7 +757,7 @@ artifacts:
   - windows
   - linux
   paths:
-  - '%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\generated\\**'
+  - '%USERPROFILE%\.qwen\projects\<sanitized-project-path>\workflows\generated\**'
   - ~/.qwen/projects/<sanitized-project-path>/workflows/generated/**
   format: text
   sensitivity: normal

@@ -10218,7 +10218,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
-                        "%USERPROFILE%\\\\.qwen\\\\projects\\\\<sanitized-project-path>\\\\workflows\\\\generated\\\\**",
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\generated\\**",
                         "~/.qwen/projects/<sanitized-project-path>/workflows/generated/**"
                     ],
                     "root": "user_profile",
@@ -10235,7 +10235,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
-                        "%USERPROFILE%\\\\.qwen\\\\projects\\\\<sanitized-project-path>\\\\workflows\\\\<run-id>\\\\journal.jsonl",
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\<run-id>\\journal.jsonl",
                         "~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>/journal.jsonl"
                     ],
                     "root": "user_profile",
@@ -10252,7 +10252,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
-                        "%USERPROFILE%\\\\.qwen\\\\projects\\\\<sanitized-project-path>\\\\workflows\\\\<run-id>.json",
+                        "%USERPROFILE%\\.qwen\\projects\\<sanitized-project-path>\\workflows\\<run-id>.json",
                         "~/.qwen/projects/<sanitized-project-path>/workflows/<run-id>.json"
                     ],
                     "root": "user_profile",
@@ -11539,7 +11539,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "d4211859034b8cdc727f4d589eb312ed4100b677c03d4db6be12cf4856345748"
+    "sha256": "debb272fa76fc56dc9dc3cb327b9896e52eff57e17e7595c2b559d3773a0468f"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

@@ -1444,3 +1444,31 @@ def test_every_per_workspace_store_claims_the_file_that_names_its_folder() -> No
         "folder they belong to, so every row of them arrives unattributed and nothing in "
         f"the case says why: {missing}"
     )
+
+
+def test_no_path_has_a_doubled_separator() -> None:
+    """A doubled separator survives into a collection rule and matches nothing there.
+
+    It reads as a typo and is not one, because the two halves of this suite disagree about
+    it. The matcher and both collectors normalise a path before using it, so a doubled
+    separator costs nothing there and a catalogue entry carrying one looks fine in every
+    test that reads the catalogue. One of the generated exporters does not normalise: it
+    writes the path into its query as it stands, and a glob with an empty segment in it
+    matches no file on any endpoint.
+
+    That is how three of one agent's workflow artifacts came to be uncollectable by one of
+    the five exporters while being collectable by the other four, for as long as nobody
+    read the generated file. The cause was a YAML string written with escaped backslashes
+    where its neighbours use plain ones.
+    """
+    catalogue = load_catalogue(CATALOG_DIR)
+    doubled = {
+        artifact.id: [path for path in artifact.paths if "//" in path or "\\\\" in path]
+        for artifact in catalogue.artifacts
+    }
+    found = {name: paths for name, paths in doubled.items() if paths}
+    assert not found, (
+        "these paths carry a doubled separator, which the matcher and the collectors "
+        "normalise away and at least one exporter does not, so the entry is collectable "
+        f"by some of this suite and by none of the rest: {found}"
+    )
