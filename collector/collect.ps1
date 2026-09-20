@@ -6102,6 +6102,87 @@ $EmbeddedCatalogueJson = @'
                 },
                 {
                     "category": "file_snapshot",
+                    "collect_priority": "normal",
+                    "id": "hermes.browser_agent_profiles",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/chrome-debug/**",
+                        "$HERMES_HOME/profiles/<name>/chrome-debug/**",
+                        "~/.hermes/chrome-debug/**",
+                        "~/.hermes/profiles/<name>/chrome-debug/**",
+                        "%LOCALAPPDATA%\\hermes\\chrome-debug\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\chrome-debug\\**",
+                        "$HERMES_HOME/browser_auth/**",
+                        "$HERMES_HOME/profiles/<name>/browser_auth/**",
+                        "~/.hermes/browser_auth/**",
+                        "~/.hermes/profiles/<name>/browser_auth/**",
+                        "%LOCALAPPDATA%\\hermes\\browser_auth\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\browser_auth\\**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "hermes.browser_media",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/browser_recordings/session_*.webm",
+                        "$HERMES_HOME/profiles/<name>/browser_recordings/session_*.webm",
+                        "~/.hermes/browser_recordings/session_*.webm",
+                        "~/.hermes/profiles/<name>/browser_recordings/session_*.webm",
+                        "%LOCALAPPDATA%\\hermes\\browser_recordings\\session_*.webm",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\browser_recordings\\session_*.webm",
+                        "$HERMES_HOME/cache/screenshots/browser_screenshot_*.png",
+                        "$HERMES_HOME/profiles/<name>/cache/screenshots/browser_screenshot_*.png",
+                        "~/.hermes/cache/screenshots/browser_screenshot_*.png",
+                        "~/.hermes/profiles/<name>/cache/screenshots/browser_screenshot_*.png",
+                        "%LOCALAPPDATA%\\hermes\\cache\\screenshots\\browser_screenshot_*.png",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\cache\\screenshots\\browser_screenshot_*.png",
+                        "$HERMES_HOME/browser_screenshots/browser_screenshot_*.png",
+                        "$HERMES_HOME/profiles/<name>/browser_screenshots/browser_screenshot_*.png",
+                        "~/.hermes/browser_screenshots/browser_screenshot_*.png",
+                        "~/.hermes/profiles/<name>/browser_screenshots/browser_screenshot_*.png",
+                        "%LOCALAPPDATA%\\hermes\\browser_screenshots\\browser_screenshot_*.png",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\browser_screenshots\\browser_screenshot_*.png"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "first",
+                    "id": "hermes.browser_profile",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/browser-profile/**",
+                        "$HERMES_HOME/profiles/<name>/browser-profile/**",
+                        "~/.hermes/browser-profile/**",
+                        "~/.hermes/profiles/<name>/browser-profile/**",
+                        "%LOCALAPPDATA%\\hermes\\browser-profile\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\browser-profile\\**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
                     "collect_priority": "durable",
                     "id": "hermes.checkpoint_projects",
                     "os": [
@@ -6426,6 +6507,27 @@ $EmbeddedCatalogueJson = @'
                     "status": "verified"
                 },
                 {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "hermes.mcp_installs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/mcp-installs/**",
+                        "$HERMES_HOME/profiles/<name>/mcp-installs/**",
+                        "~/.hermes/mcp-installs/**",
+                        "~/.hermes/profiles/<name>/mcp-installs/**",
+                        "%LOCALAPPDATA%\\hermes\\mcp-installs\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\mcp-installs\\**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "credentials",
                     "collect_priority": "normal",
                     "id": "hermes.mcp_tokens",
@@ -6683,6 +6785,27 @@ $EmbeddedCatalogueJson = @'
                 },
                 {
                     "category": "config",
+                    "collect_priority": "normal",
+                    "id": "hermes.profile_home",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/home/**",
+                        "$HERMES_HOME/profiles/<name>/home/**",
+                        "~/.hermes/home/**",
+                        "~/.hermes/profiles/<name>/home/**",
+                        "%LOCALAPPDATA%\\hermes\\home\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\home\\**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
                     "collect_priority": "first",
                     "id": "hermes.profile_tombstones",
                     "os": [
@@ -6712,6 +6835,39 @@ $EmbeddedCatalogueJson = @'
                         "$HERMES_HOME/profiles/<name>/profile.yaml",
                         "~/.hermes/profiles/<name>/profile.yaml",
                         "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\profile.yaml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "hermes.remote_sandbox_snapshots",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/modal_snapshots.json",
+                        "$HERMES_HOME/profiles/<name>/modal_snapshots.json",
+                        "~/.hermes/modal_snapshots.json",
+                        "~/.hermes/profiles/<name>/modal_snapshots.json",
+                        "%LOCALAPPDATA%\\hermes\\modal_snapshots.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\modal_snapshots.json",
+                        "$HERMES_HOME/singularity_snapshots.json",
+                        "$HERMES_HOME/profiles/<name>/singularity_snapshots.json",
+                        "~/.hermes/singularity_snapshots.json",
+                        "~/.hermes/profiles/<name>/singularity_snapshots.json",
+                        "%LOCALAPPDATA%\\hermes\\singularity_snapshots.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\singularity_snapshots.json",
+                        "$HERMES_HOME/vercel_sandbox_snapshots.json",
+                        "$HERMES_HOME/profiles/<name>/vercel_sandbox_snapshots.json",
+                        "~/.hermes/vercel_sandbox_snapshots.json",
+                        "~/.hermes/profiles/<name>/vercel_sandbox_snapshots.json",
+                        "%LOCALAPPDATA%\\hermes\\vercel_sandbox_snapshots.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\vercel_sandbox_snapshots.json"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -10220,7 +10376,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "a0308d9522b29479131361e6c2444fb525cbc0dbdee2cb292f382e4fb1a63266"
+    "sha256": "e58408da69c77dbc8888785a2016e72eaeaa0f465bf19ac9d87b995c99141576"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

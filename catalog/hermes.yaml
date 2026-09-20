@@ -619,6 +619,249 @@ artifacts:
 
     Record structure: the recorded gateway state per profile, the process identifier of a running gateway, a directory of channels with their identifiers and any aliases, and the webhook routes that are subscribed.
   parser: json_generic
+- id: hermes.browser_profile
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/browser-profile/**
+  - $HERMES_HOME/profiles/<name>/browser-profile/**
+  - ~/.hermes/browser-profile/**
+  - ~/.hermes/profiles/<name>/browser-profile/**
+  - '%LOCALAPPDATA%\hermes\browser-profile\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\browser-profile\**'
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/features/browser.md
+  source_kind: official
+  contains_credentials:
+  - Cookies
+  - Network/Cookies
+  - Login Data
+  - Login Data For Account
+  - Web Data
+  volatility: |-
+    Created the first time the setting is used and refreshed from the real profile on every launch after that, so the authentication files here are as new as the last browser session the agent ran. Deleted whole on the next browser use after the setting is turned off, which makes an absence inconclusive rather than exculpatory.
+  notes: |-
+    A copy of the user's own browser profile, taken by the agent, sitting under the agent's home.
+
+    When the setting is on, the product copies the browser profile the person actually browses with, the one the browser itself records as last used, and launches the real browser binary against the copy. It launches the real binary on purpose: a bundled browser with a mock keychain would fail to decrypt the cookies, so the point of the design is that the copied cookies stay usable.
+
+    Three consequences for an investigation, and they are the reason this is collected first.
+
+    It is an authentication artifact. Session cookies and saved logins for every site the person was signed into are now in a second place on disk, and they were refreshed on every launch, so they are recent rather than stale.
+
+    It is a browsing record. The copy carries the profile's history, its preferences and its autofill data, which is where to look for what the agent did on the person's behalf and under their identity.
+
+    And it is a scoping answer. Whatever the agent did in that browser, it did as the user, so activity at those sites in that period cannot be attributed to the person from the site's logs alone.
+
+    It is collected rather than withheld because the history and preferences are the evidence, and the credential members are named here so they are redacted out of anything that leaves the case. The product's own security page lists this directory as one of its secret stores, which is the same judgement from the other direction.
+
+    Record structure: a browser profile directory. Only the one active profile is copied, never the others, unless the configuration pins a different one by name.
+  parser: null
+- id: hermes.browser_agent_profiles
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/chrome-debug/**
+  - $HERMES_HOME/profiles/<name>/chrome-debug/**
+  - ~/.hermes/chrome-debug/**
+  - ~/.hermes/profiles/<name>/chrome-debug/**
+  - '%LOCALAPPDATA%\hermes\chrome-debug\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\chrome-debug\**'
+  - $HERMES_HOME/browser_auth/**
+  - $HERMES_HOME/profiles/<name>/browser_auth/**
+  - ~/.hermes/browser_auth/**
+  - ~/.hermes/profiles/<name>/browser_auth/**
+  - '%LOCALAPPDATA%\hermes\browser_auth\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\browser_auth\**'
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/hermes_cli/browser_connect.py
+  source_kind: source_code
+  contains_credentials:
+  - Cookies
+  - Login Data
+  - the stored authentication state of the hardened browser
+  volatility: Persistent until removed. Nothing in the product prunes these.
+  notes: |-
+    The browser profiles this agent created for itself, as opposed to the copy it takes of the user's.
+
+    These are where the agent browsed under its own identity: its own cookie jar, its own logins, its own history. For an analyst that separates two questions that otherwise run together. Activity in the user's copied profile happened as the user; activity here happened as the agent, and the sites it signed into here are accounts somebody set up for it.
+
+    One of the two is the profile of a hardened browser the product can drive instead of the ordinary one, and its stored authentication state is kept separately for the same reason.
+
+    Record structure: browser profile directories.
+  parser: null
+- id: hermes.browser_media
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/browser_recordings/session_*.webm
+  - $HERMES_HOME/profiles/<name>/browser_recordings/session_*.webm
+  - ~/.hermes/browser_recordings/session_*.webm
+  - ~/.hermes/profiles/<name>/browser_recordings/session_*.webm
+  - '%LOCALAPPDATA%\hermes\browser_recordings\session_*.webm'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\browser_recordings\session_*.webm'
+  - $HERMES_HOME/cache/screenshots/browser_screenshot_*.png
+  - $HERMES_HOME/profiles/<name>/cache/screenshots/browser_screenshot_*.png
+  - ~/.hermes/cache/screenshots/browser_screenshot_*.png
+  - ~/.hermes/profiles/<name>/cache/screenshots/browser_screenshot_*.png
+  - '%LOCALAPPDATA%\hermes\cache\screenshots\browser_screenshot_*.png'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\cache\screenshots\browser_screenshot_*.png'
+  - $HERMES_HOME/browser_screenshots/browser_screenshot_*.png
+  - $HERMES_HOME/profiles/<name>/browser_screenshots/browser_screenshot_*.png
+  - ~/.hermes/browser_screenshots/browser_screenshot_*.png
+  - ~/.hermes/profiles/<name>/browser_screenshots/browser_screenshot_*.png
+  - '%LOCALAPPDATA%\hermes\browser_screenshots\browser_screenshot_*.png'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\browser_screenshots\browser_screenshot_*.png'
+  format: binary
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/tools/browser_tool_lifecycle.py
+  source_kind: source_code
+  volatility: |-
+    Recordings are swept after seventy-two hours and screenshots on a shorter schedule, both by the agent itself, so this is a window of days rather than a history. Collect it early or not at all.
+  notes: |-
+    Pictures and video of what the agent did in a browser, which is the only artifact in this file that shows rather than describes.
+
+    A transcript says the agent navigated somewhere and what it concluded. A recording shows the page as it was, including what was on screen that never reached the model's summary: the account it was signed in as, the data on the page, the form it filled in. Where the browsing was done in the copy of the user's profile, it shows the user's own session being driven.
+
+    The screenshots are the frames the model was actually given, so they are also the answer to what the agent saw at the moment it decided something.
+
+    Record structure: one video per browser session, named after the session, and one image per screenshot. The older location for screenshots is listed beside the current one because the product reads a populated legacy directory rather than migrating it.
+  parser: null
+- id: hermes.remote_sandbox_snapshots
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/modal_snapshots.json
+  - $HERMES_HOME/profiles/<name>/modal_snapshots.json
+  - ~/.hermes/modal_snapshots.json
+  - ~/.hermes/profiles/<name>/modal_snapshots.json
+  - '%LOCALAPPDATA%\hermes\modal_snapshots.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\modal_snapshots.json'
+  - $HERMES_HOME/singularity_snapshots.json
+  - $HERMES_HOME/profiles/<name>/singularity_snapshots.json
+  - ~/.hermes/singularity_snapshots.json
+  - ~/.hermes/profiles/<name>/singularity_snapshots.json
+  - '%LOCALAPPDATA%\hermes\singularity_snapshots.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\singularity_snapshots.json'
+  - $HERMES_HOME/vercel_sandbox_snapshots.json
+  - $HERMES_HOME/profiles/<name>/vercel_sandbox_snapshots.json
+  - ~/.hermes/vercel_sandbox_snapshots.json
+  - ~/.hermes/profiles/<name>/vercel_sandbox_snapshots.json
+  - '%LOCALAPPDATA%\hermes\vercel_sandbox_snapshots.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\vercel_sandbox_snapshots.json'
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: |-
+    An entry lasts as long as the snapshot it names exists at the provider, which this endpoint does not control. So a name here can outlive the thing it names, and the thing it names can outlive this file.
+  notes: |-
+    Receipts for filesystem state this endpoint sent to somebody else's infrastructure.
+
+    The agent can run its commands in a sandbox on a remote service rather than on the host, and when it does, the sandbox filesystem is snapshotted at the end of a session and restored at the start of the next. Each of these files maps a task on this endpoint to the identifier of a snapshot held by that provider.
+
+    For the question of which data left the device this is as direct as an artifact gets: it is a list of identifiers, held by a third party, of filesystem state produced by this endpoint's work. The content is not here and cannot be recovered from here. What is here is enough to ask the provider, and enough to say that the material exists off the endpoint.
+
+    Read it beside the terminal backend in the configuration, which says whether remote execution was in use at all, and beside the entry for the state the product pushes into a sandbox and syncs back afterwards.
+
+    Record structure: one file per backend, each a JSON object mapping a task key to a snapshot identifier at that provider. Keys appear in a namespaced and a bare form, the bare one being the older spelling the product still reads.
+  parser: json_generic
+- id: hermes.profile_home
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/home/**
+  - $HERMES_HOME/profiles/<name>/home/**
+  - ~/.hermes/home/**
+  - ~/.hermes/profiles/<name>/home/**
+  - '%LOCALAPPDATA%\hermes\home\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\home\**'
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  contains_credentials:
+  - .ssh
+  - .aws
+  - .azure
+  - .config/gh
+  - .netrc
+  - .npmrc
+  volatility: |-
+    Exists where the product is configured to give its subprocesses a home of their own, which is its own recommended default inside containers. Persistent.
+  notes: |-
+    A second home directory, used by the programs this agent runs rather than by the person.
+
+    When the product is in this mode, every tool subprocess it spawns, its version control, its remote shell, its package manager, its platform command line tools, sees this directory as the home directory. So the configuration those tools read and the state they write are here and not in the person's own home.
+
+    Two things follow. The version control identity here is the identity the agent's commits were made under, which is an attribution answer that the person's own configuration would give wrongly. And credentials the agent needed were placed here rather than borrowed from the person, so this directory says which services somebody deliberately gave the agent its own access to.
+
+    The credential members are named so they are redacted out of anything leaving the case; the directory itself is collected because the configuration and the tool state are the evidence.
+
+    Record structure: an ordinary home directory, holding whatever the tools the agent ran chose to write there.
+  parser: null
+- id: hermes.mcp_installs
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/mcp-installs/**
+  - $HERMES_HOME/profiles/<name>/mcp-installs/**
+  - ~/.hermes/mcp-installs/**
+  - ~/.hermes/profiles/<name>/mcp-installs/**
+  - '%LOCALAPPDATA%\hermes\mcp-installs\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\mcp-installs\**'
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/hermes_cli/mcp_catalog.py
+  source_kind: source_code
+  volatility: Persistent until removed by hand.
+  notes: |-
+    Third-party code this agent fetched and ran on the endpoint.
+
+    Installing an MCP server from the product's catalogue clones a repository into this directory and then runs that repository's own bootstrap commands, through a shell, as the user. So a directory here is an external project that executed arbitrary setup on this machine, and the clone's own version control history says where it came from and at which revision.
+
+    That makes it a supply chain question rather than a configuration one. Read each clone's remote and commit, and compare the tree on disk against that commit: a difference is code that is running here and is in no upstream repository.
+
+    Record structure: one directory per installed server, named after the server, each an ordinary checkout.
+  parser: null
 - id: hermes.retired_wal_transcripts
   category: transcript
   root: user_profile

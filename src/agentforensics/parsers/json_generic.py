@@ -165,6 +165,7 @@ DOCUMENTS = frozenset(
         "hermes.pairing",
         "hermes.pending_skills",
         "hermes.process_results",
+        "hermes.remote_sandbox_snapshots",
         "hermes.retired_wal_manifests",
         "hermes.saved_sessions",
         "jetbrains_ai.mcp_config",

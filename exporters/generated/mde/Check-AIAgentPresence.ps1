@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: cd5ec96673cc
+# Catalogue digest: 1c3de2ec5a69
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -609,6 +609,24 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.blocked_scripts'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.blocked_scripts'; Path = '$profile\AppData\Local\hermes\cache\blocked-scripts\blocked-' }
     @{ Agent = 'hermes'; Id = 'hermes.blocked_scripts'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_agent_profiles'; Path = '$profile\.hermes\browser_auth' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_agent_profiles'; Path = '$profile\.hermes\chrome-debug' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_agent_profiles'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_agent_profiles'; Path = '$profile\AppData\Local\hermes\browser_auth' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_agent_profiles'; Path = '$profile\AppData\Local\hermes\chrome-debug' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_agent_profiles'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_media'; Path = '$profile\.hermes\browser_recordings\session_' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_media'; Path = '$profile\.hermes\browser_screenshots\browser_screenshot_' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_media'; Path = '$profile\.hermes\cache\screenshots\browser_screenshot_' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_media'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_media'; Path = '$profile\AppData\Local\hermes\browser_recordings\session_' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_media'; Path = '$profile\AppData\Local\hermes\browser_screenshots\browser_screenshot_' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_media'; Path = '$profile\AppData\Local\hermes\cache\screenshots\browser_screenshot_' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_media'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_profile'; Path = '$profile\.hermes\browser-profile' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_profile'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_profile'; Path = '$profile\AppData\Local\hermes\browser-profile' }
+    @{ Agent = 'hermes'; Id = 'hermes.browser_profile'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.checkpoint_projects'; Path = '$profile\.hermes\checkpoints\store\ledgers' }
     @{ Agent = 'hermes'; Id = 'hermes.checkpoint_projects'; Path = '$profile\.hermes\checkpoints\store\projects' }
     @{ Agent = 'hermes'; Id = 'hermes.checkpoint_projects'; Path = '$profile\.hermes\profiles' }
@@ -679,6 +697,10 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\AppData\Local\hermes\logs\errors.log' }
     @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\AppData\Local\hermes\logs\gateway.log' }
     @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.mcp_installs'; Path = '$profile\.hermes\mcp-installs' }
+    @{ Agent = 'hermes'; Id = 'hermes.mcp_installs'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.mcp_installs'; Path = '$profile\AppData\Local\hermes\mcp-installs' }
+    @{ Agent = 'hermes'; Id = 'hermes.mcp_installs'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.mcp_tokens'; Path = '$profile\.hermes\mcp-tokens' }
     @{ Agent = 'hermes'; Id = 'hermes.mcp_tokens'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.mcp_tokens'; Path = '$profile\AppData\Local\hermes\mcp-tokens' }
@@ -739,10 +761,22 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.process_results'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.process_results'; Path = '$profile\AppData\Local\hermes\logs\process-results\proc_' }
     @{ Agent = 'hermes'; Id = 'hermes.process_results'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.profile_home'; Path = '$profile\.hermes\home' }
+    @{ Agent = 'hermes'; Id = 'hermes.profile_home'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.profile_home'; Path = '$profile\AppData\Local\hermes\home' }
+    @{ Agent = 'hermes'; Id = 'hermes.profile_home'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.profile_tombstones'; Path = '$profile\.hermes\profiles\.deleted' }
     @{ Agent = 'hermes'; Id = 'hermes.profile_tombstones'; Path = '$profile\AppData\Local\hermes\profiles\.deleted' }
     @{ Agent = 'hermes'; Id = 'hermes.profiles'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.profiles'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.remote_sandbox_snapshots'; Path = '$profile\.hermes\modal_snapshots.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.remote_sandbox_snapshots'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.remote_sandbox_snapshots'; Path = '$profile\.hermes\singularity_snapshots.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.remote_sandbox_snapshots'; Path = '$profile\.hermes\vercel_sandbox_snapshots.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.remote_sandbox_snapshots'; Path = '$profile\AppData\Local\hermes\modal_snapshots.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.remote_sandbox_snapshots'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.remote_sandbox_snapshots'; Path = '$profile\AppData\Local\hermes\singularity_snapshots.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.remote_sandbox_snapshots'; Path = '$profile\AppData\Local\hermes\vercel_sandbox_snapshots.json' }
     @{ Agent = 'hermes'; Id = 'hermes.retired_wal_generations'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.retired_wal_generations'; Path = '$profile\.hermes\state.db.retired-wal-' }
     @{ Agent = 'hermes'; Id = 'hermes.retired_wal_generations'; Path = '$profile\AppData\Local\hermes\profiles' }

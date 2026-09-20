@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: cd5ec96673cc
+# Catalogue digest: 1c3de2ec5a69
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 33 of the 518 catalogue artifacts declare
+# KAPE is Windows only. 33 of the 524 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -164,6 +164,150 @@ Targets:
         Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\cache\blocked-scripts
         FileMask: "blocked-*.sh"
         Recursive: false
+    -
+        Name: hermes.browser_agent_profiles
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\browser_auth
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.browser_agent_profiles
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\chrome-debug
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.browser_agent_profiles
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\profiles\*\browser_auth
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.browser_agent_profiles
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\profiles\*\chrome-debug
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.browser_agent_profiles
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\browser_auth
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.browser_agent_profiles
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\chrome-debug
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.browser_agent_profiles
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\browser_auth
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.browser_agent_profiles
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\chrome-debug
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.browser_media
+        Category: log
+        Path: C:\Users\%user%\.hermes\browser_recordings
+        FileMask: "session_*.webm"
+        Recursive: false
+    -
+        Name: hermes.browser_media
+        Category: log
+        Path: C:\Users\%user%\.hermes\browser_screenshots
+        FileMask: "browser_screenshot_*.png"
+        Recursive: false
+    -
+        Name: hermes.browser_media
+        Category: log
+        Path: C:\Users\%user%\.hermes\cache\screenshots
+        FileMask: "browser_screenshot_*.png"
+        Recursive: false
+    -
+        Name: hermes.browser_media
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*\browser_recordings
+        FileMask: "session_*.webm"
+        Recursive: false
+    -
+        Name: hermes.browser_media
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*\browser_screenshots
+        FileMask: "browser_screenshot_*.png"
+        Recursive: false
+    -
+        Name: hermes.browser_media
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*\cache\screenshots
+        FileMask: "browser_screenshot_*.png"
+        Recursive: false
+    -
+        Name: hermes.browser_media
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\browser_recordings
+        FileMask: "session_*.webm"
+        Recursive: false
+    -
+        Name: hermes.browser_media
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\browser_screenshots
+        FileMask: "browser_screenshot_*.png"
+        Recursive: false
+    -
+        Name: hermes.browser_media
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\cache\screenshots
+        FileMask: "browser_screenshot_*.png"
+        Recursive: false
+    -
+        Name: hermes.browser_media
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\browser_recordings
+        FileMask: "session_*.webm"
+        Recursive: false
+    -
+        Name: hermes.browser_media
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\browser_screenshots
+        FileMask: "browser_screenshot_*.png"
+        Recursive: false
+    -
+        Name: hermes.browser_media
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\cache\screenshots
+        FileMask: "browser_screenshot_*.png"
+        Recursive: false
+    -
+        Name: hermes.browser_profile
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\browser-profile
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.browser_profile
+        Category: file_snapshot
+        Path: C:\Users\%user%\.hermes\profiles\*\browser-profile
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.browser_profile
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\browser-profile
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.browser_profile
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\browser-profile
+        FileMask: "*"
+        Recursive: true
     -
         Name: hermes.checkpoint_projects
         Category: file_snapshot
@@ -692,6 +836,30 @@ Targets:
         Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\logs
         FileMask: "gateway.log"
         Recursive: false
+    -
+        Name: hermes.mcp_installs
+        Category: install_evidence
+        Path: C:\Users\%user%\.hermes\mcp-installs
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.mcp_installs
+        Category: install_evidence
+        Path: C:\Users\%user%\.hermes\profiles\*\mcp-installs
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.mcp_installs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\hermes\mcp-installs
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.mcp_installs
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\mcp-installs
+        FileMask: "*"
+        Recursive: true
     -
         Name: hermes.mcp_tokens
         Category: credentials
@@ -1245,6 +1413,30 @@ Targets:
         FileMask: "proc_*.json"
         Recursive: false
     -
+        Name: hermes.profile_home
+        Category: config
+        Path: C:\Users\%user%\.hermes\home
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.profile_home
+        Category: config
+        Path: C:\Users\%user%\.hermes\profiles\*\home
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.profile_home
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\hermes\home
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.profile_home
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\home
+        FileMask: "*"
+        Recursive: true
+    -
         Name: hermes.profile_tombstones
         Category: config
         Path: C:\Users\%user%\.hermes\profiles
@@ -1267,6 +1459,78 @@ Targets:
         Category: config
         Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
         FileMask: "profile.yaml"
+        Recursive: false
+    -
+        Name: hermes.remote_sandbox_snapshots
+        Category: log
+        Path: C:\Users\%user%\.hermes
+        FileMask: "modal_snapshots.json"
+        Recursive: false
+    -
+        Name: hermes.remote_sandbox_snapshots
+        Category: log
+        Path: C:\Users\%user%\.hermes
+        FileMask: "singularity_snapshots.json"
+        Recursive: false
+    -
+        Name: hermes.remote_sandbox_snapshots
+        Category: log
+        Path: C:\Users\%user%\.hermes
+        FileMask: "vercel_sandbox_snapshots.json"
+        Recursive: false
+    -
+        Name: hermes.remote_sandbox_snapshots
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*
+        FileMask: "modal_snapshots.json"
+        Recursive: false
+    -
+        Name: hermes.remote_sandbox_snapshots
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*
+        FileMask: "singularity_snapshots.json"
+        Recursive: false
+    -
+        Name: hermes.remote_sandbox_snapshots
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*
+        FileMask: "vercel_sandbox_snapshots.json"
+        Recursive: false
+    -
+        Name: hermes.remote_sandbox_snapshots
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes
+        FileMask: "modal_snapshots.json"
+        Recursive: false
+    -
+        Name: hermes.remote_sandbox_snapshots
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes
+        FileMask: "singularity_snapshots.json"
+        Recursive: false
+    -
+        Name: hermes.remote_sandbox_snapshots
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes
+        FileMask: "vercel_sandbox_snapshots.json"
+        Recursive: false
+    -
+        Name: hermes.remote_sandbox_snapshots
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
+        FileMask: "modal_snapshots.json"
+        Recursive: false
+    -
+        Name: hermes.remote_sandbox_snapshots
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
+        FileMask: "singularity_snapshots.json"
+        Recursive: false
+    -
+        Name: hermes.remote_sandbox_snapshots
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
+        FileMask: "vercel_sandbox_snapshots.json"
         Recursive: false
     -
         Name: hermes.retired_wal_generations

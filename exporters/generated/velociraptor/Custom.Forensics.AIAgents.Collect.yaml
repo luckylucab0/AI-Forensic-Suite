@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: cd5ec96673cc
+# Catalogue digest: 1c3de2ec5a69
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -691,6 +691,30 @@ sources:
     hermes,hermes.blocked_scripts,C:/Users/*/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
     hermes,hermes.blocked_scripts,C:/Users/*/AppData/Local/hermes/cache/blocked-scripts/blocked-*.sh
     hermes,hermes.blocked_scripts,C:/Users/*/AppData/Local/hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
+    hermes,hermes.browser_agent_profiles,C:/Users/*/.hermes/browser_auth/**
+    hermes,hermes.browser_agent_profiles,C:/Users/*/.hermes/chrome-debug/**
+    hermes,hermes.browser_agent_profiles,C:/Users/*/.hermes/profiles/*/browser_auth/**
+    hermes,hermes.browser_agent_profiles,C:/Users/*/.hermes/profiles/*/chrome-debug/**
+    hermes,hermes.browser_agent_profiles,C:/Users/*/AppData/Local/hermes/browser_auth/**
+    hermes,hermes.browser_agent_profiles,C:/Users/*/AppData/Local/hermes/chrome-debug/**
+    hermes,hermes.browser_agent_profiles,C:/Users/*/AppData/Local/hermes/profiles/*/browser_auth/**
+    hermes,hermes.browser_agent_profiles,C:/Users/*/AppData/Local/hermes/profiles/*/chrome-debug/**
+    hermes,hermes.browser_media,C:/Users/*/.hermes/browser_recordings/session_*.webm
+    hermes,hermes.browser_media,C:/Users/*/.hermes/browser_screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,C:/Users/*/.hermes/cache/screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,C:/Users/*/.hermes/profiles/*/browser_recordings/session_*.webm
+    hermes,hermes.browser_media,C:/Users/*/.hermes/profiles/*/browser_screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,C:/Users/*/.hermes/profiles/*/cache/screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,C:/Users/*/AppData/Local/hermes/browser_recordings/session_*.webm
+    hermes,hermes.browser_media,C:/Users/*/AppData/Local/hermes/browser_screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,C:/Users/*/AppData/Local/hermes/cache/screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,C:/Users/*/AppData/Local/hermes/profiles/*/browser_recordings/session_*.webm
+    hermes,hermes.browser_media,C:/Users/*/AppData/Local/hermes/profiles/*/browser_screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,C:/Users/*/AppData/Local/hermes/profiles/*/cache/screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_profile,C:/Users/*/.hermes/browser-profile/**
+    hermes,hermes.browser_profile,C:/Users/*/.hermes/profiles/*/browser-profile/**
+    hermes,hermes.browser_profile,C:/Users/*/AppData/Local/hermes/browser-profile/**
+    hermes,hermes.browser_profile,C:/Users/*/AppData/Local/hermes/profiles/*/browser-profile/**
     hermes,hermes.checkpoint_projects,C:/Users/*/.hermes/checkpoints/store/ledgers/*.json
     hermes,hermes.checkpoint_projects,C:/Users/*/.hermes/checkpoints/store/projects/*.json
     hermes,hermes.checkpoint_projects,C:/Users/*/.hermes/profiles/*/checkpoints/store/ledgers/*.json
@@ -779,6 +803,10 @@ sources:
     hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/logs/gateway.log
     hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/profiles/*/logs/errors.log
     hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/profiles/*/logs/gateway.log
+    hermes,hermes.mcp_installs,C:/Users/*/.hermes/mcp-installs/**
+    hermes,hermes.mcp_installs,C:/Users/*/.hermes/profiles/*/mcp-installs/**
+    hermes,hermes.mcp_installs,C:/Users/*/AppData/Local/hermes/mcp-installs/**
+    hermes,hermes.mcp_installs,C:/Users/*/AppData/Local/hermes/profiles/*/mcp-installs/**
     hermes,hermes.mcp_tokens,C:/Users/*/.hermes/mcp-tokens/*.cimd-off
     hermes,hermes.mcp_tokens,C:/Users/*/.hermes/mcp-tokens/*.json
     hermes,hermes.mcp_tokens,C:/Users/*/.hermes/profiles/*/mcp-tokens/*.cimd-off
@@ -871,10 +899,26 @@ sources:
     hermes,hermes.process_results,C:/Users/*/.hermes/profiles/*/logs/process-results/proc_*.json
     hermes,hermes.process_results,C:/Users/*/AppData/Local/hermes/logs/process-results/proc_*.json
     hermes,hermes.process_results,C:/Users/*/AppData/Local/hermes/profiles/*/logs/process-results/proc_*.json
+    hermes,hermes.profile_home,C:/Users/*/.hermes/home/**
+    hermes,hermes.profile_home,C:/Users/*/.hermes/profiles/*/home/**
+    hermes,hermes.profile_home,C:/Users/*/AppData/Local/hermes/home/**
+    hermes,hermes.profile_home,C:/Users/*/AppData/Local/hermes/profiles/*/home/**
     hermes,hermes.profile_tombstones,C:/Users/*/.hermes/profiles/.deleted/**
     hermes,hermes.profile_tombstones,C:/Users/*/AppData/Local/hermes/profiles/.deleted/**
     hermes,hermes.profiles,C:/Users/*/.hermes/profiles/*/profile.yaml
     hermes,hermes.profiles,C:/Users/*/AppData/Local/hermes/profiles/*/profile.yaml
+    hermes,hermes.remote_sandbox_snapshots,C:/Users/*/.hermes/modal_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,C:/Users/*/.hermes/profiles/*/modal_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,C:/Users/*/.hermes/profiles/*/singularity_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,C:/Users/*/.hermes/profiles/*/vercel_sandbox_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,C:/Users/*/.hermes/singularity_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,C:/Users/*/.hermes/vercel_sandbox_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,C:/Users/*/AppData/Local/hermes/modal_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,C:/Users/*/AppData/Local/hermes/profiles/*/modal_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,C:/Users/*/AppData/Local/hermes/profiles/*/singularity_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,C:/Users/*/AppData/Local/hermes/profiles/*/vercel_sandbox_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,C:/Users/*/AppData/Local/hermes/singularity_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,C:/Users/*/AppData/Local/hermes/vercel_sandbox_snapshots.json
     hermes,hermes.retired_wal_generations,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,hermes.retired_wal_generations,C:/Users/*/.hermes/state.db.retired-wal-*/**
     hermes,hermes.retired_wal_generations,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/**
@@ -2507,6 +2551,30 @@ sources:
     hermes,hermes.blocked_scripts,/Users/*/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
     hermes,hermes.blocked_scripts,/var/root/.hermes/cache/blocked-scripts/blocked-*.sh
     hermes,hermes.blocked_scripts,/var/root/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
+    hermes,hermes.browser_agent_profiles,/Users/*/.hermes/browser_auth/**
+    hermes,hermes.browser_agent_profiles,/Users/*/.hermes/chrome-debug/**
+    hermes,hermes.browser_agent_profiles,/Users/*/.hermes/profiles/*/browser_auth/**
+    hermes,hermes.browser_agent_profiles,/Users/*/.hermes/profiles/*/chrome-debug/**
+    hermes,hermes.browser_agent_profiles,/var/root/.hermes/browser_auth/**
+    hermes,hermes.browser_agent_profiles,/var/root/.hermes/chrome-debug/**
+    hermes,hermes.browser_agent_profiles,/var/root/.hermes/profiles/*/browser_auth/**
+    hermes,hermes.browser_agent_profiles,/var/root/.hermes/profiles/*/chrome-debug/**
+    hermes,hermes.browser_media,/Users/*/.hermes/browser_recordings/session_*.webm
+    hermes,hermes.browser_media,/Users/*/.hermes/browser_screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/Users/*/.hermes/cache/screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/Users/*/.hermes/profiles/*/browser_recordings/session_*.webm
+    hermes,hermes.browser_media,/Users/*/.hermes/profiles/*/browser_screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/Users/*/.hermes/profiles/*/cache/screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/var/root/.hermes/browser_recordings/session_*.webm
+    hermes,hermes.browser_media,/var/root/.hermes/browser_screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/var/root/.hermes/cache/screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/var/root/.hermes/profiles/*/browser_recordings/session_*.webm
+    hermes,hermes.browser_media,/var/root/.hermes/profiles/*/browser_screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/var/root/.hermes/profiles/*/cache/screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_profile,/Users/*/.hermes/browser-profile/**
+    hermes,hermes.browser_profile,/Users/*/.hermes/profiles/*/browser-profile/**
+    hermes,hermes.browser_profile,/var/root/.hermes/browser-profile/**
+    hermes,hermes.browser_profile,/var/root/.hermes/profiles/*/browser-profile/**
     hermes,hermes.checkpoint_projects,/Users/*/.hermes/checkpoints/store/ledgers/*.json
     hermes,hermes.checkpoint_projects,/Users/*/.hermes/checkpoints/store/projects/*.json
     hermes,hermes.checkpoint_projects,/Users/*/.hermes/profiles/*/checkpoints/store/ledgers/*.json
@@ -2595,6 +2663,10 @@ sources:
     hermes,hermes.logs,/var/root/.hermes/logs/gateway.log
     hermes,hermes.logs,/var/root/.hermes/profiles/*/logs/errors.log
     hermes,hermes.logs,/var/root/.hermes/profiles/*/logs/gateway.log
+    hermes,hermes.mcp_installs,/Users/*/.hermes/mcp-installs/**
+    hermes,hermes.mcp_installs,/Users/*/.hermes/profiles/*/mcp-installs/**
+    hermes,hermes.mcp_installs,/var/root/.hermes/mcp-installs/**
+    hermes,hermes.mcp_installs,/var/root/.hermes/profiles/*/mcp-installs/**
     hermes,hermes.mcp_tokens,/Users/*/.hermes/mcp-tokens/*.cimd-off
     hermes,hermes.mcp_tokens,/Users/*/.hermes/mcp-tokens/*.json
     hermes,hermes.mcp_tokens,/Users/*/.hermes/profiles/*/mcp-tokens/*.cimd-off
@@ -2687,10 +2759,26 @@ sources:
     hermes,hermes.process_results,/Users/*/.hermes/profiles/*/logs/process-results/proc_*.json
     hermes,hermes.process_results,/var/root/.hermes/logs/process-results/proc_*.json
     hermes,hermes.process_results,/var/root/.hermes/profiles/*/logs/process-results/proc_*.json
+    hermes,hermes.profile_home,/Users/*/.hermes/home/**
+    hermes,hermes.profile_home,/Users/*/.hermes/profiles/*/home/**
+    hermes,hermes.profile_home,/var/root/.hermes/home/**
+    hermes,hermes.profile_home,/var/root/.hermes/profiles/*/home/**
     hermes,hermes.profile_tombstones,/Users/*/.hermes/profiles/.deleted/**
     hermes,hermes.profile_tombstones,/var/root/.hermes/profiles/.deleted/**
     hermes,hermes.profiles,/Users/*/.hermes/profiles/*/profile.yaml
     hermes,hermes.profiles,/var/root/.hermes/profiles/*/profile.yaml
+    hermes,hermes.remote_sandbox_snapshots,/Users/*/.hermes/modal_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/Users/*/.hermes/profiles/*/modal_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/Users/*/.hermes/profiles/*/singularity_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/Users/*/.hermes/profiles/*/vercel_sandbox_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/Users/*/.hermes/singularity_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/Users/*/.hermes/vercel_sandbox_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/var/root/.hermes/modal_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/var/root/.hermes/profiles/*/modal_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/var/root/.hermes/profiles/*/singularity_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/var/root/.hermes/profiles/*/vercel_sandbox_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/var/root/.hermes/singularity_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/var/root/.hermes/vercel_sandbox_snapshots.json
     hermes,hermes.retired_wal_generations,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,hermes.retired_wal_generations,/Users/*/.hermes/state.db.retired-wal-*/**
     hermes,hermes.retired_wal_generations,/var/root/.hermes/profiles/*/state.db.retired-wal-*/**
@@ -4711,6 +4799,30 @@ sources:
     hermes,hermes.blocked_scripts,/home/*/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
     hermes,hermes.blocked_scripts,/root/.hermes/cache/blocked-scripts/blocked-*.sh
     hermes,hermes.blocked_scripts,/root/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
+    hermes,hermes.browser_agent_profiles,/home/*/.hermes/browser_auth/**
+    hermes,hermes.browser_agent_profiles,/home/*/.hermes/chrome-debug/**
+    hermes,hermes.browser_agent_profiles,/home/*/.hermes/profiles/*/browser_auth/**
+    hermes,hermes.browser_agent_profiles,/home/*/.hermes/profiles/*/chrome-debug/**
+    hermes,hermes.browser_agent_profiles,/root/.hermes/browser_auth/**
+    hermes,hermes.browser_agent_profiles,/root/.hermes/chrome-debug/**
+    hermes,hermes.browser_agent_profiles,/root/.hermes/profiles/*/browser_auth/**
+    hermes,hermes.browser_agent_profiles,/root/.hermes/profiles/*/chrome-debug/**
+    hermes,hermes.browser_media,/home/*/.hermes/browser_recordings/session_*.webm
+    hermes,hermes.browser_media,/home/*/.hermes/browser_screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/home/*/.hermes/cache/screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/home/*/.hermes/profiles/*/browser_recordings/session_*.webm
+    hermes,hermes.browser_media,/home/*/.hermes/profiles/*/browser_screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/home/*/.hermes/profiles/*/cache/screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/root/.hermes/browser_recordings/session_*.webm
+    hermes,hermes.browser_media,/root/.hermes/browser_screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/root/.hermes/cache/screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/root/.hermes/profiles/*/browser_recordings/session_*.webm
+    hermes,hermes.browser_media,/root/.hermes/profiles/*/browser_screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_media,/root/.hermes/profiles/*/cache/screenshots/browser_screenshot_*.png
+    hermes,hermes.browser_profile,/home/*/.hermes/browser-profile/**
+    hermes,hermes.browser_profile,/home/*/.hermes/profiles/*/browser-profile/**
+    hermes,hermes.browser_profile,/root/.hermes/browser-profile/**
+    hermes,hermes.browser_profile,/root/.hermes/profiles/*/browser-profile/**
     hermes,hermes.checkpoint_projects,/home/*/.hermes/checkpoints/store/ledgers/*.json
     hermes,hermes.checkpoint_projects,/home/*/.hermes/checkpoints/store/projects/*.json
     hermes,hermes.checkpoint_projects,/home/*/.hermes/profiles/*/checkpoints/store/ledgers/*.json
@@ -4799,6 +4911,10 @@ sources:
     hermes,hermes.logs,/root/.hermes/logs/gateway.log
     hermes,hermes.logs,/root/.hermes/profiles/*/logs/errors.log
     hermes,hermes.logs,/root/.hermes/profiles/*/logs/gateway.log
+    hermes,hermes.mcp_installs,/home/*/.hermes/mcp-installs/**
+    hermes,hermes.mcp_installs,/home/*/.hermes/profiles/*/mcp-installs/**
+    hermes,hermes.mcp_installs,/root/.hermes/mcp-installs/**
+    hermes,hermes.mcp_installs,/root/.hermes/profiles/*/mcp-installs/**
     hermes,hermes.mcp_tokens,/home/*/.hermes/mcp-tokens/*.cimd-off
     hermes,hermes.mcp_tokens,/home/*/.hermes/mcp-tokens/*.json
     hermes,hermes.mcp_tokens,/home/*/.hermes/profiles/*/mcp-tokens/*.cimd-off
@@ -4891,10 +5007,26 @@ sources:
     hermes,hermes.process_results,/home/*/.hermes/profiles/*/logs/process-results/proc_*.json
     hermes,hermes.process_results,/root/.hermes/logs/process-results/proc_*.json
     hermes,hermes.process_results,/root/.hermes/profiles/*/logs/process-results/proc_*.json
+    hermes,hermes.profile_home,/home/*/.hermes/home/**
+    hermes,hermes.profile_home,/home/*/.hermes/profiles/*/home/**
+    hermes,hermes.profile_home,/root/.hermes/home/**
+    hermes,hermes.profile_home,/root/.hermes/profiles/*/home/**
     hermes,hermes.profile_tombstones,/home/*/.hermes/profiles/.deleted/**
     hermes,hermes.profile_tombstones,/root/.hermes/profiles/.deleted/**
     hermes,hermes.profiles,/home/*/.hermes/profiles/*/profile.yaml
     hermes,hermes.profiles,/root/.hermes/profiles/*/profile.yaml
+    hermes,hermes.remote_sandbox_snapshots,/home/*/.hermes/modal_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/home/*/.hermes/profiles/*/modal_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/home/*/.hermes/profiles/*/singularity_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/home/*/.hermes/profiles/*/vercel_sandbox_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/home/*/.hermes/singularity_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/home/*/.hermes/vercel_sandbox_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/root/.hermes/modal_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/root/.hermes/profiles/*/modal_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/root/.hermes/profiles/*/singularity_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/root/.hermes/profiles/*/vercel_sandbox_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/root/.hermes/singularity_snapshots.json
+    hermes,hermes.remote_sandbox_snapshots,/root/.hermes/vercel_sandbox_snapshots.json
     hermes,hermes.retired_wal_generations,/home/*/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,hermes.retired_wal_generations,/home/*/.hermes/state.db.retired-wal-*/**
     hermes,hermes.retired_wal_generations,/root/.hermes/profiles/*/state.db.retired-wal-*/**
