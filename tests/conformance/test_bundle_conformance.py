@@ -13,6 +13,7 @@ because nothing about the bundle itself would look wrong afterwards.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -712,3 +713,109 @@ def test_collector_runs_on_python_38(synthetic_home: Path, tmp_path: Path) -> No
     )
     assert result.returncode == 0, result.stderr
     assert verify_bundle(out).ok
+
+
+# ---------------------------------------------------------------- the source is evidence
+
+
+def snapshot(root: Path) -> dict[str, tuple[int, int, str]]:
+    """Every file below `root` as (size, mtime in nanoseconds, content hash).
+
+    Access time is left out on purpose and is the one thing a collection is allowed to
+    change: the bundle format says the collector opens without updating it where the
+    platform and the file's ownership permit, and records the original value where it
+    cannot. Everything else has to come back identical.
+    """
+    out: dict[str, tuple[int, int, str]] = {}
+    for path in sorted(root.rglob("*")):
+        relative = str(path.relative_to(root))
+        if path.is_symlink():
+            out[relative] = (-1, -1, "-> " + os.readlink(path))
+        elif path.is_dir():
+            out[relative] = (-1, -1, "directory")
+        else:
+            info = path.stat()
+            out[relative] = (
+                info.st_size,
+                info.st_mtime_ns,
+                hashlib.sha256(path.read_bytes()).hexdigest(),
+            )
+    return out
+
+
+@pytest.mark.slow
+@pytest.mark.collector
+def test_collecting_leaves_the_source_tree_exactly_as_it_was(
+    tmp_path_factory: pytest.TempPathFactory,
+) -> None:
+    """The third non-negotiable, and the one whose breach destroys the evidence itself.
+
+    Nothing on the target is modified, moved, renamed or deleted. It is written down in the
+    bundle format and in the project's own rules, and until now nothing checked it: every
+    other test here reads the bundle that came out, and none of them looked at what was left
+    behind.
+
+    A breach here is not a bug that produces a wrong answer. It is a collection that changes
+    the thing it was run to preserve, which an opposing examiner can demonstrate from the
+    timestamps and which makes the whole bundle arguable.
+
+    A fresh profile rather than the module-scoped one, because this has to compare a tree
+    against itself across one run and nothing else may have touched it in between.
+    """
+    home = tmp_path_factory.mktemp("readonly-profile") / "home"
+    build_home(home)
+    before = snapshot(home)
+    assert len(before) > 100, "an empty tree would make this test pass and prove nothing"
+
+    out = tmp_path_factory.mktemp("readonly-bundle") / "case"
+    result = run_collect_py(["--out", str(out), "--root", str(home), "--os", "linux"])
+    assert result.returncode == 0, result.stderr
+    # Without this the test passes on a collector that reads nothing at all, which is the
+    # failure mode of every test that asserts something did not happen.
+    taken = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+    assert taken["counts"]["collected"] > 20, taken["counts"]
+
+    after = snapshot(home)
+    appeared = sorted(set(after) - set(before))
+    vanished = sorted(set(before) - set(after))
+    changed = sorted(name for name in set(before) & set(after) if before[name] != after[name])
+    assert not appeared, f"the collection created these under the source tree: {appeared}"
+    assert not vanished, f"the collection removed these from the source tree: {vanished}"
+    assert not changed, f"the collection altered these in the source tree: {changed}"
+
+
+@pytest.mark.slow
+@pytest.mark.collector
+def test_collecting_writes_nothing_outside_the_output_directory(
+    tmp_path_factory: pytest.TempPathFactory,
+) -> None:
+    """The other half of the same promise: no temporary files elsewhere, no logs, no
+    configuration.
+
+    Checked by giving the run a home and a temporary directory of its own and asserting they
+    are still empty afterwards. That is where a stray write would land, because it is where
+    every library that writes one is told to look.
+    """
+    home = tmp_path_factory.mktemp("stray-profile") / "home"
+    build_home(home, with_edge_cases=False)
+    elsewhere = tmp_path_factory.mktemp("elsewhere")
+    fake_home = elsewhere / "home"
+    fake_tmp = elsewhere / "tmp"
+    fake_home.mkdir()
+    fake_tmp.mkdir()
+
+    out = tmp_path_factory.mktemp("stray-bundle") / "case"
+    environment = dict(os.environ, HOME=str(fake_home), TMPDIR=str(fake_tmp))
+    result = subprocess.run(
+        [sys.executable, str(COLLECT_PY), "--out", str(out), "--root", str(home), "--os", "linux"],
+        capture_output=True,
+        text=True,
+        timeout=600,
+        env=environment,
+    )
+    assert result.returncode == 0, result.stderr
+    taken = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+    assert taken["counts"]["collected"] > 20, taken["counts"]
+
+    strays = sorted(str(p.relative_to(elsewhere)) for p in elsewhere.rglob("*"))
+    assert strays == ["home", "tmp"], f"the collection wrote outside its output: {strays}"
