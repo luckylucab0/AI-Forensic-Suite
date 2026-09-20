@@ -151,6 +151,9 @@ UNINTERPRETED: dict[str, str] = {
     "is prose rather than records: a line of it is a fragment of what the agent saw",
     "cursor.subagent_output": "what a background subagent wrote for its parent, in a format "
     "the vendor documents nothing about, so a line of it is a fragment of a report",
+    "factory_droid.specs": "a saved specification, which is the plan for a piece of work "
+    "in prose: a line of it is a fragment of what somebody asked for, and the analyzer "
+    "carries the file whole as one plan",
     "gemini_cli.chats": "a chats directory this artifact will not narrow to an extension",
     "jetbrains_ai.aia_task_history": "a session file of prose rather than records, so a "
     "line of it is a fragment of a conversation",

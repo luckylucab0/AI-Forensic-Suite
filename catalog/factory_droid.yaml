@@ -28,6 +28,81 @@ references:
 - |-
   https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift
 artifacts:
+- id: factory_droid.output_styles
+  category: instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.factory/output-styles/*.md
+  - '%USERPROFILE%\.factory\output-styles\*.md'
+  - <project>/.factory/output-styles/*.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://docs.factory.ai/docs/droid-cli/output-styles
+  source_kind: official
+  volatility: Persistent until removed.
+  notes: |-
+    Text that changes how the agent answers, kept in its own directory at three scopes.
+
+    An output style is a markdown file the product loads into the model's instructions, so it is instruction surface in the same sense a rules file is, and the same question applies to it: one that arrives with a repository was written by whoever wrote the repository.
+
+    The third scope is the one to remember. Besides the user's directory and the repository root, the product reads the same directory from a folder inside the repository, so a style can sit next to the part of a tree it applies to and be missed by a collection that looked at the root alone.
+  parser: instructions
+- id: factory_droid.specs
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.factory/specs/**
+  - '%USERPROFILE%\.factory\specs\**'
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://docs.factory.ai/cli/configuration/settings
+  source_kind: official
+  volatility: |-
+    Written when a specification is saved and kept. The directory is a setting, so a host that changed it keeps these somewhere else entirely.
+  notes: |-
+    What the agent was asked to build, written down before it built it.
+
+    A specification here is the plan for a piece of work, saved out of a session and outliving it. Where the conversation that produced it is gone, this is the surviving statement of intent, and comparing it against what is in the repository is how an analyst sees the difference between what was asked for and what was done.
+
+    Read the setting that names this directory before concluding there are none: it accepts any path and expands a leading tilde.
+  parser: prose_document
+- id: factory_droid.worktrees
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.factory/worktrees/**
+  - '%USERPROFILE%\.factory\worktrees\**'
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://docs.factory.ai/docs/droid-cli/cli-reference
+  source_kind: official
+  volatility: |-
+    Created when the agent works in a worktree and left behind afterwards unless somebody removes it. The directory is a setting, so a host that changed it keeps them elsewhere.
+  notes: |-
+    Working copies the agent made for itself, outside the repository they came from.
+
+    When the product works in a git worktree it creates it under the user's home rather than beside the checkout. That puts a second copy of the repository's files in a place nobody looks, with the agent's own changes in it, and it survives the branch being deleted and the original checkout being cleaned.
+
+    Two things follow. Source code left the project directory, which is a data-at-rest answer. And where the agent's work was discarded upstream, the worktree can still hold it.
+  parser: null
 - id: factory_droid.auth
   category: config
   root: user_profile
@@ -52,7 +127,9 @@ artifacts:
 
     Filed as a container rather than as credential material: the file is evidence and is collected, and contains_credentials names what an exporter redacts. Withholding it to protect the credentials inside would throw away the conversations an investigation exists to read.
 
-    Record structure: I could not establish the filename of Droid's credential/session-token store from any source I was able to fetch. Do NOT guess at auth.json or cli-config.json here. Enumerate ~/.factory/ on a live image and identify the credential file empirically.
+    Half of the question is now answered and the half that is answered is the surprising one. The vendor states that the OAuth tokens for the MCP servers this agent connects to are kept in the operating system's own keyring, globally rather than per project, with a fallback file it does not name. So for those credentials the endpoint's filesystem is the wrong place to look: the keychain or credential store is, and an absence in this directory says nothing.
+
+    Record structure: the filename of the product's own sign-in token store is still not established from any source that could be fetched. Do NOT guess at auth.json or cli-config.json here. Enumerate ~/.factory/ on a live image and identify it empirically, and read the keyring for the server tokens.
   parser: json_generic
 - id: factory_droid.config
   category: config
@@ -62,6 +139,7 @@ artifacts:
   - linux
   - windows
   paths:
+  - '%USERPROFILE%\.factory\settings.json'
   - <project>/.factory/settings.json
   - <project>/.factory/settings.local.json
   - ~/.factory/config.json
@@ -70,10 +148,11 @@ artifacts:
   format: json
   sensitivity: normal
   collect_priority: normal
-  status: unverified
-  source: |-
-    https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift
-  source_kind: community
+  status: verified
+  source: https://docs.factory.ai/cli/configuration/settings
+  source_kind: official
+  unsourced_paths:
+  - ~/.factory/config.json
   volatility: Persistent until edited. settings.json is created with defaults on first run of droid.
   notes: |-
     The allow/deny lists in settings.json are the permission record for Droid - collect both the global and every project-level copy, and diff them, since a project-local settings.local.json can quietly widen what the agent may do. Note that customModels entries can contain plaintext API keys even though this is catalogued as config.
@@ -88,17 +167,22 @@ artifacts:
   - linux
   - windows
   paths:
+  - <project>/.claude/agents/*.md
   - <project>/AGENTS.md
+  - ~/.claude/agents/*.md
   - ~/.factory/commands/
   - ~/.factory/droids/
   - ~/.factory/skills/
   format: markdown
   sensitivity: normal
   collect_priority: normal
-  status: unverified
-  source: |-
-    https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift
-  source_kind: community
+  status: verified
+  source: https://docs.factory.ai/cli/configuration/custom-droids
+  source_kind: official
+  unsourced_paths:
+  - <project>/AGENTS.md
+  - ~/.factory/commands/
+  - ~/.factory/skills/
   volatility: Persistent until removed.
   notes: |-
     Partially unverified: skills/ is corroborated, droids/ and commands/ are recollection, needs verification. Custom droid definitions are user-authored agent personas with their own tool grants and are a common vector for privilege widening.
@@ -136,15 +220,17 @@ artifacts:
   - windows
   paths:
   - <project>/.factory/mcp.json
+  - <project>/<folder>/.factory/mcp.json
   - ~/.factory/hooks.json
   - ~/.factory/mcp.json
   format: json
   sensitivity: normal
   collect_priority: normal
-  status: unverified
-  source: |-
-    https://github.com/nguyenphutrong/quotio/blob/main/Packages/QuotioCore/Sources/QuotioInfrastructure/Agents/AgentDetectionAdapter.swift
-  source_kind: community
+  status: verified
+  source: https://docs.factory.ai/cli/configuration/mcp
+  source_kind: official
+  unsourced_paths:
+  - ~/.factory/hooks.json
   volatility: Persistent until edited.
   notes: |-
     hooks.json is the standout: hooks are shell commands the harness runs automatically around agent events, so this file can contain arbitrary code execution that is attributable to configuration rather than to any prompt in a transcript. Always review it, and compare its mtime against session times.

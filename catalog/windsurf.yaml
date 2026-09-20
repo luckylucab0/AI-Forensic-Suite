@@ -598,18 +598,19 @@ artifacts:
   format: registry
   sensitivity: normal
   collect_priority: normal
-  status: unverified
-  source: |-
-    https://github.com/depalmar/ai-dfir-toolkit/blob/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/docs/RESEARCH-2026-08-14.md
-  source_kind: community
+  status: verified
+  source: https://docs.devin.ai/desktop/enterprise-policies
+  source_kind: official
   volatility: |-
     Machine-wide and administrator-writable. A change here is an administrative action rather than user activity, and is unlikely to be cleaned up by the user.
   notes: |-
     The registry half of this product's enterprise policy. The filesystem paths that used to sit in this entry are now windsurf.enterprise_policy_json, windsurf.enterprise_policy_bundled and windsurf.enterprise_policy_templates: an entry declared root: registry is skipped whole by the analyzer's path matcher, so the policy file was collected and claimed by nothing, and the entry also declared os: windows, so the Linux and macOS locations were never collected at all.
 
-    Retrieved as a code-search snippet from a research-audit log inside a DFIR toolkit repo that quotes the vendor's enterprise-policies page verbatim; the vendor page itself was unreachable, which is why this is community and unverified.
+    The vendor's own page states this, and reaching it is the reason the entry is verified now rather than resting on the research log it came from. The page is not where the product's name says it would be: the documentation site of the product this entry is named after redirects to the site of the vendor's other agent, and the pages there call it Devin Desktop. The path in the registry key still spells the old name, which is the pairing to remember when searching a host for either.
 
-    Record structure: <ProductName> is the channel name, for example Software\Policies\Windsurf\Windsurf or Software\Policies\Windsurf\WindsurfInsiders, deliberately contrasted with the editor it forked, whose keys sit under Software\Policies\Microsoft\<ProductName>.
+    The vendor names the key without a hive. Both are listed because a policy of this kind can be set per machine or per user, and searching one of the two is how a control in force reads as absent.
+
+    Record structure: <ProductName> is the channel name, for example Software\Policies\Windsurf\Windsurf, which is the vendor's own example, or Software\Policies\Windsurf\WindsurfInsiders. It is deliberately contrasted with the editor it forked, whose keys sit under Software\Policies\Microsoft\<ProductName>.
   parser: registry
 - id: windsurf.enterprise_policy_json
   category: permissions
@@ -617,20 +618,21 @@ artifacts:
   os:
   - linux
   paths:
-  - /etc/windsurf/policies/policy.json
+  - /etc/vscode/policy.json
   format: json
   sensitivity: normal
   collect_priority: normal
-  status: unverified
-  source: |-
-    https://github.com/depalmar/ai-dfir-toolkit/blob/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/docs/RESEARCH-2026-08-14.md
-  source_kind: community
+  status: verified
+  source: https://docs.devin.ai/desktop/enterprise-policies
+  source_kind: official
   volatility: |-
     Machine-wide and administrator-writable. A change here is an administrative action rather than user activity, and is unlikely to be cleaned up by the user.
   notes: |-
     Split out of windsurf.enterprise_policy, which declared root: registry and os: windows, so this file was skipped by the analyzer's path matcher and never collected on the platform it exists on. Forensically this is where an administrator, or an attacker holding administrative rights, enables hooks and rules for every user on the machine: a system-wide agent configuration with no per-user artifact to show for it.
 
-    Record structure: the path is deliberately contrasted with the editor this product forked, whose machine-wide policy is /etc/vscode/policy.json. A machine-wide system.json in the same administrator-writable directory reportedly also carries system-level rules and hooks.
+    The path is the correction this entry exists for. The research it rested on placed the file under a directory named after this product and contrasted that with the editor it forked, whose machine-wide policy is at /etc/vscode/policy.json. The vendor's own page says the fork kept the upstream path: the file is /etc/vscode/policy.json, and a collection of the product-named directory would have found nothing and reported no policy in force.
+
+    Record structure: a JSON document of policy settings. The vendor also names a policies directory inside the installation tree, which holds the definitions rather than the settings, and which the entry beside this one claims on macOS. A machine-wide system.json in the same administrator-writable directory is reported by third-party research to carry system-level rules and hooks; the vendor does not mention it, so treat that as a lead rather than a location.
   parser: json_generic
 - id: windsurf.enterprise_policy_bundled
   category: permissions
@@ -642,10 +644,9 @@ artifacts:
   format: directory
   sensitivity: normal
   collect_priority: normal
-  status: unverified
-  source: |-
-    https://github.com/depalmar/ai-dfir-toolkit/blob/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/docs/RESEARCH-2026-08-14.md
-  source_kind: community
+  status: verified
+  source: https://docs.devin.ai/desktop/enterprise-policies
+  source_kind: official
   volatility: |-
     Inside the application bundle, so it is replaced wholesale by an update and carries no history of what was there before.
   notes: |-
@@ -662,10 +663,9 @@ artifacts:
   format: text
   sensitivity: normal
   collect_priority: normal
-  status: unverified
-  source: |-
-    https://github.com/depalmar/ai-dfir-toolkit/blob/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/docs/RESEARCH-2026-08-14.md
-  source_kind: community
+  status: verified
+  source: https://docs.devin.ai/desktop/enterprise-policies
+  source_kind: official
   volatility: |-
     Installed by an administrator and left alone by the product, so their presence dates the moment somebody set this machine up to be managed.
   notes: |-

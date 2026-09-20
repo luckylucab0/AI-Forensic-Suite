@@ -143,6 +143,7 @@ NOT_CLAIMED = {
     "claude_desktop.ssh_remote_artifacts": "what the agent left on another host",
     "cline.chat_workspace": "a working directory of arbitrary files",
     "cursor.worktrees": "a whole working copy, not a copy of one file",
+    "factory_droid.worktrees": "a whole working copy, not a copy of one file",
     "hermes.browser_agent_profiles": "browser profiles the agent created for itself, "
     "which are that product's own storage rather than a copy of a user's file",
     "hermes.browser_profile": "a copy of a whole browser profile, which is a tree of "

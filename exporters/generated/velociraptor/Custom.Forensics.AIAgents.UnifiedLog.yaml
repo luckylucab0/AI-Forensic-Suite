@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 9536266a9a00
+# Catalogue digest: 4e1827ac2533
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,8 +8,8 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# Scope: the 102 artifacts the catalogue files under transcript and prompt_history.
-# The other 445 are configuration, credentials, caches, logs and install
+# Scope: the 103 artifacts the catalogue files under transcript and prompt_history.
+# The other 447 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
 # credential store what an analyst wants is the file, which is what the Collect
@@ -39,6 +39,7 @@
 #   - codex.sqlite_write_ahead_logs: a database's write-ahead log and shared-memory index, which hold changed pages rather than records, so nothing comes out of one a line at a time. The analyzer names them for what they are and reads what is in the log through the database beside it, so collect all three files and ingest them together
 #   - copilot.session_store_sidecars: the same two files for another product's store, for the same reason
 #   - cursor.subagent_output: what a background subagent wrote for its parent, in a format the vendor documents nothing about, so a line of it is a fragment of a report
+#   - factory_droid.specs: a saved specification, which is the plan for a piece of work in prose: a line of it is a fragment of what somebody asked for, and the analyzer carries the file whole as one plan
 #   - gemini_cli.chats: a chats directory this artifact will not narrow to an extension
 #   - goose.command_history: a line editor's history file, which is a line each until the writer chooses its escaped format, and the analyzer reads whichever of the two the file is in
 #   - hermes.pastes: the text behind a placeholder in a prompt, which is whatever the user pasted: a line of it is a fragment of what they handed the agent, and the analyzer carries the file whole as one prompt
@@ -106,7 +107,7 @@ description: |
       read rather than as an agent that left nothing behind.
 
     - Some of what the suite's own analyzer reads is not read here, or is read
-      only in part: 30 artifacts, named in the notes below. Where
+      only in part: 31 artifacts, named in the notes below. Where
       one of them is not read, a row says the file was there, with its hash and its
       timestamps, and nothing about the conversation in it. Collect those files
       with the Collect artifact and ingest them.
@@ -289,6 +290,7 @@ sources:
       devin,devin.sessions_db,file_only,C:/Users/*/.local/share/devin/cli/sessions.db
       devin,devin.sessions_db,file_only,C:/Users/*/.local/share/devin/cli/sessions.db-shm
       devin,devin.sessions_db,file_only,C:/Users/*/.local/share/devin/cli/sessions.db-wal
+      factory_droid,factory_droid.specs,file_only,C:/Users/*/.factory/specs/**
       gemini_cli,gemini_cli.chats,file_only,C:/Users/*/.gemini/sessions/**
       gemini_cli,gemini_cli.chats,file_only,C:/Users/*/.gemini/tmp/*/chats/**
       goose,goose.command_history,file_only,C:/Users/*/AppData/Roaming/Block/goose/data/history.txt
@@ -1165,6 +1167,8 @@ sources:
       devin,devin.sessions_db,file_only,/var/root/Library/Application Support/devin/cli/sessions.db-shm
       devin,devin.sessions_db,file_only,/var/root/Library/Application Support/devin/cli/sessions.db-wal
       devin,devin.sessions_db,file_only,/var/root/Library/Application Support/devin/cli/transcripts/*.json
+      factory_droid,factory_droid.specs,file_only,/Users/*/.factory/specs/**
+      factory_droid,factory_droid.specs,file_only,/var/root/.factory/specs/**
       gemini_cli,gemini_cli.chats,file_only,/Users/*/.cache/.gemini/tmp/*/chats/**
       gemini_cli,gemini_cli.chats,file_only,/Users/*/.gemini/sessions/**
       gemini_cli,gemini_cli.chats,file_only,/Users/*/.gemini/tmp/*/chats/**
@@ -2165,6 +2169,8 @@ sources:
       devin,devin.sessions_db,file_only,/root/Library/Application Support/devin/cli/sessions.db-shm
       devin,devin.sessions_db,file_only,/root/Library/Application Support/devin/cli/sessions.db-wal
       devin,devin.sessions_db,file_only,/root/Library/Application Support/devin/cli/transcripts/*.json
+      factory_droid,factory_droid.specs,file_only,/home/*/.factory/specs/**
+      factory_droid,factory_droid.specs,file_only,/root/.factory/specs/**
       gemini_cli,gemini_cli.chats,file_only,/home/*/.cache/.gemini/tmp/*/chats/**
       gemini_cli,gemini_cli.chats,file_only,/home/*/.gemini/sessions/**
       gemini_cli,gemini_cli.chats,file_only,/home/*/.gemini/tmp/*/chats/**

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 9536266a9a00
+# Catalogue digest: 4e1827ac2533
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -96,6 +96,7 @@
 #     cursor.subagents
 #     factory_droid.config
 #     factory_droid.mcp_and_hooks
+#     factory_droid.output_styles
 #     factory_droid.sessions
 #     factory_droid.skills_and_droids
 #     gemini_cli.agent_definitions
@@ -582,6 +583,8 @@ $targets = @(
     @{ Agent = 'factory_droid'; Id = 'factory_droid.auth'; Path = '$profile\.factory' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.logs'; Path = '$profile\.factory\bug-reports' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.logs'; Path = '$profile\.factory\logs' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.specs'; Path = '$profile\.factory\specs' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.worktrees'; Path = '$profile\.factory\worktrees' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.chats'; Path = '$profile\.gemini\sessions' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.chats'; Path = '$profile\.gemini\tmp' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.credentials'; Path = '$profile\.gemini\oauth_creds.json' }

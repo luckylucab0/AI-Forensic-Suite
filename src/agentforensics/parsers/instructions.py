@@ -109,6 +109,7 @@ SOURCES = frozenset(
         "cursor.project_instructions",
         "cursor.skills",
         "cursor.subagents",
+        "factory_droid.output_styles",
         "factory_droid.skills_and_droids",
         "gemini_cli.agent_definitions",
         "gemini_cli.commands",

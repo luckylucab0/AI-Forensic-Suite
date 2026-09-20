@@ -48,6 +48,7 @@ SOURCES = {
     # model. Which prompt is not knowable from this file, and the event says so.
     "claude_code.paste_cache": "user.prompt",
     "claude_code.tool_result_spills": "unparsed.record",
+    "factory_droid.specs": "plan.write",
     "cursor.subagent_output": "unparsed.record",
     # The same shape as claude_code.paste_cache above, in a second product: a paste
     # longer than five lines or two thousand characters is written out and the prompt

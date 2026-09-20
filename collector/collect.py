@@ -5591,6 +5591,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
+                        "%USERPROFILE%\\.factory\\settings.json",
                         "<project>/.factory/settings.json",
                         "<project>/.factory/settings.local.json",
                         "~/.factory/config.json",
@@ -5599,7 +5600,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "project",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "log",
@@ -5629,12 +5630,31 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "<project>/.factory/mcp.json",
+                        "<project>/<folder>/.factory/mcp.json",
                         "~/.factory/hooks.json",
                         "~/.factory/mcp.json"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "first",
+                    "id": "factory_droid.output_styles",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.factory/output-styles/*.md",
+                        "%USERPROFILE%\\.factory\\output-styles\\*.md",
+                        "<project>/.factory/output-styles/*.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 },
                 {
                     "category": "transcript",
@@ -5665,14 +5685,50 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
+                        "<project>/.claude/agents/*.md",
                         "<project>/AGENTS.md",
+                        "~/.claude/agents/*.md",
                         "~/.factory/commands/",
                         "~/.factory/droids/",
                         "~/.factory/skills/"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "factory_droid.specs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.factory/specs/**",
+                        "%USERPROFILE%\\.factory\\specs\\**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "normal",
+                    "id": "factory_droid.worktrees",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.factory/worktrees/**",
+                        "%USERPROFILE%\\.factory\\worktrees\\**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 }
             ]
         },
@@ -10270,7 +10326,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "read_registry": true,
                     "root": "registry",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "permissions",
@@ -10284,7 +10340,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "system",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "permissions",
@@ -10294,11 +10350,11 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
-                        "/etc/windsurf/policies/policy.json"
+                        "/etc/vscode/policy.json"
                     ],
                     "root": "system",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "permissions",
@@ -10313,7 +10369,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "system",
                     "sensitivity": "normal",
-                    "status": "unverified"
+                    "status": "verified"
                 },
                 {
                     "category": "instructions",
@@ -10825,7 +10881,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "9de07de4887cd51c95eac57a4cc6c4db2cc45658df3c781a0a54ae9318ed3a2a"
+    "sha256": "e9cb8b4fcef17ae93318bf56aeb8a4b8201450950dfd71fe2e30852511533b6e"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

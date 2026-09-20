@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 9536266a9a00
+# Catalogue digest: 4e1827ac2533
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -87,6 +87,7 @@
 #     cursor.subagents
 #     factory_droid.config
 #     factory_droid.mcp_and_hooks
+#     factory_droid.output_styles
 #     factory_droid.sessions
 #     factory_droid.skills_and_droids
 #     gemini_cli.agent_definitions
@@ -664,6 +665,8 @@ sources:
     factory_droid,factory_droid.auth,C:/Users/*/.factory/**
     factory_droid,factory_droid.logs,C:/Users/*/.factory/bug-reports/**
     factory_droid,factory_droid.logs,C:/Users/*/.factory/logs/**
+    factory_droid,factory_droid.specs,C:/Users/*/.factory/specs/**
+    factory_droid,factory_droid.worktrees,C:/Users/*/.factory/worktrees/**
     gemini_cli,gemini_cli.chats,C:/Users/*/.gemini/sessions/**
     gemini_cli,gemini_cli.chats,C:/Users/*/.gemini/tmp/*/chats/**
     gemini_cli,gemini_cli.credentials,C:/Users/*/.gemini/oauth_creds.json
@@ -2569,6 +2572,10 @@ sources:
     factory_droid,factory_droid.logs,/Users/*/.factory/logs/**
     factory_droid,factory_droid.logs,/var/root/.factory/bug-reports/**
     factory_droid,factory_droid.logs,/var/root/.factory/logs/**
+    factory_droid,factory_droid.specs,/Users/*/.factory/specs/**
+    factory_droid,factory_droid.specs,/var/root/.factory/specs/**
+    factory_droid,factory_droid.worktrees,/Users/*/.factory/worktrees/**
+    factory_droid,factory_droid.worktrees,/var/root/.factory/worktrees/**
     gemini_cli,gemini_cli.chats,/Users/*/.cache/.gemini/tmp/*/chats/**
     gemini_cli,gemini_cli.chats,/Users/*/.gemini/sessions/**
     gemini_cli,gemini_cli.chats,/Users/*/.gemini/tmp/*/chats/**
@@ -4899,6 +4906,10 @@ sources:
     factory_droid,factory_droid.logs,/home/*/.factory/logs/**
     factory_droid,factory_droid.logs,/root/.factory/bug-reports/**
     factory_droid,factory_droid.logs,/root/.factory/logs/**
+    factory_droid,factory_droid.specs,/home/*/.factory/specs/**
+    factory_droid,factory_droid.specs,/root/.factory/specs/**
+    factory_droid,factory_droid.worktrees,/home/*/.factory/worktrees/**
+    factory_droid,factory_droid.worktrees,/root/.factory/worktrees/**
     gemini_cli,gemini_cli.chats,/home/*/.cache/.gemini/tmp/*/chats/**
     gemini_cli,gemini_cli.chats,/home/*/.gemini/sessions/**
     gemini_cli,gemini_cli.chats,/home/*/.gemini/tmp/*/chats/**
@@ -5990,7 +6001,7 @@ sources:
     windsurf,windsurf.embedding_database,/root/.codeium/windsurf/database/*/embedding_database.sqlite
     windsurf,windsurf.embedding_database,/root/.codeium/windsurf/database/*/embedding_database.sqlite-shm
     windsurf,windsurf.embedding_database,/root/.codeium/windsurf/database/*/embedding_database.sqlite-wal
-    windsurf,windsurf.enterprise_policy_json,/etc/windsurf/policies/policy.json
+    windsurf,windsurf.enterprise_policy_json,/etc/vscode/policy.json
     windsurf,windsurf.global_rules,/home/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,windsurf.global_rules,/home/*/.codeium/windsurf-next/memories/global_rules.md
     windsurf,windsurf.global_rules,/home/*/.codeium/windsurf/memories/global_rules.md
