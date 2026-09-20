@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: df9ddcda5104
+# Catalogue digest: d3e9da90b842
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 33 of the 503 catalogue artifacts declare
+# KAPE is Windows only. 33 of the 512 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -93,6 +93,30 @@ Targets:
         FileMask: "auth.json"
         Recursive: false
     -
+        Name: hermes.background_processes
+        Category: log
+        Path: C:\Users\%user%\.hermes
+        FileMask: "processes.json"
+        Recursive: false
+    -
+        Name: hermes.background_processes
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*
+        FileMask: "processes.json"
+        Recursive: false
+    -
+        Name: hermes.background_processes
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes
+        FileMask: "processes.json"
+        Recursive: false
+    -
+        Name: hermes.background_processes
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*
+        FileMask: "processes.json"
+        Recursive: false
+    -
         Name: hermes.backups
         Category: file_snapshot
         Path: C:\Users\%user%\.hermes\backups
@@ -115,6 +139,30 @@ Targets:
         Category: file_snapshot
         Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\backups
         FileMask: "*.zip"
+        Recursive: false
+    -
+        Name: hermes.blocked_scripts
+        Category: permissions
+        Path: C:\Users\%user%\.hermes\cache\blocked-scripts
+        FileMask: "blocked-*.sh"
+        Recursive: false
+    -
+        Name: hermes.blocked_scripts
+        Category: permissions
+        Path: C:\Users\%user%\.hermes\profiles\*\cache\blocked-scripts
+        FileMask: "blocked-*.sh"
+        Recursive: false
+    -
+        Name: hermes.blocked_scripts
+        Category: permissions
+        Path: C:\Users\%user%\AppData\Local\hermes\cache\blocked-scripts
+        FileMask: "blocked-*.sh"
+        Recursive: false
+    -
+        Name: hermes.blocked_scripts
+        Category: permissions
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\cache\blocked-scripts
+        FileMask: "blocked-*.sh"
         Recursive: false
     -
         Name: hermes.checkpoint_projects
@@ -261,6 +309,150 @@ Targets:
         FileMask: "*"
         Recursive: true
     -
+        Name: hermes.cron_executions
+        Category: log
+        Path: C:\Users\%user%\.hermes\cron
+        FileMask: "executions.db"
+        Recursive: false
+    -
+        Name: hermes.cron_executions
+        Category: log
+        Path: C:\Users\%user%\.hermes\cron
+        FileMask: "executions.db-shm"
+        Recursive: false
+    -
+        Name: hermes.cron_executions
+        Category: log
+        Path: C:\Users\%user%\.hermes\cron
+        FileMask: "executions.db-wal"
+        Recursive: false
+    -
+        Name: hermes.cron_executions
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*\cron
+        FileMask: "executions.db"
+        Recursive: false
+    -
+        Name: hermes.cron_executions
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*\cron
+        FileMask: "executions.db-shm"
+        Recursive: false
+    -
+        Name: hermes.cron_executions
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*\cron
+        FileMask: "executions.db-wal"
+        Recursive: false
+    -
+        Name: hermes.cron_executions
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\cron
+        FileMask: "executions.db"
+        Recursive: false
+    -
+        Name: hermes.cron_executions
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\cron
+        FileMask: "executions.db-shm"
+        Recursive: false
+    -
+        Name: hermes.cron_executions
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\cron
+        FileMask: "executions.db-wal"
+        Recursive: false
+    -
+        Name: hermes.cron_executions
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\cron
+        FileMask: "executions.db"
+        Recursive: false
+    -
+        Name: hermes.cron_executions
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\cron
+        FileMask: "executions.db-shm"
+        Recursive: false
+    -
+        Name: hermes.cron_executions
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\cron
+        FileMask: "executions.db-wal"
+        Recursive: false
+    -
+        Name: hermes.cron_external_workers
+        Category: log
+        Path: C:\Users\%user%\.hermes\cron\external-workers
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.cron_external_workers
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*\cron\external-workers
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.cron_external_workers
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\cron\external-workers
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.cron_external_workers
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\cron\external-workers
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.cron_jobs
+        Category: config
+        Path: C:\Users\%user%\.hermes\cron
+        FileMask: "jobs.json"
+        Recursive: false
+    -
+        Name: hermes.cron_jobs
+        Category: config
+        Path: C:\Users\%user%\.hermes\profiles\*\cron
+        FileMask: "jobs.json"
+        Recursive: false
+    -
+        Name: hermes.cron_jobs
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\hermes\cron
+        FileMask: "jobs.json"
+        Recursive: false
+    -
+        Name: hermes.cron_jobs
+        Category: config
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\cron
+        FileMask: "jobs.json"
+        Recursive: false
+    -
+        Name: hermes.cron_usage_audit
+        Category: log
+        Path: C:\Users\%user%\.hermes\cron
+        FileMask: "usage_audit.jsonl"
+        Recursive: false
+    -
+        Name: hermes.cron_usage_audit
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*\cron
+        FileMask: "usage_audit.jsonl"
+        Recursive: false
+    -
+        Name: hermes.cron_usage_audit
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\cron
+        FileMask: "usage_audit.jsonl"
+        Recursive: false
+    -
+        Name: hermes.cron_usage_audit
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\cron
+        FileMask: "usage_audit.jsonl"
+        Recursive: false
+    -
         Name: hermes.debug_share_pastes
         Category: log
         Path: C:\Users\%user%\.hermes\pastes
@@ -309,6 +501,30 @@ Targets:
         FileMask: ".env"
         Recursive: false
     -
+        Name: hermes.hooks
+        Category: instructions
+        Path: C:\Users\%user%\.hermes\hooks
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.hooks
+        Category: instructions
+        Path: C:\Users\%user%\.hermes\profiles\*\hooks
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.hooks
+        Category: instructions
+        Path: C:\Users\%user%\AppData\Local\hermes\hooks
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: hermes.hooks
+        Category: instructions
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\hooks
+        FileMask: "*"
+        Recursive: true
+    -
         Name: hermes.logs
         Category: log
         Path: C:\Users\%user%\.hermes\logs
@@ -427,6 +643,54 @@ Targets:
         Category: prompt_history
         Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\pastes
         FileMask: "paste_*.txt"
+        Recursive: false
+    -
+        Name: hermes.pending_skills
+        Category: instructions
+        Path: C:\Users\%user%\.hermes\pending\skills
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: hermes.pending_skills
+        Category: instructions
+        Path: C:\Users\%user%\.hermes\profiles\*\pending\skills
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: hermes.pending_skills
+        Category: instructions
+        Path: C:\Users\%user%\AppData\Local\hermes\pending\skills
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: hermes.pending_skills
+        Category: instructions
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\pending\skills
+        FileMask: "*.json"
+        Recursive: false
+    -
+        Name: hermes.process_results
+        Category: log
+        Path: C:\Users\%user%\.hermes\logs\process-results
+        FileMask: "proc_*.json"
+        Recursive: false
+    -
+        Name: hermes.process_results
+        Category: log
+        Path: C:\Users\%user%\.hermes\profiles\*\logs\process-results
+        FileMask: "proc_*.json"
+        Recursive: false
+    -
+        Name: hermes.process_results
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\logs\process-results
+        FileMask: "proc_*.json"
+        Recursive: false
+    -
+        Name: hermes.process_results
+        Category: log
+        Path: C:\Users\%user%\AppData\Local\hermes\profiles\*\logs\process-results
+        FileMask: "proc_*.json"
         Recursive: false
     -
         Name: hermes.profile_tombstones

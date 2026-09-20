@@ -60,6 +60,7 @@ SOURCES = frozenset(
     {
         "claude_code.shell_profile_evidence",
         "claude_code.shell_snapshots",
+        "hermes.blocked_scripts",
     }
 )
 
@@ -67,6 +68,15 @@ SOURCES = frozenset(
 # because it is a fact about the file rather than about its contents, and it is the
 # opposite fact in the two cases.
 PRESENT = {
+    "hermes.blocked_scripts": (
+        "this file is a command the agent produced and was stopped from running directly. "
+        "The block is on the shape and size of what the model wrote rather than on what "
+        "the command does, and the product saves it here as a runnable script and tells "
+        "the model it can run it in one step by naming this path. So the file is both the "
+        "command that was refused and the means of running it, and the question it raises "
+        "is whether a later command in the transcript names this path. The time it was "
+        "written is in its own name"
+    ),
     "claude_code.shell_snapshots": (
         "this snapshot was on disk when the collection ran. The vendor's documentation "
         "states that a snapshot is removed when the session exits cleanly, so one that "

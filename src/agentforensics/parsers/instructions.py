@@ -114,6 +114,7 @@ SOURCES = frozenset(
         "gemini_cli.project_config",
         "goose.hints",
         "goose.prompts",
+        "hermes.hooks",
         "hermes.skills",
         "hermes.soul",
         "junie.project_dir",

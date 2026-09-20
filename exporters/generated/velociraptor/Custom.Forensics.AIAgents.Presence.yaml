@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: df9ddcda5104
+# Catalogue digest: d3e9da90b842
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -580,10 +580,26 @@ sources:
     goose,/root/.local/state/goose/logs/llm_request.*.jsonl
     goose,/var/root/.local/state/goose/logs/llm_request.*.jsonl
     goose,C:/Users/*/AppData/Roaming/Block/goose/data/logs/llm_request.*.jsonl
+    hermes,/Users/*/.hermes/cache/blocked-scripts/blocked-*.sh
+    hermes,/Users/*/.hermes/cron/executions.db
+    hermes,/Users/*/.hermes/cron/executions.db-shm
+    hermes,/Users/*/.hermes/cron/executions.db-wal
+    hermes,/Users/*/.hermes/cron/jobs.json
+    hermes,/Users/*/.hermes/hooks/**
+    hermes,/Users/*/.hermes/logs/process-results/proc_*.json
     hermes,/Users/*/.hermes/pastes/paste_*.txt
     hermes,/Users/*/.hermes/pastes/pending.json
+    hermes,/Users/*/.hermes/pending/skills/*.json
+    hermes,/Users/*/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
+    hermes,/Users/*/.hermes/profiles/*/cron/executions.db
+    hermes,/Users/*/.hermes/profiles/*/cron/executions.db-shm
+    hermes,/Users/*/.hermes/profiles/*/cron/executions.db-wal
+    hermes,/Users/*/.hermes/profiles/*/cron/jobs.json
+    hermes,/Users/*/.hermes/profiles/*/hooks/**
+    hermes,/Users/*/.hermes/profiles/*/logs/process-results/proc_*.json
     hermes,/Users/*/.hermes/profiles/*/pastes/paste_*.txt
     hermes,/Users/*/.hermes/profiles/*/pastes/pending.json
+    hermes,/Users/*/.hermes/profiles/*/pending/skills/*.json
     hermes,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
     hermes,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db
@@ -595,10 +611,26 @@ sources:
     hermes,/Users/*/.hermes/state.db.retired-wal-*/state.db
     hermes,/Users/*/.hermes/state.db.retired-wal-*/state.db-shm
     hermes,/Users/*/.hermes/state.db.retired-wal-*/state.db-wal
+    hermes,/home/*/.hermes/cache/blocked-scripts/blocked-*.sh
+    hermes,/home/*/.hermes/cron/executions.db
+    hermes,/home/*/.hermes/cron/executions.db-shm
+    hermes,/home/*/.hermes/cron/executions.db-wal
+    hermes,/home/*/.hermes/cron/jobs.json
+    hermes,/home/*/.hermes/hooks/**
+    hermes,/home/*/.hermes/logs/process-results/proc_*.json
     hermes,/home/*/.hermes/pastes/paste_*.txt
     hermes,/home/*/.hermes/pastes/pending.json
+    hermes,/home/*/.hermes/pending/skills/*.json
+    hermes,/home/*/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
+    hermes,/home/*/.hermes/profiles/*/cron/executions.db
+    hermes,/home/*/.hermes/profiles/*/cron/executions.db-shm
+    hermes,/home/*/.hermes/profiles/*/cron/executions.db-wal
+    hermes,/home/*/.hermes/profiles/*/cron/jobs.json
+    hermes,/home/*/.hermes/profiles/*/hooks/**
+    hermes,/home/*/.hermes/profiles/*/logs/process-results/proc_*.json
     hermes,/home/*/.hermes/profiles/*/pastes/paste_*.txt
     hermes,/home/*/.hermes/profiles/*/pastes/pending.json
+    hermes,/home/*/.hermes/profiles/*/pending/skills/*.json
     hermes,/home/*/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,/home/*/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
     hermes,/home/*/.hermes/profiles/*/state.db.retired-wal-*/state.db
@@ -610,10 +642,26 @@ sources:
     hermes,/home/*/.hermes/state.db.retired-wal-*/state.db
     hermes,/home/*/.hermes/state.db.retired-wal-*/state.db-shm
     hermes,/home/*/.hermes/state.db.retired-wal-*/state.db-wal
+    hermes,/root/.hermes/cache/blocked-scripts/blocked-*.sh
+    hermes,/root/.hermes/cron/executions.db
+    hermes,/root/.hermes/cron/executions.db-shm
+    hermes,/root/.hermes/cron/executions.db-wal
+    hermes,/root/.hermes/cron/jobs.json
+    hermes,/root/.hermes/hooks/**
+    hermes,/root/.hermes/logs/process-results/proc_*.json
     hermes,/root/.hermes/pastes/paste_*.txt
     hermes,/root/.hermes/pastes/pending.json
+    hermes,/root/.hermes/pending/skills/*.json
+    hermes,/root/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
+    hermes,/root/.hermes/profiles/*/cron/executions.db
+    hermes,/root/.hermes/profiles/*/cron/executions.db-shm
+    hermes,/root/.hermes/profiles/*/cron/executions.db-wal
+    hermes,/root/.hermes/profiles/*/cron/jobs.json
+    hermes,/root/.hermes/profiles/*/hooks/**
+    hermes,/root/.hermes/profiles/*/logs/process-results/proc_*.json
     hermes,/root/.hermes/profiles/*/pastes/paste_*.txt
     hermes,/root/.hermes/profiles/*/pastes/pending.json
+    hermes,/root/.hermes/profiles/*/pending/skills/*.json
     hermes,/root/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,/root/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
     hermes,/root/.hermes/profiles/*/state.db.retired-wal-*/state.db
@@ -625,10 +673,26 @@ sources:
     hermes,/root/.hermes/state.db.retired-wal-*/state.db
     hermes,/root/.hermes/state.db.retired-wal-*/state.db-shm
     hermes,/root/.hermes/state.db.retired-wal-*/state.db-wal
+    hermes,/var/root/.hermes/cache/blocked-scripts/blocked-*.sh
+    hermes,/var/root/.hermes/cron/executions.db
+    hermes,/var/root/.hermes/cron/executions.db-shm
+    hermes,/var/root/.hermes/cron/executions.db-wal
+    hermes,/var/root/.hermes/cron/jobs.json
+    hermes,/var/root/.hermes/hooks/**
+    hermes,/var/root/.hermes/logs/process-results/proc_*.json
     hermes,/var/root/.hermes/pastes/paste_*.txt
     hermes,/var/root/.hermes/pastes/pending.json
+    hermes,/var/root/.hermes/pending/skills/*.json
+    hermes,/var/root/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
+    hermes,/var/root/.hermes/profiles/*/cron/executions.db
+    hermes,/var/root/.hermes/profiles/*/cron/executions.db-shm
+    hermes,/var/root/.hermes/profiles/*/cron/executions.db-wal
+    hermes,/var/root/.hermes/profiles/*/cron/jobs.json
+    hermes,/var/root/.hermes/profiles/*/hooks/**
+    hermes,/var/root/.hermes/profiles/*/logs/process-results/proc_*.json
     hermes,/var/root/.hermes/profiles/*/pastes/paste_*.txt
     hermes,/var/root/.hermes/profiles/*/pastes/pending.json
+    hermes,/var/root/.hermes/profiles/*/pending/skills/*.json
     hermes,/var/root/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,/var/root/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
     hermes,/var/root/.hermes/profiles/*/state.db.retired-wal-*/state.db
@@ -640,10 +704,26 @@ sources:
     hermes,/var/root/.hermes/state.db.retired-wal-*/state.db
     hermes,/var/root/.hermes/state.db.retired-wal-*/state.db-shm
     hermes,/var/root/.hermes/state.db.retired-wal-*/state.db-wal
+    hermes,C:/Users/*/.hermes/cache/blocked-scripts/blocked-*.sh
+    hermes,C:/Users/*/.hermes/cron/executions.db
+    hermes,C:/Users/*/.hermes/cron/executions.db-shm
+    hermes,C:/Users/*/.hermes/cron/executions.db-wal
+    hermes,C:/Users/*/.hermes/cron/jobs.json
+    hermes,C:/Users/*/.hermes/hooks/**
+    hermes,C:/Users/*/.hermes/logs/process-results/proc_*.json
     hermes,C:/Users/*/.hermes/pastes/paste_*.txt
     hermes,C:/Users/*/.hermes/pastes/pending.json
+    hermes,C:/Users/*/.hermes/pending/skills/*.json
+    hermes,C:/Users/*/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
+    hermes,C:/Users/*/.hermes/profiles/*/cron/executions.db
+    hermes,C:/Users/*/.hermes/profiles/*/cron/executions.db-shm
+    hermes,C:/Users/*/.hermes/profiles/*/cron/executions.db-wal
+    hermes,C:/Users/*/.hermes/profiles/*/cron/jobs.json
+    hermes,C:/Users/*/.hermes/profiles/*/hooks/**
+    hermes,C:/Users/*/.hermes/profiles/*/logs/process-results/proc_*.json
     hermes,C:/Users/*/.hermes/profiles/*/pastes/paste_*.txt
     hermes,C:/Users/*/.hermes/profiles/*/pastes/pending.json
+    hermes,C:/Users/*/.hermes/profiles/*/pending/skills/*.json
     hermes,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
     hermes,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
     hermes,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db
@@ -655,10 +735,26 @@ sources:
     hermes,C:/Users/*/.hermes/state.db.retired-wal-*/state.db
     hermes,C:/Users/*/.hermes/state.db.retired-wal-*/state.db-shm
     hermes,C:/Users/*/.hermes/state.db.retired-wal-*/state.db-wal
+    hermes,C:/Users/*/AppData/Local/hermes/cache/blocked-scripts/blocked-*.sh
+    hermes,C:/Users/*/AppData/Local/hermes/cron/executions.db
+    hermes,C:/Users/*/AppData/Local/hermes/cron/executions.db-shm
+    hermes,C:/Users/*/AppData/Local/hermes/cron/executions.db-wal
+    hermes,C:/Users/*/AppData/Local/hermes/cron/jobs.json
+    hermes,C:/Users/*/AppData/Local/hermes/hooks/**
+    hermes,C:/Users/*/AppData/Local/hermes/logs/process-results/proc_*.json
     hermes,C:/Users/*/AppData/Local/hermes/pastes/paste_*.txt
     hermes,C:/Users/*/AppData/Local/hermes/pastes/pending.json
+    hermes,C:/Users/*/AppData/Local/hermes/pending/skills/*.json
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/cron/executions.db
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/cron/executions.db-shm
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/cron/executions.db-wal
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/cron/jobs.json
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/hooks/**
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/logs/process-results/proc_*.json
     hermes,C:/Users/*/AppData/Local/hermes/profiles/*/pastes/paste_*.txt
     hermes,C:/Users/*/AppData/Local/hermes/profiles/*/pastes/pending.json
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/pending/skills/*.json
     hermes,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/**
     hermes,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/manifest.json
     hermes,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/state.db

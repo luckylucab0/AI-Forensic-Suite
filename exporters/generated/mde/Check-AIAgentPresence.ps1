@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: df9ddcda5104
+# Catalogue digest: d3e9da90b842
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -597,10 +597,18 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\AppData\Local\hermes\auth.json' }
     @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.background_processes'; Path = '$profile\.hermes\processes.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.background_processes'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.background_processes'; Path = '$profile\AppData\Local\hermes\processes.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.background_processes'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.backups'; Path = '$profile\.hermes\backups' }
     @{ Agent = 'hermes'; Id = 'hermes.backups'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.backups'; Path = '$profile\AppData\Local\hermes\backups' }
     @{ Agent = 'hermes'; Id = 'hermes.backups'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.blocked_scripts'; Path = '$profile\.hermes\cache\blocked-scripts\blocked-' }
+    @{ Agent = 'hermes'; Id = 'hermes.blocked_scripts'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.blocked_scripts'; Path = '$profile\AppData\Local\hermes\cache\blocked-scripts\blocked-' }
+    @{ Agent = 'hermes'; Id = 'hermes.blocked_scripts'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.checkpoint_projects'; Path = '$profile\.hermes\checkpoints\store\ledgers' }
     @{ Agent = 'hermes'; Id = 'hermes.checkpoint_projects'; Path = '$profile\.hermes\checkpoints\store\projects' }
     @{ Agent = 'hermes'; Id = 'hermes.checkpoint_projects'; Path = '$profile\.hermes\profiles' }
@@ -621,6 +629,26 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.cron'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.cron'; Path = '$profile\AppData\Local\hermes\cron' }
     @{ Agent = 'hermes'; Id = 'hermes.cron'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_executions'; Path = '$profile\.hermes\cron\executions.db' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_executions'; Path = '$profile\.hermes\cron\executions.db-shm' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_executions'; Path = '$profile\.hermes\cron\executions.db-wal' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_executions'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_executions'; Path = '$profile\AppData\Local\hermes\cron\executions.db' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_executions'; Path = '$profile\AppData\Local\hermes\cron\executions.db-shm' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_executions'; Path = '$profile\AppData\Local\hermes\cron\executions.db-wal' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_executions'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_external_workers'; Path = '$profile\.hermes\cron\external-workers' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_external_workers'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_external_workers'; Path = '$profile\AppData\Local\hermes\cron\external-workers' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_external_workers'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_jobs'; Path = '$profile\.hermes\cron\jobs.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_jobs'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_jobs'; Path = '$profile\AppData\Local\hermes\cron\jobs.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_jobs'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_usage_audit'; Path = '$profile\.hermes\cron\usage_audit.jsonl' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_usage_audit'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_usage_audit'; Path = '$profile\AppData\Local\hermes\cron\usage_audit.jsonl' }
+    @{ Agent = 'hermes'; Id = 'hermes.cron_usage_audit'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.debug_share_pastes'; Path = '$profile\.hermes\pastes\pending.json' }
     @{ Agent = 'hermes'; Id = 'hermes.debug_share_pastes'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.debug_share_pastes'; Path = '$profile\AppData\Local\hermes\pastes\pending.json' }
@@ -629,6 +657,10 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.env'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.env'; Path = '$profile\AppData\Local\hermes\.env' }
     @{ Agent = 'hermes'; Id = 'hermes.env'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.hooks'; Path = '$profile\.hermes\hooks' }
+    @{ Agent = 'hermes'; Id = 'hermes.hooks'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.hooks'; Path = '$profile\AppData\Local\hermes\hooks' }
+    @{ Agent = 'hermes'; Id = 'hermes.hooks'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\.hermes\logs\errors.log' }
     @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\.hermes\logs\gateway.log' }
     @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\.hermes\profiles' }
@@ -645,6 +677,14 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.pastes'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.pastes'; Path = '$profile\AppData\Local\hermes\pastes\paste_' }
     @{ Agent = 'hermes'; Id = 'hermes.pastes'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.pending_skills'; Path = '$profile\.hermes\pending\skills' }
+    @{ Agent = 'hermes'; Id = 'hermes.pending_skills'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.pending_skills'; Path = '$profile\AppData\Local\hermes\pending\skills' }
+    @{ Agent = 'hermes'; Id = 'hermes.pending_skills'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.process_results'; Path = '$profile\.hermes\logs\process-results\proc_' }
+    @{ Agent = 'hermes'; Id = 'hermes.process_results'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.process_results'; Path = '$profile\AppData\Local\hermes\logs\process-results\proc_' }
+    @{ Agent = 'hermes'; Id = 'hermes.process_results'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.profile_tombstones'; Path = '$profile\.hermes\profiles\.deleted' }
     @{ Agent = 'hermes'; Id = 'hermes.profile_tombstones'; Path = '$profile\AppData\Local\hermes\profiles\.deleted' }
     @{ Agent = 'hermes'; Id = 'hermes.profiles'; Path = '$profile\.hermes\profiles' }

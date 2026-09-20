@@ -6038,6 +6038,27 @@ $EmbeddedCatalogueJson = @'
                     "status": "verified"
                 },
                 {
+                    "category": "log",
+                    "collect_priority": "live_only",
+                    "id": "hermes.background_processes",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/processes.json",
+                        "$HERMES_HOME/profiles/<name>/processes.json",
+                        "~/.hermes/processes.json",
+                        "~/.hermes/profiles/<name>/processes.json",
+                        "%LOCALAPPDATA%\\hermes\\processes.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\processes.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "file_snapshot",
                     "collect_priority": "durable",
                     "id": "hermes.backups",
@@ -6053,6 +6074,27 @@ $EmbeddedCatalogueJson = @'
                         "~/.hermes/profiles/<name>/backups/*.zip",
                         "%LOCALAPPDATA%\\hermes\\backups\\*.zip",
                         "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\backups\\*.zip"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "first",
+                    "id": "hermes.blocked_scripts",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/cache/blocked-scripts/blocked-*.sh",
+                        "$HERMES_HOME/profiles/<name>/cache/blocked-scripts/blocked-*.sh",
+                        "~/.hermes/cache/blocked-scripts/blocked-*.sh",
+                        "~/.hermes/profiles/<name>/cache/blocked-scripts/blocked-*.sh",
+                        "%LOCALAPPDATA%\\hermes\\cache\\blocked-scripts\\blocked-*.sh",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\cache\\blocked-scripts\\blocked-*.sh"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6157,6 +6199,102 @@ $EmbeddedCatalogueJson = @'
                 {
                     "category": "log",
                     "collect_priority": "first",
+                    "id": "hermes.cron_executions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/cron/executions.db",
+                        "$HERMES_HOME/profiles/<name>/cron/executions.db",
+                        "~/.hermes/cron/executions.db",
+                        "~/.hermes/profiles/<name>/cron/executions.db",
+                        "%LOCALAPPDATA%\\hermes\\cron\\executions.db",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\cron\\executions.db",
+                        "$HERMES_HOME/cron/executions.db-wal",
+                        "$HERMES_HOME/profiles/<name>/cron/executions.db-wal",
+                        "~/.hermes/cron/executions.db-wal",
+                        "~/.hermes/profiles/<name>/cron/executions.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\cron\\executions.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\cron\\executions.db-wal",
+                        "$HERMES_HOME/cron/executions.db-shm",
+                        "$HERMES_HOME/profiles/<name>/cron/executions.db-shm",
+                        "~/.hermes/cron/executions.db-shm",
+                        "~/.hermes/profiles/<name>/cron/executions.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\cron\\executions.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\cron\\executions.db-shm"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "hermes.cron_external_workers",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/cron/external-workers/**",
+                        "$HERMES_HOME/profiles/<name>/cron/external-workers/**",
+                        "~/.hermes/cron/external-workers/**",
+                        "~/.hermes/profiles/<name>/cron/external-workers/**",
+                        "%LOCALAPPDATA%\\hermes\\cron\\external-workers\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\cron\\external-workers\\**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "hermes.cron_jobs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/cron/jobs.json",
+                        "$HERMES_HOME/profiles/<name>/cron/jobs.json",
+                        "~/.hermes/cron/jobs.json",
+                        "~/.hermes/profiles/<name>/cron/jobs.json",
+                        "%LOCALAPPDATA%\\hermes\\cron\\jobs.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\cron\\jobs.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "hermes.cron_usage_audit",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/cron/usage_audit.jsonl",
+                        "$HERMES_HOME/profiles/<name>/cron/usage_audit.jsonl",
+                        "~/.hermes/cron/usage_audit.jsonl",
+                        "~/.hermes/profiles/<name>/cron/usage_audit.jsonl",
+                        "%LOCALAPPDATA%\\hermes\\cron\\usage_audit.jsonl",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\cron\\usage_audit.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
                     "id": "hermes.debug_share_pastes",
                     "os": [
                         "macos",
@@ -6194,6 +6332,27 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "root": "user_profile",
                     "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "first",
+                    "id": "hermes.hooks",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/hooks/**",
+                        "$HERMES_HOME/profiles/<name>/hooks/**",
+                        "~/.hermes/hooks/**",
+                        "~/.hermes/profiles/<name>/hooks/**",
+                        "%LOCALAPPDATA%\\hermes\\hooks\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\hooks\\**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
                     "status": "verified"
                 },
                 {
@@ -6262,6 +6421,48 @@ $EmbeddedCatalogueJson = @'
                         "~/.hermes/profiles/<name>/pastes/paste_*.txt",
                         "%LOCALAPPDATA%\\hermes\\pastes\\paste_*.txt",
                         "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\pastes\\paste_*.txt"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "first",
+                    "id": "hermes.pending_skills",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/pending/skills/*.json",
+                        "$HERMES_HOME/profiles/<name>/pending/skills/*.json",
+                        "~/.hermes/pending/skills/*.json",
+                        "~/.hermes/profiles/<name>/pending/skills/*.json",
+                        "%LOCALAPPDATA%\\hermes\\pending\\skills\\*.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\pending\\skills\\*.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "hermes.process_results",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/logs/process-results/proc_*.json",
+                        "$HERMES_HOME/profiles/<name>/logs/process-results/proc_*.json",
+                        "~/.hermes/logs/process-results/proc_*.json",
+                        "~/.hermes/profiles/<name>/logs/process-results/proc_*.json",
+                        "%LOCALAPPDATA%\\hermes\\logs\\process-results\\proc_*.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\logs\\process-results\\proc_*.json"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -9779,7 +9980,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "6ecf50e726a33aa87bcce591532d44c8145691ae4ee29dadad4bd1fb73192e65"
+    "sha256": "6eea75f0908e1202ede64a5521d12afa7ac1fb9b9fccd323463b804b630dd960"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

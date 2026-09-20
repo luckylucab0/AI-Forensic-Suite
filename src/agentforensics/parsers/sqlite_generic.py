@@ -70,6 +70,7 @@ STORES = frozenset(
         "devin.sessions_db",
         "goose.sessions_db",
         "goose.sessions_db_windows",
+        "hermes.cron_executions",
         "hermes.retired_wal_transcripts",
         "hermes.state_db",
         "hermes.state_snapshot_transcripts",

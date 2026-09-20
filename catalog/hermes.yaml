@@ -41,6 +41,284 @@ env_overrides:
   source: |-
     https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
 artifacts:
+- id: hermes.hooks
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/hooks/**
+  - $HERMES_HOME/profiles/<name>/hooks/**
+  - ~/.hermes/hooks/**
+  - ~/.hermes/profiles/<name>/hooks/**
+  - '%LOCALAPPDATA%\hermes\hooks\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\hooks\**'
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/gateway/hooks.py
+  source_kind: source_code
+  volatility: Persistent until removed. Nothing in the product prunes this directory.
+  notes: |-
+    Code on the endpoint that this agent runs by itself, and the sharpest surface in its tree.
+
+    A hook is a Python module the agent imports and calls at fixed points in its own life: when the gateway starts, when a session starts, ends or is reset, when the agent starts a turn, on every step of its tool loop, when it finishes, and on any command. It runs in the agent's own process with the agent's own credentials, and it is not the model's code: whoever put it here decided what runs.
+
+    Two things make it worth collecting first. It runs whether or not anybody is at the keyboard, so a hook explains activity no conversation accounts for. And every profile has its own, which the product's own comment calls out as a bug it had to fix, because a hook belonging to one profile ran on another profile's messages, responses and user identifiers. Read every profile's hooks, not just the default home's.
+
+    Collect the bodies verbatim. They are evidence rather than secrets, and the times on them date when the endpoint gained the behaviour.
+
+    Record structure: one directory per hook, holding HOOK.yaml with the hook's name, description and the events it binds to, and handler.py with a handle function taking the event type and a context. The context the agent passes a handler includes the platform, the user and chat identifiers, the session id and the first five hundred characters of the message, and at the end of a turn the response, the model and the provider.
+  parser: instructions
+- id: hermes.cron_jobs
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/cron/jobs.json
+  - $HERMES_HOME/profiles/<name>/cron/jobs.json
+  - ~/.hermes/cron/jobs.json
+  - ~/.hermes/profiles/<name>/cron/jobs.json
+  - '%LOCALAPPDATA%\hermes\cron\jobs.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\cron\jobs.json'
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/developer-guide/cron-internals.md
+  source_kind: official
+  volatility: |-
+    Rewritten whole on every change, by writing a temporary file and renaming it, so the file has no history of its own and a removed job leaves nothing behind here.
+  notes: |-
+    Standing instructions this agent carries out with nobody present, and where the results are sent.
+
+    The entry for the directory around this file said the format was undocumented. It is documented, and the record is the important part: each job carries the prompt the agent is given, which is an instruction in force on the endpoint, and a delivery target, which is a destination off it. A job whose delivery target is a chat platform is a standing arrangement for this endpoint's output to leave it, written down with the channel identifier.
+
+    The counters beside them are a timeline: how many times the job has completed, when it last ran and how that run ended, and when it is due next. Compare last_run_at against the transcripts, because a job that ran without a conversation to show for it is the case where this file is the only record that anything happened.
+
+    Record structure: a JSON array of job objects with id, name, prompt, schedule as kind, expression and display text, the skills the job runs with, deliver, a repeat counter, state, enabled, next_run_at, last_run_at, last_status, created_at, and the model, provider and script the job pins if it pins any.
+  parser: json_generic
+- id: hermes.cron_executions
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/cron/executions.db
+  - $HERMES_HOME/profiles/<name>/cron/executions.db
+  - ~/.hermes/cron/executions.db
+  - ~/.hermes/profiles/<name>/cron/executions.db
+  - '%LOCALAPPDATA%\hermes\cron\executions.db'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\cron\executions.db'
+  - $HERMES_HOME/cron/executions.db-wal
+  - $HERMES_HOME/profiles/<name>/cron/executions.db-wal
+  - ~/.hermes/cron/executions.db-wal
+  - ~/.hermes/profiles/<name>/cron/executions.db-wal
+  - '%LOCALAPPDATA%\hermes\cron\executions.db-wal'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\cron\executions.db-wal'
+  - $HERMES_HOME/cron/executions.db-shm
+  - $HERMES_HOME/profiles/<name>/cron/executions.db-shm
+  - ~/.hermes/cron/executions.db-shm
+  - ~/.hermes/profiles/<name>/cron/executions.db-shm
+  - '%LOCALAPPDATA%\hermes\cron\executions.db-shm'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\cron\executions.db-shm'
+  format: sqlite
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/cron/executions.py
+  source_kind: source_code
+  volatility: |-
+    Written with every run of every scheduled job and opened with full synchronous writes, so a run that was in progress when the machine stopped is still recorded. Shares the file with the incident record.
+  notes: |-
+    The run history of the standing instructions in the file above, which those instructions themselves do not keep.
+
+    This is where unattended activity is dated. A job record says a job exists and when it last ran; this says every time it ran. For a timeline that is the difference between one point and a series, and for the question of whether anything happened while nobody was present it is the only answer on the endpoint that does not depend on a conversation having been written.
+
+    Read it beside the transcript store. Runs here with no session there are the interesting ones.
+  parser: sqlite_generic
+- id: hermes.cron_usage_audit
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/cron/usage_audit.jsonl
+  - $HERMES_HOME/profiles/<name>/cron/usage_audit.jsonl
+  - ~/.hermes/cron/usage_audit.jsonl
+  - ~/.hermes/profiles/<name>/cron/usage_audit.jsonl
+  - '%LOCALAPPDATA%\hermes\cron\usage_audit.jsonl'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\cron\usage_audit.jsonl'
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/cron/scheduler.py
+  source_kind: source_code
+  volatility: Appended to by the scheduler.
+  notes: |-
+    What the unattended work cost, line by line. Its value to an analyst is not the money but the shape: a line here is a model call that happened, with a time on it, and a run of lines is a period of activity. Where the conversation for that work was pruned or the job deleted, this is a record that it took place.
+  parser: jsonl_generic
+- id: hermes.cron_external_workers
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/cron/external-workers/**
+  - $HERMES_HOME/profiles/<name>/cron/external-workers/**
+  - ~/.hermes/cron/external-workers/**
+  - ~/.hermes/profiles/<name>/cron/external-workers/**
+  - '%LOCALAPPDATA%\hermes\cron\external-workers\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\cron\external-workers\**'
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/cron/scheduler.py
+  source_kind: source_code
+  volatility: Handoff files, written when work is passed out and removed when it is taken back.
+  notes: |-
+    Where the scheduler hands a job to something that is not this process. A file here is a piece of this endpoint's work that was carried out elsewhere, so it marks the boundary past which this collection stops answering and says which run went over it.
+  parser: json_generic
+- id: hermes.pending_skills
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/pending/skills/*.json
+  - $HERMES_HOME/profiles/<name>/pending/skills/*.json
+  - ~/.hermes/pending/skills/*.json
+  - ~/.hermes/profiles/<name>/pending/skills/*.json
+  - '%LOCALAPPDATA%\hermes\pending\skills\*.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\pending\skills\*.json'
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: |-
+    Written when the approval gate is on and kept until the write is approved or rejected. The vendor documents that staged writes survive a restart. Only present at all where somebody turned the gate on.
+  notes: |-
+    A skill this agent wrote for itself and was not allowed to install.
+
+    The installed skills are evidence of self-directed capability acquisition that succeeded. This is the other half: the attempts, held at a gate, with their full text, including the ones a person then rejected. A rejected write leaves no skill on disk and would otherwise leave no trace at all.
+
+    It is also the clearest place to see an agent acting on an instruction it was given rather than on its own: a staged skill whose content matches text that arrived in a conversation is an injected instruction caught at the moment it tried to become permanent.
+
+    The same gate exists for memory writes, under its own setting.
+
+    Record structure: one JSON document per staged write, carrying the proposed skill and enough to render a difference against what is installed. Where a write was approved the skill is under the skills directory and this file is gone, so the two entries have to be read together.
+  parser: json_generic
+- id: hermes.blocked_scripts
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/cache/blocked-scripts/blocked-*.sh
+  - $HERMES_HOME/profiles/<name>/cache/blocked-scripts/blocked-*.sh
+  - ~/.hermes/cache/blocked-scripts/blocked-*.sh
+  - ~/.hermes/profiles/<name>/cache/blocked-scripts/blocked-*.sh
+  - '%LOCALAPPDATA%\hermes\cache\blocked-scripts\blocked-*.sh'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\cache\blocked-scripts\blocked-*.sh'
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/tools/approval_floors.py
+  source_kind: source_code
+  volatility: |-
+    Swept by the agent after seven days. The name carries the time of writing as a Unix timestamp, so a file that is gone can still be dated from a reference to it in a conversation.
+  notes: |-
+    Commands the agent tried to run and was stopped from running directly, written out verbatim as runnable scripts.
+
+    This is the file that answers whether a control was worked around. The product blocks a command here on the shape and size of what the model produced rather than on what the command does, saves it as a script, and tells the model it can run it in one step by naming that script. So the block is a speed bump by design, and the endpoint now holds both the command that was refused and the path that runs it.
+
+    Read it against the transcript in both directions. A script here with no matching invocation afterwards is a command that did not run. A script here followed by a command naming its path is a control that was satisfied rather than enforced, and the analyst is looking at exactly what was executed.
+
+    A separate floor refuses some commands outright, with wording telling the model not to retry or rephrase them. Those are never written here, so an absence is not evidence that nothing was refused.
+
+    Record structure: one file per blocked command, named with the word blocked, the Unix time and eight hexadecimal characters. The file is a shell script whose first lines are the product's own comment saying why it exists and how to run it, followed by the command as the model wrote it.
+  parser: shell_script
+- id: hermes.background_processes
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/processes.json
+  - $HERMES_HOME/profiles/<name>/processes.json
+  - ~/.hermes/processes.json
+  - ~/.hermes/profiles/<name>/processes.json
+  - '%LOCALAPPDATA%\hermes\processes.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\processes.json'
+  format: json
+  sensitivity: normal
+  collect_priority: live_only
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/tools/process_registry.py
+  source_kind: source_code
+  volatility: |-
+    A crash-recovery checkpoint of processes that are running now, rewritten as they start and finish and deleted as stale when the container next boots. On a live endpoint it is a snapshot of what is running; on an image it is whatever was running when the machine stopped.
+  notes: |-
+    Processes this agent started in the background and left running.
+
+    A background command does not end with the turn that started it. This file is what the agent keeps so it can find them again after a crash, and for an analyst it is a list of work that outlived the conversation: the command, the process id, the working directory, when it started, and the session and task it belongs to.
+
+    Two cautions the file itself imposes. The command is written here with the product's own redaction applied, so a secret on the command line is masked and what is in the case is not exactly what ran. And it names running processes, not finished ones, which have their own entry beside this one.
+  parser: json_generic
+- id: hermes.process_results
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/logs/process-results/proc_*.json
+  - $HERMES_HOME/profiles/<name>/logs/process-results/proc_*.json
+  - ~/.hermes/logs/process-results/proc_*.json
+  - ~/.hermes/profiles/<name>/logs/process-results/proc_*.json
+  - '%LOCALAPPDATA%\hermes\logs\process-results\proc_*.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\logs\process-results\proc_*.json'
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/tools/process_registry_results.py
+  source_kind: source_code
+  volatility: |-
+    Kept to the sixty-four most recently completed and pruned by a retention window, both counted from when a job finished rather than when it started. A busy endpoint therefore keeps a short window and a quiet one keeps a long history.
+  notes: |-
+    A command execution record with the exit code and the output, for the background work the entry above only lists while it is running.
+
+    This is as close as this agent comes to a shell history, and it is better than one in two ways: it carries the exit code and the tail of what the command printed, and it joins each run to the session and the task that asked for it. Where a conversation was pruned, these receipts remain and say what was run and how it ended.
+
+    The redaction applies here too, to both the command and the output, and it is forced rather than optional, so what is in the file is the product's redacted view of what happened.
+
+    Record structure: one JSON document per finished process, with id, the redacted command, the working directory, the task and owning task, the session key and parent session, the start time, the exit code, how the process completed, what terminated it, and the tail of its output.
+  parser: json_generic
 - id: hermes.retired_wal_transcripts
   category: transcript
   root: user_profile

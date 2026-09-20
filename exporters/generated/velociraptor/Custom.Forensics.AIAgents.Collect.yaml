@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: df9ddcda5104
+# Catalogue digest: d3e9da90b842
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -679,10 +679,18 @@ sources:
     hermes,hermes.auth,C:/Users/*/.hermes/profiles/*/auth.json
     hermes,hermes.auth,C:/Users/*/AppData/Local/hermes/auth.json
     hermes,hermes.auth,C:/Users/*/AppData/Local/hermes/profiles/*/auth.json
+    hermes,hermes.background_processes,C:/Users/*/.hermes/processes.json
+    hermes,hermes.background_processes,C:/Users/*/.hermes/profiles/*/processes.json
+    hermes,hermes.background_processes,C:/Users/*/AppData/Local/hermes/processes.json
+    hermes,hermes.background_processes,C:/Users/*/AppData/Local/hermes/profiles/*/processes.json
     hermes,hermes.backups,C:/Users/*/.hermes/backups/*.zip
     hermes,hermes.backups,C:/Users/*/.hermes/profiles/*/backups/*.zip
     hermes,hermes.backups,C:/Users/*/AppData/Local/hermes/backups/*.zip
     hermes,hermes.backups,C:/Users/*/AppData/Local/hermes/profiles/*/backups/*.zip
+    hermes,hermes.blocked_scripts,C:/Users/*/.hermes/cache/blocked-scripts/blocked-*.sh
+    hermes,hermes.blocked_scripts,C:/Users/*/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
+    hermes,hermes.blocked_scripts,C:/Users/*/AppData/Local/hermes/cache/blocked-scripts/blocked-*.sh
+    hermes,hermes.blocked_scripts,C:/Users/*/AppData/Local/hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
     hermes,hermes.checkpoint_projects,C:/Users/*/.hermes/checkpoints/store/ledgers/*.json
     hermes,hermes.checkpoint_projects,C:/Users/*/.hermes/checkpoints/store/projects/*.json
     hermes,hermes.checkpoint_projects,C:/Users/*/.hermes/profiles/*/checkpoints/store/ledgers/*.json
@@ -707,6 +715,30 @@ sources:
     hermes,hermes.cron,C:/Users/*/.hermes/profiles/*/cron/**
     hermes,hermes.cron,C:/Users/*/AppData/Local/hermes/cron/**
     hermes,hermes.cron,C:/Users/*/AppData/Local/hermes/profiles/*/cron/**
+    hermes,hermes.cron_executions,C:/Users/*/.hermes/cron/executions.db
+    hermes,hermes.cron_executions,C:/Users/*/.hermes/cron/executions.db-shm
+    hermes,hermes.cron_executions,C:/Users/*/.hermes/cron/executions.db-wal
+    hermes,hermes.cron_executions,C:/Users/*/.hermes/profiles/*/cron/executions.db
+    hermes,hermes.cron_executions,C:/Users/*/.hermes/profiles/*/cron/executions.db-shm
+    hermes,hermes.cron_executions,C:/Users/*/.hermes/profiles/*/cron/executions.db-wal
+    hermes,hermes.cron_executions,C:/Users/*/AppData/Local/hermes/cron/executions.db
+    hermes,hermes.cron_executions,C:/Users/*/AppData/Local/hermes/cron/executions.db-shm
+    hermes,hermes.cron_executions,C:/Users/*/AppData/Local/hermes/cron/executions.db-wal
+    hermes,hermes.cron_executions,C:/Users/*/AppData/Local/hermes/profiles/*/cron/executions.db
+    hermes,hermes.cron_executions,C:/Users/*/AppData/Local/hermes/profiles/*/cron/executions.db-shm
+    hermes,hermes.cron_executions,C:/Users/*/AppData/Local/hermes/profiles/*/cron/executions.db-wal
+    hermes,hermes.cron_external_workers,C:/Users/*/.hermes/cron/external-workers/**
+    hermes,hermes.cron_external_workers,C:/Users/*/.hermes/profiles/*/cron/external-workers/**
+    hermes,hermes.cron_external_workers,C:/Users/*/AppData/Local/hermes/cron/external-workers/**
+    hermes,hermes.cron_external_workers,C:/Users/*/AppData/Local/hermes/profiles/*/cron/external-workers/**
+    hermes,hermes.cron_jobs,C:/Users/*/.hermes/cron/jobs.json
+    hermes,hermes.cron_jobs,C:/Users/*/.hermes/profiles/*/cron/jobs.json
+    hermes,hermes.cron_jobs,C:/Users/*/AppData/Local/hermes/cron/jobs.json
+    hermes,hermes.cron_jobs,C:/Users/*/AppData/Local/hermes/profiles/*/cron/jobs.json
+    hermes,hermes.cron_usage_audit,C:/Users/*/.hermes/cron/usage_audit.jsonl
+    hermes,hermes.cron_usage_audit,C:/Users/*/.hermes/profiles/*/cron/usage_audit.jsonl
+    hermes,hermes.cron_usage_audit,C:/Users/*/AppData/Local/hermes/cron/usage_audit.jsonl
+    hermes,hermes.cron_usage_audit,C:/Users/*/AppData/Local/hermes/profiles/*/cron/usage_audit.jsonl
     hermes,hermes.debug_share_pastes,C:/Users/*/.hermes/pastes/pending.json
     hermes,hermes.debug_share_pastes,C:/Users/*/.hermes/profiles/*/pastes/pending.json
     hermes,hermes.debug_share_pastes,C:/Users/*/AppData/Local/hermes/pastes/pending.json
@@ -715,6 +747,10 @@ sources:
     hermes,hermes.env,C:/Users/*/.hermes/profiles/*/.env
     hermes,hermes.env,C:/Users/*/AppData/Local/hermes/.env
     hermes,hermes.env,C:/Users/*/AppData/Local/hermes/profiles/*/.env
+    hermes,hermes.hooks,C:/Users/*/.hermes/hooks/**
+    hermes,hermes.hooks,C:/Users/*/.hermes/profiles/*/hooks/**
+    hermes,hermes.hooks,C:/Users/*/AppData/Local/hermes/hooks/**
+    hermes,hermes.hooks,C:/Users/*/AppData/Local/hermes/profiles/*/hooks/**
     hermes,hermes.logs,C:/Users/*/.hermes/logs/errors.log
     hermes,hermes.logs,C:/Users/*/.hermes/logs/gateway.log
     hermes,hermes.logs,C:/Users/*/.hermes/profiles/*/logs/errors.log
@@ -735,6 +771,14 @@ sources:
     hermes,hermes.pastes,C:/Users/*/.hermes/profiles/*/pastes/paste_*.txt
     hermes,hermes.pastes,C:/Users/*/AppData/Local/hermes/pastes/paste_*.txt
     hermes,hermes.pastes,C:/Users/*/AppData/Local/hermes/profiles/*/pastes/paste_*.txt
+    hermes,hermes.pending_skills,C:/Users/*/.hermes/pending/skills/*.json
+    hermes,hermes.pending_skills,C:/Users/*/.hermes/profiles/*/pending/skills/*.json
+    hermes,hermes.pending_skills,C:/Users/*/AppData/Local/hermes/pending/skills/*.json
+    hermes,hermes.pending_skills,C:/Users/*/AppData/Local/hermes/profiles/*/pending/skills/*.json
+    hermes,hermes.process_results,C:/Users/*/.hermes/logs/process-results/proc_*.json
+    hermes,hermes.process_results,C:/Users/*/.hermes/profiles/*/logs/process-results/proc_*.json
+    hermes,hermes.process_results,C:/Users/*/AppData/Local/hermes/logs/process-results/proc_*.json
+    hermes,hermes.process_results,C:/Users/*/AppData/Local/hermes/profiles/*/logs/process-results/proc_*.json
     hermes,hermes.profile_tombstones,C:/Users/*/.hermes/profiles/.deleted/**
     hermes,hermes.profile_tombstones,C:/Users/*/AppData/Local/hermes/profiles/.deleted/**
     hermes,hermes.profiles,C:/Users/*/.hermes/profiles/*/profile.yaml
@@ -2351,10 +2395,18 @@ sources:
     hermes,hermes.auth,/Users/*/.hermes/profiles/*/auth.json
     hermes,hermes.auth,/var/root/.hermes/auth.json
     hermes,hermes.auth,/var/root/.hermes/profiles/*/auth.json
+    hermes,hermes.background_processes,/Users/*/.hermes/processes.json
+    hermes,hermes.background_processes,/Users/*/.hermes/profiles/*/processes.json
+    hermes,hermes.background_processes,/var/root/.hermes/processes.json
+    hermes,hermes.background_processes,/var/root/.hermes/profiles/*/processes.json
     hermes,hermes.backups,/Users/*/.hermes/backups/*.zip
     hermes,hermes.backups,/Users/*/.hermes/profiles/*/backups/*.zip
     hermes,hermes.backups,/var/root/.hermes/backups/*.zip
     hermes,hermes.backups,/var/root/.hermes/profiles/*/backups/*.zip
+    hermes,hermes.blocked_scripts,/Users/*/.hermes/cache/blocked-scripts/blocked-*.sh
+    hermes,hermes.blocked_scripts,/Users/*/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
+    hermes,hermes.blocked_scripts,/var/root/.hermes/cache/blocked-scripts/blocked-*.sh
+    hermes,hermes.blocked_scripts,/var/root/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
     hermes,hermes.checkpoint_projects,/Users/*/.hermes/checkpoints/store/ledgers/*.json
     hermes,hermes.checkpoint_projects,/Users/*/.hermes/checkpoints/store/projects/*.json
     hermes,hermes.checkpoint_projects,/Users/*/.hermes/profiles/*/checkpoints/store/ledgers/*.json
@@ -2379,6 +2431,30 @@ sources:
     hermes,hermes.cron,/Users/*/.hermes/profiles/*/cron/**
     hermes,hermes.cron,/var/root/.hermes/cron/**
     hermes,hermes.cron,/var/root/.hermes/profiles/*/cron/**
+    hermes,hermes.cron_executions,/Users/*/.hermes/cron/executions.db
+    hermes,hermes.cron_executions,/Users/*/.hermes/cron/executions.db-shm
+    hermes,hermes.cron_executions,/Users/*/.hermes/cron/executions.db-wal
+    hermes,hermes.cron_executions,/Users/*/.hermes/profiles/*/cron/executions.db
+    hermes,hermes.cron_executions,/Users/*/.hermes/profiles/*/cron/executions.db-shm
+    hermes,hermes.cron_executions,/Users/*/.hermes/profiles/*/cron/executions.db-wal
+    hermes,hermes.cron_executions,/var/root/.hermes/cron/executions.db
+    hermes,hermes.cron_executions,/var/root/.hermes/cron/executions.db-shm
+    hermes,hermes.cron_executions,/var/root/.hermes/cron/executions.db-wal
+    hermes,hermes.cron_executions,/var/root/.hermes/profiles/*/cron/executions.db
+    hermes,hermes.cron_executions,/var/root/.hermes/profiles/*/cron/executions.db-shm
+    hermes,hermes.cron_executions,/var/root/.hermes/profiles/*/cron/executions.db-wal
+    hermes,hermes.cron_external_workers,/Users/*/.hermes/cron/external-workers/**
+    hermes,hermes.cron_external_workers,/Users/*/.hermes/profiles/*/cron/external-workers/**
+    hermes,hermes.cron_external_workers,/var/root/.hermes/cron/external-workers/**
+    hermes,hermes.cron_external_workers,/var/root/.hermes/profiles/*/cron/external-workers/**
+    hermes,hermes.cron_jobs,/Users/*/.hermes/cron/jobs.json
+    hermes,hermes.cron_jobs,/Users/*/.hermes/profiles/*/cron/jobs.json
+    hermes,hermes.cron_jobs,/var/root/.hermes/cron/jobs.json
+    hermes,hermes.cron_jobs,/var/root/.hermes/profiles/*/cron/jobs.json
+    hermes,hermes.cron_usage_audit,/Users/*/.hermes/cron/usage_audit.jsonl
+    hermes,hermes.cron_usage_audit,/Users/*/.hermes/profiles/*/cron/usage_audit.jsonl
+    hermes,hermes.cron_usage_audit,/var/root/.hermes/cron/usage_audit.jsonl
+    hermes,hermes.cron_usage_audit,/var/root/.hermes/profiles/*/cron/usage_audit.jsonl
     hermes,hermes.debug_share_pastes,/Users/*/.hermes/pastes/pending.json
     hermes,hermes.debug_share_pastes,/Users/*/.hermes/profiles/*/pastes/pending.json
     hermes,hermes.debug_share_pastes,/var/root/.hermes/pastes/pending.json
@@ -2387,6 +2463,10 @@ sources:
     hermes,hermes.env,/Users/*/.hermes/profiles/*/.env
     hermes,hermes.env,/var/root/.hermes/.env
     hermes,hermes.env,/var/root/.hermes/profiles/*/.env
+    hermes,hermes.hooks,/Users/*/.hermes/hooks/**
+    hermes,hermes.hooks,/Users/*/.hermes/profiles/*/hooks/**
+    hermes,hermes.hooks,/var/root/.hermes/hooks/**
+    hermes,hermes.hooks,/var/root/.hermes/profiles/*/hooks/**
     hermes,hermes.logs,/Users/*/.hermes/logs/errors.log
     hermes,hermes.logs,/Users/*/.hermes/logs/gateway.log
     hermes,hermes.logs,/Users/*/.hermes/profiles/*/logs/errors.log
@@ -2407,6 +2487,14 @@ sources:
     hermes,hermes.pastes,/Users/*/.hermes/profiles/*/pastes/paste_*.txt
     hermes,hermes.pastes,/var/root/.hermes/pastes/paste_*.txt
     hermes,hermes.pastes,/var/root/.hermes/profiles/*/pastes/paste_*.txt
+    hermes,hermes.pending_skills,/Users/*/.hermes/pending/skills/*.json
+    hermes,hermes.pending_skills,/Users/*/.hermes/profiles/*/pending/skills/*.json
+    hermes,hermes.pending_skills,/var/root/.hermes/pending/skills/*.json
+    hermes,hermes.pending_skills,/var/root/.hermes/profiles/*/pending/skills/*.json
+    hermes,hermes.process_results,/Users/*/.hermes/logs/process-results/proc_*.json
+    hermes,hermes.process_results,/Users/*/.hermes/profiles/*/logs/process-results/proc_*.json
+    hermes,hermes.process_results,/var/root/.hermes/logs/process-results/proc_*.json
+    hermes,hermes.process_results,/var/root/.hermes/profiles/*/logs/process-results/proc_*.json
     hermes,hermes.profile_tombstones,/Users/*/.hermes/profiles/.deleted/**
     hermes,hermes.profile_tombstones,/var/root/.hermes/profiles/.deleted/**
     hermes,hermes.profiles,/Users/*/.hermes/profiles/*/profile.yaml
@@ -4411,10 +4499,18 @@ sources:
     hermes,hermes.auth,/home/*/.hermes/profiles/*/auth.json
     hermes,hermes.auth,/root/.hermes/auth.json
     hermes,hermes.auth,/root/.hermes/profiles/*/auth.json
+    hermes,hermes.background_processes,/home/*/.hermes/processes.json
+    hermes,hermes.background_processes,/home/*/.hermes/profiles/*/processes.json
+    hermes,hermes.background_processes,/root/.hermes/processes.json
+    hermes,hermes.background_processes,/root/.hermes/profiles/*/processes.json
     hermes,hermes.backups,/home/*/.hermes/backups/*.zip
     hermes,hermes.backups,/home/*/.hermes/profiles/*/backups/*.zip
     hermes,hermes.backups,/root/.hermes/backups/*.zip
     hermes,hermes.backups,/root/.hermes/profiles/*/backups/*.zip
+    hermes,hermes.blocked_scripts,/home/*/.hermes/cache/blocked-scripts/blocked-*.sh
+    hermes,hermes.blocked_scripts,/home/*/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
+    hermes,hermes.blocked_scripts,/root/.hermes/cache/blocked-scripts/blocked-*.sh
+    hermes,hermes.blocked_scripts,/root/.hermes/profiles/*/cache/blocked-scripts/blocked-*.sh
     hermes,hermes.checkpoint_projects,/home/*/.hermes/checkpoints/store/ledgers/*.json
     hermes,hermes.checkpoint_projects,/home/*/.hermes/checkpoints/store/projects/*.json
     hermes,hermes.checkpoint_projects,/home/*/.hermes/profiles/*/checkpoints/store/ledgers/*.json
@@ -4439,6 +4535,30 @@ sources:
     hermes,hermes.cron,/home/*/.hermes/profiles/*/cron/**
     hermes,hermes.cron,/root/.hermes/cron/**
     hermes,hermes.cron,/root/.hermes/profiles/*/cron/**
+    hermes,hermes.cron_executions,/home/*/.hermes/cron/executions.db
+    hermes,hermes.cron_executions,/home/*/.hermes/cron/executions.db-shm
+    hermes,hermes.cron_executions,/home/*/.hermes/cron/executions.db-wal
+    hermes,hermes.cron_executions,/home/*/.hermes/profiles/*/cron/executions.db
+    hermes,hermes.cron_executions,/home/*/.hermes/profiles/*/cron/executions.db-shm
+    hermes,hermes.cron_executions,/home/*/.hermes/profiles/*/cron/executions.db-wal
+    hermes,hermes.cron_executions,/root/.hermes/cron/executions.db
+    hermes,hermes.cron_executions,/root/.hermes/cron/executions.db-shm
+    hermes,hermes.cron_executions,/root/.hermes/cron/executions.db-wal
+    hermes,hermes.cron_executions,/root/.hermes/profiles/*/cron/executions.db
+    hermes,hermes.cron_executions,/root/.hermes/profiles/*/cron/executions.db-shm
+    hermes,hermes.cron_executions,/root/.hermes/profiles/*/cron/executions.db-wal
+    hermes,hermes.cron_external_workers,/home/*/.hermes/cron/external-workers/**
+    hermes,hermes.cron_external_workers,/home/*/.hermes/profiles/*/cron/external-workers/**
+    hermes,hermes.cron_external_workers,/root/.hermes/cron/external-workers/**
+    hermes,hermes.cron_external_workers,/root/.hermes/profiles/*/cron/external-workers/**
+    hermes,hermes.cron_jobs,/home/*/.hermes/cron/jobs.json
+    hermes,hermes.cron_jobs,/home/*/.hermes/profiles/*/cron/jobs.json
+    hermes,hermes.cron_jobs,/root/.hermes/cron/jobs.json
+    hermes,hermes.cron_jobs,/root/.hermes/profiles/*/cron/jobs.json
+    hermes,hermes.cron_usage_audit,/home/*/.hermes/cron/usage_audit.jsonl
+    hermes,hermes.cron_usage_audit,/home/*/.hermes/profiles/*/cron/usage_audit.jsonl
+    hermes,hermes.cron_usage_audit,/root/.hermes/cron/usage_audit.jsonl
+    hermes,hermes.cron_usage_audit,/root/.hermes/profiles/*/cron/usage_audit.jsonl
     hermes,hermes.debug_share_pastes,/home/*/.hermes/pastes/pending.json
     hermes,hermes.debug_share_pastes,/home/*/.hermes/profiles/*/pastes/pending.json
     hermes,hermes.debug_share_pastes,/root/.hermes/pastes/pending.json
@@ -4447,6 +4567,10 @@ sources:
     hermes,hermes.env,/home/*/.hermes/profiles/*/.env
     hermes,hermes.env,/root/.hermes/.env
     hermes,hermes.env,/root/.hermes/profiles/*/.env
+    hermes,hermes.hooks,/home/*/.hermes/hooks/**
+    hermes,hermes.hooks,/home/*/.hermes/profiles/*/hooks/**
+    hermes,hermes.hooks,/root/.hermes/hooks/**
+    hermes,hermes.hooks,/root/.hermes/profiles/*/hooks/**
     hermes,hermes.logs,/home/*/.hermes/logs/errors.log
     hermes,hermes.logs,/home/*/.hermes/logs/gateway.log
     hermes,hermes.logs,/home/*/.hermes/profiles/*/logs/errors.log
@@ -4467,6 +4591,14 @@ sources:
     hermes,hermes.pastes,/home/*/.hermes/profiles/*/pastes/paste_*.txt
     hermes,hermes.pastes,/root/.hermes/pastes/paste_*.txt
     hermes,hermes.pastes,/root/.hermes/profiles/*/pastes/paste_*.txt
+    hermes,hermes.pending_skills,/home/*/.hermes/pending/skills/*.json
+    hermes,hermes.pending_skills,/home/*/.hermes/profiles/*/pending/skills/*.json
+    hermes,hermes.pending_skills,/root/.hermes/pending/skills/*.json
+    hermes,hermes.pending_skills,/root/.hermes/profiles/*/pending/skills/*.json
+    hermes,hermes.process_results,/home/*/.hermes/logs/process-results/proc_*.json
+    hermes,hermes.process_results,/home/*/.hermes/profiles/*/logs/process-results/proc_*.json
+    hermes,hermes.process_results,/root/.hermes/logs/process-results/proc_*.json
+    hermes,hermes.process_results,/root/.hermes/profiles/*/logs/process-results/proc_*.json
     hermes,hermes.profile_tombstones,/home/*/.hermes/profiles/.deleted/**
     hermes,hermes.profile_tombstones,/root/.hermes/profiles/.deleted/**
     hermes,hermes.profiles,/home/*/.hermes/profiles/*/profile.yaml
