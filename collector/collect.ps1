@@ -11010,6 +11010,10 @@ $EmbeddedCatalogueJson = @'
                         "%APPDATA%\\Windsurf\\User\\keybindings.json",
                         "%APPDATA%\\Windsurf\\User\\settings.json",
                         "%APPDATA%\\Windsurf\\argv.json",
+                        "~/.config/Devin/User/chatLanguageModels.json",
+                        "~/.config/Devin/User/settings.json",
+                        "~/.config/Devin/Workspaces/<epoch-ms>/workspace.json",
+                        "~/.config/Devin/config.json",
                         "~/.config/Windsurf/User/settings.json",
                         "~/.devin/.devin-argv-precopy",
                         "~/.devin/argv.json",
@@ -11594,7 +11598,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "28f03013a839df5d1218fb79a37d47aff88b8448ecd68bd618141d92527532a0"
+    "sha256": "681e3eec5f32b4c71c16a93ea8fb99eec66cc0560dcea9b6137e5da54575e3e7"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

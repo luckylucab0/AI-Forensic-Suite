@@ -1162,3 +1162,38 @@ def test_the_cross_product_rule_fires_from_the_filesystem_up(tmp_path: Path) -> 
     # Three events per store carry the folder: the store's own inventory, its one row, and
     # the workspace file itself. The rule groups them and counts the products, not the rows.
     assert len(both[0].event_ids) == 6
+
+
+def test_the_cross_product_rule_fires_on_a_windows_image_too(tmp_path: Path) -> None:
+    """The same rule over the synthetic Windows profile, collected as a mounted image.
+
+    Windows is where this chain has the most places to go wrong quietly, and it already had
+    one: the file that names a store's folder was catalogued for macOS alone, so on Windows
+    it was never collected and every row of the store arrived unattributed while the
+    collection reported success. Between the catalogue pattern and this finding sit the
+    expansion of the application-data variables, the glob, the claim order, the bundle path
+    mapping for a path with a drive letter in it, and a percent-encoded drive letter inside
+    the URI itself.
+    """
+    import sys
+
+    from agentforensics.catalog import load_catalogue
+    from agentforensics.ingest import ingest
+
+    root = Path(__file__).resolve().parents[2]
+    sys.path.insert(0, str(root / "tests" / "fixtures"))
+    from generate import build_windows_home
+
+    image = tmp_path / "image"
+    build_windows_home(image / "Users" / "alice")
+    rules = [rule for rule in load(root / "rules") if rule.id == "AFX-COLLECTIONINTEGRITY-004"]
+
+    with Case.open(tmp_path / "case.db") as case:
+        ingest(case, image, load_catalogue(root / "catalog"))
+        findings = scan(case, rules, store=False).findings
+
+    assert len(findings) == 1, f"one folder in two products is one finding, got {len(findings)}"
+    assert findings[0].matched == {"project_path": ["c:/Users/alice/src/app"]}, (
+        "the drive letter arrives percent-encoded in the URI, so a reading that skipped the "
+        "decoding would produce a path with an escape in it that no filesystem has"
+    )

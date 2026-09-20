@@ -50,6 +50,12 @@ OLD = REFERENCE_NOW - 45 * 86400
 # not catch that code changing them.
 LEVELDB_TABLE_MAGIC = 0xDB4775248B80FB57
 
+# The directory name a per-workspace store sits in. Fixed and shared between the two
+# products on purpose: measurement showed the same folder produces the same name in both,
+# and that is the only thing that ties their stores together, since the name is not a digest
+# of the folder path and nothing can compute it back into one.
+WORKSPACE_DIR = "b4af0224818994b4dab29942900af245"
+
 SESSION_A = "4f8c1e2a-0000-4000-8000-000000000001"
 SESSION_B = "4f8c1e2a-0000-4000-8000-000000000002"
 # The SDK session, which is a different store from the editor extension's task tree: a
@@ -1369,6 +1375,38 @@ def write_vscode_state(path: Path, mtime: int = RECENT) -> Path:
     return path
 
 
+def write_workspace_store(directory: Path, folder: str, mtime: int = RECENT) -> Path:
+    """A per-workspace state store and the file beside it that says which folder it is.
+
+    The pair rather than the store alone, because the pair is the point. The directory name
+    is not a digest of the folder path and cannot be computed back into one, so the store on
+    its own is a set of rows nobody can attribute. ADR 0038 has the parser read the
+    neighbour; this writes the shape that reading depends on.
+    """
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / "state.vscdb"
+    if path.exists():
+        path.unlink()
+    connection = sqlite3.connect(path)
+    try:
+        connection.execute(VSCODE_SCHEMA)
+        connection.execute(
+            "INSERT INTO ItemTable VALUES (?,?)",
+            (
+                "aiService.prompts",
+                json.dumps([{"text": "remove the debug logging"}], sort_keys=True).encode(),
+            ),
+        )
+        connection.commit()
+    finally:
+        connection.close()
+    os.utime(path, (mtime, mtime))
+    # The URI is percent-encoded the way the editor writes it, drive letter included, so
+    # the decoding the parser does is exercised rather than assumed.
+    write(directory / "workspace.json", json.dumps({"folder": folder}, sort_keys=True), mtime)
+    return path
+
+
 # What build_windows_home writes, as {catalogue artifact id: why it is in the fixture}.
 # Named here rather than only in a test, because the value of this tree is that each file
 # is reached by a Windows application-data pattern from the catalogue and nothing else, and
@@ -1383,6 +1421,17 @@ WINDOWS_ARTIFACTS = {
     "vscode.state_vscdb": (
         "the editor's key/value state store, which five catalogue entries across three "
         "products are, so the one file's reading is exercised where it actually lives"
+    ),
+    "cursor.workspace_state_vscdb": (
+        "a per-workspace store and the file beside it that names its folder. Both, because "
+        "the file was catalogued for macOS alone until a rule needed it: on Windows it was "
+        "never collected, every row of the store arrived unattributed, and the collection "
+        "reported success"
+    ),
+    "windsurf.ide_workspace_state_vscdb": (
+        "the same pair under the second product, on the same folder. Two products in one "
+        "folder is what AFX-COLLECTIONINTEGRITY-004 is about, and it can only be shown by a "
+        "tree that has both"
     ),
     "goose.secrets": "a credential file, so the withholding rule is exercised on a "
     "Windows path rather than only on a POSIX one",
@@ -1447,6 +1496,16 @@ def build_windows_home(home: Path) -> dict:
     write_zed_store(local / "Zed" / "threads" / "threads.db", project.replace("\\", "/"))
     write_leveldb_store(roaming / "Claude" / "Local Storage" / "leveldb")
     write_vscode_state(roaming / "Code" / "User" / "globalStorage" / "state.vscdb")
+
+    # The same folder under both products, with the same opaque directory name, which is
+    # what the endpoint actually does: the name is derived from the folder identically by
+    # both and is not a digest of the path. The URI carries the drive letter percent-encoded
+    # the way the editor writes it.
+    opened = "file:///c%3A/Users/alice/src/app"
+    for product in ("Cursor", "Devin"):
+        write_workspace_store(
+            roaming / product / "User" / "workspaceStorage" / WORKSPACE_DIR, opened
+        )
 
     goose_config = roaming / "Block" / "goose" / "config"
     write(

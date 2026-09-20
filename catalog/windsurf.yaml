@@ -274,6 +274,10 @@ artifacts:
   - '%APPDATA%\Windsurf\User\keybindings.json'
   - '%APPDATA%\Windsurf\User\settings.json'
   - '%APPDATA%\Windsurf\argv.json'
+  - ~/.config/Devin/User/chatLanguageModels.json
+  - ~/.config/Devin/User/settings.json
+  - ~/.config/Devin/Workspaces/<epoch-ms>/workspace.json
+  - ~/.config/Devin/config.json
   - ~/.config/Windsurf/User/settings.json
   - ~/.devin/.devin-argv-precopy
   - ~/.devin/argv.json

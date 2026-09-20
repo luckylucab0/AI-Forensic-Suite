@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: e9544ada63da
+// Catalogue digest: 8c8a4ecb7852
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -2508,7 +2508,15 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "windsurf", "windsurf.ide_global_state_vscdb", "Windsurf\\User\\globalStorage\\state.vscdb",
     "windsurf", "windsurf.ide_global_state_vscdb", "Windsurf\\User\\globalStorage\\state.vscdb-shm",
     "windsurf", "windsurf.ide_global_state_vscdb", "Windsurf\\User\\globalStorage\\state.vscdb-wal",
+    "windsurf", "windsurf.ide_user_data", ".config/Devin/User/chatLanguageModels.json",
+    "windsurf", "windsurf.ide_user_data", ".config/Devin/User/settings.json",
+    "windsurf", "windsurf.ide_user_data", ".config/Devin/Workspaces",
+    "windsurf", "windsurf.ide_user_data", ".config/Devin/config.json",
     "windsurf", "windsurf.ide_user_data", ".config/Windsurf/User/settings.json",
+    "windsurf", "windsurf.ide_user_data", ".config\\Devin\\User\\chatLanguageModels.json",
+    "windsurf", "windsurf.ide_user_data", ".config\\Devin\\User\\settings.json",
+    "windsurf", "windsurf.ide_user_data", ".config\\Devin\\Workspaces",
+    "windsurf", "windsurf.ide_user_data", ".config\\Devin\\config.json",
     "windsurf", "windsurf.ide_user_data", ".config\\Windsurf\\User\\settings.json",
     "windsurf", "windsurf.ide_user_data", ".devin/.devin-argv-precopy",
     "windsurf", "windsurf.ide_user_data", ".devin/argv.json",

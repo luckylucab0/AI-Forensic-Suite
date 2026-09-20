@@ -345,7 +345,7 @@ def test_the_same_task_reads_the_same_from_both_shapes(
 def test_the_fixture_declares_why_each_artifact_is_in_it() -> None:
     """The fixture names its own coverage, so a gap is a sentence rather than an absence.
 
-    Eight artifacts out of the eighty-four the catalogue has under the two application-data
+    Ten artifacts out of the eighty-four the catalogue has under the two application-data
     roots. The number is not the point and raising it is not automatically an improvement:
     what this pins is that the chain works for every shape in the fixture, and that
     somebody said out loud which shapes those are.
@@ -354,10 +354,12 @@ def test_the_fixture_declares_why_each_artifact_is_in_it() -> None:
         "claude_code.mcp_logs",
         "claude_desktop.renderer_state",
         "crosscutting.shell_psreadline_history",
+        "cursor.workspace_state_vscdb",
         "goose.config",
         "goose.secrets",
         "kilo_code.extension_id_legacy_tree",
         "vscode.state_vscdb",
+        "windsurf.ide_workspace_state_vscdb",
         "zed.threads_db",
     }
     for artifact, reason in WINDOWS_ARTIFACTS.items():
