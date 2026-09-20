@@ -974,3 +974,191 @@ def test_the_generated_rule_says_it_is_generated() -> None:
     # And it states what it leaves out, because an exclusion nobody can see is a silent
     # narrowing of a detection.
     assert "Deliberately excluded" in text
+
+
+# ------------------------------- a group judged by how many different things are in it
+
+DISTINCT_RULE = """
+id: AFX-COLLECTIONINTEGRITY-900
+pack: collection_integrity
+title: A rule used by the distinct-count engine tests
+severity: low
+description: Fires when one folder appears under more than one agent, for the tests.
+rationale: Long enough to satisfy the schema, and it exists only to exercise distinct.
+applies_to:
+  kinds: [config.snapshot]
+match:
+  field: project_path
+  exists: true
+aggregate:
+  group_by: [project_path]
+  min_count: 2
+  distinct: agent
+  distinct_gte: 2
+tests:
+  - name: a snapshot that names a folder
+    match: true
+    event: {kind: config.snapshot, project_path: /repos/proj}
+  - name: a snapshot that names none
+    match: false
+    event: {kind: config.snapshot}
+"""
+
+
+def two_product_case(tmp_path: Path, agents: list[str | None]) -> Case:
+    """One folder, one event per entry in `agents`, each under the agent named."""
+    from agentforensics.model import BundleRecord
+    from agentforensics.model.event import Event, Provenance
+
+    case = Case.open(tmp_path / "distinct.sqlite")
+    case.add_bundle(BundleRecord(bundle_uuid="b1", source_kind="directory", source_path="/x"))
+    case.add_events(
+        [
+            Event(
+                kind="config.snapshot",
+                provenance=Provenance("b1", f"/x/{index}/state.vscdb", "aa", None, "row:1"),
+                agent=agent or "unknown",
+                raw={},
+                ts_utc=None,
+                ts_precision="absent",
+                ts_source=None,
+                actor="system",
+                user="alice",
+                project_path="/Users/alice/repos/proj",
+                payload={"key": "k", "text": "v"},
+            )
+            for index, agent in enumerate(agents)
+        ]
+    )
+    return case
+
+
+def test_a_distinct_count_does_not_fire_on_one_product_alone(tmp_path: Path) -> None:
+    """The whole reason the option exists. Twenty rows of one product in one folder is
+    every developer machine; one row each from two products in one folder is the finding,
+    and a count of events cannot tell them apart."""
+    write(
+        tmp_path / "rules",
+        "collection_integrity",
+        "AFX-COLLECTIONINTEGRITY-900.yaml",
+        DISTINCT_RULE,
+    )
+    rules = load(tmp_path / "rules")
+    case = two_product_case(tmp_path, ["cursor", "cursor", "cursor"])
+    report = scan(case, rules, store=False)
+    case.close()
+
+    assert not report.findings
+
+
+def test_a_distinct_count_fires_when_the_group_holds_two_of_them(tmp_path: Path) -> None:
+    write(
+        tmp_path / "rules",
+        "collection_integrity",
+        "AFX-COLLECTIONINTEGRITY-900.yaml",
+        DISTINCT_RULE,
+    )
+    rules = load(tmp_path / "rules")
+    case = two_product_case(tmp_path, ["cursor", "windsurf"])
+    report = scan(case, rules, store=False)
+    case.close()
+
+    assert len(report.findings) == 1
+    assert len(report.findings[0].event_ids) == 2
+
+
+def test_an_absent_value_counts_as_one_of_its_own(tmp_path: Path) -> None:
+    """Dropping the events that did not say would turn "one product, and some rows that did
+    not say" into "one product", which is a smaller claim than the evidence supports. The
+    finding is then somebody's to read rather than the engine's to suppress."""
+    write(
+        tmp_path / "rules",
+        "collection_integrity",
+        "AFX-COLLECTIONINTEGRITY-900.yaml",
+        DISTINCT_RULE,
+    )
+    rules = load(tmp_path / "rules")
+    case = two_product_case(tmp_path, ["cursor", None])
+    report = scan(case, rules, store=False)
+    case.close()
+
+    assert len(report.findings) == 1
+
+
+def test_a_distinct_field_without_a_threshold_is_refused(tmp_path: Path) -> None:
+    """A field named with no threshold would silently do nothing, which is the kind of
+    half-written rule that makes a pack untrustworthy."""
+    body = DISTINCT_RULE.replace("  distinct_gte: 2\n", "")
+    write(tmp_path / "rules", "collection_integrity", "AFX-COLLECTIONINTEGRITY-900.yaml", body)
+    with pytest.raises(RuleError):
+        load(tmp_path / "rules")
+
+
+def test_a_threshold_without_a_field_is_refused(tmp_path: Path) -> None:
+    body = DISTINCT_RULE.replace("  distinct: agent\n", "")
+    write(tmp_path / "rules", "collection_integrity", "AFX-COLLECTIONINTEGRITY-900.yaml", body)
+    with pytest.raises(RuleError):
+        load(tmp_path / "rules")
+
+
+def test_the_cross_product_rule_fires_from_the_filesystem_up(tmp_path: Path) -> None:
+    """The shipped rule, over a profile on disk, through the catalogue and the parsers.
+
+    Its inline tests can only show that the condition matches one event, and this rule is
+    not about one event: it is about a group holding two products. The path it depends on
+    has four places to break silently, and two of them already had. The catalogue has to
+    claim the file beside each store for this operating system; the matcher has to attribute
+    both trees; the parser has to resolve the folder out of that file; and the engine has to
+    count the products rather than the rows. A test over constructed events would pass with
+    any of those broken.
+
+    Both directions, because the first is what makes the rule true and the second is what
+    keeps it from firing on every developer machine.
+    """
+    import sqlite3
+
+    from agentforensics.catalog import load_catalogue
+    from agentforensics.ingest import ingest
+
+    schema = (
+        "CREATE TABLE IF NOT EXISTS ItemTable (key TEXT UNIQUE ON CONFLICT REPLACE, value BLOB)"
+    )
+    folder = "file:///home/alice/repos/proj"
+
+    def profile(home: Path, products: tuple[str, ...]) -> Path:
+        for product in products:
+            directory = home / ".config" / product / "User" / "workspaceStorage" / "b4af02248189"
+            directory.mkdir(parents=True)
+            (directory / "workspace.json").write_text(f'{{"folder": "{folder}"}}')
+            connection = sqlite3.connect(directory / "state.vscdb")
+            try:
+                connection.execute(schema)
+                connection.execute("INSERT INTO ItemTable VALUES ('aiService.prompts', '[]')")
+                connection.commit()
+            finally:
+                connection.close()
+        return home
+
+    root = Path(__file__).resolve().parents[2]
+    catalogue = load_catalogue(root / "catalog")
+    rules = [rule for rule in load(root / "rules") if rule.id == "AFX-COLLECTIONINTEGRITY-004"]
+    assert rules, "the shipped rule this test is about"
+
+    def findings(products: tuple[str, ...], name: str) -> list:
+        home = profile(tmp_path / name / "alice", products)
+        with Case.open(tmp_path / f"{name}.db") as case:
+            ingest(case, home, catalogue)
+            return scan(case, rules, store=False).findings
+
+    alone = findings(("Cursor",), "one")
+    assert not alone, "one product in one folder is every developer machine, not a finding"
+
+    both = findings(("Cursor", "Devin"), "two")
+    assert len(both) == 1, f"one folder in two products is one finding, got {len(both)}"
+    assert both[0].matched == {"project_path": ["/home/alice/repos/proj"]}, (
+        "the folder the finding is about, resolved out of the file beside each store "
+        "rather than out of the directory name, which is not a digest of it"
+    )
+    # Three events per store carry the folder: the store's own inventory, its one row, and
+    # the workspace file itself. The rule groups them and counts the products, not the rows.
+    assert len(both[0].event_ids) == 6

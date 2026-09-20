@@ -5867,9 +5867,11 @@ $EmbeddedCatalogueJson = @'
                         "%APPDATA%\\Cursor\\User\\workspaceStorage\\<workspace-hash>\\state.vscdb",
                         "%APPDATA%\\Cursor\\User\\workspaceStorage\\<workspace-hash>\\state.vscdb-shm",
                         "%APPDATA%\\Cursor\\User\\workspaceStorage\\<workspace-hash>\\state.vscdb-wal",
+                        "%APPDATA%\\Cursor\\User\\workspaceStorage\\<workspace-hash>\\workspace.json",
                         "~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb",
                         "~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-shm",
                         "~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-wal",
+                        "~/.config/Cursor/User/workspaceStorage/<workspace-hash>/workspace.json",
                         "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb",
                         "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-shm",
                         "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-wal",
@@ -11044,6 +11046,7 @@ $EmbeddedCatalogueJson = @'
                         "%APPDATA%\\Windsurf\\User\\workspaceStorage\\<hash>\\state.vscdb",
                         "%APPDATA%\\Windsurf\\User\\workspaceStorage\\<hash>\\state.vscdb-shm",
                         "%APPDATA%\\Windsurf\\User\\workspaceStorage\\<hash>\\state.vscdb-wal",
+                        "%APPDATA%\\Windsurf\\User\\workspaceStorage\\<hash>\\workspace.json",
                         "~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb",
                         "~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-shm",
                         "~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-wal",
@@ -11053,6 +11056,7 @@ $EmbeddedCatalogueJson = @'
                         "~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb",
                         "~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-shm",
                         "~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-wal",
+                        "~/.config/Windsurf/User/workspaceStorage/<hash>/workspace.json",
                         "~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb",
                         "~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-shm",
                         "~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-wal",
@@ -11060,7 +11064,8 @@ $EmbeddedCatalogueJson = @'
                         "~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/workspace.json",
                         "~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb",
                         "~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb-shm",
-                        "~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb-wal"
+                        "~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb-wal",
+                        "~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/workspace.json"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -11589,7 +11594,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "b296b87eb5714a76cacd83a99be6a8195a0ff99402fc20b2ab6d2876b33fc4bb"
+    "sha256": "28f03013a839df5d1218fb79a37d47aff88b8448ecd68bd618141d92527532a0"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

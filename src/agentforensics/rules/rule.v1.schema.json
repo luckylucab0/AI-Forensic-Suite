@@ -89,8 +89,27 @@
           "description": "Optional. When set, the count has to be reached inside a sliding window of this many minutes, so a rule about a burst does not fire on the same number of events spread over a week. Events with no timestamp are counted in a group of their own, never folded into a window they might not belong to.",
           "type": ["integer", "null"],
           "minimum": 1
+        },
+        "distinct": {
+          "description": "Optional, and set together with distinct_gte. An event field whose DIFFERENT values are counted inside a group, for 'this folder was open in more than one product'. Without it a group is judged by how many events it holds, which cannot tell one product's twenty rows apart from two products' one row each.",
+          "type": "string",
+          "minLength": 1
+        },
+        "distinct_gte": {
+          "description": "Optional, and set together with distinct. How many different values of that field a group needs before the rule fires, applied after min_count and inside the same window. An absent value counts as one value of its own rather than being ignored, because 'some of them did not say' is not the same as 'they all agreed'.",
+          "type": "integer",
+          "minimum": 2
         }
-      }
+      },
+      "$comment": "distinct and distinct_gte are both or neither. Expressed with anyOf rather than with dependentRequired because the validator this package uses does not implement the latter and accepts a rule that names a field with no threshold, which would silently do nothing.",
+      "anyOf": [
+        { "required": ["distinct", "distinct_gte"] },
+        {
+          "not": {
+            "anyOf": [{ "required": ["distinct"] }, { "required": ["distinct_gte"] }]
+          }
+        }
+      ]
     },
     "redact": {
       "description": "When true, a finding names what matched without quoting it. Used by the secrets pack: the matched value there is the credential itself, and a finding is exported to CSV and pasted into reports, so quoting it would spread the credential rather than report it. The event still holds the original, which is where an analyst looks.",

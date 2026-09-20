@@ -1406,3 +1406,41 @@ def test_an_entry_whose_paths_are_registry_keys_says_so_in_its_root() -> None:
         "these entries list a registry key under a filesystem root, so the collector "
         f"would search for it as a path: {misfiled}"
     )
+
+
+# ------------------------------- the file that says which project a workspace store is
+
+
+def test_every_per_workspace_store_claims_the_file_that_names_its_folder() -> None:
+    """Without it the store's directory name cannot be reversed, and nothing says so.
+
+    A per-workspace store sits in a directory whose name is not a digest of the folder
+    path: measurement showed that fifty combinations of normalisation and algorithm fail to
+    reproduce one, and the same folder yields the same name in two different products. The
+    editor writes the answer beside the store in a `workspace.json`, and the parser reads it
+    to put the project on every row of that store (ADR 0038).
+
+    The gap this holds shut was real and it was silent. One product's entry claimed that
+    file for macOS alone, so on Windows and on Linux it was never collected, the store
+    arrived with nothing that could attribute its rows, and the collection reported success.
+    So: any entry that claims a state store under a per-workspace directory has to claim the
+    neighbour for every spelling of it, per operating system prefix.
+    """
+    catalogue = load_catalogue(CATALOG_DIR)
+    missing: dict[str, list[str]] = {}
+    for artifact in catalogue.artifacts:
+        for path in artifact.paths:
+            normalised = path.replace("\\", "/")
+            if "workspaceStorage/" not in normalised or not normalised.endswith("state.vscdb"):
+                continue
+            directory = normalised.rsplit("/", 1)[0]
+            wanted = f"{directory}/workspace.json"
+            claimed = {other.replace("\\", "/") for other in artifact.paths}
+            if wanted not in claimed:
+                missing.setdefault(artifact.id, []).append(path)
+
+    assert not missing, (
+        "these per-workspace stores would be collected without the file that says which "
+        "folder they belong to, so every row of them arrives unattributed and nothing in "
+        f"the case says why: {missing}"
+    )

@@ -234,7 +234,7 @@ def scan(case: Case, rules: Sequence[Rule], *, store: bool = True) -> ScanReport
             continue
         for members in buckets[rule.id].values():
             for window in _windows(members, aggregate):
-                if len(window) >= aggregate.min_count:
+                if len(window) >= aggregate.min_count and _distinct_enough(window, aggregate):
                     fired.add(rule.id)
                     report.findings.append(_finding(rule, window))
 
@@ -251,6 +251,22 @@ def _group_value(event: EventView, name: str) -> Any:
     """One grouping key, with an absent value kept distinct from an empty one."""
     value = getattr(event, name, None)
     return ("\x00absent",) if value is None else value
+
+
+def _distinct_enough(window: list[EventView], aggregate: Aggregate) -> bool:
+    """Whether a group holds enough DIFFERENT values of the field the rule names.
+
+    Applied after the size test and inside the same window, so a rule can ask for both "at
+    least two events" and "from at least two products" without those meaning the same thing.
+
+    An absent value counts as a value of its own, through the same helper the grouping uses.
+    Dropping the events that did not say would turn "one product and some rows that did not
+    say" into "one product", which is a smaller claim than the evidence supports.
+    """
+    if aggregate.distinct is None or aggregate.distinct_gte is None:
+        return True
+    seen = {_group_value(event, aggregate.distinct) for event in window}
+    return len(seen) >= aggregate.distinct_gte
 
 
 def _windows(members: list[EventView], aggregate: Aggregate) -> list[list[EventView]]:

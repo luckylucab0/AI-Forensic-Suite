@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 8b845017c074
+# Catalogue digest: e9544ada63da
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -687,6 +687,7 @@ sources:
     cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-shm
     cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/workspace.json
     cursor,cursor.worktrees,C:/Users/*/.cursor/worktrees/*
     devin,devin.acp_events,C:/Users/*/AppData/Roaming/Devin/User/acp-events/**
     devin,devin.sessions_db,C:/Users/*/.local/share/devin/cli/sessions.db
@@ -1445,6 +1446,7 @@ sources:
     windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.implicit_trajectories,C:/Users/*/.codeium/windsurf/implicit/*.pb
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/.codeium/*/language_server_linux_x64
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/.codeium/*/language_server_macos_arm
@@ -2690,6 +2692,7 @@ sources:
     cursor,cursor.workspace_state_vscdb,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
     cursor,cursor.workspace_state_vscdb,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    cursor,cursor.workspace_state_vscdb,/Users/*/.config/Cursor/User/workspaceStorage/*/workspace.json
     cursor,cursor.workspace_state_vscdb,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
     cursor,cursor.workspace_state_vscdb,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
@@ -2697,6 +2700,7 @@ sources:
     cursor,cursor.workspace_state_vscdb,/var/root/.config/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/var/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
     cursor,cursor.workspace_state_vscdb,/var/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    cursor,cursor.workspace_state_vscdb,/var/root/.config/Cursor/User/workspaceStorage/*/workspace.json
     cursor,cursor.workspace_state_vscdb,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
     cursor,cursor.workspace_state_vscdb,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
@@ -3978,6 +3982,7 @@ sources:
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-wal
@@ -3986,6 +3991,7 @@ sources:
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Devin/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Devin/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Devin/User/workspaceStorage/*/state.vscdb-wal
@@ -3995,6 +4001,7 @@ sources:
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-wal
@@ -4003,6 +4010,7 @@ sources:
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.implicit_trajectories,/Users/*/.codeium/windsurf/implicit/*.pb
     windsurf,windsurf.implicit_trajectories,/var/root/.codeium/windsurf/implicit/*.pb
     windsurf,windsurf.language_server_binaries_and_logs,/Applications/Devin.app
@@ -5207,6 +5215,7 @@ sources:
     cursor,cursor.workspace_state_vscdb,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
     cursor,cursor.workspace_state_vscdb,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    cursor,cursor.workspace_state_vscdb,/home/*/.config/Cursor/User/workspaceStorage/*/workspace.json
     cursor,cursor.workspace_state_vscdb,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
     cursor,cursor.workspace_state_vscdb,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
@@ -5214,6 +5223,7 @@ sources:
     cursor,cursor.workspace_state_vscdb,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
     cursor,cursor.workspace_state_vscdb,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    cursor,cursor.workspace_state_vscdb,/root/.config/Cursor/User/workspaceStorage/*/workspace.json
     cursor,cursor.workspace_state_vscdb,/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
     cursor,cursor.workspace_state_vscdb,/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
@@ -6471,6 +6481,7 @@ sources:
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-wal
@@ -6479,6 +6490,7 @@ sources:
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Windsurf/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Devin/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Devin/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Devin/User/workspaceStorage/*/state.vscdb-wal
@@ -6488,6 +6500,7 @@ sources:
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-wal
@@ -6496,6 +6509,7 @@ sources:
     windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Windsurf/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.implicit_trajectories,/home/*/.codeium/windsurf/implicit/*.pb
     windsurf,windsurf.implicit_trajectories,/root/.codeium/windsurf/implicit/*.pb
     windsurf,windsurf.language_server_binaries_and_logs,/Applications/Devin.app

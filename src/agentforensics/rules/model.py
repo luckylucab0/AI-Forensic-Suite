@@ -101,11 +101,21 @@ class Aggregate:
     "Twenty files read from one session in a minute" is not a property any single event has.
     Such a rule groups the events it matched and fires once per group, so a finding is about
     the burst rather than about its twentieth member.
+
+    A group can also be judged by how many different values of one field it holds rather
+    than only by its size. "This folder was open in more than one product" needs that: a
+    count alone cannot tell one product's twenty rows apart from two products' one row each,
+    and the first of those is every developer machine while the second is the finding.
     """
 
     group_by: tuple[str, ...]
     min_count: int
     window_minutes: int | None = None
+    # How many DIFFERENT values of one field a group has to hold, on top of how many events
+    # it holds. Both or neither: the schema requires them together, because a field named
+    # with no threshold would silently do nothing.
+    distinct: str | None = None
+    distinct_gte: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -281,6 +291,10 @@ def load_file(path: Path, pack: str | None = None, lang: str = "en") -> Rule:
             min_count=int(block["min_count"]),
             window_minutes=(
                 int(block["window_minutes"]) if block.get("window_minutes") is not None else None
+            ),
+            distinct=(str(block["distinct"]) if block.get("distinct") is not None else None),
+            distinct_gte=(
+                int(block["distinct_gte"]) if block.get("distinct_gte") is not None else None
             ),
         )
 

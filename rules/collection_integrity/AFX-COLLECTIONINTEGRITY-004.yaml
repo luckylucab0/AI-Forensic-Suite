@@ -1,0 +1,78 @@
+id: AFX-COLLECTIONINTEGRITY-004
+pack: collection_integrity
+title: One folder was open in more than one agent product
+severity: low
+description: >
+  The same project folder appears in the per-workspace state of two or more different agent
+  products. Whatever one product's transcripts say about that folder is not the whole of
+  what was done in it.
+rationale: >
+  This rule is about the case rather than about the endpoint, and what it corrects is a
+  scoping mistake rather than a technical one. An examination that found one agent's
+  conversations about a repository and answered from them has answered about one of the
+  products that worked on it. The other one's transcripts live in a different tree, under a
+  different product name, and on the measured hosts in a different store format, so nothing
+  in the first product's data points at them.
+  .
+  It is worth a rule rather than a note because the endpoint makes the connection hard to
+  see. Measured on a clean Windows 11 26200 host and a clean macOS 26.5 host: two editors
+  derived from the same one keep their per-workspace state in a directory whose name is not
+  a digest of the folder path, so nobody can compute it, and the same folder produces the
+  same opaque name in both products. The only thing that undoes the name is a small file
+  beside each store, and it is that file this rule's field comes from.
+  .
+  Read it as an instruction to widen the collection, not as suspicion. Two agent products on
+  one machine is ordinary. What is not ordinary is reporting on one of them as though it
+  were all of them.
+applies_to:
+  kinds: [config.snapshot]
+match:
+  # Set by the parser from the file beside the store, so an event only carries it where the
+  # folder is actually known. A store whose neighbour was not collected says so in its own
+  # parse problem and is correctly absent from this rule.
+  field: project_path
+  exists: true
+aggregate:
+  group_by: [project_path]
+  # Two events is the floor the schema allows and it is not what decides this finding: one
+  # product alone produces hundreds of rows for a folder and must not fire. The distinct
+  # count over the product is what makes it a finding.
+  min_count: 2
+  distinct: agent
+  distinct_gte: 2
+tags:
+  - collection-integrity
+  - cross-product
+  - scoping
+false_positives:
+  - >-
+    A developer who simply uses two editors. That is the common case and the reason this is
+    low rather than higher: the finding is a reason to collect the second product's data,
+    not a reason to suspect anybody.
+  - >-
+    One product migrated from another and carried the workspace state over. The renamed
+    product in this catalogue does exactly that, so a folder can appear under both its
+    names without anybody having used the older one.
+  - >-
+    A folder path that two products resolved differently, for example one through a
+    symbolic link and one not. Those group as different folders and this rule will miss the
+    pair rather than invent one, which is the right way round.
+tests:
+  - name: one folder under two products
+    match: true
+    event:
+      kind: config.snapshot
+      agent: cursor
+      project_path: /Users/alice/repos/proj
+  - name: the same folder under the other product
+    match: true
+    event:
+      kind: config.snapshot
+      agent: windsurf
+      project_path: /Users/alice/repos/proj
+  - name: a store whose folder nobody could resolve
+    match: false
+    event:
+      kind: config.snapshot
+      agent: cursor
+      payload: {key: 'aiService.prompts'}

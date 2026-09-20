@@ -24,6 +24,7 @@ Funde werden in die Falldatenbank geschrieben, neben die Ereignisse, auf denen s
 | [`collection_integrity`](#collection-integrity) | [AFX-COLLECTIONINTEGRITY-001](#afx-collectionintegrity-001) | mittel |
 |  | [AFX-COLLECTIONINTEGRITY-002](#afx-collectionintegrity-002) | Info |
 |  | [AFX-COLLECTIONINTEGRITY-003](#afx-collectionintegrity-003) | niedrig |
+|  | [AFX-COLLECTIONINTEGRITY-004](#afx-collectionintegrity-004) | niedrig |
 | [`dangerous_commands`](#dangerous-commands) | [AFX-DANGEROUSCOMMANDS-001](#afx-dangerouscommands-001) | hoch |
 |  | [AFX-DANGEROUSCOMMANDS-002](#afx-dangerouscommands-002) | hoch |
 |  | [AFX-DANGEROUSCOMMANDS-003](#afx-dangerouscommands-003) | mittel |
@@ -308,6 +309,35 @@ Ob das Gesammelte die Frage beantworten kann, die ihm gestellt wird. Jedes ander
 - [EN] A scheme key restored from a backup or roamed from another machine with the profile.
 
 *Stichproben in der Regeldatei:* 2 / 3 (+/-)
+
+#### AFX-COLLECTIONINTEGRITY-004
+
+**One folder was open in more than one agent product**
+
+| | |
+| --- | --- |
+| Schweregrad | niedrig |
+| Paket | `collection_integrity` |
+| Agenten | `any` |
+| Ereignisarten | `config.snapshot` |
+| Gelesene Felder | `project_path` |
+| Schlagworte | `collection-integrity`, `cross-product`, `scoping` |
+
+[EN] The same project folder appears in the per-workspace state of two or more different agent products. Whatever one product's transcripts say about that folder is not the whole of what was done in it.
+
+*Worauf sie trifft:* `project_path is present`
+
+*Feuert auf eine Anzahl statt auf ein einzelnes Ereignis, gruppiert nach* `project_path`, n >= 2.
+
+*Warum das für die Analyse zählt:* [EN] This rule is about the case rather than about the endpoint, and what it corrects is a scoping mistake rather than a technical one. An examination that found one agent's conversations about a repository and answered from them has answered about one of the products that worked on it. The other one's transcripts live in a different tree, under a different product name, and on the measured hosts in a different store format, so nothing in the first product's data points at them. . It is worth a rule rather than a note because the endpoint makes the connection hard to see. Measured on a clean Windows 11 26200 host and a clean macOS 26.5 host: two editors derived from the same one keep their per-workspace state in a directory whose name is not a digest of the folder path, so nobody can compute it, and the same folder produces the same opaque name in both products. The only thing that undoes the name is a small file beside each store, and it is that file this rule's field comes from. . Read it as an instruction to widen the collection, not as suspicion. Two agent products on one machine is ordinary. What is not ordinary is reporting on one of them as though it were all of them.
+
+*Bekannte Fehlalarme:*
+
+- [EN] A developer who simply uses two editors. That is the common case and the reason this is low rather than higher: the finding is a reason to collect the second product's data, not a reason to suspect anybody.
+- [EN] One product migrated from another and carried the workspace state over. The renamed product in this catalogue does exactly that, so a folder can appear under both its names without anybody having used the older one.
+- [EN] A folder path that two products resolved differently, for example one through a symbolic link and one not. Those group as different folders and this rule will miss the pair rather than invent one, which is the right way round.
+
+*Stichproben in der Regeldatei:* 2 / 1 (+/-)
 
 ## dangerous commands
 

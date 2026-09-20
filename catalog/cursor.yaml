@@ -1469,9 +1469,11 @@ artifacts:
   - '%APPDATA%\Cursor\User\workspaceStorage\<workspace-hash>\state.vscdb'
   - '%APPDATA%\Cursor\User\workspaceStorage\<workspace-hash>\state.vscdb-shm'
   - '%APPDATA%\Cursor\User\workspaceStorage\<workspace-hash>\state.vscdb-wal'
+  - '%APPDATA%\Cursor\User\workspaceStorage\<workspace-hash>\workspace.json'
   - ~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb
   - ~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-shm
   - ~/.config/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-wal
+  - ~/.config/Cursor/User/workspaceStorage/<workspace-hash>/workspace.json
   - ~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb
   - ~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-shm
   - ~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/state.vscdb-wal
@@ -1493,4 +1495,6 @@ artifacts:
     Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16, one installation and one trivial conversation each. The legacy flag came off this entry as a result. The database is written by the current version on both operating systems, with a populated key table per workspace and a second directory under the fixed name for the window with no folder open, so treating the whole artifact as no longer written was wrong. What is legacy is the set of keys named in the paragraph above, not the file.
 
         Two things about the directory name, both of which cost an analyst time if nobody says them. It is not the hash of the workspace path: ten normalisations of the folder URI were tried against five digest algorithms and none of the fifty combinations reproduced the observed name, so do not try to compute it forwards from a path. And the same folder produced the same name in this product and in the other Electron product in this catalogue, which makes the name a join key across two products for the statement that one folder was open in both.
+
+    The file that maps the directory name back to the folder was catalogued for macOS alone, so on Windows and on Linux it was never collected and the store beside it arrived with nothing that could say which project it belonged to. Both spellings are here now. The consequence of the gap was silent, which is why it is worth recording: the parser reads that file to set the project on every row of this store (ADR 0038), and without it every row of every Windows and Linux collection of this store was unattributed while the collection reported success.
   parser: vscode_state

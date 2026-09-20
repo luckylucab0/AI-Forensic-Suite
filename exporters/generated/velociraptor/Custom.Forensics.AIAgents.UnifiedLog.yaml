@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 8b845017c074
+# Catalogue digest: e9544ada63da
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -286,6 +286,7 @@ sources:
       cursor,cursor.workspace_state_vscdb,file_only,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb
       cursor,cursor.workspace_state_vscdb,file_only,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-shm
       cursor,cursor.workspace_state_vscdb,file_only,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-wal
+      cursor,cursor.workspace_state_vscdb,file_only,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/workspace.json
       devin,devin.sessions_db,file_only,C:/Users/*/.local/share/devin/cli/sessions.db
       devin,devin.sessions_db,file_only,C:/Users/*/.local/share/devin/cli/sessions.db-shm
       devin,devin.sessions_db,file_only,C:/Users/*/.local/share/devin/cli/sessions.db-wal
@@ -1145,6 +1146,7 @@ sources:
       cursor,cursor.workspace_state_vscdb,file_only,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
       cursor,cursor.workspace_state_vscdb,file_only,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
       cursor,cursor.workspace_state_vscdb,file_only,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
+      cursor,cursor.workspace_state_vscdb,file_only,/Users/*/.config/Cursor/User/workspaceStorage/*/workspace.json
       cursor,cursor.workspace_state_vscdb,file_only,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
       cursor,cursor.workspace_state_vscdb,file_only,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
       cursor,cursor.workspace_state_vscdb,file_only,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
@@ -1152,6 +1154,7 @@ sources:
       cursor,cursor.workspace_state_vscdb,file_only,/var/root/.config/Cursor/User/workspaceStorage/*/state.vscdb
       cursor,cursor.workspace_state_vscdb,file_only,/var/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
       cursor,cursor.workspace_state_vscdb,file_only,/var/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
+      cursor,cursor.workspace_state_vscdb,file_only,/var/root/.config/Cursor/User/workspaceStorage/*/workspace.json
       cursor,cursor.workspace_state_vscdb,file_only,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
       cursor,cursor.workspace_state_vscdb,file_only,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
       cursor,cursor.workspace_state_vscdb,file_only,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
@@ -2159,6 +2162,7 @@ sources:
       cursor,cursor.workspace_state_vscdb,file_only,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
       cursor,cursor.workspace_state_vscdb,file_only,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
       cursor,cursor.workspace_state_vscdb,file_only,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
+      cursor,cursor.workspace_state_vscdb,file_only,/home/*/.config/Cursor/User/workspaceStorage/*/workspace.json
       cursor,cursor.workspace_state_vscdb,file_only,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
       cursor,cursor.workspace_state_vscdb,file_only,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
       cursor,cursor.workspace_state_vscdb,file_only,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
@@ -2166,6 +2170,7 @@ sources:
       cursor,cursor.workspace_state_vscdb,file_only,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb
       cursor,cursor.workspace_state_vscdb,file_only,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
       cursor,cursor.workspace_state_vscdb,file_only,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
+      cursor,cursor.workspace_state_vscdb,file_only,/root/.config/Cursor/User/workspaceStorage/*/workspace.json
       cursor,cursor.workspace_state_vscdb,file_only,/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
       cursor,cursor.workspace_state_vscdb,file_only,/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
       cursor,cursor.workspace_state_vscdb,file_only,/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
