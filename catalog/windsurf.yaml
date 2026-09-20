@@ -28,6 +28,7 @@ vendor_sources:
 # The product was renamed and its documentation host now redirects here, so this is the
 # same vendor writing about the same product rather than a third party.
 - https://docs.devin.ai/
+- https://windsurf-stable.codeiumdata.com/
 - https://devin.ai/
 description: |-
   The Codeium editor, renamed Devin Desktop in mid-2026, whose agent is called Cascade. Two things about its storage decide what a collection means. First, the rename: the application reads both the legacy Windsurf and Codeium paths and the new Devin paths, writes new data to the Devin paths, and copies everything from the legacy paths to the new ones the first time it runs after the upgrade. So the same content can exist in two trees and a timestamp under a Devin path may be the migration rather than the user, which makes the legacy tree the better timeline evidence where both exist. Second, the vendor documents the directories that hold conversations and memories and says nothing at all about the files inside them, which are opaque binary blobs. The one parseable record of a conversation is the transcript file the hook interface exposes, and the product keeps only the hundred most recent of those.
@@ -509,6 +510,37 @@ artifacts:
 
     Record structure: KEY-SCOPED for the SQLite path: only the windsurfAuthStatus ItemTable row is secret, and its JSON has an apiKey field. Observed API key formats: 'devin-session-token$<JWT>' (Cognition era), 'sk-ws-01-*' and 'cog_*' (older). ~/.codeium/config.json is plaintext JSON holding the API key. credentials.toml uses a windsurf-api-key method id, reflecting the shared lineage. A CSRF token additionally lives only in the running language_server process environment (WINDSURF_CSRF_TOKEN), readable from /proc/<pid>/environ on Linux — memory/process evidence, not disk.
   parser: null
+- id: windsurf.server_data
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.devin-server/**
+  - ~/.windsurf-server/**
+  - '%USERPROFILE%\.devin-server\**'
+  - '%USERPROFILE%\.windsurf-server\**'
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/pool/main/d/devin-desktop/Devin-linux-x64-3.10.31.deb
+  source_kind: source_code
+  volatility: |-
+    Written while the editor is attached to a remote host or a container and kept afterwards. Nothing in the product prunes it.
+  notes: |-
+    The half of this editor that runs on the machine the code is on, rather than on the machine the person is at.
+
+    When the editor attaches to a remote host, a container or a Linux subsystem, it installs a server there and that server is what runs the agent's extension. So on that machine this directory is where the agent's own data is, and on the workstation there is nothing to find. An investigation scoped to the developer's laptop and not to the host they were attached to misses the side that did the work.
+
+    Both spellings are listed because the product was renamed. The shipped package declares the current one and the older one is what an install from before the rename created; neither is migrated by the other.
+
+    The citation is the product's own installable package rather than a page: this vendor publishes no source and its documentation does not state these paths. The package is fetchable from the repository the vendor's own install instructions add, and what is quoted above is in the product.json and the bundled JavaScript inside it, so the finding is reproducible by unpacking the same file.
+
+    Record structure: the server's own tree, with its logs under a data directory named by the time the server started.
+  parser: null
 - id: windsurf.language_server_binaries_and_logs
   category: install_evidence
   root: system
@@ -517,6 +549,9 @@ artifacts:
   - windows
   - linux
   paths:
+  - /usr/share/devin-desktop/resources/app/extensions/windsurf/bin/language_server_linux_x64
+  - /usr/share/devin-desktop/resources/app/extensions/windsurf/devin/bin/devin
+  - ~/.devin-server/data/logs/<timestamp>/1-windsurf.log
   - '%LOCALAPPDATA%\Programs\Windsurf\'
   - /Applications/Devin.app
   - /usr/share/windsurf/resources/app/extensions/windsurf/bin/language_server_linux_x64

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 4e1827ac2533
+# Catalogue digest: e3164e0cb5db
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -85,6 +85,7 @@
 #     cursor.project_instructions
 #     cursor.skills
 #     cursor.subagents
+#     cursor.worktree_setup
 #     factory_droid.config
 #     factory_droid.mcp_and_hooks
 #     factory_droid.output_styles
@@ -149,6 +150,7 @@
 #     claude_desktop.coworkd_service_log
 #     claude_desktop.org_plugins
 #     cursor.retrieval_index
+#     cursor.worker_data
 #     kiro.managed_settings
 #     opencode.legacy_json_storage
 #     qwen_code.system_settings
@@ -632,7 +634,10 @@ sources:
     cursor,cursor.chat_store_db,C:/Users/*/.cursor/chats/*/*/store.db
     cursor,cursor.chat_store_db,C:/Users/*/.cursor/chats/*/*/store.db-shm
     cursor,cursor.chat_store_db,C:/Users/*/.cursor/chats/*/*/store.db-wal
+    cursor,cursor.cli_workspaces,C:/Users/*/.cursor/cli-workspaces.json
+    cursor,cursor.cli_workspaces,C:/Users/*/.cursor/ide_state.json
     cursor,cursor.commit_checkpoints,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/**
+    cursor,cursor.computer_use_sidecar,C:/Users/*/.cursor/cursor-computer-use/**
     cursor,cursor.conversation_search_db,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/conversation-search.db
     cursor,cursor.conversation_search_db,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/conversation-search.db-shm
     cursor,cursor.conversation_search_db,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/conversation-search.db-wal
@@ -647,6 +652,7 @@ sources:
     cursor,cursor.install_dirs,C:/Users/*/AppData/Local/cursor-updater/**
     cursor,cursor.local_file_history,C:/Users/*/AppData/Roaming/Cursor/User/History/**
     cursor,cursor.logs,C:/Users/*/AppData/Roaming/Cursor/logs/**
+    cursor,cursor.mdm_policy,C:/Users/*/.cursor/policy.json
     cursor,cursor.pasted_text,C:/Users/*/.cursor/chats/*/*/pasted_text.json
     cursor,cursor.plugins,C:/Users/*/.cursor/plugins/**
     cursor,cursor.plugins,C:/Users/*/.cursor/plugins/local/**
@@ -1385,6 +1391,7 @@ sources:
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/.codeium/*/language_server_linux_x64
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/.codeium/*/language_server_macos_arm
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/.codeium/*/language_server_windows_x64.exe
+    windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/.devin-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/.windsurf-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/AppData/Local/Programs/Windsurf/**
     windsurf,windsurf.memories,C:/Users/*/.codeium/windsurf-insiders/memories/*
@@ -1392,6 +1399,8 @@ sources:
     windsurf,windsurf.memories,C:/Users/*/.codeium/windsurf/memories/*
     windsurf,windsurf.memories,C:/Users/*/.codeium/windsurf/memories/*.pb
     windsurf,windsurf.plugin_log,C:/Users/*/.codeium/codeium.log
+    windsurf,windsurf.server_data,C:/Users/*/.devin-server/**
+    windsurf,windsurf.server_data,C:/Users/*/.windsurf-server/**
     windsurf,windsurf.worktrees,C:/Users/*/.devin/worktrees/*
     windsurf,windsurf.worktrees,C:/Users/*/.windsurf/worktrees/*
     zed,zed.extensions,C:/Users/*/AppData/Local/Zed/debug_adapters/**
@@ -2442,6 +2451,10 @@ sources:
     cursor,cursor.chat_store_db,/var/root/.cursor/chats/*/*/store.db
     cursor,cursor.chat_store_db,/var/root/.cursor/chats/*/*/store.db-shm
     cursor,cursor.chat_store_db,/var/root/.cursor/chats/*/*/store.db-wal
+    cursor,cursor.cli_workspaces,/Users/*/.cursor/cli-workspaces.json
+    cursor,cursor.cli_workspaces,/Users/*/.cursor/ide_state.json
+    cursor,cursor.cli_workspaces,/var/root/.cursor/cli-workspaces.json
+    cursor,cursor.cli_workspaces,/var/root/.cursor/ide_state.json
     cursor,cursor.commit_checkpoints,/Users/*/.config/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/**
     cursor,cursor.commit_checkpoints,/Users/*/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/diffs/*
     cursor,cursor.commit_checkpoints,/Users/*/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/files/*
@@ -2450,6 +2463,8 @@ sources:
     cursor,cursor.commit_checkpoints,/var/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/diffs/*
     cursor,cursor.commit_checkpoints,/var/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/files/*
     cursor,cursor.commit_checkpoints,/var/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/metadata.json
+    cursor,cursor.computer_use_sidecar,/Users/*/.cursor/cursor-computer-use/**
+    cursor,cursor.computer_use_sidecar,/var/root/.cursor/cursor-computer-use/**
     cursor,cursor.conversation_search_db,/Users/*/.config/Cursor/User/globalStorage/conversation-search.db
     cursor,cursor.conversation_search_db,/Users/*/.config/Cursor/User/globalStorage/conversation-search.db-shm
     cursor,cursor.conversation_search_db,/Users/*/.config/Cursor/User/globalStorage/conversation-search.db-wal
@@ -2506,6 +2521,8 @@ sources:
     cursor,cursor.machine_identity_storage,/var/root/Library/Application Support/Cursor/User/globalStorage/storage.json
     cursor,cursor.macos_preferences,/Users/*/Library/Preferences/com.todesktop.230313mzl4w4u92.plist
     cursor,cursor.macos_preferences,/var/root/Library/Preferences/com.todesktop.230313mzl4w4u92.plist
+    cursor,cursor.mdm_policy,/Users/*/.cursor/policy.json
+    cursor,cursor.mdm_policy,/var/root/.cursor/policy.json
     cursor,cursor.pasted_text,/Users/*/.cursor/chats/*/*/pasted_text.json
     cursor,cursor.pasted_text,/var/root/.cursor/chats/*/*/pasted_text.json
     cursor,cursor.plugins,/Users/*/.cursor/plugins/**
@@ -2528,6 +2545,9 @@ sources:
     cursor,cursor.retrieval_index,/var/root/Library/Caches/cursor-compile-cache/**
     cursor,cursor.subagent_output,/Users/*/.cursor/subagents/**
     cursor,cursor.subagent_output,/var/root/.cursor/subagents/**
+    cursor,cursor.worker_data,/Users/*/.local/share/cursor-agent/**
+    cursor,cursor.worker_data,/opt/cursor/**
+    cursor,cursor.worker_data,/var/root/.local/share/cursor-agent/**
     cursor,cursor.workspace_state_vscdb,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
     cursor,cursor.workspace_state_vscdb,/Users/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
@@ -3766,11 +3786,15 @@ sources:
     windsurf,windsurf.language_server_binaries_and_logs,/Users/*/.codeium/*/language_server_linux_x64
     windsurf,windsurf.language_server_binaries_and_logs,/Users/*/.codeium/*/language_server_macos_arm
     windsurf,windsurf.language_server_binaries_and_logs,/Users/*/.codeium/*/language_server_windows_x64.exe
+    windsurf,windsurf.language_server_binaries_and_logs,/Users/*/.devin-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,/Users/*/.windsurf-server/data/logs/*/1-windsurf.log
+    windsurf,windsurf.language_server_binaries_and_logs,/usr/share/devin-desktop/resources/app/extensions/windsurf/bin/language_server_linux_x64
+    windsurf,windsurf.language_server_binaries_and_logs,/usr/share/devin-desktop/resources/app/extensions/windsurf/devin/bin/devin
     windsurf,windsurf.language_server_binaries_and_logs,/usr/share/windsurf/resources/app/extensions/windsurf/bin/language_server_linux_x64
     windsurf,windsurf.language_server_binaries_and_logs,/var/root/.codeium/*/language_server_linux_x64
     windsurf,windsurf.language_server_binaries_and_logs,/var/root/.codeium/*/language_server_macos_arm
     windsurf,windsurf.language_server_binaries_and_logs,/var/root/.codeium/*/language_server_windows_x64.exe
+    windsurf,windsurf.language_server_binaries_and_logs,/var/root/.devin-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,/var/root/.windsurf-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.memories,/Users/*/.codeium/windsurf-insiders/memories/*
     windsurf,windsurf.memories,/Users/*/.codeium/windsurf-next/memories/*
@@ -3782,6 +3806,10 @@ sources:
     windsurf,windsurf.memories,/var/root/.codeium/windsurf/memories/*.pb
     windsurf,windsurf.plugin_log,/Users/*/.codeium/codeium.log
     windsurf,windsurf.plugin_log,/var/root/.codeium/codeium.log
+    windsurf,windsurf.server_data,/Users/*/.devin-server/**
+    windsurf,windsurf.server_data,/Users/*/.windsurf-server/**
+    windsurf,windsurf.server_data,/var/root/.devin-server/**
+    windsurf,windsurf.server_data,/var/root/.windsurf-server/**
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/hooks.json
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/rules/*.md
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/skills/**
@@ -4784,6 +4812,10 @@ sources:
     cursor,cursor.chat_store_db,/root/.cursor/chats/*/*/store.db
     cursor,cursor.chat_store_db,/root/.cursor/chats/*/*/store.db-shm
     cursor,cursor.chat_store_db,/root/.cursor/chats/*/*/store.db-wal
+    cursor,cursor.cli_workspaces,/home/*/.cursor/cli-workspaces.json
+    cursor,cursor.cli_workspaces,/home/*/.cursor/ide_state.json
+    cursor,cursor.cli_workspaces,/root/.cursor/cli-workspaces.json
+    cursor,cursor.cli_workspaces,/root/.cursor/ide_state.json
     cursor,cursor.commit_checkpoints,/home/*/.config/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/**
     cursor,cursor.commit_checkpoints,/home/*/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/diffs/*
     cursor,cursor.commit_checkpoints,/home/*/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/files/*
@@ -4792,6 +4824,8 @@ sources:
     cursor,cursor.commit_checkpoints,/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/diffs/*
     cursor,cursor.commit_checkpoints,/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/files/*
     cursor,cursor.commit_checkpoints,/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/metadata.json
+    cursor,cursor.computer_use_sidecar,/home/*/.cursor/cursor-computer-use/**
+    cursor,cursor.computer_use_sidecar,/root/.cursor/cursor-computer-use/**
     cursor,cursor.conversation_search_db,/home/*/.config/Cursor/User/globalStorage/conversation-search.db
     cursor,cursor.conversation_search_db,/home/*/.config/Cursor/User/globalStorage/conversation-search.db-shm
     cursor,cursor.conversation_search_db,/home/*/.config/Cursor/User/globalStorage/conversation-search.db-wal
@@ -4840,6 +4874,8 @@ sources:
     cursor,cursor.logs,/root/Library/Application Support/Cursor/User/process-monitor/**
     cursor,cursor.logs,/root/Library/Application Support/Cursor/logs/*/**
     cursor,cursor.logs,/root/Library/Application Support/Cursor/logs/*/window*/workbench.mcp.*.log
+    cursor,cursor.mdm_policy,/home/*/.cursor/policy.json
+    cursor,cursor.mdm_policy,/root/.cursor/policy.json
     cursor,cursor.pasted_text,/home/*/.cursor/chats/*/*/pasted_text.json
     cursor,cursor.pasted_text,/root/.cursor/chats/*/*/pasted_text.json
     cursor,cursor.plugins,/home/*/.cursor/plugins/**
@@ -4862,6 +4898,9 @@ sources:
     cursor,cursor.retrieval_index,/root/Library/Caches/cursor-compile-cache/**
     cursor,cursor.subagent_output,/home/*/.cursor/subagents/**
     cursor,cursor.subagent_output,/root/.cursor/subagents/**
+    cursor,cursor.worker_data,/home/*/.local/share/cursor-agent/**
+    cursor,cursor.worker_data,/opt/cursor/**
+    cursor,cursor.worker_data,/root/.local/share/cursor-agent/**
     cursor,cursor.workspace_state_vscdb,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
     cursor,cursor.workspace_state_vscdb,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
@@ -6076,11 +6115,15 @@ sources:
     windsurf,windsurf.language_server_binaries_and_logs,/home/*/.codeium/*/language_server_linux_x64
     windsurf,windsurf.language_server_binaries_and_logs,/home/*/.codeium/*/language_server_macos_arm
     windsurf,windsurf.language_server_binaries_and_logs,/home/*/.codeium/*/language_server_windows_x64.exe
+    windsurf,windsurf.language_server_binaries_and_logs,/home/*/.devin-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,/home/*/.windsurf-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,/root/.codeium/*/language_server_linux_x64
     windsurf,windsurf.language_server_binaries_and_logs,/root/.codeium/*/language_server_macos_arm
     windsurf,windsurf.language_server_binaries_and_logs,/root/.codeium/*/language_server_windows_x64.exe
+    windsurf,windsurf.language_server_binaries_and_logs,/root/.devin-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,/root/.windsurf-server/data/logs/*/1-windsurf.log
+    windsurf,windsurf.language_server_binaries_and_logs,/usr/share/devin-desktop/resources/app/extensions/windsurf/bin/language_server_linux_x64
+    windsurf,windsurf.language_server_binaries_and_logs,/usr/share/devin-desktop/resources/app/extensions/windsurf/devin/bin/devin
     windsurf,windsurf.language_server_binaries_and_logs,/usr/share/windsurf/resources/app/extensions/windsurf/bin/language_server_linux_x64
     windsurf,windsurf.memories,/home/*/.codeium/windsurf-insiders/memories/*
     windsurf,windsurf.memories,/home/*/.codeium/windsurf-next/memories/*
@@ -6092,6 +6135,10 @@ sources:
     windsurf,windsurf.memories,/root/.codeium/windsurf/memories/*.pb
     windsurf,windsurf.plugin_log,/home/*/.codeium/codeium.log
     windsurf,windsurf.plugin_log,/root/.codeium/codeium.log
+    windsurf,windsurf.server_data,/home/*/.devin-server/**
+    windsurf,windsurf.server_data,/home/*/.windsurf-server/**
+    windsurf,windsurf.server_data,/root/.devin-server/**
+    windsurf,windsurf.server_data,/root/.windsurf-server/**
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/hooks.json
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/rules/*.md
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/skills/**

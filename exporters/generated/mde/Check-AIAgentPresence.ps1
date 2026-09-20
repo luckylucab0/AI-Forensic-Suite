@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 4e1827ac2533
+# Catalogue digest: e3164e0cb5db
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -94,6 +94,7 @@
 #     cursor.project_instructions
 #     cursor.skills
 #     cursor.subagents
+#     cursor.worktree_setup
 #     factory_droid.config
 #     factory_droid.mcp_and_hooks
 #     factory_droid.output_styles
@@ -152,6 +153,7 @@
 #     amp.continuations
 #     amp.session_pointer
 #     cursor.retrieval_index
+#     cursor.worker_data
 #     opencode.legacy_json_storage
 #   reachable only through a relocation variable: the runbook's collector reads the variable, this check does not
 #     claude_code.git_global_excludes
@@ -553,7 +555,10 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.chat_session_meta_json'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.chat_session_prompt_history'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.chat_store_db'; Path = '$profile\.cursor\chats' }
+    @{ Agent = 'cursor'; Id = 'cursor.cli_workspaces'; Path = '$profile\.cursor\cli-workspaces.json' }
+    @{ Agent = 'cursor'; Id = 'cursor.cli_workspaces'; Path = '$profile\.cursor\ide_state.json' }
     @{ Agent = 'cursor'; Id = 'cursor.commit_checkpoints'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\anysphere.cursor-commits\checkpoints' }
+    @{ Agent = 'cursor'; Id = 'cursor.computer_use_sidecar'; Path = '$profile\.cursor\cursor-computer-use' }
     @{ Agent = 'cursor'; Id = 'cursor.conversation_search_db'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\conversation-search.db' }
     @{ Agent = 'cursor'; Id = 'cursor.conversation_search_db'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\conversation-search.db-shm' }
     @{ Agent = 'cursor'; Id = 'cursor.conversation_search_db'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\conversation-search.db-wal' }
@@ -568,6 +573,7 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.install_dirs'; Path = '$profile\AppData\Local\cursor-updater' }
     @{ Agent = 'cursor'; Id = 'cursor.local_file_history'; Path = '$profile\AppData\Roaming\Cursor\User\History' }
     @{ Agent = 'cursor'; Id = 'cursor.logs'; Path = '$profile\AppData\Roaming\Cursor\logs' }
+    @{ Agent = 'cursor'; Id = 'cursor.mdm_policy'; Path = '$profile\.cursor\policy.json' }
     @{ Agent = 'cursor'; Id = 'cursor.pasted_text'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.plugins'; Path = '$profile\.cursor\plugins' }
     @{ Agent = 'cursor'; Id = 'cursor.plugins'; Path = '$profile\.cursor\plugins\local' }
@@ -1150,6 +1156,7 @@ $targets = @(
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_workspace_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf\User\workspaceStorage' }
     @{ Agent = 'windsurf'; Id = 'windsurf.implicit_trajectories'; Path = '$profile\.codeium\windsurf\implicit' }
     @{ Agent = 'windsurf'; Id = 'windsurf.language_server_binaries_and_logs'; Path = '$profile\.codeium' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.language_server_binaries_and_logs'; Path = '$profile\.devin-server\data\logs' }
     @{ Agent = 'windsurf'; Id = 'windsurf.language_server_binaries_and_logs'; Path = '$profile\.windsurf-server\data\logs' }
     @{ Agent = 'windsurf'; Id = 'windsurf.language_server_binaries_and_logs'; Path = '$profile\AppData\Local\Programs\Windsurf' }
     @{ Agent = 'windsurf'; Id = 'windsurf.language_server_binaries_and_logs'; Path = 'C:\Program Files\Windsurf' }
@@ -1157,6 +1164,8 @@ $targets = @(
     @{ Agent = 'windsurf'; Id = 'windsurf.memories'; Path = '$profile\.codeium\windsurf-next\memories' }
     @{ Agent = 'windsurf'; Id = 'windsurf.memories'; Path = '$profile\.codeium\windsurf\memories' }
     @{ Agent = 'windsurf'; Id = 'windsurf.plugin_log'; Path = '$profile\.codeium\codeium.log' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.server_data'; Path = '$profile\.devin-server' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.server_data'; Path = '$profile\.windsurf-server' }
     @{ Agent = 'windsurf'; Id = 'windsurf.system_config'; Path = 'C:\ProgramData\Windsurf\hooks.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.system_config'; Path = 'C:\ProgramData\Windsurf\rules' }
     @{ Agent = 'windsurf'; Id = 'windsurf.system_config'; Path = 'C:\ProgramData\Windsurf\skills' }

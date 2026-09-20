@@ -23,6 +23,7 @@ vendor_sources:
 - https://github.com/getcursor/
 - https://raw.githubusercontent.com/getcursor/
 - https://cursor.com/
+- https://downloads.cursor.com/
 - https://docs.cursor.com/
 - https://www.cursor.com/
 description: |-
@@ -39,6 +40,14 @@ references:
 - |-
   https://raw.githubusercontent.com/VasiHemanth/tokentelemetry/0d691ae343ed31991e504a738bb1b288eea3b2ee/docs/research/harness-survey/harness-cursor-vscode.md
 env_overrides:
+- name: CURSOR_DATA_DIR
+  effect: |-
+    Relocates the command line agent's whole directory. Its own code reads this variable and falls back to the product directory under the home only when it is unset, and every subdirectory is built from the result, the per-project directory among them. So a host with this set keeps its agent state somewhere this catalogue cannot predict, and a collection of the default path returns nothing while reporting success. The self-hosted worker takes the same variable and documents its own default besides.
+  source: https://downloads.cursor.com/lab/2026.09.18-9a7762b/linux/x64/agent-cli-package.tar.gz
+- name: CURSOR_SANDBOX_POLICY_DIR
+  effect: |-
+    Relocates the directory of sandbox policies, which is where the rules that decide what the agent may run without asking are kept. Its own code resolves this variable first and falls back to the directory under the product's home. A policy set here and collected from the default path reads as no policy in force.
+  source: https://downloads.cursor.com/lab/2026.09.18-9a7762b/linux/x64/agent-cli-package.tar.gz
 - name: CURSOR_CONFIG_DIR
   effect: |-
     Relocates the agent configuration directory that the command line interface reads, which the vendor otherwise resolves to .cursor under the home directory or, on Linux and BSD, to a cursor directory under the base configuration directory. A collection keyed on the default finds nothing on such a host.
@@ -126,6 +135,135 @@ artifacts:
 
     Record structure: embeddable_files.txt is a newline-delimited list of workspace-relative paths (100,000 unique paths / 9.51 MB observed, mean 94 chars, max 273). high_level_folder_description.txt is a one-line marker (39 bytes observed). A 'Crepe' local index (index.bin, postings.bin, metadata.json, built by the bundled crepectl helper) is referenced but was not present in the audited profile.
   parser: text_config
+- id: cursor.mdm_policy
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.cursor/policy.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://downloads.cursor.com/lab/2026.09.18-9a7762b/linux/x64/agent-cli-package.tar.gz
+  source_kind: source_code
+  volatility: |-
+    Written by whoever manages the endpoint rather than by the user, and not cleaned up by the product. A change to it is an administrative action.
+  notes: |-
+    The managed sign-in policy, which decides who this agent will let sign in on this machine.
+
+    Its own code reads an environment variable first and falls back to this file, so an endpoint can carry the policy in either place and the file is the one that survives a reboot. For an investigation it answers a question the transcripts cannot: whether the agent was restricted to an organisation's accounts, and therefore whether a session belongs to a managed identity or a personal one.
+
+    The citation is the product's own command line package rather than a page or a repository: this vendor publishes no source and its documentation does not mention this path. The package is a pinned build, it is fetchable by anybody, and the construction quoted above is in its bundled JavaScript, so the finding is reproducible by unpacking it and searching for the same literal. The installer at the vendor's install URL names whichever build is current.
+
+    Record structure: a JSON document. The variant delivered by the variable carries the same document as a value.
+  parser: json_generic
+- id: cursor.cli_workspaces
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.cursor/cli-workspaces.json
+  - ~/.cursor/ide_state.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://downloads.cursor.com/lab/2026.09.18-9a7762b/linux/x64/agent-cli-package.tar.gz
+  source_kind: source_code
+  volatility: Rewritten as workspaces are saved and as the editor's state changes. No history of its own.
+  notes: |-
+    Two small documents that name the directories this agent was pointed at.
+
+    The first is the list of saved workspaces, which the command line accepts by name instead of by path. A name here is a directory somebody worked in often enough to save, and the entry survives the directory being deleted.
+
+    The second is the state the command line reads to find out what the editor beside it is doing. It is how the two halves of this product join up, and for an analyst it is the link between a terminal session and an editor window.
+
+    The citation is the product's own command line package rather than a page or a repository: this vendor publishes no source and its documentation does not mention this path. The package is a pinned build, it is fetchable by anybody, and the construction quoted above is in its bundled JavaScript, so the finding is reproducible by unpacking it and searching for the same literal. The installer at the vendor's install URL names whichever build is current.
+  parser: json_generic
+- id: cursor.computer_use_sidecar
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.cursor/cursor-computer-use/**
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://downloads.cursor.com/lab/2026.09.18-9a7762b/linux/x64/agent-cli-package.tar.gz
+  source_kind: source_code
+  volatility: Installed on demand and left in place.
+  notes: |-
+    An application this agent installs under the user's home so that it can drive the machine itself.
+
+    This is the capability worth finding early. An agent that edits files and runs commands is one thing; a sidecar for computer use means it could act on the desktop, which is outside every artifact this catalogue collects and leaves its traces in the operating system's own input and accessibility records instead.
+
+    Its presence dates when the machine gained that capability. An environment variable can point the product at a different application, which the code reads before falling back to this path, so an absence here is not an absence of the capability.
+
+    The citation is the product's own command line package rather than a page or a repository: this vendor publishes no source and its documentation does not mention this path. The package is a pinned build, it is fetchable by anybody, and the construction quoted above is in its bundled JavaScript, so the finding is reproducible by unpacking it and searching for the same literal. The installer at the vendor's install URL names whichever build is current.
+  parser: null
+- id: cursor.worktree_setup
+  category: instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.cursor/worktrees.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://downloads.cursor.com/lab/2026.09.18-9a7762b/linux/x64/agent-cli-package.tar.gz
+  source_kind: source_code
+  volatility: Persistent until edited. Arrives and leaves with the repository.
+  notes: |-
+    Setup scripts that run when this agent makes itself a working copy.
+
+    The product creates isolated worktrees and then runs the setup declared in this file in them. The file lives in the repository, so it arrives with a clone, and running the agent in a hostile checkout is enough to execute what it names.
+
+    Its own code gates that on the workspace being trusted, and says so out loud when it skips. So read the trust decision beside this: an untrusted workspace's setup is on disk and did not run, and the command line carries a flag that skips it and another that trusts the workspace without prompting.
+
+    The citation is the product's own command line package rather than a page or a repository: this vendor publishes no source and its documentation does not mention this path. The package is a pinned build, it is fetchable by anybody, and the construction quoted above is in its bundled JavaScript, so the finding is reproducible by unpacking it and searching for the same literal. The installer at the vendor's install URL names whichever build is current.
+  parser: json_generic
+- id: cursor.worker_data
+  category: log
+  root: system
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - /opt/cursor/**
+  - ~/.local/share/cursor-agent/**
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://downloads.cursor.com/lab/2026.09.18-9a7762b/linux/x64/agent-cli-package.tar.gz
+  source_kind: source_code
+  volatility: |-
+    Written while a worker runs and kept afterwards. Relocated whole by the data directory variable this file declares.
+  notes: |-
+    Where this product keeps its installed builds, and where a self-hosted worker keeps what it did.
+
+    Two things live here and the second is the reason the entry is collected first. The versioned builds under the user's share directory are install evidence: which versions of the agent this machine has had, each a complete tree with its own date.
+
+    The worker is the other half. The product can run as a worker that connects to the vendor and executes tool calls on this machine, driven from outside it, and its own help says this directory holds that worker's logs, artifacts and recording data. An endpoint with a populated worker directory was being operated remotely, which is a different investigation from one where somebody sat at the keyboard. The default is the system path where it is writable and the user's share directory otherwise.
+
+    The citation is the product's own command line package rather than a page or a repository: this vendor publishes no source and its documentation does not mention this path. The package is a pinned build, it is fetchable by anybody, and the construction quoted above is in its bundled JavaScript, so the finding is reproducible by unpacking it and searching for the same literal. The installer at the vendor's install URL names whichever build is current.
+  parser: null
 - id: cursor.agent_cli_state
   category: config
   root: user_profile

@@ -5044,6 +5044,23 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "cursor.cli_workspaces",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.cursor/cli-workspaces.json",
+                        "~/.cursor/ide_state.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "project_instructions",
                     "collect_priority": "normal",
                     "id": "cursor.commands_and_plans",
@@ -5079,6 +5096,22 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "first",
+                    "id": "cursor.computer_use_sidecar",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.cursor/cursor-computer-use/**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 },
                 {
                     "category": "transcript",
@@ -5320,6 +5353,22 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "unverified"
                 },
                 {
+                    "category": "permissions",
+                    "collect_priority": "first",
+                    "id": "cursor.mdm_policy",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.cursor/policy.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "transcript",
                     "collect_priority": "normal",
                     "id": "cursor.pasted_text",
@@ -5469,6 +5518,23 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "cursor.worker_data",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "/opt/cursor/**",
+                        "~/.local/share/cursor-agent/**"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "transcript",
                     "collect_priority": "normal",
                     "id": "cursor.workspace_state_vscdb",
@@ -5492,6 +5558,22 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "unverified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "first",
+                    "id": "cursor.worktree_setup",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.cursor/worktrees.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 },
                 {
                     "category": "file_snapshot",
@@ -10552,6 +10634,9 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
+                        "/usr/share/devin-desktop/resources/app/extensions/windsurf/bin/language_server_linux_x64",
+                        "/usr/share/devin-desktop/resources/app/extensions/windsurf/devin/bin/devin",
+                        "~/.devin-server/data/logs/<timestamp>/1-windsurf.log",
                         "%LOCALAPPDATA%\\Programs\\Windsurf\\",
                         "/Applications/Devin.app",
                         "/usr/share/windsurf/resources/app/extensions/windsurf/bin/language_server_linux_x64",
@@ -10658,6 +10743,25 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "<project>/AGENTS.md"
                     ],
                     "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "windsurf.server_data",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.devin-server/**",
+                        "~/.windsurf-server/**",
+                        "%USERPROFILE%\\.devin-server\\**",
+                        "%USERPROFILE%\\.windsurf-server\\**"
+                    ],
+                    "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -10881,7 +10985,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "e9cb8b4fcef17ae93318bf56aeb8a4b8201450950dfd71fe2e30852511533b6e"
+    "sha256": "ce9720f3c5c22a70a666f09422c4cdb7f2da0ee25fe6c8729948ef61363f2035"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

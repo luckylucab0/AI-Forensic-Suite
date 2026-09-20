@@ -368,6 +368,10 @@ def test_an_empty_file_is_still_an_event(tmp_path: Path) -> None:
 # parser. Named here rather than excluded by format, so an instruction artifact can never
 # be left claimed by nobody: the test below holds every name to the parser that has it.
 ELSEWHERE = {
+    # Setup that runs when an agent makes itself a working copy. It is a JSON document
+    # declaring the commands rather than a file of instruction text, so the document
+    # reader takes it and the commands travel in the record.
+    "cursor.worktree_setup": "json_generic",
     # A staged skill write is a JSON document holding the proposed skill rather than the
     # skill file itself, so it is read as a document. The skills that were installed are
     # read here; these are the ones that were held at the approval gate.

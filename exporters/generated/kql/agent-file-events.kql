@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 4e1827ac2533
+// Catalogue digest: e3164e0cb5db
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -91,6 +91,7 @@
 //     cursor.project_instructions
 //     cursor.skills
 //     cursor.subagents
+//     cursor.worktree_setup
 //     factory_droid.config
 //     factory_droid.mcp_and_hooks
 //     factory_droid.output_styles
@@ -160,6 +161,7 @@
 //     roo_code.extension_id
 //     roo_code.settings
 //     roo_code.tasks
+//     windsurf.server_data
 //   reachable only through a relocation variable, which is not in the event data: read the variable off the endpoint
 //     claude_code.global_config
 //     crosscutting.shell_bash_history
@@ -1048,12 +1050,18 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.chat_session_prompt_history", ".cursor\\chats",
     "cursor", "cursor.chat_store_db", ".cursor/chats",
     "cursor", "cursor.chat_store_db", ".cursor\\chats",
+    "cursor", "cursor.cli_workspaces", ".cursor/cli-workspaces.json",
+    "cursor", "cursor.cli_workspaces", ".cursor/ide_state.json",
+    "cursor", "cursor.cli_workspaces", ".cursor\\cli-workspaces.json",
+    "cursor", "cursor.cli_workspaces", ".cursor\\ide_state.json",
     "cursor", "cursor.commit_checkpoints", ".config/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints",
     "cursor", "cursor.commit_checkpoints", ".config\\Cursor\\User\\globalStorage\\anysphere.cursor-commits\\checkpoints",
     "cursor", "cursor.commit_checkpoints", "Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints",
     "cursor", "cursor.commit_checkpoints", "Cursor\\User\\globalStorage\\anysphere.cursor-commits\\checkpoints",
     "cursor", "cursor.commit_checkpoints", "Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints",
     "cursor", "cursor.commit_checkpoints", "Library\\Application Support\\Cursor\\User\\globalStorage\\anysphere.cursor-commits\\checkpoints",
+    "cursor", "cursor.computer_use_sidecar", ".cursor/cursor-computer-use",
+    "cursor", "cursor.computer_use_sidecar", ".cursor\\cursor-computer-use",
     "cursor", "cursor.conversation_search_db", ".config/Cursor/User/globalStorage/conversation-search.db",
     "cursor", "cursor.conversation_search_db", ".config/Cursor/User/globalStorage/conversation-search.db-shm",
     "cursor", "cursor.conversation_search_db", ".config/Cursor/User/globalStorage/conversation-search.db-wal",
@@ -1121,6 +1129,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.machine_identity_storage", "Library/Application Support/Cursor/User/globalStorage/statsig-cache.json",
     "cursor", "cursor.machine_identity_storage", "Library/Application Support/Cursor/User/globalStorage/storage.json",
     "cursor", "cursor.macos_preferences", "Library/Preferences/com.todesktop.230313mzl4w4u92.plist",
+    "cursor", "cursor.mdm_policy", ".cursor/policy.json",
+    "cursor", "cursor.mdm_policy", ".cursor\\policy.json",
     "cursor", "cursor.pasted_text", ".cursor/chats",
     "cursor", "cursor.pasted_text", ".cursor\\chats",
     "cursor", "cursor.plugins", ".cursor/plugins",
@@ -1139,6 +1149,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.retrieval_index", "Library\\Caches\\cursor-compile-cache",
     "cursor", "cursor.subagent_output", ".cursor/subagents",
     "cursor", "cursor.subagent_output", ".cursor\\subagents",
+    "cursor", "cursor.worker_data", ".local/share/cursor-agent",
+    "cursor", "cursor.worker_data", ".local\\share\\cursor-agent",
+    "cursor", "cursor.worker_data", "/opt/cursor",
+    "cursor", "cursor.worker_data", "\\opt\\cursor",
     "cursor", "cursor.workspace_state_vscdb", ".config/Cursor/User/workspaceStorage",
     "cursor", "cursor.workspace_state_vscdb", ".config\\Cursor\\User\\workspaceStorage",
     "cursor", "cursor.workspace_state_vscdb", "Cursor/User/workspaceStorage",
@@ -2400,15 +2414,21 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "windsurf", "windsurf.ide_workspace_state_vscdb", "Windsurf\\User\\workspaceStorage",
     "windsurf", "windsurf.implicit_trajectories", ".codeium/windsurf/implicit",
     "windsurf", "windsurf.implicit_trajectories", ".codeium\\windsurf\\implicit",
+    "windsurf", "windsurf.language_server_binaries_and_logs", ".devin-server/data/logs",
+    "windsurf", "windsurf.language_server_binaries_and_logs", ".devin-server\\data\\logs",
     "windsurf", "windsurf.language_server_binaries_and_logs", ".windsurf-server/data/logs",
     "windsurf", "windsurf.language_server_binaries_and_logs", ".windsurf-server\\data\\logs",
     "windsurf", "windsurf.language_server_binaries_and_logs", "/Applications/Devin.app",
+    "windsurf", "windsurf.language_server_binaries_and_logs", "/usr/share/devin-desktop/resources/app/extensions/windsurf/bin/language_server_linux_x64",
+    "windsurf", "windsurf.language_server_binaries_and_logs", "/usr/share/devin-desktop/resources/app/extensions/windsurf/devin/bin/devin",
     "windsurf", "windsurf.language_server_binaries_and_logs", "/usr/share/windsurf/resources/app/extensions/windsurf/bin/language_server_linux_x64",
     "windsurf", "windsurf.language_server_binaries_and_logs", "C:/Program Files/Windsurf",
     "windsurf", "windsurf.language_server_binaries_and_logs", "C:\\Program Files\\Windsurf",
     "windsurf", "windsurf.language_server_binaries_and_logs", "Programs/Windsurf",
     "windsurf", "windsurf.language_server_binaries_and_logs", "Programs\\Windsurf",
     "windsurf", "windsurf.language_server_binaries_and_logs", "\\Applications\\Devin.app",
+    "windsurf", "windsurf.language_server_binaries_and_logs", "\\usr\\share\\devin-desktop\\resources\\app\\extensions\\windsurf\\bin\\language_server_linux_x64",
+    "windsurf", "windsurf.language_server_binaries_and_logs", "\\usr\\share\\devin-desktop\\resources\\app\\extensions\\windsurf\\devin\\bin\\devin",
     "windsurf", "windsurf.language_server_binaries_and_logs", "\\usr\\share\\windsurf\\resources\\app\\extensions\\windsurf\\bin\\language_server_linux_x64",
     "windsurf", "windsurf.memories", ".codeium/windsurf-insiders/memories",
     "windsurf", "windsurf.memories", ".codeium/windsurf-next/memories",
