@@ -427,33 +427,6 @@ def test_a_symlink_out_of_the_profile_is_recorded_and_not_followed(
         assert entry["collected"] is False
 
 
-def test_nothing_is_written_outside_the_output_directory(
-    synthetic_home: Path, tmp_path: Path
-) -> None:
-    """The read-only guarantee, checked rather than asserted in prose.
-
-    A snapshot of the profile is taken before and after a collection. Any difference means
-    the collector wrote to, or deleted from, evidence.
-    """
-
-    def snapshot(root: Path) -> dict[str, tuple[int, int]]:
-        out = {}
-        for path in sorted(root.rglob("*")):
-            if path.is_symlink():
-                out[str(path)] = (-1, 0)
-            elif path.is_file():
-                stat = path.stat()
-                out[str(path)] = (stat.st_size, int(stat.st_mtime))
-        return out
-
-    before = snapshot(synthetic_home)
-    out = tmp_path / "bundle"
-    result = run_collect_py(["--out", str(out), "--root", str(synthetic_home), "--os", "linux"])
-    assert result.returncode == 0, result.stderr
-    after = snapshot(synthetic_home)
-    assert before == after, "the collector modified the evidence it was reading"
-
-
 def test_dry_run_writes_nothing_at_all(synthetic_home: Path, tmp_path: Path) -> None:
     out = tmp_path / "should-not-exist"
     result = run_collect_py(["--dry-run", "--json", "--root", str(synthetic_home), "--os", "linux"])
@@ -750,10 +723,17 @@ def test_collecting_leaves_the_source_tree_exactly_as_it_was(
 ) -> None:
     """The third non-negotiable, and the one whose breach destroys the evidence itself.
 
-    Nothing on the target is modified, moved, renamed or deleted. It is written down in the
-    bundle format and in the project's own rules, and until now nothing checked it: every
-    other test here reads the bundle that came out, and none of them looked at what was left
-    behind.
+    Nothing on the target is modified, moved, renamed or deleted. A test did check this and
+    it was weaker than its own name: it compared a file's size and its modification time to
+    the second, so a rewrite with the same length inside the same second was invisible to
+    it, and it looked at neither content, nor symlink targets, nor directories. Its name
+    said it checked that nothing is written outside the output directory, which is a
+    different promise and the one the test below this covers.
+
+    So: size, modification time to the nanosecond, and a hash of the content, plus the link
+    target of every symlink and the set of directories. Nothing may appear, vanish or
+    differ. Access time is left out and is the one thing a collection may change, which the
+    bundle format already states and explains.
 
     A breach here is not a bug that produces a wrong answer. It is a collection that changes
     the thing it was run to preserve, which an opposing examiner can demonstrate from the
@@ -789,8 +769,8 @@ def test_collecting_leaves_the_source_tree_exactly_as_it_was(
 def test_collecting_writes_nothing_outside_the_output_directory(
     tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
-    """The other half of the same promise: no temporary files elsewhere, no logs, no
-    configuration.
+    """The promise the test above used to be named for: no temporary files elsewhere, no
+    logs, no configuration.
 
     Checked by giving the run a home and a temporary directory of its own and asserting they
     are still empty afterwards. That is where a stray write would land, because it is where
