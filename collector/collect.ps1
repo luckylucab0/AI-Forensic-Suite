@@ -4969,7 +4969,11 @@ $EmbeddedCatalogueJson = @'
                         "linux"
                     ],
                     "paths": [
-                        "%USERPROFILE%\\.cursor\\projects\\<escaped-abs-cwd>\\agent-transcripts\\...",
+                        "%USERPROFILE%\\.cursor\\projects\\<escaped-abs-cwd>\\agent-tools\\*.txt",
+                        "%USERPROFILE%\\.cursor\\projects\\<escaped-abs-cwd>\\agent-transcripts\\<composer-id>.txt",
+                        "%USERPROFILE%\\.cursor\\projects\\<escaped-abs-cwd>\\agent-transcripts\\<session-uuid>.jsonl",
+                        "%USERPROFILE%\\.cursor\\projects\\<escaped-abs-cwd>\\agent-transcripts\\<session-uuid>\\<session-uuid>.jsonl",
+                        "%USERPROFILE%\\.cursor\\projects\\<escaped-abs-cwd>\\agent-transcripts\\<session-uuid>\\transcript.jsonl",
                         "~/.cursor/projects/<escaped-abs-cwd>/agent-tools/*.txt",
                         "~/.cursor/projects/<escaped-abs-cwd>/agent-transcripts/<composer-id>.txt",
                         "~/.cursor/projects/<escaped-abs-cwd>/agent-transcripts/<session-uuid>.jsonl",
@@ -5012,7 +5016,6 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "$XDG_CONFIG_HOME/cursor/auth.json",
-                        "%APPDATA%\\Cursor\\auth.json",
                         "~/.config/cursor/auth.json",
                         "~/.cursor/auth.json"
                     ],
@@ -5142,8 +5145,11 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "%APPDATA%\\Cursor\\User\\globalStorage\\anysphere.cursor-commits\\checkpoints\\",
+                        "%APPDATA%\\Cursor\\User\\globalStorage\\anysphere.cursor-retrieval\\checkpoints\\",
                         "~/.config/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/",
+                        "~/.config/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints/<uuid>/",
                         "~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/<id>/diffs/<uuid>",
+                        "~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints/<uuid>/",
                         "~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/<id>/files/<uuid>",
                         "~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/<id>/metadata.json"
                     ],
@@ -5475,6 +5481,42 @@ $EmbeddedCatalogueJson = @'
                     "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "cursor.project_mcp_definitions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.cursor\\projects\\<escaped-abs-cwd>\\mcps\\<server-name>\\SERVER_METADATA.json",
+                        "%USERPROFILE%\\.cursor\\projects\\<escaped-abs-cwd>\\mcps\\<server-name>\\<tool-name>.json",
+                        "~/.cursor/projects/<escaped-abs-cwd>/mcps/<server-name>/SERVER_METADATA.json",
+                        "~/.cursor/projects/<escaped-abs-cwd>/mcps/<server-name>/<tool-name>.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "cursor.project_mcp_instructions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.cursor\\projects\\<escaped-abs-cwd>\\mcps\\<server-name>\\INSTRUCTIONS.md",
+                        "~/.cursor/projects/<escaped-abs-cwd>/mcps/<server-name>/INSTRUCTIONS.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
                 },
                 {
                     "category": "config",
@@ -11039,7 +11081,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "ce9720f3c5c22a70a666f09422c4cdb7f2da0ee25fe6c8729948ef61363f2035"
+    "sha256": "ed28bcfe7e48a78549c24eb2da644ba9616882f44b3fa3f1151adb5126595ee0"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

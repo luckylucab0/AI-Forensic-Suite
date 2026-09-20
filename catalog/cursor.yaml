@@ -328,7 +328,6 @@ artifacts:
   - linux
   paths:
   - $XDG_CONFIG_HOME/cursor/auth.json
-  - '%APPDATA%\Cursor\auth.json'
   - ~/.config/cursor/auth.json
   - ~/.cursor/auth.json
   format: json
@@ -346,6 +345,10 @@ artifacts:
     The catalogued path had an explanation appended to it, kept here: ~/.cursor/cli-config.json  (key: authInfo)
 
     Record structure: JSON with accessToken, refreshToken, apiKey (often null), bedrockCredentials (often null). Written at mode 0600 inside 0700 directories by tooling that manages it. macOS additionally/preferentially uses Keychain generic-password items named cursor-access-token, cursor-refresh-token, cursor-api-key, plus a safeStorage master key at service 'Cursor Safe Storage', account 'Cursor Key'. AGENT_CLI_CREDENTIAL_STORE=file forces the file store. One source states the macOS file credential store ignores CURSOR_CONFIG_DIR and always reads ~/.cursor/auth.json.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16 with command line agent 2026.09.18-9a7762b, one installation and one trivial conversation each. The Windows spelling of this file, under the editor's application data directory, was removed from this entry: it did not exist there and a recursive search for the filename across the whole user profile, the agent directory, the editor profile and both command line directories did not find it anywhere. Three write-ups name it and it is not there, which is the shape of a path that was copied from one catalogue into the next.
+
+    What the measurement found instead is where an analyst should go. On Windows the account binding sits in the editor's own key value store, under adminSettings.cachedAuthId and alongside a cloud agent repository key that carries the provider and the account identifier in the key name itself. On macOS there is a generic keychain password item for the product's safe storage, which is the Electron key that unwraps cookies and tokens, and it survives every uninstall because it does not hang off the application bundle. The remaining file paths in this entry were not measured and stay as they were.
   parser: null
 - id: cursor.commit_checkpoints
   category: file_snapshot
@@ -356,8 +359,11 @@ artifacts:
   - linux
   paths:
   - '%APPDATA%\Cursor\User\globalStorage\anysphere.cursor-commits\checkpoints\'
+  - '%APPDATA%\Cursor\User\globalStorage\anysphere.cursor-retrieval\checkpoints\'
   - ~/.config/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/
+  - ~/.config/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints/<uuid>/
   - ~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/<id>/diffs/<uuid>
+  - ~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints/<uuid>/
   - ~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/<id>/files/<uuid>
   - |-
     ~/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/<id>/metadata.json
@@ -376,6 +382,10 @@ artifacts:
     The vendor states the behaviour and not the location, so the paths stay unverified and the entry stays collected. What the vendor's agent page does state is worth the acquisition decision on its own: a checkpoint is created automatically before a significant change, it captures every modified file, it is stored locally and separately from git, and restoring one reverts the files WITHOUT removing anything from the conversation. So a transcript can describe an edit that no longer exists in the working tree and say nothing about the restore, and this directory is where the intermediate state went.
 
     Record structure: metadata.json fields: agentRequestId, requestFiles, deduplicatedGitInfos, workspaceId, startTrackingDateUnixMilliseconds. Diff payload fields: fsPath, fileUuid, diffChanges, gitInfo, kind. files/<uuid> are pre-edit file bodies.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16 with command line agent 2026.09.18-9a7762b, one installation and one trivial conversation each. Neither host had the extension directory this entry was built around. The namespace named after the product's commit feature does not exist on either operating system, and a recursive search for it across both editor profiles returned nothing. What does exist on both, in the same parent directory, is a checkpoints directory under the retrieval extension's namespace, keyed by a session identifier. Its paths are in this entry now beside the catalogued ones, because the catalogued ones may still be right for a version nobody measured and both cost one glob.
+
+    Be honest about what that second directory is: nobody opened it. The name says checkpoints and the parent extension is the one that indexes the workspace, so it may be the pre-edit store this entry describes or it may be indexing state that happens to share the word. Collect it, and let the metadata.json field list in this entry decide which of the two it is once an analyst has one in front of them.
   parser: json_generic
 - id: cursor.local_file_history
   category: file_snapshot
@@ -611,6 +621,10 @@ artifacts:
     Flagged as an execution primitive and highest-value config by two DFIR catalogues. MCP OAuth/client-registration secret envelopes are additionally stored in the IDE's state.vscdb ItemTable in byte-array Buffer form.
 
     Record structure: { "mcpServers": { "<id": { "command", "args", "env", "url", "disabled" } } }. The per-server `env` block routinely holds plaintext API keys and bearer tokens — hash those values on export while keeping the rest of the file. Project-scoped .cursor/mcp.json travels with the repository, so it can arrive on a host via git clone with no local user action.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16 with command line agent 2026.09.18-9a7762b, one installation and one trivial conversation each. No global file of this name existed on either host, and a recursive search for the filename across the agent directory, the editor profile and the command line directories did not find it anywhere. That is not a refutation of the path: the product's own command line names it, printing that it expects a server configuration in the project directory or in the agent directory under the home, so the path is one the code looks for rather than one it writes. The correct reading of an absent file here is that nobody configured a server, not that the location is wrong.
+
+    What both hosts did have is a per-project directory of server definitions, catalogued separately as cursor.project_mcp_definitions. It is populated in the shipped state with servers the user never added, so the absence of this file says nothing at all about what the agent could reach.
   parser: json_generic
 - id: cursor.cli_config
   category: permissions
@@ -645,6 +659,56 @@ artifacts:
 
     This file also holds credential material, which is recorded here rather than as a separate entry, because a separate entry marked secret would stop the collector copying a file that is itself the evidence. Folded in from cursor.auth_credentials: RECORD HASH AND METADATA ONLY, never copy contents. The credential claim rests on third-party research rather than on the vendor page: newer builds are reported to store them in this same file under a top-level authInfo key. Also note CURSOR_API_KEY and CURSOR_AUTH_TOKEN as a non-file credential path.
   parser: json_generic
+- id: cursor.project_mcp_definitions
+  category: mcp_config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.cursor\projects\<escaped-abs-cwd>\mcps\<server-name>\SERVER_METADATA.json'
+  - '%USERPROFILE%\.cursor\projects\<escaped-abs-cwd>\mcps\<server-name>\<tool-name>.json'
+  - ~/.cursor/projects/<escaped-abs-cwd>/mcps/<server-name>/SERVER_METADATA.json
+  - ~/.cursor/projects/<escaped-abs-cwd>/mcps/<server-name>/<tool-name>.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on Windows 11 26200 and macOS 26.5
+  source_kind: observed
+  volatility: |-
+    Written when the project directory is first used and not pruned afterwards, so the set of servers here is cumulative rather than current. A server the user removed from the interface may still have its directory.
+  notes: |-
+    THE SERVER SURFACE THAT NOBODY CONFIGURED. This is where the measured hosts kept their tool server definitions, one directory per server under the per project agent directory, and it is not the global configuration file the rest of this catalogue expects. Both operating systems had it and neither had the global file.
+
+    What makes it worth collecting before anything else in the project directory is that it was populated in the shipped state. On a fresh installation, with no user action and no server added, the measured hosts carried definitions for screen control, for browser control including the debugging protocol, and for subscriptions to three external services. For a governance question the presence of the editor is not the finding; this directory is.
+
+    Record structure: SERVER_METADATA.json holds the server's own description, and one JSON file per tool holds that tool's name, description and argument schema. The tool file names are therefore an inventory of what the agent could call, readable without opening a single transcript.
+  parser: json_generic
+- id: cursor.project_mcp_instructions
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.cursor\projects\<escaped-abs-cwd>\mcps\<server-name>\INSTRUCTIONS.md'
+  - ~/.cursor/projects/<escaped-abs-cwd>/mcps/<server-name>/INSTRUCTIONS.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on Windows 11 26200 and macOS 26.5
+  source_kind: observed
+  volatility: |-
+    Written beside the server definition and not rewritten afterwards, so it is the text as it stood when the server directory was created rather than the text the server serves now.
+  notes: |-
+    INSTRUCTION TEXT THAT ARRIVES WITH A TOOL SERVER, which is the reason it is catalogued apart from the JSON definitions beside it. A tool server's instructions go into the agent's context the way a project instruction file does, and they come from whoever wrote the server rather than from the user. That makes this file part of the instruction surface the suite reports on, and a place where text the endpoint's owner never wrote can tell the agent what to do.
+
+    Found on both measured hosts in the shipped state, one file per server directory, for servers nobody added.
+  parser: instructions
 - id: cursor.project_instructions
   category: project_instructions
   root: project
@@ -834,7 +898,9 @@ artifacts:
 
     Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The result is stronger than an absent source. The vendor documents around twenty paths under the same agent directory, among them the agent, skill, subagent, command and worktree directories and the configuration, hook and authentication files, and a chats directory is not one of them. Nothing in two hundred and fifty documentation pages, three changelogs, the data-use and security pages or the vendor's code hosting organization mentions this layout: no hit for the database filename, for the prompt history filename, for a chats directory, or for an md5 keyed directory level. Control searches against the same sources returned hundreds of results, so the absence is real rather than a failed search.
 
-    There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and the slug one is the better supported of the two. Collect the whole agent directory rather than either path list, and expect the layout that is actually on the endpoint to settle which is right.
+    A first hand measurement has since settled it in this layout's favour, for one operating system out of two. On a clean macOS 26.5 host running product version 3.21.16, the directory exists exactly as described: a hash keyed level under a chats directory, a session identifier under that, and inside it the store with a write ahead log holding almost all of its content, the per session input history and the metadata file. On a Windows 11 26200 host measured the same day with the same product version it does not exist at all, and a recursive search for every one of those filenames across the whole user profile found none of them. So this layout is real, it is not universal, and an agent directory on Windows without it is the ordinary case rather than a cleared one.
+
+    There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and both of them were then found on the same macOS host at the same time, side by side under the same agent directory. They are not two guesses at one store: the slug keyed one holds the per project agent transcripts and the hash keyed one holds the command line product's own sessions. Collect the whole agent directory rather than either path list.
   parser: json_generic
 - id: cursor.global_prompt_history
   category: prompt_history
@@ -860,6 +926,10 @@ artifacts:
     Independently listed as a first-class collection target by two DFIR tools (UAC artifact file for Cursor; a Windows/osquery artifact catalogue that tags it family=history).
 
     Record structure: Flat JSON array of user prompt strings (workspace-wide, not per-session).
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16, one installation and one trivial conversation each. There was no global file of this name on either host, and a recursive search for the filename found it nowhere on Windows. On macOS it was found one level per session deeper, inside the command line product's own session directory beside that session's store and metadata file, which this catalogue already carries as its own entry, cursor.chat_session_prompt_history. It is not repeated here, because one path claimed by two entries is collected twice and counted twice.
+
+        Read the difference as a scope correction rather than as a contradiction. Both write-ups that name the global file describe a workspace wide list, and a per session file is a narrower thing that has to be collected per session and then merged. An analyst who globs only the top level of the agent directory gets nothing and concludes the user typed nothing.
   parser: json_generic
 - id: cursor.acp_session_store
   category: transcript
@@ -896,7 +966,11 @@ artifacts:
   - windows
   - linux
   paths:
-  - '%USERPROFILE%\.cursor\projects\<escaped-abs-cwd>\agent-transcripts\...'
+  - '%USERPROFILE%\.cursor\projects\<escaped-abs-cwd>\agent-tools\*.txt'
+  - '%USERPROFILE%\.cursor\projects\<escaped-abs-cwd>\agent-transcripts\<composer-id>.txt'
+  - '%USERPROFILE%\.cursor\projects\<escaped-abs-cwd>\agent-transcripts\<session-uuid>.jsonl'
+  - '%USERPROFILE%\.cursor\projects\<escaped-abs-cwd>\agent-transcripts\<session-uuid>\<session-uuid>.jsonl'
+  - '%USERPROFILE%\.cursor\projects\<escaped-abs-cwd>\agent-transcripts\<session-uuid>\transcript.jsonl'
   - ~/.cursor/projects/<escaped-abs-cwd>/agent-tools/*.txt
   - ~/.cursor/projects/<escaped-abs-cwd>/agent-transcripts/<composer-id>.txt
   - ~/.cursor/projects/<escaped-abs-cwd>/agent-transcripts/<session-uuid>.jsonl
@@ -915,6 +989,12 @@ artifacts:
     Plaintext canonical transcript, by far the easiest Cursor CLI artifact to read. Paired sidecars: agent-tools/*.txt. Some tooling also reports a per-transcript index .db built by third parties, not by Cursor — do not attribute that to the product.
 
     Record structure: One JSON object per line, shape {role, message:{content:[blocks]}} with `text` and `tool_use` blocks often in one record. NO per-record timestamps — order is positional and wall-clock must come from the paired store.db meta/createdAt or file mtime. Directory name is the project's absolute path with path separators flattened to '-' (e.g. Users-alice-repos-proj). At least three on-disk layouts exist across versions (nested <uuid>/<uuid>.jsonl, nested <uuid>/transcript.jsonl, flat <uuid>.jsonl) plus an older <composerId>.txt form — glob all four.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16, one installation and one trivial conversation each. The nested layout named above, a session directory holding a file of the same name, is the one both hosts wrote.
+
+        The Windows spelling in this entry was broken and is fixed here. It ended in a literal three dot ellipsis where the other spellings name the file, and the collectors turn an angle bracket placeholder into a star and leave everything else alone, so that pattern globbed for a directory actually called three dots. It matched nothing on any Windows endpoint, and matching nothing is the one failure mode this catalogue is built to avoid, because the collection reports success. All five Windows spellings are written out now.
+
+        The directory name deserves more weight than it has been given. It is the project's absolute path with the separators replaced, not a hash of it, which the Windows measurement showed plainly: the drive letter, the profile directory, the user name and every path component were readable in the directory name itself. So this directory is a record of which project was worked on, it survives the deletion of that project, and it identifies the person whose profile the path runs through. Treat the listing of this directory as evidence in its own right, before anything inside it is opened, and treat it as personal data when exporting.
   parser: jsonl_generic
 - id: cursor.chat_session_meta_json
   category: transcript
@@ -938,7 +1018,9 @@ artifacts:
 
     Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The result is stronger than an absent source. The vendor documents around twenty paths under the same agent directory, among them the agent, skill, subagent, command and worktree directories and the configuration, hook and authentication files, and a chats directory is not one of them. Nothing in two hundred and fifty documentation pages, three changelogs, the data-use and security pages or the vendor's code hosting organization mentions this layout: no hit for the database filename, for the prompt history filename, for a chats directory, or for an md5 keyed directory level. Control searches against the same sources returned hundreds of results, so the absence is real rather than a failed search.
 
-    There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and the slug one is the better supported of the two. Collect the whole agent directory rather than either path list, and expect the layout that is actually on the endpoint to settle which is right.
+    A first hand measurement has since settled it in this layout's favour, for one operating system out of two. On a clean macOS 26.5 host running product version 3.21.16, the directory exists exactly as described: a hash keyed level under a chats directory, a session identifier under that, and inside it the store with a write ahead log holding almost all of its content, the per session input history and the metadata file. On a Windows 11 26200 host measured the same day with the same product version it does not exist at all, and a recursive search for every one of those filenames across the whole user profile found none of them. So this layout is real, it is not universal, and an agent directory on Windows without it is the ordinary case rather than a cleared one.
+
+    There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and both of them were then found on the same macOS host at the same time, side by side under the same agent directory. They are not two guesses at one store: the slug keyed one holds the per project agent transcripts and the hash keyed one holds the command line product's own sessions. Collect the whole agent directory rather than either path list.
   parser: json_generic
 - id: cursor.chat_store_db
   category: transcript
@@ -971,7 +1053,9 @@ artifacts:
 
     Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The result is stronger than an absent source. The vendor documents around twenty paths under the same agent directory, among them the agent, skill, subagent, command and worktree directories and the configuration, hook and authentication files, and a chats directory is not one of them. Nothing in two hundred and fifty documentation pages, three changelogs, the data-use and security pages or the vendor's code hosting organization mentions this layout: no hit for the database filename, for the prompt history filename, for a chats directory, or for an md5 keyed directory level. Control searches against the same sources returned hundreds of results, so the absence is real rather than a failed search.
 
-    There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and the slug one is the better supported of the two. Collect the whole agent directory rather than either path list, and expect the layout that is actually on the endpoint to settle which is right.
+    A first hand measurement has since settled it in this layout's favour, for one operating system out of two. On a clean macOS 26.5 host running product version 3.21.16, the directory exists exactly as described: a hash keyed level under a chats directory, a session identifier under that, and inside it the store with a write ahead log holding almost all of its content, the per session input history and the metadata file. On a Windows 11 26200 host measured the same day with the same product version it does not exist at all, and a recursive search for every one of those filenames across the whole user profile found none of them. So this layout is real, it is not universal, and an agent directory on Windows without it is the ordinary case rather than a cleared one.
+
+    There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and both of them were then found on the same macOS host at the same time, side by side under the same agent directory. They are not two guesses at one store: the slug keyed one holds the per project agent transcripts and the hash keyed one holds the command line product's own sessions. Collect the whole agent directory rather than either path list.
   parser: sqlite_generic
 - id: cursor.conversation_search_db
   category: transcript
@@ -1069,7 +1153,9 @@ artifacts:
 
     Re-checked against the vendor's own documentation by a second verification pass, after its site became reachable. The result is stronger than an absent source. The vendor documents around twenty paths under the same agent directory, among them the agent, skill, subagent, command and worktree directories and the configuration, hook and authentication files, and a chats directory is not one of them. Nothing in two hundred and fifty documentation pages, three changelogs, the data-use and security pages or the vendor's code hosting organization mentions this layout: no hit for the database filename, for the prompt history filename, for a chats directory, or for an md5 keyed directory level. Control searches against the same sources returned hundreds of results, so the absence is real rather than a failed search.
 
-    There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and the slug one is the better supported of the two. Collect the whole agent directory rather than either path list, and expect the layout that is actually on the endpoint to settle which is right.
+    A first hand measurement has since settled it in this layout's favour, for one operating system out of two. On a clean macOS 26.5 host running product version 3.21.16, the directory exists exactly as described: a hash keyed level under a chats directory, a session identifier under that, and inside it the store with a write ahead log holding almost all of its content, the per session input history and the metadata file. On a Windows 11 26200 host measured the same day with the same product version it does not exist at all, and a recursive search for every one of those filenames across the whole user profile found none of them. So this layout is real, it is not universal, and an agent directory on Windows without it is the ordinary case rather than a cleared one.
+
+    There is also a contradicting lead, which is why this stays unverified rather than being dropped. Both the vendor's own cookbook and its software development kit documentation describe a per-workspace state root keyed by a slug, under a projects directory, not by a hash of the workspace path under a chats directory. This catalogue carries both layouts, and both of them were then found on the same macOS host at the same time, side by side under the same agent directory. They are not two guesses at one store: the slug keyed one holds the per project agent transcripts and the hash keyed one holds the command line product's own sessions. Collect the whole agent directory rather than either path list.
   parser: json_generic
 - id: cursor.workspace_state_vscdb
   category: transcript
@@ -1092,7 +1178,6 @@ artifacts:
   format: sqlite
   sensitivity: normal
   collect_priority: normal
-  legacy: true
   status: unverified
   source: |-
     https://raw.githubusercontent.com/VasiHemanth/tokentelemetry/0d691ae343ed31991e504a738bb1b288eea3b2ee/docs/research/harness-survey/harness-cursor-vscode.md
@@ -1103,4 +1188,8 @@ artifacts:
     The aiService.prompts / aiService.generations / aichat.chatdata keys are EARLY-VERSION artifacts. On Cursor 3.0+ the workspace DB retains mainly selectedComposerIds and UI state — so finding populated aiService.* keys is itself a dating signal for an older install or an older workspace. workspace.json is the only reliable hash-to-path resolver; VS Code proper does not store folder paths per workspace and needs globalStorage/storage.json openedPathsList instead.
 
     Record structure: ItemTable only (plus cursorDiskKV in some builds). Keys: aiService.prompts (LEGACY prompt-only history: prompt text + commandType), aiService.generations (LEGACY generation event log: UUID + timestamp + type), workbench.panel.aichat.view.aichat.chatdata (LEGACY chat: tabs[] + bubbles[]), composer.composerData (selected/focused composer ids), cursor/pinnedComposers, history.entries, workbench.backgroundComposer.workspacePersistentData, workbench.panel.composerChatViewPane.*, workbench.panel.aichat.<uuid>.numberOfVisibleViews, newAgentSidebar.*, cursor/agentLayout.*, agentSidebar.section.*.collapsed, interactive.sessions. workspace.json beside it maps the opaque hash to the real folder: a "folder" or "workspace" key with a file:// or vscode-remote://ssh-remote+<host>/ URI.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16, one installation and one trivial conversation each. The legacy flag came off this entry as a result. The database is written by the current version on both operating systems, with a populated key table per workspace and a second directory under the fixed name for the window with no folder open, so treating the whole artifact as no longer written was wrong. What is legacy is the set of keys named in the paragraph above, not the file.
+
+        Two things about the directory name, both of which cost an analyst time if nobody says them. It is not the hash of the workspace path: ten normalisations of the folder URI were tried against five digest algorithms and none of the fifty combinations reproduced the observed name, so do not try to compute it forwards from a path. And the same folder produced the same name in this product and in the other Electron product in this catalogue, which makes the name a join key across two products for the statement that one folder was open in both.
   parser: vscode_state

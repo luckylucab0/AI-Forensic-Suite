@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: e3164e0cb5db
+# Catalogue digest: 8537054e578a
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -620,7 +620,6 @@ sources:
     cursor,cursor.agent_transcripts_jsonl,C:/Users/*/.cursor/projects/*/agent-transcripts/*.txt
     cursor,cursor.agent_transcripts_jsonl,C:/Users/*/.cursor/projects/*/agent-transcripts/*/*.jsonl
     cursor,cursor.agent_transcripts_jsonl,C:/Users/*/.cursor/projects/*/agent-transcripts/*/transcript.jsonl
-    cursor,cursor.agent_transcripts_jsonl,C:/Users/*/.cursor/projects/*/agent-transcripts/...
     cursor,cursor.ai_code_tracking_db,C:/Users/*/.cursor/ai-tracking/*.db
     cursor,cursor.ai_code_tracking_db,C:/Users/*/.cursor/ai-tracking/*.db-shm
     cursor,cursor.ai_code_tracking_db,C:/Users/*/.cursor/ai-tracking/*.db-wal
@@ -628,7 +627,6 @@ sources:
     cursor,cursor.ai_code_tracking_db,C:/Users/*/.cursor/ai-tracking/ai-code-tracking.db-shm
     cursor,cursor.ai_code_tracking_db,C:/Users/*/.cursor/ai-tracking/ai-code-tracking.db-wal
     cursor,cursor.auth_credentials,C:/Users/*/.cursor/auth.json
-    cursor,cursor.auth_credentials,C:/Users/*/AppData/Roaming/Cursor/auth.json
     cursor,cursor.chat_session_meta_json,C:/Users/*/.cursor/chats/*/*/meta.json
     cursor,cursor.chat_session_prompt_history,C:/Users/*/.cursor/chats/*/*/prompt_history.json
     cursor,cursor.chat_store_db,C:/Users/*/.cursor/chats/*/*/store.db
@@ -637,6 +635,7 @@ sources:
     cursor,cursor.cli_workspaces,C:/Users/*/.cursor/cli-workspaces.json
     cursor,cursor.cli_workspaces,C:/Users/*/.cursor/ide_state.json
     cursor,cursor.commit_checkpoints,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/**
+    cursor,cursor.commit_checkpoints,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints/**
     cursor,cursor.computer_use_sidecar,C:/Users/*/.cursor/cursor-computer-use/**
     cursor,cursor.conversation_search_db,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/conversation-search.db
     cursor,cursor.conversation_search_db,C:/Users/*/AppData/Roaming/Cursor/User/globalStorage/conversation-search.db-shm
@@ -656,6 +655,9 @@ sources:
     cursor,cursor.pasted_text,C:/Users/*/.cursor/chats/*/*/pasted_text.json
     cursor,cursor.plugins,C:/Users/*/.cursor/plugins/**
     cursor,cursor.plugins,C:/Users/*/.cursor/plugins/local/**
+    cursor,cursor.project_mcp_definitions,C:/Users/*/.cursor/projects/*/mcps/*/*.json
+    cursor,cursor.project_mcp_definitions,C:/Users/*/.cursor/projects/*/mcps/*/SERVER_METADATA.json
+    cursor,cursor.project_mcp_instructions,C:/Users/*/.cursor/projects/*/mcps/*/INSTRUCTIONS.md
     cursor,cursor.project_metadata,C:/Users/*/.cursor/projects-metadata.json
     cursor,cursor.project_metadata,C:/Users/*/.cursor/projects/*/mcp-approvals.json
     cursor,cursor.project_metadata,C:/Users/*/.cursor/projects/*/repo.json
@@ -2456,13 +2458,17 @@ sources:
     cursor,cursor.cli_workspaces,/var/root/.cursor/cli-workspaces.json
     cursor,cursor.cli_workspaces,/var/root/.cursor/ide_state.json
     cursor,cursor.commit_checkpoints,/Users/*/.config/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/**
+    cursor,cursor.commit_checkpoints,/Users/*/.config/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints/*/**
     cursor,cursor.commit_checkpoints,/Users/*/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/diffs/*
     cursor,cursor.commit_checkpoints,/Users/*/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/files/*
     cursor,cursor.commit_checkpoints,/Users/*/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/metadata.json
+    cursor,cursor.commit_checkpoints,/Users/*/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints/*/**
     cursor,cursor.commit_checkpoints,/var/root/.config/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/**
+    cursor,cursor.commit_checkpoints,/var/root/.config/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints/*/**
     cursor,cursor.commit_checkpoints,/var/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/diffs/*
     cursor,cursor.commit_checkpoints,/var/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/files/*
     cursor,cursor.commit_checkpoints,/var/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/metadata.json
+    cursor,cursor.commit_checkpoints,/var/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints/*/**
     cursor,cursor.computer_use_sidecar,/Users/*/.cursor/cursor-computer-use/**
     cursor,cursor.computer_use_sidecar,/var/root/.cursor/cursor-computer-use/**
     cursor,cursor.conversation_search_db,/Users/*/.config/Cursor/User/globalStorage/conversation-search.db
@@ -2529,6 +2535,12 @@ sources:
     cursor,cursor.plugins,/Users/*/.cursor/plugins/local/**
     cursor,cursor.plugins,/var/root/.cursor/plugins/**
     cursor,cursor.plugins,/var/root/.cursor/plugins/local/**
+    cursor,cursor.project_mcp_definitions,/Users/*/.cursor/projects/*/mcps/*/*.json
+    cursor,cursor.project_mcp_definitions,/Users/*/.cursor/projects/*/mcps/*/SERVER_METADATA.json
+    cursor,cursor.project_mcp_definitions,/var/root/.cursor/projects/*/mcps/*/*.json
+    cursor,cursor.project_mcp_definitions,/var/root/.cursor/projects/*/mcps/*/SERVER_METADATA.json
+    cursor,cursor.project_mcp_instructions,/Users/*/.cursor/projects/*/mcps/*/INSTRUCTIONS.md
+    cursor,cursor.project_mcp_instructions,/var/root/.cursor/projects/*/mcps/*/INSTRUCTIONS.md
     cursor,cursor.project_metadata,/Users/*/.cursor/projects-metadata.json
     cursor,cursor.project_metadata,/Users/*/.cursor/projects/*/mcp-approvals.json
     cursor,cursor.project_metadata,/Users/*/.cursor/projects/*/repo.json
@@ -4817,13 +4829,17 @@ sources:
     cursor,cursor.cli_workspaces,/root/.cursor/cli-workspaces.json
     cursor,cursor.cli_workspaces,/root/.cursor/ide_state.json
     cursor,cursor.commit_checkpoints,/home/*/.config/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/**
+    cursor,cursor.commit_checkpoints,/home/*/.config/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints/*/**
     cursor,cursor.commit_checkpoints,/home/*/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/diffs/*
     cursor,cursor.commit_checkpoints,/home/*/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/files/*
     cursor,cursor.commit_checkpoints,/home/*/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/metadata.json
+    cursor,cursor.commit_checkpoints,/home/*/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints/*/**
     cursor,cursor.commit_checkpoints,/root/.config/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/**
+    cursor,cursor.commit_checkpoints,/root/.config/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints/*/**
     cursor,cursor.commit_checkpoints,/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/diffs/*
     cursor,cursor.commit_checkpoints,/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/files/*
     cursor,cursor.commit_checkpoints,/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints/*/metadata.json
+    cursor,cursor.commit_checkpoints,/root/Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints/*/**
     cursor,cursor.computer_use_sidecar,/home/*/.cursor/cursor-computer-use/**
     cursor,cursor.computer_use_sidecar,/root/.cursor/cursor-computer-use/**
     cursor,cursor.conversation_search_db,/home/*/.config/Cursor/User/globalStorage/conversation-search.db
@@ -4882,6 +4898,12 @@ sources:
     cursor,cursor.plugins,/home/*/.cursor/plugins/local/**
     cursor,cursor.plugins,/root/.cursor/plugins/**
     cursor,cursor.plugins,/root/.cursor/plugins/local/**
+    cursor,cursor.project_mcp_definitions,/home/*/.cursor/projects/*/mcps/*/*.json
+    cursor,cursor.project_mcp_definitions,/home/*/.cursor/projects/*/mcps/*/SERVER_METADATA.json
+    cursor,cursor.project_mcp_definitions,/root/.cursor/projects/*/mcps/*/*.json
+    cursor,cursor.project_mcp_definitions,/root/.cursor/projects/*/mcps/*/SERVER_METADATA.json
+    cursor,cursor.project_mcp_instructions,/home/*/.cursor/projects/*/mcps/*/INSTRUCTIONS.md
+    cursor,cursor.project_mcp_instructions,/root/.cursor/projects/*/mcps/*/INSTRUCTIONS.md
     cursor,cursor.project_metadata,/home/*/.cursor/projects-metadata.json
     cursor,cursor.project_metadata,/home/*/.cursor/projects/*/mcp-approvals.json
     cursor,cursor.project_metadata,/home/*/.cursor/projects/*/repo.json

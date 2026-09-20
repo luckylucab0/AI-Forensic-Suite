@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: e3164e0cb5db
+// Catalogue digest: 8537054e578a
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1042,8 +1042,6 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.auth_credentials", ".config\\cursor\\auth.json",
     "cursor", "cursor.auth_credentials", ".cursor/auth.json",
     "cursor", "cursor.auth_credentials", ".cursor\\auth.json",
-    "cursor", "cursor.auth_credentials", "Cursor/auth.json",
-    "cursor", "cursor.auth_credentials", "Cursor\\auth.json",
     "cursor", "cursor.chat_session_meta_json", ".cursor/chats",
     "cursor", "cursor.chat_session_meta_json", ".cursor\\chats",
     "cursor", "cursor.chat_session_prompt_history", ".cursor/chats",
@@ -1055,11 +1053,17 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.cli_workspaces", ".cursor\\cli-workspaces.json",
     "cursor", "cursor.cli_workspaces", ".cursor\\ide_state.json",
     "cursor", "cursor.commit_checkpoints", ".config/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints",
+    "cursor", "cursor.commit_checkpoints", ".config/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints",
     "cursor", "cursor.commit_checkpoints", ".config\\Cursor\\User\\globalStorage\\anysphere.cursor-commits\\checkpoints",
+    "cursor", "cursor.commit_checkpoints", ".config\\Cursor\\User\\globalStorage\\anysphere.cursor-retrieval\\checkpoints",
     "cursor", "cursor.commit_checkpoints", "Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints",
+    "cursor", "cursor.commit_checkpoints", "Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints",
     "cursor", "cursor.commit_checkpoints", "Cursor\\User\\globalStorage\\anysphere.cursor-commits\\checkpoints",
+    "cursor", "cursor.commit_checkpoints", "Cursor\\User\\globalStorage\\anysphere.cursor-retrieval\\checkpoints",
     "cursor", "cursor.commit_checkpoints", "Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-commits/checkpoints",
+    "cursor", "cursor.commit_checkpoints", "Library/Application Support/Cursor/User/globalStorage/anysphere.cursor-retrieval/checkpoints",
     "cursor", "cursor.commit_checkpoints", "Library\\Application Support\\Cursor\\User\\globalStorage\\anysphere.cursor-commits\\checkpoints",
+    "cursor", "cursor.commit_checkpoints", "Library\\Application Support\\Cursor\\User\\globalStorage\\anysphere.cursor-retrieval\\checkpoints",
     "cursor", "cursor.computer_use_sidecar", ".cursor/cursor-computer-use",
     "cursor", "cursor.computer_use_sidecar", ".cursor\\cursor-computer-use",
     "cursor", "cursor.conversation_search_db", ".config/Cursor/User/globalStorage/conversation-search.db",
@@ -1137,6 +1141,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.plugins", ".cursor/plugins/local",
     "cursor", "cursor.plugins", ".cursor\\plugins",
     "cursor", "cursor.plugins", ".cursor\\plugins\\local",
+    "cursor", "cursor.project_mcp_definitions", ".cursor/projects",
+    "cursor", "cursor.project_mcp_definitions", ".cursor\\projects",
+    "cursor", "cursor.project_mcp_instructions", ".cursor/projects",
+    "cursor", "cursor.project_mcp_instructions", ".cursor\\projects",
     "cursor", "cursor.project_metadata", ".cursor/projects",
     "cursor", "cursor.project_metadata", ".cursor/projects-metadata.json",
     "cursor", "cursor.project_metadata", ".cursor\\projects",

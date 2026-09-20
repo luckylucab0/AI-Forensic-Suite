@@ -107,6 +107,7 @@ SOURCES = frozenset(
         "crosscutting.instructions_windsurf_rules",
         "cursor.commands_and_plans",
         "cursor.project_instructions",
+        "cursor.project_mcp_instructions",
         "cursor.skills",
         "cursor.subagents",
         "factory_droid.output_styles",

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: e3164e0cb5db
+# Catalogue digest: 8537054e578a
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -551,13 +551,13 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.ai_code_tracking_db'; Path = '$profile\.cursor\ai-tracking\ai-code-tracking.db-shm' }
     @{ Agent = 'cursor'; Id = 'cursor.ai_code_tracking_db'; Path = '$profile\.cursor\ai-tracking\ai-code-tracking.db-wal' }
     @{ Agent = 'cursor'; Id = 'cursor.auth_credentials'; Path = '$profile\.cursor\auth.json' }
-    @{ Agent = 'cursor'; Id = 'cursor.auth_credentials'; Path = '$profile\AppData\Roaming\Cursor\auth.json' }
     @{ Agent = 'cursor'; Id = 'cursor.chat_session_meta_json'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.chat_session_prompt_history'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.chat_store_db'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.cli_workspaces'; Path = '$profile\.cursor\cli-workspaces.json' }
     @{ Agent = 'cursor'; Id = 'cursor.cli_workspaces'; Path = '$profile\.cursor\ide_state.json' }
     @{ Agent = 'cursor'; Id = 'cursor.commit_checkpoints'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\anysphere.cursor-commits\checkpoints' }
+    @{ Agent = 'cursor'; Id = 'cursor.commit_checkpoints'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\anysphere.cursor-retrieval\checkpoints' }
     @{ Agent = 'cursor'; Id = 'cursor.computer_use_sidecar'; Path = '$profile\.cursor\cursor-computer-use' }
     @{ Agent = 'cursor'; Id = 'cursor.conversation_search_db'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\conversation-search.db' }
     @{ Agent = 'cursor'; Id = 'cursor.conversation_search_db'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\conversation-search.db-shm' }
@@ -577,6 +577,8 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.pasted_text'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.plugins'; Path = '$profile\.cursor\plugins' }
     @{ Agent = 'cursor'; Id = 'cursor.plugins'; Path = '$profile\.cursor\plugins\local' }
+    @{ Agent = 'cursor'; Id = 'cursor.project_mcp_definitions'; Path = '$profile\.cursor\projects' }
+    @{ Agent = 'cursor'; Id = 'cursor.project_mcp_instructions'; Path = '$profile\.cursor\projects' }
     @{ Agent = 'cursor'; Id = 'cursor.project_metadata'; Path = '$profile\.cursor\projects' }
     @{ Agent = 'cursor'; Id = 'cursor.project_metadata'; Path = '$profile\.cursor\projects-metadata.json' }
     @{ Agent = 'cursor'; Id = 'cursor.subagent_output'; Path = '$profile\.cursor\subagents' }
