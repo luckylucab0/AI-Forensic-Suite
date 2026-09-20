@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 483bd9a3bd62
+# Catalogue digest: 615e653bec2d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -540,6 +540,7 @@ sources:
     crosscutting,C:/Users/*/AppData/Local/npm-cache/_logs/*-debug-*.log
     crosscutting,C:/Users/*/AppData/Roaming/npm/**
     crosscutting,C:/Users/*/AppData/Roaming/npm/node_modules/**
+    cursor,/Users/*/.cache/cursor-compile-cache/**
     cursor,/Users/*/.cursor/cursor-computer-use/**
     cursor,/Users/*/.cursor/policy.json
     cursor,/Users/*/.cursor/subagents/**
@@ -549,6 +550,8 @@ sources:
     cursor,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,/Users/*/Library/Caches/cursor-compile-cache/**
+    cursor,/Users/*/Library/Caches/cursor-compile-cache/v*-*-*-*/**
+    cursor,/home/*/.cache/cursor-compile-cache/**
     cursor,/home/*/.cursor/cursor-computer-use/**
     cursor,/home/*/.cursor/policy.json
     cursor,/home/*/.cursor/subagents/**
@@ -558,7 +561,9 @@ sources:
     cursor,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,/home/*/Library/Caches/cursor-compile-cache/**
+    cursor,/home/*/Library/Caches/cursor-compile-cache/v*-*-*-*/**
     cursor,/opt/cursor/**
+    cursor,/root/.cache/cursor-compile-cache/**
     cursor,/root/.cursor/cursor-computer-use/**
     cursor,/root/.cursor/policy.json
     cursor,/root/.cursor/subagents/**
@@ -568,6 +573,8 @@ sources:
     cursor,/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,/root/Library/Caches/cursor-compile-cache/**
+    cursor,/root/Library/Caches/cursor-compile-cache/v*-*-*-*/**
+    cursor,/var/root/.cache/cursor-compile-cache/**
     cursor,/var/root/.cursor/cursor-computer-use/**
     cursor,/var/root/.cursor/policy.json
     cursor,/var/root/.cursor/subagents/**
@@ -577,10 +584,12 @@ sources:
     cursor,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,/var/root/Library/Caches/cursor-compile-cache/**
+    cursor,/var/root/Library/Caches/cursor-compile-cache/v*-*-*-*/**
     cursor,C:/Users/*/.cursor/cursor-computer-use/**
     cursor,C:/Users/*/.cursor/policy.json
     cursor,C:/Users/*/.cursor/subagents/**
     cursor,C:/Users/*/.cursor/worktrees/*
+    cursor,C:/Users/*/AppData/Local/Temp/cursor-agent-logs-*/*
     gemini_cli,/Users/*/.cache/.gemini/tmp/*/chats/**
     gemini_cli,/Users/*/.gemini/**
     gemini_cli,/Users/*/.gemini/sessions/**
@@ -1244,6 +1253,9 @@ sources:
     windsurf,C:/Users/*/.windsurf-server/**
     windsurf,C:/Users/*/.windsurf/transcripts/*.jsonl
     windsurf,C:/Users/*/.windsurf/worktrees/*
+    windsurf,C:/Users/*/AppData/Local/Temp/devin-inno-updater-*.log
+    windsurf,C:/Users/*/AppData/Local/Temp/unleash-backup-codeium-extension.json
+    windsurf,C:/Users/*/AppData/Local/Temp/unleash-repo-schema-v1-codeium-language-server.json
     windsurf,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db
     windsurf,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db-shm
     windsurf,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db-wal

@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 483bd9a3bd62
+// Catalogue digest: 615e653bec2d
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1191,16 +1191,21 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.project_metadata", ".cursor/projects-metadata.json",
     "cursor", "cursor.project_metadata", ".cursor\\projects",
     "cursor", "cursor.project_metadata", ".cursor\\projects-metadata.json",
+    "cursor", "cursor.retrieval_index", ".cache/cursor-compile-cache",
+    "cursor", "cursor.retrieval_index", ".cache\\cursor-compile-cache",
     "cursor", "cursor.retrieval_index", "Library/Application Support/Cursor/CachedData",
     "cursor", "cursor.retrieval_index", "Library/Application Support/Cursor/User/workspaceStorage",
     "cursor", "cursor.retrieval_index", "Library/Caches/cursor-compile-cache",
+    "cursor", "cursor.retrieval_index", "Library/Caches/cursor-compile-cache/v",
     "cursor", "cursor.retrieval_index", "Library\\Application Support\\Cursor\\CachedData",
     "cursor", "cursor.retrieval_index", "Library\\Application Support\\Cursor\\User\\workspaceStorage",
     "cursor", "cursor.retrieval_index", "Library\\Caches\\cursor-compile-cache",
+    "cursor", "cursor.retrieval_index", "Library\\Caches\\cursor-compile-cache\\v",
     "cursor", "cursor.runtime_arguments", ".cursor/argv.json",
     "cursor", "cursor.runtime_arguments", ".cursor\\argv.json",
     "cursor", "cursor.subagent_output", ".cursor/subagents",
     "cursor", "cursor.subagent_output", ".cursor\\subagents",
+    "cursor", "cursor.temp_residue", "Temp\\cursor-agent-logs-",
     "cursor", "cursor.worker_data", ".local/share/cursor-agent",
     "cursor", "cursor.worker_data", ".local\\share\\cursor-agent",
     "cursor", "cursor.worker_data", "/opt/cursor",
@@ -2630,6 +2635,9 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "windsurf", "windsurf.system_config", "\\etc\\windsurf\\rules",
     "windsurf", "windsurf.system_config", "\\etc\\windsurf\\skills",
     "windsurf", "windsurf.system_config", "\\etc\\windsurf\\workflows",
+    "windsurf", "windsurf.temp_residue", "Temp\\devin-inno-updater-",
+    "windsurf", "windsurf.temp_residue", "Temp\\unleash-backup-codeium-extension.json",
+    "windsurf", "windsurf.temp_residue", "Temp\\unleash-repo-schema-v1-codeium-language-server.json",
     "windsurf", "windsurf.worktrees", ".devin/worktrees",
     "windsurf", "windsurf.worktrees", ".devin\\worktrees",
     "windsurf", "windsurf.worktrees", ".windsurf/worktrees",

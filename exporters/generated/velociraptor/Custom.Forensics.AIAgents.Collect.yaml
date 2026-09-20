@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 483bd9a3bd62
+# Catalogue digest: 615e653bec2d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -676,10 +676,12 @@ sources:
     cursor,cursor.project_mcp_definitions,C:/Users/*/.cursor/projects/*/mcps/*/SERVER_METADATA.json
     cursor,cursor.project_mcp_instructions,C:/Users/*/.cursor/projects/*/mcps/*/INSTRUCTIONS.md
     cursor,cursor.project_metadata,C:/Users/*/.cursor/projects-metadata.json
+    cursor,cursor.project_metadata,C:/Users/*/.cursor/projects/*/canvases/**
     cursor,cursor.project_metadata,C:/Users/*/.cursor/projects/*/mcp-approvals.json
     cursor,cursor.project_metadata,C:/Users/*/.cursor/projects/*/repo.json
     cursor,cursor.runtime_arguments,C:/Users/*/.cursor/argv.json
     cursor,cursor.subagent_output,C:/Users/*/.cursor/subagents/**
+    cursor,cursor.temp_residue,C:/Users/*/AppData/Local/Temp/cursor-agent-logs-*/*
     cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb
     cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-shm
     cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-wal
@@ -1460,6 +1462,9 @@ sources:
     windsurf,windsurf.shared_storage,C:/Users/*/.devin-shared/sharedStorage/state.vscdb-shm
     windsurf,windsurf.shared_storage,C:/Users/*/.devin-shared/sharedStorage/state.vscdb-wal
     windsurf,windsurf.shared_storage,C:/Users/*/.devin-shared/sharedStorage/state.vscdb.backup
+    windsurf,windsurf.temp_residue,C:/Users/*/AppData/Local/Temp/devin-inno-updater-*.log
+    windsurf,windsurf.temp_residue,C:/Users/*/AppData/Local/Temp/unleash-backup-codeium-extension.json
+    windsurf,windsurf.temp_residue,C:/Users/*/AppData/Local/Temp/unleash-repo-schema-v1-codeium-language-server.json
     windsurf,windsurf.worktrees,C:/Users/*/.devin/worktrees/*
     windsurf,windsurf.worktrees,C:/Users/*/.windsurf/worktrees/*
     zed,zed.extensions,C:/Users/*/AppData/Local/Zed/debug_adapters/**
@@ -2654,19 +2659,25 @@ sources:
     cursor,cursor.project_mcp_instructions,/Users/*/.cursor/projects/*/mcps/*/INSTRUCTIONS.md
     cursor,cursor.project_mcp_instructions,/var/root/.cursor/projects/*/mcps/*/INSTRUCTIONS.md
     cursor,cursor.project_metadata,/Users/*/.cursor/projects-metadata.json
+    cursor,cursor.project_metadata,/Users/*/.cursor/projects/*/canvases/**
     cursor,cursor.project_metadata,/Users/*/.cursor/projects/*/mcp-approvals.json
     cursor,cursor.project_metadata,/Users/*/.cursor/projects/*/repo.json
     cursor,cursor.project_metadata,/var/root/.cursor/projects-metadata.json
+    cursor,cursor.project_metadata,/var/root/.cursor/projects/*/canvases/**
     cursor,cursor.project_metadata,/var/root/.cursor/projects/*/mcp-approvals.json
     cursor,cursor.project_metadata,/var/root/.cursor/projects/*/repo.json
+    cursor,cursor.retrieval_index,/Users/*/.cache/cursor-compile-cache/**
     cursor,cursor.retrieval_index,/Users/*/Library/Application Support/Cursor/CachedData/**
     cursor,cursor.retrieval_index,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,cursor.retrieval_index,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,cursor.retrieval_index,/Users/*/Library/Caches/cursor-compile-cache/**
+    cursor,cursor.retrieval_index,/Users/*/Library/Caches/cursor-compile-cache/v*-*-*-*/**
+    cursor,cursor.retrieval_index,/var/root/.cache/cursor-compile-cache/**
     cursor,cursor.retrieval_index,/var/root/Library/Application Support/Cursor/CachedData/**
     cursor,cursor.retrieval_index,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,cursor.retrieval_index,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,cursor.retrieval_index,/var/root/Library/Caches/cursor-compile-cache/**
+    cursor,cursor.retrieval_index,/var/root/Library/Caches/cursor-compile-cache/v*-*-*-*/**
     cursor,cursor.runtime_arguments,/Users/*/.cursor/argv.json
     cursor,cursor.runtime_arguments,/var/root/.cursor/argv.json
     cursor,cursor.subagent_output,/Users/*/.cursor/subagents/**
@@ -5165,19 +5176,25 @@ sources:
     cursor,cursor.project_mcp_instructions,/home/*/.cursor/projects/*/mcps/*/INSTRUCTIONS.md
     cursor,cursor.project_mcp_instructions,/root/.cursor/projects/*/mcps/*/INSTRUCTIONS.md
     cursor,cursor.project_metadata,/home/*/.cursor/projects-metadata.json
+    cursor,cursor.project_metadata,/home/*/.cursor/projects/*/canvases/**
     cursor,cursor.project_metadata,/home/*/.cursor/projects/*/mcp-approvals.json
     cursor,cursor.project_metadata,/home/*/.cursor/projects/*/repo.json
     cursor,cursor.project_metadata,/root/.cursor/projects-metadata.json
+    cursor,cursor.project_metadata,/root/.cursor/projects/*/canvases/**
     cursor,cursor.project_metadata,/root/.cursor/projects/*/mcp-approvals.json
     cursor,cursor.project_metadata,/root/.cursor/projects/*/repo.json
+    cursor,cursor.retrieval_index,/home/*/.cache/cursor-compile-cache/**
     cursor,cursor.retrieval_index,/home/*/Library/Application Support/Cursor/CachedData/**
     cursor,cursor.retrieval_index,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,cursor.retrieval_index,/home/*/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,cursor.retrieval_index,/home/*/Library/Caches/cursor-compile-cache/**
+    cursor,cursor.retrieval_index,/home/*/Library/Caches/cursor-compile-cache/v*-*-*-*/**
+    cursor,cursor.retrieval_index,/root/.cache/cursor-compile-cache/**
     cursor,cursor.retrieval_index,/root/Library/Application Support/Cursor/CachedData/**
     cursor,cursor.retrieval_index,/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/embeddable_files.txt
     cursor,cursor.retrieval_index,/root/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,cursor.retrieval_index,/root/Library/Caches/cursor-compile-cache/**
+    cursor,cursor.retrieval_index,/root/Library/Caches/cursor-compile-cache/v*-*-*-*/**
     cursor,cursor.runtime_arguments,/home/*/.cursor/argv.json
     cursor,cursor.runtime_arguments,/root/.cursor/argv.json
     cursor,cursor.subagent_output,/home/*/.cursor/subagents/**

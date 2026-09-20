@@ -2,7 +2,7 @@
 
 <!-- Generated from the artifact catalogue. Do not edit by hand:
 <!-- run `afx export-collection` and commit the result.
-<!-- Catalogue digest: 483bd9a3bd62
+<!-- Catalogue digest: 615e653bec2d
 <!--
 <!-- An empty result from this rule means the paths it searched held nothing. It does
 <!-- not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -73,7 +73,7 @@ Windows-relevant catalogue entries, as a sense of what a collection will cover:
 | Cline | `cline` | 24 |
 | Continue | `continue` | 17 |
 | Cross-cutting evidence | `crosscutting` | 21 |
-| Cursor | `cursor` | 44 |
+| Cursor | `cursor` | 45 |
 | Devin | `devin` | 2 |
 | Factory Droid | `factory_droid` | 9 |
 | Gemini CLI | `gemini_cli` | 13 |
@@ -92,7 +92,7 @@ Windows-relevant catalogue entries, as a sense of what a collection will cover:
 | Roo Code | `roo_code` | 7 |
 | Visual Studio Code host storage | `vscode` | 5 |
 | Warp | `warp` | 1 |
-| Windsurf | `windsurf` | 33 |
+| Windsurf | `windsurf` | 34 |
 | Zed | `zed` | 6 |
 | pi | `pi` | 10 |
 

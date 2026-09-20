@@ -207,6 +207,30 @@ artifacts:
 
     The vendor documents a global ignore file in the configuration directory for enforcing rules across all repositories, which applies in addition to the per-repository files rather than instead of them.
   parser: text_config
+- id: windsurf.temp_residue
+  category: log
+  root: user_profile
+  os:
+  - windows
+  paths:
+  - '%LOCALAPPDATA%\Temp\devin-inno-updater-<epoch>.log'
+  - '%LOCALAPPDATA%\Temp\unleash-backup-codeium-extension.json'
+  - '%LOCALAPPDATA%\Temp\unleash-repo-schema-v1-codeium-language-server.json'
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: observed on Windows 11 26200
+  source_kind: observed
+  volatility: |-
+    In the temporary directory, so it is at the mercy of disk cleanup and of the operating system's own maintenance. All three survived the product's own uninstaller in the measurement that found them.
+  notes: |-
+    WHAT THIS PRODUCT LEAVES IN THE TEMPORARY DIRECTORY, AND THE NAMES ARE UNDER THE OLD BRAND. Two of the three files are close to a megabyte of feature flag definitions, named after the flag service and after the previous company's language server and extension, and they were still there after the uninstall.
+
+    That is what makes them worth collecting on a host that looks clean: a file naming the predecessor product in the temporary directory, on a machine where the predecessor was never installed, is evidence of the renamed one. The updater log beside them carries an epoch timestamp in its filename, which dates an installation or an update even when it is empty, as it was on the measured host.
+
+    Nobody read the contents. The flag definitions describe what the vendor had switched on, which is the same question windsurf.cli_feature_state answers from a different directory.
+  parser: text_log
 - id: windsurf.plugin_log
   title: Plugin log
   category: log

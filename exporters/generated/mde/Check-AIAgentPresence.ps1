@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 483bd9a3bd62
+# Catalogue digest: 615e653bec2d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -594,6 +594,7 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.project_metadata'; Path = '$profile\.cursor\projects-metadata.json' }
     @{ Agent = 'cursor'; Id = 'cursor.runtime_arguments'; Path = '$profile\.cursor\argv.json' }
     @{ Agent = 'cursor'; Id = 'cursor.subagent_output'; Path = '$profile\.cursor\subagents' }
+    @{ Agent = 'cursor'; Id = 'cursor.temp_residue'; Path = '$profile\AppData\Local\Temp\cursor-agent-logs-' }
     @{ Agent = 'cursor'; Id = 'cursor.workspace_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\workspaceStorage' }
     @{ Agent = 'cursor'; Id = 'cursor.worktrees'; Path = '$profile\.cursor\worktrees' }
     @{ Agent = 'devin'; Id = 'devin.acp_events'; Path = '$profile\AppData\Roaming\Devin\User\acp-events' }
@@ -1217,6 +1218,9 @@ $targets = @(
     @{ Agent = 'windsurf'; Id = 'windsurf.system_config'; Path = 'C:\ProgramData\Windsurf\rules' }
     @{ Agent = 'windsurf'; Id = 'windsurf.system_config'; Path = 'C:\ProgramData\Windsurf\skills' }
     @{ Agent = 'windsurf'; Id = 'windsurf.system_config'; Path = 'C:\ProgramData\Windsurf\workflows' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.temp_residue'; Path = '$profile\AppData\Local\Temp\devin-inno-updater-' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.temp_residue'; Path = '$profile\AppData\Local\Temp\unleash-backup-codeium-extension.json' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.temp_residue'; Path = '$profile\AppData\Local\Temp\unleash-repo-schema-v1-codeium-language-server.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.worktrees'; Path = '$profile\.devin\worktrees' }
     @{ Agent = 'windsurf'; Id = 'windsurf.worktrees'; Path = '$profile\.windsurf\worktrees' }
     @{ Agent = 'zed'; Id = 'zed.extensions'; Path = '$profile\AppData\Local\Zed\debug_adapters' }

@@ -5652,6 +5652,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "~/.cursor/projects-metadata.json",
                         "~/.cursor/projects/<escaped-abs-cwd>/mcp-approvals.json",
+                        "~/.cursor/projects/<escaped-abs-cwd>/canvases/",
                         "~/.cursor/projects/<escaped-abs-cwd>/repo.json"
                     ],
                     "root": "user_profile",
@@ -5671,6 +5672,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/Library/Application Support/Cursor/CachedData/",
                         "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/anysphere.cursor-retrieval/embeddable_files.txt",
                         "~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/anysphere.cursor-retrieval/high_level_folder_description.txt",
+                        "~/.cache/cursor-compile-cache/",
+                        "~/Library/Caches/cursor-compile-cache/v<runtime-version>-<arch>-<hash>-<uid>/",
                         "~/Library/Caches/cursor-compile-cache/"
                     ],
                     "root": "user_profile",
@@ -5751,6 +5754,20 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "cursor.temp_residue",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Temp\\cursor-agent-logs-<username>\\*"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
                 },
                 {
                     "category": "log",
@@ -11278,6 +11295,22 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "windsurf.temp_residue",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\Temp\\devin-inno-updater-<epoch>.log",
+                        "%LOCALAPPDATA%\\Temp\\unleash-backup-codeium-extension.json",
+                        "%LOCALAPPDATA%\\Temp\\unleash-repo-schema-v1-codeium-language-server.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
                     "category": "instructions",
                     "collect_priority": "normal",
                     "id": "windsurf.workflows_and_skills",
@@ -11470,7 +11503,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "4ce604579de6df1ca5066b07b2cbb532cea878b16e2b5930a2f63ee3a9fc81df"
+    "sha256": "9da2b212f16d39f7b6b6e09ba8af527239617f7270d11680de6cdafba22b6649"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

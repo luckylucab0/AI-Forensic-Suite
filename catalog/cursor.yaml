@@ -127,6 +127,8 @@ artifacts:
     ~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/anysphere.cursor-retrieval/embeddable_files.txt
   - |-
     ~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-hash>/anysphere.cursor-retrieval/high_level_folder_description.txt
+  - ~/.cache/cursor-compile-cache/
+  - ~/Library/Caches/cursor-compile-cache/v<runtime-version>-<arch>-<hash>-<uid>/
   - ~/Library/Caches/cursor-compile-cache/
   format: text
   sensitivity: normal
@@ -140,6 +142,10 @@ artifacts:
     FILE-NAME INVENTORY, not content: proves which files existed in a workspace and were eligible for upload to the vendor's indexing service, even if the files themselves are gone. Low session linkage. CachedData is keyed by commit hash (219 MB / 11 directories observed) and is useful only for version dating.
 
     Record structure: embeddable_files.txt is a newline-delimited list of workspace-relative paths (100,000 unique paths / 9.51 MB observed, mean 94 chars, max 273). high_level_folder_description.txt is a one-line marker (39 bytes observed). A 'Crepe' local index (index.bin, postings.bin, metadata.json, built by the bundled crepectl helper) is referenced but was not present in the audited profile.
+
+    Measured first hand on a clean macOS 26.5 host running product version 3.21.16. The compile cache exists and its subdirectory names are the evidence in it: each one names a runtime version, an architecture, a content hash and the numeric user identifier. Two of them were created during the measurement, and the two different runtime versions in their names date an update that happened between the first and the second launch. That makes a listing of this directory a version history for the command line agent, without a single file being opened, and it survived the uninstall.
+
+        The Linux spelling was missing from this entry and is here now. The Windows one lives in cursor.install_dirs, because on Windows the whole command line agent installs under local application data and the cache is created beside it on the first invocation.
   parser: text_config
 - id: cursor.mdm_policy
   category: permissions
@@ -327,6 +333,7 @@ artifacts:
   paths:
   - ~/.cursor/projects-metadata.json
   - ~/.cursor/projects/<escaped-abs-cwd>/mcp-approvals.json
+  - ~/.cursor/projects/<escaped-abs-cwd>/canvases/
   - ~/.cursor/projects/<escaped-abs-cwd>/repo.json
   format: json
   sensitivity: normal
@@ -676,6 +683,28 @@ artifacts:
 
         Both hosts had the deleted file table and the summary table empty after one conversation, so nobody has seen what a row in them looks like. Neither measurement opened one.
   parser: sqlite_generic
+- id: cursor.temp_residue
+  category: log
+  root: user_profile
+  os:
+  - windows
+  paths:
+  - '%LOCALAPPDATA%\Temp\cursor-agent-logs-<username>\*'
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: observed on Windows 11 26200
+  source_kind: observed
+  volatility: |-
+    In the temporary directory, so it is at the mercy of disk cleanup and of the operating system's own maintenance, and it is the first thing to take on a live host. It survived the product's own uninstaller in the measurement that found it.
+  notes: |-
+    LOGS OF THE COMMAND LINE AGENT, IN THE TEMPORARY DIRECTORY, WITH THE USER NAME IN THE DIRECTORY NAME. Five files were left there after the product had been uninstalled and the command line directory deleted by hand.
+
+    Two reasons this is worth a glob. The directory name carries the account the agent ran as, so the directory listing alone attributes the activity to a user on a multi-user host, which nothing else in the temporary directory does. And a cleanup aimed at the product removes the product's own directories and does not reach here: on the measured host this was among the last things still naming the agent.
+
+    Nobody read the contents. Treat them as potentially carrying paths and prompt material until somebody has.
+  parser: text_log
 - id: cursor.logs
   category: log
   root: user_profile

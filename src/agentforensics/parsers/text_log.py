@@ -56,6 +56,7 @@ LOGS = frozenset(
         "crosscutting.npm_debug_logs",
         "cursor.agent_data_cleanup_marker",
         "cursor.logs",
+        "cursor.temp_residue",
         "factory_droid.logs",
         "goose.cli_logs",
         "goose.desktop_log",
@@ -74,6 +75,7 @@ LOGS = frozenset(
         "windsurf.cli_logs",
         "windsurf.cli_session_locks",
         "windsurf.plugin_log",
+        "windsurf.temp_residue",
         "zed.logs",
     }
 )
