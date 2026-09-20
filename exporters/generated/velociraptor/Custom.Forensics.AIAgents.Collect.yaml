@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: a79339ed4b97
+# Catalogue digest: df155331d8d0
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -2607,8 +2607,28 @@ sources:
     cursor,cursor.machine_identity_storage,/Users/*/Library/Application Support/Cursor/User/globalStorage/storage.json
     cursor,cursor.machine_identity_storage,/var/root/Library/Application Support/Cursor/User/globalStorage/statsig-cache.json
     cursor,cursor.machine_identity_storage,/var/root/Library/Application Support/Cursor/User/globalStorage/storage.json
+    cursor,cursor.macos_bundle_storage,/Users/*/Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db
+    cursor,cursor.macos_bundle_storage,/Users/*/Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db-shm
+    cursor,cursor.macos_bundle_storage,/Users/*/Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db-wal
+    cursor,cursor.macos_bundle_storage,/Users/*/Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite
+    cursor,cursor.macos_bundle_storage,/Users/*/Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite-shm
+    cursor,cursor.macos_bundle_storage,/Users/*/Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite-wal
+    cursor,cursor.macos_bundle_storage,/var/root/Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db
+    cursor,cursor.macos_bundle_storage,/var/root/Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db-shm
+    cursor,cursor.macos_bundle_storage,/var/root/Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db-wal
+    cursor,cursor.macos_bundle_storage,/var/root/Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite
+    cursor,cursor.macos_bundle_storage,/var/root/Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite-shm
+    cursor,cursor.macos_bundle_storage,/var/root/Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite-wal
     cursor,cursor.macos_preferences,/Users/*/Library/Preferences/com.todesktop.230313mzl4w4u92.plist
     cursor,cursor.macos_preferences,/var/root/Library/Preferences/com.todesktop.230313mzl4w4u92.plist
+    cursor,cursor.macos_update_state,/Users/*/Library/Application Support/Cursor/3.21-main.sock
+    cursor,cursor.macos_update_state,/Users/*/Library/Application Support/Cursor/Backups/**
+    cursor,cursor.macos_update_state,/Users/*/Library/Application Support/Cursor/Crashpad/**
+    cursor,cursor.macos_update_state,/Users/*/Library/Caches/com.todesktop.230313mzl4w4u92.ShipIt/**
+    cursor,cursor.macos_update_state,/var/root/Library/Application Support/Cursor/3.21-main.sock
+    cursor,cursor.macos_update_state,/var/root/Library/Application Support/Cursor/Backups/**
+    cursor,cursor.macos_update_state,/var/root/Library/Application Support/Cursor/Crashpad/**
+    cursor,cursor.macos_update_state,/var/root/Library/Caches/com.todesktop.230313mzl4w4u92.ShipIt/**
     cursor,cursor.mdm_policy,/Users/*/.cursor/policy.json
     cursor,cursor.mdm_policy,/var/root/.cursor/policy.json
     cursor,cursor.pasted_text,/Users/*/.cursor/chats/*/*/pasted_text.json
@@ -3996,6 +4016,28 @@ sources:
     windsurf,windsurf.language_server_binaries_and_logs,/var/root/.codeium/*/language_server_windows_x64.exe
     windsurf,windsurf.language_server_binaries_and_logs,/var/root/.devin-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,/var/root/.windsurf-server/data/logs/*/1-windsurf.log
+    windsurf,windsurf.macos_bundle_storage,/Users/*/Library/Caches/com.exafunction.windsurf/Cache.db
+    windsurf,windsurf.macos_bundle_storage,/Users/*/Library/Caches/com.exafunction.windsurf/Cache.db-shm
+    windsurf,windsurf.macos_bundle_storage,/Users/*/Library/Caches/com.exafunction.windsurf/Cache.db-wal
+    windsurf,windsurf.macos_bundle_storage,/Users/*/Library/HTTPStorages/com.exafunction.windsurf/httpstorages.sqlite
+    windsurf,windsurf.macos_bundle_storage,/Users/*/Library/HTTPStorages/com.exafunction.windsurf/httpstorages.sqlite-shm
+    windsurf,windsurf.macos_bundle_storage,/Users/*/Library/HTTPStorages/com.exafunction.windsurf/httpstorages.sqlite-wal
+    windsurf,windsurf.macos_bundle_storage,/var/root/Library/Caches/com.exafunction.windsurf/Cache.db
+    windsurf,windsurf.macos_bundle_storage,/var/root/Library/Caches/com.exafunction.windsurf/Cache.db-shm
+    windsurf,windsurf.macos_bundle_storage,/var/root/Library/Caches/com.exafunction.windsurf/Cache.db-wal
+    windsurf,windsurf.macos_bundle_storage,/var/root/Library/HTTPStorages/com.exafunction.windsurf/httpstorages.sqlite
+    windsurf,windsurf.macos_bundle_storage,/var/root/Library/HTTPStorages/com.exafunction.windsurf/httpstorages.sqlite-shm
+    windsurf,windsurf.macos_bundle_storage,/var/root/Library/HTTPStorages/com.exafunction.windsurf/httpstorages.sqlite-wal
+    windsurf,windsurf.macos_preferences,/Users/*/Library/Preferences/com.exafunction.windsurf.plist
+    windsurf,windsurf.macos_preferences,/var/root/Library/Preferences/com.exafunction.windsurf.plist
+    windsurf,windsurf.macos_update_state,/Users/*/Library/Application Support/Devin/1.12-main.sock
+    windsurf,windsurf.macos_update_state,/Users/*/Library/Application Support/Devin/Backups/**
+    windsurf,windsurf.macos_update_state,/Users/*/Library/Application Support/Devin/Crashpad/**
+    windsurf,windsurf.macos_update_state,/Users/*/Library/Caches/com.exafunction.windsurf.ShipIt/**
+    windsurf,windsurf.macos_update_state,/var/root/Library/Application Support/Devin/1.12-main.sock
+    windsurf,windsurf.macos_update_state,/var/root/Library/Application Support/Devin/Backups/**
+    windsurf,windsurf.macos_update_state,/var/root/Library/Application Support/Devin/Crashpad/**
+    windsurf,windsurf.macos_update_state,/var/root/Library/Caches/com.exafunction.windsurf.ShipIt/**
     windsurf,windsurf.mcp_oauth_state,/Users/*/.config/Devin/mcp/oauth/**
     windsurf,windsurf.mcp_oauth_state,/Users/*/Library/Application Support/Devin/mcp/oauth/**
     windsurf,windsurf.mcp_oauth_state,/var/root/.config/Devin/mcp/oauth/**

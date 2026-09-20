@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: a79339ed4b97
+// Catalogue digest: df155331d8d0
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1158,7 +1158,17 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.machine_identity_file", "Library\\Application Support\\Cursor\\machineid",
     "cursor", "cursor.machine_identity_storage", "Library/Application Support/Cursor/User/globalStorage/statsig-cache.json",
     "cursor", "cursor.machine_identity_storage", "Library/Application Support/Cursor/User/globalStorage/storage.json",
+    "cursor", "cursor.macos_bundle_storage", "Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db",
+    "cursor", "cursor.macos_bundle_storage", "Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db-shm",
+    "cursor", "cursor.macos_bundle_storage", "Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db-wal",
+    "cursor", "cursor.macos_bundle_storage", "Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite",
+    "cursor", "cursor.macos_bundle_storage", "Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite-shm",
+    "cursor", "cursor.macos_bundle_storage", "Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite-wal",
     "cursor", "cursor.macos_preferences", "Library/Preferences/com.todesktop.230313mzl4w4u92.plist",
+    "cursor", "cursor.macos_update_state", "Library/Application Support/Cursor/3.21-main.sock",
+    "cursor", "cursor.macos_update_state", "Library/Application Support/Cursor/Backups",
+    "cursor", "cursor.macos_update_state", "Library/Application Support/Cursor/Crashpad",
+    "cursor", "cursor.macos_update_state", "Library/Caches/com.todesktop.230313mzl4w4u92.ShipIt",
     "cursor", "cursor.mdm_policy", ".cursor/policy.json",
     "cursor", "cursor.mdm_policy", ".cursor\\policy.json",
     "cursor", "cursor.pasted_text", ".cursor/chats",
@@ -2582,6 +2592,17 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "windsurf", "windsurf.language_server_binaries_and_logs", "\\usr\\share\\devin-desktop\\resources\\app\\extensions\\windsurf\\bin\\language_server_linux_x64",
     "windsurf", "windsurf.language_server_binaries_and_logs", "\\usr\\share\\devin-desktop\\resources\\app\\extensions\\windsurf\\devin\\bin\\devin",
     "windsurf", "windsurf.language_server_binaries_and_logs", "\\usr\\share\\windsurf\\resources\\app\\extensions\\windsurf\\bin\\language_server_linux_x64",
+    "windsurf", "windsurf.macos_bundle_storage", "Library/Caches/com.exafunction.windsurf/Cache.db",
+    "windsurf", "windsurf.macos_bundle_storage", "Library/Caches/com.exafunction.windsurf/Cache.db-shm",
+    "windsurf", "windsurf.macos_bundle_storage", "Library/Caches/com.exafunction.windsurf/Cache.db-wal",
+    "windsurf", "windsurf.macos_bundle_storage", "Library/HTTPStorages/com.exafunction.windsurf/httpstorages.sqlite",
+    "windsurf", "windsurf.macos_bundle_storage", "Library/HTTPStorages/com.exafunction.windsurf/httpstorages.sqlite-shm",
+    "windsurf", "windsurf.macos_bundle_storage", "Library/HTTPStorages/com.exafunction.windsurf/httpstorages.sqlite-wal",
+    "windsurf", "windsurf.macos_preferences", "Library/Preferences/com.exafunction.windsurf.plist",
+    "windsurf", "windsurf.macos_update_state", "Library/Application Support/Devin/1.12-main.sock",
+    "windsurf", "windsurf.macos_update_state", "Library/Application Support/Devin/Backups",
+    "windsurf", "windsurf.macos_update_state", "Library/Application Support/Devin/Crashpad",
+    "windsurf", "windsurf.macos_update_state", "Library/Caches/com.exafunction.windsurf.ShipIt",
     "windsurf", "windsurf.mcp_oauth_state", ".config/Devin/mcp/oauth",
     "windsurf", "windsurf.mcp_oauth_state", ".config\\Devin\\mcp\\oauth",
     "windsurf", "windsurf.mcp_oauth_state", "Devin/mcp/oauth",

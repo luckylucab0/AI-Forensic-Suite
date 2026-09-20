@@ -370,6 +370,10 @@ artifacts:
     Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.21.16 with command line agent 2026.09.18-9a7762b, one installation and one trivial conversation each. The Windows spelling of this file, under the editor's application data directory, was removed from this entry: it did not exist there and a recursive search for the filename across the whole user profile, the agent directory, the editor profile and both command line directories did not find it anywhere. Three write-ups name it and it is not there, which is the shape of a path that was copied from one catalogue into the next.
 
     What the measurement found instead is where an analyst should go. On Windows the account binding sits in the editor's own key value store, under adminSettings.cachedAuthId and alongside a cloud agent repository key that carries the provider and the account identifier in the key name itself. On macOS there is a generic keychain password item for the product's safe storage, which is the Electron key that unwraps cookies and tokens, and it survives every uninstall because it does not hang off the application bundle. The remaining file paths in this entry were not measured and stay as they were.
+
+    The macOS measurement found the keychain item this entry's notes predicted, and it is worth stating as a finding rather than as a possibility: a generic password item named for the product's safe storage was present, and it was still present after the application bundle had been deleted. It does not hang off the bundle, so nothing about removing the product removes it.
+
+        The file that holds it is the login keychain, which this catalogue claims once, under claude_code.macos_keychain_credentials, because one path is one manifest entry. Do not add a second claim on it here. What belongs here is the item name to ask for once the keychain is open, and the fact that its presence alone says this product was signed in on this account at some point, on a machine where nothing else may say so.
   parser: null
 - id: cursor.commit_checkpoints
   category: file_snapshot
@@ -569,6 +573,58 @@ artifacts:
 
         The shared storage file beside it is new here for the same reason: it is part of the same runtime profile, it was present on both hosts, and it is one of the files a wipe of the installation directory does not touch.
   parser: text_config
+- id: cursor.macos_bundle_storage
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db
+  - ~/Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db-shm
+  - ~/Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db-wal
+  - ~/Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite
+  - ~/Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite-shm
+  - ~/Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite-wal
+  format: sqlite
+  sensitivity: normal
+  collect_priority: durable
+  status: unverified
+  source: observed on macOS 26.5
+  source_kind: observed
+  volatility: |-
+    Written by the operating system's own networking and caching layers rather than by the product, so nothing in the product's settings prunes them and the product's own cleanup does not reach them.
+  notes: |-
+    WHAT THE OPERATING SYSTEM KEPT ON THE PRODUCT'S BEHALF, addressed by bundle identifier rather than by product name. That is the reason for the entry: the identifier for this product is com.todesktop.230313mzl4w4u92, and searching an image for the product's name does not find these directories.
+
+    These hold the cached responses and the request metadata of the product's own network activity: hosts, timestamps and sizes, even where the payloads are encrypted or gone. For a question about which endpoints a product talked to, this is evidence that exists whether or not the product wrote anything itself.
+
+    Both directories were still on disk after the product was deleted, in the measurement that found them. Collected at durable priority for that reason.
+  parser: sqlite_generic
+- id: cursor.macos_update_state
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Application Support/Cursor/Backups/
+  - ~/Library/Application Support/Cursor/Crashpad/
+  - ~/Library/Application Support/Cursor/3.21-main.sock
+  - ~/Library/Caches/com.todesktop.230313mzl4w4u92.ShipIt/
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on macOS 26.5
+  source_kind: observed
+  volatility: |-
+    The socket exists while the product runs and is removed with it. The update and crash directories are kept.
+  notes: |-
+    HOW THIS PRODUCT UPDATED ITSELF, AND WHICH VERSION IT WAS. The update framework keeps its own directory under the bundle identifier, so a host with more than one entry in it ran more than one version, and that is a version history for a product whose installer overwrites itself.
+
+    The socket is the cheap part and it is worth naming on its own: its filename carries a version number. A listing of the application support directory therefore dates the running build without opening a file, and on the measured host the number in the second product's socket did not match the product version at all, which says it names an internal component rather than the release. Do not report it as the product version.
+
+    The crash directory is the other half. A crash report holds the loaded module list and the command line of the process, which on an agent product is a record of how it was started, and it is written by the operating system rather than by the product.
+  parser: null
 - id: cursor.macos_preferences
   category: install_evidence
   root: user_profile

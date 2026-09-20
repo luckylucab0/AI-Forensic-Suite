@@ -44,6 +44,7 @@ DOCUMENTS = frozenset(
         "claude_code.managed_settings_macos_profile",
         "claude_desktop.managed_policy_macos",
         "cursor.macos_preferences",
+        "windsurf.macos_preferences",
     }
 )
 

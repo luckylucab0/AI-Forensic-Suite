@@ -5472,6 +5472,25 @@ $EmbeddedCatalogueJson = @'
                     "status": "unverified"
                 },
                 {
+                    "category": "cache",
+                    "collect_priority": "durable",
+                    "id": "cursor.macos_bundle_storage",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db",
+                        "~/Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db-shm",
+                        "~/Library/Caches/com.todesktop.230313mzl4w4u92/Cache.db-wal",
+                        "~/Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite",
+                        "~/Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite-shm",
+                        "~/Library/HTTPStorages/com.todesktop.230313mzl4w4u92/httpstorages.sqlite-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
                     "category": "install_evidence",
                     "collect_priority": "normal",
                     "id": "cursor.macos_preferences",
@@ -5480,6 +5499,23 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "~/Library/Preferences/com.todesktop.230313mzl4w4u92.plist"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "cursor.macos_update_state",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/Cursor/Backups/",
+                        "~/Library/Application Support/Cursor/Crashpad/",
+                        "~/Library/Application Support/Cursor/3.21-main.sock",
+                        "~/Library/Caches/com.todesktop.230313mzl4w4u92.ShipIt/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -11031,6 +11067,56 @@ $EmbeddedCatalogueJson = @'
                     "status": "unverified"
                 },
                 {
+                    "category": "cache",
+                    "collect_priority": "durable",
+                    "id": "windsurf.macos_bundle_storage",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Caches/com.exafunction.windsurf/Cache.db",
+                        "~/Library/Caches/com.exafunction.windsurf/Cache.db-shm",
+                        "~/Library/Caches/com.exafunction.windsurf/Cache.db-wal",
+                        "~/Library/HTTPStorages/com.exafunction.windsurf/httpstorages.sqlite",
+                        "~/Library/HTTPStorages/com.exafunction.windsurf/httpstorages.sqlite-shm",
+                        "~/Library/HTTPStorages/com.exafunction.windsurf/httpstorages.sqlite-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "durable",
+                    "id": "windsurf.macos_preferences",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Preferences/com.exafunction.windsurf.plist"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "windsurf.macos_update_state",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/Devin/Backups/",
+                        "~/Library/Application Support/Devin/Crashpad/",
+                        "~/Library/Application Support/Devin/1.12-main.sock",
+                        "~/Library/Caches/com.exafunction.windsurf.ShipIt/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
                     "category": "mcp_config",
                     "collect_priority": "normal",
                     "id": "windsurf.mcp_config",
@@ -11406,7 +11492,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "38714476bcdf6dcbd45997416ee8d385bf58d187a334b3558a0b85892d2ac4ed"
+    "sha256": "4e4e02376d62dc249fd88eaa3084177d24264e8f47ffc6b5abc80391f4598f3f"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json
