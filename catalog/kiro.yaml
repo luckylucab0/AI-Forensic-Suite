@@ -640,6 +640,10 @@ artifacts:
     Only exists while the environment variable is set. Path and lifetime are entirely operator-chosen.
   notes: |-
     The vendor documents KIRO_ACP_RECORD_PATH as the path to a JSONL file for recording TUI ACP wire traffic. There is no default location, so it is invisible to any path-based collection: it has to be discovered from the live environment, from shell profiles, from wrapper scripts or from shell history. When present it is a complete protocol-level transcript of a session, including tool calls, which is frequently richer than the saved session store. Worth an explicit check in every Kiro engagement precisely because nobody expects it.
+
+    This path is a variable and nothing else, so there is no part of it a reading of a directory tree could match on. That is a property of the artifact rather than a gap: the product writes this file only where somebody names the file, and where nobody has, the file does not exist.
+
+        So a case built from a bundle carries it with this entry's name, because the collector expanded the variable from the environment it ran in and wrote the attribution into the manifest. A case built from a tree or an image cannot, and the place to look for the value is the shell profiles and whatever started the process.
   parser: jsonl_generic
 - id: kiro.legacy_amazonq_config
   title: Amazon Q Developer configuration still read by Kiro

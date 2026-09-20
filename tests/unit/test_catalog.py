@@ -26,6 +26,7 @@ from agentforensics.catalog import (
     load_file,
     resolve_text,
 )
+from agentforensics.ingest.match import _pattern_regexes
 from agentforensics.parsers import PARSERS, for_artifact
 
 CATALOG_DIR = Path(__file__).resolve().parents[2] / "catalog"
@@ -1531,3 +1532,44 @@ def test_a_path_two_entries_read_differently_is_one_somebody_argued_for() -> Non
     )
     for path, reason in SHARED_WITH_DIFFERENT_READERS.items():
         assert reason.strip(), f"{path} is declared with no reason given"
+
+
+# Artifacts no reading of a directory tree can attribute, with why. Both are properties of
+# the artifact rather than defects, and both cost something an analyst should be told: in a
+# bundle the collector wrote the attribution into the manifest, and in a tree or a mounted
+# image the file is collected and reported as claimed by nothing.
+UNMATCHABLE = {
+    "goose.recipes": "any file of one extension in the working copy, which is what the "
+    "product means and is unusable without knowing where the working copies are. The "
+    "collector knows, out of the agent's own state; the matcher does not, and refuses it "
+    "rather than claiming every file of that extension on the disk",
+    "kiro.acp_wire_record": "a path that is a variable and nothing else, so there is no "
+    "part of it to match on. The product writes the file only where somebody names it",
+}
+
+
+def test_an_artifact_a_tree_can_never_attribute_is_one_somebody_argued_for() -> None:
+    """Two readings of the same collection do not agree about these, and that is the point.
+
+    A native bundle carries an attribution per file, written by the collector, which knew
+    where the working copies were and what the environment held. A directory tree or a
+    mounted image carries neither, so the matcher is all there is, and an entry it can never
+    act on is an entry that exists for one of the two readings.
+
+    Both of these are defensible and both are surprising, which is why they are written down
+    here and said in the entries themselves. A third would need the same.
+    """
+    catalogue = load_catalogue(CATALOG_DIR)
+    unmatchable = {
+        artifact.id
+        for artifact in catalogue.artifacts
+        if artifact.root != "registry"
+        and not any(_pattern_regexes(path) for path in artifact.paths)
+    }
+    assert unmatchable == set(UNMATCHABLE), (
+        "an entry no reading of a directory tree can attribute is one an analyst meets as a "
+        "file claimed by nothing, so it has to be argued for rather than appear: "
+        f"{sorted(unmatchable - set(UNMATCHABLE))}"
+    )
+    for name, reason in UNMATCHABLE.items():
+        assert reason.strip(), f"{name} is declared with no reason given"

@@ -71,6 +71,10 @@ artifacts:
     Variable location, not globbable: <directories listed in GOOSE_RECIPE_PATH>
 
     Record structure: The recipes doc states recipes are found in 'the current directory or GOOSE_RECIPE_PATH directories' (colon-separated on Unix, semicolon-separated on Windows) but does NOT document a default recipe directory. Resolve GOOSE_RECIPE_PATH from the user's shell profile/environment rather than guessing a path.
+
+    A collection takes this and a reading of a directory tree cannot attribute it, which is worth knowing before an empty result is read as an absence. The pattern is any file of one extension in the working copy, which is what the product means by a recipe and is true. The collector can act on it because it knows where the working copies are, out of the agent's own state. The analyzer's matcher does not: it has no state file and matches below any directory, so acting on this pattern there would hand every file of that extension on the disk to this agent, and it refuses it instead.
+
+        The consequence is narrow and worth stating plainly. In a bundle the file arrives with this entry's name on it, because the collector wrote the attribution into the manifest. In a directory tree or a mounted image read without one, the file is collected and reported as claimed by nothing, which is a lead somebody follows rather than an answer.
   parser: yaml_generic
 - id: goose.secrets
   category: credentials
