@@ -92,17 +92,23 @@ EXPECTED = {
 
 
 @pytest.fixture(scope="module")
-def findings(tmp_path_factory: pytest.TempPathFactory) -> set[str]:
-    """Every rule id that fired over a case built from the synthetic profile."""
+def case_file(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """A case built from the synthetic profile, kept so a test can look at the events."""
     from agentforensics.catalog import load_catalogue
     from agentforensics.ingest import ingest
 
     home = tmp_path_factory.mktemp("profile")
     build_home(home, with_edge_cases=False)
     case_path = tmp_path_factory.mktemp("case") / "case.db"
-    catalogue = load_catalogue(REPO_ROOT / "catalog")
     with Case.open(case_path) as case:
-        ingest(case, home, catalogue)
+        ingest(case, home, load_catalogue(REPO_ROOT / "catalog"))
+    return case_path
+
+
+@pytest.fixture(scope="module")
+def findings(case_file: Path) -> set[str]:
+    """Every rule id that fired over a case built from the synthetic profile."""
+    with Case.open(case_file) as case:
         report = scan(case, load(REPO_ROOT / "rules"), store=False)
     return {finding.rule.id for finding in report.findings}
 
@@ -135,3 +141,50 @@ def test_a_settings_file_reaches_the_packs_as_a_configuration(findings: set[str]
         "AFX-SUPPLYCHAIN-002",
         "AFX-THIRDPARTYENDPOINTS-001",
     } <= findings
+
+
+@pytest.mark.slow
+def test_a_credential_is_recovered_from_a_pack_and_reaches_the_packs(case_file: Path) -> None:
+    """The longest path in this suite, asserted end to end.
+
+    The profile's shadow repository holds the version of a configuration file from before
+    the agent took a credential out of it. After that edit the token is in no file on the
+    endpoint and in no transcript. It is a difference against another object inside a pack
+    file in the agent's own repository, and a case either recovers it from there or does
+    not have it at all.
+
+    So this asks for the finding and then asks what it rests on: a file snapshot located by
+    a byte offset in a pack, whose content this suite computed by applying a delta. Every
+    piece of that is tested on its own. What this holds together is the whole of it, which
+    is the sentence a report would make: the agent removed a credential, and here is the
+    file as it stood before.
+    """
+    import json
+
+    with Case.open(case_file) as case:
+        report = scan(case, load(REPO_ROOT / "rules"), store=False)
+        out_of_a_pack = []
+        for finding in report.findings:
+            if not finding.rule.id.startswith("AFX-SECRETS-"):
+                continue
+            for event_id in finding.event_ids:
+                rows = case.query(
+                    "SELECT locator, raw FROM events WHERE event_id = ? AND kind = 'file.snapshot'",
+                    (event_id,),
+                )
+                for row in rows:
+                    raw = json.loads(row["raw"])
+                    if raw.get("pack_offset") is not None:
+                        out_of_a_pack.append((finding.rule.id, row["locator"], raw))
+
+    assert out_of_a_pack, (
+        "no secrets rule rests on an object out of a pack, so the one copy of that "
+        "credential on the endpoint is in the case as a file nobody read"
+    )
+    _, locator, raw = out_of_a_pack[0]
+    assert locator.startswith("offset:")
+    assert raw["type"] == "blob"
+    # Computed rather than read: the pre-edit version is stored as a difference against the
+    # version that replaced it, so a reader that stopped at loose objects had nothing here.
+    assert raw["delta_depth"] >= 1
+    assert "sk_live_examplekey0123456789" in raw["content"]

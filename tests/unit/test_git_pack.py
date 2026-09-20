@@ -473,8 +473,9 @@ def test_the_synthetic_profile_carries_a_packed_repository_and_it_reads(tmp_path
     fixture that writes a pack nothing can read is a fixture that proves nothing.
 
     The blob asserted on is the version of the file before the agent changed it, and in the
-    pack it is a difference against the version after. Nothing else in the profile carries
-    it, and on an endpoint nothing else carries it either.
+    pack it is a difference against the version after. What the agent changed is that it
+    took a credential out of a configuration file, so that token is in no other file in the
+    profile, and on an endpoint it would be in no other file either.
     """
     import sys
 
@@ -495,6 +496,9 @@ def test_the_synthetic_profile_carries_a_packed_repository_and_it_reads(tmp_path
     assert len(before) == 1
     # It came out of a delta, so these bytes were computed here and read nowhere.
     assert before[0].raw["delta_depth"] == 1
-    assert "listen_port = 8003" in before[0].raw["content"]
+    # The credential the agent took out of the file. After that edit it is in no file on
+    # the endpoint, so this delta inside this pack is the only copy of it there is.
+    assert "Bearer sk_live_examplekey0123456789" in before[0].raw["content"]
     after = [event for event in events if event.raw.get("object_id") == ids["blob_after"]]
-    assert "listen_port = 9999" in after[0].raw["content"]
+    assert "sk_live" not in after[0].raw["content"]
+    assert "${SERVICE_TOKEN}" in after[0].raw["content"]

@@ -966,9 +966,15 @@ def write_shadow_repository(root: Path, mtime: int = RECENT) -> dict[str, str]:
     Returns the ids the case should be able to name, so a test can ask for them rather than
     hard-coding a hash that this function decides.
     """
+    # The one line that changes between the two checkpoints, and the reason this fixture
+    # has content at all: the agent took a credential out of a configuration file. After
+    # its edit the token is in no file on the endpoint and in no transcript. It is in the
+    # pre-edit version of this file, which exists only as a difference inside a pack in the
+    # agent's own repository, and a case either recovers it from there or does not have it.
     lines = [f"listen_port = {8000 + number}\n" for number in range(40)]
+    lines[3] = "authorization = Bearer sk_live_examplekey0123456789\n"
     before = "".join(lines).encode()
-    lines[3] = "listen_port = 9999\n"
+    lines[3] = "authorization = ${SERVICE_TOKEN}\n"
     after = "".join(lines).encode()
 
     def identify(kind: str, content: bytes) -> str:
