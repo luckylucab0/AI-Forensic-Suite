@@ -161,6 +161,8 @@ DOCUMENTS = frozenset(
         "hermes.cron_external_workers",
         "hermes.cron_jobs",
         "hermes.debug_share_pastes",
+        "hermes.gateway_state",
+        "hermes.pairing",
         "hermes.pending_skills",
         "hermes.process_results",
         "hermes.retired_wal_manifests",

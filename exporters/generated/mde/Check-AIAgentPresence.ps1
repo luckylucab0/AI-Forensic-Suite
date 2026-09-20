@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: d3e9da90b842
+# Catalogue digest: cd5ec96673cc
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -657,6 +657,18 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.env'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.env'; Path = '$profile\AppData\Local\hermes\.env' }
     @{ Agent = 'hermes'; Id = 'hermes.env'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.gateway_state'; Path = '$profile\.hermes\channel_aliases.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.gateway_state'; Path = '$profile\.hermes\channel_directory.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.gateway_state'; Path = '$profile\.hermes\gateway.pid' }
+    @{ Agent = 'hermes'; Id = 'hermes.gateway_state'; Path = '$profile\.hermes\gateway_state.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.gateway_state'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.gateway_state'; Path = '$profile\.hermes\webhook_subscriptions.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.gateway_state'; Path = '$profile\AppData\Local\hermes\channel_aliases.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.gateway_state'; Path = '$profile\AppData\Local\hermes\channel_directory.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.gateway_state'; Path = '$profile\AppData\Local\hermes\gateway.pid' }
+    @{ Agent = 'hermes'; Id = 'hermes.gateway_state'; Path = '$profile\AppData\Local\hermes\gateway_state.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.gateway_state'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.gateway_state'; Path = '$profile\AppData\Local\hermes\webhook_subscriptions.json' }
     @{ Agent = 'hermes'; Id = 'hermes.hooks'; Path = '$profile\.hermes\hooks' }
     @{ Agent = 'hermes'; Id = 'hermes.hooks'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.hooks'; Path = '$profile\AppData\Local\hermes\hooks' }
@@ -667,12 +679,44 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\AppData\Local\hermes\logs\errors.log' }
     @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\AppData\Local\hermes\logs\gateway.log' }
     @{ Agent = 'hermes'; Id = 'hermes.logs'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.mcp_tokens'; Path = '$profile\.hermes\mcp-tokens' }
+    @{ Agent = 'hermes'; Id = 'hermes.mcp_tokens'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.mcp_tokens'; Path = '$profile\AppData\Local\hermes\mcp-tokens' }
+    @{ Agent = 'hermes'; Id = 'hermes.mcp_tokens'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\.hermes\memories\MEMORY.md' }
     @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\.hermes\memories\USER.md' }
     @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\AppData\Local\hermes\memories\MEMORY.md' }
     @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\AppData\Local\hermes\memories\USER.md' }
     @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\.hermes\.anthropic_oauth.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\.hermes\cache\bws_cache.enc.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\.hermes\cache\bws_cache.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\.hermes\google_chat_user_client_secret.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\.hermes\google_chat_user_oauth_pending' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\.hermes\google_chat_user_oauth_pending.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\.hermes\google_chat_user_token.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\.hermes\google_chat_user_tokens' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\.hermes\google_token.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\.hermes\slack_tokens.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\AppData\Local\hermes\.anthropic_oauth.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\AppData\Local\hermes\cache\bws_cache.enc.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\AppData\Local\hermes\cache\bws_cache.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\AppData\Local\hermes\google_chat_user_client_secret.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\AppData\Local\hermes\google_chat_user_oauth_pending' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\AppData\Local\hermes\google_chat_user_oauth_pending.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\AppData\Local\hermes\google_chat_user_token.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\AppData\Local\hermes\google_chat_user_tokens' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\AppData\Local\hermes\google_token.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.oauth_tokens'; Path = '$profile\AppData\Local\hermes\slack_tokens.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.pairing'; Path = '$profile\.hermes\pairing' }
+    @{ Agent = 'hermes'; Id = 'hermes.pairing'; Path = '$profile\.hermes\platforms\pairing' }
+    @{ Agent = 'hermes'; Id = 'hermes.pairing'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.pairing'; Path = '$profile\AppData\Local\hermes\pairing' }
+    @{ Agent = 'hermes'; Id = 'hermes.pairing'; Path = '$profile\AppData\Local\hermes\platforms\pairing' }
+    @{ Agent = 'hermes'; Id = 'hermes.pairing'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.pastes'; Path = '$profile\.hermes\pastes\paste_' }
     @{ Agent = 'hermes'; Id = 'hermes.pastes'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.pastes'; Path = '$profile\AppData\Local\hermes\pastes\paste_' }
@@ -681,6 +725,16 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.pending_skills'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.pending_skills'; Path = '$profile\AppData\Local\hermes\pending\skills' }
     @{ Agent = 'hermes'; Id = 'hermes.pending_skills'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.platform_sessions'; Path = '$profile\.hermes\matrix\store\crypto.db' }
+    @{ Agent = 'hermes'; Id = 'hermes.platform_sessions'; Path = '$profile\.hermes\platforms\matrix\store\crypto.db' }
+    @{ Agent = 'hermes'; Id = 'hermes.platform_sessions'; Path = '$profile\.hermes\platforms\whatsapp\session' }
+    @{ Agent = 'hermes'; Id = 'hermes.platform_sessions'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.platform_sessions'; Path = '$profile\.hermes\whatsapp\session' }
+    @{ Agent = 'hermes'; Id = 'hermes.platform_sessions'; Path = '$profile\AppData\Local\hermes\matrix\store\crypto.db' }
+    @{ Agent = 'hermes'; Id = 'hermes.platform_sessions'; Path = '$profile\AppData\Local\hermes\platforms\matrix\store\crypto.db' }
+    @{ Agent = 'hermes'; Id = 'hermes.platform_sessions'; Path = '$profile\AppData\Local\hermes\platforms\whatsapp\session' }
+    @{ Agent = 'hermes'; Id = 'hermes.platform_sessions'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.platform_sessions'; Path = '$profile\AppData\Local\hermes\whatsapp\session' }
     @{ Agent = 'hermes'; Id = 'hermes.process_results'; Path = '$profile\.hermes\logs\process-results\proc_' }
     @{ Agent = 'hermes'; Id = 'hermes.process_results'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.process_results'; Path = '$profile\AppData\Local\hermes\logs\process-results\proc_' }
@@ -747,6 +801,12 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.state_snapshots'; Path = '$profile\.hermes\state-snapshots' }
     @{ Agent = 'hermes'; Id = 'hermes.state_snapshots'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.state_snapshots'; Path = '$profile\AppData\Local\hermes\state-snapshots' }
+    @{ Agent = 'hermes'; Id = 'hermes.vault'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.vault'; Path = '$profile\.hermes\vault\vault.json.enc' }
+    @{ Agent = 'hermes'; Id = 'hermes.vault'; Path = '$profile\.hermes\vault\vault.key' }
+    @{ Agent = 'hermes'; Id = 'hermes.vault'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.vault'; Path = '$profile\AppData\Local\hermes\vault\vault.json.enc' }
+    @{ Agent = 'hermes'; Id = 'hermes.vault'; Path = '$profile\AppData\Local\hermes\vault\vault.key' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.aia_task_history'; Path = '$profile\AppData\Roaming\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.base_directories'; Path = '$profile\AppData\Local\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.base_directories'; Path = '$profile\AppData\Roaming\JetBrains' }

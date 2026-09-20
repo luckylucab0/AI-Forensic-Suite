@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: d3e9da90b842
+# Catalogue digest: cd5ec96673cc
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -747,6 +747,26 @@ sources:
     hermes,hermes.env,C:/Users/*/.hermes/profiles/*/.env
     hermes,hermes.env,C:/Users/*/AppData/Local/hermes/.env
     hermes,hermes.env,C:/Users/*/AppData/Local/hermes/profiles/*/.env
+    hermes,hermes.gateway_state,C:/Users/*/.hermes/channel_aliases.json
+    hermes,hermes.gateway_state,C:/Users/*/.hermes/channel_directory.json
+    hermes,hermes.gateway_state,C:/Users/*/.hermes/gateway.pid
+    hermes,hermes.gateway_state,C:/Users/*/.hermes/gateway_state.json
+    hermes,hermes.gateway_state,C:/Users/*/.hermes/profiles/*/channel_aliases.json
+    hermes,hermes.gateway_state,C:/Users/*/.hermes/profiles/*/channel_directory.json
+    hermes,hermes.gateway_state,C:/Users/*/.hermes/profiles/*/gateway.pid
+    hermes,hermes.gateway_state,C:/Users/*/.hermes/profiles/*/gateway_state.json
+    hermes,hermes.gateway_state,C:/Users/*/.hermes/profiles/*/webhook_subscriptions.json
+    hermes,hermes.gateway_state,C:/Users/*/.hermes/webhook_subscriptions.json
+    hermes,hermes.gateway_state,C:/Users/*/AppData/Local/hermes/channel_aliases.json
+    hermes,hermes.gateway_state,C:/Users/*/AppData/Local/hermes/channel_directory.json
+    hermes,hermes.gateway_state,C:/Users/*/AppData/Local/hermes/gateway.pid
+    hermes,hermes.gateway_state,C:/Users/*/AppData/Local/hermes/gateway_state.json
+    hermes,hermes.gateway_state,C:/Users/*/AppData/Local/hermes/profiles/*/channel_aliases.json
+    hermes,hermes.gateway_state,C:/Users/*/AppData/Local/hermes/profiles/*/channel_directory.json
+    hermes,hermes.gateway_state,C:/Users/*/AppData/Local/hermes/profiles/*/gateway.pid
+    hermes,hermes.gateway_state,C:/Users/*/AppData/Local/hermes/profiles/*/gateway_state.json
+    hermes,hermes.gateway_state,C:/Users/*/AppData/Local/hermes/profiles/*/webhook_subscriptions.json
+    hermes,hermes.gateway_state,C:/Users/*/AppData/Local/hermes/webhook_subscriptions.json
     hermes,hermes.hooks,C:/Users/*/.hermes/hooks/**
     hermes,hermes.hooks,C:/Users/*/.hermes/profiles/*/hooks/**
     hermes,hermes.hooks,C:/Users/*/AppData/Local/hermes/hooks/**
@@ -759,6 +779,14 @@ sources:
     hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/logs/gateway.log
     hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/profiles/*/logs/errors.log
     hermes,hermes.logs,C:/Users/*/AppData/Local/hermes/profiles/*/logs/gateway.log
+    hermes,hermes.mcp_tokens,C:/Users/*/.hermes/mcp-tokens/*.cimd-off
+    hermes,hermes.mcp_tokens,C:/Users/*/.hermes/mcp-tokens/*.json
+    hermes,hermes.mcp_tokens,C:/Users/*/.hermes/profiles/*/mcp-tokens/*.cimd-off
+    hermes,hermes.mcp_tokens,C:/Users/*/.hermes/profiles/*/mcp-tokens/*.json
+    hermes,hermes.mcp_tokens,C:/Users/*/AppData/Local/hermes/mcp-tokens/*.cimd-off
+    hermes,hermes.mcp_tokens,C:/Users/*/AppData/Local/hermes/mcp-tokens/*.json
+    hermes,hermes.mcp_tokens,C:/Users/*/AppData/Local/hermes/profiles/*/mcp-tokens/*.cimd-off
+    hermes,hermes.mcp_tokens,C:/Users/*/AppData/Local/hermes/profiles/*/mcp-tokens/*.json
     hermes,hermes.memories,C:/Users/*/.hermes/memories/MEMORY.md
     hermes,hermes.memories,C:/Users/*/.hermes/memories/USER.md
     hermes,hermes.memories,C:/Users/*/.hermes/profiles/*/memories/MEMORY.md
@@ -767,6 +795,54 @@ sources:
     hermes,hermes.memories,C:/Users/*/AppData/Local/hermes/memories/USER.md
     hermes,hermes.memories,C:/Users/*/AppData/Local/hermes/profiles/*/memories/MEMORY.md
     hermes,hermes.memories,C:/Users/*/AppData/Local/hermes/profiles/*/memories/USER.md
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/.anthropic_oauth.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/cache/bws_cache.enc.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/cache/bws_cache.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/google_chat_user_client_secret.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/google_chat_user_oauth_pending.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/google_chat_user_oauth_pending/*.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/google_chat_user_token.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/google_chat_user_tokens/*.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/google_token.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/profiles/*/.anthropic_oauth.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/profiles/*/cache/bws_cache.enc.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/profiles/*/cache/bws_cache.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/profiles/*/google_chat_user_client_secret.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/profiles/*/google_chat_user_oauth_pending.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/profiles/*/google_chat_user_oauth_pending/*.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/profiles/*/google_chat_user_token.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/profiles/*/google_chat_user_tokens/*.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/profiles/*/google_token.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/profiles/*/slack_tokens.json
+    hermes,hermes.oauth_tokens,C:/Users/*/.hermes/slack_tokens.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/.anthropic_oauth.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/cache/bws_cache.enc.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/cache/bws_cache.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/google_chat_user_client_secret.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/google_chat_user_oauth_pending.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/google_chat_user_oauth_pending/*.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/google_chat_user_token.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/google_chat_user_tokens/*.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/google_token.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/profiles/*/.anthropic_oauth.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/profiles/*/cache/bws_cache.enc.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/profiles/*/cache/bws_cache.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/profiles/*/google_chat_user_client_secret.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/profiles/*/google_chat_user_oauth_pending.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/profiles/*/google_chat_user_oauth_pending/*.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/profiles/*/google_chat_user_token.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/profiles/*/google_chat_user_tokens/*.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/profiles/*/google_token.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/profiles/*/slack_tokens.json
+    hermes,hermes.oauth_tokens,C:/Users/*/AppData/Local/hermes/slack_tokens.json
+    hermes,hermes.pairing,C:/Users/*/.hermes/pairing/**
+    hermes,hermes.pairing,C:/Users/*/.hermes/platforms/pairing/**
+    hermes,hermes.pairing,C:/Users/*/.hermes/profiles/*/pairing/**
+    hermes,hermes.pairing,C:/Users/*/.hermes/profiles/*/platforms/pairing/**
+    hermes,hermes.pairing,C:/Users/*/AppData/Local/hermes/pairing/**
+    hermes,hermes.pairing,C:/Users/*/AppData/Local/hermes/platforms/pairing/**
+    hermes,hermes.pairing,C:/Users/*/AppData/Local/hermes/profiles/*/pairing/**
+    hermes,hermes.pairing,C:/Users/*/AppData/Local/hermes/profiles/*/platforms/pairing/**
     hermes,hermes.pastes,C:/Users/*/.hermes/pastes/paste_*.txt
     hermes,hermes.pastes,C:/Users/*/.hermes/profiles/*/pastes/paste_*.txt
     hermes,hermes.pastes,C:/Users/*/AppData/Local/hermes/pastes/paste_*.txt
@@ -775,6 +851,22 @@ sources:
     hermes,hermes.pending_skills,C:/Users/*/.hermes/profiles/*/pending/skills/*.json
     hermes,hermes.pending_skills,C:/Users/*/AppData/Local/hermes/pending/skills/*.json
     hermes,hermes.pending_skills,C:/Users/*/AppData/Local/hermes/profiles/*/pending/skills/*.json
+    hermes,hermes.platform_sessions,C:/Users/*/.hermes/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,C:/Users/*/.hermes/platforms/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,C:/Users/*/.hermes/platforms/whatsapp/session/**
+    hermes,hermes.platform_sessions,C:/Users/*/.hermes/profiles/*/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,C:/Users/*/.hermes/profiles/*/platforms/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,C:/Users/*/.hermes/profiles/*/platforms/whatsapp/session/**
+    hermes,hermes.platform_sessions,C:/Users/*/.hermes/profiles/*/whatsapp/session/**
+    hermes,hermes.platform_sessions,C:/Users/*/.hermes/whatsapp/session/**
+    hermes,hermes.platform_sessions,C:/Users/*/AppData/Local/hermes/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,C:/Users/*/AppData/Local/hermes/platforms/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,C:/Users/*/AppData/Local/hermes/platforms/whatsapp/session/**
+    hermes,hermes.platform_sessions,C:/Users/*/AppData/Local/hermes/profiles/*/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,C:/Users/*/AppData/Local/hermes/profiles/*/platforms/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,C:/Users/*/AppData/Local/hermes/profiles/*/platforms/whatsapp/session/**
+    hermes,hermes.platform_sessions,C:/Users/*/AppData/Local/hermes/profiles/*/whatsapp/session/**
+    hermes,hermes.platform_sessions,C:/Users/*/AppData/Local/hermes/whatsapp/session/**
     hermes,hermes.process_results,C:/Users/*/.hermes/logs/process-results/proc_*.json
     hermes,hermes.process_results,C:/Users/*/.hermes/profiles/*/logs/process-results/proc_*.json
     hermes,hermes.process_results,C:/Users/*/AppData/Local/hermes/logs/process-results/proc_*.json
@@ -855,6 +947,14 @@ sources:
     hermes,hermes.state_snapshots,C:/Users/*/.hermes/state-snapshots/**
     hermes,hermes.state_snapshots,C:/Users/*/AppData/Local/hermes/profiles/*/state-snapshots/**
     hermes,hermes.state_snapshots,C:/Users/*/AppData/Local/hermes/state-snapshots/**
+    hermes,hermes.vault,C:/Users/*/.hermes/profiles/*/vault/vault.json.enc
+    hermes,hermes.vault,C:/Users/*/.hermes/profiles/*/vault/vault.key
+    hermes,hermes.vault,C:/Users/*/.hermes/vault/vault.json.enc
+    hermes,hermes.vault,C:/Users/*/.hermes/vault/vault.key
+    hermes,hermes.vault,C:/Users/*/AppData/Local/hermes/profiles/*/vault/vault.json.enc
+    hermes,hermes.vault,C:/Users/*/AppData/Local/hermes/profiles/*/vault/vault.key
+    hermes,hermes.vault,C:/Users/*/AppData/Local/hermes/vault/vault.json.enc
+    hermes,hermes.vault,C:/Users/*/AppData/Local/hermes/vault/vault.key
     jetbrains_ai,jetbrains_ai.aia_task_history,C:/Users/*/AppData/Roaming/JetBrains/**/aia-task-history/**
     jetbrains_ai,jetbrains_ai.base_directories,C:/Users/*/AppData/Local/JetBrains/**/**
     jetbrains_ai,jetbrains_ai.base_directories,C:/Users/*/AppData/Local/JetBrains/**/log/**
@@ -2463,6 +2563,26 @@ sources:
     hermes,hermes.env,/Users/*/.hermes/profiles/*/.env
     hermes,hermes.env,/var/root/.hermes/.env
     hermes,hermes.env,/var/root/.hermes/profiles/*/.env
+    hermes,hermes.gateway_state,/Users/*/.hermes/channel_aliases.json
+    hermes,hermes.gateway_state,/Users/*/.hermes/channel_directory.json
+    hermes,hermes.gateway_state,/Users/*/.hermes/gateway.pid
+    hermes,hermes.gateway_state,/Users/*/.hermes/gateway_state.json
+    hermes,hermes.gateway_state,/Users/*/.hermes/profiles/*/channel_aliases.json
+    hermes,hermes.gateway_state,/Users/*/.hermes/profiles/*/channel_directory.json
+    hermes,hermes.gateway_state,/Users/*/.hermes/profiles/*/gateway.pid
+    hermes,hermes.gateway_state,/Users/*/.hermes/profiles/*/gateway_state.json
+    hermes,hermes.gateway_state,/Users/*/.hermes/profiles/*/webhook_subscriptions.json
+    hermes,hermes.gateway_state,/Users/*/.hermes/webhook_subscriptions.json
+    hermes,hermes.gateway_state,/var/root/.hermes/channel_aliases.json
+    hermes,hermes.gateway_state,/var/root/.hermes/channel_directory.json
+    hermes,hermes.gateway_state,/var/root/.hermes/gateway.pid
+    hermes,hermes.gateway_state,/var/root/.hermes/gateway_state.json
+    hermes,hermes.gateway_state,/var/root/.hermes/profiles/*/channel_aliases.json
+    hermes,hermes.gateway_state,/var/root/.hermes/profiles/*/channel_directory.json
+    hermes,hermes.gateway_state,/var/root/.hermes/profiles/*/gateway.pid
+    hermes,hermes.gateway_state,/var/root/.hermes/profiles/*/gateway_state.json
+    hermes,hermes.gateway_state,/var/root/.hermes/profiles/*/webhook_subscriptions.json
+    hermes,hermes.gateway_state,/var/root/.hermes/webhook_subscriptions.json
     hermes,hermes.hooks,/Users/*/.hermes/hooks/**
     hermes,hermes.hooks,/Users/*/.hermes/profiles/*/hooks/**
     hermes,hermes.hooks,/var/root/.hermes/hooks/**
@@ -2475,6 +2595,14 @@ sources:
     hermes,hermes.logs,/var/root/.hermes/logs/gateway.log
     hermes,hermes.logs,/var/root/.hermes/profiles/*/logs/errors.log
     hermes,hermes.logs,/var/root/.hermes/profiles/*/logs/gateway.log
+    hermes,hermes.mcp_tokens,/Users/*/.hermes/mcp-tokens/*.cimd-off
+    hermes,hermes.mcp_tokens,/Users/*/.hermes/mcp-tokens/*.json
+    hermes,hermes.mcp_tokens,/Users/*/.hermes/profiles/*/mcp-tokens/*.cimd-off
+    hermes,hermes.mcp_tokens,/Users/*/.hermes/profiles/*/mcp-tokens/*.json
+    hermes,hermes.mcp_tokens,/var/root/.hermes/mcp-tokens/*.cimd-off
+    hermes,hermes.mcp_tokens,/var/root/.hermes/mcp-tokens/*.json
+    hermes,hermes.mcp_tokens,/var/root/.hermes/profiles/*/mcp-tokens/*.cimd-off
+    hermes,hermes.mcp_tokens,/var/root/.hermes/profiles/*/mcp-tokens/*.json
     hermes,hermes.memories,/Users/*/.hermes/memories/MEMORY.md
     hermes,hermes.memories,/Users/*/.hermes/memories/USER.md
     hermes,hermes.memories,/Users/*/.hermes/profiles/*/memories/MEMORY.md
@@ -2483,6 +2611,54 @@ sources:
     hermes,hermes.memories,/var/root/.hermes/memories/USER.md
     hermes,hermes.memories,/var/root/.hermes/profiles/*/memories/MEMORY.md
     hermes,hermes.memories,/var/root/.hermes/profiles/*/memories/USER.md
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/.anthropic_oauth.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/cache/bws_cache.enc.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/cache/bws_cache.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/google_chat_user_client_secret.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/google_chat_user_oauth_pending.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/google_chat_user_oauth_pending/*.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/google_chat_user_token.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/google_chat_user_tokens/*.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/google_token.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/profiles/*/.anthropic_oauth.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/profiles/*/cache/bws_cache.enc.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/profiles/*/cache/bws_cache.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/profiles/*/google_chat_user_client_secret.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/profiles/*/google_chat_user_oauth_pending.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/profiles/*/google_chat_user_oauth_pending/*.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/profiles/*/google_chat_user_token.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/profiles/*/google_chat_user_tokens/*.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/profiles/*/google_token.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/profiles/*/slack_tokens.json
+    hermes,hermes.oauth_tokens,/Users/*/.hermes/slack_tokens.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/.anthropic_oauth.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/cache/bws_cache.enc.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/cache/bws_cache.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/google_chat_user_client_secret.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/google_chat_user_oauth_pending.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/google_chat_user_oauth_pending/*.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/google_chat_user_token.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/google_chat_user_tokens/*.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/google_token.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/profiles/*/.anthropic_oauth.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/profiles/*/cache/bws_cache.enc.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/profiles/*/cache/bws_cache.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/profiles/*/google_chat_user_client_secret.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/profiles/*/google_chat_user_oauth_pending.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/profiles/*/google_chat_user_oauth_pending/*.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/profiles/*/google_chat_user_token.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/profiles/*/google_chat_user_tokens/*.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/profiles/*/google_token.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/profiles/*/slack_tokens.json
+    hermes,hermes.oauth_tokens,/var/root/.hermes/slack_tokens.json
+    hermes,hermes.pairing,/Users/*/.hermes/pairing/**
+    hermes,hermes.pairing,/Users/*/.hermes/platforms/pairing/**
+    hermes,hermes.pairing,/Users/*/.hermes/profiles/*/pairing/**
+    hermes,hermes.pairing,/Users/*/.hermes/profiles/*/platforms/pairing/**
+    hermes,hermes.pairing,/var/root/.hermes/pairing/**
+    hermes,hermes.pairing,/var/root/.hermes/platforms/pairing/**
+    hermes,hermes.pairing,/var/root/.hermes/profiles/*/pairing/**
+    hermes,hermes.pairing,/var/root/.hermes/profiles/*/platforms/pairing/**
     hermes,hermes.pastes,/Users/*/.hermes/pastes/paste_*.txt
     hermes,hermes.pastes,/Users/*/.hermes/profiles/*/pastes/paste_*.txt
     hermes,hermes.pastes,/var/root/.hermes/pastes/paste_*.txt
@@ -2491,6 +2667,22 @@ sources:
     hermes,hermes.pending_skills,/Users/*/.hermes/profiles/*/pending/skills/*.json
     hermes,hermes.pending_skills,/var/root/.hermes/pending/skills/*.json
     hermes,hermes.pending_skills,/var/root/.hermes/profiles/*/pending/skills/*.json
+    hermes,hermes.platform_sessions,/Users/*/.hermes/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/Users/*/.hermes/platforms/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/Users/*/.hermes/platforms/whatsapp/session/**
+    hermes,hermes.platform_sessions,/Users/*/.hermes/profiles/*/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/Users/*/.hermes/profiles/*/platforms/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/Users/*/.hermes/profiles/*/platforms/whatsapp/session/**
+    hermes,hermes.platform_sessions,/Users/*/.hermes/profiles/*/whatsapp/session/**
+    hermes,hermes.platform_sessions,/Users/*/.hermes/whatsapp/session/**
+    hermes,hermes.platform_sessions,/var/root/.hermes/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/var/root/.hermes/platforms/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/var/root/.hermes/platforms/whatsapp/session/**
+    hermes,hermes.platform_sessions,/var/root/.hermes/profiles/*/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/var/root/.hermes/profiles/*/platforms/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/var/root/.hermes/profiles/*/platforms/whatsapp/session/**
+    hermes,hermes.platform_sessions,/var/root/.hermes/profiles/*/whatsapp/session/**
+    hermes,hermes.platform_sessions,/var/root/.hermes/whatsapp/session/**
     hermes,hermes.process_results,/Users/*/.hermes/logs/process-results/proc_*.json
     hermes,hermes.process_results,/Users/*/.hermes/profiles/*/logs/process-results/proc_*.json
     hermes,hermes.process_results,/var/root/.hermes/logs/process-results/proc_*.json
@@ -2571,6 +2763,14 @@ sources:
     hermes,hermes.state_snapshots,/Users/*/.hermes/state-snapshots/**
     hermes,hermes.state_snapshots,/var/root/.hermes/profiles/*/state-snapshots/**
     hermes,hermes.state_snapshots,/var/root/.hermes/state-snapshots/**
+    hermes,hermes.vault,/Users/*/.hermes/profiles/*/vault/vault.json.enc
+    hermes,hermes.vault,/Users/*/.hermes/profiles/*/vault/vault.key
+    hermes,hermes.vault,/Users/*/.hermes/vault/vault.json.enc
+    hermes,hermes.vault,/Users/*/.hermes/vault/vault.key
+    hermes,hermes.vault,/var/root/.hermes/profiles/*/vault/vault.json.enc
+    hermes,hermes.vault,/var/root/.hermes/profiles/*/vault/vault.key
+    hermes,hermes.vault,/var/root/.hermes/vault/vault.json.enc
+    hermes,hermes.vault,/var/root/.hermes/vault/vault.key
     jetbrains_ai,jetbrains_ai.aia_task_history,/Users/*/.config/JetBrains/**/aia-task-history/**
     jetbrains_ai,jetbrains_ai.aia_task_history,/Users/*/Library/Application Support/JetBrains/**/aia-task-history/*.agentsession
     jetbrains_ai,jetbrains_ai.aia_task_history,/Users/*/Library/Application Support/JetBrains/**/aia-task-history/*.checkpoints
@@ -4567,6 +4767,26 @@ sources:
     hermes,hermes.env,/home/*/.hermes/profiles/*/.env
     hermes,hermes.env,/root/.hermes/.env
     hermes,hermes.env,/root/.hermes/profiles/*/.env
+    hermes,hermes.gateway_state,/home/*/.hermes/channel_aliases.json
+    hermes,hermes.gateway_state,/home/*/.hermes/channel_directory.json
+    hermes,hermes.gateway_state,/home/*/.hermes/gateway.pid
+    hermes,hermes.gateway_state,/home/*/.hermes/gateway_state.json
+    hermes,hermes.gateway_state,/home/*/.hermes/profiles/*/channel_aliases.json
+    hermes,hermes.gateway_state,/home/*/.hermes/profiles/*/channel_directory.json
+    hermes,hermes.gateway_state,/home/*/.hermes/profiles/*/gateway.pid
+    hermes,hermes.gateway_state,/home/*/.hermes/profiles/*/gateway_state.json
+    hermes,hermes.gateway_state,/home/*/.hermes/profiles/*/webhook_subscriptions.json
+    hermes,hermes.gateway_state,/home/*/.hermes/webhook_subscriptions.json
+    hermes,hermes.gateway_state,/root/.hermes/channel_aliases.json
+    hermes,hermes.gateway_state,/root/.hermes/channel_directory.json
+    hermes,hermes.gateway_state,/root/.hermes/gateway.pid
+    hermes,hermes.gateway_state,/root/.hermes/gateway_state.json
+    hermes,hermes.gateway_state,/root/.hermes/profiles/*/channel_aliases.json
+    hermes,hermes.gateway_state,/root/.hermes/profiles/*/channel_directory.json
+    hermes,hermes.gateway_state,/root/.hermes/profiles/*/gateway.pid
+    hermes,hermes.gateway_state,/root/.hermes/profiles/*/gateway_state.json
+    hermes,hermes.gateway_state,/root/.hermes/profiles/*/webhook_subscriptions.json
+    hermes,hermes.gateway_state,/root/.hermes/webhook_subscriptions.json
     hermes,hermes.hooks,/home/*/.hermes/hooks/**
     hermes,hermes.hooks,/home/*/.hermes/profiles/*/hooks/**
     hermes,hermes.hooks,/root/.hermes/hooks/**
@@ -4579,6 +4799,14 @@ sources:
     hermes,hermes.logs,/root/.hermes/logs/gateway.log
     hermes,hermes.logs,/root/.hermes/profiles/*/logs/errors.log
     hermes,hermes.logs,/root/.hermes/profiles/*/logs/gateway.log
+    hermes,hermes.mcp_tokens,/home/*/.hermes/mcp-tokens/*.cimd-off
+    hermes,hermes.mcp_tokens,/home/*/.hermes/mcp-tokens/*.json
+    hermes,hermes.mcp_tokens,/home/*/.hermes/profiles/*/mcp-tokens/*.cimd-off
+    hermes,hermes.mcp_tokens,/home/*/.hermes/profiles/*/mcp-tokens/*.json
+    hermes,hermes.mcp_tokens,/root/.hermes/mcp-tokens/*.cimd-off
+    hermes,hermes.mcp_tokens,/root/.hermes/mcp-tokens/*.json
+    hermes,hermes.mcp_tokens,/root/.hermes/profiles/*/mcp-tokens/*.cimd-off
+    hermes,hermes.mcp_tokens,/root/.hermes/profiles/*/mcp-tokens/*.json
     hermes,hermes.memories,/home/*/.hermes/memories/MEMORY.md
     hermes,hermes.memories,/home/*/.hermes/memories/USER.md
     hermes,hermes.memories,/home/*/.hermes/profiles/*/memories/MEMORY.md
@@ -4587,6 +4815,54 @@ sources:
     hermes,hermes.memories,/root/.hermes/memories/USER.md
     hermes,hermes.memories,/root/.hermes/profiles/*/memories/MEMORY.md
     hermes,hermes.memories,/root/.hermes/profiles/*/memories/USER.md
+    hermes,hermes.oauth_tokens,/home/*/.hermes/.anthropic_oauth.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/cache/bws_cache.enc.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/cache/bws_cache.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/google_chat_user_client_secret.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/google_chat_user_oauth_pending.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/google_chat_user_oauth_pending/*.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/google_chat_user_token.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/google_chat_user_tokens/*.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/google_token.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/profiles/*/.anthropic_oauth.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/profiles/*/cache/bws_cache.enc.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/profiles/*/cache/bws_cache.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/profiles/*/google_chat_user_client_secret.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/profiles/*/google_chat_user_oauth_pending.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/profiles/*/google_chat_user_oauth_pending/*.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/profiles/*/google_chat_user_token.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/profiles/*/google_chat_user_tokens/*.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/profiles/*/google_token.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/profiles/*/slack_tokens.json
+    hermes,hermes.oauth_tokens,/home/*/.hermes/slack_tokens.json
+    hermes,hermes.oauth_tokens,/root/.hermes/.anthropic_oauth.json
+    hermes,hermes.oauth_tokens,/root/.hermes/cache/bws_cache.enc.json
+    hermes,hermes.oauth_tokens,/root/.hermes/cache/bws_cache.json
+    hermes,hermes.oauth_tokens,/root/.hermes/google_chat_user_client_secret.json
+    hermes,hermes.oauth_tokens,/root/.hermes/google_chat_user_oauth_pending.json
+    hermes,hermes.oauth_tokens,/root/.hermes/google_chat_user_oauth_pending/*.json
+    hermes,hermes.oauth_tokens,/root/.hermes/google_chat_user_token.json
+    hermes,hermes.oauth_tokens,/root/.hermes/google_chat_user_tokens/*.json
+    hermes,hermes.oauth_tokens,/root/.hermes/google_token.json
+    hermes,hermes.oauth_tokens,/root/.hermes/profiles/*/.anthropic_oauth.json
+    hermes,hermes.oauth_tokens,/root/.hermes/profiles/*/cache/bws_cache.enc.json
+    hermes,hermes.oauth_tokens,/root/.hermes/profiles/*/cache/bws_cache.json
+    hermes,hermes.oauth_tokens,/root/.hermes/profiles/*/google_chat_user_client_secret.json
+    hermes,hermes.oauth_tokens,/root/.hermes/profiles/*/google_chat_user_oauth_pending.json
+    hermes,hermes.oauth_tokens,/root/.hermes/profiles/*/google_chat_user_oauth_pending/*.json
+    hermes,hermes.oauth_tokens,/root/.hermes/profiles/*/google_chat_user_token.json
+    hermes,hermes.oauth_tokens,/root/.hermes/profiles/*/google_chat_user_tokens/*.json
+    hermes,hermes.oauth_tokens,/root/.hermes/profiles/*/google_token.json
+    hermes,hermes.oauth_tokens,/root/.hermes/profiles/*/slack_tokens.json
+    hermes,hermes.oauth_tokens,/root/.hermes/slack_tokens.json
+    hermes,hermes.pairing,/home/*/.hermes/pairing/**
+    hermes,hermes.pairing,/home/*/.hermes/platforms/pairing/**
+    hermes,hermes.pairing,/home/*/.hermes/profiles/*/pairing/**
+    hermes,hermes.pairing,/home/*/.hermes/profiles/*/platforms/pairing/**
+    hermes,hermes.pairing,/root/.hermes/pairing/**
+    hermes,hermes.pairing,/root/.hermes/platforms/pairing/**
+    hermes,hermes.pairing,/root/.hermes/profiles/*/pairing/**
+    hermes,hermes.pairing,/root/.hermes/profiles/*/platforms/pairing/**
     hermes,hermes.pastes,/home/*/.hermes/pastes/paste_*.txt
     hermes,hermes.pastes,/home/*/.hermes/profiles/*/pastes/paste_*.txt
     hermes,hermes.pastes,/root/.hermes/pastes/paste_*.txt
@@ -4595,6 +4871,22 @@ sources:
     hermes,hermes.pending_skills,/home/*/.hermes/profiles/*/pending/skills/*.json
     hermes,hermes.pending_skills,/root/.hermes/pending/skills/*.json
     hermes,hermes.pending_skills,/root/.hermes/profiles/*/pending/skills/*.json
+    hermes,hermes.platform_sessions,/home/*/.hermes/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/home/*/.hermes/platforms/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/home/*/.hermes/platforms/whatsapp/session/**
+    hermes,hermes.platform_sessions,/home/*/.hermes/profiles/*/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/home/*/.hermes/profiles/*/platforms/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/home/*/.hermes/profiles/*/platforms/whatsapp/session/**
+    hermes,hermes.platform_sessions,/home/*/.hermes/profiles/*/whatsapp/session/**
+    hermes,hermes.platform_sessions,/home/*/.hermes/whatsapp/session/**
+    hermes,hermes.platform_sessions,/root/.hermes/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/root/.hermes/platforms/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/root/.hermes/platforms/whatsapp/session/**
+    hermes,hermes.platform_sessions,/root/.hermes/profiles/*/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/root/.hermes/profiles/*/platforms/matrix/store/crypto.db
+    hermes,hermes.platform_sessions,/root/.hermes/profiles/*/platforms/whatsapp/session/**
+    hermes,hermes.platform_sessions,/root/.hermes/profiles/*/whatsapp/session/**
+    hermes,hermes.platform_sessions,/root/.hermes/whatsapp/session/**
     hermes,hermes.process_results,/home/*/.hermes/logs/process-results/proc_*.json
     hermes,hermes.process_results,/home/*/.hermes/profiles/*/logs/process-results/proc_*.json
     hermes,hermes.process_results,/root/.hermes/logs/process-results/proc_*.json
@@ -4675,6 +4967,14 @@ sources:
     hermes,hermes.state_snapshots,/home/*/.hermes/state-snapshots/**
     hermes,hermes.state_snapshots,/root/.hermes/profiles/*/state-snapshots/**
     hermes,hermes.state_snapshots,/root/.hermes/state-snapshots/**
+    hermes,hermes.vault,/home/*/.hermes/profiles/*/vault/vault.json.enc
+    hermes,hermes.vault,/home/*/.hermes/profiles/*/vault/vault.key
+    hermes,hermes.vault,/home/*/.hermes/vault/vault.json.enc
+    hermes,hermes.vault,/home/*/.hermes/vault/vault.key
+    hermes,hermes.vault,/root/.hermes/profiles/*/vault/vault.json.enc
+    hermes,hermes.vault,/root/.hermes/profiles/*/vault/vault.key
+    hermes,hermes.vault,/root/.hermes/vault/vault.json.enc
+    hermes,hermes.vault,/root/.hermes/vault/vault.key
     jetbrains_ai,jetbrains_ai.aia_task_history,/home/*/.config/JetBrains/**/aia-task-history/**
     jetbrains_ai,jetbrains_ai.aia_task_history,/home/*/Library/Application Support/JetBrains/**/aia-task-history/*.agentsession
     jetbrains_ai,jetbrains_ai.aia_task_history,/home/*/Library/Application Support/JetBrains/**/aia-task-history/*.checkpoints

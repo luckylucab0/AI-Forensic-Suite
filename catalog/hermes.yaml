@@ -319,6 +319,306 @@ artifacts:
 
     Record structure: one JSON document per finished process, with id, the redacted command, the working directory, the task and owning task, the session key and parent session, the start time, the exit code, how the process completed, what terminated it, and the tail of its output.
   parser: json_generic
+- id: hermes.oauth_tokens
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/.anthropic_oauth.json
+  - $HERMES_HOME/profiles/<name>/.anthropic_oauth.json
+  - ~/.hermes/.anthropic_oauth.json
+  - ~/.hermes/profiles/<name>/.anthropic_oauth.json
+  - '%LOCALAPPDATA%\hermes\.anthropic_oauth.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\.anthropic_oauth.json'
+  - $HERMES_HOME/google_token.json
+  - $HERMES_HOME/profiles/<name>/google_token.json
+  - ~/.hermes/google_token.json
+  - ~/.hermes/profiles/<name>/google_token.json
+  - '%LOCALAPPDATA%\hermes\google_token.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\google_token.json'
+  - $HERMES_HOME/slack_tokens.json
+  - $HERMES_HOME/profiles/<name>/slack_tokens.json
+  - ~/.hermes/slack_tokens.json
+  - ~/.hermes/profiles/<name>/slack_tokens.json
+  - '%LOCALAPPDATA%\hermes\slack_tokens.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\slack_tokens.json'
+  - $HERMES_HOME/google_chat_user_tokens/*.json
+  - $HERMES_HOME/profiles/<name>/google_chat_user_tokens/*.json
+  - ~/.hermes/google_chat_user_tokens/*.json
+  - ~/.hermes/profiles/<name>/google_chat_user_tokens/*.json
+  - '%LOCALAPPDATA%\hermes\google_chat_user_tokens\*.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\google_chat_user_tokens\*.json'
+  - $HERMES_HOME/google_chat_user_token.json
+  - $HERMES_HOME/profiles/<name>/google_chat_user_token.json
+  - ~/.hermes/google_chat_user_token.json
+  - ~/.hermes/profiles/<name>/google_chat_user_token.json
+  - '%LOCALAPPDATA%\hermes\google_chat_user_token.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\google_chat_user_token.json'
+  - $HERMES_HOME/google_chat_user_client_secret.json
+  - $HERMES_HOME/profiles/<name>/google_chat_user_client_secret.json
+  - ~/.hermes/google_chat_user_client_secret.json
+  - ~/.hermes/profiles/<name>/google_chat_user_client_secret.json
+  - '%LOCALAPPDATA%\hermes\google_chat_user_client_secret.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\google_chat_user_client_secret.json'
+  - $HERMES_HOME/google_chat_user_oauth_pending.json
+  - $HERMES_HOME/profiles/<name>/google_chat_user_oauth_pending.json
+  - ~/.hermes/google_chat_user_oauth_pending.json
+  - ~/.hermes/profiles/<name>/google_chat_user_oauth_pending.json
+  - '%LOCALAPPDATA%\hermes\google_chat_user_oauth_pending.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\google_chat_user_oauth_pending.json'
+  - $HERMES_HOME/google_chat_user_oauth_pending/*.json
+  - $HERMES_HOME/profiles/<name>/google_chat_user_oauth_pending/*.json
+  - ~/.hermes/google_chat_user_oauth_pending/*.json
+  - ~/.hermes/profiles/<name>/google_chat_user_oauth_pending/*.json
+  - '%LOCALAPPDATA%\hermes\google_chat_user_oauth_pending\*.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\google_chat_user_oauth_pending\*.json'
+  - $HERMES_HOME/cache/bws_cache.json
+  - $HERMES_HOME/profiles/<name>/cache/bws_cache.json
+  - ~/.hermes/cache/bws_cache.json
+  - ~/.hermes/profiles/<name>/cache/bws_cache.json
+  - '%LOCALAPPDATA%\hermes\cache\bws_cache.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\cache\bws_cache.json'
+  - $HERMES_HOME/cache/bws_cache.enc.json
+  - $HERMES_HOME/profiles/<name>/cache/bws_cache.enc.json
+  - ~/.hermes/cache/bws_cache.enc.json
+  - ~/.hermes/profiles/<name>/cache/bws_cache.enc.json
+  - '%LOCALAPPDATA%\hermes\cache\bws_cache.enc.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\cache\bws_cache.enc.json'
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/security.md
+  source_kind: official
+  volatility: |-
+    Persistent until the grant is revoked or the integration is removed. A pending authorization file is written while an authorization is in flight and removed when it completes, so one left behind is an authorization that was started and not finished.
+  notes: |-
+    Record metadata and a hash only. The names are the evidence.
+
+    The single credential file this catalogue had for this agent was the one its configuration guide documents. The product's own security page lists the rest, and each is a different account this agent could act as: a model provider's device authorization, a workspace suite, a chat platform, and a cached copy of a password manager's secrets. A file here is a standing ability to act as somebody, and it is on this endpoint rather than in that service's own store.
+
+    The per-user files are the ones to read the names of first. One integration keeps a refresh token per person who authorized it, in a file named after their address, so the directory listing alone enumerates the people on whose behalf this agent could act. That is a scoping answer, and it comes from the file names without opening anything.
+
+    Record structure: not read. The collector records the path, the size, the timestamps and a SHA-256, which is enough to say a grant existed and when it was last written.
+  parser: null
+- id: hermes.vault
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/vault/vault.json.enc
+  - $HERMES_HOME/profiles/<name>/vault/vault.json.enc
+  - ~/.hermes/vault/vault.json.enc
+  - ~/.hermes/profiles/<name>/vault/vault.json.enc
+  - '%LOCALAPPDATA%\hermes\vault\vault.json.enc'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\vault\vault.json.enc'
+  - $HERMES_HOME/vault/vault.key
+  - $HERMES_HOME/profiles/<name>/vault/vault.key
+  - ~/.hermes/vault/vault.key
+  - ~/.hermes/profiles/<name>/vault/vault.key
+  - '%LOCALAPPDATA%\hermes\vault\vault.key'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\vault\vault.key'
+  format: binary
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/agent/vault_store.py
+  source_kind: source_code
+  volatility: Persistent until the vault is cleared.
+  notes: |-
+    Record metadata and a hash only.
+
+    Worth its own entry rather than a line in the one above because of what the pair of files is. The vault is encrypted and its key file sits in the same directory, which the product's own source calls out. So this is encrypted at rest against somebody reading the file alone and not against anybody holding the directory, and an analyst with a disk image holds the directory. Treat the contents as recoverable when scoping what an attacker with that image would have.
+
+    Record structure: not read. One encrypted document and the key beside it.
+  parser: null
+- id: hermes.mcp_tokens
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/mcp-tokens/*.json
+  - $HERMES_HOME/profiles/<name>/mcp-tokens/*.json
+  - ~/.hermes/mcp-tokens/*.json
+  - ~/.hermes/profiles/<name>/mcp-tokens/*.json
+  - '%LOCALAPPDATA%\hermes\mcp-tokens\*.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\mcp-tokens\*.json'
+  - $HERMES_HOME/mcp-tokens/*.cimd-off
+  - $HERMES_HOME/profiles/<name>/mcp-tokens/*.cimd-off
+  - ~/.hermes/mcp-tokens/*.cimd-off
+  - ~/.hermes/profiles/<name>/mcp-tokens/*.cimd-off
+  - '%LOCALAPPDATA%\hermes\mcp-tokens\*.cimd-off'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\mcp-tokens\*.cimd-off'
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/reference/mcp-config-reference.md
+  source_kind: official
+  volatility: Persistent across restarts by design, and reused until the grant is revoked.
+  notes: |-
+    Record metadata and a hash only, and then read the directory listing, because the listing is the answer.
+
+    Each file is named after an MCP server this agent authorized against, so this directory enumerates the external services the agent had standing access to. A server that appears here is one the agent could call without anybody re-authorizing it, including from a scheduled job with nobody present.
+
+    Compare the listing against the servers named in the configuration. A token for a server the configuration no longer mentions is access that outlived its reason to exist.
+
+    Record structure: not read. One JSON file per server holding its tokens, and beside it a marker file, same name with a different suffix, recorded when a server rejected the product's preferred authorization method so a different one is used from then on. The marker is not a credential and its presence dates a change in how the agent authenticates to that server.
+  parser: null
+- id: hermes.platform_sessions
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/platforms/whatsapp/session/**
+  - $HERMES_HOME/profiles/<name>/platforms/whatsapp/session/**
+  - ~/.hermes/platforms/whatsapp/session/**
+  - ~/.hermes/profiles/<name>/platforms/whatsapp/session/**
+  - '%LOCALAPPDATA%\hermes\platforms\whatsapp\session\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\platforms\whatsapp\session\**'
+  - $HERMES_HOME/whatsapp/session/**
+  - $HERMES_HOME/profiles/<name>/whatsapp/session/**
+  - ~/.hermes/whatsapp/session/**
+  - ~/.hermes/profiles/<name>/whatsapp/session/**
+  - '%LOCALAPPDATA%\hermes\whatsapp\session\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\whatsapp\session\**'
+  - $HERMES_HOME/platforms/matrix/store/crypto.db
+  - $HERMES_HOME/profiles/<name>/platforms/matrix/store/crypto.db
+  - ~/.hermes/platforms/matrix/store/crypto.db
+  - ~/.hermes/profiles/<name>/platforms/matrix/store/crypto.db
+  - '%LOCALAPPDATA%\hermes\platforms\matrix\store\crypto.db'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\platforms\matrix\store\crypto.db'
+  - $HERMES_HOME/matrix/store/crypto.db
+  - $HERMES_HOME/profiles/<name>/matrix/store/crypto.db
+  - ~/.hermes/matrix/store/crypto.db
+  - ~/.hermes/profiles/<name>/matrix/store/crypto.db
+  - '%LOCALAPPDATA%\hermes\matrix\store\crypto.db'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\matrix\store\crypto.db'
+  format: binary
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/gateway/whatsapp_identity.py
+  source_kind: source_code
+  volatility: |-
+    Written when the platform is linked and kept for as long as the link lasts. Both the current and the older location exist in the wild: the product reads the older one where it is populated and does not migrate it, so a collection has to take both.
+  notes: |-
+    Record metadata and a hash only.
+
+    A linked messaging session is not an API token, it is a device registration: the endpoint is a logged-in client of that account. For the question of what an attacker with this machine could do, that is stronger than a token, and for the question of how the agent was reached it says the account was linked at all.
+
+    The encryption store of the federated chat platform is here for the same reason and with a sharper edge: it holds the keys that decrypt that platform's history, so its presence means encrypted conversations involving this endpoint are readable by whoever has this file.
+
+    Record structure: not read.
+  parser: null
+- id: hermes.pairing
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/platforms/pairing/**
+  - $HERMES_HOME/profiles/<name>/platforms/pairing/**
+  - ~/.hermes/platforms/pairing/**
+  - ~/.hermes/profiles/<name>/platforms/pairing/**
+  - '%LOCALAPPDATA%\hermes\platforms\pairing\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\platforms\pairing\**'
+  - $HERMES_HOME/pairing/**
+  - $HERMES_HOME/profiles/<name>/pairing/**
+  - ~/.hermes/pairing/**
+  - ~/.hermes/profiles/<name>/pairing/**
+  - '%LOCALAPPDATA%\hermes\pairing\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\pairing\**'
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/gateway/pairing.py
+  source_kind: source_code
+  contains_credentials:
+  - the hashed pairing codes and any per-user secrets in an approval record
+  volatility: |-
+    An approval is persistent. A pending request expires after an hour, so the pending side of this store is a snapshot of the last hour and nothing more. Stored in the current location and in an older one the product still reads.
+  notes: |-
+    Who was allowed to operate this agent from a chat platform.
+
+    This is the answer to the question a transcript raises and does not settle. The transcript store records that a session came in from a messaging platform and which account identifier it came from; this records who was approved to do that, and when. An identifier in a conversation with no approval record behind it is worth explaining.
+
+    It is collected rather than withheld, and that is deliberate: the codes are hashed and what matters here is the list of identities, which is evidence. The hashes are named as credential material so they are redacted out of anything that leaves the case.
+
+    Record structure: per-platform records of approved users, and pending requests carrying a hashed one-time code with its expiry. The product caps pending requests and locks out after repeated failed approvals, so a lockout in this store is a record of somebody trying to get in.
+  parser: json_generic
+- id: hermes.gateway_state
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/gateway_state.json
+  - $HERMES_HOME/profiles/<name>/gateway_state.json
+  - ~/.hermes/gateway_state.json
+  - ~/.hermes/profiles/<name>/gateway_state.json
+  - '%LOCALAPPDATA%\hermes\gateway_state.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\gateway_state.json'
+  - $HERMES_HOME/gateway.pid
+  - $HERMES_HOME/profiles/<name>/gateway.pid
+  - ~/.hermes/gateway.pid
+  - ~/.hermes/profiles/<name>/gateway.pid
+  - '%LOCALAPPDATA%\hermes\gateway.pid'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\gateway.pid'
+  - $HERMES_HOME/channel_directory.json
+  - $HERMES_HOME/profiles/<name>/channel_directory.json
+  - ~/.hermes/channel_directory.json
+  - ~/.hermes/profiles/<name>/channel_directory.json
+  - '%LOCALAPPDATA%\hermes\channel_directory.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\channel_directory.json'
+  - $HERMES_HOME/channel_aliases.json
+  - $HERMES_HOME/profiles/<name>/channel_aliases.json
+  - ~/.hermes/channel_aliases.json
+  - ~/.hermes/profiles/<name>/channel_aliases.json
+  - '%LOCALAPPDATA%\hermes\channel_aliases.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\channel_aliases.json'
+  - $HERMES_HOME/webhook_subscriptions.json
+  - $HERMES_HOME/profiles/<name>/webhook_subscriptions.json
+  - ~/.hermes/webhook_subscriptions.json
+  - ~/.hermes/profiles/<name>/webhook_subscriptions.json
+  - '%LOCALAPPDATA%\hermes\webhook_subscriptions.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\webhook_subscriptions.json'
+  format: json
+  sensitivity: normal
+  collect_priority: live_only
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/gateway/status.py
+  source_kind: source_code
+  volatility: |-
+    Runtime state. The recorded state survives a restart on purpose, because the product uses it to decide which profiles to bring back up, so it says what was running rather than what is running. The process identifier file is stale the moment the process is gone.
+  notes: |-
+    Whether this agent was listening, and on what.
+
+    An agent that only ever ran when somebody typed a command is a different investigation from one that sat waiting for messages, and this is where the difference is written down. The recorded state is kept so a restart can bring back the profiles that were running, which means it also says which profiles were serving when the machine last stopped.
+
+    The channel directory and its aliases are the map of where output goes: the chats and channels this agent could post into, by identifier, with the names somebody gave them. Read them beside the delivery targets in the scheduled jobs, because a target there is a name in here.
+
+    The webhook subscriptions are the other direction: addresses on this endpoint that something outside can call to make the agent act. Each is an entry point that does not involve a person typing.
+
+    Record structure: the recorded gateway state per profile, the process identifier of a running gateway, a directory of channels with their identifiers and any aliases, and the webhook routes that are subscribed.
+  parser: json_generic
 - id: hermes.retired_wal_transcripts
   category: transcript
   root: user_profile

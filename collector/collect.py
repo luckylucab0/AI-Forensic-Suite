@@ -6281,6 +6281,51 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "config",
+                    "collect_priority": "live_only",
+                    "id": "hermes.gateway_state",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/gateway_state.json",
+                        "$HERMES_HOME/profiles/<name>/gateway_state.json",
+                        "~/.hermes/gateway_state.json",
+                        "~/.hermes/profiles/<name>/gateway_state.json",
+                        "%LOCALAPPDATA%\\hermes\\gateway_state.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\gateway_state.json",
+                        "$HERMES_HOME/gateway.pid",
+                        "$HERMES_HOME/profiles/<name>/gateway.pid",
+                        "~/.hermes/gateway.pid",
+                        "~/.hermes/profiles/<name>/gateway.pid",
+                        "%LOCALAPPDATA%\\hermes\\gateway.pid",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\gateway.pid",
+                        "$HERMES_HOME/channel_directory.json",
+                        "$HERMES_HOME/profiles/<name>/channel_directory.json",
+                        "~/.hermes/channel_directory.json",
+                        "~/.hermes/profiles/<name>/channel_directory.json",
+                        "%LOCALAPPDATA%\\hermes\\channel_directory.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\channel_directory.json",
+                        "$HERMES_HOME/channel_aliases.json",
+                        "$HERMES_HOME/profiles/<name>/channel_aliases.json",
+                        "~/.hermes/channel_aliases.json",
+                        "~/.hermes/profiles/<name>/channel_aliases.json",
+                        "%LOCALAPPDATA%\\hermes\\channel_aliases.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\channel_aliases.json",
+                        "$HERMES_HOME/webhook_subscriptions.json",
+                        "$HERMES_HOME/profiles/<name>/webhook_subscriptions.json",
+                        "~/.hermes/webhook_subscriptions.json",
+                        "~/.hermes/profiles/<name>/webhook_subscriptions.json",
+                        "%LOCALAPPDATA%\\hermes\\webhook_subscriptions.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\webhook_subscriptions.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "instructions",
                     "collect_priority": "first",
                     "id": "hermes.hooks",
@@ -6327,6 +6372,33 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "hermes.mcp_tokens",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/mcp-tokens/*.json",
+                        "$HERMES_HOME/profiles/<name>/mcp-tokens/*.json",
+                        "~/.hermes/mcp-tokens/*.json",
+                        "~/.hermes/profiles/<name>/mcp-tokens/*.json",
+                        "%LOCALAPPDATA%\\hermes\\mcp-tokens\\*.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\mcp-tokens\\*.json",
+                        "$HERMES_HOME/mcp-tokens/*.cimd-off",
+                        "$HERMES_HOME/profiles/<name>/mcp-tokens/*.cimd-off",
+                        "~/.hermes/mcp-tokens/*.cimd-off",
+                        "~/.hermes/profiles/<name>/mcp-tokens/*.cimd-off",
+                        "%LOCALAPPDATA%\\hermes\\mcp-tokens\\*.cimd-off",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\mcp-tokens\\*.cimd-off"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
                     "category": "memory",
                     "collect_priority": "normal",
                     "id": "hermes.memories",
@@ -6346,6 +6418,108 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.hermes/profiles/<name>/memories/USER.md",
                         "%LOCALAPPDATA%\\hermes\\memories\\USER.md",
                         "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\memories\\USER.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "hermes.oauth_tokens",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/.anthropic_oauth.json",
+                        "$HERMES_HOME/profiles/<name>/.anthropic_oauth.json",
+                        "~/.hermes/.anthropic_oauth.json",
+                        "~/.hermes/profiles/<name>/.anthropic_oauth.json",
+                        "%LOCALAPPDATA%\\hermes\\.anthropic_oauth.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\.anthropic_oauth.json",
+                        "$HERMES_HOME/google_token.json",
+                        "$HERMES_HOME/profiles/<name>/google_token.json",
+                        "~/.hermes/google_token.json",
+                        "~/.hermes/profiles/<name>/google_token.json",
+                        "%LOCALAPPDATA%\\hermes\\google_token.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\google_token.json",
+                        "$HERMES_HOME/slack_tokens.json",
+                        "$HERMES_HOME/profiles/<name>/slack_tokens.json",
+                        "~/.hermes/slack_tokens.json",
+                        "~/.hermes/profiles/<name>/slack_tokens.json",
+                        "%LOCALAPPDATA%\\hermes\\slack_tokens.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\slack_tokens.json",
+                        "$HERMES_HOME/google_chat_user_tokens/*.json",
+                        "$HERMES_HOME/profiles/<name>/google_chat_user_tokens/*.json",
+                        "~/.hermes/google_chat_user_tokens/*.json",
+                        "~/.hermes/profiles/<name>/google_chat_user_tokens/*.json",
+                        "%LOCALAPPDATA%\\hermes\\google_chat_user_tokens\\*.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\google_chat_user_tokens\\*.json",
+                        "$HERMES_HOME/google_chat_user_token.json",
+                        "$HERMES_HOME/profiles/<name>/google_chat_user_token.json",
+                        "~/.hermes/google_chat_user_token.json",
+                        "~/.hermes/profiles/<name>/google_chat_user_token.json",
+                        "%LOCALAPPDATA%\\hermes\\google_chat_user_token.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\google_chat_user_token.json",
+                        "$HERMES_HOME/google_chat_user_client_secret.json",
+                        "$HERMES_HOME/profiles/<name>/google_chat_user_client_secret.json",
+                        "~/.hermes/google_chat_user_client_secret.json",
+                        "~/.hermes/profiles/<name>/google_chat_user_client_secret.json",
+                        "%LOCALAPPDATA%\\hermes\\google_chat_user_client_secret.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\google_chat_user_client_secret.json",
+                        "$HERMES_HOME/google_chat_user_oauth_pending.json",
+                        "$HERMES_HOME/profiles/<name>/google_chat_user_oauth_pending.json",
+                        "~/.hermes/google_chat_user_oauth_pending.json",
+                        "~/.hermes/profiles/<name>/google_chat_user_oauth_pending.json",
+                        "%LOCALAPPDATA%\\hermes\\google_chat_user_oauth_pending.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\google_chat_user_oauth_pending.json",
+                        "$HERMES_HOME/google_chat_user_oauth_pending/*.json",
+                        "$HERMES_HOME/profiles/<name>/google_chat_user_oauth_pending/*.json",
+                        "~/.hermes/google_chat_user_oauth_pending/*.json",
+                        "~/.hermes/profiles/<name>/google_chat_user_oauth_pending/*.json",
+                        "%LOCALAPPDATA%\\hermes\\google_chat_user_oauth_pending\\*.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\google_chat_user_oauth_pending\\*.json",
+                        "$HERMES_HOME/cache/bws_cache.json",
+                        "$HERMES_HOME/profiles/<name>/cache/bws_cache.json",
+                        "~/.hermes/cache/bws_cache.json",
+                        "~/.hermes/profiles/<name>/cache/bws_cache.json",
+                        "%LOCALAPPDATA%\\hermes\\cache\\bws_cache.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\cache\\bws_cache.json",
+                        "$HERMES_HOME/cache/bws_cache.enc.json",
+                        "$HERMES_HOME/profiles/<name>/cache/bws_cache.enc.json",
+                        "~/.hermes/cache/bws_cache.enc.json",
+                        "~/.hermes/profiles/<name>/cache/bws_cache.enc.json",
+                        "%LOCALAPPDATA%\\hermes\\cache\\bws_cache.enc.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\cache\\bws_cache.enc.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "hermes.pairing",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/platforms/pairing/**",
+                        "$HERMES_HOME/profiles/<name>/platforms/pairing/**",
+                        "~/.hermes/platforms/pairing/**",
+                        "~/.hermes/profiles/<name>/platforms/pairing/**",
+                        "%LOCALAPPDATA%\\hermes\\platforms\\pairing\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\platforms\\pairing\\**",
+                        "$HERMES_HOME/pairing/**",
+                        "$HERMES_HOME/profiles/<name>/pairing/**",
+                        "~/.hermes/pairing/**",
+                        "~/.hermes/profiles/<name>/pairing/**",
+                        "%LOCALAPPDATA%\\hermes\\pairing\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\pairing\\**"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6391,6 +6565,45 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "hermes.platform_sessions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/platforms/whatsapp/session/**",
+                        "$HERMES_HOME/profiles/<name>/platforms/whatsapp/session/**",
+                        "~/.hermes/platforms/whatsapp/session/**",
+                        "~/.hermes/profiles/<name>/platforms/whatsapp/session/**",
+                        "%LOCALAPPDATA%\\hermes\\platforms\\whatsapp\\session\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\platforms\\whatsapp\\session\\**",
+                        "$HERMES_HOME/whatsapp/session/**",
+                        "$HERMES_HOME/profiles/<name>/whatsapp/session/**",
+                        "~/.hermes/whatsapp/session/**",
+                        "~/.hermes/profiles/<name>/whatsapp/session/**",
+                        "%LOCALAPPDATA%\\hermes\\whatsapp\\session\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\whatsapp\\session\\**",
+                        "$HERMES_HOME/platforms/matrix/store/crypto.db",
+                        "$HERMES_HOME/profiles/<name>/platforms/matrix/store/crypto.db",
+                        "~/.hermes/platforms/matrix/store/crypto.db",
+                        "~/.hermes/profiles/<name>/platforms/matrix/store/crypto.db",
+                        "%LOCALAPPDATA%\\hermes\\platforms\\matrix\\store\\crypto.db",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\platforms\\matrix\\store\\crypto.db",
+                        "$HERMES_HOME/matrix/store/crypto.db",
+                        "$HERMES_HOME/profiles/<name>/matrix/store/crypto.db",
+                        "~/.hermes/matrix/store/crypto.db",
+                        "~/.hermes/profiles/<name>/matrix/store/crypto.db",
+                        "%LOCALAPPDATA%\\hermes\\matrix\\store\\crypto.db",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\matrix\\store\\crypto.db"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
                     "status": "verified"
                 },
                 {
@@ -6751,6 +6964,33 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "hermes.vault",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/vault/vault.json.enc",
+                        "$HERMES_HOME/profiles/<name>/vault/vault.json.enc",
+                        "~/.hermes/vault/vault.json.enc",
+                        "~/.hermes/profiles/<name>/vault/vault.json.enc",
+                        "%LOCALAPPDATA%\\hermes\\vault\\vault.json.enc",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\vault\\vault.json.enc",
+                        "$HERMES_HOME/vault/vault.key",
+                        "$HERMES_HOME/profiles/<name>/vault/vault.key",
+                        "~/.hermes/vault/vault.key",
+                        "~/.hermes/profiles/<name>/vault/vault.key",
+                        "%LOCALAPPDATA%\\hermes\\vault\\vault.key",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\vault\\vault.key"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
                     "status": "verified"
                 }
             ]
@@ -9926,7 +10166,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "6eea75f0908e1202ede64a5521d12afa7ac1fb9b9fccd323463b804b630dd960"
+    "sha256": "a0308d9522b29479131361e6c2444fb525cbc0dbdee2cb292f382e4fb1a63266"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)
