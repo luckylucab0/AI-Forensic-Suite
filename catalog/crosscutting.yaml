@@ -295,8 +295,6 @@ artifacts:
   os:
   - windows
   paths:
-  - HKEY_CURRENT_USER\Software\Classes\<url-scheme>
-  - HKEY_CURRENT_USER\Software\Classes\<url-scheme>\shell\open\command
   - HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\*
   - HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\*
   format: registry
@@ -310,7 +308,13 @@ artifacts:
   notes: |-
     WHAT A REMOVED PRODUCT LEAVES IN THE REGISTRY. Measured by installing two agent products on a clean Windows 11 26200 host, using them, uninstalling them through their own uninstallers, and reading the registry again.
 
-    The uninstall keys were gone. The protocol handlers were not. Each product had registered a scheme of its own under the user's class keys, with the command value naming the executable, and after the uninstall all of them were still there pointing at executables that no longer exist. A protocol handler whose target is missing is a strong, compact finding: it says the product was installed on this account and was later removed, in one key, on a machine where the program directory, the uninstall key and the start menu entry are all gone.
+    The uninstall keys were gone. The protocol handlers were not, and those are not in this
+    entry: they are per product and this catalogue carries them under the products that
+    register them, as cursor.url_handler and windsurf.url_handlers, so the Windows
+    collector reads them as documents and a rule can be written against them. What is left
+    here is the generic pair, which the collector does not read for the reason ADR 0033
+    gives: an uninstall key and a path variable are read better by any general purpose
+    registry tool than by this one. Each product had registered a scheme of its own under the user's class keys, with the command value naming the executable, and after the uninstall all of them were still there pointing at executables that no longer exist. A protocol handler whose target is missing is a strong, compact finding: it says the product was installed on this account and was later removed, in one key, on a machine where the program directory, the uninstall key and the start menu entry are all gone.
 
     Read the scheme names rather than the product names. One of the two products registered three schemes, one of them the scheme of the product it used to be called, pointing at the current executable. So a handler under the old name is not evidence that the old product was ever installed, and a search for the current name misses two of the three keys.
 

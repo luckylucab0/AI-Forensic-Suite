@@ -53,8 +53,10 @@ SOURCES = frozenset(
     {
         "claude_code.managed_settings_registry",
         "claude_desktop.managed_policy_windows",
+        "cursor.url_handler",
         "ollama.env_overrides_registry",
         "windsurf.enterprise_policy",
+        "windsurf.url_handlers",
     }
 )
 

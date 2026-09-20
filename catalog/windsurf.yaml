@@ -719,6 +719,31 @@ artifacts:
 
         What the Windows host did have, once the account was signed in, is an authorisation directory for tool servers under the editor profile, which this catalogue now carries as windsurf.mcp_oauth_state. So the two questions come apart: this entry answers which servers were configured, and that one answers which servers the product actually held an authorisation for. An endpoint can answer the second with the first missing.
   parser: json_generic
+- id: windsurf.url_handlers
+  category: install_evidence
+  root: registry
+  os:
+  - windows
+  paths:
+  - HKEY_CURRENT_USER\Software\Classes\devin
+  - HKEY_CURRENT_USER\Software\Classes\devin\shell\open\command
+  - HKEY_CURRENT_USER\Software\Classes\windsurf
+  - HKEY_CURRENT_USER\Software\Classes\windsurf\shell\open\command
+  format: registry
+  sensitivity: normal
+  collect_priority: durable
+  status: unverified
+  source: observed on Windows 11 26200
+  source_kind: observed
+  volatility: |-
+    Written by the installer and removed by nothing. It outlived the product's own uninstaller in the measurement that found it, with the command value still naming an executable that had been deleted.
+  notes: |-
+    TWO SCHEMES FOR ONE PRODUCT, AND ONE OF THEM IS THE NAME IT USED TO HAVE. The renamed product registers both its current scheme and its predecessor's, and on the measured host both command values pointed at the current executable.
+
+    That cuts two ways and both are worth stating. A key under the old name is NOT evidence that the old product was ever installed: a plain installation of the current one creates it. And a search of the class keys for the current product name finds half of what this product registered, so both names have to be looked for.
+
+    Like its counterpart for the other product in this catalogue, these keys survive the uninstaller while the uninstall key does not, so a handler whose command value names an executable that is no longer on disk is a removed installation and the path says where it was.
+  parser: registry
 - id: windsurf.enterprise_policy
   category: permissions
   root: registry

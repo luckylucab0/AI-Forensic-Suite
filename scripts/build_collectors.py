@@ -32,7 +32,7 @@ from agentforensics.catalog import CatalogueError, load_catalogue  # noqa: E402
 CATALOG_DIR = REPO_ROOT / "catalog"
 
 # The registry keys a collection carries, with the reason each one is worth the trouble.
-# Four of the catalogue's six, and the two left out are left out on purpose.
+# Six of the catalogue's eight, and the two left out are left out on purpose.
 #
 # Reading the registry is something only the PowerShell collector can do and only on the
 # host itself: a key cannot be read from a mounted image without a hive parser and this
@@ -50,6 +50,10 @@ REGISTRY_KEYS = {
     "Windows can exist here and in no file at all. The user hive is the tamper path: a "
     "non-administrator can put a policy there when no real one exists, so both hives are "
     "read and the difference is the finding",
+    "cursor.url_handler": "the URL scheme this product registers under the user's own "
+    "class keys, which its uninstaller does not remove. The command value names the "
+    "executable, so on a host where everything else is gone the key says the product was "
+    "installed on this account and the path says where it was",
     "claude_desktop.managed_policy_windows": "the desktop product's own policy key, which "
     "the vendor documents as separate from the one above and which a collector globbing "
     "the policies branch would conflate with it",
@@ -57,6 +61,9 @@ REGISTRY_KEYS = {
     "Windows, so an empty model directory can be told from a moved one",
     "windsurf.enterprise_policy": "the policy branch this product reads, where an "
     "administrator can enable hooks and rules for every user on the machine",
+    "windsurf.url_handlers": "the two URL schemes this product registers, one of them "
+    "under the name it had before the rename, which a plain installation of the current "
+    "product creates. Neither is removed by the uninstaller",
 }
 
 PY_BEGIN = "# --- BEGIN EMBEDDED CATALOGUE ---"

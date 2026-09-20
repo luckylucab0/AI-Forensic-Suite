@@ -471,6 +471,29 @@ artifacts:
 
     Record structure: extensions.json is a JSON ARRAY of installed-extension records (identifier, version, location, metadata). Each extension unpacks to its own <publisher>.<name>-<version>/ directory beside it.
   parser: json_generic
+- id: cursor.url_handler
+  category: install_evidence
+  root: registry
+  os:
+  - windows
+  paths:
+  - HKEY_CURRENT_USER\Software\Classes\cursor
+  - HKEY_CURRENT_USER\Software\Classes\cursor\shell\open\command
+  format: registry
+  sensitivity: normal
+  collect_priority: durable
+  status: unverified
+  source: observed on Windows 11 26200
+  source_kind: observed
+  volatility: |-
+    Written by the installer and removed by nothing. It outlived the product's own uninstaller in the measurement that found it, with the command value still naming an executable that had been deleted.
+  notes: |-
+    THE ONE KEY THAT SAYS BOTH THAT THIS PRODUCT WAS INSTALLED ON THIS ACCOUNT AND THAT IT WAS LATER REMOVED. The installer registers a URL scheme of the product's own name under the user's class keys, with the command value naming the executable. The uninstaller removes the uninstall key under the same hive and leaves this one alone.
+
+    So on a host where the program directory, the start menu entry and the uninstall key are all gone, this key is still there and its command value still points at the executable's old path. Compare that path against the filesystem: a handler whose target is missing is a removed installation, in one key, and the path itself says where the product was.
+
+    The scheme name comes from the product's own shipped configuration, which declares it beside the data directory names, so the name is not guesswork even though no page states the registry location.
+  parser: registry
 - id: cursor.install_and_machine_identity
   category: install_evidence
   root: registry

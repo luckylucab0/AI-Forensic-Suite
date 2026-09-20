@@ -4951,8 +4951,6 @@ $EmbeddedCatalogueJson = @'
                         "windows"
                     ],
                     "paths": [
-                        "HKEY_CURRENT_USER\\Software\\Classes\\<url-scheme>",
-                        "HKEY_CURRENT_USER\\Software\\Classes\\<url-scheme>\\shell\\open\\command",
                         "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*",
                         "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*"
                     ],
@@ -5820,6 +5818,22 @@ $EmbeddedCatalogueJson = @'
                         "%LOCALAPPDATA%\\Temp\\cursor-agent-logs-<username>\\*"
                     ],
                     "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "durable",
+                    "id": "cursor.url_handler",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "HKEY_CURRENT_USER\\Software\\Classes\\cursor",
+                        "HKEY_CURRENT_USER\\Software\\Classes\\cursor\\shell\\open\\command"
+                    ],
+                    "read_registry": true,
+                    "root": "registry",
                     "sensitivity": "normal",
                     "status": "unverified"
                 },
@@ -11365,6 +11379,24 @@ $EmbeddedCatalogueJson = @'
                     "status": "unverified"
                 },
                 {
+                    "category": "install_evidence",
+                    "collect_priority": "durable",
+                    "id": "windsurf.url_handlers",
+                    "os": [
+                        "windows"
+                    ],
+                    "paths": [
+                        "HKEY_CURRENT_USER\\Software\\Classes\\devin",
+                        "HKEY_CURRENT_USER\\Software\\Classes\\devin\\shell\\open\\command",
+                        "HKEY_CURRENT_USER\\Software\\Classes\\windsurf",
+                        "HKEY_CURRENT_USER\\Software\\Classes\\windsurf\\shell\\open\\command"
+                    ],
+                    "read_registry": true,
+                    "root": "registry",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
                     "category": "instructions",
                     "collect_priority": "normal",
                     "id": "windsurf.workflows_and_skills",
@@ -11557,7 +11589,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "9da2b212f16d39f7b6b6e09ba8af527239617f7270d11680de6cdafba22b6649"
+    "sha256": "b296b87eb5714a76cacd83a99be6a8195a0ff99402fc20b2ab6d2876b33fc4bb"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

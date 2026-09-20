@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 615e653bec2d
+# Catalogue digest: 8b845017c074
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -28,8 +28,10 @@
 #     crosscutting.windows_execution_evidence_registry
 #     crosscutting.windows_removed_product_registry
 #     cursor.install_and_machine_identity
+#     cursor.url_handler
 #     ollama.env_overrides_registry
 #     windsurf.enterprise_policy
+#     windsurf.url_handlers
 #   anchored at a working copy, whose location only the agent's own state file gives: the runbook's collector reads it, this check cannot
 #     aider.chat_history
 #     aider.config

@@ -1,0 +1,67 @@
+id: AFX-COLLECTIONINTEGRITY-002
+pack: collection_integrity
+title: An agent tidied its own data, and left the date it did it
+severity: info
+description: >
+  A file whose own name carries a date, written by an agent's cleanup rather than by a
+  user. Material older than that date may be gone because the product removed it.
+rationale: >
+  This rule is about the case rather than about the endpoint. An analyst who finds a
+  transcript directory thinner than the conversation it describes has two readings in front
+  of them, and they lead to opposite conclusions: somebody removed material, or the product
+  removed it by itself on a schedule nobody chose. This marker settles that question for
+  one date, so it fires at the lowest severity there is and its whole job is to be in the
+  timeline before an absence is reported as a deletion.
+  .
+  Read it as a bound and not as an inventory. It says a cleanup ran on that date. It does
+  not say what was removed, because nobody has read the rules the cleanup follows, and an
+  empty marker file cannot say. More than one of these means more than one cleanup, and the
+  set of dates is the schedule.
+  .
+  First hand: measured on a clean Windows 11 26200 host and a clean macOS 26.5 host, on a
+  fresh installation with one trivial conversation each. Both wrote the marker.
+applies_to:
+  kinds: [artifact.fs]
+match:
+  field: payload.path
+  # The date is the evidence, so the pattern requires one: a file of the same name without
+  # a date is something else and should not be reported as a cleanup that happened on a day
+  # nobody can name.
+  regex: '[\\/]\.agent-data-cleanup-\d{4}-\d{2}-\d{2}$'
+tags:
+  - collection-integrity
+  - retention
+  - vendor-cleanup
+false_positives:
+  - >-
+    A file somebody created by hand with that name, which would be an odd thing to do but
+    is not prevented by anything.
+  - >-
+    A marker restored from a backup onto a host that never ran the cleanup, which would
+    date an event that happened elsewhere.
+tests:
+  - name: the dated marker one product leaves in its per-project directory
+    match: true
+    event:
+      kind: artifact.fs
+      agent: cursor
+      payload: {path: "C:\\Users\\alice\\.cursor\\projects\\.agent-data-cleanup-2026-09-20"}
+  - name: the same marker in a POSIX profile
+    match: true
+    event:
+      kind: artifact.fs
+      agent: cursor
+      payload: {path: "/Users/alice/.cursor/projects/.agent-data-cleanup-2026-09-20"}
+  - name: a marker with no date in its name is not this finding
+    match: false
+    event:
+      kind: artifact.fs
+      agent: cursor
+      payload: {path: "/Users/alice/.cursor/projects/.agent-data-cleanup"}
+  - name: an ordinary transcript beside it
+    match: false
+    event:
+      kind: artifact.fs
+      agent: cursor
+      payload:
+        path: "/Users/alice/.cursor/projects/Users-alice-repos-proj/agent-transcripts/a.jsonl"

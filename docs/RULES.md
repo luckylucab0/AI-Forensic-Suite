@@ -22,6 +22,8 @@ Findings are written into the case database next to the events they rest on, and
 |  | [AFX-ANTIFORENSICS-004](#afx-antiforensics-004) | high |
 |  | [AFX-ANTIFORENSICS-005](#afx-antiforensics-005) | low |
 | [`collection_integrity`](#collection-integrity) | [AFX-COLLECTIONINTEGRITY-001](#afx-collectionintegrity-001) | medium |
+|  | [AFX-COLLECTIONINTEGRITY-002](#afx-collectionintegrity-002) | info |
+|  | [AFX-COLLECTIONINTEGRITY-003](#afx-collectionintegrity-003) | low |
 | [`dangerous_commands`](#dangerous-commands) | [AFX-DANGEROUSCOMMANDS-001](#afx-dangerouscommands-001) | high |
 |  | [AFX-DANGEROUSCOMMANDS-002](#afx-dangerouscommands-002) | high |
 |  | [AFX-DANGEROUSCOMMANDS-003](#afx-dangerouscommands-003) | medium |
@@ -251,6 +253,59 @@ A shell profile, or the environment an agent ran in, exports a variable the cata
 - <https://code.claude.com/docs/en/troubleshoot-install.md>
 
 *Samples in the rule file:* 2 / 2 (+/-)
+
+#### AFX-COLLECTIONINTEGRITY-002
+
+**An agent tidied its own data, and left the date it did it**
+
+| | |
+| --- | --- |
+| Severity | info |
+| Pack | `collection_integrity` |
+| Agents | `any` |
+| Event kinds | `artifact.fs` |
+| Fields read | `payload.path` |
+| Tags | `collection-integrity`, `retention`, `vendor-cleanup` |
+
+A file whose own name carries a date, written by an agent's cleanup rather than by a user. Material older than that date may be gone because the product removed it.
+
+*What it matches:* `payload.path matches /[\\/]\.agent-data-cleanup-\d{4}-\d{2}-\d{2}$/`
+
+*Why an analyst cares:* This rule is about the case rather than about the endpoint. An analyst who finds a transcript directory thinner than the conversation it describes has two readings in front of them, and they lead to opposite conclusions: somebody removed material, or the product removed it by itself on a schedule nobody chose. This marker settles that question for one date, so it fires at the lowest severity there is and its whole job is to be in the timeline before an absence is reported as a deletion. . Read it as a bound and not as an inventory. It says a cleanup ran on that date. It does not say what was removed, because nobody has read the rules the cleanup follows, and an empty marker file cannot say. More than one of these means more than one cleanup, and the set of dates is the schedule. . First hand: measured on a clean Windows 11 26200 host and a clean macOS 26.5 host, on a fresh installation with one trivial conversation each. Both wrote the marker.
+
+*Known false positives:*
+
+- A file somebody created by hand with that name, which would be an odd thing to do but is not prevented by anything.
+- A marker restored from a backup onto a host that never ran the cleanup, which would date an event that happened elsewhere.
+
+*Samples in the rule file:* 2 / 2 (+/-)
+
+#### AFX-COLLECTIONINTEGRITY-003
+
+**A URL handler says an agent product was installed on this account**
+
+| | |
+| --- | --- |
+| Severity | low |
+| Pack | `collection_integrity` |
+| Agents | `any` |
+| Event kinds | `config.snapshot` |
+| Fields read | `payload.key`, `payload.text` |
+| Tags | `collection-integrity`, `install-evidence`, `survives-uninstall` |
+
+A URL protocol handler registered under the user's own class keys names an agent product's executable. The key is written by the installer and removed by no uninstaller, so it outlives the product it belongs to.
+
+*What it matches:* `payload.key matches /(?i)\\Software\\Classes\\(cursor\|devin\|windsurf)(\\\|$)/ and payload.text matches /(?i)\.exe/`
+
+*Why an analyst cares:* This rule is about the case rather than about the endpoint, and it exists because of what is on the other side of it. Measured on a clean Windows 11 26200 host: two agent products were installed, used once, and uninstalled through their own uninstallers. The uninstall keys were gone afterwards and these handlers were not, with their command values still naming executables that had been deleted. . So the finding is an instruction rather than an accusation. Compare the path in the command value against the filesystem. If the executable is there, the product is installed and its data should be in this collection; if it is not, the product was installed on this account and later removed, and this key is telling you where it was and that its data may still be on the disk, because an uninstall of these products removes the program and none of the content. . Read the scheme name rather than the product name. One of the two products registers three schemes, one of them under the name it had before it was renamed, and all of them point at the current executable. A key under the old name is therefore not evidence that the old product was ever installed, and a search for the current name finds a third of what that product registered.
+
+*Known false positives:*
+
+- An ordinary installed product. This rule fires on every host where one of these editors is installed, which is why it is low rather than higher: the finding is worth a look at the path, not an escalation.
+- A handler registered by something else that happens to use one of these scheme names, which nothing on Windows prevents.
+- A scheme key restored from a backup or roamed from another machine with the profile.
+
+*Samples in the rule file:* 2 / 3 (+/-)
 
 ## dangerous commands
 

@@ -1,0 +1,96 @@
+id: AFX-COLLECTIONINTEGRITY-003
+pack: collection_integrity
+title: A URL handler says an agent product was installed on this account
+severity: low
+description: >
+  A URL protocol handler registered under the user's own class keys names an agent
+  product's executable. The key is written by the installer and removed by no uninstaller,
+  so it outlives the product it belongs to.
+rationale: >
+  This rule is about the case rather than about the endpoint, and it exists because of what
+  is on the other side of it. Measured on a clean Windows 11 26200 host: two agent products
+  were installed, used once, and uninstalled through their own uninstallers. The uninstall
+  keys were gone afterwards and these handlers were not, with their command values still
+  naming executables that had been deleted.
+  .
+  So the finding is an instruction rather than an accusation. Compare the path in the
+  command value against the filesystem. If the executable is there, the product is
+  installed and its data should be in this collection; if it is not, the product was
+  installed on this account and later removed, and this key is telling you where it was and
+  that its data may still be on the disk, because an uninstall of these products removes
+  the program and none of the content.
+  .
+  Read the scheme name rather than the product name. One of the two products registers
+  three schemes, one of them under the name it had before it was renamed, and all of them
+  point at the current executable. A key under the old name is therefore not evidence that
+  the old product was ever installed, and a search for the current name finds a third of
+  what that product registered.
+applies_to:
+  kinds: [config.snapshot]
+match:
+  all:
+    - field: payload.key
+      # Both the scheme key itself and the command key under it. The scheme names are the
+      # ones the products' own shipped configuration declares, so this list grows with the
+      # catalogue rather than with guesswork.
+      regex: '(?i)\\Software\\Classes\\(cursor|devin|windsurf)(\\|$)'
+    - field: payload.text
+      # Only the value that names an executable, because that is the one an analyst can
+      # check against the filesystem. The scheme key's own values say nothing but that a
+      # protocol exists.
+      regex: '(?i)\.exe'
+tags:
+  - collection-integrity
+  - install-evidence
+  - survives-uninstall
+false_positives:
+  - >-
+    An ordinary installed product. This rule fires on every host where one of these
+    editors is installed, which is why it is low rather than higher: the finding is worth
+    a look at the path, not an escalation.
+  - >-
+    A handler registered by something else that happens to use one of these scheme names,
+    which nothing on Windows prevents.
+  - >-
+    A scheme key restored from a backup or roamed from another machine with the profile.
+tests:
+  - name: the command value of one product's handler, after its uninstaller has run
+    match: true
+    event:
+      kind: config.snapshot
+      agent: cursor
+      payload:
+        key: 'HKEY_CURRENT_USER\Software\Classes\cursor\shell\open\command'
+        text: '(default) = "C:\Users\alice\AppData\Local\Programs\cursor\Cursor.exe" --open-url -- "%1"'
+  - name: the renamed product's handler under the name it used to have
+    match: true
+    event:
+      kind: config.snapshot
+      agent: windsurf
+      payload:
+        key: 'HKEY_CURRENT_USER\Software\Classes\windsurf\shell\open\command'
+        text: '(default) = "C:\Users\alice\AppData\Local\Programs\Devin\Devin.exe" --open-url -- "%1"'
+  - name: the scheme key itself, which names no executable
+    match: false
+    event:
+      kind: config.snapshot
+      agent: cursor
+      payload:
+        key: 'HKEY_CURRENT_USER\Software\Classes\cursor'
+        text: 'URL Protocol = '
+  - name: an unrelated protocol handler on the same host
+    match: false
+    event:
+      kind: config.snapshot
+      agent: crosscutting
+      payload:
+        key: 'HKEY_CURRENT_USER\Software\Classes\mailto\shell\open\command'
+        text: '(default) = "C:\Program Files\Example\mail.exe" "%1"'
+  - name: a managed policy value, which is another rule's business
+    match: false
+    event:
+      kind: config.snapshot
+      agent: windsurf
+      payload:
+        key: 'HKEY_LOCAL_MACHINE\Software\Policies\Windsurf\Devin'
+        text: 'AllowHooks = 1'
