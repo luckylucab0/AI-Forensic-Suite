@@ -378,6 +378,7 @@ artifacts:
   - linux
   paths:
   - '%APPDATA%\Devin\User\globalStorage\state.vscdb'
+  - '%APPDATA%\Devin\User\globalStorage\state.vscdb.backup'
   - '%APPDATA%\Devin\User\globalStorage\state.vscdb-shm'
   - '%APPDATA%\Devin\User\globalStorage\state.vscdb-wal'
   - '%APPDATA%\Windsurf - Next\User\globalStorage\state.vscdb'
@@ -390,12 +391,15 @@ artifacts:
   - '%APPDATA%\Windsurf\User\globalStorage\state.vscdb-shm'
   - '%APPDATA%\Windsurf\User\globalStorage\state.vscdb-wal'
   - ~/.config/Devin/User/globalStorage/state.vscdb
+  - ~/.config/Devin/User/globalStorage/state.vscdb.backup
   - ~/.config/Devin/User/globalStorage/state.vscdb-shm
   - ~/.config/Devin/User/globalStorage/state.vscdb-wal
   - ~/.config/Windsurf/User/globalStorage/state.vscdb
   - ~/.config/Windsurf/User/globalStorage/state.vscdb-shm
   - ~/.config/Windsurf/User/globalStorage/state.vscdb-wal
   - ~/Library/Application Support/Devin/User/globalStorage/state.vscdb
+  - ~/Library/Application Support/Devin/User/globalStorage/state.vscdb.backup
+  - ~/Library/Application Support/Devin/User/globalStorage/storage.json
   - ~/Library/Application Support/Devin/User/globalStorage/state.vscdb-shm
   - ~/Library/Application Support/Devin/User/globalStorage/state.vscdb-wal
   - ~/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb
@@ -427,23 +431,13 @@ artifacts:
 
     The catalogued path had an explanation appended to it, kept here: ~/.config/Windsurf/User/globalStorage/state.vscdb  (ItemTable key: windsurfAuthStatus)
 
-    This file also holds credential material. That is recorded here rather than as a separate entry, because a separate entry marked secret would stop the collector copying a file that is itself the evidence. Folded in from windsurf.auth_credentials: RECORD HASH AND METADATA ONLY for these. The state.vscdb file itself must still be collected under windsurf.ide_global_state_vscdb — apply this as an export-time redaction of one key, never a file-level skip. Rated CRITICAL by a DFIR catalogue because the key is stored unencrypted. The nvim plugin path is a separate Codeium install footprint on the same host.
-
-    The catalogued path had an explanation appended to it, kept here: ~/Library/Application Support/Windsurf/User/globalStorage/state.vscdb  (ItemTable key: windsurfAuthStatus)
-
-    The catalogued path had an explanation appended to it, kept here: %APPDATA%\Windsurf\User\globalStorage\state.vscdb  (ItemTable key: windsurfAuthStatus)
-
-    The catalogued path had an explanation appended to it, kept here: ~/.config/Windsurf/User/globalStorage/state.vscdb  (ItemTable key: windsurfAuthStatus)
-
-    This file also holds credential material. That is recorded here rather than as a separate entry, because a separate entry marked secret would stop the collector copying a file that is itself the evidence. Folded in from windsurf.auth_credentials: RECORD HASH AND METADATA ONLY for these. The state.vscdb file itself must still be collected under windsurf.ide_global_state_vscdb — apply this as an export-time redaction of one key, never a file-level skip. Rated CRITICAL by a DFIR catalogue because the key is stored unencrypted. The nvim plugin path is a separate Codeium install footprint on the same host.
-
-    The catalogued path had an explanation appended to it, kept here: ~/Library/Application Support/Windsurf/User/globalStorage/state.vscdb  (ItemTable key: windsurfAuthStatus)
-
-    The catalogued path had an explanation appended to it, kept here: %APPDATA%\Windsurf\User\globalStorage\state.vscdb  (ItemTable key: windsurfAuthStatus)
-
-    The catalogued path had an explanation appended to it, kept here: ~/.config/Windsurf/User/globalStorage/state.vscdb  (ItemTable key: windsurfAuthStatus)
-
     Record structure: Standard VS Code ItemTable(key, value BLOB). Windsurf-specific keys: windsurfAuthStatus (JSON containing an apiKey field plus base64-encoded protobuf blobs for the cached allowed-models list) and windsurf.settings.cachedPlanInfo (quota/usage counters: quotaUsage, or usedMessages/messages and usedFlowActions/flowActions in newer shapes). Generic VS Code chat keys worth checking: chat.ChatSessionStore.index (observed EMPTY: {"version":1,"entries":{}}), aiService.prompts, workbench.panel.aichat.view.aichat.chatdata, agentSessions.model.cache. CONVERSATION CONTENT IS NOT HERE — only session metadata (title, cwd, lastActivity) and UI state.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.10.31, one installation and one trivial conversation each. Under the current product name this database exists on both, and it does not have the sidecars this entry assumed.
+
+        There is no write ahead log and no shared memory file beside it on either operating system. What sits beside it instead is a full second copy of the database under the same name with a backup suffix, the same size as the original, and it is a database in its own right rather than a journal. That is the opposite of the usual acquisition rule, and both halves matter: collecting only the sidecars named in this entry gets nothing, and a copy that is byte for byte a second database is readable after the original has been overwritten. The backup spellings are in this entry now for all three operating systems.
+
+        Three key groups were read, names only, and are worth knowing before the file is opened. The credential keys are still spelled under the old brand, so a search for the current product name finds neither of them. Three telemetry keys carry the first, current and last session dates, which gives first and last use of the product without touching a transcript. And one key group per session carries the session start time and the count of user messages, keyed by a readable session name, so an analyst can answer when a session ran and how much the user said in it without opening a single message store.
   parser: vscode_state
 - id: windsurf.ide_workspace_state_vscdb
   category: config
@@ -453,13 +447,28 @@ artifacts:
   - windows
   - linux
   paths:
+  - '%APPDATA%\Devin\User\workspaceStorage\<workspace-hash>\state.vscdb'
+  - '%APPDATA%\Devin\User\workspaceStorage\<workspace-hash>\state.vscdb-shm'
+  - '%APPDATA%\Devin\User\workspaceStorage\<workspace-hash>\state.vscdb-wal'
+  - '%APPDATA%\Devin\User\workspaceStorage\<workspace-hash>\state.vscdb.backup'
+  - '%APPDATA%\Devin\User\workspaceStorage\<workspace-hash>\workspace.json'
   - '%APPDATA%\Windsurf\User\workspaceStorage\<hash>\state.vscdb'
   - '%APPDATA%\Windsurf\User\workspaceStorage\<hash>\state.vscdb-shm'
   - '%APPDATA%\Windsurf\User\workspaceStorage\<hash>\state.vscdb-wal'
+  - ~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb
+  - ~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-shm
+  - ~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-wal
+  - ~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb.backup
+  - ~/.config/Devin/User/workspaceStorage/<workspace-hash>/workspace.json
   - ~/.config/Windsurf/User/settings.json
   - ~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb
   - ~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-shm
   - ~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-wal
+  - ~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb
+  - ~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-shm
+  - ~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-wal
+  - ~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb.backup
+  - ~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/workspace.json
   - ~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb
   - ~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb-shm
   - ~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb-wal
@@ -476,6 +485,12 @@ artifacts:
     Explicitly described by an independent instrumentation project as a 'narrow legacy DB history fallback' behind the authoritative Cascade transcript. Do not build the Windsurf parser on this.
 
     Record structure: ItemTable only. Legacy VS Code chat keys (aiService.prompts, workbench.panel.aichat.view.aichat.chatdata) can be populated on older builds and are the only SQLite-resident Windsurf chat text; treat as a narrow legacy fallback, not the primary transcript. workspace.json beside it maps the hash to a folder URI.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host, both running product version 3.10.31. This entry carried only the paths spelled with the old product name, so on a current installation it collected nothing at all, which is the failure this catalogue is built to avoid because the collection reports success. The spellings under the current name are in the entry now, with the full backup copy beside each database, and so is the file that maps the opaque directory name back to the folder that was open.
+
+        Two things about the directory names. Some of them are not hashes but a Unix timestamp in milliseconds, which dates the creation of that workspace without reference to any filesystem time and therefore survives a touched timestamp. And the hash shaped ones are not a digest of the folder path: fifty combinations of normalisation and algorithm failed to reproduce one. The same folder did produce the same name in this product and in the other Electron product in this catalogue, so the name is a join key between the two, and the only way from a name to a path is the workspace file beside it.
+
+    The write ahead log and shared memory spellings are in this entry although neither measured host had them, and the reason is worth stating once: which sidecars existed on an endpoint cannot be read back off the database afterwards, so an entry that does not ask for a log could never have carried one whatever was on the disk. Asking costs two globs.
   parser: vscode_state
 - id: windsurf.auth_credentials
   category: credentials
@@ -793,6 +808,260 @@ artifacts:
 
     Record structure: Same AES-256-GCM envelope and hardcoded key as cascade/*.pb; plaintext is a trajectory protobuf of the same family. Described as 'shorter conversations' / 'background trajectory' files.
   parser: windsurf_cascade
+- id: windsurf.acp_message_stores
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Devin\User\acp-messages\<session-uuid>.db'
+  - '%APPDATA%\Devin\User\acp-messages\<session-uuid>.db-shm'
+  - '%APPDATA%\Devin\User\acp-messages\<session-uuid>.db-wal'
+  - ~/.config/Devin/User/acp-messages/<session-uuid>.db
+  - ~/.config/Devin/User/acp-messages/<session-uuid>.db-shm
+  - ~/.config/Devin/User/acp-messages/<session-uuid>.db-wal
+  - ~/Library/Application Support/Devin/User/acp-messages/<session-uuid>.db
+  - ~/Library/Application Support/Devin/User/acp-messages/<session-uuid>.db-shm
+  - ~/Library/Application Support/Devin/User/acp-messages/<session-uuid>.db-wal
+  format: sqlite
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: observed on Windows 11 26200 and macOS 26.5
+  source_kind: observed
+  tables:
+  - messages
+  - meta
+  volatility: |-
+    No write ahead log was seen beside these, so a live acquisition gets what is committed. Nothing in the measurements says whether they are pruned, and one trivial conversation produced files of a uniform 128 kilobytes, which looks preallocated rather than grown.
+  notes: |-
+    THE CONVERSATION STORE OF THIS PRODUCT ON BOTH MEASURED OPERATING SYSTEMS, and the catalogue had nothing pointing at it. Everything else this catalogue carries for this product is either the protocol buffer trajectory store under the agent configuration directory or key value state, and neither of those is where the messages of a desktop conversation were found.
+
+    One file per session, named with a session identifier, holding a messages table and a small metadata table.
+
+    The counting trap is the reason this entry exists as much as the location is. One conversation produced six files on Windows and five on macOS, and in both cases exactly one of them had rows in its messages table while the rest had none. The application creates session databases in advance. An empty message store is therefore NOT evidence that a conversation was deleted, and an analyst who counts files and subtracts populated ones will report a deletion that never happened.
+
+    Nobody read a row, so the column names and the message encoding are unknown. Expect the same opacity the rest of this product shows and treat a readable message as a bonus rather than as the plan.
+
+    The write ahead log and shared memory spellings are in this entry although neither measured host had them, and the reason is worth stating once: which sidecars existed on an endpoint cannot be read back off the database afterwards, so an entry that does not ask for a log could never have carried one whatever was on the disk. Asking costs two globs.
+  parser: sqlite_generic
+- id: windsurf.cli_sessions_db
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Devin\cli\sessions.db'
+  - '%APPDATA%\Devin\cli\sessions.db-shm'
+  - '%APPDATA%\Devin\cli\sessions.db-wal'
+  - ~/.config/Devin/cli/sessions.db
+  - ~/.config/Devin/cli/sessions.db-shm
+  - ~/.config/Devin/cli/sessions.db-wal
+  - ~/Library/Application Support/Devin/cli/sessions.db
+  - ~/Library/Application Support/Devin/cli/sessions.db-shm
+  - ~/Library/Application Support/Devin/cli/sessions.db-wal
+  format: sqlite
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: observed on Windows 11 26200
+  source_kind: observed
+  tables:
+  - app_state
+  - message_nodes
+  - prompt_history
+  - rendered_commits
+  - sessions
+  - subagent_heads
+  - tool_call_state
+  volatility: |-
+    In write ahead log mode, and the log held two hundred times what the database held: four kilobytes in the file against eight hundred kilobytes in the log. Acquiring the database without its log gets an empty schema and nothing else. This is the clearest example in this catalogue of ADR 0032.
+  notes: |-
+    THE COMMAND LINE PRODUCT'S OWN TRANSCRIPT STORE, and the single most content-bearing file the Windows measurement found for this product. One trivial conversation produced thirty one message nodes in it.
+
+    The table names say what a collection gets. Messages are stored as nodes rather than as a flat list, which means a conversation here is a tree and an analyst should expect branches that were never shown to the user. There is a table of tool call state, so what the agent did is recorded here and not only what it said. There is a table of subagent heads, so work delegated to a second agent is recorded here too and a transcript that looks short may have most of its activity in that table. And there is a prompt history table, which is the user's own input separated from the conversation.
+
+    Found on the Windows host. The macOS host of the same product version had no such directory, although its key value store carried per session keys naming the same command line interface, so the command line had run there without leaving this file. The macOS and Linux spellings are in this entry anyway, because two globs cost nothing and a missing transcript store costs the case.
+
+    Nobody opened a row. Column names, the node linkage and the encoding are unknown.
+  parser: sqlite_generic
+- id: windsurf.cli_session_locks
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Devin\cli\session_locks\<session-name>.lock'
+  - ~/.config/Devin/cli/session_locks/<session-name>.lock
+  - ~/Library/Application Support/Devin/cli/session_locks/<session-name>.lock
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on Windows 11 26200
+  source_kind: observed
+  volatility: |-
+    Six bytes each, and nothing in the measurement says when a lock file is removed. Treat the set as the sessions that existed rather than as the sessions that are running.
+  notes: |-
+    A LIST OF SESSION NAMES, AND THE NAMES ARE THE EVIDENCE. This product names its command line sessions with a readable two word pair rather than with an identifier, and it writes one lock file per session named after that pair.
+
+    The reason to collect a directory of six byte files is that the same names appear as keys in the editor's global key value store, three keys per session carrying the session start time, the count of user messages and the session information. So the directory listing alone gives the set of sessions, and joining it to the key value store gives when each one ran and how much the user said in it. Neither step opens a transcript.
+
+    That join is also the check on a deletion. A session name present in the lock directory and absent from the key value store, or the other way round, is a gap somebody made.
+  parser: text_log
+- id: windsurf.cli_logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Devin\cli\logs\devin_<yyyymmdd-hhmmss>_<pid>.log'
+  - ~/.config/Devin/cli/logs/devin_<yyyymmdd-hhmmss>_<pid>.log
+  - ~/Library/Application Support/Devin/cli/logs/devin_<yyyymmdd-hhmmss>_<pid>.log
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on Windows 11 26200
+  source_kind: observed
+  volatility: |-
+    One file per process, kept after the process ends. No rotation was observed, and the measurement ran for a few hours, so a long-lived endpoint may prune these in a way nobody has seen.
+  notes: |-
+    ONE LOG FILE PER RUN OF THE COMMAND LINE PRODUCT, with the start time and the process identifier in the filename. Sizes ran from five to a hundred kilobytes for a session with one trivial conversation in it, so these are verbose rather than token.
+
+    The filenames alone are a process history: every invocation of the command line interface, dated to the second, surviving after the process is gone and after the product is uninstalled. Nobody read the contents, so what is inside is unknown and should be treated as potentially carrying prompt or path material until somebody has looked.
+  parser: text_log
+- id: windsurf.cli_feature_state
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Devin\cli\plugins\discovered.json'
+  - '%APPDATA%\Devin\cli\plugins\lock.json'
+  - '%LOCALAPPDATA%\devin\cli\<name>.<hash>.bin'
+  - '%LOCALAPPDATA%\devin\telemetry_state.json'
+  - ~/.config/devin/cli/<name>.<hash>.bin
+  - ~/.config/devin/telemetry_state.json
+  - ~/Library/Application Support/devin/cli/<name>.<hash>.bin
+  - ~/Library/Application Support/devin/telemetry_state.json
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on Windows 11 26200
+  source_kind: observed
+  volatility: |-
+    Refreshed from the vendor and overwritten wholesale, so these describe the account and the deployment at the last run and hold no history. The hash in each filename changes with the content, so a changed filename is a changed policy.
+  notes: |-
+    WHAT THE VENDOR HAD SWITCHED ON FOR THIS ACCOUNT AND THIS DEPLOYMENT, in a second directory under a lowercase spelling of the product name that is separate from the one everything else in this entry's product uses. Six files were found, named for a model configuration, a feature flag definition set, team settings, user status, a deployment record and a managed plugin list, each carrying a content hash in its own filename.
+
+    Why this is worth an entry rather than a footnote. The team settings and the deployment record are the closest thing this product has to a local copy of the policy it was under, and the managed plugin list says which extensions an administrator pushed rather than which the user chose. For a governance question that is the evidence; the presence of the product is not.
+
+    The format is binary and undocumented. Collect and hash them and read the filenames; do not promise an analyst the contents.
+  parser: null
+- id: windsurf.shared_storage
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.devin-shared\sharedStorage\state.vscdb'
+  - '%USERPROFILE%\.devin-shared\sharedStorage\state.vscdb-shm'
+  - '%USERPROFILE%\.devin-shared\sharedStorage\state.vscdb-wal'
+  - '%USERPROFILE%\.devin-shared\sharedStorage\state.vscdb.backup'
+  - ~/.devin-shared/sharedStorage/state.vscdb
+  - ~/.devin-shared/sharedStorage/state.vscdb-shm
+  - ~/.devin-shared/sharedStorage/state.vscdb-wal
+  - ~/.devin-shared/sharedStorage/state.vscdb.backup
+  format: sqlite
+  sensitivity: normal
+  collect_priority: durable
+  status: unverified
+  source: observed on Windows 11 26200 and macOS 26.5
+  source_kind: observed
+  tables:
+  - ItemTable
+  volatility: |-
+    Tiny, outside both of the product's expected trees, and untouched by uninstalling the product. It was still there after the measurement's uninstall on both operating systems.
+  notes: |-
+    A LIST OF RECENTLY OPENED PATHS THAT OUTLIVES THE PRODUCT. Four keys, and one of them is the editor's recently opened paths list. That makes this small file the cheapest answer to which projects were worked on, and it is in neither of the two directory trees this catalogue expected for this product: not the editor profile and not the agent configuration directory, but a third dot directory under the home named for sharing between installations.
+
+    It also carries a content trust key, which is the record of which folders the user marked as trusted. On the measured Windows host the agent refused to act in an untrusted folder, so a folder in that key is a folder where the agent was allowed to run, which is a permission decision recorded nowhere else.
+
+    Collected at durable priority because it is small, because it survives the uninstall, and because it answers the first question of an investigation without opening a transcript.
+
+    The write ahead log and shared memory spellings are in this entry although neither measured host had them, and the reason is worth stating once: which sidecars existed on an endpoint cannot be read back off the database afterwards, so an entry that does not ask for a log could never have carried one whatever was on the disk. Asking costs two globs.
+  parser: vscode_state
+- id: windsurf.mcp_oauth_state
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Devin\mcp\oauth\'
+  - ~/.config/Devin/mcp/oauth/
+  - ~/Library/Application Support/Devin/mcp/oauth/
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: unverified
+  source: observed on Windows 11 26200
+  source_kind: observed
+  volatility: |-
+    Authorisation material rotates, so what is here after the fact is not what was in use. Record metadata and a hash before any restart or sign-out.
+  notes: |-
+    RECORD HASH AND METADATA ONLY, never copy contents. The directory appeared under the editor profile on the measured Windows host after the account was signed in, and it is where this product keeps the authorisation state for tool servers it connected to.
+
+    Its evidentiary value is the file list rather than the content: one entry per server the product held an authorisation for names the external services the agent could reach on the user's behalf, which is an egress question, and the catalogue's server configuration entry for this product describes a file that existed on neither measured host.
+  parser: null
+- id: windsurf.device_identity
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\Devin\.devin-migration-complete'
+  - '%APPDATA%\Devin\cli\installation_id'
+  - '%APPDATA%\Devin\machineid'
+  - ~/.codeium/windsurf/native_storage_migrations.lock
+  - ~/.config/Devin/.devin-migration-complete
+  - ~/.config/Devin/cli/installation_id
+  - ~/.config/Devin/machineid
+  - ~/Library/Application Support/Devin/.devin-migration-complete
+  - ~/Library/Application Support/Devin/cli/installation_id
+  - ~/Library/Application Support/Devin/machineid
+  format: text
+  sensitivity: normal
+  collect_priority: durable
+  status: unverified
+  source: observed on Windows 11 26200 and macOS 26.5
+  source_kind: observed
+  volatility: |-
+    Written once and stable across launches, which is what makes them useful and also what makes a changed value a tamper indicator. All of them survived the uninstall on both measured operating systems.
+  notes: |-
+    THREE IDENTIFIERS AND ONE DATE, all of which outlive the product. The device identifier under the editor profile and the installation identifier under the command line directory are both thirty six byte values in the shape of an identifier, and a third one of the same shape sits under the agent configuration directory of the old brand, which this catalogue already carries in windsurf.code_tracker_and_settings.
+
+    The migration marker is the different one and it is the reason this entry is worth reading first. It is written when the product upgrades from its previous name, so its presence says this installation was the earlier product before it was this one, and its timestamp dates that upgrade. A host with this file had the predecessor installed, whatever the current directory names say, and that changes which trees an analyst should expect to find populated.
+
+    All four were still on disk after a normal uninstall on both measured operating systems, which is why they are collected at durable priority: on a machine where the product appears never to have been installed, these are what remains.
+  parser: text_config
 - id: windsurf.memories
   category: memory
   root: user_profile

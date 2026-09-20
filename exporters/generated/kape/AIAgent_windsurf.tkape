@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b0420e330ecb
+# Catalogue digest: 8559b7bb3fe5
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 33 of the 563 catalogue artifacts declare
+# KAPE is Windows only. 33 of the 571 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -29,6 +29,24 @@ Version: 1.0
 Id: 711dd7b5-5e28-fe09-8519-7a1a3744a8e1
 RecreateDirectories: true
 Targets:
+    -
+        Name: windsurf.acp_message_stores
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User\acp-messages
+        FileMask: "*.db"
+        Recursive: false
+    -
+        Name: windsurf.acp_message_stores
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User\acp-messages
+        FileMask: "*.db-shm"
+        Recursive: false
+    -
+        Name: windsurf.acp_message_stores
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User\acp-messages
+        FileMask: "*.db-wal"
+        Recursive: false
     -
         Name: windsurf.acp_registry
         Category: config
@@ -96,6 +114,60 @@ Targets:
         FileMask: "*.jsonl"
         Recursive: false
     -
+        Name: windsurf.cli_feature_state
+        Category: cache
+        Path: C:\Users\%user%\AppData\Local\devin
+        FileMask: "telemetry_state.json"
+        Recursive: false
+    -
+        Name: windsurf.cli_feature_state
+        Category: cache
+        Path: C:\Users\%user%\AppData\Local\devin\cli
+        FileMask: "*.*.bin"
+        Recursive: false
+    -
+        Name: windsurf.cli_feature_state
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Devin\cli\plugins
+        FileMask: "discovered.json"
+        Recursive: false
+    -
+        Name: windsurf.cli_feature_state
+        Category: cache
+        Path: C:\Users\%user%\AppData\Roaming\Devin\cli\plugins
+        FileMask: "lock.json"
+        Recursive: false
+    -
+        Name: windsurf.cli_logs
+        Category: log
+        Path: C:\Users\%user%\AppData\Roaming\Devin\cli\logs
+        FileMask: "devin_*_*.log"
+        Recursive: false
+    -
+        Name: windsurf.cli_session_locks
+        Category: log
+        Path: C:\Users\%user%\AppData\Roaming\Devin\cli\session_locks
+        FileMask: "*.lock"
+        Recursive: false
+    -
+        Name: windsurf.cli_sessions_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Devin\cli
+        FileMask: "sessions.db"
+        Recursive: false
+    -
+        Name: windsurf.cli_sessions_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Devin\cli
+        FileMask: "sessions.db-shm"
+        Recursive: false
+    -
+        Name: windsurf.cli_sessions_db
+        Category: transcript
+        Path: C:\Users\%user%\AppData\Roaming\Devin\cli
+        FileMask: "sessions.db-wal"
+        Recursive: false
+    -
         Name: windsurf.code_tracker_and_settings
         Category: config
         Path: C:\Users\%user%\.codeium
@@ -117,6 +189,30 @@ Targets:
         Name: windsurf.code_tracker_and_settings
         Category: config
         Path: C:\Users\%user%\.codeium\windsurf\installation_id
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: windsurf.device_identity
+        Category: install_evidence
+        Path: C:\Users\%user%\.codeium\windsurf
+        FileMask: "native_storage_migrations.lock"
+        Recursive: false
+    -
+        Name: windsurf.device_identity
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Devin
+        FileMask: ".devin-migration-complete"
+        Recursive: false
+    -
+        Name: windsurf.device_identity
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Devin\cli\installation_id
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: windsurf.device_identity
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Roaming\Devin\machineid
         FileMask: "*"
         Recursive: true
     -
@@ -190,6 +286,12 @@ Targets:
         Category: config
         Path: C:\Users\%user%\AppData\Roaming\Devin\User\globalStorage
         FileMask: "state.vscdb-wal"
+        Recursive: false
+    -
+        Name: windsurf.ide_global_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User\globalStorage
+        FileMask: "state.vscdb.backup"
         Recursive: false
     -
         Name: windsurf.ide_global_state_vscdb
@@ -272,6 +374,36 @@ Targets:
     -
         Name: windsurf.ide_workspace_state_vscdb
         Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User\workspaceStorage\*
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: windsurf.ide_workspace_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User\workspaceStorage\*
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: windsurf.ide_workspace_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User\workspaceStorage\*
+        FileMask: "state.vscdb-wal"
+        Recursive: false
+    -
+        Name: windsurf.ide_workspace_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User\workspaceStorage\*
+        FileMask: "state.vscdb.backup"
+        Recursive: false
+    -
+        Name: windsurf.ide_workspace_state_vscdb
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Devin\User\workspaceStorage\*
+        FileMask: "workspace.json"
+        Recursive: false
+    -
+        Name: windsurf.ide_workspace_state_vscdb
+        Category: config
         Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\workspaceStorage\*
         FileMask: "state.vscdb"
         Recursive: false
@@ -336,6 +468,12 @@ Targets:
         FileMask: "*"
         Recursive: true
     -
+        Name: windsurf.mcp_oauth_state
+        Category: credentials
+        Path: C:\Users\%user%\AppData\Roaming\Devin\mcp\oauth
+        FileMask: "*"
+        Recursive: true
+    -
         Name: windsurf.memories
         Category: memory
         Path: C:\Users\%user%\.codeium\windsurf-insiders\memories
@@ -377,6 +515,30 @@ Targets:
         Path: C:\Users\%user%
         FileMask: ".windsurf-server"
         Recursive: true
+    -
+        Name: windsurf.shared_storage
+        Category: config
+        Path: C:\Users\%user%\.devin-shared\sharedStorage
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: windsurf.shared_storage
+        Category: config
+        Path: C:\Users\%user%\.devin-shared\sharedStorage
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: windsurf.shared_storage
+        Category: config
+        Path: C:\Users\%user%\.devin-shared\sharedStorage
+        FileMask: "state.vscdb-wal"
+        Recursive: false
+    -
+        Name: windsurf.shared_storage
+        Category: config
+        Path: C:\Users\%user%\.devin-shared\sharedStorage
+        FileMask: "state.vscdb.backup"
+        Recursive: false
     -
         Name: windsurf.system_config
         Category: instructions

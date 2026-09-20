@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b0420e330ecb
+# Catalogue digest: 8559b7bb3fe5
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,8 +8,8 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# Scope: the 103 artifacts the catalogue files under transcript and prompt_history.
-# The other 460 are configuration, credentials, caches, logs and install
+# Scope: the 105 artifacts the catalogue files under transcript and prompt_history.
+# The other 466 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
 # credential store what an analyst wants is the file, which is what the Collect
@@ -454,6 +454,9 @@ sources:
       warp,warp.sqlite,file_only,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite
       warp,warp.sqlite,file_only,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite-shm
       warp,warp.sqlite,file_only,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite-wal
+      windsurf,windsurf.acp_message_stores,file_only,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db
+      windsurf,windsurf.acp_message_stores,file_only,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db-shm
+      windsurf,windsurf.acp_message_stores,file_only,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db-wal
       windsurf,windsurf.cascade_trajectories,file_only,C:/Users/*/.codeium/windsurf-insiders/cascade/*
       windsurf,windsurf.cascade_trajectories,file_only,C:/Users/*/.codeium/windsurf-next/cascade/*
       windsurf,windsurf.cascade_trajectories,file_only,C:/Users/*/.codeium/windsurf/cascade/*
@@ -461,6 +464,9 @@ sources:
       windsurf,windsurf.cascade_trajectories,file_only,C:/Users/*/.codeium/windsurf/cascade/*.pb.archived
       windsurf,windsurf.cascade_transcripts,generic_jsonl,C:/Users/*/.devin/transcripts/*.jsonl
       windsurf,windsurf.cascade_transcripts,generic_jsonl,C:/Users/*/.windsurf/transcripts/*.jsonl
+      windsurf,windsurf.cli_sessions_db,file_only,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db
+      windsurf,windsurf.cli_sessions_db,file_only,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db-shm
+      windsurf,windsurf.cli_sessions_db,file_only,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db-wal
       windsurf,windsurf.implicit_trajectories,file_only,C:/Users/*/.codeium/windsurf/implicit/*.pb
       zed,zed.sidebar_threads,file_only,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite
       zed,zed.sidebar_threads,file_only,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite-shm
@@ -1466,6 +1472,18 @@ sources:
       warp,warp.sqlite,file_only,/var/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite
       warp,warp.sqlite,file_only,/var/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm
       warp,warp.sqlite,file_only,/var/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal
+      windsurf,windsurf.acp_message_stores,file_only,/Users/*/.config/Devin/User/acp-messages/*.db
+      windsurf,windsurf.acp_message_stores,file_only,/Users/*/.config/Devin/User/acp-messages/*.db-shm
+      windsurf,windsurf.acp_message_stores,file_only,/Users/*/.config/Devin/User/acp-messages/*.db-wal
+      windsurf,windsurf.acp_message_stores,file_only,/Users/*/Library/Application Support/Devin/User/acp-messages/*.db
+      windsurf,windsurf.acp_message_stores,file_only,/Users/*/Library/Application Support/Devin/User/acp-messages/*.db-shm
+      windsurf,windsurf.acp_message_stores,file_only,/Users/*/Library/Application Support/Devin/User/acp-messages/*.db-wal
+      windsurf,windsurf.acp_message_stores,file_only,/var/root/.config/Devin/User/acp-messages/*.db
+      windsurf,windsurf.acp_message_stores,file_only,/var/root/.config/Devin/User/acp-messages/*.db-shm
+      windsurf,windsurf.acp_message_stores,file_only,/var/root/.config/Devin/User/acp-messages/*.db-wal
+      windsurf,windsurf.acp_message_stores,file_only,/var/root/Library/Application Support/Devin/User/acp-messages/*.db
+      windsurf,windsurf.acp_message_stores,file_only,/var/root/Library/Application Support/Devin/User/acp-messages/*.db-shm
+      windsurf,windsurf.acp_message_stores,file_only,/var/root/Library/Application Support/Devin/User/acp-messages/*.db-wal
       windsurf,windsurf.cascade_trajectories,file_only,/Users/*/.codeium/windsurf-insiders/cascade/*
       windsurf,windsurf.cascade_trajectories,file_only,/Users/*/.codeium/windsurf-next/cascade/*
       windsurf,windsurf.cascade_trajectories,file_only,/Users/*/.codeium/windsurf/cascade/*
@@ -1480,6 +1498,18 @@ sources:
       windsurf,windsurf.cascade_transcripts,generic_jsonl,/Users/*/.windsurf/transcripts/*.jsonl
       windsurf,windsurf.cascade_transcripts,generic_jsonl,/var/root/.devin/transcripts/*.jsonl
       windsurf,windsurf.cascade_transcripts,generic_jsonl,/var/root/.windsurf/transcripts/*.jsonl
+      windsurf,windsurf.cli_sessions_db,file_only,/Users/*/.config/Devin/cli/sessions.db
+      windsurf,windsurf.cli_sessions_db,file_only,/Users/*/.config/Devin/cli/sessions.db-shm
+      windsurf,windsurf.cli_sessions_db,file_only,/Users/*/.config/Devin/cli/sessions.db-wal
+      windsurf,windsurf.cli_sessions_db,file_only,/Users/*/Library/Application Support/Devin/cli/sessions.db
+      windsurf,windsurf.cli_sessions_db,file_only,/Users/*/Library/Application Support/Devin/cli/sessions.db-shm
+      windsurf,windsurf.cli_sessions_db,file_only,/Users/*/Library/Application Support/Devin/cli/sessions.db-wal
+      windsurf,windsurf.cli_sessions_db,file_only,/var/root/.config/Devin/cli/sessions.db
+      windsurf,windsurf.cli_sessions_db,file_only,/var/root/.config/Devin/cli/sessions.db-shm
+      windsurf,windsurf.cli_sessions_db,file_only,/var/root/.config/Devin/cli/sessions.db-wal
+      windsurf,windsurf.cli_sessions_db,file_only,/var/root/Library/Application Support/Devin/cli/sessions.db
+      windsurf,windsurf.cli_sessions_db,file_only,/var/root/Library/Application Support/Devin/cli/sessions.db-shm
+      windsurf,windsurf.cli_sessions_db,file_only,/var/root/Library/Application Support/Devin/cli/sessions.db-wal
       windsurf,windsurf.implicit_trajectories,file_only,/Users/*/.codeium/windsurf/implicit/*.pb
       windsurf,windsurf.implicit_trajectories,file_only,/var/root/.codeium/windsurf/implicit/*.pb
       zed,zed.sidebar_threads,file_only,/Users/*/Library/Application Support/Zed/db/0-stable/db.sqlite
@@ -2468,6 +2498,18 @@ sources:
       warp,warp.sqlite,file_only,/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite
       warp,warp.sqlite,file_only,/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm
       warp,warp.sqlite,file_only,/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal
+      windsurf,windsurf.acp_message_stores,file_only,/home/*/.config/Devin/User/acp-messages/*.db
+      windsurf,windsurf.acp_message_stores,file_only,/home/*/.config/Devin/User/acp-messages/*.db-shm
+      windsurf,windsurf.acp_message_stores,file_only,/home/*/.config/Devin/User/acp-messages/*.db-wal
+      windsurf,windsurf.acp_message_stores,file_only,/home/*/Library/Application Support/Devin/User/acp-messages/*.db
+      windsurf,windsurf.acp_message_stores,file_only,/home/*/Library/Application Support/Devin/User/acp-messages/*.db-shm
+      windsurf,windsurf.acp_message_stores,file_only,/home/*/Library/Application Support/Devin/User/acp-messages/*.db-wal
+      windsurf,windsurf.acp_message_stores,file_only,/root/.config/Devin/User/acp-messages/*.db
+      windsurf,windsurf.acp_message_stores,file_only,/root/.config/Devin/User/acp-messages/*.db-shm
+      windsurf,windsurf.acp_message_stores,file_only,/root/.config/Devin/User/acp-messages/*.db-wal
+      windsurf,windsurf.acp_message_stores,file_only,/root/Library/Application Support/Devin/User/acp-messages/*.db
+      windsurf,windsurf.acp_message_stores,file_only,/root/Library/Application Support/Devin/User/acp-messages/*.db-shm
+      windsurf,windsurf.acp_message_stores,file_only,/root/Library/Application Support/Devin/User/acp-messages/*.db-wal
       windsurf,windsurf.cascade_trajectories,file_only,/home/*/.codeium/windsurf-insiders/cascade/*
       windsurf,windsurf.cascade_trajectories,file_only,/home/*/.codeium/windsurf-next/cascade/*
       windsurf,windsurf.cascade_trajectories,file_only,/home/*/.codeium/windsurf/cascade/*
@@ -2482,6 +2524,18 @@ sources:
       windsurf,windsurf.cascade_transcripts,generic_jsonl,/home/*/.windsurf/transcripts/*.jsonl
       windsurf,windsurf.cascade_transcripts,generic_jsonl,/root/.devin/transcripts/*.jsonl
       windsurf,windsurf.cascade_transcripts,generic_jsonl,/root/.windsurf/transcripts/*.jsonl
+      windsurf,windsurf.cli_sessions_db,file_only,/home/*/.config/Devin/cli/sessions.db
+      windsurf,windsurf.cli_sessions_db,file_only,/home/*/.config/Devin/cli/sessions.db-shm
+      windsurf,windsurf.cli_sessions_db,file_only,/home/*/.config/Devin/cli/sessions.db-wal
+      windsurf,windsurf.cli_sessions_db,file_only,/home/*/Library/Application Support/Devin/cli/sessions.db
+      windsurf,windsurf.cli_sessions_db,file_only,/home/*/Library/Application Support/Devin/cli/sessions.db-shm
+      windsurf,windsurf.cli_sessions_db,file_only,/home/*/Library/Application Support/Devin/cli/sessions.db-wal
+      windsurf,windsurf.cli_sessions_db,file_only,/root/.config/Devin/cli/sessions.db
+      windsurf,windsurf.cli_sessions_db,file_only,/root/.config/Devin/cli/sessions.db-shm
+      windsurf,windsurf.cli_sessions_db,file_only,/root/.config/Devin/cli/sessions.db-wal
+      windsurf,windsurf.cli_sessions_db,file_only,/root/Library/Application Support/Devin/cli/sessions.db
+      windsurf,windsurf.cli_sessions_db,file_only,/root/Library/Application Support/Devin/cli/sessions.db-shm
+      windsurf,windsurf.cli_sessions_db,file_only,/root/Library/Application Support/Devin/cli/sessions.db-wal
       windsurf,windsurf.implicit_trajectories,file_only,/home/*/.codeium/windsurf/implicit/*.pb
       windsurf,windsurf.implicit_trajectories,file_only,/root/.codeium/windsurf/implicit/*.pb
       zed,zed.flatpak_legacy_threads,file_only,/home/*/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/**

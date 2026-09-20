@@ -71,6 +71,8 @@ LOGS = frozenset(
         "pi.debug_log",
         "qwen_code.debug_logs",
         "qwen_code.plan_files",
+        "windsurf.cli_logs",
+        "windsurf.cli_session_locks",
         "windsurf.plugin_log",
         "zed.logs",
     }

@@ -86,9 +86,12 @@ STORES = frozenset(
         "opencode.db",
         "vscode.state_vscdb",
         "warp.sqlite",
+        "windsurf.acp_message_stores",
+        "windsurf.cli_sessions_db",
         "windsurf.embedding_database",
         "windsurf.ide_global_state_vscdb",
         "windsurf.ide_workspace_state_vscdb",
+        "windsurf.shared_storage",
         "zed.sidebar_threads",
         "zed.threads_db",
     }

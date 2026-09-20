@@ -10478,6 +10478,30 @@ $EmbeddedCatalogueJson = @'
             "agent": "windsurf",
             "artifacts": [
                 {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "windsurf.acp_message_stores",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Devin\\User\\acp-messages\\<session-uuid>.db",
+                        "%APPDATA%\\Devin\\User\\acp-messages\\<session-uuid>.db-shm",
+                        "%APPDATA%\\Devin\\User\\acp-messages\\<session-uuid>.db-wal",
+                        "~/.config/Devin/User/acp-messages/<session-uuid>.db",
+                        "~/.config/Devin/User/acp-messages/<session-uuid>.db-shm",
+                        "~/.config/Devin/User/acp-messages/<session-uuid>.db-wal",
+                        "~/Library/Application Support/Devin/User/acp-messages/<session-uuid>.db",
+                        "~/Library/Application Support/Devin/User/acp-messages/<session-uuid>.db-shm",
+                        "~/Library/Application Support/Devin/User/acp-messages/<session-uuid>.db-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
                     "category": "config",
                     "collect_priority": "normal",
                     "id": "windsurf.acp_registry",
@@ -10554,6 +10578,89 @@ $EmbeddedCatalogueJson = @'
                     "status": "verified"
                 },
                 {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "windsurf.cli_feature_state",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Devin\\cli\\plugins\\discovered.json",
+                        "%APPDATA%\\Devin\\cli\\plugins\\lock.json",
+                        "%LOCALAPPDATA%\\devin\\cli\\<name>.<hash>.bin",
+                        "%LOCALAPPDATA%\\devin\\telemetry_state.json",
+                        "~/.config/devin/cli/<name>.<hash>.bin",
+                        "~/.config/devin/telemetry_state.json",
+                        "~/Library/Application Support/devin/cli/<name>.<hash>.bin",
+                        "~/Library/Application Support/devin/telemetry_state.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "windsurf.cli_logs",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Devin\\cli\\logs\\devin_<yyyymmdd-hhmmss>_<pid>.log",
+                        "~/.config/Devin/cli/logs/devin_<yyyymmdd-hhmmss>_<pid>.log",
+                        "~/Library/Application Support/Devin/cli/logs/devin_<yyyymmdd-hhmmss>_<pid>.log"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "windsurf.cli_session_locks",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Devin\\cli\\session_locks\\<session-name>.lock",
+                        "~/.config/Devin/cli/session_locks/<session-name>.lock",
+                        "~/Library/Application Support/Devin/cli/session_locks/<session-name>.lock"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "windsurf.cli_sessions_db",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Devin\\cli\\sessions.db",
+                        "%APPDATA%\\Devin\\cli\\sessions.db-shm",
+                        "%APPDATA%\\Devin\\cli\\sessions.db-wal",
+                        "~/.config/Devin/cli/sessions.db",
+                        "~/.config/Devin/cli/sessions.db-shm",
+                        "~/.config/Devin/cli/sessions.db-wal",
+                        "~/Library/Application Support/Devin/cli/sessions.db",
+                        "~/Library/Application Support/Devin/cli/sessions.db-shm",
+                        "~/Library/Application Support/Devin/cli/sessions.db-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
                     "category": "config",
                     "collect_priority": "normal",
                     "id": "windsurf.code_tracker_and_settings",
@@ -10572,6 +10679,31 @@ $EmbeddedCatalogueJson = @'
                     "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "durable",
+                    "id": "windsurf.device_identity",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Devin\\.devin-migration-complete",
+                        "%APPDATA%\\Devin\\cli\\installation_id",
+                        "%APPDATA%\\Devin\\machineid",
+                        "~/.codeium/windsurf/native_storage_migrations.lock",
+                        "~/.config/Devin/.devin-migration-complete",
+                        "~/.config/Devin/cli/installation_id",
+                        "~/.config/Devin/machineid",
+                        "~/Library/Application Support/Devin/.devin-migration-complete",
+                        "~/Library/Application Support/Devin/cli/installation_id",
+                        "~/Library/Application Support/Devin/machineid"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
                 },
                 {
                     "category": "cache",
@@ -10702,6 +10834,7 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "%APPDATA%\\Devin\\User\\globalStorage\\state.vscdb",
+                        "%APPDATA%\\Devin\\User\\globalStorage\\state.vscdb.backup",
                         "%APPDATA%\\Devin\\User\\globalStorage\\state.vscdb-shm",
                         "%APPDATA%\\Devin\\User\\globalStorage\\state.vscdb-wal",
                         "%APPDATA%\\Windsurf - Next\\User\\globalStorage\\state.vscdb",
@@ -10714,12 +10847,15 @@ $EmbeddedCatalogueJson = @'
                         "%APPDATA%\\Windsurf\\User\\globalStorage\\state.vscdb-shm",
                         "%APPDATA%\\Windsurf\\User\\globalStorage\\state.vscdb-wal",
                         "~/.config/Devin/User/globalStorage/state.vscdb",
+                        "~/.config/Devin/User/globalStorage/state.vscdb.backup",
                         "~/.config/Devin/User/globalStorage/state.vscdb-shm",
                         "~/.config/Devin/User/globalStorage/state.vscdb-wal",
                         "~/.config/Windsurf/User/globalStorage/state.vscdb",
                         "~/.config/Windsurf/User/globalStorage/state.vscdb-shm",
                         "~/.config/Windsurf/User/globalStorage/state.vscdb-wal",
                         "~/Library/Application Support/Devin/User/globalStorage/state.vscdb",
+                        "~/Library/Application Support/Devin/User/globalStorage/state.vscdb.backup",
+                        "~/Library/Application Support/Devin/User/globalStorage/storage.json",
                         "~/Library/Application Support/Devin/User/globalStorage/state.vscdb-shm",
                         "~/Library/Application Support/Devin/User/globalStorage/state.vscdb-wal",
                         "~/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb",
@@ -10771,13 +10907,28 @@ $EmbeddedCatalogueJson = @'
                         "linux"
                     ],
                     "paths": [
+                        "%APPDATA%\\Devin\\User\\workspaceStorage\\<workspace-hash>\\state.vscdb",
+                        "%APPDATA%\\Devin\\User\\workspaceStorage\\<workspace-hash>\\state.vscdb-shm",
+                        "%APPDATA%\\Devin\\User\\workspaceStorage\\<workspace-hash>\\state.vscdb-wal",
+                        "%APPDATA%\\Devin\\User\\workspaceStorage\\<workspace-hash>\\state.vscdb.backup",
+                        "%APPDATA%\\Devin\\User\\workspaceStorage\\<workspace-hash>\\workspace.json",
                         "%APPDATA%\\Windsurf\\User\\workspaceStorage\\<hash>\\state.vscdb",
                         "%APPDATA%\\Windsurf\\User\\workspaceStorage\\<hash>\\state.vscdb-shm",
                         "%APPDATA%\\Windsurf\\User\\workspaceStorage\\<hash>\\state.vscdb-wal",
+                        "~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb",
+                        "~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-shm",
+                        "~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-wal",
+                        "~/.config/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb.backup",
+                        "~/.config/Devin/User/workspaceStorage/<workspace-hash>/workspace.json",
                         "~/.config/Windsurf/User/settings.json",
                         "~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb",
                         "~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-shm",
                         "~/.config/Windsurf/User/workspaceStorage/<hash>/state.vscdb-wal",
+                        "~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb",
+                        "~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-shm",
+                        "~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb-wal",
+                        "~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/state.vscdb.backup",
+                        "~/Library/Application Support/Devin/User/workspaceStorage/<workspace-hash>/workspace.json",
                         "~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb",
                         "~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb-shm",
                         "~/Library/Application Support/Windsurf/User/workspaceStorage/<hash>/state.vscdb-wal"
@@ -10865,6 +11016,24 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "root": "project",
                     "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "windsurf.mcp_oauth_state",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Devin\\mcp\\oauth\\",
+                        "~/.config/Devin/mcp/oauth/",
+                        "~/Library/Application Support/Devin/mcp/oauth/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
                     "status": "unverified"
                 },
                 {
@@ -10963,6 +11132,29 @@ $EmbeddedCatalogueJson = @'
                     "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "windsurf.shared_storage",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.devin-shared\\sharedStorage\\state.vscdb",
+                        "%USERPROFILE%\\.devin-shared\\sharedStorage\\state.vscdb-shm",
+                        "%USERPROFILE%\\.devin-shared\\sharedStorage\\state.vscdb-wal",
+                        "%USERPROFILE%\\.devin-shared\\sharedStorage\\state.vscdb.backup",
+                        "~/.devin-shared/sharedStorage/state.vscdb",
+                        "~/.devin-shared/sharedStorage/state.vscdb-shm",
+                        "~/.devin-shared/sharedStorage/state.vscdb-wal",
+                        "~/.devin-shared/sharedStorage/state.vscdb.backup"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
                 },
                 {
                     "category": "instructions",
@@ -11184,7 +11376,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "b9512af0ad1f87efda3902509a2940142d50a66eef308e2c6d141031590965b9"
+    "sha256": "e4ba393418c382b833813831ab8b60d13ad71bada236a2aeef59defb47946838"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

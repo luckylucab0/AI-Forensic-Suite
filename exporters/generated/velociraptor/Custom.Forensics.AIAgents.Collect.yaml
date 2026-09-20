@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b0420e330ecb
+# Catalogue digest: 8559b7bb3fe5
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1363,6 +1363,9 @@ sources:
     warp,warp.sqlite,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite
     warp,warp.sqlite,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite-shm
     warp,warp.sqlite,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite-wal
+    windsurf,windsurf.acp_message_stores,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db
+    windsurf,windsurf.acp_message_stores,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db-shm
+    windsurf,windsurf.acp_message_stores,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db-wal
     windsurf,windsurf.acp_registry,C:/Users/*/.windsurf-next/acp/registry.json
     windsurf,windsurf.acp_registry,C:/Users/*/.windsurf/acp/registry.json
     windsurf,windsurf.auth_credentials,C:/Users/*/.codeium/config.json
@@ -1374,10 +1377,23 @@ sources:
     windsurf,windsurf.cascade_trajectories,C:/Users/*/.codeium/windsurf/cascade/*.pb.archived
     windsurf,windsurf.cascade_transcripts,C:/Users/*/.devin/transcripts/*.jsonl
     windsurf,windsurf.cascade_transcripts,C:/Users/*/.windsurf/transcripts/*.jsonl
+    windsurf,windsurf.cli_feature_state,C:/Users/*/AppData/Local/devin/cli/*.*.bin
+    windsurf,windsurf.cli_feature_state,C:/Users/*/AppData/Local/devin/telemetry_state.json
+    windsurf,windsurf.cli_feature_state,C:/Users/*/AppData/Roaming/Devin/cli/plugins/discovered.json
+    windsurf,windsurf.cli_feature_state,C:/Users/*/AppData/Roaming/Devin/cli/plugins/lock.json
+    windsurf,windsurf.cli_logs,C:/Users/*/AppData/Roaming/Devin/cli/logs/devin_*_*.log
+    windsurf,windsurf.cli_session_locks,C:/Users/*/AppData/Roaming/Devin/cli/session_locks/*.lock
+    windsurf,windsurf.cli_sessions_db,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db
+    windsurf,windsurf.cli_sessions_db,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db-shm
+    windsurf,windsurf.cli_sessions_db,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db-wal
     windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/user_settings.pb
     windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/windsurf/code_tracker/**
     windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/windsurf/installation_id
     windsurf,windsurf.code_tracker_and_settings,C:/Users/*/.codeium/windsurf/user_settings.pb
+    windsurf,windsurf.device_identity,C:/Users/*/.codeium/windsurf/native_storage_migrations.lock
+    windsurf,windsurf.device_identity,C:/Users/*/AppData/Roaming/Devin/.devin-migration-complete
+    windsurf,windsurf.device_identity,C:/Users/*/AppData/Roaming/Devin/cli/installation_id
+    windsurf,windsurf.device_identity,C:/Users/*/AppData/Roaming/Devin/machineid
     windsurf,windsurf.embedding_database,C:/Users/*/.codeium/windsurf/database/*/**
     windsurf,windsurf.embedding_database,C:/Users/*/.codeium/windsurf/database/*/embedding_database.sqlite
     windsurf,windsurf.embedding_database,C:/Users/*/.codeium/windsurf/database/*/embedding_database.sqlite-shm
@@ -1388,6 +1404,7 @@ sources:
     windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Devin/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Devin/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Devin/User/globalStorage/state.vscdb-wal
+    windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Devin/User/globalStorage/state.vscdb.backup
     windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf - Next/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf - Next/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf - Next/User/globalStorage/state.vscdb-wal
@@ -1401,6 +1418,11 @@ sources:
     windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Windsurf/User/keybindings.json
     windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Windsurf/User/settings.json
     windsurf,windsurf.ide_user_data,C:/Users/*/AppData/Roaming/Windsurf/argv.json
+    windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Devin/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Devin/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Devin/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Devin/User/workspaceStorage/*/state.vscdb.backup
+    windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Devin/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-wal
@@ -1411,6 +1433,7 @@ sources:
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/.devin-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/.windsurf-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/AppData/Local/Programs/Windsurf/**
+    windsurf,windsurf.mcp_oauth_state,C:/Users/*/AppData/Roaming/Devin/mcp/oauth/**
     windsurf,windsurf.memories,C:/Users/*/.codeium/windsurf-insiders/memories/*
     windsurf,windsurf.memories,C:/Users/*/.codeium/windsurf-next/memories/*
     windsurf,windsurf.memories,C:/Users/*/.codeium/windsurf/memories/*
@@ -1418,6 +1441,10 @@ sources:
     windsurf,windsurf.plugin_log,C:/Users/*/.codeium/codeium.log
     windsurf,windsurf.server_data,C:/Users/*/.devin-server/**
     windsurf,windsurf.server_data,C:/Users/*/.windsurf-server/**
+    windsurf,windsurf.shared_storage,C:/Users/*/.devin-shared/sharedStorage/state.vscdb
+    windsurf,windsurf.shared_storage,C:/Users/*/.devin-shared/sharedStorage/state.vscdb-shm
+    windsurf,windsurf.shared_storage,C:/Users/*/.devin-shared/sharedStorage/state.vscdb-wal
+    windsurf,windsurf.shared_storage,C:/Users/*/.devin-shared/sharedStorage/state.vscdb.backup
     windsurf,windsurf.worktrees,C:/Users/*/.devin/worktrees/*
     windsurf,windsurf.worktrees,C:/Users/*/.windsurf/worktrees/*
     zed,zed.extensions,C:/Users/*/AppData/Local/Zed/debug_adapters/**
@@ -3720,6 +3747,18 @@ sources:
     warp,warp.sqlite,/var/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite
     warp,warp.sqlite,/var/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm
     warp,warp.sqlite,/var/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal
+    windsurf,windsurf.acp_message_stores,/Users/*/.config/Devin/User/acp-messages/*.db
+    windsurf,windsurf.acp_message_stores,/Users/*/.config/Devin/User/acp-messages/*.db-shm
+    windsurf,windsurf.acp_message_stores,/Users/*/.config/Devin/User/acp-messages/*.db-wal
+    windsurf,windsurf.acp_message_stores,/Users/*/Library/Application Support/Devin/User/acp-messages/*.db
+    windsurf,windsurf.acp_message_stores,/Users/*/Library/Application Support/Devin/User/acp-messages/*.db-shm
+    windsurf,windsurf.acp_message_stores,/Users/*/Library/Application Support/Devin/User/acp-messages/*.db-wal
+    windsurf,windsurf.acp_message_stores,/var/root/.config/Devin/User/acp-messages/*.db
+    windsurf,windsurf.acp_message_stores,/var/root/.config/Devin/User/acp-messages/*.db-shm
+    windsurf,windsurf.acp_message_stores,/var/root/.config/Devin/User/acp-messages/*.db-wal
+    windsurf,windsurf.acp_message_stores,/var/root/Library/Application Support/Devin/User/acp-messages/*.db
+    windsurf,windsurf.acp_message_stores,/var/root/Library/Application Support/Devin/User/acp-messages/*.db-shm
+    windsurf,windsurf.acp_message_stores,/var/root/Library/Application Support/Devin/User/acp-messages/*.db-wal
     windsurf,windsurf.acp_registry,/Users/*/.windsurf-next/acp/registry.json
     windsurf,windsurf.acp_registry,/Users/*/.windsurf/acp/registry.json
     windsurf,windsurf.acp_registry,/var/root/.windsurf-next/acp/registry.json
@@ -3746,6 +3785,34 @@ sources:
     windsurf,windsurf.cascade_transcripts,/Users/*/.windsurf/transcripts/*.jsonl
     windsurf,windsurf.cascade_transcripts,/var/root/.devin/transcripts/*.jsonl
     windsurf,windsurf.cascade_transcripts,/var/root/.windsurf/transcripts/*.jsonl
+    windsurf,windsurf.cli_feature_state,/Users/*/.config/devin/cli/*.*.bin
+    windsurf,windsurf.cli_feature_state,/Users/*/.config/devin/telemetry_state.json
+    windsurf,windsurf.cli_feature_state,/Users/*/Library/Application Support/devin/cli/*.*.bin
+    windsurf,windsurf.cli_feature_state,/Users/*/Library/Application Support/devin/telemetry_state.json
+    windsurf,windsurf.cli_feature_state,/var/root/.config/devin/cli/*.*.bin
+    windsurf,windsurf.cli_feature_state,/var/root/.config/devin/telemetry_state.json
+    windsurf,windsurf.cli_feature_state,/var/root/Library/Application Support/devin/cli/*.*.bin
+    windsurf,windsurf.cli_feature_state,/var/root/Library/Application Support/devin/telemetry_state.json
+    windsurf,windsurf.cli_logs,/Users/*/.config/Devin/cli/logs/devin_*_*.log
+    windsurf,windsurf.cli_logs,/Users/*/Library/Application Support/Devin/cli/logs/devin_*_*.log
+    windsurf,windsurf.cli_logs,/var/root/.config/Devin/cli/logs/devin_*_*.log
+    windsurf,windsurf.cli_logs,/var/root/Library/Application Support/Devin/cli/logs/devin_*_*.log
+    windsurf,windsurf.cli_session_locks,/Users/*/.config/Devin/cli/session_locks/*.lock
+    windsurf,windsurf.cli_session_locks,/Users/*/Library/Application Support/Devin/cli/session_locks/*.lock
+    windsurf,windsurf.cli_session_locks,/var/root/.config/Devin/cli/session_locks/*.lock
+    windsurf,windsurf.cli_session_locks,/var/root/Library/Application Support/Devin/cli/session_locks/*.lock
+    windsurf,windsurf.cli_sessions_db,/Users/*/.config/Devin/cli/sessions.db
+    windsurf,windsurf.cli_sessions_db,/Users/*/.config/Devin/cli/sessions.db-shm
+    windsurf,windsurf.cli_sessions_db,/Users/*/.config/Devin/cli/sessions.db-wal
+    windsurf,windsurf.cli_sessions_db,/Users/*/Library/Application Support/Devin/cli/sessions.db
+    windsurf,windsurf.cli_sessions_db,/Users/*/Library/Application Support/Devin/cli/sessions.db-shm
+    windsurf,windsurf.cli_sessions_db,/Users/*/Library/Application Support/Devin/cli/sessions.db-wal
+    windsurf,windsurf.cli_sessions_db,/var/root/.config/Devin/cli/sessions.db
+    windsurf,windsurf.cli_sessions_db,/var/root/.config/Devin/cli/sessions.db-shm
+    windsurf,windsurf.cli_sessions_db,/var/root/.config/Devin/cli/sessions.db-wal
+    windsurf,windsurf.cli_sessions_db,/var/root/Library/Application Support/Devin/cli/sessions.db
+    windsurf,windsurf.cli_sessions_db,/var/root/Library/Application Support/Devin/cli/sessions.db-shm
+    windsurf,windsurf.cli_sessions_db,/var/root/Library/Application Support/Devin/cli/sessions.db-wal
     windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/user_settings.pb
     windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/windsurf/code_tracker/**
     windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/windsurf/installation_id
@@ -3754,6 +3821,20 @@ sources:
     windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/windsurf/code_tracker/**
     windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/windsurf/installation_id
     windsurf,windsurf.code_tracker_and_settings,/var/root/.codeium/windsurf/user_settings.pb
+    windsurf,windsurf.device_identity,/Users/*/.codeium/windsurf/native_storage_migrations.lock
+    windsurf,windsurf.device_identity,/Users/*/.config/Devin/.devin-migration-complete
+    windsurf,windsurf.device_identity,/Users/*/.config/Devin/cli/installation_id
+    windsurf,windsurf.device_identity,/Users/*/.config/Devin/machineid
+    windsurf,windsurf.device_identity,/Users/*/Library/Application Support/Devin/.devin-migration-complete
+    windsurf,windsurf.device_identity,/Users/*/Library/Application Support/Devin/cli/installation_id
+    windsurf,windsurf.device_identity,/Users/*/Library/Application Support/Devin/machineid
+    windsurf,windsurf.device_identity,/var/root/.codeium/windsurf/native_storage_migrations.lock
+    windsurf,windsurf.device_identity,/var/root/.config/Devin/.devin-migration-complete
+    windsurf,windsurf.device_identity,/var/root/.config/Devin/cli/installation_id
+    windsurf,windsurf.device_identity,/var/root/.config/Devin/machineid
+    windsurf,windsurf.device_identity,/var/root/Library/Application Support/Devin/.devin-migration-complete
+    windsurf,windsurf.device_identity,/var/root/Library/Application Support/Devin/cli/installation_id
+    windsurf,windsurf.device_identity,/var/root/Library/Application Support/Devin/machineid
     windsurf,windsurf.embedding_database,/Users/*/.codeium/windsurf/database/*/**
     windsurf,windsurf.embedding_database,/Users/*/.codeium/windsurf/database/*/embedding_database.sqlite
     windsurf,windsurf.embedding_database,/Users/*/.codeium/windsurf/database/*/embedding_database.sqlite-shm
@@ -3772,12 +3853,15 @@ sources:
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/.config/Devin/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/.config/Devin/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/.config/Devin/User/globalStorage/state.vscdb-wal
+    windsurf,windsurf.ide_global_state_vscdb,/Users/*/.config/Devin/User/globalStorage/state.vscdb.backup
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/.config/Windsurf/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/.config/Windsurf/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/.config/Windsurf/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Devin/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Devin/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Devin/User/globalStorage/state.vscdb-wal
+    windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Devin/User/globalStorage/state.vscdb.backup
+    windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Devin/User/globalStorage/storage.json
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/Users/*/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-wal
@@ -3789,12 +3873,15 @@ sources:
     windsurf,windsurf.ide_global_state_vscdb,/var/root/.config/Devin/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/var/root/.config/Devin/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/var/root/.config/Devin/User/globalStorage/state.vscdb-wal
+    windsurf,windsurf.ide_global_state_vscdb,/var/root/.config/Devin/User/globalStorage/state.vscdb.backup
     windsurf,windsurf.ide_global_state_vscdb,/var/root/.config/Windsurf/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/var/root/.config/Windsurf/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/var/root/.config/Windsurf/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Devin/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Devin/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Devin/User/globalStorage/state.vscdb-wal
+    windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Devin/User/globalStorage/state.vscdb.backup
+    windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Devin/User/globalStorage/storage.json
     windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/var/root/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-wal
@@ -3817,17 +3904,37 @@ sources:
     windsurf,windsurf.ide_user_data,/var/root/Library/Application Support/Windsurf/User/snippets/**
     windsurf,windsurf.ide_user_data,/var/root/Library/Application Support/Windsurf/Workspaces/**
     windsurf,windsurf.ide_user_data,/var/root/Library/Application Support/Windsurf/argv.json
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Devin/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Devin/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Devin/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Devin/User/workspaceStorage/*/state.vscdb.backup
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Devin/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/settings.json
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb.backup
+    windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Devin/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Devin/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Devin/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Devin/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Devin/User/workspaceStorage/*/state.vscdb.backup
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Devin/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/settings.json
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb.backup
+    windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Devin/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
@@ -3847,6 +3954,10 @@ sources:
     windsurf,windsurf.language_server_binaries_and_logs,/var/root/.codeium/*/language_server_windows_x64.exe
     windsurf,windsurf.language_server_binaries_and_logs,/var/root/.devin-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,/var/root/.windsurf-server/data/logs/*/1-windsurf.log
+    windsurf,windsurf.mcp_oauth_state,/Users/*/.config/Devin/mcp/oauth/**
+    windsurf,windsurf.mcp_oauth_state,/Users/*/Library/Application Support/Devin/mcp/oauth/**
+    windsurf,windsurf.mcp_oauth_state,/var/root/.config/Devin/mcp/oauth/**
+    windsurf,windsurf.mcp_oauth_state,/var/root/Library/Application Support/Devin/mcp/oauth/**
     windsurf,windsurf.memories,/Users/*/.codeium/windsurf-insiders/memories/*
     windsurf,windsurf.memories,/Users/*/.codeium/windsurf-next/memories/*
     windsurf,windsurf.memories,/Users/*/.codeium/windsurf/memories/*
@@ -3861,6 +3972,14 @@ sources:
     windsurf,windsurf.server_data,/Users/*/.windsurf-server/**
     windsurf,windsurf.server_data,/var/root/.devin-server/**
     windsurf,windsurf.server_data,/var/root/.windsurf-server/**
+    windsurf,windsurf.shared_storage,/Users/*/.devin-shared/sharedStorage/state.vscdb
+    windsurf,windsurf.shared_storage,/Users/*/.devin-shared/sharedStorage/state.vscdb-shm
+    windsurf,windsurf.shared_storage,/Users/*/.devin-shared/sharedStorage/state.vscdb-wal
+    windsurf,windsurf.shared_storage,/Users/*/.devin-shared/sharedStorage/state.vscdb.backup
+    windsurf,windsurf.shared_storage,/var/root/.devin-shared/sharedStorage/state.vscdb
+    windsurf,windsurf.shared_storage,/var/root/.devin-shared/sharedStorage/state.vscdb-shm
+    windsurf,windsurf.shared_storage,/var/root/.devin-shared/sharedStorage/state.vscdb-wal
+    windsurf,windsurf.shared_storage,/var/root/.devin-shared/sharedStorage/state.vscdb.backup
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/hooks.json
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/rules/*.md
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/skills/**
@@ -6083,6 +6202,18 @@ sources:
     warp,warp.sqlite,/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite
     warp,warp.sqlite,/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm
     warp,warp.sqlite,/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal
+    windsurf,windsurf.acp_message_stores,/home/*/.config/Devin/User/acp-messages/*.db
+    windsurf,windsurf.acp_message_stores,/home/*/.config/Devin/User/acp-messages/*.db-shm
+    windsurf,windsurf.acp_message_stores,/home/*/.config/Devin/User/acp-messages/*.db-wal
+    windsurf,windsurf.acp_message_stores,/home/*/Library/Application Support/Devin/User/acp-messages/*.db
+    windsurf,windsurf.acp_message_stores,/home/*/Library/Application Support/Devin/User/acp-messages/*.db-shm
+    windsurf,windsurf.acp_message_stores,/home/*/Library/Application Support/Devin/User/acp-messages/*.db-wal
+    windsurf,windsurf.acp_message_stores,/root/.config/Devin/User/acp-messages/*.db
+    windsurf,windsurf.acp_message_stores,/root/.config/Devin/User/acp-messages/*.db-shm
+    windsurf,windsurf.acp_message_stores,/root/.config/Devin/User/acp-messages/*.db-wal
+    windsurf,windsurf.acp_message_stores,/root/Library/Application Support/Devin/User/acp-messages/*.db
+    windsurf,windsurf.acp_message_stores,/root/Library/Application Support/Devin/User/acp-messages/*.db-shm
+    windsurf,windsurf.acp_message_stores,/root/Library/Application Support/Devin/User/acp-messages/*.db-wal
     windsurf,windsurf.acp_registry,/home/*/.windsurf-next/acp/registry.json
     windsurf,windsurf.acp_registry,/home/*/.windsurf/acp/registry.json
     windsurf,windsurf.acp_registry,/root/.windsurf-next/acp/registry.json
@@ -6109,6 +6240,34 @@ sources:
     windsurf,windsurf.cascade_transcripts,/home/*/.windsurf/transcripts/*.jsonl
     windsurf,windsurf.cascade_transcripts,/root/.devin/transcripts/*.jsonl
     windsurf,windsurf.cascade_transcripts,/root/.windsurf/transcripts/*.jsonl
+    windsurf,windsurf.cli_feature_state,/home/*/.config/devin/cli/*.*.bin
+    windsurf,windsurf.cli_feature_state,/home/*/.config/devin/telemetry_state.json
+    windsurf,windsurf.cli_feature_state,/home/*/Library/Application Support/devin/cli/*.*.bin
+    windsurf,windsurf.cli_feature_state,/home/*/Library/Application Support/devin/telemetry_state.json
+    windsurf,windsurf.cli_feature_state,/root/.config/devin/cli/*.*.bin
+    windsurf,windsurf.cli_feature_state,/root/.config/devin/telemetry_state.json
+    windsurf,windsurf.cli_feature_state,/root/Library/Application Support/devin/cli/*.*.bin
+    windsurf,windsurf.cli_feature_state,/root/Library/Application Support/devin/telemetry_state.json
+    windsurf,windsurf.cli_logs,/home/*/.config/Devin/cli/logs/devin_*_*.log
+    windsurf,windsurf.cli_logs,/home/*/Library/Application Support/Devin/cli/logs/devin_*_*.log
+    windsurf,windsurf.cli_logs,/root/.config/Devin/cli/logs/devin_*_*.log
+    windsurf,windsurf.cli_logs,/root/Library/Application Support/Devin/cli/logs/devin_*_*.log
+    windsurf,windsurf.cli_session_locks,/home/*/.config/Devin/cli/session_locks/*.lock
+    windsurf,windsurf.cli_session_locks,/home/*/Library/Application Support/Devin/cli/session_locks/*.lock
+    windsurf,windsurf.cli_session_locks,/root/.config/Devin/cli/session_locks/*.lock
+    windsurf,windsurf.cli_session_locks,/root/Library/Application Support/Devin/cli/session_locks/*.lock
+    windsurf,windsurf.cli_sessions_db,/home/*/.config/Devin/cli/sessions.db
+    windsurf,windsurf.cli_sessions_db,/home/*/.config/Devin/cli/sessions.db-shm
+    windsurf,windsurf.cli_sessions_db,/home/*/.config/Devin/cli/sessions.db-wal
+    windsurf,windsurf.cli_sessions_db,/home/*/Library/Application Support/Devin/cli/sessions.db
+    windsurf,windsurf.cli_sessions_db,/home/*/Library/Application Support/Devin/cli/sessions.db-shm
+    windsurf,windsurf.cli_sessions_db,/home/*/Library/Application Support/Devin/cli/sessions.db-wal
+    windsurf,windsurf.cli_sessions_db,/root/.config/Devin/cli/sessions.db
+    windsurf,windsurf.cli_sessions_db,/root/.config/Devin/cli/sessions.db-shm
+    windsurf,windsurf.cli_sessions_db,/root/.config/Devin/cli/sessions.db-wal
+    windsurf,windsurf.cli_sessions_db,/root/Library/Application Support/Devin/cli/sessions.db
+    windsurf,windsurf.cli_sessions_db,/root/Library/Application Support/Devin/cli/sessions.db-shm
+    windsurf,windsurf.cli_sessions_db,/root/Library/Application Support/Devin/cli/sessions.db-wal
     windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/user_settings.pb
     windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/windsurf/code_tracker/**
     windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/windsurf/installation_id
@@ -6117,6 +6276,20 @@ sources:
     windsurf,windsurf.code_tracker_and_settings,/root/.codeium/windsurf/code_tracker/**
     windsurf,windsurf.code_tracker_and_settings,/root/.codeium/windsurf/installation_id
     windsurf,windsurf.code_tracker_and_settings,/root/.codeium/windsurf/user_settings.pb
+    windsurf,windsurf.device_identity,/home/*/.codeium/windsurf/native_storage_migrations.lock
+    windsurf,windsurf.device_identity,/home/*/.config/Devin/.devin-migration-complete
+    windsurf,windsurf.device_identity,/home/*/.config/Devin/cli/installation_id
+    windsurf,windsurf.device_identity,/home/*/.config/Devin/machineid
+    windsurf,windsurf.device_identity,/home/*/Library/Application Support/Devin/.devin-migration-complete
+    windsurf,windsurf.device_identity,/home/*/Library/Application Support/Devin/cli/installation_id
+    windsurf,windsurf.device_identity,/home/*/Library/Application Support/Devin/machineid
+    windsurf,windsurf.device_identity,/root/.codeium/windsurf/native_storage_migrations.lock
+    windsurf,windsurf.device_identity,/root/.config/Devin/.devin-migration-complete
+    windsurf,windsurf.device_identity,/root/.config/Devin/cli/installation_id
+    windsurf,windsurf.device_identity,/root/.config/Devin/machineid
+    windsurf,windsurf.device_identity,/root/Library/Application Support/Devin/.devin-migration-complete
+    windsurf,windsurf.device_identity,/root/Library/Application Support/Devin/cli/installation_id
+    windsurf,windsurf.device_identity,/root/Library/Application Support/Devin/machineid
     windsurf,windsurf.embedding_database,/home/*/.codeium/windsurf/database/*/**
     windsurf,windsurf.embedding_database,/home/*/.codeium/windsurf/database/*/embedding_database.sqlite
     windsurf,windsurf.embedding_database,/home/*/.codeium/windsurf/database/*/embedding_database.sqlite-shm
@@ -6135,12 +6308,15 @@ sources:
     windsurf,windsurf.ide_global_state_vscdb,/home/*/.config/Devin/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/home/*/.config/Devin/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/home/*/.config/Devin/User/globalStorage/state.vscdb-wal
+    windsurf,windsurf.ide_global_state_vscdb,/home/*/.config/Devin/User/globalStorage/state.vscdb.backup
     windsurf,windsurf.ide_global_state_vscdb,/home/*/.config/Windsurf/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/home/*/.config/Windsurf/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/home/*/.config/Windsurf/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Devin/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Devin/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Devin/User/globalStorage/state.vscdb-wal
+    windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Devin/User/globalStorage/state.vscdb.backup
+    windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Devin/User/globalStorage/storage.json
     windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/home/*/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-wal
@@ -6152,12 +6328,15 @@ sources:
     windsurf,windsurf.ide_global_state_vscdb,/root/.config/Devin/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/root/.config/Devin/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/root/.config/Devin/User/globalStorage/state.vscdb-wal
+    windsurf,windsurf.ide_global_state_vscdb,/root/.config/Devin/User/globalStorage/state.vscdb.backup
     windsurf,windsurf.ide_global_state_vscdb,/root/.config/Windsurf/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/root/.config/Windsurf/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/root/.config/Windsurf/User/globalStorage/state.vscdb-wal
     windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Devin/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Devin/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Devin/User/globalStorage/state.vscdb-wal
+    windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Devin/User/globalStorage/state.vscdb.backup
+    windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Devin/User/globalStorage/storage.json
     windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb
     windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-shm
     windsurf,windsurf.ide_global_state_vscdb,/root/Library/Application Support/Windsurf - Next/User/globalStorage/state.vscdb-wal
@@ -6180,17 +6359,37 @@ sources:
     windsurf,windsurf.ide_user_data,/root/Library/Application Support/Windsurf/User/snippets/**
     windsurf,windsurf.ide_user_data,/root/Library/Application Support/Windsurf/Workspaces/**
     windsurf,windsurf.ide_user_data,/root/Library/Application Support/Windsurf/argv.json
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Devin/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Devin/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Devin/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Devin/User/workspaceStorage/*/state.vscdb.backup
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Devin/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/settings.json
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb.backup
+    windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Devin/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/home/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Devin/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Devin/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Devin/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Devin/User/workspaceStorage/*/state.vscdb.backup
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Devin/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/settings.json
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-shm
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb-wal
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Devin/User/workspaceStorage/*/state.vscdb.backup
+    windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Devin/User/workspaceStorage/*/workspace.json
     windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
     windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     windsurf,windsurf.ide_workspace_state_vscdb,/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
@@ -6210,6 +6409,10 @@ sources:
     windsurf,windsurf.language_server_binaries_and_logs,/usr/share/devin-desktop/resources/app/extensions/windsurf/bin/language_server_linux_x64
     windsurf,windsurf.language_server_binaries_and_logs,/usr/share/devin-desktop/resources/app/extensions/windsurf/devin/bin/devin
     windsurf,windsurf.language_server_binaries_and_logs,/usr/share/windsurf/resources/app/extensions/windsurf/bin/language_server_linux_x64
+    windsurf,windsurf.mcp_oauth_state,/home/*/.config/Devin/mcp/oauth/**
+    windsurf,windsurf.mcp_oauth_state,/home/*/Library/Application Support/Devin/mcp/oauth/**
+    windsurf,windsurf.mcp_oauth_state,/root/.config/Devin/mcp/oauth/**
+    windsurf,windsurf.mcp_oauth_state,/root/Library/Application Support/Devin/mcp/oauth/**
     windsurf,windsurf.memories,/home/*/.codeium/windsurf-insiders/memories/*
     windsurf,windsurf.memories,/home/*/.codeium/windsurf-next/memories/*
     windsurf,windsurf.memories,/home/*/.codeium/windsurf/memories/*
@@ -6224,6 +6427,14 @@ sources:
     windsurf,windsurf.server_data,/home/*/.windsurf-server/**
     windsurf,windsurf.server_data,/root/.devin-server/**
     windsurf,windsurf.server_data,/root/.windsurf-server/**
+    windsurf,windsurf.shared_storage,/home/*/.devin-shared/sharedStorage/state.vscdb
+    windsurf,windsurf.shared_storage,/home/*/.devin-shared/sharedStorage/state.vscdb-shm
+    windsurf,windsurf.shared_storage,/home/*/.devin-shared/sharedStorage/state.vscdb-wal
+    windsurf,windsurf.shared_storage,/home/*/.devin-shared/sharedStorage/state.vscdb.backup
+    windsurf,windsurf.shared_storage,/root/.devin-shared/sharedStorage/state.vscdb
+    windsurf,windsurf.shared_storage,/root/.devin-shared/sharedStorage/state.vscdb-shm
+    windsurf,windsurf.shared_storage,/root/.devin-shared/sharedStorage/state.vscdb-wal
+    windsurf,windsurf.shared_storage,/root/.devin-shared/sharedStorage/state.vscdb.backup
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/hooks.json
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/rules/*.md
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/skills/**

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b0420e330ecb
+# Catalogue digest: 8559b7bb3fe5
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1174,42 +1174,90 @@ sources:
     windsurf,/Users/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,/Users/*/.codeium/windsurf-next/memories/global_rules.md
     windsurf,/Users/*/.codeium/windsurf/memories/global_rules.md
+    windsurf,/Users/*/.config/Devin/User/acp-messages/*.db
+    windsurf,/Users/*/.config/Devin/User/acp-messages/*.db-shm
+    windsurf,/Users/*/.config/Devin/User/acp-messages/*.db-wal
+    windsurf,/Users/*/.config/Devin/cli/sessions.db
+    windsurf,/Users/*/.config/Devin/cli/sessions.db-shm
+    windsurf,/Users/*/.config/Devin/cli/sessions.db-wal
     windsurf,/Users/*/.devin-server/**
     windsurf,/Users/*/.devin/transcripts/*.jsonl
     windsurf,/Users/*/.devin/worktrees/*
     windsurf,/Users/*/.windsurf-server/**
     windsurf,/Users/*/.windsurf/transcripts/*.jsonl
     windsurf,/Users/*/.windsurf/worktrees/*
+    windsurf,/Users/*/Library/Application Support/Devin/User/acp-messages/*.db
+    windsurf,/Users/*/Library/Application Support/Devin/User/acp-messages/*.db-shm
+    windsurf,/Users/*/Library/Application Support/Devin/User/acp-messages/*.db-wal
+    windsurf,/Users/*/Library/Application Support/Devin/cli/sessions.db
+    windsurf,/Users/*/Library/Application Support/Devin/cli/sessions.db-shm
+    windsurf,/Users/*/Library/Application Support/Devin/cli/sessions.db-wal
     windsurf,/home/*/.codeium/codeium.log
     windsurf,/home/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,/home/*/.codeium/windsurf-next/memories/global_rules.md
     windsurf,/home/*/.codeium/windsurf/memories/global_rules.md
+    windsurf,/home/*/.config/Devin/User/acp-messages/*.db
+    windsurf,/home/*/.config/Devin/User/acp-messages/*.db-shm
+    windsurf,/home/*/.config/Devin/User/acp-messages/*.db-wal
+    windsurf,/home/*/.config/Devin/cli/sessions.db
+    windsurf,/home/*/.config/Devin/cli/sessions.db-shm
+    windsurf,/home/*/.config/Devin/cli/sessions.db-wal
     windsurf,/home/*/.devin-server/**
     windsurf,/home/*/.devin/transcripts/*.jsonl
     windsurf,/home/*/.devin/worktrees/*
     windsurf,/home/*/.windsurf-server/**
     windsurf,/home/*/.windsurf/transcripts/*.jsonl
     windsurf,/home/*/.windsurf/worktrees/*
+    windsurf,/home/*/Library/Application Support/Devin/User/acp-messages/*.db
+    windsurf,/home/*/Library/Application Support/Devin/User/acp-messages/*.db-shm
+    windsurf,/home/*/Library/Application Support/Devin/User/acp-messages/*.db-wal
+    windsurf,/home/*/Library/Application Support/Devin/cli/sessions.db
+    windsurf,/home/*/Library/Application Support/Devin/cli/sessions.db-shm
+    windsurf,/home/*/Library/Application Support/Devin/cli/sessions.db-wal
     windsurf,/root/.codeium/codeium.log
     windsurf,/root/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,/root/.codeium/windsurf-next/memories/global_rules.md
     windsurf,/root/.codeium/windsurf/memories/global_rules.md
+    windsurf,/root/.config/Devin/User/acp-messages/*.db
+    windsurf,/root/.config/Devin/User/acp-messages/*.db-shm
+    windsurf,/root/.config/Devin/User/acp-messages/*.db-wal
+    windsurf,/root/.config/Devin/cli/sessions.db
+    windsurf,/root/.config/Devin/cli/sessions.db-shm
+    windsurf,/root/.config/Devin/cli/sessions.db-wal
     windsurf,/root/.devin-server/**
     windsurf,/root/.devin/transcripts/*.jsonl
     windsurf,/root/.devin/worktrees/*
     windsurf,/root/.windsurf-server/**
     windsurf,/root/.windsurf/transcripts/*.jsonl
     windsurf,/root/.windsurf/worktrees/*
+    windsurf,/root/Library/Application Support/Devin/User/acp-messages/*.db
+    windsurf,/root/Library/Application Support/Devin/User/acp-messages/*.db-shm
+    windsurf,/root/Library/Application Support/Devin/User/acp-messages/*.db-wal
+    windsurf,/root/Library/Application Support/Devin/cli/sessions.db
+    windsurf,/root/Library/Application Support/Devin/cli/sessions.db-shm
+    windsurf,/root/Library/Application Support/Devin/cli/sessions.db-wal
     windsurf,/var/root/.codeium/codeium.log
     windsurf,/var/root/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,/var/root/.codeium/windsurf-next/memories/global_rules.md
     windsurf,/var/root/.codeium/windsurf/memories/global_rules.md
+    windsurf,/var/root/.config/Devin/User/acp-messages/*.db
+    windsurf,/var/root/.config/Devin/User/acp-messages/*.db-shm
+    windsurf,/var/root/.config/Devin/User/acp-messages/*.db-wal
+    windsurf,/var/root/.config/Devin/cli/sessions.db
+    windsurf,/var/root/.config/Devin/cli/sessions.db-shm
+    windsurf,/var/root/.config/Devin/cli/sessions.db-wal
     windsurf,/var/root/.devin-server/**
     windsurf,/var/root/.devin/transcripts/*.jsonl
     windsurf,/var/root/.devin/worktrees/*
     windsurf,/var/root/.windsurf-server/**
     windsurf,/var/root/.windsurf/transcripts/*.jsonl
     windsurf,/var/root/.windsurf/worktrees/*
+    windsurf,/var/root/Library/Application Support/Devin/User/acp-messages/*.db
+    windsurf,/var/root/Library/Application Support/Devin/User/acp-messages/*.db-shm
+    windsurf,/var/root/Library/Application Support/Devin/User/acp-messages/*.db-wal
+    windsurf,/var/root/Library/Application Support/Devin/cli/sessions.db
+    windsurf,/var/root/Library/Application Support/Devin/cli/sessions.db-shm
+    windsurf,/var/root/Library/Application Support/Devin/cli/sessions.db-wal
     windsurf,C:/Users/*/.codeium/codeium.log
     windsurf,C:/Users/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,C:/Users/*/.codeium/windsurf-next/memories/global_rules.md
@@ -1220,6 +1268,12 @@ sources:
     windsurf,C:/Users/*/.windsurf-server/**
     windsurf,C:/Users/*/.windsurf/transcripts/*.jsonl
     windsurf,C:/Users/*/.windsurf/worktrees/*
+    windsurf,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db
+    windsurf,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db-shm
+    windsurf,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db-wal
+    windsurf,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db
+    windsurf,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db-shm
+    windsurf,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db-wal
     ''')
     LET hits = SELECT * FROM foreach(row=targets, query={
         SELECT Agent, OSPath, Mtime FROM glob(globs=glob)

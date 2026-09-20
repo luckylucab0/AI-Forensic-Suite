@@ -95,6 +95,7 @@ class VscodeStateParser:
             "cursor.workspace_state_vscdb",
             "windsurf.ide_global_state_vscdb",
             "windsurf.ide_workspace_state_vscdb",
+            "windsurf.shared_storage",
         }
     )
 

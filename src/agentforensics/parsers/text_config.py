@@ -71,6 +71,7 @@ SOURCES = frozenset(
         "ollama.env_overrides",
         "hermes.profile_tombstones",
         "qwen_code.install_evidence",
+        "windsurf.device_identity",
         "windsurf.ignore_files",
     }
 )

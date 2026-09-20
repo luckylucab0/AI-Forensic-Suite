@@ -2,7 +2,7 @@
 
 <!-- Generated from the artifact catalogue. Do not edit by hand:
 <!-- run `afx export-collection` and commit the result.
-<!-- Catalogue digest: b0420e330ecb
+<!-- Catalogue digest: 8559b7bb3fe5
 <!--
 <!-- An empty result from this rule means the paths it searched held nothing. It does
 <!-- not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -92,7 +92,7 @@ Windows-relevant catalogue entries, as a sense of what a collection will cover:
 | Roo Code | `roo_code` | 7 |
 | Visual Studio Code host storage | `vscode` | 5 |
 | Warp | `warp` | 1 |
-| Windsurf | `windsurf` | 25 |
+| Windsurf | `windsurf` | 33 |
 | Zed | `zed` | 6 |
 | pi | `pi` | 10 |
 
