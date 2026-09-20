@@ -48,6 +48,12 @@ SOURCES = {
     "claude_code.paste_cache": "user.prompt",
     "claude_code.tool_result_spills": "unparsed.record",
     "cursor.subagent_output": "unparsed.record",
+    # The same shape as claude_code.paste_cache above, in a second product: a paste
+    # longer than five lines or two thousand characters is written out and the prompt
+    # keeps a placeholder naming it. Same reading, same reason.
+    "hermes.pastes": "user.prompt",
+    "hermes.session_exports": "unparsed.record",
+    "hermes.spillover": "unparsed.record",
     "jetbrains_ai.aia_task_history": "unparsed.record",
     # The file is the plan. There is no further reading to do and no shape anybody has to
     # map, so this one is not marked as unread.

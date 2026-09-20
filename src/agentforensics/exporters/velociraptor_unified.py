@@ -154,7 +154,14 @@ UNINTERPRETED: dict[str, str] = {
     "gemini_cli.chats": "a chats directory this artifact will not narrow to an extension",
     "jetbrains_ai.aia_task_history": "a session file of prose rather than records, so a "
     "line of it is a fragment of a conversation",
+    "hermes.pastes": "the text behind a placeholder in a prompt, which is whatever the "
+    "user pasted: a line of it is a fragment of what they handed the agent, and the "
+    "analyzer carries the file whole as one prompt",
+    "hermes.session_exports": "conversations exported to readable files, which are prose "
+    "rather than records, in a directory this artifact will not narrow to an extension",
     "hermes.sessions_dir": "a sessions directory this artifact will not narrow to an extension",
+    "hermes.spillover": "the bulk output of one tool call in one file, which is prose "
+    "rather than records, for the same reason as the entry of another agent above",
     "junie.cli_sessions": "read in part: its own event log comes back record by record and "
     "the subagent transcripts beside it sit in a subtree this artifact will not narrow to "
     "an extension",

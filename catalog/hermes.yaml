@@ -41,6 +41,318 @@ env_overrides:
   source: |-
     https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
 artifacts:
+- id: hermes.retired_wal_transcripts
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/state.db.retired-wal-*/state.db
+  - $HERMES_HOME/profiles/<name>/state.db.retired-wal-*/state.db
+  - ~/.hermes/state.db.retired-wal-*/state.db
+  - ~/.hermes/profiles/<name>/state.db.retired-wal-*/state.db
+  - '%LOCALAPPDATA%\hermes\state.db.retired-wal-*\state.db'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\state.db.retired-wal-*\state.db'
+  - $HERMES_HOME/state.db.retired-wal-*/state.db-wal
+  - $HERMES_HOME/profiles/<name>/state.db.retired-wal-*/state.db-wal
+  - ~/.hermes/state.db.retired-wal-*/state.db-wal
+  - ~/.hermes/profiles/<name>/state.db.retired-wal-*/state.db-wal
+  - '%LOCALAPPDATA%\hermes\state.db.retired-wal-*\state.db-wal'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\state.db.retired-wal-*\state.db-wal'
+  - $HERMES_HOME/state.db.retired-wal-*/state.db-shm
+  - $HERMES_HOME/profiles/<name>/state.db.retired-wal-*/state.db-shm
+  - ~/.hermes/state.db.retired-wal-*/state.db-shm
+  - ~/.hermes/profiles/<name>/state.db.retired-wal-*/state.db-shm
+  - '%LOCALAPPDATA%\hermes\state.db.retired-wal-*\state.db-shm'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\state.db.retired-wal-*\state.db-shm'
+  format: sqlite
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/hermes_state_dbfile.py
+  source_kind: source_code
+  volatility: |-
+    Written when the product finds a write-ahead log whose database generation is gone, and left in place afterwards. Nothing prunes it, so a capture from months ago is still there.
+  notes: |-
+    A transaction this agent committed and then could not put back. When a write-ahead log is orphaned, because the database generation that wrote it was replaced or unlinked while a process still held it open, the product copies the log out before letting go of it, together with the database image it belonged to, and leaves the pair in a directory beside the live store.
+
+    The frames in that log were committed. Whether they belong on top of the database now at the path is a judgement, which is exactly why the product does not decide it and leaves the pair on disk. For an analyst it means messages that are in no live store and in no snapshot can be here, and they are readable the ordinary way because the copy is a database with its log beside it.
+
+    Read it as a store in its own right and compare it against the live one rather than merging it. The manifest in the same directory says when it was captured, what triggered it, and which generation was at the path at that moment, and it has an entry of its own.
+
+    Record structure: the same schema as the live transcript store. Where the database was larger than 512 MB only its first hundred bytes were copied, as a file ending in .header, and then the log is here without the store it belongs to: the manifest says which of the two happened.
+  parser: hermes
+- id: hermes.retired_wal_manifests
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/state.db.retired-wal-*/manifest.json
+  - $HERMES_HOME/profiles/<name>/state.db.retired-wal-*/manifest.json
+  - ~/.hermes/state.db.retired-wal-*/manifest.json
+  - ~/.hermes/profiles/<name>/state.db.retired-wal-*/manifest.json
+  - '%LOCALAPPDATA%\hermes\state.db.retired-wal-*\manifest.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\state.db.retired-wal-*\manifest.json'
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/hermes_state_dbfile.py
+  source_kind: source_code
+  volatility: Written once with the capture beside it and never rewritten.
+  notes: |-
+    What the capture beside it is and when it happened. Without this file the directory is a database and a log with no account of why either is there.
+
+    The capture time is the useful part. It dates a moment when this agent's store was replaced or unlinked underneath a running process, which is a thing worth knowing on its own: the ordinary cause is an update or a restore, and a less ordinary one is somebody replacing the database.
+
+    Record structure: version, the absolute path of the database, what triggered the capture, the process id, the capture time in UTC, the Python and SQLite versions, the device and inode identity and copied size of the log and of the shared-memory file, whether the main image was copied whole or only its header, the parsed header of that image, and the generation that was at the path at the moment of capture.
+  parser: json_generic
+- id: hermes.retired_wal_generations
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/state.db.retired-wal-*/**
+  - $HERMES_HOME/profiles/<name>/state.db.retired-wal-*/**
+  - ~/.hermes/state.db.retired-wal-*/**
+  - ~/.hermes/profiles/<name>/state.db.retired-wal-*/**
+  - '%LOCALAPPDATA%\hermes\state.db.retired-wal-*\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\state.db.retired-wal-*\**'
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/hermes_state_dbfile.py
+  source_kind: source_code
+  volatility: See the two entries above, which claim the files in here that can be read.
+  notes: |-
+    The whole capture directory, so nothing in it is left behind. The database, its log and the manifest are claimed by the stricter entries above and read; this takes the rest, which is the header-only image of a database too large to copy and any directory still carrying the .partial suffix of a capture that was interrupted.
+
+    A .partial directory is worth opening rather than dismissing. It means the capture was cut off, which usually means the process was killed, and whatever had already been written is still there.
+
+    Record structure: one directory per capture, named after the database, the word retired-wal, the capture time in UTC and the process id, with a counter appended when two captures land in the same second.
+  parser: null
+- id: hermes.a2a_conversations
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/a2a_conversations/*.jsonl
+  - $HERMES_HOME/profiles/<name>/a2a_conversations/*.jsonl
+  - ~/.hermes/a2a_conversations/*.jsonl
+  - ~/.hermes/profiles/<name>/a2a_conversations/*.jsonl
+  - '%LOCALAPPDATA%\hermes\a2a_conversations\*.jsonl'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\a2a_conversations\*.jsonl'
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/plugins/platforms/a2a/protocol.py
+  source_kind: source_code
+  volatility: Appended to and never rotated or pruned by the code that writes it.
+  notes: |-
+    Conversations this agent had with another agent rather than with a person, and they are not in the session database at all.
+
+    That is the point of the entry. An analyst who reads the transcript store has what the user asked and what the agent answered. This is a second channel: another program spoke to this one over the agent-to-agent protocol, and what it said is here. An instruction that reached the model from another machine arrives this way, which makes this the first place to look when the question is whether the agent was steered by something other than its user.
+
+    One file per conversation context, named after the context id with everything but letters, digits, dash and underscore removed, so the file name is a lossy form of the id and two contexts can in principle land in one file.
+
+    Record structure: one JSON object per line, with ts as a Unix timestamp, role, text and task_id.
+  parser: jsonl_generic
+- id: hermes.a2a_audit
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/a2a_audit.jsonl
+  - $HERMES_HOME/profiles/<name>/a2a_audit.jsonl
+  - ~/.hermes/a2a_audit.jsonl
+  - ~/.hermes/profiles/<name>/a2a_audit.jsonl
+  - '%LOCALAPPDATA%\hermes\a2a_audit.jsonl'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\a2a_audit.jsonl'
+  format: jsonl
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/plugins/platforms/a2a/security.py
+  source_kind: source_code
+  volatility: Appended to. No rotation in the code that writes it.
+  notes: |-
+    The security record of the channel the entry above carries the content of: who was allowed to talk to this agent and who was turned away. Read the two together, because a refusal here with no conversation beside it is an attempt that did not get through, and that is evidence of its own.
+  parser: jsonl_generic
+- id: hermes.pastes
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/pastes/paste_*.txt
+  - $HERMES_HOME/profiles/<name>/pastes/paste_*.txt
+  - ~/.hermes/pastes/paste_*.txt
+  - ~/.hermes/profiles/<name>/pastes/paste_*.txt
+  - '%LOCALAPPDATA%\hermes\pastes\paste_*.txt'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\pastes\paste_*.txt'
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/hermes_cli/cli_tui_mixin.py
+  source_kind: source_code
+  volatility: |-
+    Written when the paste happens and not cleaned up by the code that writes it. The counter restarts at one with each run of the interface, and the name carries only the time of day, so two runs on one day can collide and the later paste overwrites the earlier one.
+  notes: |-
+    What the user actually handed the agent. When a paste into the prompt is longer than five lines or two thousand characters, the interface writes it to this file and puts a placeholder in the prompt in its place. So the transcript records that something was pasted, how many lines it was and where it went, and not one word of what it said.
+
+    This is the same shape as one other agent in this catalogue, and it has the same consequence: a case built from transcripts alone is missing the largest single pieces of what the user put in front of the model, and those are the pieces most likely to be a credential, a configuration file or third-party source that was never committed anywhere.
+
+    Which prompt a given file belongs to is not in the file. The placeholder in the transcript carries the number and the path, so the join is made from the transcript side.
+
+    Record structure: the pasted text, whole, as it was typed. The name is the word paste, the counter within this run of the interface, and the time of day as hours, minutes and seconds.
+  parser: prose_document
+- id: hermes.debug_share_pastes
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/pastes/pending.json
+  - $HERMES_HOME/profiles/<name>/pastes/pending.json
+  - ~/.hermes/pastes/pending.json
+  - ~/.hermes/profiles/<name>/pastes/pending.json
+  - '%LOCALAPPDATA%\hermes\pastes\pending.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\pastes\pending.json'
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/NousResearch/hermes-agent/blob/639823919ced15640924e905bacab3858c5afd19/hermes_cli/debug.py
+  source_kind: source_code
+  volatility: |-
+    An entry is removed when its paste is deleted, which a sweep does about six hours after the upload. So this file names recent uploads only, and an empty file does not mean none were made.
+  notes: |-
+    A list of addresses on a public paste service where this endpoint's data now is.
+
+    The product's own troubleshooting command uploads system information and the tails of the agent's logs to a public paste service, with a second service as a fallback, and records the resulting address here so it can delete it again later. Each entry is a URL and the time it expires.
+
+    For an analyst this is a data egress record with the destination written down, which almost nothing else on an endpoint gives. Two things follow. The upload is public while it lasts, so anybody with the address had it. And the redaction the command applies is partial by the product's own notice, so what went out is not limited to what the redaction covers.
+
+    The fallback service's pastes have no deletable identifier and are kept for a month rather than six hours, so an address for it is a longer exposure than an address for the primary one.
+
+    Record structure: a JSON array of objects, each with url and expire_at. An entry missing either field is discarded by the product when it reads the file, so a malformed entry is still evidence and is only here.
+  parser: json_generic
+- id: hermes.session_exports
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/session-exports/**
+  - $HERMES_HOME/profiles/<name>/session-exports/**
+  - ~/.hermes/session-exports/**
+  - ~/.hermes/profiles/<name>/session-exports/**
+  - '%LOCALAPPDATA%\hermes\session-exports\**'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\session-exports\**'
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/sessions.md
+  source_kind: official
+  volatility: |-
+    Written when somebody exports and never touched again. The vendor documents this as the thing to do before hiding or deleting old sessions, so a file here routinely outlives the session it came from.
+  notes: |-
+    Conversations exported to readable files, one per session, in the directory the product uses when no other is named.
+
+    The vendor's own guidance is what makes this valuable: it recommends exporting before hiding or deleting old sessions. So the presence of an export and the absence of the session it names is the ordinary case rather than a surprise, and this directory is where a conversation that is no longer in the database is still readable.
+
+    Record structure: one file per session, in the readable formats the export command offers. An export made with an explicit destination went somewhere else entirely and is not under this path.
+  parser: prose_document
+- id: hermes.saved_sessions
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/sessions/saved/*.json
+  - $HERMES_HOME/profiles/<name>/sessions/saved/*.json
+  - ~/.hermes/sessions/saved/*.json
+  - ~/.hermes/profiles/<name>/sessions/saved/*.json
+  - '%LOCALAPPDATA%\hermes\sessions\saved\*.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\sessions\saved\*.json'
+  - $HERMES_HOME/sessions/sessions.json
+  - $HERMES_HOME/profiles/<name>/sessions/sessions.json
+  - ~/.hermes/sessions/sessions.json
+  - ~/.hermes/profiles/<name>/sessions/sessions.json
+  - '%LOCALAPPDATA%\hermes\sessions\sessions.json'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\sessions\sessions.json'
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/sessions.md
+  source_kind: official
+  volatility: |-
+    A saved conversation is written on request and not pruned. The routing mirror is rewritten as sessions come and go and can be turned off in the configuration, in which case it is simply absent.
+  notes: |-
+    Two files the directory-wide entry for the session directory would have read as line-delimited records, which they are not.
+
+    A saved conversation is an export somebody asked for, in the session directory rather than the export directory, and like every export it survives the pruning of the conversation it came from.
+
+    The routing mirror is a different thing and the vendor warns about it directly: it is not the session list. It maps messaging keys to active session ids and holds gateway and messaging entries only, so an analyst reading it as the list of conversations would conclude the command line was never used. Its value is the keys, which name the platform, the chat and the direction each session came in on.
+
+    Record structure: a saved conversation is one JSON document per file. The mirror is the routing index, keyed by strings of the form agent:main:<platform>:....
+  parser: json_generic
+- id: hermes.spillover
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $HERMES_HOME/cache/spillover/*.txt
+  - $HERMES_HOME/profiles/<name>/cache/spillover/*.txt
+  - ~/.hermes/cache/spillover/*.txt
+  - ~/.hermes/profiles/<name>/cache/spillover/*.txt
+  - '%LOCALAPPDATA%\hermes\cache\spillover\*.txt'
+  - '%LOCALAPPDATA%\hermes\profiles\<name>\cache\spillover\*.txt'
+  format: text
+  sensitivity: normal
+  collect_priority: live_only
+  status: verified
+  source: https://raw.githubusercontent.com/NousResearch/hermes-agent/main/website/docs/user-guide/configuration.md
+  source_kind: official
+  volatility: |-
+    Swept by the agent itself after twenty-four hours. This is the shortest-lived artifact in this file and the reason it is collected first on a live endpoint: on a disk image taken a day later it is gone.
+  notes: |-
+    The part of a tool's output the conversation does not hold. When a result is too large for the context it is written here whole and the conversation keeps a preview and the path to this file. So the transcript says a command was run and shows the first few lines of what came back, and what actually came back is here.
+
+    That matters for the question this suite exists to answer. A tool result is the agent reading a file, a fetched page, the output of a command: the material the model was actually given. Truncated in the transcript, it reads as a short answer; here it is whole.
+
+    Record structure: one file per spilled result, named after the result's identifier. The default threshold is a hundred thousand characters and is lowered automatically for models with smaller contexts, so what spilled depends on the model in use at the time.
+  parser: prose_document
 - id: hermes.checkpoints
   category: file_snapshot
   root: user_profile

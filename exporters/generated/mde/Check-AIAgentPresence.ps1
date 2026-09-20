@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: cd86baac2010
+# Catalogue digest: df9ddcda5104
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -585,6 +585,14 @@ $targets = @(
     @{ Agent = 'goose'; Id = 'goose.sessions_db_windows'; Path = '$profile\AppData\Roaming\Block\goose\data\sessions\sessions.db-shm' }
     @{ Agent = 'goose'; Id = 'goose.sessions_db_windows'; Path = '$profile\AppData\Roaming\Block\goose\data\sessions\sessions.db-wal' }
     @{ Agent = 'goose'; Id = 'goose.sessions_jsonl_legacy'; Path = '$profile\AppData\Roaming\Block\goose\data\sessions' }
+    @{ Agent = 'hermes'; Id = 'hermes.a2a_audit'; Path = '$profile\.hermes\a2a_audit.jsonl' }
+    @{ Agent = 'hermes'; Id = 'hermes.a2a_audit'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.a2a_audit'; Path = '$profile\AppData\Local\hermes\a2a_audit.jsonl' }
+    @{ Agent = 'hermes'; Id = 'hermes.a2a_audit'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.a2a_conversations'; Path = '$profile\.hermes\a2a_conversations' }
+    @{ Agent = 'hermes'; Id = 'hermes.a2a_conversations'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.a2a_conversations'; Path = '$profile\AppData\Local\hermes\a2a_conversations' }
+    @{ Agent = 'hermes'; Id = 'hermes.a2a_conversations'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\.hermes\auth.json' }
     @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.auth'; Path = '$profile\AppData\Local\hermes\auth.json' }
@@ -613,6 +621,10 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.cron'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.cron'; Path = '$profile\AppData\Local\hermes\cron' }
     @{ Agent = 'hermes'; Id = 'hermes.cron'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.debug_share_pastes'; Path = '$profile\.hermes\pastes\pending.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.debug_share_pastes'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.debug_share_pastes'; Path = '$profile\AppData\Local\hermes\pastes\pending.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.debug_share_pastes'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.env'; Path = '$profile\.hermes\.env' }
     @{ Agent = 'hermes'; Id = 'hermes.env'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.env'; Path = '$profile\AppData\Local\hermes\.env' }
@@ -629,14 +641,40 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\AppData\Local\hermes\memories\MEMORY.md' }
     @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\AppData\Local\hermes\memories\USER.md' }
     @{ Agent = 'hermes'; Id = 'hermes.memories'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.pastes'; Path = '$profile\.hermes\pastes\paste_' }
+    @{ Agent = 'hermes'; Id = 'hermes.pastes'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.pastes'; Path = '$profile\AppData\Local\hermes\pastes\paste_' }
+    @{ Agent = 'hermes'; Id = 'hermes.pastes'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.profile_tombstones'; Path = '$profile\.hermes\profiles\.deleted' }
     @{ Agent = 'hermes'; Id = 'hermes.profile_tombstones'; Path = '$profile\AppData\Local\hermes\profiles\.deleted' }
     @{ Agent = 'hermes'; Id = 'hermes.profiles'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.profiles'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.retired_wal_generations'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.retired_wal_generations'; Path = '$profile\.hermes\state.db.retired-wal-' }
+    @{ Agent = 'hermes'; Id = 'hermes.retired_wal_generations'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.retired_wal_generations'; Path = '$profile\AppData\Local\hermes\state.db.retired-wal-' }
+    @{ Agent = 'hermes'; Id = 'hermes.retired_wal_manifests'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.retired_wal_manifests'; Path = '$profile\.hermes\state.db.retired-wal-' }
+    @{ Agent = 'hermes'; Id = 'hermes.retired_wal_manifests'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.retired_wal_manifests'; Path = '$profile\AppData\Local\hermes\state.db.retired-wal-' }
+    @{ Agent = 'hermes'; Id = 'hermes.retired_wal_transcripts'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.retired_wal_transcripts'; Path = '$profile\.hermes\state.db.retired-wal-' }
+    @{ Agent = 'hermes'; Id = 'hermes.retired_wal_transcripts'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.retired_wal_transcripts'; Path = '$profile\AppData\Local\hermes\state.db.retired-wal-' }
     @{ Agent = 'hermes'; Id = 'hermes.sandboxes'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.sandboxes'; Path = '$profile\.hermes\sandboxes' }
     @{ Agent = 'hermes'; Id = 'hermes.sandboxes'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.sandboxes'; Path = '$profile\AppData\Local\hermes\sandboxes' }
+    @{ Agent = 'hermes'; Id = 'hermes.saved_sessions'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.saved_sessions'; Path = '$profile\.hermes\sessions\saved' }
+    @{ Agent = 'hermes'; Id = 'hermes.saved_sessions'; Path = '$profile\.hermes\sessions\sessions.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.saved_sessions'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.saved_sessions'; Path = '$profile\AppData\Local\hermes\sessions\saved' }
+    @{ Agent = 'hermes'; Id = 'hermes.saved_sessions'; Path = '$profile\AppData\Local\hermes\sessions\sessions.json' }
+    @{ Agent = 'hermes'; Id = 'hermes.session_exports'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.session_exports'; Path = '$profile\.hermes\session-exports' }
+    @{ Agent = 'hermes'; Id = 'hermes.session_exports'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.session_exports'; Path = '$profile\AppData\Local\hermes\session-exports' }
     @{ Agent = 'hermes'; Id = 'hermes.sessions_dir'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.sessions_dir'; Path = '$profile\.hermes\sessions' }
     @{ Agent = 'hermes'; Id = 'hermes.sessions_dir'; Path = '$profile\AppData\Local\hermes\profiles' }
@@ -649,6 +687,10 @@ $targets = @(
     @{ Agent = 'hermes'; Id = 'hermes.soul'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.soul'; Path = '$profile\AppData\Local\hermes\SOUL.md' }
     @{ Agent = 'hermes'; Id = 'hermes.soul'; Path = '$profile\AppData\Local\hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.spillover'; Path = '$profile\.hermes\cache\spillover' }
+    @{ Agent = 'hermes'; Id = 'hermes.spillover'; Path = '$profile\.hermes\profiles' }
+    @{ Agent = 'hermes'; Id = 'hermes.spillover'; Path = '$profile\AppData\Local\hermes\cache\spillover' }
+    @{ Agent = 'hermes'; Id = 'hermes.spillover'; Path = '$profile\AppData\Local\hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\.hermes\state.db' }
     @{ Agent = 'hermes'; Id = 'hermes.state_db'; Path = '$profile\.hermes\state.db-shm' }

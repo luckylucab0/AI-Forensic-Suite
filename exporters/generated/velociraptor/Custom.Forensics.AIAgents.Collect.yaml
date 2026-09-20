@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: cd86baac2010
+# Catalogue digest: df9ddcda5104
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -667,6 +667,14 @@ sources:
     goose,goose.sessions_db_windows,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db-shm
     goose,goose.sessions_db_windows,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db-wal
     goose,goose.sessions_jsonl_legacy,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/*.jsonl
+    hermes,hermes.a2a_audit,C:/Users/*/.hermes/a2a_audit.jsonl
+    hermes,hermes.a2a_audit,C:/Users/*/.hermes/profiles/*/a2a_audit.jsonl
+    hermes,hermes.a2a_audit,C:/Users/*/AppData/Local/hermes/a2a_audit.jsonl
+    hermes,hermes.a2a_audit,C:/Users/*/AppData/Local/hermes/profiles/*/a2a_audit.jsonl
+    hermes,hermes.a2a_conversations,C:/Users/*/.hermes/a2a_conversations/*.jsonl
+    hermes,hermes.a2a_conversations,C:/Users/*/.hermes/profiles/*/a2a_conversations/*.jsonl
+    hermes,hermes.a2a_conversations,C:/Users/*/AppData/Local/hermes/a2a_conversations/*.jsonl
+    hermes,hermes.a2a_conversations,C:/Users/*/AppData/Local/hermes/profiles/*/a2a_conversations/*.jsonl
     hermes,hermes.auth,C:/Users/*/.hermes/auth.json
     hermes,hermes.auth,C:/Users/*/.hermes/profiles/*/auth.json
     hermes,hermes.auth,C:/Users/*/AppData/Local/hermes/auth.json
@@ -699,6 +707,10 @@ sources:
     hermes,hermes.cron,C:/Users/*/.hermes/profiles/*/cron/**
     hermes,hermes.cron,C:/Users/*/AppData/Local/hermes/cron/**
     hermes,hermes.cron,C:/Users/*/AppData/Local/hermes/profiles/*/cron/**
+    hermes,hermes.debug_share_pastes,C:/Users/*/.hermes/pastes/pending.json
+    hermes,hermes.debug_share_pastes,C:/Users/*/.hermes/profiles/*/pastes/pending.json
+    hermes,hermes.debug_share_pastes,C:/Users/*/AppData/Local/hermes/pastes/pending.json
+    hermes,hermes.debug_share_pastes,C:/Users/*/AppData/Local/hermes/profiles/*/pastes/pending.json
     hermes,hermes.env,C:/Users/*/.hermes/.env
     hermes,hermes.env,C:/Users/*/.hermes/profiles/*/.env
     hermes,hermes.env,C:/Users/*/AppData/Local/hermes/.env
@@ -719,14 +731,50 @@ sources:
     hermes,hermes.memories,C:/Users/*/AppData/Local/hermes/memories/USER.md
     hermes,hermes.memories,C:/Users/*/AppData/Local/hermes/profiles/*/memories/MEMORY.md
     hermes,hermes.memories,C:/Users/*/AppData/Local/hermes/profiles/*/memories/USER.md
+    hermes,hermes.pastes,C:/Users/*/.hermes/pastes/paste_*.txt
+    hermes,hermes.pastes,C:/Users/*/.hermes/profiles/*/pastes/paste_*.txt
+    hermes,hermes.pastes,C:/Users/*/AppData/Local/hermes/pastes/paste_*.txt
+    hermes,hermes.pastes,C:/Users/*/AppData/Local/hermes/profiles/*/pastes/paste_*.txt
     hermes,hermes.profile_tombstones,C:/Users/*/.hermes/profiles/.deleted/**
     hermes,hermes.profile_tombstones,C:/Users/*/AppData/Local/hermes/profiles/.deleted/**
     hermes,hermes.profiles,C:/Users/*/.hermes/profiles/*/profile.yaml
     hermes,hermes.profiles,C:/Users/*/AppData/Local/hermes/profiles/*/profile.yaml
+    hermes,hermes.retired_wal_generations,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
+    hermes,hermes.retired_wal_generations,C:/Users/*/.hermes/state.db.retired-wal-*/**
+    hermes,hermes.retired_wal_generations,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/**
+    hermes,hermes.retired_wal_generations,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/**
+    hermes,hermes.retired_wal_manifests,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
+    hermes,hermes.retired_wal_manifests,C:/Users/*/.hermes/state.db.retired-wal-*/manifest.json
+    hermes,hermes.retired_wal_manifests,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/manifest.json
+    hermes,hermes.retired_wal_manifests,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/manifest.json
+    hermes,hermes.retired_wal_transcripts,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db
+    hermes,hermes.retired_wal_transcripts,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+    hermes,hermes.retired_wal_transcripts,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
+    hermes,hermes.retired_wal_transcripts,C:/Users/*/.hermes/state.db.retired-wal-*/state.db
+    hermes,hermes.retired_wal_transcripts,C:/Users/*/.hermes/state.db.retired-wal-*/state.db-shm
+    hermes,hermes.retired_wal_transcripts,C:/Users/*/.hermes/state.db.retired-wal-*/state.db-wal
+    hermes,hermes.retired_wal_transcripts,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/state.db
+    hermes,hermes.retired_wal_transcripts,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+    hermes,hermes.retired_wal_transcripts,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/state.db-wal
+    hermes,hermes.retired_wal_transcripts,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/state.db
+    hermes,hermes.retired_wal_transcripts,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/state.db-shm
+    hermes,hermes.retired_wal_transcripts,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/state.db-wal
     hermes,hermes.sandboxes,C:/Users/*/.hermes/profiles/*/sandboxes/**
     hermes,hermes.sandboxes,C:/Users/*/.hermes/sandboxes/**
     hermes,hermes.sandboxes,C:/Users/*/AppData/Local/hermes/profiles/*/sandboxes/**
     hermes,hermes.sandboxes,C:/Users/*/AppData/Local/hermes/sandboxes/**
+    hermes,hermes.saved_sessions,C:/Users/*/.hermes/profiles/*/sessions/saved/*.json
+    hermes,hermes.saved_sessions,C:/Users/*/.hermes/profiles/*/sessions/sessions.json
+    hermes,hermes.saved_sessions,C:/Users/*/.hermes/sessions/saved/*.json
+    hermes,hermes.saved_sessions,C:/Users/*/.hermes/sessions/sessions.json
+    hermes,hermes.saved_sessions,C:/Users/*/AppData/Local/hermes/profiles/*/sessions/saved/*.json
+    hermes,hermes.saved_sessions,C:/Users/*/AppData/Local/hermes/profiles/*/sessions/sessions.json
+    hermes,hermes.saved_sessions,C:/Users/*/AppData/Local/hermes/sessions/saved/*.json
+    hermes,hermes.saved_sessions,C:/Users/*/AppData/Local/hermes/sessions/sessions.json
+    hermes,hermes.session_exports,C:/Users/*/.hermes/profiles/*/session-exports/**
+    hermes,hermes.session_exports,C:/Users/*/.hermes/session-exports/**
+    hermes,hermes.session_exports,C:/Users/*/AppData/Local/hermes/profiles/*/session-exports/**
+    hermes,hermes.session_exports,C:/Users/*/AppData/Local/hermes/session-exports/**
     hermes,hermes.sessions_dir,C:/Users/*/.hermes/profiles/*/sessions/**
     hermes,hermes.sessions_dir,C:/Users/*/.hermes/sessions/**
     hermes,hermes.sessions_dir,C:/Users/*/AppData/Local/hermes/profiles/*/sessions/**
@@ -739,6 +787,10 @@ sources:
     hermes,hermes.soul,C:/Users/*/.hermes/profiles/*/SOUL.md
     hermes,hermes.soul,C:/Users/*/AppData/Local/hermes/SOUL.md
     hermes,hermes.soul,C:/Users/*/AppData/Local/hermes/profiles/*/SOUL.md
+    hermes,hermes.spillover,C:/Users/*/.hermes/cache/spillover/*.txt
+    hermes,hermes.spillover,C:/Users/*/.hermes/profiles/*/cache/spillover/*.txt
+    hermes,hermes.spillover,C:/Users/*/AppData/Local/hermes/cache/spillover/*.txt
+    hermes,hermes.spillover,C:/Users/*/AppData/Local/hermes/profiles/*/cache/spillover/*.txt
     hermes,hermes.state_db,C:/Users/*/.hermes/profiles/*/state.db
     hermes,hermes.state_db,C:/Users/*/.hermes/profiles/*/state.db-shm
     hermes,hermes.state_db,C:/Users/*/.hermes/profiles/*/state.db-wal
@@ -2287,6 +2339,14 @@ sources:
     goose,goose.sessions_db,/var/root/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
     goose,goose.sessions_jsonl_legacy,/Users/*/.local/share/goose/sessions/*.jsonl
     goose,goose.sessions_jsonl_legacy,/var/root/.local/share/goose/sessions/*.jsonl
+    hermes,hermes.a2a_audit,/Users/*/.hermes/a2a_audit.jsonl
+    hermes,hermes.a2a_audit,/Users/*/.hermes/profiles/*/a2a_audit.jsonl
+    hermes,hermes.a2a_audit,/var/root/.hermes/a2a_audit.jsonl
+    hermes,hermes.a2a_audit,/var/root/.hermes/profiles/*/a2a_audit.jsonl
+    hermes,hermes.a2a_conversations,/Users/*/.hermes/a2a_conversations/*.jsonl
+    hermes,hermes.a2a_conversations,/Users/*/.hermes/profiles/*/a2a_conversations/*.jsonl
+    hermes,hermes.a2a_conversations,/var/root/.hermes/a2a_conversations/*.jsonl
+    hermes,hermes.a2a_conversations,/var/root/.hermes/profiles/*/a2a_conversations/*.jsonl
     hermes,hermes.auth,/Users/*/.hermes/auth.json
     hermes,hermes.auth,/Users/*/.hermes/profiles/*/auth.json
     hermes,hermes.auth,/var/root/.hermes/auth.json
@@ -2319,6 +2379,10 @@ sources:
     hermes,hermes.cron,/Users/*/.hermes/profiles/*/cron/**
     hermes,hermes.cron,/var/root/.hermes/cron/**
     hermes,hermes.cron,/var/root/.hermes/profiles/*/cron/**
+    hermes,hermes.debug_share_pastes,/Users/*/.hermes/pastes/pending.json
+    hermes,hermes.debug_share_pastes,/Users/*/.hermes/profiles/*/pastes/pending.json
+    hermes,hermes.debug_share_pastes,/var/root/.hermes/pastes/pending.json
+    hermes,hermes.debug_share_pastes,/var/root/.hermes/profiles/*/pastes/pending.json
     hermes,hermes.env,/Users/*/.hermes/.env
     hermes,hermes.env,/Users/*/.hermes/profiles/*/.env
     hermes,hermes.env,/var/root/.hermes/.env
@@ -2339,14 +2403,50 @@ sources:
     hermes,hermes.memories,/var/root/.hermes/memories/USER.md
     hermes,hermes.memories,/var/root/.hermes/profiles/*/memories/MEMORY.md
     hermes,hermes.memories,/var/root/.hermes/profiles/*/memories/USER.md
+    hermes,hermes.pastes,/Users/*/.hermes/pastes/paste_*.txt
+    hermes,hermes.pastes,/Users/*/.hermes/profiles/*/pastes/paste_*.txt
+    hermes,hermes.pastes,/var/root/.hermes/pastes/paste_*.txt
+    hermes,hermes.pastes,/var/root/.hermes/profiles/*/pastes/paste_*.txt
     hermes,hermes.profile_tombstones,/Users/*/.hermes/profiles/.deleted/**
     hermes,hermes.profile_tombstones,/var/root/.hermes/profiles/.deleted/**
     hermes,hermes.profiles,/Users/*/.hermes/profiles/*/profile.yaml
     hermes,hermes.profiles,/var/root/.hermes/profiles/*/profile.yaml
+    hermes,hermes.retired_wal_generations,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
+    hermes,hermes.retired_wal_generations,/Users/*/.hermes/state.db.retired-wal-*/**
+    hermes,hermes.retired_wal_generations,/var/root/.hermes/profiles/*/state.db.retired-wal-*/**
+    hermes,hermes.retired_wal_generations,/var/root/.hermes/state.db.retired-wal-*/**
+    hermes,hermes.retired_wal_manifests,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
+    hermes,hermes.retired_wal_manifests,/Users/*/.hermes/state.db.retired-wal-*/manifest.json
+    hermes,hermes.retired_wal_manifests,/var/root/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
+    hermes,hermes.retired_wal_manifests,/var/root/.hermes/state.db.retired-wal-*/manifest.json
+    hermes,hermes.retired_wal_transcripts,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db
+    hermes,hermes.retired_wal_transcripts,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+    hermes,hermes.retired_wal_transcripts,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
+    hermes,hermes.retired_wal_transcripts,/Users/*/.hermes/state.db.retired-wal-*/state.db
+    hermes,hermes.retired_wal_transcripts,/Users/*/.hermes/state.db.retired-wal-*/state.db-shm
+    hermes,hermes.retired_wal_transcripts,/Users/*/.hermes/state.db.retired-wal-*/state.db-wal
+    hermes,hermes.retired_wal_transcripts,/var/root/.hermes/profiles/*/state.db.retired-wal-*/state.db
+    hermes,hermes.retired_wal_transcripts,/var/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+    hermes,hermes.retired_wal_transcripts,/var/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
+    hermes,hermes.retired_wal_transcripts,/var/root/.hermes/state.db.retired-wal-*/state.db
+    hermes,hermes.retired_wal_transcripts,/var/root/.hermes/state.db.retired-wal-*/state.db-shm
+    hermes,hermes.retired_wal_transcripts,/var/root/.hermes/state.db.retired-wal-*/state.db-wal
     hermes,hermes.sandboxes,/Users/*/.hermes/profiles/*/sandboxes/**
     hermes,hermes.sandboxes,/Users/*/.hermes/sandboxes/**
     hermes,hermes.sandboxes,/var/root/.hermes/profiles/*/sandboxes/**
     hermes,hermes.sandboxes,/var/root/.hermes/sandboxes/**
+    hermes,hermes.saved_sessions,/Users/*/.hermes/profiles/*/sessions/saved/*.json
+    hermes,hermes.saved_sessions,/Users/*/.hermes/profiles/*/sessions/sessions.json
+    hermes,hermes.saved_sessions,/Users/*/.hermes/sessions/saved/*.json
+    hermes,hermes.saved_sessions,/Users/*/.hermes/sessions/sessions.json
+    hermes,hermes.saved_sessions,/var/root/.hermes/profiles/*/sessions/saved/*.json
+    hermes,hermes.saved_sessions,/var/root/.hermes/profiles/*/sessions/sessions.json
+    hermes,hermes.saved_sessions,/var/root/.hermes/sessions/saved/*.json
+    hermes,hermes.saved_sessions,/var/root/.hermes/sessions/sessions.json
+    hermes,hermes.session_exports,/Users/*/.hermes/profiles/*/session-exports/**
+    hermes,hermes.session_exports,/Users/*/.hermes/session-exports/**
+    hermes,hermes.session_exports,/var/root/.hermes/profiles/*/session-exports/**
+    hermes,hermes.session_exports,/var/root/.hermes/session-exports/**
     hermes,hermes.sessions_dir,/Users/*/.hermes/profiles/*/sessions/**
     hermes,hermes.sessions_dir,/Users/*/.hermes/sessions/**
     hermes,hermes.sessions_dir,/var/root/.hermes/profiles/*/sessions/**
@@ -2359,6 +2459,10 @@ sources:
     hermes,hermes.soul,/Users/*/.hermes/profiles/*/SOUL.md
     hermes,hermes.soul,/var/root/.hermes/SOUL.md
     hermes,hermes.soul,/var/root/.hermes/profiles/*/SOUL.md
+    hermes,hermes.spillover,/Users/*/.hermes/cache/spillover/*.txt
+    hermes,hermes.spillover,/Users/*/.hermes/profiles/*/cache/spillover/*.txt
+    hermes,hermes.spillover,/var/root/.hermes/cache/spillover/*.txt
+    hermes,hermes.spillover,/var/root/.hermes/profiles/*/cache/spillover/*.txt
     hermes,hermes.state_db,/Users/*/.hermes/profiles/*/state.db
     hermes,hermes.state_db,/Users/*/.hermes/profiles/*/state.db-shm
     hermes,hermes.state_db,/Users/*/.hermes/profiles/*/state.db-wal
@@ -4295,6 +4399,14 @@ sources:
     goose,goose.sessions_db,/root/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
     goose,goose.sessions_jsonl_legacy,/home/*/.local/share/goose/sessions/*.jsonl
     goose,goose.sessions_jsonl_legacy,/root/.local/share/goose/sessions/*.jsonl
+    hermes,hermes.a2a_audit,/home/*/.hermes/a2a_audit.jsonl
+    hermes,hermes.a2a_audit,/home/*/.hermes/profiles/*/a2a_audit.jsonl
+    hermes,hermes.a2a_audit,/root/.hermes/a2a_audit.jsonl
+    hermes,hermes.a2a_audit,/root/.hermes/profiles/*/a2a_audit.jsonl
+    hermes,hermes.a2a_conversations,/home/*/.hermes/a2a_conversations/*.jsonl
+    hermes,hermes.a2a_conversations,/home/*/.hermes/profiles/*/a2a_conversations/*.jsonl
+    hermes,hermes.a2a_conversations,/root/.hermes/a2a_conversations/*.jsonl
+    hermes,hermes.a2a_conversations,/root/.hermes/profiles/*/a2a_conversations/*.jsonl
     hermes,hermes.auth,/home/*/.hermes/auth.json
     hermes,hermes.auth,/home/*/.hermes/profiles/*/auth.json
     hermes,hermes.auth,/root/.hermes/auth.json
@@ -4327,6 +4439,10 @@ sources:
     hermes,hermes.cron,/home/*/.hermes/profiles/*/cron/**
     hermes,hermes.cron,/root/.hermes/cron/**
     hermes,hermes.cron,/root/.hermes/profiles/*/cron/**
+    hermes,hermes.debug_share_pastes,/home/*/.hermes/pastes/pending.json
+    hermes,hermes.debug_share_pastes,/home/*/.hermes/profiles/*/pastes/pending.json
+    hermes,hermes.debug_share_pastes,/root/.hermes/pastes/pending.json
+    hermes,hermes.debug_share_pastes,/root/.hermes/profiles/*/pastes/pending.json
     hermes,hermes.env,/home/*/.hermes/.env
     hermes,hermes.env,/home/*/.hermes/profiles/*/.env
     hermes,hermes.env,/root/.hermes/.env
@@ -4347,14 +4463,50 @@ sources:
     hermes,hermes.memories,/root/.hermes/memories/USER.md
     hermes,hermes.memories,/root/.hermes/profiles/*/memories/MEMORY.md
     hermes,hermes.memories,/root/.hermes/profiles/*/memories/USER.md
+    hermes,hermes.pastes,/home/*/.hermes/pastes/paste_*.txt
+    hermes,hermes.pastes,/home/*/.hermes/profiles/*/pastes/paste_*.txt
+    hermes,hermes.pastes,/root/.hermes/pastes/paste_*.txt
+    hermes,hermes.pastes,/root/.hermes/profiles/*/pastes/paste_*.txt
     hermes,hermes.profile_tombstones,/home/*/.hermes/profiles/.deleted/**
     hermes,hermes.profile_tombstones,/root/.hermes/profiles/.deleted/**
     hermes,hermes.profiles,/home/*/.hermes/profiles/*/profile.yaml
     hermes,hermes.profiles,/root/.hermes/profiles/*/profile.yaml
+    hermes,hermes.retired_wal_generations,/home/*/.hermes/profiles/*/state.db.retired-wal-*/**
+    hermes,hermes.retired_wal_generations,/home/*/.hermes/state.db.retired-wal-*/**
+    hermes,hermes.retired_wal_generations,/root/.hermes/profiles/*/state.db.retired-wal-*/**
+    hermes,hermes.retired_wal_generations,/root/.hermes/state.db.retired-wal-*/**
+    hermes,hermes.retired_wal_manifests,/home/*/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
+    hermes,hermes.retired_wal_manifests,/home/*/.hermes/state.db.retired-wal-*/manifest.json
+    hermes,hermes.retired_wal_manifests,/root/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
+    hermes,hermes.retired_wal_manifests,/root/.hermes/state.db.retired-wal-*/manifest.json
+    hermes,hermes.retired_wal_transcripts,/home/*/.hermes/profiles/*/state.db.retired-wal-*/state.db
+    hermes,hermes.retired_wal_transcripts,/home/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+    hermes,hermes.retired_wal_transcripts,/home/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
+    hermes,hermes.retired_wal_transcripts,/home/*/.hermes/state.db.retired-wal-*/state.db
+    hermes,hermes.retired_wal_transcripts,/home/*/.hermes/state.db.retired-wal-*/state.db-shm
+    hermes,hermes.retired_wal_transcripts,/home/*/.hermes/state.db.retired-wal-*/state.db-wal
+    hermes,hermes.retired_wal_transcripts,/root/.hermes/profiles/*/state.db.retired-wal-*/state.db
+    hermes,hermes.retired_wal_transcripts,/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+    hermes,hermes.retired_wal_transcripts,/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
+    hermes,hermes.retired_wal_transcripts,/root/.hermes/state.db.retired-wal-*/state.db
+    hermes,hermes.retired_wal_transcripts,/root/.hermes/state.db.retired-wal-*/state.db-shm
+    hermes,hermes.retired_wal_transcripts,/root/.hermes/state.db.retired-wal-*/state.db-wal
     hermes,hermes.sandboxes,/home/*/.hermes/profiles/*/sandboxes/**
     hermes,hermes.sandboxes,/home/*/.hermes/sandboxes/**
     hermes,hermes.sandboxes,/root/.hermes/profiles/*/sandboxes/**
     hermes,hermes.sandboxes,/root/.hermes/sandboxes/**
+    hermes,hermes.saved_sessions,/home/*/.hermes/profiles/*/sessions/saved/*.json
+    hermes,hermes.saved_sessions,/home/*/.hermes/profiles/*/sessions/sessions.json
+    hermes,hermes.saved_sessions,/home/*/.hermes/sessions/saved/*.json
+    hermes,hermes.saved_sessions,/home/*/.hermes/sessions/sessions.json
+    hermes,hermes.saved_sessions,/root/.hermes/profiles/*/sessions/saved/*.json
+    hermes,hermes.saved_sessions,/root/.hermes/profiles/*/sessions/sessions.json
+    hermes,hermes.saved_sessions,/root/.hermes/sessions/saved/*.json
+    hermes,hermes.saved_sessions,/root/.hermes/sessions/sessions.json
+    hermes,hermes.session_exports,/home/*/.hermes/profiles/*/session-exports/**
+    hermes,hermes.session_exports,/home/*/.hermes/session-exports/**
+    hermes,hermes.session_exports,/root/.hermes/profiles/*/session-exports/**
+    hermes,hermes.session_exports,/root/.hermes/session-exports/**
     hermes,hermes.sessions_dir,/home/*/.hermes/profiles/*/sessions/**
     hermes,hermes.sessions_dir,/home/*/.hermes/sessions/**
     hermes,hermes.sessions_dir,/root/.hermes/profiles/*/sessions/**
@@ -4367,6 +4519,10 @@ sources:
     hermes,hermes.soul,/home/*/.hermes/profiles/*/SOUL.md
     hermes,hermes.soul,/root/.hermes/SOUL.md
     hermes,hermes.soul,/root/.hermes/profiles/*/SOUL.md
+    hermes,hermes.spillover,/home/*/.hermes/cache/spillover/*.txt
+    hermes,hermes.spillover,/home/*/.hermes/profiles/*/cache/spillover/*.txt
+    hermes,hermes.spillover,/root/.hermes/cache/spillover/*.txt
+    hermes,hermes.spillover,/root/.hermes/profiles/*/cache/spillover/*.txt
     hermes,hermes.state_db,/home/*/.hermes/profiles/*/state.db
     hermes,hermes.state_db,/home/*/.hermes/profiles/*/state.db-shm
     hermes,hermes.state_db,/home/*/.hermes/profiles/*/state.db-wal

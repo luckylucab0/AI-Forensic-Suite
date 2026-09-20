@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: cd86baac2010
+# Catalogue digest: df9ddcda5104
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,8 +8,8 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# Scope: the 91 artifacts the catalogue files under transcript and prompt_history.
-# The other 402 are configuration, credentials, caches, logs and install
+# Scope: the 98 artifacts the catalogue files under transcript and prompt_history.
+# The other 405 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
 # credential store what an analyst wants is the file, which is what the Collect
@@ -41,7 +41,10 @@
 #   - cursor.subagent_output: what a background subagent wrote for its parent, in a format the vendor documents nothing about, so a line of it is a fragment of a report
 #   - gemini_cli.chats: a chats directory this artifact will not narrow to an extension
 #   - goose.command_history: a line editor's history file, which is a line each until the writer chooses its escaped format, and the analyzer reads whichever of the two the file is in
+#   - hermes.pastes: the text behind a placeholder in a prompt, which is whatever the user pasted: a line of it is a fragment of what they handed the agent, and the analyzer carries the file whole as one prompt
+#   - hermes.session_exports: conversations exported to readable files, which are prose rather than records, in a directory this artifact will not narrow to an extension
 #   - hermes.sessions_dir: a sessions directory this artifact will not narrow to an extension
+#   - hermes.spillover: the bulk output of one tool call in one file, which is prose rather than records, for the same reason as the entry of another agent above
 #   - jetbrains_ai.aia_task_history: a session file of prose rather than records, so a line of it is a fragment of a conversation
 #   - junie.cli_sessions: read in part: its own event log comes back record by record and the subagent transcripts beside it sit in a subtree this artifact will not narrow to an extension
 #   - junie.matterhorn_project_logs: read in part: the event and issue files come back record by record and the tree around them, which is where this product's Windows paths lead, is returned as files
@@ -102,7 +105,7 @@ description: |
       read rather than as an agent that left nothing behind.
 
     - Some of what the suite's own analyzer reads is not read here, or is read
-      only in part: 27 artifacts, named in the notes below. Where
+      only in part: 30 artifacts, named in the notes below. Where
       one of them is not read, a row says the file was there, with its hash and its
       timestamps, and nothing about the conversation in it. Collect those files
       with the Collect artifact and ingest them.
@@ -292,10 +295,50 @@ sources:
       goose,goose.sessions_db_windows,file_only,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db-shm
       goose,goose.sessions_db_windows,file_only,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db-wal
       goose,goose.sessions_jsonl_legacy,generic_jsonl,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/*.jsonl
+      hermes,hermes.a2a_conversations,generic_jsonl,C:/Users/*/.hermes/a2a_conversations/*.jsonl
+      hermes,hermes.a2a_conversations,generic_jsonl,C:/Users/*/.hermes/profiles/*/a2a_conversations/*.jsonl
+      hermes,hermes.a2a_conversations,generic_jsonl,C:/Users/*/AppData/Local/hermes/a2a_conversations/*.jsonl
+      hermes,hermes.a2a_conversations,generic_jsonl,C:/Users/*/AppData/Local/hermes/profiles/*/a2a_conversations/*.jsonl
+      hermes,hermes.pastes,file_only,C:/Users/*/.hermes/pastes/paste_*.txt
+      hermes,hermes.pastes,file_only,C:/Users/*/.hermes/profiles/*/pastes/paste_*.txt
+      hermes,hermes.pastes,file_only,C:/Users/*/AppData/Local/hermes/pastes/paste_*.txt
+      hermes,hermes.pastes,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/pastes/paste_*.txt
+      hermes,hermes.retired_wal_generations,file_only,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
+      hermes,hermes.retired_wal_generations,file_only,C:/Users/*/.hermes/state.db.retired-wal-*/**
+      hermes,hermes.retired_wal_generations,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/**
+      hermes,hermes.retired_wal_generations,file_only,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/**
+      hermes,hermes.retired_wal_transcripts,file_only,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db
+      hermes,hermes.retired_wal_transcripts,file_only,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+      hermes,hermes.retired_wal_transcripts,file_only,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
+      hermes,hermes.retired_wal_transcripts,file_only,C:/Users/*/.hermes/state.db.retired-wal-*/state.db
+      hermes,hermes.retired_wal_transcripts,file_only,C:/Users/*/.hermes/state.db.retired-wal-*/state.db-shm
+      hermes,hermes.retired_wal_transcripts,file_only,C:/Users/*/.hermes/state.db.retired-wal-*/state.db-wal
+      hermes,hermes.retired_wal_transcripts,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/state.db
+      hermes,hermes.retired_wal_transcripts,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+      hermes,hermes.retired_wal_transcripts,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/state.db-wal
+      hermes,hermes.retired_wal_transcripts,file_only,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/state.db
+      hermes,hermes.retired_wal_transcripts,file_only,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/state.db-shm
+      hermes,hermes.retired_wal_transcripts,file_only,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/state.db-wal
+      hermes,hermes.saved_sessions,file_only,C:/Users/*/.hermes/profiles/*/sessions/saved/*.json
+      hermes,hermes.saved_sessions,file_only,C:/Users/*/.hermes/profiles/*/sessions/sessions.json
+      hermes,hermes.saved_sessions,file_only,C:/Users/*/.hermes/sessions/saved/*.json
+      hermes,hermes.saved_sessions,file_only,C:/Users/*/.hermes/sessions/sessions.json
+      hermes,hermes.saved_sessions,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/sessions/saved/*.json
+      hermes,hermes.saved_sessions,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/sessions/sessions.json
+      hermes,hermes.saved_sessions,file_only,C:/Users/*/AppData/Local/hermes/sessions/saved/*.json
+      hermes,hermes.saved_sessions,file_only,C:/Users/*/AppData/Local/hermes/sessions/sessions.json
+      hermes,hermes.session_exports,file_only,C:/Users/*/.hermes/profiles/*/session-exports/**
+      hermes,hermes.session_exports,file_only,C:/Users/*/.hermes/session-exports/**
+      hermes,hermes.session_exports,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/session-exports/**
+      hermes,hermes.session_exports,file_only,C:/Users/*/AppData/Local/hermes/session-exports/**
       hermes,hermes.sessions_dir,file_only,C:/Users/*/.hermes/profiles/*/sessions/**
       hermes,hermes.sessions_dir,file_only,C:/Users/*/.hermes/sessions/**
       hermes,hermes.sessions_dir,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/sessions/**
       hermes,hermes.sessions_dir,file_only,C:/Users/*/AppData/Local/hermes/sessions/**
+      hermes,hermes.spillover,file_only,C:/Users/*/.hermes/cache/spillover/*.txt
+      hermes,hermes.spillover,file_only,C:/Users/*/.hermes/profiles/*/cache/spillover/*.txt
+      hermes,hermes.spillover,file_only,C:/Users/*/AppData/Local/hermes/cache/spillover/*.txt
+      hermes,hermes.spillover,file_only,C:/Users/*/AppData/Local/hermes/profiles/*/cache/spillover/*.txt
       hermes,hermes.state_db,file_only,C:/Users/*/.hermes/profiles/*/state.db
       hermes,hermes.state_db,file_only,C:/Users/*/.hermes/profiles/*/state.db-shm
       hermes,hermes.state_db,file_only,C:/Users/*/.hermes/profiles/*/state.db-wal
@@ -1128,10 +1171,50 @@ sources:
       goose,goose.sessions_db,file_only,/var/root/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
       goose,goose.sessions_jsonl_legacy,generic_jsonl,/Users/*/.local/share/goose/sessions/*.jsonl
       goose,goose.sessions_jsonl_legacy,generic_jsonl,/var/root/.local/share/goose/sessions/*.jsonl
+      hermes,hermes.a2a_conversations,generic_jsonl,/Users/*/.hermes/a2a_conversations/*.jsonl
+      hermes,hermes.a2a_conversations,generic_jsonl,/Users/*/.hermes/profiles/*/a2a_conversations/*.jsonl
+      hermes,hermes.a2a_conversations,generic_jsonl,/var/root/.hermes/a2a_conversations/*.jsonl
+      hermes,hermes.a2a_conversations,generic_jsonl,/var/root/.hermes/profiles/*/a2a_conversations/*.jsonl
+      hermes,hermes.pastes,file_only,/Users/*/.hermes/pastes/paste_*.txt
+      hermes,hermes.pastes,file_only,/Users/*/.hermes/profiles/*/pastes/paste_*.txt
+      hermes,hermes.pastes,file_only,/var/root/.hermes/pastes/paste_*.txt
+      hermes,hermes.pastes,file_only,/var/root/.hermes/profiles/*/pastes/paste_*.txt
+      hermes,hermes.retired_wal_generations,file_only,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
+      hermes,hermes.retired_wal_generations,file_only,/Users/*/.hermes/state.db.retired-wal-*/**
+      hermes,hermes.retired_wal_generations,file_only,/var/root/.hermes/profiles/*/state.db.retired-wal-*/**
+      hermes,hermes.retired_wal_generations,file_only,/var/root/.hermes/state.db.retired-wal-*/**
+      hermes,hermes.retired_wal_transcripts,file_only,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db
+      hermes,hermes.retired_wal_transcripts,file_only,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+      hermes,hermes.retired_wal_transcripts,file_only,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
+      hermes,hermes.retired_wal_transcripts,file_only,/Users/*/.hermes/state.db.retired-wal-*/state.db
+      hermes,hermes.retired_wal_transcripts,file_only,/Users/*/.hermes/state.db.retired-wal-*/state.db-shm
+      hermes,hermes.retired_wal_transcripts,file_only,/Users/*/.hermes/state.db.retired-wal-*/state.db-wal
+      hermes,hermes.retired_wal_transcripts,file_only,/var/root/.hermes/profiles/*/state.db.retired-wal-*/state.db
+      hermes,hermes.retired_wal_transcripts,file_only,/var/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+      hermes,hermes.retired_wal_transcripts,file_only,/var/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
+      hermes,hermes.retired_wal_transcripts,file_only,/var/root/.hermes/state.db.retired-wal-*/state.db
+      hermes,hermes.retired_wal_transcripts,file_only,/var/root/.hermes/state.db.retired-wal-*/state.db-shm
+      hermes,hermes.retired_wal_transcripts,file_only,/var/root/.hermes/state.db.retired-wal-*/state.db-wal
+      hermes,hermes.saved_sessions,file_only,/Users/*/.hermes/profiles/*/sessions/saved/*.json
+      hermes,hermes.saved_sessions,file_only,/Users/*/.hermes/profiles/*/sessions/sessions.json
+      hermes,hermes.saved_sessions,file_only,/Users/*/.hermes/sessions/saved/*.json
+      hermes,hermes.saved_sessions,file_only,/Users/*/.hermes/sessions/sessions.json
+      hermes,hermes.saved_sessions,file_only,/var/root/.hermes/profiles/*/sessions/saved/*.json
+      hermes,hermes.saved_sessions,file_only,/var/root/.hermes/profiles/*/sessions/sessions.json
+      hermes,hermes.saved_sessions,file_only,/var/root/.hermes/sessions/saved/*.json
+      hermes,hermes.saved_sessions,file_only,/var/root/.hermes/sessions/sessions.json
+      hermes,hermes.session_exports,file_only,/Users/*/.hermes/profiles/*/session-exports/**
+      hermes,hermes.session_exports,file_only,/Users/*/.hermes/session-exports/**
+      hermes,hermes.session_exports,file_only,/var/root/.hermes/profiles/*/session-exports/**
+      hermes,hermes.session_exports,file_only,/var/root/.hermes/session-exports/**
       hermes,hermes.sessions_dir,file_only,/Users/*/.hermes/profiles/*/sessions/**
       hermes,hermes.sessions_dir,file_only,/Users/*/.hermes/sessions/**
       hermes,hermes.sessions_dir,file_only,/var/root/.hermes/profiles/*/sessions/**
       hermes,hermes.sessions_dir,file_only,/var/root/.hermes/sessions/**
+      hermes,hermes.spillover,file_only,/Users/*/.hermes/cache/spillover/*.txt
+      hermes,hermes.spillover,file_only,/Users/*/.hermes/profiles/*/cache/spillover/*.txt
+      hermes,hermes.spillover,file_only,/var/root/.hermes/cache/spillover/*.txt
+      hermes,hermes.spillover,file_only,/var/root/.hermes/profiles/*/cache/spillover/*.txt
       hermes,hermes.state_db,file_only,/Users/*/.hermes/profiles/*/state.db
       hermes,hermes.state_db,file_only,/Users/*/.hermes/profiles/*/state.db-shm
       hermes,hermes.state_db,file_only,/Users/*/.hermes/profiles/*/state.db-wal
@@ -2070,10 +2153,50 @@ sources:
       goose,goose.sessions_db,file_only,/root/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
       goose,goose.sessions_jsonl_legacy,generic_jsonl,/home/*/.local/share/goose/sessions/*.jsonl
       goose,goose.sessions_jsonl_legacy,generic_jsonl,/root/.local/share/goose/sessions/*.jsonl
+      hermes,hermes.a2a_conversations,generic_jsonl,/home/*/.hermes/a2a_conversations/*.jsonl
+      hermes,hermes.a2a_conversations,generic_jsonl,/home/*/.hermes/profiles/*/a2a_conversations/*.jsonl
+      hermes,hermes.a2a_conversations,generic_jsonl,/root/.hermes/a2a_conversations/*.jsonl
+      hermes,hermes.a2a_conversations,generic_jsonl,/root/.hermes/profiles/*/a2a_conversations/*.jsonl
+      hermes,hermes.pastes,file_only,/home/*/.hermes/pastes/paste_*.txt
+      hermes,hermes.pastes,file_only,/home/*/.hermes/profiles/*/pastes/paste_*.txt
+      hermes,hermes.pastes,file_only,/root/.hermes/pastes/paste_*.txt
+      hermes,hermes.pastes,file_only,/root/.hermes/profiles/*/pastes/paste_*.txt
+      hermes,hermes.retired_wal_generations,file_only,/home/*/.hermes/profiles/*/state.db.retired-wal-*/**
+      hermes,hermes.retired_wal_generations,file_only,/home/*/.hermes/state.db.retired-wal-*/**
+      hermes,hermes.retired_wal_generations,file_only,/root/.hermes/profiles/*/state.db.retired-wal-*/**
+      hermes,hermes.retired_wal_generations,file_only,/root/.hermes/state.db.retired-wal-*/**
+      hermes,hermes.retired_wal_transcripts,file_only,/home/*/.hermes/profiles/*/state.db.retired-wal-*/state.db
+      hermes,hermes.retired_wal_transcripts,file_only,/home/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+      hermes,hermes.retired_wal_transcripts,file_only,/home/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
+      hermes,hermes.retired_wal_transcripts,file_only,/home/*/.hermes/state.db.retired-wal-*/state.db
+      hermes,hermes.retired_wal_transcripts,file_only,/home/*/.hermes/state.db.retired-wal-*/state.db-shm
+      hermes,hermes.retired_wal_transcripts,file_only,/home/*/.hermes/state.db.retired-wal-*/state.db-wal
+      hermes,hermes.retired_wal_transcripts,file_only,/root/.hermes/profiles/*/state.db.retired-wal-*/state.db
+      hermes,hermes.retired_wal_transcripts,file_only,/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+      hermes,hermes.retired_wal_transcripts,file_only,/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
+      hermes,hermes.retired_wal_transcripts,file_only,/root/.hermes/state.db.retired-wal-*/state.db
+      hermes,hermes.retired_wal_transcripts,file_only,/root/.hermes/state.db.retired-wal-*/state.db-shm
+      hermes,hermes.retired_wal_transcripts,file_only,/root/.hermes/state.db.retired-wal-*/state.db-wal
+      hermes,hermes.saved_sessions,file_only,/home/*/.hermes/profiles/*/sessions/saved/*.json
+      hermes,hermes.saved_sessions,file_only,/home/*/.hermes/profiles/*/sessions/sessions.json
+      hermes,hermes.saved_sessions,file_only,/home/*/.hermes/sessions/saved/*.json
+      hermes,hermes.saved_sessions,file_only,/home/*/.hermes/sessions/sessions.json
+      hermes,hermes.saved_sessions,file_only,/root/.hermes/profiles/*/sessions/saved/*.json
+      hermes,hermes.saved_sessions,file_only,/root/.hermes/profiles/*/sessions/sessions.json
+      hermes,hermes.saved_sessions,file_only,/root/.hermes/sessions/saved/*.json
+      hermes,hermes.saved_sessions,file_only,/root/.hermes/sessions/sessions.json
+      hermes,hermes.session_exports,file_only,/home/*/.hermes/profiles/*/session-exports/**
+      hermes,hermes.session_exports,file_only,/home/*/.hermes/session-exports/**
+      hermes,hermes.session_exports,file_only,/root/.hermes/profiles/*/session-exports/**
+      hermes,hermes.session_exports,file_only,/root/.hermes/session-exports/**
       hermes,hermes.sessions_dir,file_only,/home/*/.hermes/profiles/*/sessions/**
       hermes,hermes.sessions_dir,file_only,/home/*/.hermes/sessions/**
       hermes,hermes.sessions_dir,file_only,/root/.hermes/profiles/*/sessions/**
       hermes,hermes.sessions_dir,file_only,/root/.hermes/sessions/**
+      hermes,hermes.spillover,file_only,/home/*/.hermes/cache/spillover/*.txt
+      hermes,hermes.spillover,file_only,/home/*/.hermes/profiles/*/cache/spillover/*.txt
+      hermes,hermes.spillover,file_only,/root/.hermes/cache/spillover/*.txt
+      hermes,hermes.spillover,file_only,/root/.hermes/profiles/*/cache/spillover/*.txt
       hermes,hermes.state_db,file_only,/home/*/.hermes/profiles/*/state.db
       hermes,hermes.state_db,file_only,/home/*/.hermes/profiles/*/state.db-shm
       hermes,hermes.state_db,file_only,/home/*/.hermes/profiles/*/state.db-wal

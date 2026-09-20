@@ -68,6 +68,8 @@ LOGS = frozenset(
         "factory_droid.sessions",
         "goose.llm_request_logs",
         "goose.sessions_jsonl_legacy",
+        "hermes.a2a_audit",
+        "hermes.a2a_conversations",
         "hermes.sessions_dir",
         "junie.cli_sessions",
         "junie.matterhorn_project_logs",

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: cd86baac2010
+# Catalogue digest: df9ddcda5104
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -580,12 +580,96 @@ sources:
     goose,/root/.local/state/goose/logs/llm_request.*.jsonl
     goose,/var/root/.local/state/goose/logs/llm_request.*.jsonl
     goose,C:/Users/*/AppData/Roaming/Block/goose/data/logs/llm_request.*.jsonl
+    hermes,/Users/*/.hermes/pastes/paste_*.txt
+    hermes,/Users/*/.hermes/pastes/pending.json
+    hermes,/Users/*/.hermes/profiles/*/pastes/paste_*.txt
+    hermes,/Users/*/.hermes/profiles/*/pastes/pending.json
+    hermes,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
+    hermes,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
+    hermes,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db
+    hermes,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+    hermes,/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
     hermes,/Users/*/.hermes/profiles/.deleted/**
+    hermes,/Users/*/.hermes/state.db.retired-wal-*/**
+    hermes,/Users/*/.hermes/state.db.retired-wal-*/manifest.json
+    hermes,/Users/*/.hermes/state.db.retired-wal-*/state.db
+    hermes,/Users/*/.hermes/state.db.retired-wal-*/state.db-shm
+    hermes,/Users/*/.hermes/state.db.retired-wal-*/state.db-wal
+    hermes,/home/*/.hermes/pastes/paste_*.txt
+    hermes,/home/*/.hermes/pastes/pending.json
+    hermes,/home/*/.hermes/profiles/*/pastes/paste_*.txt
+    hermes,/home/*/.hermes/profiles/*/pastes/pending.json
+    hermes,/home/*/.hermes/profiles/*/state.db.retired-wal-*/**
+    hermes,/home/*/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
+    hermes,/home/*/.hermes/profiles/*/state.db.retired-wal-*/state.db
+    hermes,/home/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+    hermes,/home/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
     hermes,/home/*/.hermes/profiles/.deleted/**
+    hermes,/home/*/.hermes/state.db.retired-wal-*/**
+    hermes,/home/*/.hermes/state.db.retired-wal-*/manifest.json
+    hermes,/home/*/.hermes/state.db.retired-wal-*/state.db
+    hermes,/home/*/.hermes/state.db.retired-wal-*/state.db-shm
+    hermes,/home/*/.hermes/state.db.retired-wal-*/state.db-wal
+    hermes,/root/.hermes/pastes/paste_*.txt
+    hermes,/root/.hermes/pastes/pending.json
+    hermes,/root/.hermes/profiles/*/pastes/paste_*.txt
+    hermes,/root/.hermes/profiles/*/pastes/pending.json
+    hermes,/root/.hermes/profiles/*/state.db.retired-wal-*/**
+    hermes,/root/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
+    hermes,/root/.hermes/profiles/*/state.db.retired-wal-*/state.db
+    hermes,/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+    hermes,/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
     hermes,/root/.hermes/profiles/.deleted/**
+    hermes,/root/.hermes/state.db.retired-wal-*/**
+    hermes,/root/.hermes/state.db.retired-wal-*/manifest.json
+    hermes,/root/.hermes/state.db.retired-wal-*/state.db
+    hermes,/root/.hermes/state.db.retired-wal-*/state.db-shm
+    hermes,/root/.hermes/state.db.retired-wal-*/state.db-wal
+    hermes,/var/root/.hermes/pastes/paste_*.txt
+    hermes,/var/root/.hermes/pastes/pending.json
+    hermes,/var/root/.hermes/profiles/*/pastes/paste_*.txt
+    hermes,/var/root/.hermes/profiles/*/pastes/pending.json
+    hermes,/var/root/.hermes/profiles/*/state.db.retired-wal-*/**
+    hermes,/var/root/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
+    hermes,/var/root/.hermes/profiles/*/state.db.retired-wal-*/state.db
+    hermes,/var/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+    hermes,/var/root/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
     hermes,/var/root/.hermes/profiles/.deleted/**
+    hermes,/var/root/.hermes/state.db.retired-wal-*/**
+    hermes,/var/root/.hermes/state.db.retired-wal-*/manifest.json
+    hermes,/var/root/.hermes/state.db.retired-wal-*/state.db
+    hermes,/var/root/.hermes/state.db.retired-wal-*/state.db-shm
+    hermes,/var/root/.hermes/state.db.retired-wal-*/state.db-wal
+    hermes,C:/Users/*/.hermes/pastes/paste_*.txt
+    hermes,C:/Users/*/.hermes/pastes/pending.json
+    hermes,C:/Users/*/.hermes/profiles/*/pastes/paste_*.txt
+    hermes,C:/Users/*/.hermes/profiles/*/pastes/pending.json
+    hermes,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/**
+    hermes,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/manifest.json
+    hermes,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db
+    hermes,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+    hermes,C:/Users/*/.hermes/profiles/*/state.db.retired-wal-*/state.db-wal
     hermes,C:/Users/*/.hermes/profiles/.deleted/**
+    hermes,C:/Users/*/.hermes/state.db.retired-wal-*/**
+    hermes,C:/Users/*/.hermes/state.db.retired-wal-*/manifest.json
+    hermes,C:/Users/*/.hermes/state.db.retired-wal-*/state.db
+    hermes,C:/Users/*/.hermes/state.db.retired-wal-*/state.db-shm
+    hermes,C:/Users/*/.hermes/state.db.retired-wal-*/state.db-wal
+    hermes,C:/Users/*/AppData/Local/hermes/pastes/paste_*.txt
+    hermes,C:/Users/*/AppData/Local/hermes/pastes/pending.json
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/pastes/paste_*.txt
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/pastes/pending.json
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/**
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/manifest.json
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/state.db
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/state.db-shm
+    hermes,C:/Users/*/AppData/Local/hermes/profiles/*/state.db.retired-wal-*/state.db-wal
     hermes,C:/Users/*/AppData/Local/hermes/profiles/.deleted/**
+    hermes,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/**
+    hermes,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/manifest.json
+    hermes,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/state.db
+    hermes,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/state.db-shm
+    hermes,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/state.db-wal
     kiro,/Users/*/.kiro/*.sqlite3
     kiro,/Users/*/.kiro/*.sqlite3-shm
     kiro,/Users/*/.kiro/*.sqlite3-wal

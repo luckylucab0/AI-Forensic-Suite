@@ -5921,6 +5921,48 @@ EMBEDDED_CATALOGUE_JSON = r"""
             "agent": "hermes",
             "artifacts": [
                 {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "hermes.a2a_audit",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/a2a_audit.jsonl",
+                        "$HERMES_HOME/profiles/<name>/a2a_audit.jsonl",
+                        "~/.hermes/a2a_audit.jsonl",
+                        "~/.hermes/profiles/<name>/a2a_audit.jsonl",
+                        "%LOCALAPPDATA%\\hermes\\a2a_audit.jsonl",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\a2a_audit.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "hermes.a2a_conversations",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/a2a_conversations/*.jsonl",
+                        "$HERMES_HOME/profiles/<name>/a2a_conversations/*.jsonl",
+                        "~/.hermes/a2a_conversations/*.jsonl",
+                        "~/.hermes/profiles/<name>/a2a_conversations/*.jsonl",
+                        "%LOCALAPPDATA%\\hermes\\a2a_conversations\\*.jsonl",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\a2a_conversations\\*.jsonl"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "credentials",
                     "collect_priority": "normal",
                     "id": "hermes.auth",
@@ -6059,6 +6101,27 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "hermes.debug_share_pastes",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/pastes/pending.json",
+                        "$HERMES_HOME/profiles/<name>/pastes/pending.json",
+                        "~/.hermes/pastes/pending.json",
+                        "~/.hermes/profiles/<name>/pastes/pending.json",
+                        "%LOCALAPPDATA%\\hermes\\pastes\\pending.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\pastes\\pending.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "credentials",
                     "collect_priority": "normal",
                     "id": "hermes.env",
@@ -6130,6 +6193,27 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "prompt_history",
+                    "collect_priority": "first",
+                    "id": "hermes.pastes",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/pastes/paste_*.txt",
+                        "$HERMES_HOME/profiles/<name>/pastes/paste_*.txt",
+                        "~/.hermes/pastes/paste_*.txt",
+                        "~/.hermes/profiles/<name>/pastes/paste_*.txt",
+                        "%LOCALAPPDATA%\\hermes\\pastes\\paste_*.txt",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\pastes\\paste_*.txt"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "config",
                     "collect_priority": "first",
                     "id": "hermes.profile_tombstones",
@@ -6166,6 +6250,81 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "hermes.retired_wal_generations",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/state.db.retired-wal-*/**",
+                        "$HERMES_HOME/profiles/<name>/state.db.retired-wal-*/**",
+                        "~/.hermes/state.db.retired-wal-*/**",
+                        "~/.hermes/profiles/<name>/state.db.retired-wal-*/**",
+                        "%LOCALAPPDATA%\\hermes\\state.db.retired-wal-*\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\state.db.retired-wal-*\\**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "hermes.retired_wal_manifests",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/state.db.retired-wal-*/manifest.json",
+                        "$HERMES_HOME/profiles/<name>/state.db.retired-wal-*/manifest.json",
+                        "~/.hermes/state.db.retired-wal-*/manifest.json",
+                        "~/.hermes/profiles/<name>/state.db.retired-wal-*/manifest.json",
+                        "%LOCALAPPDATA%\\hermes\\state.db.retired-wal-*\\manifest.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\state.db.retired-wal-*\\manifest.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "hermes.retired_wal_transcripts",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/state.db.retired-wal-*/state.db",
+                        "$HERMES_HOME/profiles/<name>/state.db.retired-wal-*/state.db",
+                        "~/.hermes/state.db.retired-wal-*/state.db",
+                        "~/.hermes/profiles/<name>/state.db.retired-wal-*/state.db",
+                        "%LOCALAPPDATA%\\hermes\\state.db.retired-wal-*\\state.db",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\state.db.retired-wal-*\\state.db",
+                        "$HERMES_HOME/state.db.retired-wal-*/state.db-wal",
+                        "$HERMES_HOME/profiles/<name>/state.db.retired-wal-*/state.db-wal",
+                        "~/.hermes/state.db.retired-wal-*/state.db-wal",
+                        "~/.hermes/profiles/<name>/state.db.retired-wal-*/state.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\state.db.retired-wal-*\\state.db-wal",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\state.db.retired-wal-*\\state.db-wal",
+                        "$HERMES_HOME/state.db.retired-wal-*/state.db-shm",
+                        "$HERMES_HOME/profiles/<name>/state.db.retired-wal-*/state.db-shm",
+                        "~/.hermes/state.db.retired-wal-*/state.db-shm",
+                        "~/.hermes/profiles/<name>/state.db.retired-wal-*/state.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\state.db.retired-wal-*\\state.db-shm",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\state.db.retired-wal-*\\state.db-shm"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "file_snapshot",
                     "collect_priority": "normal",
                     "id": "hermes.sandboxes",
@@ -6181,6 +6340,54 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.hermes/profiles/<name>/sandboxes/",
                         "%LOCALAPPDATA%\\hermes\\sandboxes\\",
                         "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\sandboxes\\"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "hermes.saved_sessions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/sessions/saved/*.json",
+                        "$HERMES_HOME/profiles/<name>/sessions/saved/*.json",
+                        "~/.hermes/sessions/saved/*.json",
+                        "~/.hermes/profiles/<name>/sessions/saved/*.json",
+                        "%LOCALAPPDATA%\\hermes\\sessions\\saved\\*.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\sessions\\saved\\*.json",
+                        "$HERMES_HOME/sessions/sessions.json",
+                        "$HERMES_HOME/profiles/<name>/sessions/sessions.json",
+                        "~/.hermes/sessions/sessions.json",
+                        "~/.hermes/profiles/<name>/sessions/sessions.json",
+                        "%LOCALAPPDATA%\\hermes\\sessions\\sessions.json",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\sessions\\sessions.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "hermes.session_exports",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/session-exports/**",
+                        "$HERMES_HOME/profiles/<name>/session-exports/**",
+                        "~/.hermes/session-exports/**",
+                        "~/.hermes/profiles/<name>/session-exports/**",
+                        "%LOCALAPPDATA%\\hermes\\session-exports\\**",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\session-exports\\**"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6244,6 +6451,27 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.hermes/profiles/<name>/SOUL.md",
                         "%LOCALAPPDATA%\\hermes\\SOUL.md",
                         "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\SOUL.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "live_only",
+                    "id": "hermes.spillover",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$HERMES_HOME/cache/spillover/*.txt",
+                        "$HERMES_HOME/profiles/<name>/cache/spillover/*.txt",
+                        "~/.hermes/cache/spillover/*.txt",
+                        "~/.hermes/profiles/<name>/cache/spillover/*.txt",
+                        "%LOCALAPPDATA%\\hermes\\cache\\spillover\\*.txt",
+                        "%LOCALAPPDATA%\\hermes\\profiles\\<name>\\cache\\spillover\\*.txt"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -9497,7 +9725,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "be122df83d00feacf86e7b564b5fdc8397b082179f14b012a8c958aa5f2774ed"
+    "sha256": "6ecf50e726a33aa87bcce591532d44c8145691ae4ee29dadad4bd1fb73192e65"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)
