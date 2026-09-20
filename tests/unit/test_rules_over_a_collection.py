@@ -75,6 +75,23 @@ EXPECTED = {
     "AFX-PROMPTINJECTION-003": "a project instruction file arrived with the work",
     "AFX-PROMPTINJECTION-004": "a memory holds a standing permission the user is never asked "
     "for again",
+    "AFX-ANTIFORENSICS-003": "~/.zsh_history holds the agent's own purge subcommand, which "
+    "names itself where the deletion beside it does not",
+    "AFX-ANTIFORENSICS-004": "~/.zsh_history holds the same tidy-up done by hand, reaching the "
+    "transcript store and the history file itself",
+    "AFX-DANGEROUSCOMMANDS-001": "a transcript holds a recursive delete against an unset "
+    "variable, which is the accident rather than a contrived rm of the root",
+    "AFX-DANGEROUSCOMMANDS-003": "~/.zsh_history holds a force push and a hard reset, so the "
+    "reflog on this machine is the only copy of what the remote held",
+    "AFX-EXFILINDICATORS-001": "a transcript holds a tool call that posts to a public paste "
+    "service",
+    "AFX-EXFILINDICATORS-002": "the same call packs and encodes the two credential directories "
+    "before sending them, which is the shape this rule is written for",
+    "AFX-EXFILINDICATORS-003": "a transcript holds a tool call that adds a remote and pushes the "
+    "whole repository to it",
+    "AFX-SENSITIVEPATHS-001": "a transcript holds the agent reading a private key by name",
+    "AFX-SENSITIVEPATHS-002": "and the cloud provider credential file beside it",
+    "AFX-SENSITIVEPATHS-003": "and asking the platform keychain for a stored password",
     "AFX-SECRETS-001": "a transcript holds a cloud provider access key",
     "AFX-SECRETS-005": "~/.claude/paste-cache holds the configuration somebody pasted "
     "instead of committing, with a password named the way a configuration file names one",
@@ -106,27 +123,14 @@ EXPECTED = {
 # and when the evidence was finally put in front of it, two things between the catalogue
 # and the parser turned out to be wrong.
 SILENT = {
-    "AFX-ANTIFORENSICS-003": "no agent's own purge command is in any history the profile "
-    "carries. The POSIX shell history holds a deletion done with rm, which the rule beside "
-    "this one is about, and not the vendor subcommand that does the same thing and says so",
-    "AFX-ANTIFORENSICS-004": "the removal of an agent store is in the Windows profile's "
-    "PowerShell history and this case is built from the POSIX profile alone",
     "AFX-COLLECTIONINTEGRITY-002": "no agent has left its dated cleanup marker in the "
     "profile's per-project directory",
     "AFX-COLLECTIONINTEGRITY-003": "the profile carries no registry document, so the URL "
     "handler a product registers under the user's class keys is in no case this builds",
-    "AFX-DANGEROUSCOMMANDS-001": "no recursive delete against a broad path is in a history "
-    "or a transcript here",
-    "AFX-DANGEROUSCOMMANDS-003": "no history rewrite or force push is in one either",
     "AFX-DATAVOLUME-001": "the profile's transcripts read a handful of files, not the burst "
     "this rule counts, and a burst has to be written as one to be read as one",
     "AFX-DATAVOLUME-002": "nothing in the profile carries a body of text large enough, "
     "because every fixture file is small on purpose",
-    "AFX-EXFILINDICATORS-001": "no command in the profile posts a local file to a sharing "
-    "service. The rule beside it fires on an upload the shell history does carry, so what "
-    "is missing is the destination rather than the shape",
-    "AFX-EXFILINDICATORS-002": "no command here encodes a file before sending it",
-    "AFX-EXFILINDICATORS-003": "no command here adds a git remote and pushes to it",
     "AFX-PERMISSIONBYPASS-009": "a policy under the user's own hive is a registry document, "
     "and the profile carries none. The Windows profile is where one would go",
     "AFX-PROMPTINJECTION-001": "the profile's injected instructions are in files an agent "
@@ -139,10 +143,6 @@ SILENT = {
     "AFX-SECRETS-003": "no model provider token is in the profile. The cloud provider key "
     "the pack does carry is what AFX-SECRETS-001 fires on",
     "AFX-SECRETS-004": "no source forge personal access token is in the profile either",
-    "AFX-SENSITIVEPATHS-001": "no transcript here shows the agent reading a private key or "
-    "an SSH configuration",
-    "AFX-SENSITIVEPATHS-002": "nor a cloud or package registry credential file",
-    "AFX-SENSITIVEPATHS-003": "nor a browser profile, a keychain or a password store",
 }
 
 
