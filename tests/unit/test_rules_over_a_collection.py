@@ -54,6 +54,9 @@ EXPECTED = {
     "force",
     "AFX-COLLECTIONINTEGRITY-001": "~/.zshrc exports the variable that moves the agent's "
     "whole configuration tree away from the path this very fixture writes it to",
+    "AFX-COLLECTIONINTEGRITY-004": "the working copy is open in two editors at once, each "
+    "with a per-workspace store under the same opaque directory name, and the file beside "
+    "each store is what turns that name back into the folder both of them share",
     "AFX-ANTIFORENSICS-005": "~/.config/git/ignore carries the line the agent appended "
     "when it saved its first standing permission, which outlives every directory it owns",
     "AFX-DANGEROUSCOMMANDS-002": "a transcript holds a command that pipes a download into a shell",
@@ -88,6 +91,58 @@ EXPECTED = {
     "AFX-THIRDPARTYENDPOINTS-001": "~/.claude/settings.json points the model endpoint at a gateway",
     "AFX-THIRDPARTYENDPOINTS-002": "~/src/app/.mcp.json also configures a server that runs "
     "somewhere else",
+}
+
+
+# The other side of the table above, and it exists because the table above cannot say
+# anything about what is missing from it. Twenty-nine rules fire over the profile and the
+# rest do not, and until this was written nobody had to say which or why. A rule that
+# quietly left EXPECTED would leave no trace, and a rule added to a pack with no evidence
+# behind it would look exactly like a rule that is simply about something rare.
+#
+# Every entry here is a gap to close rather than a decision: the profile is the only place
+# the whole chain runs at once, so a rule that never meets it is a rule tested against
+# events somebody wrote by hand. AFX-COLLECTIONINTEGRITY-004 was in that state days ago,
+# and when the evidence was finally put in front of it, two things between the catalogue
+# and the parser turned out to be wrong.
+SILENT = {
+    "AFX-ANTIFORENSICS-003": "no agent's own purge command is in any history the profile "
+    "carries. The POSIX shell history holds a deletion done with rm, which the rule beside "
+    "this one is about, and not the vendor subcommand that does the same thing and says so",
+    "AFX-ANTIFORENSICS-004": "the removal of an agent store is in the Windows profile's "
+    "PowerShell history and this case is built from the POSIX profile alone",
+    "AFX-COLLECTIONINTEGRITY-002": "no agent has left its dated cleanup marker in the "
+    "profile's per-project directory",
+    "AFX-COLLECTIONINTEGRITY-003": "the profile carries no registry document, so the URL "
+    "handler a product registers under the user's class keys is in no case this builds",
+    "AFX-DANGEROUSCOMMANDS-001": "no recursive delete against a broad path is in a history "
+    "or a transcript here",
+    "AFX-DANGEROUSCOMMANDS-003": "no history rewrite or force push is in one either",
+    "AFX-DATAVOLUME-001": "the profile's transcripts read a handful of files, not the burst "
+    "this rule counts, and a burst has to be written as one to be read as one",
+    "AFX-DATAVOLUME-002": "nothing in the profile carries a body of text large enough, "
+    "because every fixture file is small on purpose",
+    "AFX-EXFILINDICATORS-001": "no command in the profile posts a local file to a sharing "
+    "service. The rule beside it fires on an upload the shell history does carry, so what "
+    "is missing is the destination rather than the shape",
+    "AFX-EXFILINDICATORS-002": "no command here encodes a file before sending it",
+    "AFX-EXFILINDICATORS-003": "no command here adds a git remote and pushes to it",
+    "AFX-PERMISSIONBYPASS-009": "a policy under the user's own hive is a registry document, "
+    "and the profile carries none. The Windows profile is where one would go",
+    "AFX-PROMPTINJECTION-001": "the profile's injected instructions are in files an agent "
+    "reads as instructions, which the other three rules in this pack cover. What is absent "
+    "is the harder case this rule is for: instruction-like text arriving inside content the "
+    "agent fetched, where it is not supposed to be instruction at all",
+    "AFX-SECRETS-002": "no private key block is in the profile. Writing one needs care "
+    "rather than a decision: the repository's own pre-commit hook refuses a file holding "
+    "the header, so a generator would have to assemble it rather than carry it",
+    "AFX-SECRETS-003": "no model provider token is in the profile. The cloud provider key "
+    "the pack does carry is what AFX-SECRETS-001 fires on",
+    "AFX-SECRETS-004": "no source forge personal access token is in the profile either",
+    "AFX-SENSITIVEPATHS-001": "no transcript here shows the agent reading a private key or "
+    "an SSH configuration",
+    "AFX-SENSITIVEPATHS-002": "nor a cloud or package registry credential file",
+    "AFX-SENSITIVEPATHS-003": "nor a browser profile, a keychain or a password store",
 }
 
 
@@ -188,3 +243,44 @@ def test_a_credential_is_recovered_from_a_pack_and_reaches_the_packs(case_file: 
     # version that replaced it, so a reader that stopped at loose objects had nothing here.
     assert raw["delta_depth"] >= 1
     assert "sk_live_examplekey0123456789" in raw["content"]
+
+
+@pytest.mark.slow
+def test_every_rule_is_either_exercised_here_or_declared_unexercised() -> None:
+    """Neither table says anything on its own; together they have to cover every rule.
+
+    Without this, a rule can be added to a pack, pass its own samples, and never meet a
+    collection, and nothing in the suite says so. That is the state AFX-COLLECTIONINTEGRITY-004
+    was in, and putting the evidence in front of it found two defects between the catalogue
+    and the parser that its own samples could not have caught.
+
+    So a new rule has to be put in one table or the other, and the entry in the second one
+    is a sentence saying what the profile would need to carry. That sentence is the work
+    item.
+    """
+    shipped = {rule.id for rule in load(REPO_ROOT / "rules")}
+    covered = set(EXPECTED) | set(SILENT)
+    assert shipped - covered == set(), (
+        "these rules are neither exercised over the synthetic profile nor declared as not "
+        f"exercised, so nothing says whether they can fire at all: {sorted(shipped - covered)}"
+    )
+    assert covered - shipped == set(), (
+        f"these table entries name rules that no longer exist: {sorted(covered - shipped)}"
+    )
+    assert set(EXPECTED) & set(SILENT) == set(), "a rule cannot be in both tables"
+
+
+@pytest.mark.slow
+def test_a_rule_declared_unexercised_really_does_not_fire(findings: set[str]) -> None:
+    """The table has to stay honest in the other direction too.
+
+    A rule listed as unexercised that has started firing is good news and a stale reason:
+    the profile grew the evidence, somebody should say so in EXPECTED, and the sentence
+    explaining what the profile lacks is now wrong.
+    """
+    started = sorted(rule_id for rule_id in SILENT if rule_id in findings)
+    assert not started, (
+        "these rules are declared as not exercised by the synthetic profile and they fired "
+        f"over it, so the profile now holds what they are about: {started}. Move them to "
+        "EXPECTED with the evidence named"
+    )

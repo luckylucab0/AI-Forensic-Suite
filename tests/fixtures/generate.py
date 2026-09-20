@@ -2401,6 +2401,18 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         RECENT,
     )
 
+    # The same working copy open in two editors derived from the same one, each keeping a
+    # per-workspace store in a directory with the same opaque name. That name is the whole
+    # point: measurement showed it is not a digest of the folder path, so nothing can
+    # compute it back, and both products derive it identically from the same folder. The
+    # file beside each store is the only thing that undoes it, and it was catalogued for
+    # one operating system alone until a rule needed it.
+    for product in ("Cursor", "Devin"):
+        write_workspace_store(
+            home / ".config" / product / "User" / "workspaceStorage" / WORKSPACE_DIR,
+            f"file://{project}",
+        )
+
     # A Cline task directory under the editor's global storage. Roo Code and Kilo Code
     # keep the same layout under their own extension ids, which is why one parser reads
     # all three.
