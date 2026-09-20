@@ -6,7 +6,7 @@ English | [Deutsch](ARTIFACTS.de.md)
 
 Generated from catalog/ by scripts/gen_artifact_docs.py. Do not edit by hand: CI regenerates this file and fails if it differs.
 
-476 artifacts across 31 agent(s), 371 of them resting on a fetched vendor source.
+480 artifacts across 31 agent(s), 375 of them resting on a fetched vendor source.
 
 Entries marked unverified are collected anyway, but no vendor source confirms the path. Treat the absence of such an artifact as inconclusive rather than as evidence that the agent was not used.
 
@@ -784,10 +784,21 @@ expected state rather than a sign that anybody removed it.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `gemini_cli.credentials` | credentials | credentials | macOS, Windows, Linux | `%USERPROFILE%\.gemini\oauth_creds.json`<br>`~/.gemini/oauth_creds.json` | json | secret | Rewritten on sign-in and on token refresh. | verified | [source_code](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts) |
 | `gemini_cli.google_accounts` | google accounts | config | macOS, Windows, Linux | `%USERPROFILE%\.gemini\google_accounts.json`<br>`~/.gemini/google_accounts.json` | json | normal | Rewritten on sign-in. | verified | [source_code](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts) |
+| `gemini_cli.mcp_oauth_tokens` | mcp oauth tokens | credentials | macOS, Windows, Linux | `%USERPROFILE%\.gemini\a2a-oauth-tokens.json`<br>`%USERPROFILE%\.gemini\mcp-oauth-tokens.json`<br>`~/.gemini/a2a-oauth-tokens.json`<br>`~/.gemini/mcp-oauth-tokens.json` | json | secret | Rewritten whenever a token is refreshed, so the file dates the last authentication rather than the first. | verified | [source_code](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts) |
 | `gemini_cli.project_config` | project config | project_instructions | macOS, Windows, Linux | `<project>/.gemini/`<br>`<project>/.gemini/.env`<br>`<project>/.gemini/sandbox.Dockerfile`<br>`<project>/.gemini/settings.json`<br>`<project>/GEMINI.md` | json | normal | Lives and dies with the working copy, and is usually under version control. | verified | [official](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md) |
 | `gemini_cli.system_settings` | system settings | permissions | macOS, Windows, Linux | `%PROGRAMDATA%\gemini-cli\settings.json`<br>`%PROGRAMDATA%\gemini-cli\system-defaults.json`<br>`/Library/Application Support/GeminiCli/settings.json`<br>`/Library/Application Support/GeminiCli/system-defaults.json`<br>`/etc/gemini-cli/settings.json`<br>`/etc/gemini-cli/system-defaults.json` | json | normal | Persistent until an administrator edits it. | verified | [official](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md) |
 | `gemini_cli.trusted_folders` | trusted folders | permissions | macOS, Windows, Linux | `%USERPROFILE%\.gemini\trustedFolders.json`<br>`~/.gemini/trustedFolders.json` | json | normal | Appended to as the user trusts directories; nothing observed that expires an entry. | verified | [source_code](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts) |
 | `gemini_cli.user_settings` | user settings | config | macOS, Windows, Linux | `%USERPROFILE%\.gemini\settings.json`<br>`~/.gemini/settings.json` | json | normal | Persistent until edited. | verified | [official](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md) |
+
+### durable
+
+**Usually still there.** Not covered by the retention sweep, so these routinely outlive the transcripts they describe. When the transcripts are already gone, this group is what is left, and it is often enough to establish that an agent ran, what it was allowed to do, and what the user asked.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `gemini_cli.agent_definitions` | agent definitions | instructions | macOS, Windows, Linux | `%USERPROFILE%\.agents\skills\**`<br>`%USERPROFILE%\.gemini\agents\**`<br>`%USERPROFILE%\.gemini\skills\**`<br>`<project>/.agents/skills/**`<br>`<project>/.gemini/skills/**`<br>`~/.agents/skills/**`<br>`~/.gemini/agents/**`<br>`~/.gemini/skills/**` | markdown | normal | User-authored and not swept. | verified | [source_code](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts) |
+| `gemini_cli.commands` | commands | instructions | macOS, Windows, Linux | `%USERPROFILE%\.gemini\commands\**\*.toml`<br>`<project>/.gemini/commands/**/*.toml`<br>`~/.gemini/commands/**/*.toml` | toml | normal | User-authored and not swept. A project one is normally under version control, so a superseded version is recoverable from git; a user one is not. | verified | [source_code](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts) |
+| `gemini_cli.policies` | policies | permissions | macOS, Windows, Linux | `%PROGRAMDATA%\gemini-cli\policies\**`<br>`%USERPROFILE%\.gemini\policies\**`<br>`/Library/Application Support/GeminiCli/policies/**`<br>`/etc/gemini-cli/policies/**`<br>`<project>/.gemini/policies/**`<br>`~/.gemini/policies/**` | toml | normal | The administrator-scope directories change when somebody with rights over the machine changes them, which makes a recent write there an administrative action worth dating. The user-scope one is rewritten by the product itself whenever a decision is saved. | verified | [source_code](https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts) |
 
 ## Goose
 

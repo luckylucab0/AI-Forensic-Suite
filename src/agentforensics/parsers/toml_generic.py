@@ -33,7 +33,11 @@ from agentforensics.parsers.structured_generic import documents
 # tree as documents would file thousands of events that say only "this was not TOML" and
 # bury the evidence beside them. Every one of those files is still in the case with its
 # path, its hash and its times, which is what install evidence is read for.
-NOT_READ = frozenset({"crosscutting.uv_tool_dir"})
+# One editor's custom slash commands are TOML documents and are read as instructions rather
+# than as documents, because what is in them is a prompt the agent runs when somebody types
+# a name. Reading them here as well would file the same file twice, once under the question
+# it answers and once under a question it does not.
+NOT_READ = frozenset({"crosscutting.uv_tool_dir", "gemini_cli.commands"})
 
 # Every TOML artifact in the catalogue except the one above, written out rather than derived
 # from the format field at runtime, for the reason `json_generic.DOCUMENTS` is written out.
@@ -44,6 +48,7 @@ DOCUMENTS = frozenset(
         "codex.config",
         "codex.mcp_and_notify",
         "codex.requirements_and_permissions",
+        "gemini_cli.policies",
     }
 )
 
@@ -54,6 +59,7 @@ CONFIGURATIONS = frozenset(
         "codex.config",
         "codex.mcp_and_notify",
         "codex.requirements_and_permissions",
+        "gemini_cli.policies",
     }
 )
 

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 9a6c8edb3219
+# Catalogue digest: 5b90322dd6ef
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -85,6 +85,9 @@
 #     factory_droid.mcp_and_hooks
 #     factory_droid.sessions
 #     factory_droid.skills_and_droids
+#     gemini_cli.agent_definitions
+#     gemini_cli.commands
+#     gemini_cli.policies
 #     gemini_cli.project_config
 #     goose.hints
 #     goose.memory
@@ -640,6 +643,8 @@ sources:
     gemini_cli,gemini_cli.credentials,C:/Users/*/.gemini/oauth_creds.json
     gemini_cli,gemini_cli.google_accounts,C:/Users/*/.gemini/google_accounts.json
     gemini_cli,gemini_cli.home_tree,C:/Users/*/.gemini/**
+    gemini_cli,gemini_cli.mcp_oauth_tokens,C:/Users/*/.gemini/a2a-oauth-tokens.json
+    gemini_cli,gemini_cli.mcp_oauth_tokens,C:/Users/*/.gemini/mcp-oauth-tokens.json
     gemini_cli,gemini_cli.shell_history,C:/Users/*/.gemini/tmp/*/shell_history
     gemini_cli,gemini_cli.system_settings,C:/ProgramData/gemini-cli/settings.json
     gemini_cli,gemini_cli.system_settings,C:/ProgramData/gemini-cli/system-defaults.json
@@ -2144,6 +2149,10 @@ sources:
     gemini_cli,gemini_cli.google_accounts,/var/root/.gemini/google_accounts.json
     gemini_cli,gemini_cli.home_tree,/Users/*/.gemini/**
     gemini_cli,gemini_cli.home_tree,/var/root/.gemini/**
+    gemini_cli,gemini_cli.mcp_oauth_tokens,/Users/*/.gemini/a2a-oauth-tokens.json
+    gemini_cli,gemini_cli.mcp_oauth_tokens,/Users/*/.gemini/mcp-oauth-tokens.json
+    gemini_cli,gemini_cli.mcp_oauth_tokens,/var/root/.gemini/a2a-oauth-tokens.json
+    gemini_cli,gemini_cli.mcp_oauth_tokens,/var/root/.gemini/mcp-oauth-tokens.json
     gemini_cli,gemini_cli.shell_history,/Users/*/.gemini/tmp/*/shell_history
     gemini_cli,gemini_cli.shell_history,/var/root/.gemini/tmp/*/shell_history
     gemini_cli,gemini_cli.system_settings,/Library/Application Support/GeminiCli/settings.json
@@ -4082,6 +4091,10 @@ sources:
     gemini_cli,gemini_cli.google_accounts,/root/.gemini/google_accounts.json
     gemini_cli,gemini_cli.home_tree,/home/*/.gemini/**
     gemini_cli,gemini_cli.home_tree,/root/.gemini/**
+    gemini_cli,gemini_cli.mcp_oauth_tokens,/home/*/.gemini/a2a-oauth-tokens.json
+    gemini_cli,gemini_cli.mcp_oauth_tokens,/home/*/.gemini/mcp-oauth-tokens.json
+    gemini_cli,gemini_cli.mcp_oauth_tokens,/root/.gemini/a2a-oauth-tokens.json
+    gemini_cli,gemini_cli.mcp_oauth_tokens,/root/.gemini/mcp-oauth-tokens.json
     gemini_cli,gemini_cli.shell_history,/home/*/.gemini/tmp/*/shell_history
     gemini_cli,gemini_cli.shell_history,/root/.gemini/tmp/*/shell_history
     gemini_cli,gemini_cli.system_settings,/Library/Application Support/GeminiCli/settings.json

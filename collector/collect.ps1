@@ -5462,6 +5462,29 @@ $EmbeddedCatalogueJson = @'
             "agent": "gemini_cli",
             "artifacts": [
                 {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "gemini_cli.agent_definitions",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.agents\\skills\\**",
+                        "%USERPROFILE%\\.gemini\\agents\\**",
+                        "%USERPROFILE%\\.gemini\\skills\\**",
+                        "<project>/.agents/skills/**",
+                        "<project>/.gemini/skills/**",
+                        "~/.agents/skills/**",
+                        "~/.gemini/agents/**",
+                        "~/.gemini/skills/**"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "transcript",
                     "collect_priority": "first",
                     "id": "gemini_cli.chats",
@@ -5478,6 +5501,24 @@ $EmbeddedCatalogueJson = @'
                         "~/.gemini/tmp/*/chats/"
                     ],
                     "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "gemini_cli.commands",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\commands\\**\\*.toml",
+                        "<project>/.gemini/commands/**/*.toml",
+                        "~/.gemini/commands/**/*.toml"
+                    ],
+                    "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -5529,6 +5570,46 @@ $EmbeddedCatalogueJson = @'
                         "~/.gemini/"
                     ],
                     "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "gemini_cli.mcp_oauth_tokens",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\a2a-oauth-tokens.json",
+                        "%USERPROFILE%\\.gemini\\mcp-oauth-tokens.json",
+                        "~/.gemini/a2a-oauth-tokens.json",
+                        "~/.gemini/mcp-oauth-tokens.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "durable",
+                    "id": "gemini_cli.policies",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%PROGRAMDATA%\\gemini-cli\\policies\\**",
+                        "%USERPROFILE%\\.gemini\\policies\\**",
+                        "/Library/Application Support/GeminiCli/policies/**",
+                        "/etc/gemini-cli/policies/**",
+                        "<project>/.gemini/policies/**",
+                        "~/.gemini/policies/**"
+                    ],
+                    "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -9150,7 +9231,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "74548e8707965237db94883857330736bf0218066728c7dafde6274013d09363"
+    "sha256": "8bbd5e98e7fa476ef85703a416c580adef6a18c78a6f350fa5c52107291e5058"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

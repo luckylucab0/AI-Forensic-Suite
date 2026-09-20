@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 9a6c8edb3219
+# Catalogue digest: 5b90322dd6ef
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -94,6 +94,9 @@
 #     factory_droid.mcp_and_hooks
 #     factory_droid.sessions
 #     factory_droid.skills_and_droids
+#     gemini_cli.agent_definitions
+#     gemini_cli.commands
+#     gemini_cli.policies
 #     gemini_cli.project_config
 #     goose.hints
 #     goose.memory
@@ -558,6 +561,8 @@ $targets = @(
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.credentials'; Path = '$profile\.gemini\oauth_creds.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.google_accounts'; Path = '$profile\.gemini\google_accounts.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.home_tree'; Path = '$profile\.gemini' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.mcp_oauth_tokens'; Path = '$profile\.gemini\a2a-oauth-tokens.json' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.mcp_oauth_tokens'; Path = '$profile\.gemini\mcp-oauth-tokens.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.shell_history'; Path = '$profile\.gemini\tmp' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.system_settings'; Path = 'C:\ProgramData\gemini-cli\settings.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.system_settings'; Path = 'C:\ProgramData\gemini-cli\system-defaults.json' }

@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 9a6c8edb3219
+// Catalogue digest: 5b90322dd6ef
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -91,6 +91,9 @@
 //     factory_droid.mcp_and_hooks
 //     factory_droid.sessions
 //     factory_droid.skills_and_droids
+//     gemini_cli.agent_definitions
+//     gemini_cli.commands
+//     gemini_cli.policies
 //     gemini_cli.project_config
 //     goose.hints
 //     goose.memory
@@ -1140,6 +1143,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "gemini_cli", "gemini_cli.credentials", ".gemini\\oauth_creds.json",
     "gemini_cli", "gemini_cli.google_accounts", ".gemini/google_accounts.json",
     "gemini_cli", "gemini_cli.google_accounts", ".gemini\\google_accounts.json",
+    "gemini_cli", "gemini_cli.mcp_oauth_tokens", ".gemini/a2a-oauth-tokens.json",
+    "gemini_cli", "gemini_cli.mcp_oauth_tokens", ".gemini/mcp-oauth-tokens.json",
+    "gemini_cli", "gemini_cli.mcp_oauth_tokens", ".gemini\\a2a-oauth-tokens.json",
+    "gemini_cli", "gemini_cli.mcp_oauth_tokens", ".gemini\\mcp-oauth-tokens.json",
     "gemini_cli", "gemini_cli.shell_history", ".gemini/tmp",
     "gemini_cli", "gemini_cli.shell_history", ".gemini\\tmp",
     "gemini_cli", "gemini_cli.system_settings", "/Library/Application Support/GeminiCli/settings.json",

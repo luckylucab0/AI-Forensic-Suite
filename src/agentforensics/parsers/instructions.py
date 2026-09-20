@@ -59,6 +59,11 @@ from agentforensics.parsers.base import ParseContext, looks_binary, read_json
 # so adding an entry there fails CI until it is listed here.
 SOURCES = frozenset(
     {
+        # Executable TypeScript the agent loads. Its entry says to treat it as
+        # capability grant and, potentially, the malicious component itself. The
+        # script that fetches code and runs it needs to see it.
+        # suffix rule below files it as executable, which is what a rule about a
+        # user-supplied code: a modified built-in or a bespoke tool is both a
         "amazonq.cli_todo_lists",
         "amazonq.cli_user_rules",
         "amazonq.project_rules",
@@ -104,6 +109,8 @@ SOURCES = frozenset(
         "cursor.skills",
         "cursor.subagents",
         "factory_droid.skills_and_droids",
+        "gemini_cli.agent_definitions",
+        "gemini_cli.commands",
         "gemini_cli.project_config",
         "goose.hints",
         "goose.prompts",
@@ -119,11 +126,6 @@ SOURCES = frozenset(
         "lmstudio.hub_downloads",
         "lmstudio.presets",
         "opencode.agents_commands",
-        # Executable TypeScript the agent loads. Its entry says to treat it as
-        # user-supplied code: a modified built-in or a bespoke tool is both a
-        # capability grant and, potentially, the malicious component itself. The
-        # suffix rule below files it as executable, which is what a rule about a
-        # script that fetches code and runs it needs to see it.
         "pi.extensions",
         "pi.prompts",
         "qwen_code.ignore_files",

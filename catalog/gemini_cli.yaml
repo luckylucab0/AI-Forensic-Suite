@@ -233,6 +233,123 @@ artifacts:
 
     Re-sourced by the verification pass, same cause as the home tree entry. Also under the runtime directory, so it moves under the macOS Seatbelt sandbox.
   parser: json_generic
+- id: gemini_cli.commands
+  category: instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.gemini\commands\**\*.toml'
+  - <project>/.gemini/commands/**/*.toml
+  - ~/.gemini/commands/**/*.toml
+  format: toml
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
+  source_kind: source_code
+  record_types:
+  - 'one TOML document per command, with the prompt the command expands to'
+  volatility: |-
+    User-authored and not swept. A project one is normally under version control, so a superseded version is recoverable from git; a user one is not.
+  notes: |-
+    A custom slash command is a stored prompt with a name. Typing the name runs the prompt, so this is an instruction the user wrote, kept outside every transcript, and it is where a command that looks innocuous from its name can say something else entirely.
+
+    Record structure: storage.ts puts the user's at getGlobalGeminiDir()/commands and the project's at <project>/.gemini/commands, and the loader globs '**/*.toml' under each, so subdirectories count and a command can be nested. The loader also reads a commands directory inside every active extension, which this entry does not reach: an extension's own directory is wherever it was installed.
+
+    Both directories are inside a tree this catalogue already collects whole, which is exactly why this entry exists: swept up as part of a home directory they arrive filed as configuration, and what they are is the instruction surface.
+  parser: instructions
+- id: gemini_cli.agent_definitions
+  category: instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.agents\skills\**'
+  - '%USERPROFILE%\.gemini\agents\**'
+  - '%USERPROFILE%\.gemini\skills\**'
+  - <project>/.agents/skills/**
+  - <project>/.gemini/skills/**
+  - ~/.agents/skills/**
+  - ~/.gemini/agents/**
+  - ~/.gemini/skills/**
+  format: markdown
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
+  source_kind: source_code
+  volatility: |-
+    User-authored and not swept.
+  notes: |-
+    The definitions of the subagents this product can run and the skills it can load, which are instructions in the strongest sense: a subagent definition is a standing prompt plus the tools that prompt may use.
+
+    Record structure: storage.ts gives four directories, getUserAgentsDir() = ~/.gemini/agents, getUserSkillsDir() = ~/.gemini/skills, getUserAgentSkillsDir() = ~/.agents/skills and the project equivalents under <project>/.gemini and <project>/.agents. The last pair is the cross-product convention other agents in this catalogue also read, so a skills directory found there is not necessarily this product's.
+
+    There is an acknowledgments file beside them, ~/.gemini/acknowledgments/agents.json, which records that somebody was shown what an agent may do and accepted it. It is collected by the entry for the whole home tree; it is named here because it dates the acceptance rather than the definition.
+  parser: instructions
+- id: gemini_cli.policies
+  category: permissions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%PROGRAMDATA%\gemini-cli\policies\**'
+  - '%USERPROFILE%\.gemini\policies\**'
+  - /Library/Application Support/GeminiCli/policies/**
+  - /etc/gemini-cli/policies/**
+  - <project>/.gemini/policies/**
+  - ~/.gemini/policies/**
+  format: toml
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
+  source_kind: source_code
+  record_types:
+  - 'one TOML document per policy set, including the one the product saves by itself'
+  volatility: |-
+    The administrator-scope directories change when somebody with rights over the machine changes them, which makes a recent write there an administrative action worth dating. The user-scope one is rewritten by the product itself whenever a decision is saved.
+  notes: |-
+    What this agent was allowed to do, and by whom. storage.ts has three scopes: getSystemPoliciesDir() under the platform's system configuration directory, getUserPoliciesDir() = ~/.gemini/policies, and getWorkspacePoliciesDir() = <project>/.gemini/policies. The system one is the administrator's and sits outside the user profile, so no home-directory collection reaches it, which is why it is named here.
+
+    AUTO_SAVED_POLICY_FILENAME = 'auto-saved.toml' is the file the product writes itself when a decision is remembered, in the user scope and in the workspace scope. That file is the record of a permission the user granted in passing, which is a different kind of evidence from a policy somebody sat down and wrote.
+
+    Note also ~/.gemini/policy_integrity.json, which the code keeps beside the runtime directory and which exists to notice a policy file having been changed behind the product's back. It is collected with the home tree; a mismatch between it and the policies here is worth a look.
+  parser: toml_generic
+- id: gemini_cli.mcp_oauth_tokens
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.gemini\a2a-oauth-tokens.json'
+  - '%USERPROFILE%\.gemini\mcp-oauth-tokens.json'
+  - ~/.gemini/a2a-oauth-tokens.json
+  - ~/.gemini/mcp-oauth-tokens.json
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
+  source_kind: source_code
+  volatility: |-
+    Rewritten whenever a token is refreshed, so the file dates the last authentication rather than the first.
+  notes: |-
+    Bearer tokens for the MCP servers and agent-to-agent endpoints this product talks to. storage.ts builds both paths from the runtime directory: getMcpOAuthTokensPath() and getA2aOAuthTokensPath().
+
+    This entry exists because of what happens without it. Both files sit inside the home tree this catalogue already collects whole, and that entry is ordinary configuration, so a collection carried live tokens into a bundle as configuration rather than withholding them. A path claimed by a secret entry is withheld whatever else claims it, which is the rule that makes this the correct fix rather than a second copy of the same file.
+
+    What is still worth recording is that they were there and when they were last written: an MCP server this product held a token for is a destination data could have left by, whether or not the token is in the bundle.
+  parser: null
 - id: gemini_cli.credentials
   category: credentials
   root: user_profile
