@@ -26,7 +26,7 @@ from agentforensics.catalog import (
     load_file,
     resolve_text,
 )
-from agentforensics.parsers import PARSERS
+from agentforensics.parsers import PARSERS, for_artifact
 
 CATALOG_DIR = Path(__file__).resolve().parents[2] / "catalog"
 
@@ -1472,3 +1472,62 @@ def test_no_path_has_a_doubled_separator() -> None:
         "normalise away and at least one exporter does not, so the entry is collectable "
         f"by some of this suite and by none of the rest: {found}"
     )
+
+
+# Paths two entries both claim, where the two are read by different readers. The winner is
+# decided by the matcher, so the reader a path gets is not the one its own entry names, and
+# four catalogue defects of exactly this shape were found and fixed in one pass: a settings
+# file read as prose because an instruction entry claimed it and was the more literal claim,
+# a server directory read the same way, an editor-wide extension index attributed to one
+# vendor, and a settings file inside an entry about state stores.
+#
+# These four are not that. Each is a path two entries can legitimately want, and in each the
+# reader that wins is the right one or costs nothing. They are written down so that a fifth
+# has to be argued for rather than appearing.
+SHARED_WITH_DIFFERENT_READERS = {
+    "~/.bashrc": "the shell profile. One entry wants the relocation variables out of it and "
+    "the other wants everything a profile says about an agent; the second wins and its "
+    "reader finds the variables too, which is why the relocation rule fires on this file in "
+    "the synthetic profile",
+    "~/.zshrc": "the same file under the other shell",
+    "~/.claude/feedback/drafts": "one entry claims the directory and has no reader, the "
+    "other claims what is in it and reads it as the JSON it is. The directory claim wins "
+    "the attribution and the ingest then hands the file to the claimant that can read it",
+    "~/.local/bin": "two installers put their shims in the same directory, which is a fact "
+    "about the directory rather than a defect in either entry",
+}
+
+
+def test_a_path_two_entries_read_differently_is_one_somebody_argued_for() -> None:
+    """Which reader a file gets is decided by the matcher, not by the entry that declares it.
+
+    So an entry can name a reader, have its path won by a different entry, and be read by
+    something else entirely, with every test that reads the catalogue passing: the parser
+    field test asks what reads an id, and this is about what reads a path.
+
+    That gap cost four entries at once. The most expensive was a settings file holding the
+    permissions, the server list and the model endpoint, claimed by an instruction entry
+    that was the more literal claim, so it reached a case as prose and as no configuration
+    snapshot, and the rules that read a configuration could not fire on it.
+    """
+    catalogue = load_catalogue(CATALOG_DIR)
+    claims: dict[str, set[str]] = {}
+    for artifact in catalogue.artifacts:
+        for path in artifact.paths:
+            claims.setdefault(path.replace("\\", "/").rstrip("/").lower(), set()).add(artifact.id)
+
+    contested = {}
+    for path, ids in claims.items():
+        if len(ids) < 2:
+            continue
+        readers = {getattr(for_artifact(name), "name", None) for name in ids}
+        if len(readers) > 1:
+            contested[path] = (sorted(ids), sorted(str(r) for r in readers))
+
+    assert set(contested) == set(SHARED_WITH_DIFFERENT_READERS), (
+        "a path claimed by two entries that read it differently gets whichever reader the "
+        "matcher hands it, which is not necessarily the one its own entry names: "
+        f"{ {k: v for k, v in contested.items() if k not in SHARED_WITH_DIFFERENT_READERS} }"
+    )
+    for path, reason in SHARED_WITH_DIFFERENT_READERS.items():
+        assert reason.strip(), f"{path} is declared with no reason given"
