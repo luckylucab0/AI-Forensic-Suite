@@ -50,6 +50,10 @@ artifacts:
     Successor-product artifact: Devin Desktop is the rebranded Windsurf IDE (shared Codeium/Cognition lineage). Worth cataloguing now because it is where third-party agents driven THROUGH the IDE leave their only local trace. Two independent sources (a usage-tracking tool with per-OS paths, and an extension-development skill doc for the log path).
 
     Record structure: NDJSON stream of ACP protocol events including usage_update records. Only ACP-CONNECTED agents (Cascade/Windsurf, claude-code, opencode) emit local events; the default cloud agent keeps its activity server-side and leaves NO local record.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host. No directory of this name existed under the editor profile on either, at any of the spellings here.
+
+        What was there, in the same parent directory, is a directory of per session databases with a different name, which this catalogue now carries as windsurf.acp_message_stores. The two are neighbours and they are not the same thing: that one holds the messages of a session, and this one is catalogued as an event log. Both stay, because one measurement of one version cannot tell whether the other name belongs to a different version, a different channel or a feature nobody used, and the cost of asking for both is two globs.
   parser: jsonl_generic
 - id: devin.sessions_db
   category: transcript
@@ -81,4 +85,10 @@ artifacts:
     Adjacent-product entry, included because it shows up on the same hosts as Windsurf and is easy to mistake for a Cascade store. One source explicitly retracted an earlier model that assumed a workspaceStorage chat store plus an encrypted Cascade .pb store for the desktop app — there is NO separate Devin desktop chat store; both surfaces write to sessions.db.
 
     Record structure: A single SQLite database (sessions.db) shared by the Devin CLI and the Devin desktop app, with per-session JSON transcripts in a sibling transcripts/ directory. Format is entirely separate from Windsurf's Cascade .pb files despite the shared vendor lineage.
+
+    Measured first hand on a clean Windows 11 26200 host and a clean macOS 26.5 host. None of the paths in this entry existed on either, and recursive searches for the database filename across both user profiles did not find it at any of them.
+
+        That is not a refutation and the entry is unchanged, because what both measurements installed was the desktop product that embeds this agent rather than this agent on its own. The desktop product keeps the same database under its own editor profile, which this catalogue now carries as windsurf.cli_sessions_db, and the schema read there is the one this entry describes: messages as a tree of nodes, a table of tool call state and a table of subagent heads.
+
+        So the two entries are the same store in two places, and which one an endpoint has says how the agent was run. Collect both. An empty result at these paths means the standalone command line was not installed, not that the agent never ran.
   parser: sqlite_generic

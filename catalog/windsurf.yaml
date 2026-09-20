@@ -913,19 +913,11 @@ artifacts:
   category: transcript
   root: user_profile
   os:
-  - macos
   - windows
-  - linux
   paths:
   - '%APPDATA%\Devin\cli\sessions.db'
   - '%APPDATA%\Devin\cli\sessions.db-shm'
   - '%APPDATA%\Devin\cli\sessions.db-wal'
-  - ~/.config/Devin/cli/sessions.db
-  - ~/.config/Devin/cli/sessions.db-shm
-  - ~/.config/Devin/cli/sessions.db-wal
-  - ~/Library/Application Support/Devin/cli/sessions.db
-  - ~/Library/Application Support/Devin/cli/sessions.db-shm
-  - ~/Library/Application Support/Devin/cli/sessions.db-wal
   format: sqlite
   sensitivity: normal
   collect_priority: first
@@ -950,18 +942,18 @@ artifacts:
     Found on the Windows host. The macOS host of the same product version had no such directory, although its key value store carried per session keys naming the same command line interface, so the command line had run there without leaving this file. The macOS and Linux spellings are in this entry anyway, because two globs cost nothing and a missing transcript store costs the case.
 
     Nobody opened a row. Column names, the node linkage and the encoding are unknown.
+
+    This entry is deliberately Windows only, and the reason is a collision worth knowing about. The agent this product embeds is the same agent that ships as a standalone product, and this catalogue carries that one separately under its own key. Its entry names the same database and the same schema under the user's share directory on POSIX and under the application support directory spelled in lower case on macOS, and on a case insensitive filesystem that macOS spelling and the one this entry would have used are the same file. Two entries claiming one path is what ADR 0014 exists to prevent, so this entry keeps the location the Windows measurement actually found, under the editor's own application data directory, and the other entry keeps the rest.
+
+        Which of the two an endpoint has is a real question rather than bookkeeping. A host with the embedded agent's store under the editor profile ran the agent inside the desktop product; a host with it under the share directory ran the standalone command line. Collect both and let the answer be which one is populated.
   parser: sqlite_generic
 - id: windsurf.cli_session_locks
   category: log
   root: user_profile
   os:
-  - macos
   - windows
-  - linux
   paths:
   - '%APPDATA%\Devin\cli\session_locks\<session-name>.lock'
-  - ~/.config/Devin/cli/session_locks/<session-name>.lock
-  - ~/Library/Application Support/Devin/cli/session_locks/<session-name>.lock
   format: text
   sensitivity: normal
   collect_priority: normal
@@ -976,18 +968,18 @@ artifacts:
     The reason to collect a directory of six byte files is that the same names appear as keys in the editor's global key value store, three keys per session carrying the session start time, the count of user messages and the session information. So the directory listing alone gives the set of sessions, and joining it to the key value store gives when each one ran and how much the user said in it. Neither step opens a transcript.
 
     That join is also the check on a deletion. A session name present in the lock directory and absent from the key value store, or the other way round, is a gap somebody made.
+
+    This entry is deliberately Windows only, and the reason is a collision worth knowing about. The agent this product embeds is the same agent that ships as a standalone product, and this catalogue carries that one separately under its own key. Its entry names the same database and the same schema under the user's share directory on POSIX and under the application support directory spelled in lower case on macOS, and on a case insensitive filesystem that macOS spelling and the one this entry would have used are the same file. Two entries claiming one path is what ADR 0014 exists to prevent, so this entry keeps the location the Windows measurement actually found, under the editor's own application data directory, and the other entry keeps the rest.
+
+        Which of the two an endpoint has is a real question rather than bookkeeping. A host with the embedded agent's store under the editor profile ran the agent inside the desktop product; a host with it under the share directory ran the standalone command line. Collect both and let the answer be which one is populated.
   parser: text_log
 - id: windsurf.cli_logs
   category: log
   root: user_profile
   os:
-  - macos
   - windows
-  - linux
   paths:
   - '%APPDATA%\Devin\cli\logs\devin_<yyyymmdd-hhmmss>_<pid>.log'
-  - ~/.config/Devin/cli/logs/devin_<yyyymmdd-hhmmss>_<pid>.log
-  - ~/Library/Application Support/Devin/cli/logs/devin_<yyyymmdd-hhmmss>_<pid>.log
   format: text
   sensitivity: normal
   collect_priority: normal
@@ -1000,6 +992,10 @@ artifacts:
     ONE LOG FILE PER RUN OF THE COMMAND LINE PRODUCT, with the start time and the process identifier in the filename. Sizes ran from five to a hundred kilobytes for a session with one trivial conversation in it, so these are verbose rather than token.
 
     The filenames alone are a process history: every invocation of the command line interface, dated to the second, surviving after the process is gone and after the product is uninstalled. Nobody read the contents, so what is inside is unknown and should be treated as potentially carrying prompt or path material until somebody has looked.
+
+    This entry is deliberately Windows only, and the reason is a collision worth knowing about. The agent this product embeds is the same agent that ships as a standalone product, and this catalogue carries that one separately under its own key. Its entry names the same database and the same schema under the user's share directory on POSIX and under the application support directory spelled in lower case on macOS, and on a case insensitive filesystem that macOS spelling and the one this entry would have used are the same file. Two entries claiming one path is what ADR 0014 exists to prevent, so this entry keeps the location the Windows measurement actually found, under the editor's own application data directory, and the other entry keeps the rest.
+
+        Which of the two an endpoint has is a real question rather than bookkeeping. A host with the embedded agent's store under the editor profile ran the agent inside the desktop product; a host with it under the share directory ran the standalone command line. Collect both and let the answer be which one is populated.
   parser: text_log
 - id: windsurf.cli_feature_state
   category: cache

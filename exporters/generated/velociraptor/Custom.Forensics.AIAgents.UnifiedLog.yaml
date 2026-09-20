@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7beb4f66bf30
+# Catalogue digest: 483bd9a3bd62
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1498,18 +1498,6 @@ sources:
       windsurf,windsurf.cascade_transcripts,generic_jsonl,/Users/*/.windsurf/transcripts/*.jsonl
       windsurf,windsurf.cascade_transcripts,generic_jsonl,/var/root/.devin/transcripts/*.jsonl
       windsurf,windsurf.cascade_transcripts,generic_jsonl,/var/root/.windsurf/transcripts/*.jsonl
-      windsurf,windsurf.cli_sessions_db,file_only,/Users/*/.config/Devin/cli/sessions.db
-      windsurf,windsurf.cli_sessions_db,file_only,/Users/*/.config/Devin/cli/sessions.db-shm
-      windsurf,windsurf.cli_sessions_db,file_only,/Users/*/.config/Devin/cli/sessions.db-wal
-      windsurf,windsurf.cli_sessions_db,file_only,/Users/*/Library/Application Support/Devin/cli/sessions.db
-      windsurf,windsurf.cli_sessions_db,file_only,/Users/*/Library/Application Support/Devin/cli/sessions.db-shm
-      windsurf,windsurf.cli_sessions_db,file_only,/Users/*/Library/Application Support/Devin/cli/sessions.db-wal
-      windsurf,windsurf.cli_sessions_db,file_only,/var/root/.config/Devin/cli/sessions.db
-      windsurf,windsurf.cli_sessions_db,file_only,/var/root/.config/Devin/cli/sessions.db-shm
-      windsurf,windsurf.cli_sessions_db,file_only,/var/root/.config/Devin/cli/sessions.db-wal
-      windsurf,windsurf.cli_sessions_db,file_only,/var/root/Library/Application Support/Devin/cli/sessions.db
-      windsurf,windsurf.cli_sessions_db,file_only,/var/root/Library/Application Support/Devin/cli/sessions.db-shm
-      windsurf,windsurf.cli_sessions_db,file_only,/var/root/Library/Application Support/Devin/cli/sessions.db-wal
       windsurf,windsurf.implicit_trajectories,file_only,/Users/*/.codeium/windsurf/implicit/*.pb
       windsurf,windsurf.implicit_trajectories,file_only,/var/root/.codeium/windsurf/implicit/*.pb
       zed,zed.sidebar_threads,file_only,/Users/*/Library/Application Support/Zed/db/0-stable/db.sqlite
@@ -2524,18 +2512,6 @@ sources:
       windsurf,windsurf.cascade_transcripts,generic_jsonl,/home/*/.windsurf/transcripts/*.jsonl
       windsurf,windsurf.cascade_transcripts,generic_jsonl,/root/.devin/transcripts/*.jsonl
       windsurf,windsurf.cascade_transcripts,generic_jsonl,/root/.windsurf/transcripts/*.jsonl
-      windsurf,windsurf.cli_sessions_db,file_only,/home/*/.config/Devin/cli/sessions.db
-      windsurf,windsurf.cli_sessions_db,file_only,/home/*/.config/Devin/cli/sessions.db-shm
-      windsurf,windsurf.cli_sessions_db,file_only,/home/*/.config/Devin/cli/sessions.db-wal
-      windsurf,windsurf.cli_sessions_db,file_only,/home/*/Library/Application Support/Devin/cli/sessions.db
-      windsurf,windsurf.cli_sessions_db,file_only,/home/*/Library/Application Support/Devin/cli/sessions.db-shm
-      windsurf,windsurf.cli_sessions_db,file_only,/home/*/Library/Application Support/Devin/cli/sessions.db-wal
-      windsurf,windsurf.cli_sessions_db,file_only,/root/.config/Devin/cli/sessions.db
-      windsurf,windsurf.cli_sessions_db,file_only,/root/.config/Devin/cli/sessions.db-shm
-      windsurf,windsurf.cli_sessions_db,file_only,/root/.config/Devin/cli/sessions.db-wal
-      windsurf,windsurf.cli_sessions_db,file_only,/root/Library/Application Support/Devin/cli/sessions.db
-      windsurf,windsurf.cli_sessions_db,file_only,/root/Library/Application Support/Devin/cli/sessions.db-shm
-      windsurf,windsurf.cli_sessions_db,file_only,/root/Library/Application Support/Devin/cli/sessions.db-wal
       windsurf,windsurf.implicit_trajectories,file_only,/home/*/.codeium/windsurf/implicit/*.pb
       windsurf,windsurf.implicit_trajectories,file_only,/root/.codeium/windsurf/implicit/*.pb
       zed,zed.flatpak_legacy_threads,file_only,/home/*/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/**

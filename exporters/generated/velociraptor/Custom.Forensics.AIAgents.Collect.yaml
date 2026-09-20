@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 7beb4f66bf30
+# Catalogue digest: 483bd9a3bd62
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -3841,26 +3841,6 @@ sources:
     windsurf,windsurf.cli_feature_state,/var/root/.config/devin/telemetry_state.json
     windsurf,windsurf.cli_feature_state,/var/root/Library/Application Support/devin/cli/*.*.bin
     windsurf,windsurf.cli_feature_state,/var/root/Library/Application Support/devin/telemetry_state.json
-    windsurf,windsurf.cli_logs,/Users/*/.config/Devin/cli/logs/devin_*_*.log
-    windsurf,windsurf.cli_logs,/Users/*/Library/Application Support/Devin/cli/logs/devin_*_*.log
-    windsurf,windsurf.cli_logs,/var/root/.config/Devin/cli/logs/devin_*_*.log
-    windsurf,windsurf.cli_logs,/var/root/Library/Application Support/Devin/cli/logs/devin_*_*.log
-    windsurf,windsurf.cli_session_locks,/Users/*/.config/Devin/cli/session_locks/*.lock
-    windsurf,windsurf.cli_session_locks,/Users/*/Library/Application Support/Devin/cli/session_locks/*.lock
-    windsurf,windsurf.cli_session_locks,/var/root/.config/Devin/cli/session_locks/*.lock
-    windsurf,windsurf.cli_session_locks,/var/root/Library/Application Support/Devin/cli/session_locks/*.lock
-    windsurf,windsurf.cli_sessions_db,/Users/*/.config/Devin/cli/sessions.db
-    windsurf,windsurf.cli_sessions_db,/Users/*/.config/Devin/cli/sessions.db-shm
-    windsurf,windsurf.cli_sessions_db,/Users/*/.config/Devin/cli/sessions.db-wal
-    windsurf,windsurf.cli_sessions_db,/Users/*/Library/Application Support/Devin/cli/sessions.db
-    windsurf,windsurf.cli_sessions_db,/Users/*/Library/Application Support/Devin/cli/sessions.db-shm
-    windsurf,windsurf.cli_sessions_db,/Users/*/Library/Application Support/Devin/cli/sessions.db-wal
-    windsurf,windsurf.cli_sessions_db,/var/root/.config/Devin/cli/sessions.db
-    windsurf,windsurf.cli_sessions_db,/var/root/.config/Devin/cli/sessions.db-shm
-    windsurf,windsurf.cli_sessions_db,/var/root/.config/Devin/cli/sessions.db-wal
-    windsurf,windsurf.cli_sessions_db,/var/root/Library/Application Support/Devin/cli/sessions.db
-    windsurf,windsurf.cli_sessions_db,/var/root/Library/Application Support/Devin/cli/sessions.db-shm
-    windsurf,windsurf.cli_sessions_db,/var/root/Library/Application Support/Devin/cli/sessions.db-wal
     windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/user_settings.pb
     windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/windsurf/bin/devin-desktop
     windsurf,windsurf.code_tracker_and_settings,/Users/*/.codeium/windsurf/brain/**
@@ -6348,26 +6328,6 @@ sources:
     windsurf,windsurf.cli_feature_state,/root/.config/devin/telemetry_state.json
     windsurf,windsurf.cli_feature_state,/root/Library/Application Support/devin/cli/*.*.bin
     windsurf,windsurf.cli_feature_state,/root/Library/Application Support/devin/telemetry_state.json
-    windsurf,windsurf.cli_logs,/home/*/.config/Devin/cli/logs/devin_*_*.log
-    windsurf,windsurf.cli_logs,/home/*/Library/Application Support/Devin/cli/logs/devin_*_*.log
-    windsurf,windsurf.cli_logs,/root/.config/Devin/cli/logs/devin_*_*.log
-    windsurf,windsurf.cli_logs,/root/Library/Application Support/Devin/cli/logs/devin_*_*.log
-    windsurf,windsurf.cli_session_locks,/home/*/.config/Devin/cli/session_locks/*.lock
-    windsurf,windsurf.cli_session_locks,/home/*/Library/Application Support/Devin/cli/session_locks/*.lock
-    windsurf,windsurf.cli_session_locks,/root/.config/Devin/cli/session_locks/*.lock
-    windsurf,windsurf.cli_session_locks,/root/Library/Application Support/Devin/cli/session_locks/*.lock
-    windsurf,windsurf.cli_sessions_db,/home/*/.config/Devin/cli/sessions.db
-    windsurf,windsurf.cli_sessions_db,/home/*/.config/Devin/cli/sessions.db-shm
-    windsurf,windsurf.cli_sessions_db,/home/*/.config/Devin/cli/sessions.db-wal
-    windsurf,windsurf.cli_sessions_db,/home/*/Library/Application Support/Devin/cli/sessions.db
-    windsurf,windsurf.cli_sessions_db,/home/*/Library/Application Support/Devin/cli/sessions.db-shm
-    windsurf,windsurf.cli_sessions_db,/home/*/Library/Application Support/Devin/cli/sessions.db-wal
-    windsurf,windsurf.cli_sessions_db,/root/.config/Devin/cli/sessions.db
-    windsurf,windsurf.cli_sessions_db,/root/.config/Devin/cli/sessions.db-shm
-    windsurf,windsurf.cli_sessions_db,/root/.config/Devin/cli/sessions.db-wal
-    windsurf,windsurf.cli_sessions_db,/root/Library/Application Support/Devin/cli/sessions.db
-    windsurf,windsurf.cli_sessions_db,/root/Library/Application Support/Devin/cli/sessions.db-shm
-    windsurf,windsurf.cli_sessions_db,/root/Library/Application Support/Devin/cli/sessions.db-wal
     windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/user_settings.pb
     windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/windsurf/bin/devin-desktop
     windsurf,windsurf.code_tracker_and_settings,/home/*/.codeium/windsurf/brain/**

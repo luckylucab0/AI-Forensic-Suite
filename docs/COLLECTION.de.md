@@ -141,6 +141,67 @@ Die Folge: ein Repository, das geklont und nie mit einem Agenten geöffnet wurde
 gefunden, und von einem gelöschten Repository bleibt nur der kodierte Verzeichnisname. Beides
 gehört in den Bericht, statt die Liste als vollständig zu behandeln.
 
+## Ein entferntes Produkt ist keine saubere Maschine
+
+Zwei der Produkte in diesem Katalog wurden auf einem sauberen Windows-Rechner und einem
+sauberen macOS-Rechner installiert, einmal benutzt und dann so entfernt, wie ein Mensch
+Software entfernt: unter Windows über den eigenen Deinstallationsweg des Produkts, unter
+macOS durch Löschen der Anwendung. Unter macOS bringt keines der beiden überhaupt einen
+Deinstallationsweg mit.
+
+Übrig blieben danach 376 Megabyte auf dem Windows-Rechner und rund 700 auf dem macOS-Rechner.
+Keine Fragmente: sämtliche Transkripte, der Volltextindex über die Unterhaltungen, beide
+Zustandsdatenbanken samt ihren Kontoschlüsseln, die Geräte-Kennungen, die
+Telemetrie-Zeitstempel für erste und letzte Nutzung, die Liste zuletzt geöffneter Pfade und
+die Verzeichnisnamen, die Projektpfade im Klartext tragen. Eine Deinstallation dieser
+Produkte entfernt das Programm und vom Inhalt nichts.
+
+Für eine Untersuchung ist das der Normalfall und nicht die Ausnahme. Grenzen Sie eine
+Sicherung nicht auf Rechner ein, auf denen das Produkt gerade installiert ist, und lesen Sie
+das Fehlen eines Programmverzeichnisses nicht als Fehlen von Spuren. Genau deshalb sucht die
+Anwesenheitsprüfung unter `exporters/generated/` nach Daten und nicht nach einer
+Installation.
+
+Wo jemand bewusst aufgeräumt hat, überleben drei Dinge das Aufräumen:
+
+- Unter Windows der URL-Protokoll-Handler, den jedes Produkt unter den Klassenschlüsseln des
+  Benutzers registriert. Der Deinstallationsweg entfernt den Uninstall-Schlüssel und lässt
+  den Handler auf eine ausführbare Datei zeigen, die es nicht mehr gibt. Ein einziger
+  Schlüssel belegt damit sowohl die Installation unter diesem Konto als auch die spätere
+  Entfernung. Die Benutzer-Pfadvariable verhält sich genauso.
+- Unter macOS die Registrierungsdatenbank der Startdienste, die noch einundzwanzig Einträge
+  zu zwei Produkten enthielt, deren Anwendungsbündel, Zwischenspeicher, Einstellungsdomänen
+  und Schlüsselbundeinträge sämtlich entfernt waren. Ihre Einträge verschwinden erst beim
+  Neuaufbau der Datenbank.
+- Unter macOS der generische Schlüsselbundeintrag, den jedes Produkt für seinen sicheren
+  Speicher anlegt. Er hängt nicht am Anwendungsbündel, also entfernt das Löschen der
+  Anwendung ihn nicht.
+
+## Eine Suche nach dem Namen findet das meiste nicht
+
+Aus denselben Messungen kamen drei Namensfallen, und jede davon kostet einen Auswerter ein
+ganzes Produkt.
+
+Eine Bundle-Kennung ist kein Produktname. Einer der Editoren in diesem Katalog wird über eine
+Verpackungsplattform ausgeliefert, seine Kennung enthält daher weder den Namen des
+Herstellers noch den des Produkts, und sie ist das Einzige, worüber sich seine
+Zwischenspeicher, sein Netzwerkspeicher und seine Einstellungsdomäne ansprechen lassen. Eine
+Suche nach dem Produktnamen findet das Benutzerverzeichnis und unterhalb von `~/Library`
+nichts.
+
+Eine Umbenennung benennt die Daten nicht um. Der zweite Editor wurde umbenannt, und seine
+Bundle-Kennung, sein Konfigurationsverzeichnis, seine Anmeldeschlüssel, seine
+Auslieferungsdomäne und eines seiner drei URL-Schemata tragen weiterhin den früheren
+Firmen- und Produktnamen. Eine Suche nach dem aktuellen Namen verfehlt die größere Hälfte der
+Spuren, und der alte Name auf einem Rechner ist kein Beleg dafür, dass das alte Produkt dort
+je installiert war.
+
+Ein Produktname kann Teil von etwas Harmlosem sein. Sucht man in einer Dateiliste nach einem
+dieser Produktnamen, trifft man ein Verzeichnis für Inhaltsentschlüsselung, das mehrere
+Browser mitbringen und das mit keinem Agenten zu tun hat. Verankern Sie das Muster an einer
+Pfadkomponente, statt irgendwo in der Zeichenkette zu suchen, sonst enthält schon die
+Grundaufnahme eines sauberen Rechners Treffer.
+
 ## Ein Bundle verifizieren
 
 ```bash

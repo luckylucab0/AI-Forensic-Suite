@@ -135,6 +135,60 @@ The consequence: a repository the user cloned and never opened with an agent wil
 found, and a repository that has been deleted leaves only its encoded directory name
 behind. Both are worth noting in a report rather than treating the list as complete.
 
+## A removed product is not a clean machine
+
+Two of the products in this catalogue were installed on a clean Windows host and a clean
+macOS host, used once, and then removed the way a person removes software: through the
+product's own uninstaller on Windows, by deleting the application on macOS. Neither of them
+ships an uninstaller on macOS at all.
+
+What was left afterwards was 376 megabytes on the Windows host and around 700 on the macOS
+one. Not fragments: every transcript, the full-text index over the conversations, both state
+databases with their account keys in them, the device identifiers, the telemetry timestamps
+that give first and last use, the list of recently opened paths, and the directory names
+that carry project paths in readable form. An uninstall of these products removes the
+program and none of the content.
+
+For an investigation that is the normal case rather than the exception. Do not scope a
+collection to hosts where the product is currently installed, and do not read the absence of
+a program directory as the absence of evidence. The presence check in
+`exporters/generated/` looks for data, not for an installation, for this reason.
+
+Where somebody has cleaned up deliberately, three things outlive the cleanup:
+
+- On Windows, the URL protocol handler each product registers under the user's class keys.
+  The uninstaller removes the uninstall key and leaves the handler pointing at an executable
+  that no longer exists, so one key says both that the product was installed on this account
+  and that it was later removed. The user's own path variable behaves the same way.
+- On macOS, the launch services registration database, which still held twenty-one entries
+  for two products whose bundles, caches, preference domains and keychain items had all been
+  removed. Its entries go only when the database is rebuilt.
+- On macOS, the generic keychain item each product writes for its safe storage. It does not
+  hang off the application bundle, so removing the application does not remove it.
+
+## Searching by name misses most of it
+
+Three naming traps came out of the same measurements, and each of them costs an analyst a
+whole product.
+
+A bundle identifier is not a product name. One editor in this catalogue ships through a
+packaging platform, so its identifier contains neither the vendor's name nor the product's,
+and it is the only thing that addresses its caches, its network storage and its preference
+domain. A sweep keyed on the product's name finds the home directory and nothing under
+`~/Library`.
+
+A rename does not rename the data. The second editor was renamed, and its bundle identifier,
+its agent configuration directory, its credential keys, its delivery domain and one of its
+three URL schemes all still carry the previous company and the previous product name. A
+search for the current name misses the larger half of the evidence, and finding the old name
+on a host is not evidence that the old product was ever installed there.
+
+A product name can be a substring of something innocent. Searching a file listing for one of
+these product names matches a content-decryption module directory that several browsers
+install, which has nothing to do with any agent. Anchor the pattern to a path component
+rather than matching anywhere in the string, or the baseline of a clean machine already has
+hits in it.
+
 ## Verifying a bundle
 
 ```bash

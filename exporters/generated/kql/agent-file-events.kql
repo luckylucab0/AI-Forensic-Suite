@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 7beb4f66bf30
+// Catalogue digest: 483bd9a3bd62
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -2378,36 +2378,11 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "windsurf", "windsurf.cli_feature_state", "devin/telemetry_state.json",
     "windsurf", "windsurf.cli_feature_state", "devin\\cli",
     "windsurf", "windsurf.cli_feature_state", "devin\\telemetry_state.json",
-    "windsurf", "windsurf.cli_logs", ".config/Devin/cli/logs/devin_",
-    "windsurf", "windsurf.cli_logs", ".config\\Devin\\cli\\logs\\devin_",
-    "windsurf", "windsurf.cli_logs", "Devin/cli/logs/devin_",
     "windsurf", "windsurf.cli_logs", "Devin\\cli\\logs\\devin_",
-    "windsurf", "windsurf.cli_logs", "Library/Application Support/Devin/cli/logs/devin_",
-    "windsurf", "windsurf.cli_logs", "Library\\Application Support\\Devin\\cli\\logs\\devin_",
-    "windsurf", "windsurf.cli_session_locks", ".config/Devin/cli/session_locks",
-    "windsurf", "windsurf.cli_session_locks", ".config\\Devin\\cli\\session_locks",
-    "windsurf", "windsurf.cli_session_locks", "Devin/cli/session_locks",
     "windsurf", "windsurf.cli_session_locks", "Devin\\cli\\session_locks",
-    "windsurf", "windsurf.cli_session_locks", "Library/Application Support/Devin/cli/session_locks",
-    "windsurf", "windsurf.cli_session_locks", "Library\\Application Support\\Devin\\cli\\session_locks",
-    "windsurf", "windsurf.cli_sessions_db", ".config/Devin/cli/sessions.db",
-    "windsurf", "windsurf.cli_sessions_db", ".config/Devin/cli/sessions.db-shm",
-    "windsurf", "windsurf.cli_sessions_db", ".config/Devin/cli/sessions.db-wal",
-    "windsurf", "windsurf.cli_sessions_db", ".config\\Devin\\cli\\sessions.db",
-    "windsurf", "windsurf.cli_sessions_db", ".config\\Devin\\cli\\sessions.db-shm",
-    "windsurf", "windsurf.cli_sessions_db", ".config\\Devin\\cli\\sessions.db-wal",
-    "windsurf", "windsurf.cli_sessions_db", "Devin/cli/sessions.db",
-    "windsurf", "windsurf.cli_sessions_db", "Devin/cli/sessions.db-shm",
-    "windsurf", "windsurf.cli_sessions_db", "Devin/cli/sessions.db-wal",
     "windsurf", "windsurf.cli_sessions_db", "Devin\\cli\\sessions.db",
     "windsurf", "windsurf.cli_sessions_db", "Devin\\cli\\sessions.db-shm",
     "windsurf", "windsurf.cli_sessions_db", "Devin\\cli\\sessions.db-wal",
-    "windsurf", "windsurf.cli_sessions_db", "Library/Application Support/Devin/cli/sessions.db",
-    "windsurf", "windsurf.cli_sessions_db", "Library/Application Support/Devin/cli/sessions.db-shm",
-    "windsurf", "windsurf.cli_sessions_db", "Library/Application Support/Devin/cli/sessions.db-wal",
-    "windsurf", "windsurf.cli_sessions_db", "Library\\Application Support\\Devin\\cli\\sessions.db",
-    "windsurf", "windsurf.cli_sessions_db", "Library\\Application Support\\Devin\\cli\\sessions.db-shm",
-    "windsurf", "windsurf.cli_sessions_db", "Library\\Application Support\\Devin\\cli\\sessions.db-wal",
     "windsurf", "windsurf.code_tracker_and_settings", ".codeium/user_settings.pb",
     "windsurf", "windsurf.code_tracker_and_settings", ".codeium/windsurf/bin/devin-desktop",
     "windsurf", "windsurf.code_tracker_and_settings", ".codeium/windsurf/brain",

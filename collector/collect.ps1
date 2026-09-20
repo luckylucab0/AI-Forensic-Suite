@@ -10695,14 +10695,10 @@ $EmbeddedCatalogueJson = @'
                     "collect_priority": "normal",
                     "id": "windsurf.cli_logs",
                     "os": [
-                        "macos",
-                        "windows",
-                        "linux"
+                        "windows"
                     ],
                     "paths": [
-                        "%APPDATA%\\Devin\\cli\\logs\\devin_<yyyymmdd-hhmmss>_<pid>.log",
-                        "~/.config/Devin/cli/logs/devin_<yyyymmdd-hhmmss>_<pid>.log",
-                        "~/Library/Application Support/Devin/cli/logs/devin_<yyyymmdd-hhmmss>_<pid>.log"
+                        "%APPDATA%\\Devin\\cli\\logs\\devin_<yyyymmdd-hhmmss>_<pid>.log"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -10713,14 +10709,10 @@ $EmbeddedCatalogueJson = @'
                     "collect_priority": "normal",
                     "id": "windsurf.cli_session_locks",
                     "os": [
-                        "macos",
-                        "windows",
-                        "linux"
+                        "windows"
                     ],
                     "paths": [
-                        "%APPDATA%\\Devin\\cli\\session_locks\\<session-name>.lock",
-                        "~/.config/Devin/cli/session_locks/<session-name>.lock",
-                        "~/Library/Application Support/Devin/cli/session_locks/<session-name>.lock"
+                        "%APPDATA%\\Devin\\cli\\session_locks\\<session-name>.lock"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -10731,20 +10723,12 @@ $EmbeddedCatalogueJson = @'
                     "collect_priority": "first",
                     "id": "windsurf.cli_sessions_db",
                     "os": [
-                        "macos",
-                        "windows",
-                        "linux"
+                        "windows"
                     ],
                     "paths": [
                         "%APPDATA%\\Devin\\cli\\sessions.db",
                         "%APPDATA%\\Devin\\cli\\sessions.db-shm",
-                        "%APPDATA%\\Devin\\cli\\sessions.db-wal",
-                        "~/.config/Devin/cli/sessions.db",
-                        "~/.config/Devin/cli/sessions.db-shm",
-                        "~/.config/Devin/cli/sessions.db-wal",
-                        "~/Library/Application Support/Devin/cli/sessions.db",
-                        "~/Library/Application Support/Devin/cli/sessions.db-shm",
-                        "~/Library/Application Support/Devin/cli/sessions.db-wal"
+                        "%APPDATA%\\Devin\\cli\\sessions.db-wal"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -11540,7 +11524,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "88d0b5542b774327126790e2bd92b40619e04163e5de83a1260e4cb77cad8694"
+    "sha256": "4ce604579de6df1ca5066b07b2cbb532cea878b16e2b5930a2f63ee3a9fc81df"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json
