@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: ec8e4be59eb1
+# Catalogue digest: 39479776ddef
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -71,6 +71,8 @@
 #     cline.workspace_specs
 #     continue.agents
 #     continue.config
+#     continue.hook_settings
+#     continue.rules_and_skills
 #     copilot.lsp_config_repo
 #     crosscutting.hook_scripts
 #     crosscutting.instructions_agents_md
@@ -444,10 +446,20 @@ $targets = @(
     @{ Agent = 'continue'; Id = 'continue.aux_config'; Path = '$profile\.continue\.configs' }
     @{ Agent = 'continue'; Id = 'continue.aux_config'; Path = '$profile\.continue\.continueignore' }
     @{ Agent = 'continue'; Id = 'continue.aux_config'; Path = '$profile\.continue\.migrations' }
-    @{ Agent = 'continue'; Id = 'continue.aux_config'; Path = '$profile\.continue\prompts' }
+    @{ Agent = 'continue'; Id = 'continue.cli_auth'; Path = '$profile\.continue\auth.json' }
     @{ Agent = 'continue'; Id = 'continue.dev_data'; Path = '$profile\.continue\dev_data' }
     @{ Agent = 'continue'; Id = 'continue.dev_data'; Path = '$profile\.continue\logs\core.log' }
+    @{ Agent = 'continue'; Id = 'continue.dev_data_db'; Path = '$profile\.continue\dev_data\devdata.sqlite' }
+    @{ Agent = 'continue'; Id = 'continue.dev_data_db'; Path = '$profile\.continue\dev_data\devdata.sqlite-shm' }
+    @{ Agent = 'continue'; Id = 'continue.dev_data_db'; Path = '$profile\.continue\dev_data\devdata.sqlite-wal' }
     @{ Agent = 'continue'; Id = 'continue.diffs'; Path = '$profile\.continue\.diffs' }
+    @{ Agent = 'continue'; Id = 'continue.dotenv'; Path = '$profile\.continue\.env' }
+    @{ Agent = 'continue'; Id = 'continue.environment_markers'; Path = '$profile\.continue\.continuerc.json' }
+    @{ Agent = 'continue'; Id = 'continue.environment_markers'; Path = '$profile\.continue\.local' }
+    @{ Agent = 'continue'; Id = 'continue.environment_markers'; Path = '$profile\.continue\.onboarding_complete' }
+    @{ Agent = 'continue'; Id = 'continue.environment_markers'; Path = '$profile\.continue\.staging' }
+    @{ Agent = 'continue'; Id = 'continue.global_context'; Path = '$profile\.continue\index\globalContext.json' }
+    @{ Agent = 'continue'; Id = 'continue.global_context'; Path = '$profile\.continue\sharedConfig.json' }
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\.utils\repo_map.txt' }
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\autocompleteCache.sqlite' }
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\autocompleteCache.sqlite-shm' }
@@ -459,6 +471,9 @@ $targets = @(
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\index.sqlite-shm' }
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\index.sqlite-wal' }
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\lancedb' }
+    @{ Agent = 'continue'; Id = 'continue.input_history'; Path = '$profile\.continue\input_history.json' }
+    @{ Agent = 'continue'; Id = 'continue.logs'; Path = '$profile\.continue\logs' }
+    @{ Agent = 'continue'; Id = 'continue.permissions'; Path = '$profile\.continue\permissions.yaml' }
     @{ Agent = 'continue'; Id = 'continue.sessions'; Path = '$profile\.continue\sessions' }
     @{ Agent = 'continue'; Id = 'continue.sessions'; Path = '$profile\.continue\sessions\sessions.json' }
     @{ Agent = 'copilot'; Id = 'copilot.agents_skills_hooks'; Path = '$profile\.copilot\agents' }

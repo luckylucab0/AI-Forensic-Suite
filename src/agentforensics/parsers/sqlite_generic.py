@@ -59,6 +59,7 @@ STORES = frozenset(
         "cline.sqlite_dbs",
         "codex.sqlite_glob",
         "codex.state_databases",
+        "continue.dev_data_db",
         "continue.index",
         "copilot.session_store",
         "cursor.acp_session_store",

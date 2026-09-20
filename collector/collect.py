@@ -3627,11 +3627,28 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "~/.continue/.configs/",
                         "~/.continue/.continueignore",
-                        "~/.continue/.migrations/",
-                        "~/.continue/prompts/"
+                        "~/.continue/.migrations/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "continue.cli_auth",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/auth.json",
+                        "~/.continue/auth.json",
+                        "%USERPROFILE%\\.continue\\auth.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
                     "status": "verified"
                 },
                 {
@@ -3671,6 +3688,30 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "continue.dev_data_db",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/dev_data/devdata.sqlite",
+                        "~/.continue/dev_data/devdata.sqlite",
+                        "%USERPROFILE%\\.continue\\dev_data\\devdata.sqlite",
+                        "$CONTINUE_GLOBAL_DIR/dev_data/devdata.sqlite-wal",
+                        "~/.continue/dev_data/devdata.sqlite-wal",
+                        "%USERPROFILE%\\.continue\\dev_data\\devdata.sqlite-wal",
+                        "$CONTINUE_GLOBAL_DIR/dev_data/devdata.sqlite-shm",
+                        "~/.continue/dev_data/devdata.sqlite-shm",
+                        "%USERPROFILE%\\.continue\\dev_data\\devdata.sqlite-shm"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "credentials",
                     "collect_priority": "normal",
                     "id": "continue.devbox_env",
@@ -3701,6 +3742,92 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "continue.dotenv",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/.env",
+                        "~/.continue/.env",
+                        "%USERPROFILE%\\.continue\\.env"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "continue.environment_markers",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/.local",
+                        "~/.continue/.local",
+                        "%USERPROFILE%\\.continue\\.local",
+                        "$CONTINUE_GLOBAL_DIR/.staging",
+                        "~/.continue/.staging",
+                        "%USERPROFILE%\\.continue\\.staging",
+                        "$CONTINUE_GLOBAL_DIR/.onboarding_complete",
+                        "~/.continue/.onboarding_complete",
+                        "%USERPROFILE%\\.continue\\.onboarding_complete",
+                        "$CONTINUE_GLOBAL_DIR/.continuerc.json",
+                        "~/.continue/.continuerc.json",
+                        "%USERPROFILE%\\.continue\\.continuerc.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "continue.global_context",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/index/globalContext.json",
+                        "~/.continue/index/globalContext.json",
+                        "%USERPROFILE%\\.continue\\index\\globalContext.json",
+                        "$CONTINUE_GLOBAL_DIR/sharedConfig.json",
+                        "~/.continue/sharedConfig.json",
+                        "%USERPROFILE%\\.continue\\sharedConfig.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "continue.hook_settings",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/settings.json",
+                        "~/.continue/settings.json",
+                        "%USERPROFILE%\\.continue\\settings.json",
+                        "<project>/.continue/settings.json",
+                        "<project>/.continue/settings.local.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "cache",
                     "collect_priority": "normal",
                     "id": "continue.index",
@@ -3723,6 +3850,87 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.continue/index/lancedb/"
                     ],
                     "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "first",
+                    "id": "continue.input_history",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/input_history.json",
+                        "~/.continue/input_history.json",
+                        "%USERPROFILE%\\.continue\\input_history.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "continue.logs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/logs/**",
+                        "~/.continue/logs/**",
+                        "%USERPROFILE%\\.continue\\logs\\**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "first",
+                    "id": "continue.permissions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/permissions.yaml",
+                        "~/.continue/permissions.yaml",
+                        "%USERPROFILE%\\.continue\\permissions.yaml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "first",
+                    "id": "continue.rules_and_skills",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/rules/**",
+                        "~/.continue/rules/**",
+                        "%USERPROFILE%\\.continue\\rules\\**",
+                        "$CONTINUE_GLOBAL_DIR/skills/**",
+                        "~/.continue/skills/**",
+                        "%USERPROFILE%\\.continue\\skills\\**",
+                        "$CONTINUE_GLOBAL_DIR/prompts/**",
+                        "~/.continue/prompts/**",
+                        "%USERPROFILE%\\.continue\\prompts\\**",
+                        "<project>/.continue/rules/**",
+                        "<project>/.continue/rules.md",
+                        "<project>/.continue/skills/**"
+                    ],
+                    "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -10513,7 +10721,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "d825ae285ef0b67f0f2648ec8e50dd95efd1d2a48c7226bf3ce71b1209cc0559"
+    "sha256": "b47ae71db79b6c55ff9e77cca16d1d4c3db4f66cbc2321829449902c57a615ba"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

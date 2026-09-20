@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: ec8e4be59eb1
+# Catalogue digest: 39479776ddef
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,8 +8,8 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# Scope: the 100 artifacts the catalogue files under transcript and prompt_history.
-# The other 431 are configuration, credentials, caches, logs and install
+# Scope: the 101 artifacts the catalogue files under transcript and prompt_history.
+# The other 440 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
 # credential store what an analyst wants is the file, which is what the Collect
@@ -248,6 +248,7 @@ sources:
       codex,codex.state_databases,file_only,C:/Users/*/.codex/queue_1.sqlite
       codex,codex.state_databases,file_only,C:/Users/*/.codex/state_5.sqlite
       codex,codex.state_databases,file_only,C:/Users/*/.codex/thread_history_1.sqlite
+      continue,continue.input_history,file_only,C:/Users/*/.continue/input_history.json
       continue,continue.sessions,file_only,C:/Users/*/.continue/sessions/*.json
       continue,continue.sessions,file_only,C:/Users/*/.continue/sessions/sessions.json
       copilot,copilot.command_history,file_only,C:/Users/*/.copilot/command-history-state/**
@@ -1053,6 +1054,8 @@ sources:
       codex,codex.state_databases,file_only,/var/root/.codex/queue_1.sqlite
       codex,codex.state_databases,file_only,/var/root/.codex/state_5.sqlite
       codex,codex.state_databases,file_only,/var/root/.codex/thread_history_1.sqlite
+      continue,continue.input_history,file_only,/Users/*/.continue/input_history.json
+      continue,continue.input_history,file_only,/var/root/.continue/input_history.json
       continue,continue.sessions,file_only,/Users/*/.continue/sessions/*.json
       continue,continue.sessions,file_only,/Users/*/.continue/sessions/sessions.json
       continue,continue.sessions,file_only,/var/root/.continue/sessions/*.json
@@ -2051,6 +2054,8 @@ sources:
       codex,codex.state_databases,file_only,/root/.codex/queue_1.sqlite
       codex,codex.state_databases,file_only,/root/.codex/state_5.sqlite
       codex,codex.state_databases,file_only,/root/.codex/thread_history_1.sqlite
+      continue,continue.input_history,file_only,/home/*/.continue/input_history.json
+      continue,continue.input_history,file_only,/root/.continue/input_history.json
       continue,continue.sessions,file_only,/home/*/.continue/sessions/*.json
       continue,continue.sessions,file_only,/home/*/.continue/sessions/sessions.json
       continue,continue.sessions,file_only,/root/.continue/sessions/*.json

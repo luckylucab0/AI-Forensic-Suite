@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: ec8e4be59eb1
+# Catalogue digest: 39479776ddef
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 33 of the 531 catalogue artifacts declare
+# KAPE is Windows only. 33 of the 541 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -17,6 +17,8 @@
 #   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
 #     continue.agents
 #     continue.config
+#     continue.hook_settings
+#     continue.rules_and_skills
 Description: AI coding agent artifacts, Continue
 Author: agentforensics
 Version: 1.0
@@ -42,11 +44,11 @@ Targets:
         FileMask: ".migrations"
         Recursive: false
     -
-        Name: continue.aux_config
-        Category: config
-        Path: C:\Users\%user%\.continue\prompts
-        FileMask: "*"
-        Recursive: true
+        Name: continue.cli_auth
+        Category: credentials
+        Path: C:\Users\%user%\.continue
+        FileMask: "auth.json"
+        Recursive: false
     -
         Name: continue.dev_data
         Category: log
@@ -60,10 +62,70 @@ Targets:
         FileMask: "core.log"
         Recursive: false
     -
+        Name: continue.dev_data_db
+        Category: log
+        Path: C:\Users\%user%\.continue\dev_data
+        FileMask: "devdata.sqlite"
+        Recursive: false
+    -
+        Name: continue.dev_data_db
+        Category: log
+        Path: C:\Users\%user%\.continue\dev_data
+        FileMask: "devdata.sqlite-shm"
+        Recursive: false
+    -
+        Name: continue.dev_data_db
+        Category: log
+        Path: C:\Users\%user%\.continue\dev_data
+        FileMask: "devdata.sqlite-wal"
+        Recursive: false
+    -
         Name: continue.diffs
         Category: file_snapshot
         Path: C:\Users\%user%\.continue
         FileMask: ".diffs"
+        Recursive: false
+    -
+        Name: continue.dotenv
+        Category: credentials
+        Path: C:\Users\%user%\.continue
+        FileMask: ".env"
+        Recursive: false
+    -
+        Name: continue.environment_markers
+        Category: install_evidence
+        Path: C:\Users\%user%\.continue
+        FileMask: ".continuerc.json"
+        Recursive: false
+    -
+        Name: continue.environment_markers
+        Category: install_evidence
+        Path: C:\Users\%user%\.continue
+        FileMask: ".local"
+        Recursive: false
+    -
+        Name: continue.environment_markers
+        Category: install_evidence
+        Path: C:\Users\%user%\.continue
+        FileMask: ".onboarding_complete"
+        Recursive: false
+    -
+        Name: continue.environment_markers
+        Category: install_evidence
+        Path: C:\Users\%user%\.continue
+        FileMask: ".staging"
+        Recursive: false
+    -
+        Name: continue.global_context
+        Category: config
+        Path: C:\Users\%user%\.continue
+        FileMask: "sharedConfig.json"
+        Recursive: false
+    -
+        Name: continue.global_context
+        Category: config
+        Path: C:\Users\%user%\.continue\index
+        FileMask: "globalContext.json"
         Recursive: false
     -
         Name: continue.index
@@ -131,6 +193,24 @@ Targets:
         Path: C:\Users\%user%\.continue\index\lancedb
         FileMask: "*"
         Recursive: true
+    -
+        Name: continue.input_history
+        Category: prompt_history
+        Path: C:\Users\%user%\.continue
+        FileMask: "input_history.json"
+        Recursive: false
+    -
+        Name: continue.logs
+        Category: log
+        Path: C:\Users\%user%\.continue\logs
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: continue.permissions
+        Category: permissions
+        Path: C:\Users\%user%\.continue
+        FileMask: "permissions.yaml"
+        Recursive: false
     -
         Name: continue.sessions
         Category: transcript

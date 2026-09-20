@@ -33,6 +33,293 @@ env_overrides:
     Relocates the whole global directory, which holds the session transcripts. A collection keyed on ~/.continue finds nothing on such a host and cannot tell that apart from the agent never having run.
   source: https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts
 artifacts:
+- id: continue.cli_auth
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/auth.json
+  - ~/.continue/auth.json
+  - '%USERPROFILE%\.continue\auth.json'
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/extensions/cli/src/auth/authEnv.ts
+  source_kind: source_code
+  volatility: Persistent until the user signs out or the grant is revoked.
+  notes: |-
+    Record metadata and a hash only.
+
+    The catalogue had one credential entry for this product and it was the one a container image writes. This is the one an ordinary user has: the command line form signs in and keeps the result here, beside the configuration. A collection that took the container file and not this one recorded that the agent was unauthenticated on every workstation.
+
+    Record structure: not read. The path, the size, the timestamps and a SHA-256 say a grant existed and when it was last written.
+  parser: null
+- id: continue.dotenv
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/.env
+  - ~/.continue/.env
+  - '%USERPROFILE%\.continue\.env'
+  format: text
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/core/util/paths.ts
+  source_kind: source_code
+  volatility: Persistent until edited.
+  notes: |-
+    Record metadata and a hash only. The key names are still worth recording: they enumerate the providers and gateways this agent could authenticate to.
+
+    A dotenv file at the agent's own root, read by the extension itself rather than by a shell. It is not the project's .env and not the user's, so a collection built around those two misses it entirely.
+  parser: null
+- id: continue.permissions
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/permissions.yaml
+  - ~/.continue/permissions.yaml
+  - '%USERPROFILE%\.continue\permissions.yaml'
+  format: yaml
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/extensions/cli/src/permissions/permissionsYamlLoader.ts
+  source_kind: source_code
+  volatility: Persistent until edited. No history of its own, so when a rule was added is not in the file.
+  notes: |-
+    What this agent was allowed to do without being asked, which nothing in the catalogue recorded for this product.
+
+    Three lists: the tools allowed outright, the ones that ask first, and the ones excluded. A tool name moved into the first list is a standing permission, and a collection that reads the transcripts without this file cannot tell an action nobody objected to from an action nobody was asked about.
+
+    Read it beside the hook settings entry, because the two together are the whole of what this agent could do by itself.
+
+    Record structure: a YAML document with allow, ask and exclude, each a list of tool patterns. A document with any other shape is rejected by the product, so a malformed file means the rules in it were not in force.
+  parser: yaml_generic
+- id: continue.input_history
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/input_history.json
+  - ~/.continue/input_history.json
+  - '%USERPROFILE%\.continue\input_history.json'
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/extensions/cli/src/util/inputHistory.ts
+  source_kind: source_code
+  volatility: |-
+    Capped at the thousand most recent entries, so a busy endpoint keeps days and a quiet one keeps months. Nothing else prunes it.
+  notes: |-
+    What the user typed, with a time on each entry, and it outlives the conversations the typing belonged to.
+
+    The time is the unusual part. Most prompt histories in this catalogue are a line each with nothing to date them, so they say what was asked and not when. This one carries a timestamp per entry, which makes it a timeline in its own right and the thing to reach for when a session file has been deleted but the prompt that started it has not aged out of here.
+
+    It is the command line form's history and not the editor's, so an endpoint that only ever used the extension has no file here.
+
+    Record structure: a JSON array of objects with text and timestamp, newest last, at most a thousand.
+  parser: json_generic
+- id: continue.hook_settings
+  category: config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/settings.json
+  - ~/.continue/settings.json
+  - '%USERPROFILE%\.continue\settings.json'
+  - <project>/.continue/settings.json
+  - <project>/.continue/settings.local.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/extensions/cli/src/hooks/hookConfig.ts
+  source_kind: source_code
+  volatility: Persistent until edited.
+  notes: |-
+    Commands this agent runs by itself at fixed points, declared per event, and the file that can switch them all off.
+
+    Four of these files are read in a fixed order and their hooks are appended rather than replaced, so every one of them runs: the user's global file, the project's, and the project-local one that is normally not committed. The last of those is where a hook that is on the endpoint and in no repository would be.
+
+    The trap is the other half of that list. The same loader also reads settings.json and settings.local.json from a different vendor's directory, in the project and in the home, and runs the hooks it finds there. So a hook written for another agent is executed by this one, and an analyst scoping a case to this product's own directories would attribute the execution to the wrong agent or miss it.
+
+    Record structure: a JSON document whose hooks key maps an event name to groups of matchers and the commands to run. A disable flag in any of the files turns the whole mechanism off.
+  parser: json_generic
+- id: continue.rules_and_skills
+  category: instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/rules/**
+  - ~/.continue/rules/**
+  - '%USERPROFILE%\.continue\rules\**'
+  - $CONTINUE_GLOBAL_DIR/skills/**
+  - ~/.continue/skills/**
+  - '%USERPROFILE%\.continue\skills\**'
+  - $CONTINUE_GLOBAL_DIR/prompts/**
+  - ~/.continue/prompts/**
+  - '%USERPROFILE%\.continue\prompts\**'
+  - <project>/.continue/rules/**
+  - <project>/.continue/rules.md
+  - <project>/.continue/skills/**
+  format: markdown
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/extensions/cli/src/systemMessage.ts
+  source_kind: source_code
+  volatility: Persistent until removed.
+  notes: |-
+    Text this agent was told to obey, from the three places it takes it.
+
+    The rules directories and the single rules file go into the system message directly. The skills directories are the same idea in the shape the vendor community has settled on, a directory per skill with its description in markdown. And the prompt files, which this catalogue previously filed as auxiliary configuration and read as plain text, are instructions too: they are the saved prompts a user invokes by name, and reading them as configuration put them in a case as settings nobody had mapped.
+
+    A project rules file arrives with the repository, so cloning a hostile one and running the agent in it is an injected instruction by design. Compare each project file against that repository's own history: one that was never committed was written on this endpoint.
+
+    Record structure: markdown. A skill is a directory with a markdown file describing it; a rule is a markdown file; a prompt file is markdown with the extension the product reads.
+  parser: instructions
+- id: continue.logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/logs/**
+  - ~/.continue/logs/**
+  - '%USERPROFILE%\.continue\logs\**'
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/core/util/paths.ts
+  source_kind: source_code
+  volatility: |-
+    Appended to. No rotation in the code that writes them, so the window is as long as the install.
+  notes: |-
+    The log directory, rather than the one file in it this catalogue named.
+
+    One of the files here is the reason for the entry. Beside the core log there is a prompt log, which is what this agent sent to the model, and that is a record of the instruction surface as it was actually assembled rather than as it can be reconstructed from the pieces. The command line form writes a third log of its own.
+
+    An entry that named only the core log left both of the others in the bundle with no event about them.
+
+    Record structure: plain text, one line per record, written by a logging library with a level and a time on each line.
+  parser: text_log
+- id: continue.global_context
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/index/globalContext.json
+  - ~/.continue/index/globalContext.json
+  - '%USERPROFILE%\.continue\index\globalContext.json'
+  - $CONTINUE_GLOBAL_DIR/sharedConfig.json
+  - ~/.continue/sharedConfig.json
+  - '%USERPROFILE%\.continue\sharedConfig.json'
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/core/util/paths.ts
+  source_kind: source_code
+  volatility: Rewritten as the product's state changes. No history.
+  notes: |-
+    Two small documents that say which workspaces this agent knew about and which settings were in force across all of them.
+
+    The one under the index directory is the product's own memory of its state between runs, and what an analyst takes from it is the list of workspaces: a directory named here was opened with this agent in it, which is still an answer after the directory is gone. The shared configuration is the settings that apply whatever assistant is selected, which is where to look when a setting in the visible configuration does not explain the behaviour.
+  parser: json_generic
+- id: continue.dev_data_db
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/dev_data/devdata.sqlite
+  - ~/.continue/dev_data/devdata.sqlite
+  - '%USERPROFILE%\.continue\dev_data\devdata.sqlite'
+  - $CONTINUE_GLOBAL_DIR/dev_data/devdata.sqlite-wal
+  - ~/.continue/dev_data/devdata.sqlite-wal
+  - '%USERPROFILE%\.continue\dev_data\devdata.sqlite-wal'
+  - $CONTINUE_GLOBAL_DIR/dev_data/devdata.sqlite-shm
+  - ~/.continue/dev_data/devdata.sqlite-shm
+  - '%USERPROFILE%\.continue\dev_data\devdata.sqlite-shm'
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/core/util/paths.ts
+  source_kind: source_code
+  volatility: A database, so its own deletions are not visible in it. Captured by nothing else.
+  notes: |-
+    A database in a directory this catalogue claimed as line-delimited records.
+
+    The development data directory holds one file per event type in a line-delimited format, and one database beside them. Claimed by the directory entry alone, that database reached the reader for line-delimited logs, which is not what it is. It has an entry of its own now so the tables and their rows are read.
+
+    Both live together and both are collected: the files are the events as they were appended, the database is the product's own store of the same material.
+  parser: sqlite_generic
+- id: continue.environment_markers
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/.local
+  - ~/.continue/.local
+  - '%USERPROFILE%\.continue\.local'
+  - $CONTINUE_GLOBAL_DIR/.staging
+  - ~/.continue/.staging
+  - '%USERPROFILE%\.continue\.staging'
+  - $CONTINUE_GLOBAL_DIR/.onboarding_complete
+  - ~/.continue/.onboarding_complete
+  - '%USERPROFILE%\.continue\.onboarding_complete'
+  - $CONTINUE_GLOBAL_DIR/.continuerc.json
+  - ~/.continue/.continuerc.json
+  - '%USERPROFILE%\.continue\.continuerc.json'
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/continuedev/continue/blob/5522c6f44ca0ac3528b37244818fbfa39b5af470/core/util/paths.ts
+  source_kind: source_code
+  volatility: Written once and left. Their existence is the record, not their content.
+  notes: |-
+    Four marker files, two of which answer a question about the network.
+
+    The product decides which of its vendor's environments to talk to by looking for a marker file at its own root. One names the local environment and one names the staging environment, and either means this endpoint's traffic did not go where the default says it goes. That is a destination answer that no settings file records.
+
+    The third marks that the command line form finished its first run, which dates the install from the user's side rather than from the package. The fourth is a small settings file the product writes at its own root on first use; the catalogue already carries the same filename inside a project, which is a different file with a different meaning.
+  parser: text_config
 - id: continue.index
   category: cache
   root: user_profile
@@ -106,7 +393,6 @@ artifacts:
   - ~/.continue/.configs/
   - ~/.continue/.continueignore
   - ~/.continue/.migrations/
-  - ~/.continue/prompts/
   format: text
   sensitivity: normal
   collect_priority: normal

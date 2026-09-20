@@ -63,6 +63,7 @@ SOURCES = frozenset(
         "cline.data_dir_root",
         "cline.workspace_specs",
         "continue.aux_config",
+        "continue.environment_markers",
         "copilot.ide_locks",
         "cursor.machine_identity_file",
         "cursor.retrieval_index",

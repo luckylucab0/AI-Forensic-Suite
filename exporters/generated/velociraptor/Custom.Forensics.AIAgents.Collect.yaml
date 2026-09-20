@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: ec8e4be59eb1
+# Catalogue digest: 39479776ddef
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -62,6 +62,8 @@
 #     cline.workspace_specs
 #     continue.agents
 #     continue.config
+#     continue.hook_settings
+#     continue.rules_and_skills
 #     copilot.lsp_config_repo
 #     crosscutting.hook_scripts
 #     crosscutting.instructions_agents_md
@@ -509,10 +511,20 @@ sources:
     continue,continue.aux_config,C:/Users/*/.continue/.configs/**
     continue,continue.aux_config,C:/Users/*/.continue/.continueignore
     continue,continue.aux_config,C:/Users/*/.continue/.migrations/**
-    continue,continue.aux_config,C:/Users/*/.continue/prompts/**
+    continue,continue.cli_auth,C:/Users/*/.continue/auth.json
     continue,continue.dev_data,C:/Users/*/.continue/dev_data/**
     continue,continue.dev_data,C:/Users/*/.continue/logs/core.log
+    continue,continue.dev_data_db,C:/Users/*/.continue/dev_data/devdata.sqlite
+    continue,continue.dev_data_db,C:/Users/*/.continue/dev_data/devdata.sqlite-shm
+    continue,continue.dev_data_db,C:/Users/*/.continue/dev_data/devdata.sqlite-wal
     continue,continue.diffs,C:/Users/*/.continue/.diffs/**
+    continue,continue.dotenv,C:/Users/*/.continue/.env
+    continue,continue.environment_markers,C:/Users/*/.continue/.continuerc.json
+    continue,continue.environment_markers,C:/Users/*/.continue/.local
+    continue,continue.environment_markers,C:/Users/*/.continue/.onboarding_complete
+    continue,continue.environment_markers,C:/Users/*/.continue/.staging
+    continue,continue.global_context,C:/Users/*/.continue/index/globalContext.json
+    continue,continue.global_context,C:/Users/*/.continue/sharedConfig.json
     continue,continue.index,C:/Users/*/.continue/.utils/repo_map.txt
     continue,continue.index,C:/Users/*/.continue/index/autocompleteCache.sqlite
     continue,continue.index,C:/Users/*/.continue/index/autocompleteCache.sqlite-shm
@@ -524,6 +536,9 @@ sources:
     continue,continue.index,C:/Users/*/.continue/index/index.sqlite-shm
     continue,continue.index,C:/Users/*/.continue/index/index.sqlite-wal
     continue,continue.index,C:/Users/*/.continue/index/lancedb/**
+    continue,continue.input_history,C:/Users/*/.continue/input_history.json
+    continue,continue.logs,C:/Users/*/.continue/logs/**
+    continue,continue.permissions,C:/Users/*/.continue/permissions.yaml
     continue,continue.sessions,C:/Users/*/.continue/sessions/*.json
     continue,continue.sessions,C:/Users/*/.continue/sessions/sessions.json
     copilot,copilot.agents_skills_hooks,C:/Users/*/.copilot/agents/**
@@ -2188,17 +2203,37 @@ sources:
     continue,continue.aux_config,/Users/*/.continue/.configs/**
     continue,continue.aux_config,/Users/*/.continue/.continueignore
     continue,continue.aux_config,/Users/*/.continue/.migrations/**
-    continue,continue.aux_config,/Users/*/.continue/prompts/**
     continue,continue.aux_config,/var/root/.continue/.configs/**
     continue,continue.aux_config,/var/root/.continue/.continueignore
     continue,continue.aux_config,/var/root/.continue/.migrations/**
-    continue,continue.aux_config,/var/root/.continue/prompts/**
+    continue,continue.cli_auth,/Users/*/.continue/auth.json
+    continue,continue.cli_auth,/var/root/.continue/auth.json
     continue,continue.dev_data,/Users/*/.continue/dev_data/**
     continue,continue.dev_data,/Users/*/.continue/logs/core.log
     continue,continue.dev_data,/var/root/.continue/dev_data/**
     continue,continue.dev_data,/var/root/.continue/logs/core.log
+    continue,continue.dev_data_db,/Users/*/.continue/dev_data/devdata.sqlite
+    continue,continue.dev_data_db,/Users/*/.continue/dev_data/devdata.sqlite-shm
+    continue,continue.dev_data_db,/Users/*/.continue/dev_data/devdata.sqlite-wal
+    continue,continue.dev_data_db,/var/root/.continue/dev_data/devdata.sqlite
+    continue,continue.dev_data_db,/var/root/.continue/dev_data/devdata.sqlite-shm
+    continue,continue.dev_data_db,/var/root/.continue/dev_data/devdata.sqlite-wal
     continue,continue.diffs,/Users/*/.continue/.diffs/**
     continue,continue.diffs,/var/root/.continue/.diffs/**
+    continue,continue.dotenv,/Users/*/.continue/.env
+    continue,continue.dotenv,/var/root/.continue/.env
+    continue,continue.environment_markers,/Users/*/.continue/.continuerc.json
+    continue,continue.environment_markers,/Users/*/.continue/.local
+    continue,continue.environment_markers,/Users/*/.continue/.onboarding_complete
+    continue,continue.environment_markers,/Users/*/.continue/.staging
+    continue,continue.environment_markers,/var/root/.continue/.continuerc.json
+    continue,continue.environment_markers,/var/root/.continue/.local
+    continue,continue.environment_markers,/var/root/.continue/.onboarding_complete
+    continue,continue.environment_markers,/var/root/.continue/.staging
+    continue,continue.global_context,/Users/*/.continue/index/globalContext.json
+    continue,continue.global_context,/Users/*/.continue/sharedConfig.json
+    continue,continue.global_context,/var/root/.continue/index/globalContext.json
+    continue,continue.global_context,/var/root/.continue/sharedConfig.json
     continue,continue.index,/Users/*/.continue/.utils/repo_map.txt
     continue,continue.index,/Users/*/.continue/index/autocompleteCache.sqlite
     continue,continue.index,/Users/*/.continue/index/autocompleteCache.sqlite-shm
@@ -2221,6 +2256,12 @@ sources:
     continue,continue.index,/var/root/.continue/index/index.sqlite-shm
     continue,continue.index,/var/root/.continue/index/index.sqlite-wal
     continue,continue.index,/var/root/.continue/index/lancedb/**
+    continue,continue.input_history,/Users/*/.continue/input_history.json
+    continue,continue.input_history,/var/root/.continue/input_history.json
+    continue,continue.logs,/Users/*/.continue/logs/**
+    continue,continue.logs,/var/root/.continue/logs/**
+    continue,continue.permissions,/Users/*/.continue/permissions.yaml
+    continue,continue.permissions,/var/root/.continue/permissions.yaml
     continue,continue.sessions,/Users/*/.continue/sessions/*.json
     continue,continue.sessions,/Users/*/.continue/sessions/sessions.json
     continue,continue.sessions,/var/root/.continue/sessions/*.json
@@ -4500,19 +4541,39 @@ sources:
     continue,continue.aux_config,/home/*/.continue/.configs/**
     continue,continue.aux_config,/home/*/.continue/.continueignore
     continue,continue.aux_config,/home/*/.continue/.migrations/**
-    continue,continue.aux_config,/home/*/.continue/prompts/**
     continue,continue.aux_config,/root/.continue/.configs/**
     continue,continue.aux_config,/root/.continue/.continueignore
     continue,continue.aux_config,/root/.continue/.migrations/**
-    continue,continue.aux_config,/root/.continue/prompts/**
+    continue,continue.cli_auth,/home/*/.continue/auth.json
+    continue,continue.cli_auth,/root/.continue/auth.json
     continue,continue.dev_data,/home/*/.continue/dev_data/**
     continue,continue.dev_data,/home/*/.continue/logs/core.log
     continue,continue.dev_data,/root/.continue/dev_data/**
     continue,continue.dev_data,/root/.continue/logs/core.log
+    continue,continue.dev_data_db,/home/*/.continue/dev_data/devdata.sqlite
+    continue,continue.dev_data_db,/home/*/.continue/dev_data/devdata.sqlite-shm
+    continue,continue.dev_data_db,/home/*/.continue/dev_data/devdata.sqlite-wal
+    continue,continue.dev_data_db,/root/.continue/dev_data/devdata.sqlite
+    continue,continue.dev_data_db,/root/.continue/dev_data/devdata.sqlite-shm
+    continue,continue.dev_data_db,/root/.continue/dev_data/devdata.sqlite-wal
     continue,continue.devbox_env,/home/*/.continue/devbox-env
     continue,continue.devbox_env,/root/.continue/devbox-env
     continue,continue.diffs,/home/*/.continue/.diffs/**
     continue,continue.diffs,/root/.continue/.diffs/**
+    continue,continue.dotenv,/home/*/.continue/.env
+    continue,continue.dotenv,/root/.continue/.env
+    continue,continue.environment_markers,/home/*/.continue/.continuerc.json
+    continue,continue.environment_markers,/home/*/.continue/.local
+    continue,continue.environment_markers,/home/*/.continue/.onboarding_complete
+    continue,continue.environment_markers,/home/*/.continue/.staging
+    continue,continue.environment_markers,/root/.continue/.continuerc.json
+    continue,continue.environment_markers,/root/.continue/.local
+    continue,continue.environment_markers,/root/.continue/.onboarding_complete
+    continue,continue.environment_markers,/root/.continue/.staging
+    continue,continue.global_context,/home/*/.continue/index/globalContext.json
+    continue,continue.global_context,/home/*/.continue/sharedConfig.json
+    continue,continue.global_context,/root/.continue/index/globalContext.json
+    continue,continue.global_context,/root/.continue/sharedConfig.json
     continue,continue.index,/home/*/.continue/.utils/repo_map.txt
     continue,continue.index,/home/*/.continue/index/autocompleteCache.sqlite
     continue,continue.index,/home/*/.continue/index/autocompleteCache.sqlite-shm
@@ -4535,6 +4596,12 @@ sources:
     continue,continue.index,/root/.continue/index/index.sqlite-shm
     continue,continue.index,/root/.continue/index/index.sqlite-wal
     continue,continue.index,/root/.continue/index/lancedb/**
+    continue,continue.input_history,/home/*/.continue/input_history.json
+    continue,continue.input_history,/root/.continue/input_history.json
+    continue,continue.logs,/home/*/.continue/logs/**
+    continue,continue.logs,/root/.continue/logs/**
+    continue,continue.permissions,/home/*/.continue/permissions.yaml
+    continue,continue.permissions,/root/.continue/permissions.yaml
     continue,continue.sessions,/home/*/.continue/sessions/*.json
     continue,continue.sessions,/home/*/.continue/sessions/sessions.json
     continue,continue.sessions,/root/.continue/sessions/*.json

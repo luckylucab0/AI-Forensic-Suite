@@ -51,6 +51,7 @@ LOGS = frozenset(
         "claude_desktop.coworkd_service_log",
         "cline.connector_settings_and_logs",
         "codex.log_dir",
+        "continue.logs",
         "copilot.logs",
         "crosscutting.npm_debug_logs",
         "cursor.logs",

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: ec8e4be59eb1
+# Catalogue digest: 39479776ddef
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -479,6 +479,21 @@ sources:
     codex,C:/Users/*/.codex/sessions/*/*/*/**
     codex,C:/Users/*/.codex/state_5.sqlite
     codex,C:/Users/*/.codex/thread_history_1.sqlite
+    continue,/Users/*/.continue/input_history.json
+    continue,/Users/*/.continue/logs/**
+    continue,/Users/*/.continue/permissions.yaml
+    continue,/home/*/.continue/input_history.json
+    continue,/home/*/.continue/logs/**
+    continue,/home/*/.continue/permissions.yaml
+    continue,/root/.continue/input_history.json
+    continue,/root/.continue/logs/**
+    continue,/root/.continue/permissions.yaml
+    continue,/var/root/.continue/input_history.json
+    continue,/var/root/.continue/logs/**
+    continue,/var/root/.continue/permissions.yaml
+    continue,C:/Users/*/.continue/input_history.json
+    continue,C:/Users/*/.continue/logs/**
+    continue,C:/Users/*/.continue/permissions.yaml
     copilot,/Users/*/.copilot/command-history-state/**
     copilot,/Users/*/.copilot/logs/**
     copilot,/Users/*/.copilot/session-state/**

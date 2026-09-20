@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: ec8e4be59eb1
+// Catalogue digest: 39479776ddef
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -68,6 +68,8 @@
 //     cline.workspace_specs
 //     continue.agents
 //     continue.config
+//     continue.hook_settings
+//     continue.rules_and_skills
 //     copilot.lsp_config_repo
 //     crosscutting.hook_scripts
 //     crosscutting.instructions_agents_md
@@ -815,18 +817,38 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "continue", "continue.aux_config", ".continue/.configs",
     "continue", "continue.aux_config", ".continue/.continueignore",
     "continue", "continue.aux_config", ".continue/.migrations",
-    "continue", "continue.aux_config", ".continue/prompts",
     "continue", "continue.aux_config", ".continue\\.configs",
     "continue", "continue.aux_config", ".continue\\.continueignore",
     "continue", "continue.aux_config", ".continue\\.migrations",
-    "continue", "continue.aux_config", ".continue\\prompts",
+    "continue", "continue.cli_auth", ".continue/auth.json",
+    "continue", "continue.cli_auth", ".continue\\auth.json",
     "continue", "continue.dev_data", ".continue/dev_data",
     "continue", "continue.dev_data", ".continue/logs/core.log",
     "continue", "continue.dev_data", ".continue\\dev_data",
     "continue", "continue.dev_data", ".continue\\logs\\core.log",
+    "continue", "continue.dev_data_db", ".continue/dev_data/devdata.sqlite",
+    "continue", "continue.dev_data_db", ".continue/dev_data/devdata.sqlite-shm",
+    "continue", "continue.dev_data_db", ".continue/dev_data/devdata.sqlite-wal",
+    "continue", "continue.dev_data_db", ".continue\\dev_data\\devdata.sqlite",
+    "continue", "continue.dev_data_db", ".continue\\dev_data\\devdata.sqlite-shm",
+    "continue", "continue.dev_data_db", ".continue\\dev_data\\devdata.sqlite-wal",
     "continue", "continue.devbox_env", ".continue/devbox-env",
     "continue", "continue.diffs", ".continue/.diffs",
     "continue", "continue.diffs", ".continue\\.diffs",
+    "continue", "continue.dotenv", ".continue/.env",
+    "continue", "continue.dotenv", ".continue\\.env",
+    "continue", "continue.environment_markers", ".continue/.continuerc.json",
+    "continue", "continue.environment_markers", ".continue/.local",
+    "continue", "continue.environment_markers", ".continue/.onboarding_complete",
+    "continue", "continue.environment_markers", ".continue/.staging",
+    "continue", "continue.environment_markers", ".continue\\.continuerc.json",
+    "continue", "continue.environment_markers", ".continue\\.local",
+    "continue", "continue.environment_markers", ".continue\\.onboarding_complete",
+    "continue", "continue.environment_markers", ".continue\\.staging",
+    "continue", "continue.global_context", ".continue/index/globalContext.json",
+    "continue", "continue.global_context", ".continue/sharedConfig.json",
+    "continue", "continue.global_context", ".continue\\index\\globalContext.json",
+    "continue", "continue.global_context", ".continue\\sharedConfig.json",
     "continue", "continue.index", ".continue/.utils/repo_map.txt",
     "continue", "continue.index", ".continue/index/autocompleteCache.sqlite",
     "continue", "continue.index", ".continue/index/autocompleteCache.sqlite-shm",
@@ -849,6 +871,12 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "continue", "continue.index", ".continue\\index\\index.sqlite-shm",
     "continue", "continue.index", ".continue\\index\\index.sqlite-wal",
     "continue", "continue.index", ".continue\\index\\lancedb",
+    "continue", "continue.input_history", ".continue/input_history.json",
+    "continue", "continue.input_history", ".continue\\input_history.json",
+    "continue", "continue.logs", ".continue/logs",
+    "continue", "continue.logs", ".continue\\logs",
+    "continue", "continue.permissions", ".continue/permissions.yaml",
+    "continue", "continue.permissions", ".continue\\permissions.yaml",
     "continue", "continue.sessions", ".continue/sessions",
     "continue", "continue.sessions", ".continue/sessions/sessions.json",
     "continue", "continue.sessions", ".continue\\sessions",
