@@ -92,6 +92,22 @@ EXPECTED = {
     "AFX-SENSITIVEPATHS-001": "a transcript holds the agent reading a private key by name",
     "AFX-SENSITIVEPATHS-002": "and the cloud provider credential file beside it",
     "AFX-SENSITIVEPATHS-003": "and asking the platform keychain for a stored password",
+    "AFX-COLLECTIONINTEGRITY-002": "~/.cursor/projects/ holds a zero byte file whose name is "
+    "the date the product's own cleanup ran, which is what tells an absence apart from a "
+    "deletion",
+    "AFX-DATAVOLUME-001": "one transcript reads twenty-two files inside one minute, which no "
+    "person does and no single tool call shows",
+    "AFX-DATAVOLUME-002": "a tool result in the same transcript carries more text than anybody "
+    "reads, which is what bulk leaving a device looks like from inside a conversation",
+    "AFX-PROMPTINJECTION-001": "a tool result carries instruction-shaped text that arrived "
+    "inside content the agent fetched, addressed to the model and telling it not to tell "
+    "the user",
+    "AFX-SECRETS-002": "a tool result carries a private key header, assembled by the "
+    "generator rather than written into it, because this repository's own pre-commit hook "
+    "refuses a file that holds one",
+    "AFX-SECRETS-003": "the same transcript carries a model provider token in the contents of "
+    "a file the agent read",
+    "AFX-SECRETS-004": "and a source forge token beside it",
     "AFX-SECRETS-001": "a transcript holds a cloud provider access key",
     "AFX-SECRETS-005": "~/.claude/paste-cache holds the configuration somebody pasted "
     "instead of committing, with a password named the way a configuration file names one",
@@ -123,26 +139,10 @@ EXPECTED = {
 # and when the evidence was finally put in front of it, two things between the catalogue
 # and the parser turned out to be wrong.
 SILENT = {
-    "AFX-COLLECTIONINTEGRITY-002": "no agent has left its dated cleanup marker in the "
-    "profile's per-project directory",
     "AFX-COLLECTIONINTEGRITY-003": "the profile carries no registry document, so the URL "
     "handler a product registers under the user's class keys is in no case this builds",
-    "AFX-DATAVOLUME-001": "the profile's transcripts read a handful of files, not the burst "
-    "this rule counts, and a burst has to be written as one to be read as one",
-    "AFX-DATAVOLUME-002": "nothing in the profile carries a body of text large enough, "
-    "because every fixture file is small on purpose",
     "AFX-PERMISSIONBYPASS-009": "a policy under the user's own hive is a registry document, "
     "and the profile carries none. The Windows profile is where one would go",
-    "AFX-PROMPTINJECTION-001": "the profile's injected instructions are in files an agent "
-    "reads as instructions, which the other three rules in this pack cover. What is absent "
-    "is the harder case this rule is for: instruction-like text arriving inside content the "
-    "agent fetched, where it is not supposed to be instruction at all",
-    "AFX-SECRETS-002": "no private key block is in the profile. Writing one needs care "
-    "rather than a decision: the repository's own pre-commit hook refuses a file holding "
-    "the header, so a generator would have to assemble it rather than carry it",
-    "AFX-SECRETS-003": "no model provider token is in the profile. The cloud provider key "
-    "the pack does carry is what AFX-SECRETS-001 fires on",
-    "AFX-SECRETS-004": "no source forge personal access token is in the profile either",
 }
 
 
