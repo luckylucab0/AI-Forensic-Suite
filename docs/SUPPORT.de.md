@@ -6,7 +6,7 @@
 
 Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registrierung statt aufgeschrieben. Die Zahlen bewegen sich mit dem Code.
 
-31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 517 von 656 Artefakten werden von 38 Leser-Modulen gelesen, in 23 Ereignisarten. 518 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
+31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 519 von 656 Artefakten werden von 38 Leser-Modulen gelesen, in 23 Ereignisarten. 518 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
 
 **Wie ein leeres Ergebnis zu lesen ist.** Steht ein Agent hier mit gelesenen Artefakten, dann wurden die Pfade durchsucht und die vorhandenen Dateien ausgewertet, also ist ein leeres Ergebnis ein Befund über diese Pfade. Es ist nie ein Befund darüber, dass der Agent nicht benutzt wurde: der Datenbaum kann über eine Variable verschoben sein, die Aufbewahrungsfrist kann ihn gelöscht haben, die Pfade können die unverifizierten sein, oder die Person hat in einem Profil gearbeitet, das niemand gesammelt hat. Wo ein Eintrag unverifiziert ist, sagt `docs/ARTIFACTS.de.md` es pro Artefakt, und der Analyzer wiederholt es in seiner Ausgabe.
 
@@ -38,7 +38,7 @@ Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registri
 | Kiro | Linux, macOS, Windows | 5 / 5 | 20 / 22 | 14 | 2 |
 | LM Studio | Linux, macOS, Windows | 1 / 1 | 5 / 7 | 3 | 2 |
 | Ollama | Linux, macOS, Windows | 1 / 1 | 8 / 12 | 5 | 4 |
-| OpenAI Codex CLI | Linux, macOS, Windows | 8 / 9 | 20 / 29 | 13 | 9 |
+| OpenAI Codex CLI | Linux, macOS, Windows | 8 / 9 | 22 / 29 | 13 | 7 |
 | OpenCode | Linux, macOS, Windows | 2 / 2 | 7 / 12 | 5 | 5 |
 | pi | Linux, macOS, Windows | 1 / 1 | 8 / 10 | 3 | 2 |
 | Qwen Code | Linux, macOS, Windows | 2 / 2 | 30 / 36 | 17 | 6 |
@@ -158,11 +158,9 @@ Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es 
 
 ### Lesbare Formate mit einer Begründung
 
-8 Einträge liegen in einem Format, das diese Suite liest, und werden von keinem Leser beansprucht, jeder mit der Begründung im Code neben der Entscheidung. Ein neuer Eintrag in diesem Zustand lässt einen Test scheitern, bis jemand ihn entweder liest oder die Begründung hinschreibt, und genau das verhindert, dass diese Liste versehentlich die Liste der unfertigen Arbeiten wird.
+6 Einträge liegen in einem Format, das diese Suite liest, und werden von keinem Leser beansprucht, jeder mit der Begründung im Code neben der Entscheidung. Ein neuer Eintrag in diesem Zustand lässt einen Test scheitern, bis jemand ihn entweder liest oder die Begründung hinschreibt, und genau das verhindert, dass diese Liste versehentlich die Liste der unfertigen Arbeiten wird.
 
 - `cline.extension_id`: the entry is the extension's storage directory, and what is under it is claimed by the entries for the task tree and the checkpoints. The id itself is the evidence and it is in the path, which the artifact event carries
-- `codex.installation_id`: one line holding one identifier, and nothing reads a line of text except the reader for logs, whose own test holds it to the catalogue's logs. What the file answers without being read is in the artifact event: it is created once and never rewritten, so its creation time is the earliest evidence of the product running on the machine. What needs the value is correlating this install with the vendor's own records, and that reading is owed rather than declined: it is in UNFINISHED below
-- `codex.sandbox_migration_marker`: three bytes naming the generation of the sandbox policy the install has been migrated to. The evidence is that the file exists and what it says, and what it says needs a mapping from that value to a policy generation, which the vendor documents nowhere this catalogue could cite. Read the permission and requirement files beside it for the rules actually in force
 - `crosscutting.homebrew_prefixes`: an installation prefix, so the evidence is which directories exist under it rather than what any one file says
 - `crosscutting.uv_tool_dir`: declared and deliberately not read by the reader for this format, which says why in its own module: the manifests here describe the installer's own bookkeeping rather than an agent's activity
 - `jetbrains_ai.base_directories`: the entry is the product's directory layout, which is what makes the other entries for this family resolvable. The files under it are claimed by those
@@ -175,9 +173,7 @@ Zum Zeitpunkt dieser Generierung keine. Die Prüfung hinter diesem Abschnitt suc
 
 ## Angefangen und nicht fertig
 
-Ein Eintrag, bei dem jemand aufgeschrieben hat, dass die Lesung unvollständig ist. Alles darüber ist eine Entscheidung; das hier ist eine Liste von Arbeit. Er kann zusätzlich oben stehen, in der Gruppe, in die sein jetziger Zustand ihn setzt, denn `Gelesen` ist auf dieser Seite ein Ja oder ein Nein, und wer entscheidet, ob ein Fall zitierbar ist, braucht die dritte Antwort. Die Deklaration steht in `src/agentforensics/parsers/coverage.py`, und ein Test hält ihn daran fest, dass es ihn im Katalog noch gibt, damit diese Liste nicht überlebt, was sie zusagt.
-
-- `codex.installation_id`: the file holds one identifier and nothing puts it in the case. The value is what ties this install to the vendor's own records, because the product sends the same string as installation_id in the metadata of its requests, so an examiner who has it can ask a question that the local evidence cannot answer on its own. Reading it is a few lines; what it needs is a reader for a file that holds one value, which this suite does not have yet, and the reader for logs is held by its own test to the catalogue's logs
+Zum Zeitpunkt dieser Generierung keine. Dieser Abschnitt nennt die Lesungen, die jemand angefangen und nicht fertiggestellt hat, deklariert in `src/agentforensics/parsers/coverage.py`, und es gibt keine.
 
 ## Wo die Lesung dünn ist
 

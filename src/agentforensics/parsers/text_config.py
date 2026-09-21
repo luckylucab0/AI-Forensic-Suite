@@ -64,6 +64,8 @@ SOURCES = frozenset(
         "jetbrains_ai.path_properties",
         "claude_desktop.device_identifier",
         "claude_desktop.install_evidence_linux",
+        "codex.installation_id",
+        "codex.sandbox_migration_marker",
         "cline.data_dir_root",
         "cline.workspace_specs",
         "continue.aux_config",

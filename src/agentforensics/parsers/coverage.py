@@ -69,23 +69,6 @@ READABLE_AND_UNREAD = {
         "evidence and it is in the path, which the artifact event carries",
         ("cline.vscode_task_transcripts", "cline.checkpoints_shadow_git_legacy"),
     ),
-    "codex.installation_id": Excused(
-        "one line holding one identifier, and nothing reads a line of text except the "
-        "reader for logs, whose own test holds it to the catalogue's logs. What the file "
-        "answers without being read is in the artifact event: it is created once and never "
-        "rewritten, so its creation time is the earliest evidence of the product running "
-        "on the machine. What needs the value is correlating this install with the vendor's "
-        "own records, and that reading is owed rather than declined: it is in UNFINISHED "
-        "below"
-    ),
-    "codex.sandbox_migration_marker": Excused(
-        "three bytes naming the generation of the sandbox policy the install has been "
-        "migrated to. The evidence is that the file exists and what it says, and what it "
-        "says needs a mapping from that value to a policy generation, which the vendor "
-        "documents nowhere this catalogue could cite. Read the permission and requirement "
-        "files beside it for the rules actually in force",
-        ("codex.requirements_and_permissions",),
-    ),
     "crosscutting.homebrew_prefixes": Excused(
         "an installation prefix, so the evidence is which directories exist under it "
         "rather than what any one file says"
@@ -204,19 +187,16 @@ READABLE_FORMATS = frozenset(
 # The test in tests/unit/test_parsers.py holds every id here to being in the catalogue, so a
 # renamed or deleted entry takes its promise with it rather than leaving the page making a
 # commitment about a file that is gone.
-# It was empty for a while, and what stands in it now is one line of one file. That is the
-# right size for this table: a promise small enough to keep.
-UNFINISHED: dict[str, str] = {
-    "codex.installation_id": (
-        "the file holds one identifier and nothing puts it in the case. The value is what "
-        "ties this install to the vendor's own records, because the product sends the same "
-        "string as installation_id in the metadata of its requests, so an examiner who has "
-        "it can ask a question that the local evidence cannot answer on its own. Reading it "
-        "is a few lines; what it needs is a reader for a file that holds one value, which "
-        "this suite does not have yet, and the reader for logs is held by its own test to "
-        "the catalogue's logs"
-    ),
-}
+# Empty, and the table stays rather than going with its last entry. It is the only place a
+# sentence of this kind may live, so an empty one is the statement that nobody currently
+# owes this catalogue a reading, and the next person who defers one has somewhere to say so
+# instead of leaving it in a note nobody generates a page from. Every entry it has held was
+# closed by writing the reading rather than by deleting the promise, and the last one was
+# closed by finding that the reading already existed: two files were declared unread here
+# for want of a reader for a file holding one value, and the reader for small text
+# configuration had been doing exactly that for four other agents' install identifiers all
+# along. A deferral is worth no more than the survey behind it.
+UNFINISHED: dict[str, str] = {}
 
 
 __all__ = ["READABLE_AND_UNREAD", "READABLE_FORMATS", "UNFINISHED", "Excused"]

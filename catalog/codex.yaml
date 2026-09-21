@@ -456,7 +456,7 @@ artifacts:
     It dates first use. The file is created on the first run that resolves it and never rewritten, so its creation time is the earliest evidence in this tree of the product running on this machine, and it is a cheaper answer than reasoning about the oldest conversation.
 
     It correlates this machine with server-side records. The same value is sent as installation_id in the metadata of the product's requests, so it is a durable pseudonymous handle for this install rather than a local detail, and it is what ties a device to whatever the vendor holds.
-  parser: null
+  parser: text_config
 - id: codex.thread_writer_locks
   title: Thread writer locks
   category: log
@@ -651,7 +651,7 @@ artifacts:
     Three bytes that say the sandbox policy was migrated to a newer form, and which form. It is here because a marker is the cheapest possible statement about which policy the agent was running under, and the policy is what decides whether a command the transcript shows could actually touch the filesystem.
 
     Read it together with the permission and requirement files this catalogue already carries: those say what the rules are now, and this says which generation of the rules the install has been through.
-  parser: null
+  parser: text_config
 - id: codex.models_cache
   title: Cached model list
   category: config
