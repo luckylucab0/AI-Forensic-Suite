@@ -6,7 +6,7 @@
 
 Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registrierung statt aufgeschrieben. Die Zahlen bewegen sich mit dem Code.
 
-31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 506 von 631 Artefakten werden von 38 Leser-Modulen gelesen, in 23 Ereignisarten. 505 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
+31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 508 von 640 Artefakten werden von 38 Leser-Modulen gelesen, in 23 Ereignisarten. 505 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
 
 **Wie ein leeres Ergebnis zu lesen ist.** Steht ein Agent hier mit gelesenen Artefakten, dann wurden die Pfade durchsucht und die vorhandenen Dateien ausgewertet, also ist ein leeres Ergebnis ein Befund über diese Pfade. Es ist nie ein Befund darüber, dass der Agent nicht benutzt wurde: der Datenbaum kann über eine Variable verschoben sein, die Aufbewahrungsfrist kann ihn gelöscht haben, die Pfade können die unverifizierten sein, oder die Person hat in einem Profil gearbeitet, das niemand gesammelt hat. Wo ein Eintrag unverifiziert ist, sagt `docs/ARTIFACTS.de.md` es pro Artefakt, und der Analyzer wiederholt es in seiner Ausgabe.
 
@@ -19,14 +19,14 @@ Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registri
 | Aider | Linux, macOS, Windows | 2 / 2 | 11 / 13 | 8 | 2 |
 | Amazon Q Developer (CLI and IDE extension) | Linux, macOS, Windows | 3 / 3 | 17 / 20 | 9 | 3 |
 | Amp | Linux, macOS, Windows | 2 / 2 | 10 / 11 | 6 | 1 |
-| ChatGPT Desktop | macOS, Windows | 2 / 5 | 3 / 11 | 3 | 8 |
+| ChatGPT Desktop | macOS, Windows | 2 / 6 | 5 / 19 | 5 | 14 |
 | Claude Code | Linux, macOS, Windows | 5 / 6 | 68 / 78 | 37 | 10 |
 | Claude Desktop | Linux, macOS, Windows | 1 / 2 | 18 / 29 | 11 | 11 |
 | Cline | Linux, macOS, Windows | 5 / 5 | 21 / 25 | 8 | 4 |
 | Continue | Linux, macOS, Windows | 1 / 1 | 17 / 21 | 11 | 4 |
 | Cross-cutting evidence | Linux, macOS, Windows | keine | 20 / 27 | 6 | 7 |
 | Cursor | Linux, macOS, Windows | 9 / 9 | 43 / 50 | 31 | 7 |
-| Devin | Linux, macOS, Windows | 1 / 1 | 6 / 6 | 5 | 0 |
+| Devin | Linux, macOS, Windows | 1 / 1 | 6 / 7 | 5 | 1 |
 | Factory Droid | Linux, macOS, Windows | 2 / 2 | 9 / 10 | 7 | 1 |
 | Gemini CLI | Linux, macOS, Windows | 1 / 1 | 15 / 19 | 8 | 4 |
 | GitHub Copilot CLI | Linux, macOS, Windows | 3 / 4 | 16 / 20 | 11 | 4 |
@@ -68,17 +68,23 @@ Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es 
 
 ### Container in einem Format, das hier niemand gelesen hat
 
-73 Einträge, binäre oder Verzeichnis-Layouts ohne dokumentiertes Format. Jeder wird ganz gesammelt und steht als Dateisystem-Ereignis auf der Zeitlinie. Einen davon zu lesen heisst, eine Formatimplementierung zu schreiben, und nicht, einen unfertigen Leser fertigzustellen.
+80 Einträge, binäre oder Verzeichnis-Layouts ohne dokumentiertes Format. Jeder wird ganz gesammelt und steht als Dateisystem-Ereignis auf der Zeitlinie. Einen davon zu lesen heisst, eine Formatimplementierung zu schreiben, und nicht, einen unfertigen Leser fertigzustellen.
 
 - `amazonq.cli_subagent_executions` (directory)
 - `amazonq.ide_extension_install` (directory)
 - `chatgpt_desktop.macos_app_pairing_extensions` (binary)
 - `chatgpt_desktop.macos_codex_app_support` (binary)
 - `chatgpt_desktop.macos_computer_use_service` (binary)
+- `chatgpt_desktop.macos_conversations` (binary)
+- `chatgpt_desktop.macos_crash_reports` (binary)
+- `chatgpt_desktop.macos_drafts` (binary)
 - `chatgpt_desktop.macos_httpstorages` (binary)
 - `chatgpt_desktop.macos_legacy_app_support` (binary)
 - `chatgpt_desktop.macos_legacy_conversations_dir` (binary)
+- `chatgpt_desktop.macos_openai_shared_locations` (binary)
 - `chatgpt_desktop.macos_saved_state_and_logs` (binary)
+- `chatgpt_desktop.macos_web_content_cache` (directory)
+- `chatgpt_desktop.macos_workspace_state` (binary)
 - `claude_code.feedback_bundles` (binary)
 - `claude_code.image_cache` (binary)
 - `claude_code.install_legacy_and_npm` (binary)
@@ -105,6 +111,7 @@ Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es 
 - `cursor.macos_update_state` (directory)
 - `cursor.worker_data` (directory)
 - `cursor.worktrees` (directory)
+- `devin.cli_config_dir` (directory)
 - `factory_droid.worktrees` (directory)
 - `gemini_cli.home_tree` (directory)
 - `gemini_cli.project_runtime_trees` (directory)
@@ -165,7 +172,7 @@ Zum Zeitpunkt dieser Generierung keine. Dieser Abschnitt nennt die Lesungen, die
 
 ## Wo die Lesung dünn ist
 
-300 Artefakte werden von einem generischen Leser gelesen. Die Datei wird vollständig gelesen und jeder Record steht mit seinem Inhalt im Fall; was der Record bedeutet, ist nicht entschieden, und jeder sagt das an sich selbst. Zwei Arten von Record tragen diese Aussage: `unparsed.record` für etwas, das niemand lesen konnte, und ein als uninterpretiert zurückgegebener Record für etwas Gelesenes, dessen Format niemand abgebildet hat. In jeder Zusammenfassung dieser Suite sind die beiden getrennt gezählt, denn ein Speicher ohne Schema und eine halb geschriebene Datei sind entgegengesetzte Probleme.
+302 Artefakte werden von einem generischen Leser gelesen. Die Datei wird vollständig gelesen und jeder Record steht mit seinem Inhalt im Fall; was der Record bedeutet, ist nicht entschieden, und jeder sagt das an sich selbst. Zwei Arten von Record tragen diese Aussage: `unparsed.record` für etwas, das niemand lesen konnte, und ein als uninterpretiert zurückgegebener Record für etwas Gelesenes, dessen Format niemand abgebildet hat. In jeder Zusammenfassung dieser Suite sind die beiden getrennt gezählt, denn ein Speicher ohne Schema und eine halb geschriebene Datei sind entgegengesetzte Probleme.
 
 ## Wo es weitergeht
 

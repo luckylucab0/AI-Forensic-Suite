@@ -92,7 +92,30 @@ artifacts:
     Four files, and the fourth is the one to read. The user file carries the model and the machine's own rules; the project file is committed and is what a repository asks for; the local project file is documented as gitignored, so it is the copy with no history behind it and the one a reviewer of the repository never sees. The vendor states that only permissions, hooks and one further key may be set at project level, which is worth knowing before reading a project file as if it could have changed anything else.
 
     The hooks key is executable content in a configuration file. It is in the same document as the permissions and is settable from a project, so a repository can carry commands that run around the agent's actions.
+
+    Measured on macOS 26.5.2: the user file existed at the configuration directory path and was a few bytes long, so the documented spelling is right and a profile that has never changed a permission still has the file. An undocumented subdirectory sat beside it, which devin.cli_config_dir now carries.
   parser: json_generic
+- id: devin.cli_config_dir
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  paths:
+  - ~/.config/devin/cli/
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on macOS 26.5.2 next to the configuration file the vendor documents
+  source_kind: observed
+  notes: |-
+    A directory the vendor documents nowhere. The configuration reference names one file in this directory's parent and stops there, and a real machine had this subdirectory beside it, spelled the same way as the cli layer in the data directory that devin.sessions_db describes.
+
+    It was empty when it was measured, and that is the reason this entry exists rather than the reason it should not. An empty undocumented directory is the shape of a store that is written under a condition the measurement did not meet, and a collection that does not name it returns nothing from it without ever saying so. Naming it costs a glob and turns a silent absence into a recorded one.
+
+    Windows is deliberately not in the os list. The vendor documents the configuration file under the roaming application data directory on Windows, so a sibling there is a reasonable guess and a guess is what this catalogue must not carry: nobody has measured it.
+  parser: null
 - id: devin.cli_mcp_config
   category: mcp_config
   root: project

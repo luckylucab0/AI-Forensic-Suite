@@ -6,7 +6,7 @@ English | [Deutsch](SUPPORT.de.md)
 
 What this suite reads, per agent, counted from the catalogue and the reader registry rather than written down. The numbers move when the code does.
 
-31 catalogue files, 30 of them a product and one cross-cutting. 506 of 631 artifacts are read by 38 reader modules, into 23 event kinds. 505 artifacts rest on a fetched vendor source.
+31 catalogue files, 30 of them a product and one cross-cutting. 508 of 640 artifacts are read by 38 reader modules, into 23 event kinds. 505 artifacts rest on a fetched vendor source.
 
 **How to read an empty result.** An agent listed here with artifacts read means the paths were searched and the files that were there were parsed, so an empty result is evidence that those paths held nothing. It is never evidence that the agent was not used: the data tree may have been relocated by a variable, the retention period may have swept it, the paths may be the unverified ones, or the user may have worked in a profile nobody collected. Where an entry is unverified, `docs/ARTIFACTS.md` says so per artifact and the analyzer repeats it in its output.
 
@@ -19,14 +19,14 @@ What this suite reads, per agent, counted from the catalogue and the reader regi
 | Aider | Linux, macOS, Windows | 2 / 2 | 11 / 13 | 8 | 2 |
 | Amazon Q Developer (CLI and IDE extension) | Linux, macOS, Windows | 3 / 3 | 17 / 20 | 9 | 3 |
 | Amp | Linux, macOS, Windows | 2 / 2 | 10 / 11 | 6 | 1 |
-| ChatGPT Desktop | macOS, Windows | 2 / 5 | 3 / 11 | 3 | 8 |
+| ChatGPT Desktop | macOS, Windows | 2 / 6 | 5 / 19 | 5 | 14 |
 | Claude Code | Linux, macOS, Windows | 5 / 6 | 68 / 78 | 37 | 10 |
 | Claude Desktop | Linux, macOS, Windows | 1 / 2 | 18 / 29 | 11 | 11 |
 | Cline | Linux, macOS, Windows | 5 / 5 | 21 / 25 | 8 | 4 |
 | Continue | Linux, macOS, Windows | 1 / 1 | 17 / 21 | 11 | 4 |
 | Cross-cutting evidence | Linux, macOS, Windows | none | 20 / 27 | 6 | 7 |
 | Cursor | Linux, macOS, Windows | 9 / 9 | 43 / 50 | 31 | 7 |
-| Devin | Linux, macOS, Windows | 1 / 1 | 6 / 6 | 5 | 0 |
+| Devin | Linux, macOS, Windows | 1 / 1 | 6 / 7 | 5 | 1 |
 | Factory Droid | Linux, macOS, Windows | 2 / 2 | 9 / 10 | 7 | 1 |
 | Gemini CLI | Linux, macOS, Windows | 1 / 1 | 15 / 19 | 8 | 4 |
 | GitHub Copilot CLI | Linux, macOS, Windows | 3 / 4 | 16 / 20 | 11 | 4 |
@@ -68,17 +68,23 @@ Every artifact in the catalogue is collected and appears in a case, whether a re
 
 ### Containers in a format nobody here has read
 
-73 entries, binary or directory layouts with no documented format. Each one is collected whole and is on the timeline as a filesystem event. Reading one means writing a format implementation, not finishing an unfinished reader.
+80 entries, binary or directory layouts with no documented format. Each one is collected whole and is on the timeline as a filesystem event. Reading one means writing a format implementation, not finishing an unfinished reader.
 
 - `amazonq.cli_subagent_executions` (directory)
 - `amazonq.ide_extension_install` (directory)
 - `chatgpt_desktop.macos_app_pairing_extensions` (binary)
 - `chatgpt_desktop.macos_codex_app_support` (binary)
 - `chatgpt_desktop.macos_computer_use_service` (binary)
+- `chatgpt_desktop.macos_conversations` (binary)
+- `chatgpt_desktop.macos_crash_reports` (binary)
+- `chatgpt_desktop.macos_drafts` (binary)
 - `chatgpt_desktop.macos_httpstorages` (binary)
 - `chatgpt_desktop.macos_legacy_app_support` (binary)
 - `chatgpt_desktop.macos_legacy_conversations_dir` (binary)
+- `chatgpt_desktop.macos_openai_shared_locations` (binary)
 - `chatgpt_desktop.macos_saved_state_and_logs` (binary)
+- `chatgpt_desktop.macos_web_content_cache` (directory)
+- `chatgpt_desktop.macos_workspace_state` (binary)
 - `claude_code.feedback_bundles` (binary)
 - `claude_code.image_cache` (binary)
 - `claude_code.install_legacy_and_npm` (binary)
@@ -105,6 +111,7 @@ Every artifact in the catalogue is collected and appears in a case, whether a re
 - `cursor.macos_update_state` (directory)
 - `cursor.worker_data` (directory)
 - `cursor.worktrees` (directory)
+- `devin.cli_config_dir` (directory)
 - `factory_droid.worktrees` (directory)
 - `gemini_cli.home_tree` (directory)
 - `gemini_cli.project_runtime_trees` (directory)
@@ -165,7 +172,7 @@ None as of this generation. This section names the readings somebody started and
 
 ## Where the reading is thin
 
-300 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
+302 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
 
 ## Where to look next
 

@@ -56,6 +56,8 @@ STORES = frozenset(
     {
         "aider.tags_cache",
         "amazonq.cli_state_database",
+        "chatgpt_desktop.macos_httpstorages_db",
+        "chatgpt_desktop.macos_url_cache",
         "cline.sqlite_dbs",
         "codex.sqlite_glob",
         "codex.state_databases",

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 6671aaccb0c5
+# Catalogue digest: 61e249833468
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1911,12 +1911,22 @@ sources:
     chatgpt_desktop,chatgpt_desktop.macos_computer_use_service,/var/root/Library/HTTPStorages/com.openai.sky.CUAService/**
     chatgpt_desktop,chatgpt_desktop.macos_computer_use_service,/var/root/Library/Preferences/com.openai.sky.CUAService.cli.plist
     chatgpt_desktop,chatgpt_desktop.macos_computer_use_service,/var/root/Library/Preferences/com.openai.sky.CUAService.plist
+    chatgpt_desktop,chatgpt_desktop.macos_conversations,/Users/*/Library/Application Support/com.openai.chat/conversations-v3-*/*.data
+    chatgpt_desktop,chatgpt_desktop.macos_conversations,/Users/*/Library/Application Support/com.openai.chat/project-g-p-*/conversations-v3-*/*.data
+    chatgpt_desktop,chatgpt_desktop.macos_conversations,/var/root/Library/Application Support/com.openai.chat/conversations-v3-*/*.data
+    chatgpt_desktop,chatgpt_desktop.macos_conversations,/var/root/Library/Application Support/com.openai.chat/project-g-p-*/conversations-v3-*/*.data
     chatgpt_desktop,chatgpt_desktop.macos_cookies,/Users/*/Library/HTTPStorages/com.openai.chat.binarycookies
     chatgpt_desktop,chatgpt_desktop.macos_cookies,/Users/*/Library/HTTPStorages/com.openai.codex.binarycookies
     chatgpt_desktop,chatgpt_desktop.macos_cookies,/Users/*/Library/HTTPStorages/com.openai.sky.CUAService.binarycookies
     chatgpt_desktop,chatgpt_desktop.macos_cookies,/var/root/Library/HTTPStorages/com.openai.chat.binarycookies
     chatgpt_desktop,chatgpt_desktop.macos_cookies,/var/root/Library/HTTPStorages/com.openai.codex.binarycookies
     chatgpt_desktop,chatgpt_desktop.macos_cookies,/var/root/Library/HTTPStorages/com.openai.sky.CUAService.binarycookies
+    chatgpt_desktop,chatgpt_desktop.macos_crash_reports,/Users/*/Library/Application Support/com.openai.chat/io.sentry/**
+    chatgpt_desktop,chatgpt_desktop.macos_crash_reports,/Users/*/Library/Caches/com.openai.chat/io.sentry/**
+    chatgpt_desktop,chatgpt_desktop.macos_crash_reports,/var/root/Library/Application Support/com.openai.chat/io.sentry/**
+    chatgpt_desktop,chatgpt_desktop.macos_crash_reports,/var/root/Library/Caches/com.openai.chat/io.sentry/**
+    chatgpt_desktop,chatgpt_desktop.macos_drafts,/Users/*/Library/Application Support/com.openai.chat/drafts-v2-*/**
+    chatgpt_desktop,chatgpt_desktop.macos_drafts,/var/root/Library/Application Support/com.openai.chat/drafts-v2-*/**
     chatgpt_desktop,chatgpt_desktop.macos_httpstorages,/Users/*/Library/HTTPStorages/ChatGPTHelper.binarycookies
     chatgpt_desktop,chatgpt_desktop.macos_httpstorages,/Users/*/Library/HTTPStorages/com.openai.chat/**
     chatgpt_desktop,chatgpt_desktop.macos_httpstorages,/Users/*/Library/HTTPStorages/com.openai.codex/**
@@ -1925,6 +1935,24 @@ sources:
     chatgpt_desktop,chatgpt_desktop.macos_httpstorages,/var/root/Library/HTTPStorages/com.openai.chat/**
     chatgpt_desktop,chatgpt_desktop.macos_httpstorages,/var/root/Library/HTTPStorages/com.openai.codex/**
     chatgpt_desktop,chatgpt_desktop.macos_httpstorages,/var/root/Library/HTTPStorages/com.openai.sky.CUAService/**
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/Users/*/Library/HTTPStorages/com.openai.chat/httpstorages.sqlite
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/Users/*/Library/HTTPStorages/com.openai.chat/httpstorages.sqlite-shm
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/Users/*/Library/HTTPStorages/com.openai.chat/httpstorages.sqlite-wal
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/Users/*/Library/HTTPStorages/com.openai.codex/httpstorages.sqlite
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/Users/*/Library/HTTPStorages/com.openai.codex/httpstorages.sqlite-shm
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/Users/*/Library/HTTPStorages/com.openai.codex/httpstorages.sqlite-wal
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/Users/*/Library/HTTPStorages/com.openai.sky.CUAService/httpstorages.sqlite
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/Users/*/Library/HTTPStorages/com.openai.sky.CUAService/httpstorages.sqlite-shm
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/Users/*/Library/HTTPStorages/com.openai.sky.CUAService/httpstorages.sqlite-wal
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/var/root/Library/HTTPStorages/com.openai.chat/httpstorages.sqlite
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/var/root/Library/HTTPStorages/com.openai.chat/httpstorages.sqlite-shm
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/var/root/Library/HTTPStorages/com.openai.chat/httpstorages.sqlite-wal
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/var/root/Library/HTTPStorages/com.openai.codex/httpstorages.sqlite
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/var/root/Library/HTTPStorages/com.openai.codex/httpstorages.sqlite-shm
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/var/root/Library/HTTPStorages/com.openai.codex/httpstorages.sqlite-wal
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/var/root/Library/HTTPStorages/com.openai.sky.CUAService/httpstorages.sqlite
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/var/root/Library/HTTPStorages/com.openai.sky.CUAService/httpstorages.sqlite-shm
+    chatgpt_desktop,chatgpt_desktop.macos_httpstorages_db,/var/root/Library/HTTPStorages/com.openai.sky.CUAService/httpstorages.sqlite-wal
     chatgpt_desktop,chatgpt_desktop.macos_legacy_app_support,/Users/*/Library/Application Scripts/com.openai.chat.Widgets/**
     chatgpt_desktop,chatgpt_desktop.macos_legacy_app_support,/Users/*/Library/Application Scripts/group.com.openai.chat/**
     chatgpt_desktop,chatgpt_desktop.macos_legacy_app_support,/Users/*/Library/Application Support/ChatGPT/**
@@ -1943,6 +1971,12 @@ sources:
     chatgpt_desktop,chatgpt_desktop.macos_legacy_app_support,/var/root/Library/WebKit/com.openai.chat/**
     chatgpt_desktop,chatgpt_desktop.macos_legacy_conversations_dir,/Users/*/Library/Application Support/com.openai.chat/conversations-*/**
     chatgpt_desktop,chatgpt_desktop.macos_legacy_conversations_dir,/var/root/Library/Application Support/com.openai.chat/conversations-*/**
+    chatgpt_desktop,chatgpt_desktop.macos_openai_shared_locations,/Users/*/Library/Application Support/OpenAI/**
+    chatgpt_desktop,chatgpt_desktop.macos_openai_shared_locations,/Users/*/Library/Application Support/com.openai.codex.installer/**
+    chatgpt_desktop,chatgpt_desktop.macos_openai_shared_locations,/Users/*/Library/Group Containers/*.com.openai.codex.notifications/**
+    chatgpt_desktop,chatgpt_desktop.macos_openai_shared_locations,/var/root/Library/Application Support/OpenAI/**
+    chatgpt_desktop,chatgpt_desktop.macos_openai_shared_locations,/var/root/Library/Application Support/com.openai.codex.installer/**
+    chatgpt_desktop,chatgpt_desktop.macos_openai_shared_locations,/var/root/Library/Group Containers/*.com.openai.codex.notifications/**
     chatgpt_desktop,chatgpt_desktop.macos_preferences,/Users/*/Library/Preferences/ChatGPTHelper.plist
     chatgpt_desktop,chatgpt_desktop.macos_preferences,/Users/*/Library/Preferences/com.openai.chat.*.plist
     chatgpt_desktop,chatgpt_desktop.macos_preferences,/Users/*/Library/Preferences/com.openai.chat.plist
@@ -1957,6 +1991,24 @@ sources:
     chatgpt_desktop,chatgpt_desktop.macos_saved_state_and_logs,/var/root/Library/Logs/com.openai.codex/**
     chatgpt_desktop,chatgpt_desktop.macos_saved_state_and_logs,/var/root/Library/Saved Application State/com.openai.chat.savedState/**
     chatgpt_desktop,chatgpt_desktop.macos_saved_state_and_logs,/var/root/Library/Saved Application State/com.openai.codex.savedState/**
+    chatgpt_desktop,chatgpt_desktop.macos_url_cache,/Users/*/Library/Caches/com.openai.chat/Cache.db
+    chatgpt_desktop,chatgpt_desktop.macos_url_cache,/Users/*/Library/Caches/com.openai.chat/Cache.db-shm
+    chatgpt_desktop,chatgpt_desktop.macos_url_cache,/Users/*/Library/Caches/com.openai.chat/Cache.db-wal
+    chatgpt_desktop,chatgpt_desktop.macos_url_cache,/var/root/Library/Caches/com.openai.chat/Cache.db
+    chatgpt_desktop,chatgpt_desktop.macos_url_cache,/var/root/Library/Caches/com.openai.chat/Cache.db-shm
+    chatgpt_desktop,chatgpt_desktop.macos_url_cache,/var/root/Library/Caches/com.openai.chat/Cache.db-wal
+    chatgpt_desktop,chatgpt_desktop.macos_web_content_cache,/Users/*/Library/Caches/com.openai.chat/WebKit/**
+    chatgpt_desktop,chatgpt_desktop.macos_web_content_cache,/Users/*/Library/Caches/com.openai.chat/fsCachedData/**
+    chatgpt_desktop,chatgpt_desktop.macos_web_content_cache,/var/root/Library/Caches/com.openai.chat/WebKit/**
+    chatgpt_desktop,chatgpt_desktop.macos_web_content_cache,/var/root/Library/Caches/com.openai.chat/fsCachedData/**
+    chatgpt_desktop,chatgpt_desktop.macos_workspace_state,/Users/*/Library/Application Support/com.openai.chat/gizmos-*/bootstrap.data
+    chatgpt_desktop,chatgpt_desktop.macos_workspace_state,/Users/*/Library/Application Support/com.openai.chat/gizmos-*/projects.data
+    chatgpt_desktop,chatgpt_desktop.macos_workspace_state,/Users/*/Library/Application Support/com.openai.chat/models-*/response.data
+    chatgpt_desktop,chatgpt_desktop.macos_workspace_state,/Users/*/Library/Application Support/com.openai.chat/system-hints-*/response.data
+    chatgpt_desktop,chatgpt_desktop.macos_workspace_state,/var/root/Library/Application Support/com.openai.chat/gizmos-*/bootstrap.data
+    chatgpt_desktop,chatgpt_desktop.macos_workspace_state,/var/root/Library/Application Support/com.openai.chat/gizmos-*/projects.data
+    chatgpt_desktop,chatgpt_desktop.macos_workspace_state,/var/root/Library/Application Support/com.openai.chat/models-*/response.data
+    chatgpt_desktop,chatgpt_desktop.macos_workspace_state,/var/root/Library/Application Support/com.openai.chat/system-hints-*/response.data
     claude_code,claude_code.agent_memory,/Users/*/.claude/agent-memory/*/**
     claude_code,claude_code.agent_memory,/Users/*/.claude/agent-memory/*/MEMORY.md
     claude_code,claude_code.agent_memory,/var/root/.claude/agent-memory/*/**
@@ -3131,6 +3183,8 @@ sources:
     devin,devin.acp_events,/var/root/Library/Application Support/Devin/User/acp-events/**
     devin,devin.cli_config,/Users/*/.config/devin/config.json
     devin,devin.cli_config,/var/root/.config/devin/config.json
+    devin,devin.cli_config_dir,/Users/*/.config/devin/cli/**
+    devin,devin.cli_config_dir,/var/root/.config/devin/cli/**
     devin,devin.cli_mcp_config,/Users/*/.config/devin/mcp_config.json
     devin,devin.cli_mcp_config,/var/root/.config/devin/mcp_config.json
     devin,devin.cli_subagents,/Users/*/.config/devin/agents/**
@@ -6273,6 +6327,8 @@ sources:
     devin,devin.acp_events,/root/Library/Application Support/Devin/User/acp-events/**
     devin,devin.cli_config,/home/*/.config/devin/config.json
     devin,devin.cli_config,/root/.config/devin/config.json
+    devin,devin.cli_config_dir,/home/*/.config/devin/cli/**
+    devin,devin.cli_config_dir,/root/.config/devin/cli/**
     devin,devin.cli_mcp_config,/home/*/.config/devin/mcp_config.json
     devin,devin.cli_mcp_config,/root/.config/devin/mcp_config.json
     devin,devin.cli_subagents,/home/*/.config/devin/agents/**

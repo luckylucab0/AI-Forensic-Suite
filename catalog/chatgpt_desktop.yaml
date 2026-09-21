@@ -49,7 +49,40 @@ artifacts:
     Confirmed in both the chatgpt and chatgpt-classic casks. Useful for proving network activity to OpenAI endpoints and for dating first/last use per bundle id.
 
     Record structure: HTTPStorages holds the per-bundle NSURLSession cache and cookie store. The directory itself yields cached HTTP responses and request metadata (hosts, timestamps) even when app-level content is encrypted.
+
+    MEASURED on macOS 26.5.2 with the application at version 26.915.31945: the directory under the chat identifier was present and held httpstorages.sqlite with a shared-memory file and a write-ahead log, and the log was eighty times the size of the database. Take all three or the recent requests are the ones that get lost, which in this entry means the destinations of everything the application did most recently. The other three paths were not probed, so their absence from that measurement is not evidence about them.
   parser: null
+- id: chatgpt_desktop.macos_httpstorages_db
+  title: Per-bundle HTTP storage database
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/HTTPStorages/com.openai.chat/httpstorages.sqlite
+  - ~/Library/HTTPStorages/com.openai.chat/httpstorages.sqlite-shm
+  - ~/Library/HTTPStorages/com.openai.chat/httpstorages.sqlite-wal
+  - ~/Library/HTTPStorages/com.openai.codex/httpstorages.sqlite
+  - ~/Library/HTTPStorages/com.openai.codex/httpstorages.sqlite-shm
+  - ~/Library/HTTPStorages/com.openai.codex/httpstorages.sqlite-wal
+  - ~/Library/HTTPStorages/com.openai.sky.CUAService/httpstorages.sqlite
+  - ~/Library/HTTPStorages/com.openai.sky.CUAService/httpstorages.sqlite-shm
+  - ~/Library/HTTPStorages/com.openai.sky.CUAService/httpstorages.sqlite-wal
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on macOS 26.5.2 with the application at version 26.915.31945
+  source_kind: observed
+  volatility: |-
+    The database is small and the write-ahead log is not. On the measured profile the log was eighty times the size of the database, which is the state where the recent requests exist only in the log, so a copy of the database alone is a copy of the old records.
+  notes: |-
+    The database inside the HTTP storage directory, named as a database so that something reads it as one. The entry beside this one claims the directory, and a directory entry has no format a reader can dispatch on, so before this entry existed a store that names network destinations arrived in a case as a file nobody could open.
+
+    Why this matters more here than elsewhere. This catalogue records no network destinations for this product anywhere: no endpoint list, no log of requests. What is left is this database and the URL cache, so these are the files an examiner asking what the application talked to actually has.
+
+    Only the first three paths were measured. The two other bundle identifiers keep their own directory under the same parent, which the entry beside this one records, and whether they hold a database of this name on a given machine is not established. They are not singled out as unsourced paths, because this entry is unverified as a whole and that is the stronger statement: marking six of nine would read as a claim that the other three were confirmed by a source, when what confirmed them was one machine.
+  parser: sqlite_generic
 - id: chatgpt_desktop.macos_app_pairing_extensions
   category: config
   root: user_profile
@@ -67,6 +100,8 @@ artifacts:
     Confirmed via GitHub code search content match in a third-party sandbox profile, not vendor documentation - hence medium. This is almost certainly the state for ChatGPT's 'Work with Apps' IDE pairing (Xcode/VS Code/Terminal), which makes it direct evidence that the desktop app was wired into a code editor. Worth verifying against a live install and promoting.
 
     Record structure: Appears as an explicitly allowlisted subpath in a public macOS sandbox profile alongside ~/.vscode and Microsoft DeveloperTools paths.
+
+    MEASURED on macOS 26.5.2 with the application at version 26.915.31945: the directory exists. That is worth recording because this entry rested on a third party's sandbox profile rather than on the vendor, and its own note asked for exactly this. It was empty on that profile, so the measurement says the application creates it and says nothing about what a paired editor puts in it.
   parser: null
 - id: chatgpt_desktop.macos_preferences
   category: config
@@ -90,6 +125,8 @@ artifacts:
     Feature-flag plists are an underrated dating artifact - they change as OpenAI rolls features out, so they help bound when the install was last online.
 
     Record structure: Binary plist. The wildcard sibling files are real: an uninstaller in the wild explicitly removes ~/Library/Preferences/com.openai.chat.RemoteFeatureFlags.plist, i.e. server-pushed feature-flag state is cached locally and tells you which app capabilities (agent mode, connectors) were enabled for that user.
+
+    MEASURED on macOS 26.5.2 with the application at version 26.915.31945: the plist under the chat identifier was present and was two and a half megabytes. A preferences file of that size is not a handful of settings, so read it as a store rather than as configuration, and expect the parser to meet keys that no settings document describes. None of the three sibling paths appeared on that machine, which for a wildcard is what it is: the feature-flag file is written when the server pushes one and nothing says a given profile has to have one.
   parser: plist_generic
 - id: chatgpt_desktop.macos_cookies
   category: credentials
@@ -133,6 +170,8 @@ artifacts:
     MAJOR ADDITION - not in the brief. 'CUA' is computer-use agent: this is the component that drives the GUI on the user's behalf. The presence of the system-wide authorization plugin is strong evidence the user granted an AI agent screen-and-input control of the machine, which is exactly the kind of finding an examiner needs to flag. Pair it with the TCC database (Accessibility / Screen Recording grants for com.openai.codex) which is outside this family's scope but should be cross-referenced.
 
     Record structure: A second bundle identifier, com.openai.sky.CUAService, ships inside the same app, with a system-level (not user-level) authorization plugin under /Library/Application Support/CodexComputerUseAuthorizationPlugin.
+
+    MEASURED on macOS 26.5.2 with the application at version 26.915.31945: the group container of the computer-use service was present under the vendor's team identifier, which is why the pattern here is a wildcard over that identifier rather than a literal. So the component is on the machine and its container was created. What was not probed is the system-level authorization plugin and the preference files, and those are the ones that would say whether control was actually granted: the presence of a container is evidence of the component shipping, not of a grant.
   parser: null
 - id: chatgpt_desktop.macos_saved_state_and_logs
   category: log
@@ -154,6 +193,8 @@ artifacts:
     ~/Library/Logs/com.openai.codex is new with the Codex-era app and is the natural place to look for local agent/tool-execution logging. I have not seen its contents; treat the format as unknown.
 
     Record structure: savedState contains windows.plist plus a data.data blob. Window titles in saved state have historically leaked conversation titles for AppKit apps - worth carving even when message bodies are encrypted.
+
+    MEASURED on macOS 26.5.2 with the application at version 26.915.31945, and two thirds of this entry is still open. The chat saved-state directory was ABSENT on a machine where the application was installed and in daily use, so a missing saved state here is not evidence that the application was not used. The two paths under the command line product's identifier, the log directory and its saved state, were NOT PROBED, because the probe list of scripts/measure_layout.sh was written by hand and did not carry them. Their absence from that measurement says nothing at all. A path that is not in this entry was probed instead and was also absent, which is the reason the probe list is now generated from this catalogue rather than typed.
   parser: null
 - id: chatgpt_desktop.macos_codex_app_support
   category: transcript
@@ -197,6 +238,178 @@ artifacts:
 
     Record structure: ~/.codex is listed in the zap (uninstall) set of the ChatGPT desktop cask, which means the GUI app owns and writes that directory - it is not merely the CLI's directory that the app happens to read.
   parser: jsonl_generic
+- id: chatgpt_desktop.macos_conversations
+  title: Conversation store
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - |-
+    ~/Library/Application Support/com.openai.chat/conversations-v3-<account-id>/<conversation-id>.data
+  - |-
+    ~/Library/Application Support/com.openai.chat/project-g-p-<project-id>/conversations-v3-<account-id>/<conversation-id>.data
+  format: binary
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: observed on macOS 26.5.2 with the application at version 26.915.31945
+  source_kind: observed
+  volatility: |-
+    No expiry was observed and none is documented. The files measured spanned months, which is consistent with a store that is not swept, but one measurement of one profile cannot establish a retention policy.
+  notes: |-
+    The conversations of the current application, measured rather than read off a page, because this vendor documents no path for any of this. The directory beside this entry carried one file per conversation, from three kilobytes to three hundred, named by a conversation identifier, under a directory named by an account identifier.
+
+    Why this entry exists next to the one that already globbed the same place. That entry is the whole application support tree under one identifier, flagged as a previous product's, so every file here reached a case as an undifferentiated member of a legacy blob. This one is more literal and therefore wins the attribution, which is what turns four hundred filesystem events into a statement about which of them are conversations.
+
+    Two shapes, and the second is the one to look for. A conversation inside a project sits under a project directory with its own copy of the same conversations directory, so a pattern that stops at the first level finds the loose conversations and none of the project ones.
+
+    What the measurement did not establish, and this matters before anybody quotes a file: nothing was read. The names, the sizes and the layout are measured; the content is not, so whether these files are readable on a current build is exactly as open as the entry beside this one says. Prior research on the retired application under the same identifier found plaintext and the vendor responded with encryption, which is a claim about a build from before mid-2024 and not about this one.
+  parser: null
+- id: chatgpt_desktop.macos_drafts
+  title: Unsent drafts
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Application Support/com.openai.chat/drafts-v2-<account-id>/
+  format: binary
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: observed on macOS 26.5.2 with the application at version 26.915.31945
+  source_kind: observed
+  volatility: |-
+    A draft is by nature the thing that has not been sent yet, so it is the most likely of these directories to be overwritten by the next keystroke. Collect it before anything else in this family.
+  notes: |-
+    What somebody typed and did not send. The directory was present and empty on the measured profile, which is why it is here as a directory rather than with a file shape: an empty draft store is the normal state and says nothing, and the entry exists so that a non-empty one is not missed.
+
+    Forensically this is a different artifact from a conversation and deserves its own entry for that reason. A sent prompt is in the conversation store and, for the web product, on the vendor's servers. A draft is neither: it is intent that was never carried out, it exists only on this device, and it is the one thing in this family that no server-side request will ever return.
+  parser: null
+- id: chatgpt_desktop.macos_workspace_state
+  title: Custom agents, projects and the models on offer
+  category: config
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Application Support/com.openai.chat/gizmos-<account-id>/bootstrap.data
+  - ~/Library/Application Support/com.openai.chat/gizmos-<account-id>/projects.data
+  - ~/Library/Application Support/com.openai.chat/models-<account-id>/response.data
+  - ~/Library/Application Support/com.openai.chat/system-hints-<account-id>/response.data
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on macOS 26.5.2 with the application at version 26.915.31945
+  source_kind: observed
+  volatility: |-
+    Each of these is a cached server response, so it is replaced whenever the application refreshes it and holds the state at the last refresh rather than a history.
+  notes: |-
+    Four cached responses that together say what the account could do, which no other entry in this family carries. The first two name the custom agents and the projects that existed; the third names the models that were on offer, which is what an answer about which model produced something has to be checked against; the fourth is what the application was told about the system it runs on.
+
+    Named as four paths rather than one glob because they are four different questions and an analyst asking one of them should not have to open the other three.
+
+    A cached response is a statement about the account and not only about the device, which is worth saying out loud: these files can name agents and projects that were never used on this machine.
+  parser: null
+- id: chatgpt_desktop.macos_crash_reports
+  title: Crash reports and their upload queue
+  category: log
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Application Support/com.openai.chat/io.sentry/
+  - ~/Library/Caches/com.openai.chat/io.sentry/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on macOS 26.5.2 with the application at version 26.915.31945
+  source_kind: observed
+  volatility: |-
+    An envelope is deleted once it has been sent, so what is on disk is what has not left yet, plus whatever the crash handler wrote and has not cleaned up.
+  notes: |-
+    Third-party crash reporting, present as its own tree with an installation identifier, a crash handler directory and a queue of envelopes waiting to be sent. Two things follow and both are worth an entry.
+
+    It dates the application's runs independently of anything the application itself writes, which is the usual reason to want a crash log. And it is a channel by which data left the device: an envelope is a payload addressed to a third party rather than to the vendor, so an examiner asking what was sent and to whom has a second destination to account for.
+
+    The installation identifier in this tree is stable across runs, which makes it a durable pseudonymous handle for the install, the same shape as the identifiers this catalogue records for other products.
+  parser: null
+- id: chatgpt_desktop.macos_url_cache
+  title: URL cache and web content cache
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Caches/com.openai.chat/Cache.db
+  - ~/Library/Caches/com.openai.chat/Cache.db-shm
+  - ~/Library/Caches/com.openai.chat/Cache.db-wal
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on macOS 26.5.2 with the application at version 26.915.31945
+  source_kind: observed
+  volatility: |-
+    A cache, so it is evicted by size and age with no policy this measurement could see. The write-ahead log measured larger than the database itself, which is the state where recent entries exist only in that sidecar and all three files have to be taken together.
+  notes: |-
+    The system URL cache of the application, which is the closest thing in this family to a record of network destinations. This catalogue records no network destinations for this product anywhere else, so an examiner asking what the application talked to has this and the storage entry beside it and nothing more.
+
+    Collect all three files. The measured profile had a write-ahead log several times the size of the database, which means a read of the database alone would have missed most of the recent entries.
+
+    The web content cache that was measured beside it is a different format and therefore a different entry, chatgpt_desktop.macos_web_content_cache.
+
+    Read by the generic SQLite reader rather than by a parser of its own. The table names of this database are Apple's and not this vendor's, so a parser written from recollection of them would report no rows on a schema that had moved, and no rows here reads as an application that reached nowhere. The generic reader states the schema it found and returns the rows uninterpreted, which is the honest answer until somebody holds the schema against a source.
+  parser: sqlite_generic
+- id: chatgpt_desktop.macos_web_content_cache
+  title: Cached web content
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Caches/com.openai.chat/WebKit/
+  - ~/Library/Caches/com.openai.chat/fsCachedData/
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on macOS 26.5.2 with the application at version 26.915.31945
+  source_kind: observed
+  volatility: |-
+    Evicted by size and age, and a cache is the first thing a housekeeping pass removes. Nothing here should be read as a complete record of what was rendered.
+  notes: |-
+    The other half of what the application cached, split off from the URL database beside it because it is a tree of blobs rather than a store with a schema, and an entry that is both gets read as neither.
+
+    What it is good for is the content the database only names. The web tree holds what the embedded browser rendered, with its own network cache and its own salt underneath; the second directory is the file-backed side of the URL cache, which is where a response too large for a database row ends up. So a URL with no body in the database may still have its body here.
+
+    Nothing was read from either tree. The measurement took names, sizes and times, which is what established that these directories exist and how large they get, and no more than that.
+  parser: null
+- id: chatgpt_desktop.macos_openai_shared_locations
+  title: Shared and installer locations under the vendor's own names
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Application Support/OpenAI/
+  - ~/Library/Application Support/com.openai.codex.installer/
+  - ~/Library/Group Containers/<team-id>.com.openai.codex.notifications/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on macOS 26.5.2 with the application at version 26.915.31945
+  source_kind: observed
+  volatility: Install-time state, so it survives the removal of the thing it describes.
+  notes: |-
+    Three locations the measurement found that no entry claimed, each of them evidence that something was installed rather than evidence of what it did. The first is the vendor's own name rather than a bundle identifier, so it is shared between products and a file there cannot be attributed to one of them by its path. The second belongs to the installer of the command line product, which is how that product arrives on a machine where only the application was ever downloaded. The third is a notification group container, which exists so a helper process can reach the application and is therefore evidence that the helper ran.
+
+    The team identifier is a placeholder in these paths on purpose. It is the vendor's own and it is public, but writing it into a pattern would break the moment the vendor ships under a second one, and a glob costs nothing.
+  parser: null
 - id: chatgpt_desktop.macos_legacy_app_support
   category: transcript
   root: user_profile
@@ -214,7 +427,6 @@ artifacts:
   format: binary
   sensitivity: normal
   collect_priority: normal
-  legacy: true
   status: unverified
   source: https://raw.githubusercontent.com/Homebrew/homebrew-cask/master/Casks/c/chatgpt-classic.rb
   source_kind: community
@@ -222,6 +434,30 @@ artifacts:
     Conversation payloads are encrypted in current builds; treat plaintext recovery as a bonus, not the plan. Envelope metadata (file names, counts, sizes, mtimes) survives regardless and is what supports a timeline.
   notes: |-
     This is the legacy app the brief describes. History: in July 2024 a researcher showed the app was unsandboxed and stored conversations in plaintext under ~/Library/Application Support/com.openai.chat/conversations-{uuid}/; OpenAI shipped encryption in response. So on an image, PRE-mid-2024 data may be plaintext and later data will not be. Realistic expectation for a modern image: directory structure, per-conversation file names/UUIDs, sizes and timestamps are recoverable; message bodies generally are not without the Keychain.
+
+
+    THE LEGACY FLAG CAME OFF THIS ENTRY, and the reason is the whole point of measuring. A
+    real installation of the current application, version 26.915.31945 on macOS 26.5.2, was
+    held against this catalogue, and the current application uses this bundle identifier and
+    these directories: the conversation store, the drafts, the cached account state and the
+    caches were all live under the very paths this entry described as a previous product's.
+    Flagged as legacy, an analyzer is required not to present any of it as live state, so a
+    device's current activity would have read as residue of an application nobody had
+    installed any more. That is the inversion this project exists to avoid, and it was one
+    field.
+
+    What is still true is the history in the paragraph above, and it is why the confusion was
+    reasonable: the retired application shipped under the same identifier, which is what makes
+    the 2024 research about the same directories. The identifier was reused rather than
+    retired.
+
+    This entry now claims the tree and nothing more. The artifacts inside it have entries of
+    their own, added from the same measurement, and each is more literal than this glob and
+    therefore wins the attribution. What is left to this one is the part nobody has
+    differentiated: a tips database, a helper cache, the application scripts directories and
+    the WebKit tree. Two directories also coexisted on the measured machine, one under the
+    vendor's product name and one under this identifier, and which of the two the retired
+    application owns is not settled by one measurement.
 
     Record structure: Cask `chatgpt-classic` version 1.2026.184,1784145287, app bundle "ChatGPT Classic.app", bundle identifiers com.openai.chat, com.openai.chat-helper, com.openai.chat.Widgets, group.com.openai.chat.
   parser: null
@@ -236,10 +472,14 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: unverified
-  source: recollection
-  source_kind: recollection
+  source: observed on macOS 26.5.2 with the application at version 26.915.31945
+  source_kind: observed
   notes: |-
-    recollection, needs verification. The exact subdirectory spelling `conversations-{uuid}` comes from the July 2024 disclosure by Pedro Jose Pereira Vieito; both the Mastodon and Threads originals are egress-blocked from this environment, so I saw it only in search snippets and could not fetch a page stating it. The PARENT directory is verified (see chatgpt_desktop.macos_legacy_app_support). Do not hardcode this glob until someone confirms it against a real install or an accessible primary source.
+    CONFIRMED AGAINST A REAL INSTALL, which is what this entry's own note asked for and what it refused to be trusted without. The glob matched: the measured profile held a conversations directory named by an account identifier, with one file per conversation inside it. The entry no longer rests on a researcher's disclosure that could not be fetched from here.
+
+    What the confirmation changed and what it did not. The spelling is real, so this stays as the loose glob that catches whichever version numbering a profile has, and the current spelling has an entry of its own beside it with the file shape the measurement saw. The word legacy in this id is now the honest part rather than the misleading one: this pattern is the catch-all for the versions nobody has measured, and the specific entry is the one that describes what a current machine holds.
+
+    Still not established: what is inside a file. The measurement took names, sizes and times and no content, deliberately, so whether a conversation here can be read on a current build is unchanged by it.
   parser: null
 - id: chatgpt_desktop.windows_msix_localcache
   category: transcript

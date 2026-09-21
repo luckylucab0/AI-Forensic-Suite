@@ -958,6 +958,21 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "unverified"
                 },
                 {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "chatgpt_desktop.macos_conversations",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/com.openai.chat/conversations-v3-<account-id>/<conversation-id>.data",
+                        "~/Library/Application Support/com.openai.chat/project-g-p-<project-id>/conversations-v3-<account-id>/<conversation-id>.data"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
                     "category": "credentials",
                     "collect_priority": "normal",
                     "id": "chatgpt_desktop.macos_cookies",
@@ -974,6 +989,35 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "unverified"
                 },
                 {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_crash_reports",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/com.openai.chat/io.sentry/",
+                        "~/Library/Caches/com.openai.chat/io.sentry/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "first",
+                    "id": "chatgpt_desktop.macos_drafts",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/com.openai.chat/drafts-v2-<account-id>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
                     "category": "cache",
                     "collect_priority": "normal",
                     "id": "chatgpt_desktop.macos_httpstorages",
@@ -985,6 +1029,28 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/Library/HTTPStorages/com.openai.chat/",
                         "~/Library/HTTPStorages/com.openai.codex/",
                         "~/Library/HTTPStorages/com.openai.sky.CUAService/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_httpstorages_db",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/HTTPStorages/com.openai.chat/httpstorages.sqlite",
+                        "~/Library/HTTPStorages/com.openai.chat/httpstorages.sqlite-shm",
+                        "~/Library/HTTPStorages/com.openai.chat/httpstorages.sqlite-wal",
+                        "~/Library/HTTPStorages/com.openai.codex/httpstorages.sqlite",
+                        "~/Library/HTTPStorages/com.openai.codex/httpstorages.sqlite-shm",
+                        "~/Library/HTTPStorages/com.openai.codex/httpstorages.sqlite-wal",
+                        "~/Library/HTTPStorages/com.openai.sky.CUAService/httpstorages.sqlite",
+                        "~/Library/HTTPStorages/com.openai.sky.CUAService/httpstorages.sqlite-shm",
+                        "~/Library/HTTPStorages/com.openai.sky.CUAService/httpstorages.sqlite-wal"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -1026,6 +1092,22 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "unverified"
                 },
                 {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_openai_shared_locations",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/OpenAI/",
+                        "~/Library/Application Support/com.openai.codex.installer/",
+                        "~/Library/Group Containers/<team-id>.com.openai.codex.notifications/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
                     "category": "config",
                     "collect_priority": "normal",
                     "id": "chatgpt_desktop.macos_preferences",
@@ -1053,6 +1135,54 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/Library/Logs/com.openai.codex/",
                         "~/Library/Saved Application State/com.openai.chat.savedState/",
                         "~/Library/Saved Application State/com.openai.codex.savedState/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_url_cache",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Caches/com.openai.chat/Cache.db",
+                        "~/Library/Caches/com.openai.chat/Cache.db-shm",
+                        "~/Library/Caches/com.openai.chat/Cache.db-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_web_content_cache",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Caches/com.openai.chat/WebKit/",
+                        "~/Library/Caches/com.openai.chat/fsCachedData/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "chatgpt_desktop.macos_workspace_state",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Application Support/com.openai.chat/gizmos-<account-id>/bootstrap.data",
+                        "~/Library/Application Support/com.openai.chat/gizmos-<account-id>/projects.data",
+                        "~/Library/Application Support/com.openai.chat/models-<account-id>/response.data",
+                        "~/Library/Application Support/com.openai.chat/system-hints-<account-id>/response.data"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6044,6 +6174,21 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "devin.cli_config_dir",
+                    "os": [
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.config/devin/cli/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
                 },
                 {
                     "category": "mcp_config",
@@ -12542,7 +12687,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "7d74607bcde444c0a43c8c395f45b353e2d7173225b1fe55b253ecf86f330139"
+    "sha256": "f4ba4ac6c03a9e16003e419bd64f31ad46c8f4bf2e624d61ca317b6f70cdec92"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)
