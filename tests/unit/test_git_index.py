@@ -16,6 +16,7 @@ import os
 import shutil
 import struct
 import subprocess
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -225,3 +226,103 @@ def test_a_file_named_index_that_is_not_one_falls_back_to_being_recorded(
     path.write_text("not an index\n", encoding="utf-8", newline="")
     events = parse(path, "index")
     assert events[0].kind == "config.snapshot"
+
+
+# ------------------------------------------------ an index from a SHA-256 repository
+
+# The index does not say which hash wrote it. Git knows from the repository's
+# configuration, which is not in the index and may not have been collected with it, so
+# this reader works the width out by reading. It used to get that wrong for every
+# SHA-256 repository, in both directions at once: version four returned the first
+# candidate without testing anything, and the test for the padded versions compared a
+# remainder against seven, which is true of every remainder. Every such index was read
+# with twelve bytes too few per entry and refused as a damaged file, so a checkpoint from
+# one reached a case as an artifact that would not parse.
+#
+# git writes these fixtures, as it writes the others here, because a fixture built from
+# the specification would only prove the specification was read the same way twice.
+
+
+def _object_format_available() -> bool:
+    """Whether this git can make a SHA-256 repository, asked by making one.
+
+    A version check would be the wrong question: the option has been in git since 2.29 and
+    a build can still be without it, and the tests below need the repository rather than
+    the version number. The probe cleans up after itself, because a test collection that
+    leaves a repository behind in the temporary directory is one nobody can run twice.
+    """
+    if shutil.which("git") is None:
+        return False
+    with tempfile.TemporaryDirectory() as where:
+        made = subprocess.run(
+            ["git", "init", "-q", "--object-format=sha256", "--bare", where],
+            capture_output=True,
+            text=True,
+        )
+    return made.returncode == 0
+
+
+needs_sha256 = pytest.mark.skipif(
+    not _object_format_available(), reason="this git cannot make a SHA-256 repository"
+)
+
+
+def sha256_workspace(root: Path, version: int) -> bytes:
+    """The same shapes as the workspace above, in a repository that hashes with SHA-256."""
+    root.mkdir(parents=True, exist_ok=True)
+    _git(root, "init", "-q", "-b", "main", "--object-format=sha256")
+    _git(root, "config", "index.version", str(version))
+    (root / "settings.json").write_text('{"a": 1}\n', encoding="utf-8", newline="")
+    (root / "src").mkdir(exist_ok=True)
+    (root / "src" / "app.py").write_text("x = 1\n", encoding="utf-8", newline="")
+    (root / "src" / "application.py").write_text("y = 2\n", encoding="utf-8", newline="")
+    _git(root, "add", "-A")
+    _git(root, "update-index", "--index-version", str(version))
+    return (root / ".git" / "index").read_bytes()
+
+
+@needs_git
+@needs_sha256
+@pytest.mark.parametrize("version", [2, 4])
+def test_an_index_from_a_sha256_repository_reads(tmp_path: Path, version: int) -> None:
+    raw = sha256_workspace(tmp_path / f"s{version}", version)
+    entries = {entry.path: entry for entry in read(raw)}
+    assert set(entries) == {"settings.json", "src/app.py", "src/application.py"}
+    assert entries["settings.json"].size == len('{"a": 1}\n')
+    assert len(entries["src/app.py"].object_id) == 64, (
+        "a SHA-256 object id is sixty-four characters, and a shorter one means the width "
+        "was decided wrongly and every field after it came from the wrong place"
+    )
+
+
+@needs_git
+@needs_sha256
+@pytest.mark.parametrize("version", [2, 4])
+def test_the_two_hashes_are_told_apart_rather_than_assumed(tmp_path: Path, version: int) -> None:
+    """The same paths out of both, with ids of the length each repository writes.
+
+    Asserted together because the failure was not that one of them was unreadable: it was
+    that one width was returned for both, so whichever repository did not match it read as
+    damaged while the other went on working.
+    """
+    older = {entry.path: entry for entry in read(workspace(tmp_path / f"o{version}", version))}
+    newer = {
+        entry.path: entry for entry in read(sha256_workspace(tmp_path / f"n{version}", version))
+    }
+    shared = set(older) & set(newer)
+    assert shared == {"settings.json", "src/app.py", "src/application.py"}
+    assert {len(older[path].object_id) for path in shared} == {40}
+    assert {len(newer[path].object_id) for path in shared} == {64}
+
+
+def test_an_index_with_no_entries_at_all_is_not_an_error() -> None:
+    """A staging area with nothing in it, which is what a fresh checkpoint repository has.
+
+    Built here rather than by git, because git writes no index file at all until something
+    is staged, so there is no way to ask it for this one. There is no entry to decide the
+    object id width from and nothing that depends on the answer, and the file has to read
+    as a listing of nothing rather than as a file that would not parse.
+    """
+    empty = b"DIRC" + struct.pack(">II", 2, 0) + bytes(20)
+    assert looks_like_index(empty)
+    assert list(read(empty)) == []

@@ -15,6 +15,7 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import tempfile
 import zlib
 from pathlib import Path
 
@@ -325,3 +326,73 @@ def test_which_repositories_carry_their_objects_is_the_catalogues_answer() -> No
             OWN_REPOSITORY - carries
         ),
     }
+
+
+# ------------------------------------------------ a tree from a SHA-256 repository
+
+# The hash length is not in the object and the repository configuration git reads it from
+# is not necessarily in the collection, so this reader decides it from the bytes. It used
+# to decide from one piece of arithmetic on the first entry: the longer hash was chosen
+# when what remained after that entry's name divided by thirty-two and not by twenty. Both
+# hold whenever the remainder divides by a hundred and sixty, and a two entry tree reaches
+# that with an eight character second name, which is why the fixture below has one.
+
+
+def _sha256_available() -> bool:
+    if shutil.which("git") is None:
+        return False
+    with tempfile.TemporaryDirectory() as where:
+        made = subprocess.run(
+            ["git", "init", "-q", "--object-format=sha256", "--bare", where],
+            capture_output=True,
+            text=True,
+        )
+    return made.returncode == 0
+
+
+needs_sha256 = pytest.mark.skipif(
+    not _sha256_available(), reason="this git cannot make a SHA-256 repository"
+)
+
+
+@pytest.fixture(scope="module")
+def long_hash_repository(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """A SHA-256 repository whose tree is the shape the old arithmetic got wrong."""
+    root = tmp_path_factory.mktemp("shadow256")
+    _git(root, "init", "-q", "-b", "main", "--object-format=sha256")
+    (root / "a.txt").write_text("x\n", encoding="utf-8", newline="")
+    # Eight characters exactly: with the longer hash this makes what remains after the
+    # first entry's name a multiple of twenty as well as of thirty-two.
+    (root / "bbbbbbbb").write_text("y\n", encoding="utf-8", newline="")
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "checkpoint")
+    return root
+
+
+@needs_sha256
+def test_a_tree_from_a_long_hash_repository_lists_its_files(
+    long_hash_repository: Path,
+) -> None:
+    tree = read(_object(long_hash_repository, "HEAD^{tree}"))
+    assert [entry.name for entry in tree.entries] == ["a.txt", "bbbbbbbb"]
+    assert {len(entry.object_id) for entry in tree.entries} == {64}, (
+        "a SHA-256 object id is sixty-four characters, and a shorter one means the length "
+        "was decided wrongly and every field after it came from the wrong place"
+    )
+    assert {entry.mode for entry in tree.entries} == {"100644"}
+
+
+@needs_sha256
+def test_the_two_hash_lengths_are_told_apart_rather_than_assumed(
+    repository: Path, long_hash_repository: Path
+) -> None:
+    """Both, side by side, because the failure was never that one was unreadable.
+
+    One length was chosen for both, so whichever repository did not match it was refused
+    as damaged while the other went on working, and a test of one alone would have gone on
+    passing throughout.
+    """
+    older = read(_object(repository, "HEAD^{tree}"))
+    newer = read(_object(long_hash_repository, "HEAD^{tree}"))
+    assert {len(entry.object_id) for entry in older.entries} == {40}
+    assert {len(entry.object_id) for entry in newer.entries} == {64}

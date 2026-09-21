@@ -162,16 +162,57 @@ def interpret(kind: str, content: bytes, size: int | None = None) -> GitObject:
     return GitObject(kind=kind, size=size, body=content)
 
 
+# The modes git writes into a tree, and the whole set of them: a file, an executable
+# file, a symbolic link, a directory and a submodule. Used to tell the two hash lengths
+# apart rather than to refuse anything, because a tree carrying a mode outside this set
+# is still a tree and its entries still belong in the case.
+_TREE_MODES = frozenset({"100644", "100755", "120000", "40000", "160000"})
+
+
 def _tree(content: bytes) -> Iterator[TreeEntry]:
-    """Every entry of a tree, with the object id rendered the way git prints it.
+    """Every entry of a tree, with the object id rendered the way git prints it."""
+    yield from _tree_entries(content, _tree_width(content))
+
+
+def _tree_width(content: bytes) -> int:
+    """Which hash this tree was written with, decided by reading it with each.
+
+    The length is not in the object and the repository's configuration, which is where git
+    reads it from, is not necessarily in the collection. What was here instead was one
+    piece of arithmetic on the first entry: the longer hash was chosen when what remained
+    after that entry's name divided by thirty-two and not by twenty. Both hold whenever
+    the remainder divides by a hundred and sixty, which a two entry tree reaches with an
+    eight character second name, and such a tree from a SHA-256 repository was read twelve
+    bytes short per entry and refused.
+
+    Reading the whole tree with each length answers it instead. With the wrong one an
+    entry's mode is taken from the middle of an object id, so requiring every mode to be
+    one git writes separates the two even in the rare case where both lengths happen to
+    consume the object exactly.
+    """
+    clean = []
+    for width in (_SHA1, _SHA256):
+        try:
+            entries = list(_tree_entries(content, width))
+        except GitObjectError:
+            continue
+        clean.append((width, bool(entries) and all(e.mode in _TREE_MODES for e in entries)))
+    for width, plausible in clean:
+        if plausible:
+            return width
+    # Either neither length reads the object, or one does and its modes are not ones git
+    # writes. The older hash is the answer that was right for every repository written
+    # before the newer one existed, and the walk reports whatever it then runs into.
+    return clean[0][0] if clean else _SHA1
+
+
+def _tree_entries(content: bytes, width: int) -> Iterator[TreeEntry]:
+    """The entries, read with one object id length.
 
     The entries are packed rather than delimited: a mode, a space, the name, a NUL, and
-    then the raw hash. The hash length is not in the object, so it comes from what is left,
-    which is the only way to read a repository written with either hash without being told
-    which.
+    then the raw hash.
     """
     at = 0
-    width = _SHA1
     while at < len(content):
         space = content.find(b" ", at)
         nul = content.find(b"\x00", space + 1)
@@ -179,10 +220,7 @@ def _tree(content: bytes) -> Iterator[TreeEntry]:
             raise GitObjectError("a tree entry has no mode or no name")
         mode = content[at:space].decode("ascii", "replace")
         name = content[space + 1 : nul].decode("utf-8", "replace")
-        remaining = len(content) - (nul + 1)
-        if at == 0 and remaining % _SHA1 and not remaining % _SHA256:
-            width = _SHA256
-        if remaining < width:
+        if len(content) - (nul + 1) < width:
             raise GitObjectError("a tree entry runs off the end of the object")
         object_id = content[nul + 1 : nul + 1 + width].hex()
         at = nul + 1 + width

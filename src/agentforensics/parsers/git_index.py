@@ -35,6 +35,7 @@ from __future__ import annotations
 import struct
 from collections.abc import Iterator
 from dataclasses import dataclass
+from itertools import islice
 
 # The first four bytes of every index, and the versions this reader knows.
 MAGIC = b"DIRC"
@@ -105,15 +106,28 @@ def read(raw: bytes, limit: int = MAX_ENTRIES) -> Iterator[IndexEntry]:
     if version not in VERSIONS:
         raise GitIndexError(f"this index is version {version}, which this reader does not know")
 
-    # The object id length is not in the file. It is derived from what one entry occupies,
-    # which is the only way to read an index written with either hash without being told
-    # which, and it is decided once from the first entry rather than per entry.
-    width = _width(raw, version)
+    # The object id length is not in the file. It is derived by reading with each hash in
+    # turn, which is the only way to read an index written with either one without being
+    # told which, and it is decided once for the whole file rather than per entry.
+    width = _width(raw, version, count)
+    # islice rather than a counter, because it stops without asking the walk for the entry
+    # after the last one it wants. A counted loop that checked afterwards would parse that
+    # entry, and an index trimmed by the limit precisely because it is enormous is also the
+    # one likeliest to be damaged past the point this reader stops caring about.
+    for entry, _ in islice(_walk(raw, version, width, count), limit):
+        yield entry
+
+
+def _walk(raw: bytes, version: int, width: int, count: int) -> Iterator[tuple[IndexEntry, int]]:
+    """The entries, read with one object id width, each with where it ended.
+
+    The offset travels with the entry because `_width` reads the file with each hash and
+    has to know where the walk landed, and a second copy of this arithmetic to answer that
+    would be a second copy that drifts.
+    """
     at = 12
     previous = ""
     for index in range(count):
-        if index >= limit:
-            return
         if at + _FIXED_LENGTH + width + 2 > len(raw):
             raise GitIndexError(f"entry {index + 1} of {count} runs off the end of the file")
         # The ten fields in the order the format lists them: the change time in seconds
@@ -136,45 +150,76 @@ def read(raw: bytes, limit: int = MAX_ENTRIES) -> Iterator[IndexEntry]:
             # start of the entry rather than from the start of the file.
             cursor += (8 - ((cursor - at) % 8)) % 8
         at = cursor
-        yield IndexEntry(
-            path=path,
-            mode=fields[6],
-            size=fields[9],
-            object_id=object_id,
-            mtime=fields[2],
-            ctime=fields[0],
+        yield (
+            IndexEntry(
+                path=path,
+                mode=fields[6],
+                size=fields[9],
+                object_id=object_id,
+                mtime=fields[2],
+                ctime=fields[0],
+            ),
+            at,
         )
 
 
-def _width(raw: bytes, version: int) -> int:
-    """Which hash this index was written with, decided from the first entry's own length.
+# How many entries a probe reads before it accepts a width. Enough that a wrong width has
+# run out of plausible paths long before, and few enough that deciding this on a large
+# index is not a second pass over the whole of it.
+_PROBE = 64
 
-    An entry's fixed part, its object id, its flags and its path are all that stand between
-    the header and the next entry, and in the padded versions the whole of it is a multiple
-    of eight. So reading the path's length out of the flags twice, once for each hash, and
-    keeping the one whose entry lands on a boundary, tells the two apart. An index with no
-    entries needs no answer and gets the older hash.
+
+def _width(raw: bytes, version: int, count: int) -> int:
+    """Which hash this index was written with, decided by reading it with each in turn.
+
+    The file does not say. Git knows from the repository's configuration, and that is not
+    in the index and may not have been collected with it, so the only way to read an index
+    written with either hash is to try one and see whether it reads.
+
+    With the wrong width every field after the fixed part is taken from the middle of
+    another one: the object id swallows the start of the path, the flags are two bytes of
+    path, and the length they claim runs the walk into the next entry's timestamps. That
+    stops looking like an index within a few entries, which is what this checks. Where the
+    whole file is read, the landing point is checked too: the entries are followed either
+    by the file's own trailing hash, which is as long as the ids in it, or by an extension
+    whose signature is four capital letters.
+
+    What was here before decided from one entry's length instead, and got the answer wrong
+    for every SHA-256 repository. Version four has no padding to measure against, so it
+    returned the first candidate unconditionally; and the padded versions compared a
+    remainder against seven, which every remainder satisfies, leaving a check that a byte
+    somewhere in the middle of an object id happened to be zero. An index from such a
+    repository was read with twelve bytes too few and refused as damaged.
     """
-    (count,) = struct.unpack_from(">I", raw, 8)
     if not count:
+        # No entry to read, and nothing that depends on the answer either.
         return _SHA1
     for width in (_SHA1, _SHA256):
-        at = 12 + _FIXED_LENGTH + width
-        if at + 2 > len(raw):
-            continue
-        (flags,) = struct.unpack_from(">H", raw, at)
-        length = flags & _NAME_MASK
-        if length == _NAME_CAPPED:
-            # A path at or past the cap says nothing about its own length, so this test
-            # cannot be made on it. The older hash is the answer that was right for every
-            # index written before the newer one existed.
-            continue
-        if version >= 4:
+        if _reads_as(raw, version, width, count):
             return width
-        end = at + 2 + (2 if version >= 3 and flags & _EXTENDED else 0) + length
-        if (end - 12) % 8 <= 7 and raw[end : end + 1] == b"\x00":
-            return width
+    # Neither read. The older hash is the answer that was right for every index written
+    # before the newer one existed, and the walk in `read` reports what it runs into.
     return _SHA1
+
+
+def _reads_as(raw: bytes, version: int, width: int, count: int) -> bool:
+    """Whether the entries read cleanly when the object ids are this long."""
+    landed = 12
+    seen = 0
+    try:
+        for _, at in _walk(raw, version, width, count):
+            landed = at
+            seen += 1
+            if seen >= _PROBE:
+                break
+    except GitIndexError, struct.error, IndexError:
+        return False
+    if seen < count:
+        # Stopped at the probe limit rather than at the end, so there is no landing point
+        # to check and the clean walk is the whole of the answer.
+        return True
+    rest = raw[landed:]
+    return len(rest) == width or (rest[:4].isalpha() and rest[:4].isupper())
 
 
 def _path(raw: bytes, cursor: int, flags: int, version: int, previous: str) -> tuple[str, int, str]:
