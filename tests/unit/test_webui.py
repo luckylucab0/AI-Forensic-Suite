@@ -15,7 +15,9 @@ nothing leaves the machine.
 from __future__ import annotations
 
 import contextlib
+import csv
 import http.client
+import io
 import json
 import re
 import socket
@@ -272,6 +274,117 @@ def test_the_timeline_is_the_same_rows_the_export_writes(case: Case) -> None:
     # timestamp has an unknown position, not an early one.
     kinds = [row["ts_utc"] for row in page["rows"]]
     assert kinds == sorted(kinds, key=lambda value: (value is not None, value or ""))
+
+
+def test_the_tool_view_lists_calls_from_every_session_not_only_a_loaded_one(
+    case: Case,
+) -> None:
+    """The reason this projection exists at all.
+
+    The viewer used to build its tool table by adding up the sessions it had fetched, so on
+    a large case the total was a total of what finished loading. Here the count comes from
+    the case, so it is a fact about the endpoint.
+    """
+    page = api.tool_calls(case, limit=5)
+    assert page["rows"], "the synthetic profile records tool calls"
+    assert page["total"] >= len(page["rows"])
+    assert sum(entry["calls"] for entry in page["by_tool"]) == page["total"]
+    # More than one session, which is the claim the view makes in its header.
+    assert len({row["session_id"] for row in page["rows"] if row["session_id"]}) >= 1
+    for row in page["rows"]:
+        assert row["event_id"] and row["tool"]
+        # Every row can be traced back to the file it was read out of, which is what the
+        # evidence panel beside it prints.
+        assert row["provenance"]["original_path"]
+
+
+def test_a_tool_call_with_no_recorded_result_is_not_called_a_success(case: Case) -> None:
+    """Null and "it worked" are different claims about the evidence.
+
+    A store that never wrote a result for a call has left a gap, and a view that rendered
+    that gap as a successful call would be inventing the one fact an analyst came for.
+    """
+    page = api.tool_calls(case, limit=api.MAX_PAGE)
+    for row in page["rows"]:
+        result = row["result"]
+        assert result is None or isinstance(result["is_error"], bool)
+
+
+def test_the_tool_counts_answer_for_the_filter_that_is_not_set(case: Case) -> None:
+    """A chip says how many rows it would show, so its count ignores its own filter.
+
+    Counted with the tool filter left out: with it applied every name would say the number
+    of rows already on screen, which is one number repeated rather than a way to choose.
+    """
+    page = api.tool_calls(case, limit=1)
+    assert page["by_tool"], "the synthetic profile records at least one tool"
+    name = page["by_tool"][0]["tool"]
+    narrowed = api.tool_calls(case, limit=1, tool=name)
+    assert narrowed["by_tool"] == page["by_tool"]
+    assert narrowed["total"] == page["total"]
+    every = api.tool_calls(case, limit=api.MAX_PAGE, tool=name)
+    assert len(every["rows"]) == page["by_tool"][0]["calls"]
+    assert all(row["tool"] == name for row in every["rows"])
+
+
+def test_a_tool_page_does_not_lose_or_repeat_a_call(case: Case) -> None:
+    whole = api.tool_calls(case, limit=api.MAX_PAGE)["rows"]
+    walked: list[str] = []
+    offset: int | None = 0
+    while offset is not None:
+        page = api.tool_calls(case, offset=offset, limit=3)
+        walked.extend(row["event_id"] for row in page["rows"])
+        offset = page["next_offset"]
+    assert walked == [row["event_id"] for row in whole]
+    assert len(set(walked)) == len(walked)
+
+
+def test_a_time_window_over_the_tools_keeps_an_undated_call(case: Case) -> None:
+    """The same rule the timeline and the transcript follow.
+
+    An event with no timestamp has an unknown position, not one outside the window, so a
+    window keeps it. Dropping it would turn "what happened that day" into "what happened
+    that day, minus whatever had no clock".
+    """
+    undated = [row for row in api.tool_calls(case, limit=api.MAX_PAGE)["rows"] if not row["ts_utc"]]
+    narrow = api.tool_calls(case, limit=api.MAX_PAGE, since="2999-01-01T00:00:00.000000Z")
+    assert [row["event_id"] for row in narrow["rows"]] == [row["event_id"] for row in undated]
+
+
+def test_every_view_that_is_a_table_can_be_written_out(case: Case) -> None:
+    """A finding that only exists as a screenshot of this tool is one nobody can check."""
+    for name in ("timeline", "findings", "instructions", "conversations", "artifacts", "tools"):
+        text = api.export_csv(case, name)
+        lines = text.splitlines()
+        assert len(lines) >= 1, name
+        assert "," in lines[0], (name, "a header row naming the columns")
+
+
+def test_an_export_holds_the_whole_view_and_not_a_page_of_it(case: Case) -> None:
+    """A CSV that silently held one page would be a document making a claim about a case
+    that nobody could reproduce."""
+    rows_in_case = len(api.tool_calls(case, limit=api.MAX_PAGE)["rows"])
+    body = api.export_csv(case, "tools")
+    written = list(csv.DictReader(io.StringIO(body)))
+    assert len(written) == rows_in_case
+
+    findings_in_case = len(api.findings(case)["findings"])
+    written = list(csv.DictReader(io.StringIO(api.export_csv(case, "findings"))))
+    assert len(written) == findings_in_case
+
+
+def test_an_export_cell_is_something_a_spreadsheet_can_filter(case: Case) -> None:
+    """A list has to arrive as text and not as Python's repr of one."""
+    written = list(csv.DictReader(io.StringIO(api.export_csv(case, "findings"))))
+    assert written
+    for row in written:
+        assert "[" not in row["event_ids"], row["event_ids"]
+
+
+def test_an_export_nobody_has_is_a_404_that_says_what_there_is(case: Case) -> None:
+    with pytest.raises(api.ApiError) as raised:
+        api.export_csv(case, "passwords")
+    assert "timeline" in str(raised.value)
 
 
 def test_the_findings_carry_the_fact_of_a_scan_having_run(case: Case) -> None:
@@ -804,10 +917,12 @@ def _samples(case: Case) -> dict[str, str]:
         r"^/api/sessions/(?P<key>[0-9a-f]{32})/events$": f"/api/sessions/{session}/events",
         r"^/api/events/(?P<event>[0-9a-f]{32})$": f"/api/events/{event}",
         r"^/api/timeline$": "/api/timeline",
+        r"^/api/tools$": "/api/tools",
         r"^/api/findings$": "/api/findings",
         r"^/api/instructions$": "/api/instructions",
         r"^/api/corroboration$": "/api/corroboration",
         r"^/api/artifacts$": "/api/artifacts",
+        r"^/api/export/(?P<name>[a-z]+)\.csv$": "/api/export/timeline.csv",
         r"^/api/health$": "/api/health",
     }
 
@@ -827,7 +942,12 @@ def test_every_route_answers_with_something(client: Client, case: Case) -> None:
         status, headers, body = client.request(path)
         assert status == 200, (pattern, path, status, body[:200])
         assert body, (pattern, path, "an empty body is not an answer")
-        if path.startswith("/api/"):
+        # Every API route answers JSON but the exports, which are files to attach to a
+        # report. Named here rather than skipped by a substring, so a route that started
+        # answering the wrong type is still caught.
+        if path.startswith("/api/export/"):
+            assert "csv" in headers["Content-Type"], (path, headers["Content-Type"])
+        elif path.startswith("/api/"):
             assert "json" in headers["Content-Type"], (path, headers["Content-Type"])
 
 

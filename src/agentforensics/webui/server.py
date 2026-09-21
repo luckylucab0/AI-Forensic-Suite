@@ -99,6 +99,9 @@ HTML_TYPE = "text/html; charset=utf-8"
 # The unified log's own type. One JSON object per line, which is not a JSON document, and
 # saying so keeps a client from trying to parse the page as one.
 NDJSON_TYPE = "application/x-ndjson; charset=utf-8"
+# A view written out for a report. Sent as a download rather than as something to read in
+# a tab, and `nosniff` above is what keeps a cell holding markup from being treated as one.
+CSV_TYPE = "text/csv; charset=utf-8"
 
 # No endpoint takes a body, so any request that announces one is refused without being
 # read. A cap large enough to be worth reading would be a cap worth attacking.
@@ -246,6 +249,52 @@ def _timeline(ctx: Context, match: re.Match[str], query: Query) -> Response:
         )
 
 
+def _tools(ctx: Context, match: re.Match[str], query: Query) -> Response:
+    """Every tool call in the case, paged and filtered the way the timeline is.
+
+    Served rather than left to the viewer to add up: a browser can only aggregate the
+    sessions it managed to fetch, so its totals would really be totals of what finished
+    loading, which an analyst reads as a fact about the endpoint.
+    """
+    with _open(ctx) as case:
+        return _json(
+            api.tool_calls(
+                case,
+                offset=query.number("offset", 0),
+                limit=query.number("limit", api.DEFAULT_PAGE),
+                agents=query.many("agent"),
+                tool=query.one("tool"),
+                session_id=query.one("session"),
+                since=query.one("since"),
+                until=query.one("until"),
+                failed_only=query.flag("failed"),
+                query=query.one("q"),
+            )
+        )
+
+
+def _export(ctx: Context, match: re.Match[str], query: Query) -> Response:
+    """One view as a CSV file, whole.
+
+    A download rather than something to read in a tab, so `Content-Disposition` names a
+    file. The name is constrained by the route pattern and then checked again by the
+    projection against the list of views there are, so there is no way to make it a path:
+    nothing here ever touches the filesystem.
+    """
+    name = match.group("name")
+    with _open(ctx) as case:
+        try:
+            text = api.export_csv(case, name)
+        except api.ApiError as exc:
+            return _error(404, str(exc))
+    return Response(
+        200,
+        text.encode("utf-8"),
+        CSV_TYPE,
+        (("Content-Disposition", f'attachment; filename="afx-{name}.csv"'),),
+    )
+
+
 def _findings(ctx: Context, match: re.Match[str], query: Query) -> Response:
     with _open(ctx) as case:
         return _json(api.findings(case))
@@ -281,10 +330,14 @@ ROUTES: tuple[tuple[re.Pattern[str], Callable[[Context, re.Match[str], Query], R
     (re.compile(r"^/api/sessions/(?P<key>[0-9a-f]{32})/events$"), _session_events),
     (re.compile(r"^/api/events/(?P<event>[0-9a-f]{32})$"), _event),
     (re.compile(r"^/api/timeline$"), _timeline),
+    (re.compile(r"^/api/tools$"), _tools),
     (re.compile(r"^/api/findings$"), _findings),
     (re.compile(r"^/api/instructions$"), _instructions),
     (re.compile(r"^/api/corroboration$"), _corroboration),
     (re.compile(r"^/api/artifacts$"), _artifacts),
+    # The name is a short lowercase word and nothing else, so a path can never be spelled
+    # into it. The projection checks it a second time against the views there are.
+    (re.compile(r"^/api/export/(?P<name>[a-z]+)\.csv$"), _export),
     (re.compile(r"^/api/health$"), _health),
 )
 

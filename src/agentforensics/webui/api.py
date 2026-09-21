@@ -25,7 +25,9 @@ would read as completeness, which is the one failure this suite must not have.
 
 from __future__ import annotations
 
+import csv
 import hashlib
+import io
 import json
 import sqlite3
 from itertools import islice
@@ -34,7 +36,8 @@ from typing import Any
 from agentforensics import __version__
 from agentforensics.model import UNINTERPRETED_MARK, Case
 from agentforensics.model.schema import SCHEMA_VERSION
-from agentforensics.timeline import Filters, record, rows
+from agentforensics.timeline import Filters, record, rows, summarise
+from agentforensics.timeline import write as write_timeline
 from agentforensics.unified import FORMAT_NAME, FORMAT_VERSION
 
 # Bumped when the shape of a response changes in a way a reader has to know about. The
@@ -370,13 +373,7 @@ def _unified(row: sqlite3.Row) -> dict[str, Any]:
         "git_branch": row["git_branch"],
         "payload": payload if isinstance(payload, dict) else {"payload": payload},
         "parse_problem": row["parse_problem"],
-        "provenance": {
-            "bundle_uuid": row["bundle_uuid"],
-            "original_path": row["original_path"],
-            "sha256": row["file_sha256"],
-            "artifact_id": row["artifact_id"],
-            "locator": row["locator"],
-        },
+        "provenance": _provenance(row),
         "raw": _decode(row["raw"]),
         "producer": f"agentforensics/{__version__} (case)",
     }
@@ -487,6 +484,288 @@ def findings(case: Case) -> dict[str, Any]:
         "findings": out,
         "scan_runs": scans,
         "scanned": bool(scans),
+    }
+
+
+# ---------------------------------------------------------------------------- tools
+
+
+# Every call an agent made, across every session in the case.
+#
+# Its own projection rather than something a viewer adds up, and that is the whole point.
+# A browser can only aggregate the sessions it has fetched, so on a case of a hundred
+# thousand events its tool table is really a table of the part that finished loading, with
+# a total to match. A count of tool calls that is silently a count of the ones nobody had
+# to wait for is worse than no count at all: an analyst reads "412 Bash calls" as a fact
+# about the endpoint.
+#
+# A call and its result are two events joined by the agent's own `tool_use_id`, so the
+# result is looked up for the page that is being served rather than joined in SQL over a
+# JSON field for the whole table.
+_TOOL_KINDS = ("tool.call", "mcp.call")
+
+# What SQLite gives back for a JSON `true`. Written out because a payload that stored the
+# string "true" instead of the boolean is a real thing parsers do, and a result whose error
+# flag was not recognised would be filed as a call that succeeded.
+_TRUE_VALUES = (1, "1", "true", "True", True)
+
+
+def _tool_where(
+    *,
+    agents: tuple[str, ...] = (),
+    tool: str | None = None,
+    session_id: str | None = None,
+    since: str | None = None,
+    until: str | None = None,
+    failed_only: bool = False,
+    query: str | None = None,
+) -> tuple[str, list[Any]]:
+    """The WHERE clause the tool views share, and its bound values.
+
+    Shared between the page and the counts above it so that a chip saying "Bash 412" and
+    the rows a click on it produces cannot come from two different ideas of what a Bash
+    call is.
+
+    An event with no timestamp is kept inside any window, the same rule the timeline and
+    the transcript follow: its position is unknown, not outside. Dropping it here would let
+    a time filter quietly answer a different question from the one that was asked.
+    """
+    clauses = [f"e.kind IN ({', '.join('?' * len(_TOOL_KINDS))})"]
+    params: list[Any] = list(_TOOL_KINDS)
+    if agents:
+        clauses.append(f"e.agent IN ({', '.join('?' * len(agents))})")
+        params.extend(agents)
+    if tool:
+        clauses.append("COALESCE(json_extract(e.payload, '$.tool'), e.kind) = ?")
+        params.append(tool)
+    if session_id:
+        clauses.append("e.session_id = ?")
+        params.append(session_id)
+    if since:
+        clauses.append("(e.ts_utc IS NULL OR e.ts_utc >= ?)")
+        params.append(since)
+    if until:
+        clauses.append("(e.ts_utc IS NULL OR e.ts_utc <= ?)")
+        params.append(until)
+    if failed_only:
+        clauses.append(
+            "json_extract(e.payload, '$.tool_use_id') IN ("
+            "  SELECT json_extract(r.payload, '$.tool_use_id') FROM events r"
+            "   WHERE r.kind = 'tool.result'"
+            "     AND json_extract(r.payload, '$.is_error') IN (1, 'true', 'True'))"
+        )
+    if query:
+        # Matched against the call's recorded payload rather than against the summary the
+        # screen shows, because the summary is built in Python and a filter that only
+        # searched what fits on a line would miss the argument an analyst is looking for.
+        clauses.append("e.payload LIKE ? ESCAPE '\\'")
+        params.append(
+            "%" + query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+        )
+    return " AND ".join(clauses), params
+
+
+def tool_calls(
+    case: Case,
+    *,
+    offset: int = 0,
+    limit: int = DEFAULT_PAGE,
+    agents: tuple[str, ...] = (),
+    tool: str | None = None,
+    session_id: str | None = None,
+    since: str | None = None,
+    until: str | None = None,
+    failed_only: bool = False,
+    query: str | None = None,
+) -> dict[str, Any]:
+    """One page of tool calls, with the counts every filter chip above them needs.
+
+    The counts are over the case with the *other* filters applied but not the one the chip
+    would set, which is the only way a chip can honestly say how many rows it would show.
+    """
+    limit = max(1, min(int(limit), MAX_PAGE))
+    offset = max(0, int(offset))
+    where, params = _tool_where(
+        agents=agents,
+        tool=tool,
+        session_id=session_id,
+        since=since,
+        until=until,
+        failed_only=failed_only,
+        query=query,
+    )
+    # The counts per tool name, over everything the other filters allow. The tool filter
+    # itself is left out on purpose: a chip that counted only its own rows would say "1"
+    # next to every name.
+    unfiltered_where, unfiltered_params = _tool_where(
+        agents=agents,
+        session_id=session_id,
+        since=since,
+        until=until,
+        failed_only=failed_only,
+        query=query,
+    )
+    by_tool = [
+        {"tool": row["tool"], "calls": int(row["calls"])}
+        for row in case.query(
+            # The clause is placeholders and fixed text built by _tool_where; every value
+            # is bound through unfiltered_params.
+            "SELECT COALESCE(json_extract(e.payload, '$.tool'), e.kind) AS tool, "  # noqa: S608
+            "       count(*) AS calls "
+            f"  FROM events e WHERE {unfiltered_where} "
+            " GROUP BY tool ORDER BY calls DESC, tool",
+            unfiltered_params,
+        )
+    ]
+    total = sum(entry["calls"] for entry in by_tool)
+
+    # The same page ordering as a session and the timeline: an event with no timestamp
+    # first, because its position is unknown rather than early.
+    page = case.query(
+        _EVENT_SELECT + f" WHERE {where} "
+        " ORDER BY e.ts_utc IS NULL DESC, e.ts_utc, e.original_path, "
+        "          length(e.locator), e.locator, e.event_id "
+        " LIMIT ? OFFSET ?",
+        [*params, limit + 1, offset],
+    )
+    more = len(page) > limit
+    page = page[:limit]
+    results = _tool_results(case, page)
+
+    out = []
+    for row in page:
+        payload = _decode(row["payload"])
+        payload = payload if isinstance(payload, dict) else {}
+        use_id = payload.get("tool_use_id")
+        result = results.get(str(use_id)) if use_id is not None else None
+        out.append(
+            {
+                "event_id": row["event_id"],
+                "kind": row["kind"],
+                "agent": row["agent"],
+                "ts_utc": row["ts_utc"],
+                "session_id": row["session_id"],
+                "project_path": row["project_path"],
+                "tool": payload.get("tool") or row["kind"],
+                "tool_use_id": use_id,
+                "input": payload.get("input"),
+                # The same one-line description the timeline and the CSV export use, so the
+                # three views of one call cannot describe it differently.
+                "summary": summarise(row),
+                # Everything known about how the call ended, or nulls saying it is not
+                # known. A call whose result was never recorded and a call that succeeded
+                # are different facts, and a view that showed both as blank would merge
+                # them.
+                "result": result,
+                "provenance": _provenance(row),
+            }
+        )
+    return {
+        "afx_api": API_VERSION,
+        "rows": out,
+        "offset": offset,
+        "next_offset": (offset + len(page)) if more else None,
+        "total": total,
+        "by_tool": by_tool,
+        # Counted over the same filtered set, so the "failed only" chip says how many rows
+        # it would leave rather than how many exist somewhere in the case.
+        "failed": _tool_failures(case, agents, session_id, since, until, query),
+        "undated": sum(1 for row in page if row["ts_utc"] is None),
+        # Said out loud because the column an analyst expects is not there. No producer in
+        # this suite records how long a call took, so there is no duration to show and a
+        # blank column would read as "instant".
+        "note": (
+            "One row per tool call recorded in this case, across every session. How long a "
+            "call took is not in here because no collector records it. A call whose result "
+            "was never written to the store shows no result rather than a successful one: "
+            "those are different facts about the evidence."
+        ),
+    }
+
+
+def _tool_failures(
+    case: Case,
+    agents: tuple[str, ...],
+    session_id: str | None,
+    since: str | None,
+    until: str | None,
+    query: str | None,
+) -> int:
+    """How many of the calls the other filters allow came back as an error."""
+    where, params = _tool_where(
+        agents=agents,
+        session_id=session_id,
+        since=since,
+        until=until,
+        failed_only=True,
+        query=query,
+    )
+    found = case.query(
+        f"SELECT count(*) AS n FROM events e WHERE {where}",  # noqa: S608 - placeholders only
+        params,
+    )
+    return int(found[0]["n"]) if found else 0
+
+
+def _tool_results(case: Case, page: list[sqlite3.Row]) -> dict[str, dict[str, Any]]:
+    """The results belonging to one page of calls, keyed by the agent's own call id.
+
+    Looked up for the page rather than joined for the whole table: the id lives inside a
+    JSON payload, so a join would mean extracting it from every result event in the case to
+    serve twenty rows.
+    """
+    wanted = []
+    for row in page:
+        payload = _decode(row["payload"])
+        if isinstance(payload, dict) and payload.get("tool_use_id") is not None:
+            wanted.append(str(payload["tool_use_id"]))
+    if not wanted:
+        return {}
+    out: dict[str, dict[str, Any]] = {}
+    # In batches, because SQLite has a ceiling on how many values one IN list may hold and
+    # a page can be larger than it.
+    for start in range(0, len(wanted), 400):
+        batch = wanted[start : start + 400]
+        for row in case.query(
+            # One '?' per id and nothing else interpolated; the ids are bound as `batch`.
+            "SELECT e.event_id, e.ts_utc, e.payload, "  # noqa: S608
+            "       json_extract(e.payload, '$.tool_use_id') AS use_id "
+            "  FROM events e WHERE e.kind = 'tool.result' "
+            f"   AND json_extract(e.payload, '$.tool_use_id') IN ({', '.join('?' * len(batch))})",
+            batch,
+        ):
+            payload = _decode(row["payload"])
+            payload = payload if isinstance(payload, dict) else {}
+            exit_codes = [
+                entry.get("exit_code")
+                for entry in (payload.get("commands") or [])
+                if isinstance(entry, dict) and entry.get("exit_code") is not None
+            ]
+            out[str(row["use_id"])] = {
+                "event_id": row["event_id"],
+                "ts_utc": row["ts_utc"],
+                "is_error": payload.get("is_error") in _TRUE_VALUES,
+                "exit_code": exit_codes[0] if exit_codes else None,
+                "output": payload.get("output")
+                if payload.get("output") is not None
+                else payload.get("text"),
+            }
+    return out
+
+
+def _provenance(row: sqlite3.Row) -> dict[str, Any]:
+    """Where one event was read from, in the fields an evidence panel prints.
+
+    The same five values `_unified` puts on a record, so the panel beside a transcript and
+    the record an analyst exports name the same file, the same place in it and the same
+    hash.
+    """
+    return {
+        "bundle_uuid": row["bundle_uuid"],
+        "original_path": row["original_path"],
+        "sha256": row["file_sha256"],
+        "artifact_id": row["artifact_id"],
+        "locator": row["locator"],
     }
 
 
@@ -851,6 +1130,244 @@ def artifacts(case: Case) -> dict[str, Any]:
     }
 
 
+# --------------------------------------------------------------------------- export
+
+
+# What an analyst attaches to a report. Every view that is a table can be written out as
+# one, because a finding that only exists as a screenshot of this tool is a finding the
+# other side cannot check.
+#
+# The timeline is written by the timeline module itself rather than by a writer here, which
+# is the same reason its rows are read from there: the file attached to a report and the
+# table read on screen must not be able to describe one case differently.
+#
+# Every one of these is the whole view, not the page on screen and not the rows a filter
+# left. A CSV that silently held what happened to be filtered at the time it was asked for
+# would be a document making a claim about a case that nobody could reproduce.
+_EXPORTS = ("timeline", "findings", "instructions", "conversations", "artifacts", "tools")
+
+
+def export_csv(case: Case, name: str) -> str:
+    """One view as CSV text, whole.
+
+    Raises ApiError for a name that is not a view, so an unknown export is a 404 that says
+    what exists rather than an empty file that reads as an empty case.
+    """
+    if name not in _EXPORTS:
+        raise ApiError(f"no export named {name}; there is " + ", ".join(_EXPORTS))
+    out = io.StringIO()
+    if name == "timeline":
+        write_timeline(case, out, "csv")
+        return out.getvalue()
+    columns, records = _EXPORT_ROWS[name](case)
+    writer = csv.DictWriter(out, fieldnames=columns, extrasaction="ignore", lineterminator="\n")
+    writer.writeheader()
+    for entry in records:
+        writer.writerow({key: _cell(entry.get(key)) for key in columns})
+    return out.getvalue()
+
+
+def _cell(value: Any) -> str:
+    """One value as one cell.
+
+    A list becomes its items joined by "; " and a mapping becomes compact JSON, rather than
+    Python's own repr: a spreadsheet column holding `['a', 'b']` is a column nobody can
+    filter on. None becomes the empty cell, which in every one of these tables means the
+    case does not record it.
+    """
+    if value is None:
+        return ""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (list, tuple)):
+        return "; ".join(_cell(item) for item in value)
+    if isinstance(value, dict):
+        return json.dumps(value, sort_keys=True, ensure_ascii=False, default=str)
+    return str(value)
+
+
+def _findings_rows(case: Case) -> tuple[tuple[str, ...], list[dict[str, Any]]]:
+    data = findings(case)
+    columns = (
+        "severity",
+        "rule_id",
+        "pack",
+        "title",
+        "summary",
+        "matched",
+        "ts_utc",
+        "agent",
+        "session_id",
+        "user",
+        "event_count",
+        "event_ids",
+        "rule_sha256",
+        "scanned_utc",
+        "finding_id",
+    )
+    return columns, data["findings"]
+
+
+def _instructions_rows(case: Case) -> tuple[tuple[str, ...], list[dict[str, Any]]]:
+    data = instructions(case)
+    columns = (
+        "scope",
+        "agent",
+        "original_path",
+        "instruction_paths",
+        "instruction_is_elsewhere",
+        "project_path",
+        "host",
+        "user",
+        "declared_tools",
+        "executable",
+        "prompt_field",
+        "hidden_characters",
+        "scope_problem",
+        "recovery_note",
+        "parse_problem",
+        "chars",
+        "bytes",
+        "lines",
+        "mtime_utc",
+        "file_sha256",
+        "event_id",
+    )
+    return columns, data["instructions"]
+
+
+def _conversations_rows(case: Case) -> tuple[tuple[str, ...], list[dict[str, Any]]]:
+    """One row per conversation, with the stores that name it and the ones that do not.
+
+    The silent stores are flattened into a cell rather than left out, because they are what
+    the whole view is about: a conversation only one store remembers is the row an analyst
+    opened this export to find.
+    """
+    data = corroboration(case)
+    columns = (
+        "agent",
+        "session_id",
+        "stores",
+        "named_by",
+        "silent",
+        "events",
+        "first_ts",
+        "last_ts",
+    )
+    out = []
+    for row in data["sessions"]:
+        entry = dict(row)
+        entry["named_by"] = [item["artifact_id"] for item in row.get("named_by", [])]
+        entry["silent"] = [
+            f"{item['artifact_id']} (names {item['names_sessions']})"
+            for item in row.get("silent", [])
+        ]
+        out.append(entry)
+    return columns, out
+
+
+def _artifacts_rows(case: Case) -> tuple[tuple[str, ...], list[dict[str, Any]]]:
+    data = artifacts(case)
+    columns = (
+        "original_path",
+        "agent",
+        "category",
+        "collected",
+        "status",
+        "reason",
+        "parser",
+        "parse_status",
+        "parse_detail",
+        "events_parsed",
+        "records_unparsed",
+        "size",
+        "sha256",
+        "identical_to",
+        "mtime_utc",
+        "birthtime_utc",
+        "symlink",
+        "changed_while_reading",
+        "user",
+        "bundle_uuid",
+        "artifact_id",
+    )
+    rows_out = list(data["artifacts"])
+    # The holes the collection reported, as rows of their own. A file that was never looked
+    # for is not in the artifact table at all, and an export of only what was collected is
+    # the reading this view exists to prevent.
+    for gap in data["collection_gaps"]:
+        rows_out.append(
+            {
+                "original_path": gap.get("detail"),
+                "status": f"collection gap: {gap.get('kind')}",
+                "reason": gap.get("reason"),
+                "collected": False,
+                "bundle_uuid": gap.get("bundle_uuid"),
+            }
+        )
+    return columns, rows_out
+
+
+def _tools_rows(case: Case) -> tuple[tuple[str, ...], list[dict[str, Any]]]:
+    """Every tool call in the case, flattened.
+
+    Paged out of `tool_calls` rather than queried again, so the export and the screen are
+    the same rows read the same way.
+    """
+    columns = (
+        "ts_utc",
+        "agent",
+        "tool",
+        "summary",
+        "is_error",
+        "exit_code",
+        "session_id",
+        "project_path",
+        "original_path",
+        "locator",
+        "file_sha256",
+        "event_id",
+        "result_event_id",
+    )
+    out: list[dict[str, Any]] = []
+    offset: int | None = 0
+    while offset is not None:
+        page = tool_calls(case, offset=offset, limit=MAX_PAGE)
+        for row in page["rows"]:
+            result = row.get("result") or {}
+            provenance = row.get("provenance") or {}
+            out.append(
+                {
+                    "ts_utc": row["ts_utc"],
+                    "agent": row["agent"],
+                    "tool": row["tool"],
+                    "summary": row["summary"],
+                    # Left empty where no result was recorded, which is not the same claim
+                    # as "false". A call the store never wrote a result for is a gap.
+                    "is_error": result.get("is_error") if result else None,
+                    "exit_code": result.get("exit_code") if result else None,
+                    "session_id": row["session_id"],
+                    "project_path": row["project_path"],
+                    "original_path": provenance.get("original_path"),
+                    "locator": provenance.get("locator"),
+                    "file_sha256": provenance.get("sha256"),
+                    "event_id": row["event_id"],
+                    "result_event_id": result.get("event_id") if result else None,
+                }
+            )
+        offset = page["next_offset"]
+    return columns, out
+
+
+_EXPORT_ROWS = {
+    "findings": _findings_rows,
+    "instructions": _instructions_rows,
+    "conversations": _conversations_rows,
+    "artifacts": _artifacts_rows,
+    "tools": _tools_rows,
+}
+
+
 __all__ = [
     "API_VERSION",
     "DEFAULT_PAGE",
@@ -859,11 +1376,14 @@ __all__ = [
     "ApiError",
     "artifacts",
     "case_summary",
+    "corroboration",
     "event_record",
+    "export_csv",
     "findings",
     "instructions",
     "projects",
     "session_records",
     "sessions",
     "timeline",
+    "tool_calls",
 ]
