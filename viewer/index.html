@@ -193,6 +193,22 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
 .sidebar-footer{border-top:1px solid var(--rule-soft);padding:9px 12px;flex:none;display:flex;flex-direction:column;gap:6px;}
 .footer-row{display:flex;gap:6px;}
 #root-label{font-family:var(--mono);font-size:10px;color:var(--faint);overflow-wrap:anywhere;}
+/* The loading bar. Two states on purpose, because the two phases of a load know different
+   things: a walk of a folder tree cannot say how much is left until it has finished, and
+   filling in the sessions knows its total exactly. A determinate bar for the first would be
+   a number this page invented, which is the one thing it must not do with a count. */
+.progress{height:3px;background:var(--rule-soft);border-radius:2px;overflow:hidden;}
+.progress > i{display:block;height:100%;background:var(--accent);width:0;
+  transition:width .12s linear;}
+.progress.indeterminate > i{width:35%;animation:progress-slide 1.1s ease-in-out infinite;}
+@keyframes progress-slide{
+  0%{transform:translateX(-100%);}
+  100%{transform:translateX(285%);}
+}
+@media (prefers-reduced-motion: reduce){
+  .progress > i{transition:none;}
+  .progress.indeterminate > i{animation:none;width:100%;opacity:.45;}
+}
 
 /* ---- main: one grid for every view ---- */
 /* head, chip row, the red line that says what a filter is hiding, the prose note, then
@@ -559,6 +575,8 @@ mark.hl.hl-current{background:var(--ink);color:var(--paper);border-bottom-color:
           <button id="open-unified" class="folder-btn" type="button" title="Load a unified agent log (one JSON record per line)" onclick="openUnifiedLog()">Unified log…</button>
         </div>
         <input id="unified-file" type="file" accept=".jsonl,.json,.log,.txt" class="hidden" onchange="onUnifiedFileChosen(event)" />
+        <div id="load-progress" class="progress hidden" role="progressbar"
+             aria-label="Loading progress"><i></i></div>
         <span id="root-label">scanning…</span>
       </div>
     </aside>
@@ -836,7 +854,15 @@ const apiSource = {
 // The active source. Defaults to the http.server scraper.
 let dataSource = httpSource;
 
-async function listDir(path) { return dataSource.listDir(path); }
+async function listDir(path) {
+  // Counted here because this is the single call every layout's discovery goes through.
+  // The count is of directories listed, which is what the walk actually does; the number
+  // of files under them is not known until each listing comes back.
+  const entries = await dataSource.listDir(path);
+  scanCount++;
+  showProgress('scan', scanCount, null);
+  return entries;
+}
 
 // Parse a .jsonl log into raw records.
 //
@@ -961,6 +987,88 @@ function summarize(events){
 }
 
 // concurrency-limited background enrichment of sidebar titles/counts
+// ============================================================================
+// Load progress. What the footer says while a folder is being read.
+//
+// It used to say "reading <folder>" and nothing else, from the first directory to the last
+// session. On a home directory with a few hundred conversations that is a minute or more of
+// a page that looks identical to a page that has hung, and the only honest thing it said
+// was the folder's name.
+//
+// A load is two phases and they know different things, which is why there are two shapes
+// here rather than one bar:
+//
+//   * the walk. Discovery lists directories until it runs out, so the total is not known
+//     until it is over. What can be said is what has been seen so far, and the bar is
+//     indeterminate. Turning "412 folders so far" into a percentage would mean inventing a
+//     denominator, and a made-up number in a forensic tool is worse than no number.
+//   * the reading. Every session found is loaded and summarized, so the total is exact.
+//     That gets a real count, a real percentage and a bar that means something.
+//
+// Kept as a pure function plus a thin writer, so tests/viewer/viewer_behavior.mjs can
+// assert the wording without a browser.
+// ============================================================================
+
+// The footer text for one moment of a load. `total` is null while it is unknown.
+function progressText(phase, done, total, label){
+  const where = label ? ' · ' + label : '';
+  if(phase === 'scan'){
+    // Plural handled rather than an "s" bolted on, because this string is also the one an
+    // analyst reads when the answer turns out to be one folder.
+    const unit = done === 1 ? 'folder' : 'folders';
+    return 'scanning' + where + ' · ' + done + ' ' + unit;
+  }
+  if(!total) return 'reading…' + where;
+  // Rounded down, so the bar never says 100% while work is still going on.
+  const pct = Math.floor((done / total) * 100);
+  return 'reading sessions' + where + ' · ' + done + ' / ' + total + ' · ' + pct + '%';
+}
+
+// How often the footer is allowed to be rewritten during a load. Every file would mean a
+// layout pass per file, which makes the load slower to say that it is loading.
+const PROGRESS_MIN_MS = 80;
+let progressLastAt = 0;
+
+// Write one moment of a load to the footer. `force` bypasses the throttle, which the first
+// and last update of a phase always do: a bar that stops one file short of the end looks
+// like a load that stalled.
+function showProgress(phase, done, total, force){
+  const now = Date.now();
+  if(!force && now - progressLastAt < PROGRESS_MIN_MS) return;
+  progressLastAt = now;
+  const bar = document.getElementById('load-progress');
+  const label = document.getElementById('root-label');
+  if(label) label.textContent = progressText(phase, done, total, state.sourceLabel);
+  if(!bar) return;
+  bar.classList.remove('hidden');
+  const known = phase !== 'scan' && !!total;
+  bar.classList.toggle('indeterminate', !known);
+  const fill = bar.firstElementChild;
+  if(known){
+    const pct = Math.min(100, Math.floor((done / total) * 100));
+    if(fill) fill.style.width = pct + '%';
+    bar.setAttribute('aria-valuenow', String(done));
+    bar.setAttribute('aria-valuemin', '0');
+    bar.setAttribute('aria-valuemax', String(total));
+  } else {
+    if(fill) fill.style.width = '';
+    bar.removeAttribute('aria-valuenow');
+  }
+}
+
+function hideProgress(){
+  const bar = document.getElementById('load-progress');
+  if(!bar) return;
+  bar.classList.add('hidden');
+  bar.classList.remove('indeterminate');
+  const fill = bar.firstElementChild;
+  if(fill) fill.style.width = '';
+}
+
+// Counts the walk. listDir() is the one call every discovery path goes through, so the
+// count lives there rather than in each of the three layouts, which would drift.
+let scanCount = 0;
+
 async function pool(items, limit, worker){
   let i=0;
   const runners=Array.from({length:Math.min(limit,items.length)},async()=>{
@@ -1371,7 +1479,8 @@ async function openLocalFolder(){
   dataSource=makeFolderSource(handle);
   state.sourceLabel=handle.name;
   resetData();
-  document.getElementById('root-label').textContent='reading '+handle.name+'…';
+  scanCount = 0;
+  showProgress('scan', 0, null, true);
   await loadProjects();
 }
 
@@ -3308,6 +3417,7 @@ async function loadProjects(){
 
   if(!projects.length){
     showSourceHelp();
+    hideProgress();
     rootLabel.textContent = dataSource.kind==='folder' ? 'no logs in folder' : 'no logs found';
     return;
   }
@@ -3329,6 +3439,18 @@ async function loadProjects(){
 async function enrichSessions(){
   const allSessions=[];
   for(const p of state.projects) for(const s of p.sessions) allSessions.push({p,s});
+  // The one place in a load where the total is known before the work starts, so this is
+  // the phase that gets a real percentage.
+  //
+  // The footer line is borrowed rather than taken. Two of this function's three callers
+  // write a summary there before calling it, and restoring what was found is what lets the
+  // bar belong to this phase without every caller having to clean up after it.
+  let done=0;
+  const total=allSessions.length;
+  const label=document.getElementById('root-label');
+  const borrowed=label?label.textContent:'';
+  if(!total){ hideProgress(); return; }
+  showProgress('read',0,total,true);
   await pool(allSessions,5,async({p,s})=>{
     try{
       const events=await loadSession(s);
@@ -3340,7 +3462,13 @@ async function enrichSessions(){
       if(state.view==='tools')renderToolsPanel();
       if(state.view==='security')renderSecurityPanel();
     }catch(e){ /* leave placeholder */ }
+    // Counted in a finally rather than on the happy path: a session that fails to load is
+    // still one fewer to wait for, and a bar that stops short of its own total because of
+    // it reads as a load that hung.
+    finally{ done++; showProgress('read',done,total,done===total); }
   });
+  hideProgress();
+  if(label) label.textContent=borrowed;
 }
 
 // ============================================================================

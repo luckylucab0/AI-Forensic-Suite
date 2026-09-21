@@ -73,6 +73,7 @@ vm.runInContext(
   apiSource, probeCaseApi, findCaseSession, artifactState, CASE_API_VERSION, tailPath,
   filterToolRows, filterFindingRows, filterTimelineItems, turnKinds, scopePath, buildTimeline,
   windowBound, timeWindow, inWindow, itemTime, sessionMarks, findingSessions,
+  progressText,
 };
 globalThis.__setSource = (s) => { dataSource = s; };
 `,
@@ -795,6 +796,50 @@ function fakeFetch(pages) {
   eq(api.sessionMarks(quiet).join(), '', 'and a session with neither is not');
   eq(api.sessionMarks({}).join(), '', 'a session from a folder source carries no marks at all');
   api.state.caseFindings = null;
+}
+
+{
+  // ---- what the footer says while a folder is loading ----
+  //
+  // The point of these is the difference between the two phases. A walk of a folder tree
+  // does not know its own size until it ends, and the one thing this page must not do with
+  // a count is invent it, so the scanning phase may never produce a percentage. The reading
+  // phase knows its total exactly and therefore must produce one: "reading" on its own for
+  // a minute is what this replaced.
+  eq(
+    api.progressText('scan', 412, null, 'home'),
+    'scanning · home · 412 folders',
+    'the walk reports what it has seen, with the folder it is walking',
+  );
+  eq(
+    api.progressText('scan', 1, null, ''),
+    'scanning · 1 folder',
+    'and says folder rather than folders when it has seen one',
+  );
+  ok(
+    api.progressText('scan', 412, null, 'home').indexOf('%') < 0,
+    'the walk never shows a percentage, because it has no denominator to divide by',
+  );
+  eq(
+    api.progressText('read', 128, 540, 'home'),
+    'reading sessions · home · 128 / 540 · 23%',
+    'the reading reports the exact count and a percentage',
+  );
+  eq(
+    api.progressText('read', 539, 540, ''),
+    'reading sessions · 539 / 540 · 99%',
+    'rounded down, so it never says 100% with work still to do',
+  );
+  eq(
+    api.progressText('read', 540, 540, ''),
+    'reading sessions · 540 / 540 · 100%',
+    'and reaches 100% only when it is actually done',
+  );
+  eq(
+    api.progressText('read', 0, 0, 'home'),
+    'reading… · home',
+    'a total of zero falls back to the indefinite wording rather than dividing by it',
+  );
 }
 
 console.error(
