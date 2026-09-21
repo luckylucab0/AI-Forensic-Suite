@@ -676,8 +676,9 @@ const state = { projects: [], current: null, cache: {}, normCache: {}, view: 'se
   // The case-wide tool view, paged from the server. Null until the tab is first opened.
   tools: null, toolAgent: 'all',
   // The chips the redesigned views own: which severities and packs the findings view
-  // is narrowed to, and whether the timeline is showing only the rows a rule fired on.
-  findSev: 'all', findPack: 'all', timelineFindingsOnly: false,
+  // is narrowed to, whether the timeline is showing only the rows a rule fired on, and
+  // whether the agent chips are expanded past the handful that fit.
+  findSev: 'all', findPack: 'all', timelineFindingsOnly: false, showAllAgents: false,
   // Whether the secret scan shows a match or masks its middle. Masked by default: this
   // view gets screenshotted into reports, and a live credential in a report is a second
   // incident. Triage marks live here and nowhere else — the case is opened read-only and
@@ -1348,6 +1349,7 @@ function resetData(){
   state.winEverywhere=true; state.winOfficeHours=false;
   state.picked={}; state.secTriage={}; state.secReveal=false;
   state.findSev='all'; state.findPack='all'; state.timelineFindingsOnly=false;
+  state.showAllAgents=false;
   setCaseBar(null);
   renderSidebar();
   if(typeof updateSecBadge==='function') updateSecBadge();
@@ -2121,17 +2123,6 @@ function statCard(n,label,hint,cls){
     hint?el('span',{class:'h',text:hint}):null,
   ].filter(Boolean));
 }
-// Kept under its old name because it is what the case view has always called this.
-function caseNum(n,label,qualifying){
-  return statCard(n,label,null,qualifying?'warn':null);
-}
-function kv(k,v){
-  return el('div',{class:'ev-kv'},[
-    el('span',{class:'k',text:k}),
-    el('span',{class:'v',text:(v===null||v===undefined||v==='')?'—':String(v)}),
-  ]);
-}
-
 const CASE_ARTIFACT_COLS=[
   col('artifact','Artifact'),
   col('agent','Agent',110),
@@ -2825,12 +2816,6 @@ async function loadInstructionText(row,box){
   box.textContent=hiddenCount(row)?markHidden(text):text;
 }
 
-// Kept under its old name: this is what the instruction detail has always used.
-async function toggleInstruction(row,detail){
-  pick('instructions',row.event_id);
-  drawInstructions();
-}
-
 // ---------- the Conversations view ----------
 //
 // Which of an agent's stores name each conversation. The one view in here that is about
@@ -3512,7 +3497,6 @@ function ioToString(content){
 // ============================================================================
 // Sidebar
 // ============================================================================
-function fmtTime(ts){if(!ts)return '';const d=new Date(ts);if(isNaN(d))return '';return d.toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
 // Which sessions a chip keeps. All three questions are about the case's own reliability
 // rather than about its content: where did a rule find something, where did a parser fail
 // to read a line, and where is there evidence nobody has a reading for yet.
