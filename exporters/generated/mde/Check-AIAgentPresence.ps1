@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: dd8dcc055775
+# Catalogue digest: bcee70c6de2b
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -81,6 +81,7 @@
 #     qwen_code.project_mcp_config
 #     qwen_code.project_settings
 #     roo_code.rules
+#     warp.project_rules
 #     windsurf.project_instructions
 #     zed.task_definitions
 #   no Windows path with a testable fixed prefix
@@ -164,6 +165,8 @@
 #     qwen_code.env_files
 #     roo_code.custom_storage_path
 #     vscode.mcp_config
+#     warp.mcp_config
+#     warp.skills
 #     windsurf.hooks
 #     windsurf.ignore_files
 #     windsurf.mcp_config
@@ -1301,6 +1304,24 @@ $targets = @(
     @{ Agent = 'vscode'; Id = 'vscode.workspace_storage'; Path = '$profile\AppData\Roaming\Trae\User\workspaceStorage' }
     @{ Agent = 'vscode'; Id = 'vscode.workspace_storage'; Path = '$profile\AppData\Roaming\VSCodium\User\workspaceStorage' }
     @{ Agent = 'vscode'; Id = 'vscode.workspace_storage'; Path = '$profile\AppData\Roaming\Windsurf\User\workspaceStorage' }
+    @{ Agent = 'warp'; Id = 'warp.cli_settings'; Path = '$profile\.warp_cli\settings.toml' }
+    @{ Agent = 'warp'; Id = 'warp.cli_settings'; Path = '$profile\AppData\Local\warp\Warp\config\cli\settings.toml' }
+    @{ Agent = 'warp'; Id = 'warp.global_rules'; Path = '$profile\.agents\AGENTS.md' }
+    @{ Agent = 'warp'; Id = 'warp.mcp_auth'; Path = '$profile\.mcp-auth' }
+    @{ Agent = 'warp'; Id = 'warp.mcp_config'; Path = '$profile\.agents\.mcp.json' }
+    @{ Agent = 'warp'; Id = 'warp.mcp_config'; Path = '$profile\.warp\.mcp.json' }
+    @{ Agent = 'warp'; Id = 'warp.mcp_config'; Path = '$profile\.warp_cli\.mcp.json' }
+    @{ Agent = 'warp'; Id = 'warp.mcp_logs'; Path = '$profile\AppData\Local\warp\Warp\data\logs\mcp' }
+    @{ Agent = 'warp'; Id = 'warp.skills'; Path = '$profile\.agents\skills' }
+    @{ Agent = 'warp'; Id = 'warp.skills'; Path = '$profile\.claude\skills' }
+    @{ Agent = 'warp'; Id = 'warp.skills'; Path = '$profile\.codex\skills' }
+    @{ Agent = 'warp'; Id = 'warp.skills'; Path = '$profile\.copilot\skills' }
+    @{ Agent = 'warp'; Id = 'warp.skills'; Path = '$profile\.cursor\skills' }
+    @{ Agent = 'warp'; Id = 'warp.skills'; Path = '$profile\.factory\skills' }
+    @{ Agent = 'warp'; Id = 'warp.skills'; Path = '$profile\.gemini\skills' }
+    @{ Agent = 'warp'; Id = 'warp.skills'; Path = '$profile\.github\skills' }
+    @{ Agent = 'warp'; Id = 'warp.skills'; Path = '$profile\.opencode\skills' }
+    @{ Agent = 'warp'; Id = 'warp.skills'; Path = '$profile\.warp\skills' }
     @{ Agent = 'warp'; Id = 'warp.sqlite'; Path = '$profile\AppData\Local\warp\Warp\data\warp.sqlite' }
     @{ Agent = 'warp'; Id = 'warp.sqlite'; Path = '$profile\AppData\Local\warp\Warp\data\warp.sqlite-shm' }
     @{ Agent = 'warp'; Id = 'warp.sqlite'; Path = '$profile\AppData\Local\warp\Warp\data\warp.sqlite-wal' }

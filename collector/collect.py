@@ -11013,6 +11013,160 @@ EMBEDDED_CATALOGUE_JSON = r"""
             "agent": "warp",
             "artifacts": [
                 {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "warp.cli_logs",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "~/Library/Logs/warp-cli/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "warp.cli_settings",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\warp\\Warp\\config\\cli\\settings.toml",
+                        "~/.config/warp-terminal/cli/settings.toml",
+                        "~/.warp_cli/settings.toml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "warp.global_rules",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.agents/AGENTS.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "credentials",
+                    "collect_priority": "normal",
+                    "id": "warp.mcp_auth",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "~/.mcp-auth/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "warp.mcp_config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.agents/.mcp.json",
+                        "<project>/.warp/.mcp.json",
+                        "~/.agents/.mcp.json",
+                        "~/.warp/.mcp.json",
+                        "~/.warp_cli/.mcp.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "warp.mcp_logs",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%LOCALAPPDATA%\\warp\\Warp\\data\\logs\\mcp\\",
+                        "${XDG_STATE_HOME:-~/.local/state}/warp-terminal/mcp/",
+                        "~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/mcp/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "project_instructions",
+                    "collect_priority": "normal",
+                    "id": "warp.project_rules",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/**/WARP.md",
+                        "<project>/WARP.md"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "warp.skills",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.agents/skills/",
+                        "<project>/.claude/skills/",
+                        "<project>/.codex/skills/",
+                        "<project>/.copilot/skills/",
+                        "<project>/.cursor/skills/",
+                        "<project>/.factory/skills/",
+                        "<project>/.gemini/skills/",
+                        "<project>/.github/skills/",
+                        "<project>/.opencode/skills/",
+                        "<project>/.warp/skills/",
+                        "~/.agents/skills/",
+                        "~/.claude/skills/",
+                        "~/.codex/skills/",
+                        "~/.copilot/skills/",
+                        "~/.cursor/skills/",
+                        "~/.factory/skills/",
+                        "~/.gemini/skills/",
+                        "~/.github/skills/",
+                        "~/.opencode/skills/",
+                        "~/.warp/skills/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "prompt_history",
                     "collect_priority": "normal",
                     "id": "warp.sqlite",
@@ -12160,7 +12314,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "3b7f79c09cb33d772e32586682311688c3303b52784ba631d930163d3dfcc9f0"
+    "sha256": "4757a9fe239ce7f5e63adfeb7543a2739c212a52893becdb1438fde17ac8d173"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

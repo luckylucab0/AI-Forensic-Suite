@@ -6,7 +6,7 @@ English | [Deutsch](SUPPORT.de.md)
 
 What this suite reads, per agent, counted from the catalogue and the reader registry rather than written down. The numbers move when the code does.
 
-31 catalogue files, 30 of them a product and one cross-cutting. 487 of 612 artifacts are read by 37 reader modules, into 23 event kinds. 487 artifacts rest on a fetched vendor source.
+31 catalogue files, 30 of them a product and one cross-cutting. 494 of 620 artifacts are read by 37 reader modules, into 23 event kinds. 495 artifacts rest on a fetched vendor source.
 
 **How to read an empty result.** An agent listed here with artifacts read means the paths were searched and the files that were there were parsed, so an empty result is evidence that those paths held nothing. It is never evidence that the agent was not used: the data tree may have been relocated by a variable, the retention period may have swept it, the paths may be the unverified ones, or the user may have worked in a profile nobody collected. Where an entry is unverified, `docs/ARTIFACTS.md` says so per artifact and the analyzer repeats it in its output.
 
@@ -44,7 +44,7 @@ What this suite reads, per agent, counted from the catalogue and the reader regi
 | Qwen Code | Linux, macOS, Windows | 2 / 2 | 30 / 36 | 17 | 6 |
 | Roo Code | Linux, macOS, Windows | 1 / 1 | 6 / 7 | 2 | 1 |
 | Visual Studio Code host storage | Linux, macOS, Windows | none | 8 / 10 | 6 | 2 |
-| Warp | Linux, macOS, Windows | none | 1 / 1 | 1 | 0 |
+| Warp | Linux, macOS, Windows | none | 8 / 9 | 5 | 1 |
 | Windsurf | Linux, macOS, Windows | 6 / 6 | 30 / 40 | 16 | 10 |
 | Zed | Linux, macOS, Windows | 3 / 3 | 9 / 12 | 4 | 3 |
 
@@ -54,7 +54,7 @@ Every artifact in the catalogue is collected and appears in a case, whether a re
 
 ### Credential stores: metadata and a hash, by design
 
-40 entries. The collector records the path, the size, the timestamps and the hash, and copies no content unless it is told to, so there is nothing for a reader to read. That is a decision rather than a gap: the file is evidence that an agent was authenticated and to which provider, and the token in it is not what an investigation needs.
+41 entries. The collector records the path, the size, the timestamps and the hash, and copies no content unless it is told to, so there is nothing for a reader to read. That is a decision rather than a gap: the file is evidence that an agent was authenticated and to which provider, and the token in it is not what an investigation needs.
 
 ### Collected and handed to the reader that is better at it
 
@@ -169,7 +169,7 @@ None as of this generation. The check behind this section looks for a catalogue 
 
 ## Where the reading is thin
 
-295 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
+299 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
 
 ## Where to look next
 

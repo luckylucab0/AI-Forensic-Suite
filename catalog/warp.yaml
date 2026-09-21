@@ -12,6 +12,14 @@
 agent: warp
 title: Warp
 vendor: Warp
+description: |-
+  A terminal that is also an agent, and a separate command line agent that shares its rule
+  and skill files. Two things decide how to read a collection of it. The conversations, the
+  prompts and the commands the agent ran are in one SQLite database, and on macOS that
+  database is inside an application group container, which home directory collections
+  routinely skip. And almost everything that steers the agent, the rules, the skills and
+  the MCP servers, is in files this product shares with other vendors' directories, which
+  it reads more widely than any other agent in this catalogue.
 # URL prefixes that count as first party for this agent. status: verified requires the
 # source to start with one of them, because a third party who reverse-engineered a path
 # writes it down just as confidently as the vendor does and an analyst cannot tell the
@@ -25,7 +33,227 @@ vendor_sources:
 references:
 - |-
   https://raw.githubusercontent.com/marcus/sidecar/main/.claude/skills/create-adapter/references/warp-sqlite-schema.md
+- https://docs.warp.dev/llms.txt
+- https://docs.warp.dev/agents/capabilities/mcp/
+- https://docs.warp.dev/agents/capabilities/rules/
+- https://docs.warp.dev/agents/capabilities/skills/
+- https://docs.warp.dev/agents/cli/configuration/
+- https://docs.warp.dev/agents/cli/permissions-and-profiles/
 artifacts:
+- id: warp.project_rules
+  category: project_instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/**/WARP.md
+  - <project>/WARP.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://docs.warp.dev/agents/capabilities/rules/
+  source_kind: official
+  volatility: |-
+    Committed in most repositories, so git history gives authorship and timing. A file that is present in the working copy and absent from the history is the one to look at.
+  notes: |-
+    This product's own project rule file, and it was in no entry at all, which means a repository could carry standing instructions to the agent and a collection would not have taken them. The vendor states that the newer cross-vendor filename is the default and that this one is still fully supported, and that when both exist in one directory this one takes priority. So on a repository that has both, this is the file that actually steered the agent and the other is the one a reviewer reads.
+
+    The name is case sensitive in a way that matters: the vendor states the filename must be in capitals to be recognised, so a lower-case spelling in a repository is a rule file that was never applied, which is worth knowing before concluding that an instruction was in force.
+
+    Nested files are here as their own pattern because the vendor describes the lookup as the repository root plus the current directory, with a best-effort attempt at a subdirectory's file when the agent edits files there. A rule that reached a session from a subdirectory nobody opened is the shape of injection this entry exists for.
+
+    The cross-vendor filename is not repeated here. It is collected by the cross-cutting entry for that standard, which several products in this catalogue read, and attributing it to one of them by its path would be wrong.
+  parser: instructions
+- id: warp.global_rules
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.agents/AGENTS.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://docs.warp.dev/agents/cli/configuration/
+  source_kind: official
+  volatility: Not swept. Untracked by any repository, so only its mtime says when it changed.
+  notes: |-
+    A rule file that applies to every project on the machine, stated by the vendor for the command line agent. It is in no repository, so nothing reviews it and nothing records who changed it, which makes it the quietest standing instruction on the endpoint.
+
+    The directory is not this vendor's. Several agents in this catalogue read the same shared directory, so a rule found here steered whichever of them ran, and attributing it to one product by its path alone is wrong.
+  parser: instructions
+- id: warp.skills
+  category: instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.agents/skills/
+  - <project>/.claude/skills/
+  - <project>/.codex/skills/
+  - <project>/.copilot/skills/
+  - <project>/.cursor/skills/
+  - <project>/.factory/skills/
+  - <project>/.gemini/skills/
+  - <project>/.github/skills/
+  - <project>/.opencode/skills/
+  - <project>/.warp/skills/
+  - ~/.agents/skills/
+  - ~/.claude/skills/
+  - ~/.codex/skills/
+  - ~/.copilot/skills/
+  - ~/.cursor/skills/
+  - ~/.factory/skills/
+  - ~/.gemini/skills/
+  - ~/.github/skills/
+  - ~/.opencode/skills/
+  - ~/.warp/skills/
+  format: markdown
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://docs.warp.dev/agents/capabilities/skills/
+  source_kind: official
+  volatility: Not swept. A project copy is usually committed; the ten user-level ones are not.
+  notes: |-
+    The widest skill discovery in this catalogue, and the vendor lists all twenty directories itself: ten inside a project and the same ten in the home directory, of which nine are other vendors' directories and one is its own. A skill is a directory with a SKILL.md that enters the model's context when the agent decides it is relevant, so every one of these is an instruction surface that needs no user action.
+
+    The consequence for an investigation is the one this catalogue keeps meeting and it is sharper here than anywhere else. A skill file under another vendor's directory is not evidence that the other product ran. A finding about this agent's behaviour may have its cause in a directory nobody would think to attribute to it. And a single planted skill under the shared directory reaches this agent and several others at once.
+
+    The command line agent and the application discover the same directories, which the vendor states in as many words, so a skill found here cannot be attributed to one of the two without other evidence.
+  parser: instructions
+- id: warp.mcp_config
+  category: mcp_config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.agents/.mcp.json
+  - <project>/.warp/.mcp.json
+  - ~/.agents/.mcp.json
+  - ~/.warp/.mcp.json
+  - ~/.warp_cli/.mcp.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://docs.warp.dev/agents/capabilities/mcp/
+  source_kind: official
+  volatility: Persistent until edited.
+  notes: |-
+    Which external tools the agent could reach, with the command line of each one. The vendor gives its own two locations, the global file and the project file, and states that the file-based configuration is on by default.
+
+    It reads other products' MCP configuration too, and names them: the cross-vendor file in the shared directory, one vendor's home configuration file, another's TOML configuration, and the project equivalents of each, with a toggle for everything but its own. Those files have entries of their own in this catalogue under the products that own them, and the fact worth carrying is the reverse of the usual one: an MCP server defined for a different agent was also available to this one, so the question "which tools could this agent reach" is not answered by this entry alone.
+
+    The command line agent keeps a separate file from the application, which the vendor states, and it reads only its global file: project-scoped configuration is documented as not detected there. So a project MCP server that the application used was not available to the command line agent on the same machine.
+  parser: json_generic
+- id: warp.cli_settings
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%LOCALAPPDATA%\warp\Warp\config\cli\settings.toml'
+  - ~/.config/warp-terminal/cli/settings.toml
+  - ~/.warp_cli/settings.toml
+  format: toml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://docs.warp.dev/agents/cli/permissions-and-profiles/
+  source_kind: official
+  volatility: |-
+    Created the first time a setting changes and rewritten in place after that, so it carries only the current state and one mtime. The agent can rewrite it during a session, so the mtime may belong to the agent rather than to the user.
+  notes: |-
+    What the agent was allowed to do without asking. The execution profiles live here under their own table, each naming how shell commands, file edits, file reads and MCP tool calls are handled, with a command allowlist and a command denylist beside them. The vendor states that setting a denylist replaces the built-in one, which covers a list of risky commands it names, so a short denylist in this file is not a narrowing of the default but a replacement of it.
+
+    Two fields decide whether a control was in force. Auto-approve runs every proposed action without a card, and the vendor states that with it on the agent also runs commands that match the user's own denylist unless auto_approve_bypasses_command_denylist is set to false in this file. That flag, and the profile beside it, are the difference between an agent that was constrained and one that was not.
+
+    The agent edits this file. The vendor documents a bundled skill and a settings schema for exactly that, so asking the agent to change its own permissions is a supported workflow and the file is not reliable evidence of what the user intended. Compare its mtime against the session times.
+
+    Local only. The vendor states these profiles never sync and are separate from the application's own agent profiles, so this file is the record for the command line agent and not for the application.
+  parser: toml_generic
+- id: warp.mcp_logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%LOCALAPPDATA%\warp\Warp\data\logs\mcp\'
+  - ${XDG_STATE_HOME:-~/.local/state}/warp-terminal/mcp/
+  - |-
+    ~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/mcp/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://docs.warp.dev/agents/capabilities/mcp/
+  source_kind: official
+  volatility: |-
+    No retention is documented. The vendor gives these directories as somewhere a user can open and inspect the full contents, which implies they are kept rather than swept, but nothing states it.
+  notes: |-
+    The record of what the external tools actually did, which for this product is the closest thing to a log of the agent's side effects: the application database holds the prompts and the commands, and this holds the traffic to and from every MCP server.
+
+    The macOS directory is inside the application group container, next to the database, which is the same collection problem: a home directory sweep that skips group containers takes neither.
+
+    Note that the three platforms put this in three different trees. It is beside the database on macOS, under the application data directory on Windows and in the freedesktop state directory on Linux, so there is no single pattern that finds it and all three have to be searched.
+  parser: text_log
+- id: warp.cli_logs
+  category: log
+  root: user_profile
+  os:
+  - macos
+  paths:
+  - ~/Library/Logs/warp-cli/
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://docs.warp.dev/agents/cli/reference/
+  source_kind: official
+  volatility: |-
+    SELF-DELETING: the vendor states logs rotate per session and that older session logs are rotated out over time, with no retention period given. Collect early.
+  notes: |-
+    The command line agent's own logs, one per session, plus the archive its log-viewing command writes into the same directory. On a machine where the conversations were addressed by a token rather than kept locally, these are the local record that the agent ran at all and when.
+
+    macOS only, on purpose. The vendor states this directory for macOS and states no path for the other two platforms, so nothing is guessed here. Somebody who finds the Windows or Linux location should add it rather than assume it mirrors the settings file.
+  parser: text_log
+- id: warp.mcp_auth
+  category: credentials
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - ~/.mcp-auth/
+  format: json
+  sensitivity: secret
+  collect_priority: normal
+  status: verified
+  source: https://docs.warp.dev/agents/capabilities/mcp/
+  source_kind: official
+  volatility: |-
+    Cleared wholesale by the vendor's own troubleshooting instruction, which is a recursive delete of the whole directory, so an absence here can be a documented troubleshooting step rather than an anti-forensic one.
+  notes: |-
+    Metadata and a hash only, like every credential store here. What the entry is for is the question it answers without its content: which MCP servers the user authenticated to, and when. The vendor names this directory as the local MCP authentication token store and tells users to delete it to reset authentication.
+
+    Not this product's own directory. It is the store the shared remote-MCP helper uses, so its contents can belong to any agent on the machine that spoke to an authenticated server, and a token here is not evidence that this product was the one that obtained it.
+  parser: null
 - id: warp.sqlite
   category: prompt_history
   root: user_profile

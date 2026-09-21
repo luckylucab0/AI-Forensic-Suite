@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: dd8dcc055775
+# Catalogue digest: bcee70c6de2b
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1525,6 +1525,8 @@ sources:
     vscode,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     vscode,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-wal
     vscode,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/workspace.json
+    warp,/Users/*/Library/Logs/warp-cli/**
+    warp,/var/root/Library/Logs/warp-cli/**
     windsurf,/Users/*/.codeium/codeium.log
     windsurf,/Users/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,/Users/*/.codeium/windsurf-next/memories/global_rules.md

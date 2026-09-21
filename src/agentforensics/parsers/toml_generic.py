@@ -49,6 +49,7 @@ DOCUMENTS = frozenset(
         "codex.mcp_and_notify",
         "codex.requirements_and_permissions",
         "gemini_cli.policies",
+        "warp.cli_settings",
     }
 )
 
@@ -60,6 +61,7 @@ CONFIGURATIONS = frozenset(
         "codex.mcp_and_notify",
         "codex.requirements_and_permissions",
         "gemini_cli.policies",
+        "warp.cli_settings",
     }
 )
 

@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: dd8dcc055775
+// Catalogue digest: bcee70c6de2b
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -78,6 +78,7 @@
 //     qwen_code.project_mcp_config
 //     qwen_code.project_settings
 //     roo_code.rules
+//     warp.project_rules
 //     windsurf.project_instructions
 //     zed.task_definitions
 //   no path distinctive enough to match on: after removing the profile and everything from the first wildcard, less than two path segments were left
@@ -104,6 +105,7 @@
 //     vscode.local_history
 //     vscode.mcp_config
 //     vscode.workspace_storage
+//     warp.mcp_auth
 //     windsurf.server_data
 //   reachable only through a relocation variable, which is not in the event data: read the variable off the endpoint
 //     claude_code.global_config
@@ -2598,6 +2600,45 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "vscode", "vscode.user_data_roots", "Library/Application Support/Code/User/globalStorage",
     "vscode", "vscode.user_data_roots", "Library\\Application Support\\Code - Insiders\\User\\globalStorage",
     "vscode", "vscode.user_data_roots", "Library\\Application Support\\Code\\User\\globalStorage",
+    "warp", "warp.cli_logs", "Library/Logs/warp-cli",
+    "warp", "warp.cli_settings", ".config/warp-terminal/cli/settings.toml",
+    "warp", "warp.cli_settings", ".config\\warp-terminal\\cli\\settings.toml",
+    "warp", "warp.cli_settings", ".warp_cli/settings.toml",
+    "warp", "warp.cli_settings", ".warp_cli\\settings.toml",
+    "warp", "warp.cli_settings", "warp/Warp/config/cli/settings.toml",
+    "warp", "warp.cli_settings", "warp\\Warp\\config\\cli\\settings.toml",
+    "warp", "warp.global_rules", ".agents/AGENTS.md",
+    "warp", "warp.global_rules", ".agents\\AGENTS.md",
+    "warp", "warp.mcp_config", ".agents/.mcp.json",
+    "warp", "warp.mcp_config", ".agents\\.mcp.json",
+    "warp", "warp.mcp_config", ".warp/.mcp.json",
+    "warp", "warp.mcp_config", ".warp\\.mcp.json",
+    "warp", "warp.mcp_config", ".warp_cli/.mcp.json",
+    "warp", "warp.mcp_config", ".warp_cli\\.mcp.json",
+    "warp", "warp.mcp_logs", "Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/mcp",
+    "warp", "warp.mcp_logs", "Library\\Group Containers\\2BBY89MBSN.dev.warp\\Library\\Application Support\\dev.warp.Warp-Stable\\mcp",
+    "warp", "warp.mcp_logs", "warp/Warp/data/logs/mcp",
+    "warp", "warp.mcp_logs", "warp\\Warp\\data\\logs\\mcp",
+    "warp", "warp.skills", ".agents/skills",
+    "warp", "warp.skills", ".agents\\skills",
+    "warp", "warp.skills", ".claude/skills",
+    "warp", "warp.skills", ".claude\\skills",
+    "warp", "warp.skills", ".codex/skills",
+    "warp", "warp.skills", ".codex\\skills",
+    "warp", "warp.skills", ".copilot/skills",
+    "warp", "warp.skills", ".copilot\\skills",
+    "warp", "warp.skills", ".cursor/skills",
+    "warp", "warp.skills", ".cursor\\skills",
+    "warp", "warp.skills", ".factory/skills",
+    "warp", "warp.skills", ".factory\\skills",
+    "warp", "warp.skills", ".gemini/skills",
+    "warp", "warp.skills", ".gemini\\skills",
+    "warp", "warp.skills", ".github/skills",
+    "warp", "warp.skills", ".github\\skills",
+    "warp", "warp.skills", ".opencode/skills",
+    "warp", "warp.skills", ".opencode\\skills",
+    "warp", "warp.skills", ".warp/skills",
+    "warp", "warp.skills", ".warp\\skills",
     "warp", "warp.sqlite", "Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite",
     "warp", "warp.sqlite", "Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm",
     "warp", "warp.sqlite", "Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal",

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: dd8dcc055775
+# Catalogue digest: bcee70c6de2b
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -72,6 +72,7 @@
 #     qwen_code.project_mcp_config
 #     qwen_code.project_settings
 #     roo_code.rules
+#     warp.project_rules
 #     windsurf.project_instructions
 #     zed.task_definitions
 #   no path for this operating system that this target can express
@@ -169,6 +170,8 @@
 #     qwen_code.env_files
 #     roo_code.custom_storage_path
 #     vscode.mcp_config
+#     warp.mcp_config
+#     warp.skills
 #     windsurf.hooks
 #     windsurf.ignore_files
 #     windsurf.mcp_config
@@ -1575,6 +1578,24 @@ sources:
     vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-wal
     vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/workspace.json
+    warp,warp.cli_settings,C:/Users/*/.warp_cli/settings.toml
+    warp,warp.cli_settings,C:/Users/*/AppData/Local/warp/Warp/config/cli/settings.toml
+    warp,warp.global_rules,C:/Users/*/.agents/AGENTS.md
+    warp,warp.mcp_auth,C:/Users/*/.mcp-auth/**
+    warp,warp.mcp_config,C:/Users/*/.agents/.mcp.json
+    warp,warp.mcp_config,C:/Users/*/.warp/.mcp.json
+    warp,warp.mcp_config,C:/Users/*/.warp_cli/.mcp.json
+    warp,warp.mcp_logs,C:/Users/*/AppData/Local/warp/Warp/data/logs/mcp/**
+    warp,warp.skills,C:/Users/*/.agents/skills/**
+    warp,warp.skills,C:/Users/*/.claude/skills/**
+    warp,warp.skills,C:/Users/*/.codex/skills/**
+    warp,warp.skills,C:/Users/*/.copilot/skills/**
+    warp,warp.skills,C:/Users/*/.cursor/skills/**
+    warp,warp.skills,C:/Users/*/.factory/skills/**
+    warp,warp.skills,C:/Users/*/.gemini/skills/**
+    warp,warp.skills,C:/Users/*/.github/skills/**
+    warp,warp.skills,C:/Users/*/.opencode/skills/**
+    warp,warp.skills,C:/Users/*/.warp/skills/**
     warp,warp.sqlite,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite
     warp,warp.sqlite,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite-shm
     warp,warp.sqlite,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite-wal
@@ -4520,6 +4541,44 @@ sources:
     vscode,vscode.workspace_storage,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     vscode,vscode.workspace_storage,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
     vscode,vscode.workspace_storage,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/workspace.json
+    warp,warp.cli_logs,/Users/*/Library/Logs/warp-cli/**
+    warp,warp.cli_logs,/var/root/Library/Logs/warp-cli/**
+    warp,warp.cli_settings,/Users/*/.config/warp-terminal/cli/settings.toml
+    warp,warp.cli_settings,/Users/*/.warp_cli/settings.toml
+    warp,warp.cli_settings,/var/root/.config/warp-terminal/cli/settings.toml
+    warp,warp.cli_settings,/var/root/.warp_cli/settings.toml
+    warp,warp.global_rules,/Users/*/.agents/AGENTS.md
+    warp,warp.global_rules,/var/root/.agents/AGENTS.md
+    warp,warp.mcp_auth,/Users/*/.mcp-auth/**
+    warp,warp.mcp_auth,/var/root/.mcp-auth/**
+    warp,warp.mcp_config,/Users/*/.agents/.mcp.json
+    warp,warp.mcp_config,/Users/*/.warp/.mcp.json
+    warp,warp.mcp_config,/Users/*/.warp_cli/.mcp.json
+    warp,warp.mcp_config,/var/root/.agents/.mcp.json
+    warp,warp.mcp_config,/var/root/.warp/.mcp.json
+    warp,warp.mcp_config,/var/root/.warp_cli/.mcp.json
+    warp,warp.mcp_logs,/Users/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/mcp/**
+    warp,warp.mcp_logs,/var/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/mcp/**
+    warp,warp.skills,/Users/*/.agents/skills/**
+    warp,warp.skills,/Users/*/.claude/skills/**
+    warp,warp.skills,/Users/*/.codex/skills/**
+    warp,warp.skills,/Users/*/.copilot/skills/**
+    warp,warp.skills,/Users/*/.cursor/skills/**
+    warp,warp.skills,/Users/*/.factory/skills/**
+    warp,warp.skills,/Users/*/.gemini/skills/**
+    warp,warp.skills,/Users/*/.github/skills/**
+    warp,warp.skills,/Users/*/.opencode/skills/**
+    warp,warp.skills,/Users/*/.warp/skills/**
+    warp,warp.skills,/var/root/.agents/skills/**
+    warp,warp.skills,/var/root/.claude/skills/**
+    warp,warp.skills,/var/root/.codex/skills/**
+    warp,warp.skills,/var/root/.copilot/skills/**
+    warp,warp.skills,/var/root/.cursor/skills/**
+    warp,warp.skills,/var/root/.factory/skills/**
+    warp,warp.skills,/var/root/.gemini/skills/**
+    warp,warp.skills,/var/root/.github/skills/**
+    warp,warp.skills,/var/root/.opencode/skills/**
+    warp,warp.skills,/var/root/.warp/skills/**
     warp,warp.sqlite,/Users/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite
     warp,warp.sqlite,/Users/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm
     warp,warp.sqlite,/Users/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal
@@ -7558,6 +7617,42 @@ sources:
     vscode,vscode.workspace_storage,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
     vscode,vscode.workspace_storage,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
     vscode,vscode.workspace_storage,/root/.config/Windsurf/User/workspaceStorage/*/workspace.json
+    warp,warp.cli_settings,/home/*/.config/warp-terminal/cli/settings.toml
+    warp,warp.cli_settings,/home/*/.warp_cli/settings.toml
+    warp,warp.cli_settings,/root/.config/warp-terminal/cli/settings.toml
+    warp,warp.cli_settings,/root/.warp_cli/settings.toml
+    warp,warp.global_rules,/home/*/.agents/AGENTS.md
+    warp,warp.global_rules,/root/.agents/AGENTS.md
+    warp,warp.mcp_auth,/home/*/.mcp-auth/**
+    warp,warp.mcp_auth,/root/.mcp-auth/**
+    warp,warp.mcp_config,/home/*/.agents/.mcp.json
+    warp,warp.mcp_config,/home/*/.warp/.mcp.json
+    warp,warp.mcp_config,/home/*/.warp_cli/.mcp.json
+    warp,warp.mcp_config,/root/.agents/.mcp.json
+    warp,warp.mcp_config,/root/.warp/.mcp.json
+    warp,warp.mcp_config,/root/.warp_cli/.mcp.json
+    warp,warp.mcp_logs,/home/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/mcp/**
+    warp,warp.mcp_logs,/root/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/mcp/**
+    warp,warp.skills,/home/*/.agents/skills/**
+    warp,warp.skills,/home/*/.claude/skills/**
+    warp,warp.skills,/home/*/.codex/skills/**
+    warp,warp.skills,/home/*/.copilot/skills/**
+    warp,warp.skills,/home/*/.cursor/skills/**
+    warp,warp.skills,/home/*/.factory/skills/**
+    warp,warp.skills,/home/*/.gemini/skills/**
+    warp,warp.skills,/home/*/.github/skills/**
+    warp,warp.skills,/home/*/.opencode/skills/**
+    warp,warp.skills,/home/*/.warp/skills/**
+    warp,warp.skills,/root/.agents/skills/**
+    warp,warp.skills,/root/.claude/skills/**
+    warp,warp.skills,/root/.codex/skills/**
+    warp,warp.skills,/root/.copilot/skills/**
+    warp,warp.skills,/root/.cursor/skills/**
+    warp,warp.skills,/root/.factory/skills/**
+    warp,warp.skills,/root/.gemini/skills/**
+    warp,warp.skills,/root/.github/skills/**
+    warp,warp.skills,/root/.opencode/skills/**
+    warp,warp.skills,/root/.warp/skills/**
     warp,warp.sqlite,/home/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite
     warp,warp.sqlite,/home/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm
     warp,warp.sqlite,/home/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal

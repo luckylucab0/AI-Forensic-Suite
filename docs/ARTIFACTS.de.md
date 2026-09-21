@@ -6,7 +6,7 @@
 
 Erzeugt aus catalog/ durch scripts/gen_artifact_docs.py. Nicht von Hand bearbeiten: die CI erzeugt diese Datei neu und schlägt fehl, wenn sie abweicht.
 
-612 Artefakte über 31 Agent(en), davon 487 auf einer abgerufenen Herstellerquelle beruhend.
+620 Artefakte über 31 Agent(en), davon 495 auf einer abgerufenen Herstellerquelle beruhend.
 
 Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
 
@@ -1560,7 +1560,23 @@ Die folgenden Pfade werden von aktuellen Versionen nicht mehr geschrieben oder g
 
 Vendor: Warp
 
-<https://raw.githubusercontent.com/marcus/sidecar/main/.claude/skills/create-adapter/references/warp-sqlite-schema.md>
+[EN] A terminal that is also an agent, and a separate command line agent that shares its rule
+and skill files. Two things decide how to read a collection of it. The conversations, the
+prompts and the commands the agent ran are in one SQLite database, and on macOS that
+database is inside an application group container, which home directory collections
+routinely skip. And almost everything that steers the agent, the rules, the skills and
+the MCP servers, is in files this product shares with other vendors' directories, which
+it reads more widely than any other agent in this catalogue.
+
+<https://raw.githubusercontent.com/marcus/sidecar/main/.claude/skills/create-adapter/references/warp-sqlite-schema.md>, <https://docs.warp.dev/llms.txt>, <https://docs.warp.dev/agents/capabilities/mcp/>, <https://docs.warp.dev/agents/capabilities/rules/>, <https://docs.warp.dev/agents/capabilities/skills/>, <https://docs.warp.dev/agents/cli/configuration/>, <https://docs.warp.dev/agents/cli/permissions-and-profiles/>
+
+### first
+
+**Zuerst sichern.** Rotieren oder verfallen aggressiv, nach Anzahl oder bei jedem Aufräumlauf statt nach einer bequemen Frist. Einige davon zerstört die Benutzerin schon dadurch, dass sie eine weitere Sitzung startet.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `warp.cli_logs` | cli logs | log | macOS | `~/Library/Logs/warp-cli/` | text | normal | [EN] SELF-DELETING: the vendor states logs rotate per session and that older session logs are rotated out over time, with no retention period given. Collect early. | bestätigt | [official](https://docs.warp.dev/agents/cli/reference/) |
 
 ### normal
 
@@ -1568,7 +1584,21 @@ Vendor: Warp
 
 | Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `warp.cli_settings` | cli settings | permissions | macOS, Linux, Windows | `%LOCALAPPDATA%\warp\Warp\config\cli\settings.toml`<br>`~/.config/warp-terminal/cli/settings.toml`<br>`~/.warp_cli/settings.toml` | toml | normal | [EN] Created the first time a setting changes and rewritten in place after that, so it carries only the current state and one mtime. The agent can rewrite it during a session, so the mtime may belong to the agent rather than to the user. | bestätigt | [official](https://docs.warp.dev/agents/cli/permissions-and-profiles/) |
+| `warp.mcp_auth` | mcp auth | credentials | macOS, Linux, Windows | `~/.mcp-auth/` | json | secret | [EN] Cleared wholesale by the vendor's own troubleshooting instruction, which is a recursive delete of the whole directory, so an absence here can be a documented troubleshooting step rather than an anti-forensic one. | bestätigt | [official](https://docs.warp.dev/agents/capabilities/mcp/) |
+| `warp.mcp_config` | mcp config | mcp_config | macOS, Linux, Windows | `<project>/.agents/.mcp.json`<br>`<project>/.warp/.mcp.json`<br>`~/.agents/.mcp.json`<br>`~/.warp/.mcp.json`<br>`~/.warp_cli/.mcp.json` | json | normal | [EN] Persistent until edited. | bestätigt | [official](https://docs.warp.dev/agents/capabilities/mcp/) |
+| `warp.mcp_logs` | mcp logs | log | macOS, Linux, Windows | `%LOCALAPPDATA%\warp\Warp\data\logs\mcp\`<br>`${XDG_STATE_HOME:-~/.local/state}/warp-terminal/mcp/`<br>`~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/mcp/` | text | normal | [EN] No retention is documented. The vendor gives these directories as somewhere a user can open and inspect the full contents, which implies they are kept rather than swept, but nothing states it. | bestätigt | [official](https://docs.warp.dev/agents/capabilities/mcp/) |
+| `warp.project_rules` | project rules | project_instructions | macOS, Linux, Windows | `<project>/**/WARP.md`<br>`<project>/WARP.md` | markdown | normal | [EN] Committed in most repositories, so git history gives authorship and timing. A file that is present in the working copy and absent from the history is the one to look at. | bestätigt | [official](https://docs.warp.dev/agents/capabilities/rules/) |
 | `warp.sqlite` | sqlite | prompt_history | macOS, Linux, Windows | `${XDG_STATE_HOME:-~/.local/state}/warp-terminal/warp.sqlite`<br>`${XDG_STATE_HOME:-~/.local/state}/warp-terminal/warp.sqlite-shm`<br>`${XDG_STATE_HOME:-~/.local/state}/warp-terminal/warp.sqlite-wal`<br>`%LOCALAPPDATA%\warp\Warp\data\warp.sqlite`<br>`%LOCALAPPDATA%\warp\Warp\data\warp.sqlite-shm`<br>`%LOCALAPPDATA%\warp\Warp\data\warp.sqlite-wal`<br>`~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite`<br>`~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm`<br>`~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal` | sqlite | normal | [EN] WAL mode - all three files (warp.sqlite, -wal, -shm) are required for a consistent read, and recent activity may live only in -wal. Deletion of a conversation in Warp is a SQL transaction against agent_tasks/ai_queries for that conversation id, not removal of the file, so freelist and WAL carving can recover deleted conversations. | **unbestätigt** | [community](https://raw.githubusercontent.com/marcus/sidecar/main/.claude/skills/create-adapter/references/warp-sqlite-schema.md) |
+
+### durable
+
+**Meist noch vorhanden.** Vom Aufräumlauf nicht erfasst und überleben damit regelmässig die Transkripte, die sie beschreiben. Sind die Transkripte schon weg, ist diese Gruppe das, was bleibt, und sie genügt oft, um zu belegen, dass ein Agent lief, was er durfte und was gefragt wurde.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `warp.global_rules` | global rules | instructions | macOS, Linux, Windows | `~/.agents/AGENTS.md` | markdown | normal | [EN] Not swept. Untracked by any repository, so only its mtime says when it changed. | bestätigt | [official](https://docs.warp.dev/agents/cli/configuration/) |
+| `warp.skills` | skills | instructions | macOS, Linux, Windows | `<project>/.agents/skills/`<br>`<project>/.claude/skills/`<br>`<project>/.codex/skills/`<br>`<project>/.copilot/skills/`<br>`<project>/.cursor/skills/`<br>`<project>/.factory/skills/`<br>`<project>/.gemini/skills/`<br>`<project>/.github/skills/`<br>`<project>/.opencode/skills/`<br>`<project>/.warp/skills/`<br>`~/.agents/skills/`<br>`~/.claude/skills/`<br>`~/.codex/skills/`<br>`~/.copilot/skills/`<br>`~/.cursor/skills/`<br>`~/.factory/skills/`<br>`~/.gemini/skills/`<br>`~/.github/skills/`<br>`~/.opencode/skills/`<br>`~/.warp/skills/` | markdown | normal | [EN] Not swept. A project copy is usually committed; the ten user-level ones are not. | bestätigt | [official](https://docs.warp.dev/agents/capabilities/skills/) |
 
 ## Windsurf
 
