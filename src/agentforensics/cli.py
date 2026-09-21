@@ -50,10 +50,16 @@ EXIT_NOTHING_FOUND = 3
 
 # Subcommands that do not exist yet, listed so --help describes the tool being built
 # rather than only the fragment that exists. A user can then tell a missing capability
-# apart from an undocumented one.
-_PLANNED = [
-    ("export", "export a case, including the viewer's event shape"),
-]
+# apart from an undocumented one. Empty means every subcommand the help names exists, and
+# --help then says nothing about what is planned: a gap advertised after it was filled
+# sends an analyst looking for another tool.
+_PLANNED: list[tuple[str, str]] = []
+
+# The views `afx export` writes, which are the views the local API exports plus the event
+# shape the viewer itself reads. Taken from the API rather than repeated here, so a view
+# added to one is a view the other writes.
+_EVENTS_VIEW = "events"
+EXPORT_VIEWS = (*api.EXPORTS, _EVENTS_VIEW)
 
 
 def _write(stream: TextIO, text: str) -> None:
@@ -703,6 +709,153 @@ def cmd_timeline(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _csv_rows(text: str) -> int:
+    """How many data rows a rendered CSV holds, header not counted.
+
+    Parsed rather than counted by line, because a cell can hold a newline: a prompt, a tool
+    result and a path all can, and counting lines would report a number larger than the
+    view has rows. A count that is wrong in a report is worse than no count.
+    """
+    import csv
+
+    # keepends, so a quoted cell that spans lines is rejoined by the reader rather than
+    # read as two rows.
+    return max(0, sum(1 for _ in csv.reader(text.splitlines(keepends=True))) - 1)
+
+
+def cmd_export(args: argparse.Namespace) -> int:
+    """Write a case out to files: every view a report attaches, and the events themselves.
+
+    The same bytes `afx serve` hands a browser. Each table is rendered by the projection
+    the web API renders it with, and the events by the one the viewer reads, so a file
+    attached to a report and a table on screen cannot describe one case differently. There
+    is no second renderer here, and adding one is the defect this command exists to avoid.
+
+    The flags follow what the rest of this tool does with a destination that is several
+    files. `--out` is a directory and is required: `export-collection` can default its own,
+    because the committed copy CI checks lives at that path, and a case export has no such
+    home. There is no stdout form for the same reason, and a command that wrote seven files
+    into whatever directory an analyst happened to be in is a command that loses them.
+    `--view` is repeatable and defaults to every view, the way `--format` does on
+    `export-collection`. `--json` reports what was written for a script that has to find
+    the files afterwards.
+
+    Every view is written whole, never the page a browser had on screen and never the rows
+    a filter left, which is also why this takes none of `afx timeline`'s filters: a CSV
+    that quietly held a filtered subset would be a document making a claim about a case
+    that nobody could reproduce.
+
+    A view with no rows is written as a file with its header and nothing under it. An
+    absent file would be read as a view nobody exported, and an empty view is a statement
+    about the case.
+
+    The exit code says which of three things happened. A case whose every exported view is
+    empty exits 3, the same nothing-found code `timeline` and `ingest` use, because a case
+    holding nothing is a valid result a script must be able to tell from a crash. A case
+    that could not be read, a view that is not a view, or a directory that could not be
+    written exits 2.
+    """
+    views = list(dict.fromkeys(args.view or EXPORT_VIEWS))
+    unknown = [name for name in views if name not in EXPORT_VIEWS]
+    if unknown:
+        # Named, with the list, rather than skipped. A misspelled view that wrote no file
+        # would leave an analyst holding an export they believe is complete.
+        _write(
+            sys.stderr,
+            f"export: no view named {', '.join(unknown)}; there is " + ", ".join(EXPORT_VIEWS),
+        )
+        return EXIT_ERROR
+
+    try:
+        # Read-only, so SQLite itself refuses a write. Exporting is reading, and a case is
+        # evidence: the same reason `afx serve` opens it this way.
+        case = Case.open(Path(args.case), create=False, read_only=True)
+    except CaseError as exc:
+        _write(sys.stderr, f"export: {exc}")
+        return EXIT_ERROR
+
+    out_dir = Path(args.out)
+    written: list[tuple[str, Path, int]] = []
+    try:
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for name in views:
+            if name == _EVENTS_VIEW:
+                # The viewer's own event shape, one unified log record per line, which is
+                # what the standalone viewer opens with nothing behind the page.
+                target = out_dir / "afx-events.jsonl"
+                rows = 0
+                # newline="" so two platforms produce the same bytes. A log gets hashed
+                # and compared, and a CRLF translation would break that for no gain.
+                with target.open("w", encoding="utf-8", newline="") as handle:
+                    for line in api.log_lines(case):
+                        handle.write(line)
+                        rows += 1
+            else:
+                # The file name the browser download carries, so a report's attachment
+                # list does not depend on which of the two wrote it.
+                target = out_dir / f"afx-{name}.csv"
+                text = api.export_csv(case, name)
+                rows = _csv_rows(text)
+                with target.open("w", encoding="utf-8", newline="") as handle:
+                    handle.write(text)
+            written.append((name, target, rows))
+        counts = case.counts()
+    except (api.ApiError, OSError) as exc:
+        _write(sys.stderr, f"export: {exc}")
+        return EXIT_ERROR
+    finally:
+        case.close()
+
+    if args.json:
+        _write(
+            sys.stdout,
+            json.dumps(
+                {
+                    "case": str(args.case),
+                    "out": str(out_dir),
+                    "files": [
+                        {
+                            "view": name,
+                            "path": str(target),
+                            "rows": rows,
+                            "bytes": target.stat().st_size,
+                        }
+                        for name, target, rows in written
+                    ],
+                },
+                indent=2,
+                sort_keys=True,
+            ),
+        )
+    else:
+        for _name, target, rows in written:
+            _write(sys.stdout, f"wrote {target}  {rows} row(s)")
+        _write(sys.stdout, f"total: {len(written)} file(s) in {out_dir}")
+
+    empty = [name for name, _, rows in written if rows == 0]
+    if empty:
+        _write(
+            sys.stderr,
+            f"export: {', '.join(empty)} held no rows and was written as a header and "
+            "nothing under it. A view nobody exported and a view with nothing in it are "
+            "different facts, and an absent file would read as the first.",
+        )
+    # The numbers that qualify the case travel with the export, on stderr and every time,
+    # because these files are read away from the case and from this console. The same ones
+    # `afx case` prints.
+    _write(
+        sys.stderr,
+        f"export: {counts['events_unreadable']} record(s) nothing could read, "
+        f"{counts['events_uninterpreted']} record(s) read but in a format nobody has "
+        "mapped, "
+        f"{counts['artifacts_unparsed']} collected file(s) no parser read, "
+        f"{counts['collection_gaps']} gap(s) reported by the collection itself",
+    )
+    if all(rows == 0 for _, _, rows in written):
+        return EXIT_NOTHING_FOUND
+    return EXIT_OK
+
+
 def cmd_scan(args: argparse.Namespace) -> int:
     """Run the rule packs over a case, and record what they found.
 
@@ -927,8 +1080,13 @@ def build_parser() -> argparse.ArgumentParser:
             "Offline forensic suite for the on-disk history of AI coding agents. "
             "Use requires proper authorization; see the README."
         ),
+        # Said only while there is something to say. An empty list would otherwise print a
+        # sentence naming nothing, and a gap advertised after it was filled sends a user
+        # looking for another tool.
         epilog=(
             "Planned but not implemented yet: " + ", ".join(name for name, _ in _PLANNED) + "."
+            if _PLANNED
+            else None
         ),
     )
     parser.add_argument("--version", action="version", version=f"agentforensics {__version__}")
@@ -1145,6 +1303,30 @@ def build_parser() -> argparse.ArgumentParser:
         "timestamps they are the only temporal evidence there is.",
     )
     timeline.set_defaults(func=cmd_timeline)
+
+    export_case = sub.add_parser(
+        "export",
+        help="write a case out to files: the views a report attaches, and the events",
+        description=cmd_export.__doc__,
+    )
+    export_case.add_argument("--case", required=True, help="case database")
+    export_case.add_argument(
+        "--out",
+        required=True,
+        help="directory to write into. Required rather than defaulted: an export is "
+        "several files, and files written into whatever directory an analyst happened to "
+        "be in are files nobody finds again.",
+    )
+    export_case.add_argument(
+        "--view",
+        action="append",
+        metavar="VIEW",
+        help="only this view, repeatable. Default: every view, which is "
+        + ", ".join(EXPORT_VIEWS)
+        + ". Each is written whole, so none of them takes a filter.",
+    )
+    export_case.add_argument("--json", action="store_true", help="machine-readable report")
+    export_case.set_defaults(func=cmd_export)
 
     return parser
 

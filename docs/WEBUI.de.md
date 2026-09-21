@@ -282,6 +282,15 @@ kommen: Die Datei an einem Bericht und die Tabelle auf dem Schirm dürfen densel
 nicht verschieden beschreiben. Eine CSV, die stillschweigend nur enthielte, was gerade
 gefiltert war, wäre ein Dokument mit einer Behauptung, die niemand nachvollziehen kann.
 
+Dieselben Ansichten schreibt `afx export --case <db> --out <dir>` in Dateien, ohne Server
+und ohne Browser. Es ruft dieselben Projektionen auf, also sind eine Datei daraus und ein
+Download von dieser Seite für dieselbe Ansicht dieselben Bytes, und es verwendet den Namen,
+den der Download trägt: `afx-<view>.csv`. Eine Datei kommt hinzu, für die die API keine
+Route hat, `afx-events.jsonl`: der Fall als vereinheitlichtes Agenten-Log, also die
+Ereignisform, die diese Seite liest und die der eigenständige Viewer allein öffnet. Eine
+Ansicht ohne Zeilen wird als ihre Kopfzeile geschrieben und nichts darunter, denn eine
+fehlende Datei liest sich wie eine Ansicht, die niemand exportiert hat.
+
 Jede JSON-Antwort trägt `afx_api`, die API-Version. Der Viewer prüft darauf, um überhaupt zu
 erkennen, ob hinter der Seite ein Fall liegt, und verweigert eine Version, für die er nicht
 geschrieben wurde, statt die Felder anzuzeigen, die er zufällig erkennt.

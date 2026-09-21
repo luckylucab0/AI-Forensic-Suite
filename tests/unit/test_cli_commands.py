@@ -43,6 +43,7 @@ COMMANDS = (
     "scan",
     "serve",
     "timeline",
+    "export",
 )
 
 
@@ -103,6 +104,17 @@ def test_the_chain_an_examiner_runs(
     exported = tmp_path / "timeline.csv"
     assert main(["timeline", "--case", str(case), "--out", str(exported)]) == EXIT_OK
     assert exported.stat().st_size > 0
+    capsys.readouterr()
+
+    # And the whole case written out at once, which is the last thing an examiner does
+    # with it: the files that leave with the report.
+    bundle_out = tmp_path / "export"
+    assert main(["export", "--case", str(case), "--out", str(bundle_out)]) == EXIT_OK
+    written = sorted(path.name for path in bundle_out.iterdir())
+    assert "afx-events.jsonl" in written, written
+    assert "afx-timeline.csv" in written, written
+    for name in written:
+        assert (bundle_out / name).stat().st_size > 0, name
     capsys.readouterr()
 
 

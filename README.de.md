@@ -199,7 +199,16 @@ uv run afx scan --case case.db                                 # die Regelpakete
 uv run afx instructions --case case.db                        # was die Agenten befolgen sollten
 uv run afx sessions --case case.db                            # Konversationen, an die sich nur ein Speicher erinnert
 uv run afx serve --case case.db                                # im Browser öffnen
+uv run afx export --case case.db --out report/                 # dieselben Ansichten als Dateien
 ```
+
+`export` schreibt ohne Server, was `serve` zeigt: eine CSV pro Ansicht, benannt wie der
+Browser seinen Download benennt, dazu `afx-events.jsonl`, den Fall als vereinheitlichtes
+Agenten-Log, das der eigenständige Viewer ohne etwas hinter der Seite öffnet. Beides geht
+durch dieselben Projektionen, damit eine Datei an einem Bericht und eine Tabelle auf dem
+Schirm denselben Fall nicht verschieden beschreiben können. Jede Ansicht wird vollständig
+geschrieben, und eine Ansicht ohne Inhalt wird als Datei geschrieben, die das sagt, statt
+weggelassen zu werden.
 
 Ein Agent legt seine Gespräche in einem verschlüsselten Container ab. Der Schlüssel gehört
 dem Produkt und nicht dem Benutzer, und dieses Repository liefert keinen mit, also werden

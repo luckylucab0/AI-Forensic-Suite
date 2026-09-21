@@ -215,9 +215,9 @@ def _session_events(ctx: Context, match: re.Match[str], query: Query) -> Respons
             )
         except api.ApiError as exc:
             return _error(404, str(exc))
-    lines = "".join(
-        json.dumps(record, ensure_ascii=False, default=str) + "\n" for record in records
-    )
+    # Rendered by the projection rather than here, so the page a browser reads and the log
+    # `afx export` writes to a file are the same bytes for the same session.
+    lines = "".join(api.record_line(record) for record in records)
     headers: tuple[tuple[str, str], ...] = (("X-Afx-Records", str(len(records))),)
     if next_offset is not None:
         headers += (("X-Afx-Next-Offset", str(next_offset)),)

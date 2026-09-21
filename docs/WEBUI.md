@@ -262,6 +262,14 @@ file attached to a report and the table read on screen must not be able to descr
 case differently. A CSV that silently held whatever happened to be filtered when it was
 asked for would be a document making a claim nobody could reproduce.
 
+The same views are written to files by `afx export --case <db> --out <dir>`, which needs no
+server and no browser. It calls these same projections, so a file it wrote and a download
+from this page are the same bytes for the same view, and it uses the name the download
+carries, `afx-<view>.csv`. It adds one file the API has no route for, `afx-events.jsonl`:
+the case as a unified agent log, which is the event shape this page reads and what the
+standalone viewer opens on its own. A view with no rows is written as its header and
+nothing under it, because an absent file reads as a view nobody exported.
+
 Every JSON response carries `afx_api`, the API version. The viewer probes for it to decide
 whether there is a case behind the page at all, and refuses a version it was not written
 for rather than rendering the fields it happens to recognise.

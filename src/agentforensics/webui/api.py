@@ -30,6 +30,7 @@ import hashlib
 import io
 import json
 import sqlite3
+from collections.abc import Iterator
 from itertools import islice
 from typing import Any
 
@@ -392,6 +393,43 @@ def _decode(text: Any) -> Any:
         return json.loads(text)
     except TypeError, ValueError:
         return {"__undecodable__": str(text)}
+
+
+def record_line(record: dict[str, Any]) -> str:
+    """One unified record as one line of a log.
+
+    One renderer for the two places this shape reaches a reader: the session page the
+    server hands a browser, and the log `afx export` writes to a file. A second dumps()
+    with arguments of its own would be a second event shape, and two files claiming to be
+    the same session while differing in a byte is a discrepancy a report cannot survive.
+
+    `default=str` rather than a failure, because a value JSON cannot represent is still
+    evidence: rendering what it stringifies to keeps the record in the log instead of
+    losing the line that carried it.
+    """
+    return json.dumps(record, ensure_ascii=False, default=str) + "\n"
+
+
+def log_lines(case: Case) -> Iterator[str]:
+    """Every event in the case as unified log lines, session by session.
+
+    The viewer's own event shape, the same one `/api/sessions/<key>/events` serves and
+    `afx normalize` writes, so a log exported from a case opens in the standalone viewer
+    with nothing behind the page.
+
+    Paged through the same projection the server pages through rather than queried again
+    here, so the export and the screen group a case the same way, and yielded rather than
+    returned whole, because a case can hold more events than the workstation reading it has
+    memory.
+    """
+    for session in sessions(case):
+        offset: int | None = 0
+        while offset is not None:
+            records, offset = session_records(case, session["key"], offset=offset, limit=MAX_PAGE)
+            # Not named `record`: this module imports a timeline helper of that name, and a
+            # loop that shadowed it would read as the same thing twice.
+            for entry in records:
+                yield record_line(entry)
 
 
 # ------------------------------------------------------------------------- timeline
@@ -1144,7 +1182,7 @@ def artifacts(case: Case) -> dict[str, Any]:
 # Every one of these is the whole view, not the page on screen and not the rows a filter
 # left. A CSV that silently held what happened to be filtered at the time it was asked for
 # would be a document making a claim about a case that nobody could reproduce.
-_EXPORTS = ("timeline", "findings", "instructions", "conversations", "artifacts", "tools")
+EXPORTS = ("timeline", "findings", "instructions", "conversations", "artifacts", "tools")
 
 
 def export_csv(case: Case, name: str) -> str:
@@ -1153,8 +1191,8 @@ def export_csv(case: Case, name: str) -> str:
     Raises ApiError for a name that is not a view, so an unknown export is a 404 that says
     what exists rather than an empty file that reads as an empty case.
     """
-    if name not in _EXPORTS:
-        raise ApiError(f"no export named {name}; there is " + ", ".join(_EXPORTS))
+    if name not in EXPORTS:
+        raise ApiError(f"no export named {name}; there is " + ", ".join(EXPORTS))
     out = io.StringIO()
     if name == "timeline":
         write_timeline(case, out, "csv")
@@ -1371,6 +1409,7 @@ _EXPORT_ROWS = {
 __all__ = [
     "API_VERSION",
     "DEFAULT_PAGE",
+    "EXPORTS",
     "MAX_PAGE",
     "PREVIEW",
     "ApiError",
@@ -1381,7 +1420,9 @@ __all__ = [
     "export_csv",
     "findings",
     "instructions",
+    "log_lines",
     "projects",
+    "record_line",
     "session_records",
     "sessions",
     "timeline",

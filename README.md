@@ -178,7 +178,15 @@ uv run afx scan --case case.db                                 # run the rule pa
 uv run afx instructions --case case.db                        # what the agents were told to obey
 uv run afx sessions --case case.db                            # conversations only one store remembers
 uv run afx serve --case case.db                                # open it in a browser
+uv run afx export --case case.db --out report/                 # the same views as files
 ```
+
+`export` writes what `serve` shows, without a server: one CSV per view, named the way the
+browser names its download, plus `afx-events.jsonl`, the case as a unified agent log that
+the standalone viewer opens with nothing behind the page. Both go through the same
+projections, so a file attached to a report and a table read on screen cannot describe one
+case differently. Every view is written whole, and a view with nothing in it is written as
+a file that says so rather than left out.
 
 One agent keeps its conversations in an encrypted container. The key is the product's
 rather than the user's and this repository ships none, so those files are read only when

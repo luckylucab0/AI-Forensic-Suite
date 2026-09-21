@@ -490,6 +490,13 @@ Werten (Agent, Host, Benutzer, ob es Dateisystem-Zeitstempel sind, Arbeitsverzei
 Session-ID), und der Key in der URL ist ein Hash genau dieser sechs. Derselbe Fall, dieselben
 Keys, also übersteht ein Link in eine Session ein erneutes Einlesen.
 
+`afx export --case <db> --out <dir>` schreibt dieselben Ansichten als Dateien, ohne Server
+dazwischen: eine CSV pro Ansicht und das Ereignis-Log, das der Viewer liest, beides von den
+Projektionen oben gerendert und nicht von einem eigenen Schreiber. Genau darum ist es
+derselbe Code: Die Datei, die mit einem Bericht weggeht, und die Tabelle, die eine
+Analystin auf dem Schirm gelesen hat, sind für dieselbe Ansicht dieselben Bytes, und jede
+Ansicht wird vollständig geschrieben und nicht als die Seite, die gerade geladen war.
+
 Die Härtung gehört zur Entscheidung und ist kein Nachgedanke, denn eine forensische
 Workstation ist kein freundliches Netz: ausschliesslich Loopback ohne Option auf etwas
 anderes, ein zufälliges Pfad-Token pro Lauf, eine `Host`-Prüfung gegen DNS-Rebinding, eine

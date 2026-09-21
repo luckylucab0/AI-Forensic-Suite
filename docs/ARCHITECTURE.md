@@ -442,6 +442,13 @@ session is a group of them sharing six values (agent, host, user, whether they a
 filesystem timestamps, working directory, session id), and the key in the URL is a hash of
 exactly those. Same case, same keys, so a link into a session survives a re-ingest.
 
+`afx export --case <db> --out <dir>` writes the same views out as files with no server in
+the way: one CSV per view and the event log the viewer reads, both rendered by the
+projections above rather than by a writer of its own. That is the point of it being the
+same code: the file that leaves with a report and the table an analyst read on screen are
+the same bytes for the same view, and every view is written whole rather than as the page
+that happened to be loaded.
+
 The hardening is part of the decision rather than a later concern, because a forensic
 workstation is not a friendly network: loopback only with no option to change it, a random
 per-run path token, a `Host` check against DNS rebinding, an `Origin` check, GET and HEAD
