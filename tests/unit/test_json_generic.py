@@ -286,3 +286,92 @@ def test_a_document_that_will_not_parse_carries_its_text(tmp_path: Path) -> None
     assert events[0].kind == "unparsed.record"
     assert "not valid JSON" in (events[0].parse_problem or "")
     assert "Bash(" in events[0].raw["text"]
+
+
+# ------------------------------- the rest of the dialect these settings files are in
+
+# The relaxed reading exists because a strict one reported the most important
+# configuration files in this catalogue as unreadable. Line comments and a trailing comma
+# are tested above and they are the common shapes; what follows are the ones that were
+# not run at all, and each of them would take a whole settings file out of a case: the
+# permissions, the tool servers and the endpoints in it reach no event and no rule.
+
+
+def test_a_block_comment_is_removed_and_the_document_still_reads(tmp_path: Path) -> None:
+    """The other comment the dialect allows, and the one nothing had ever removed."""
+    path = tmp_path / "settings.json"
+    path.write_text(
+        "{\n"
+        "  /* the sandbox is off\n"
+        "     for the demo */\n"
+        '  "permissions": {"allow": ["Bash(*)"]}\n'
+        "}\n",
+        encoding="utf-8",
+        newline="",
+    )
+    events = parse(path, "claude_code.user_settings")
+    assert any("Bash(*)" in json.dumps(event.raw) for event in events)
+    assert "block comments removed" in " ".join(event.parse_problem or "" for event in events)
+
+
+def test_a_block_comment_nobody_closed_takes_the_rest_of_the_file(tmp_path: Path) -> None:
+    """What a settings file killed mid-write looks like.
+
+    There is no honest reading of what comes after an unclosed comment, so it is treated
+    as comment to the end. That usually leaves a document that will not parse either, and
+    then the file reaches the case as its own text rather than as nothing, which is the
+    half of this the strict reader used to get wrong.
+    """
+    path = tmp_path / "settings.json"
+    path.write_text('{\n  "a": 1,\n  /* and then the process died\n', encoding="utf-8", newline="")
+    events = parse(path, "claude_code.user_settings")
+    assert events
+    said = " ".join(event.parse_problem or "" for event in events)
+    assert "not valid JSON" in said or "block comments removed" in said
+    assert any("and then the process died" in json.dumps(event.raw) for event in events), (
+        "the text that was written has to be in the case even when nothing could read it"
+    )
+
+
+def test_a_comment_marker_inside_a_string_is_not_a_comment(tmp_path: Path) -> None:
+    """Both spellings, and an escaped quote before one of them.
+
+    A reader that removed these would truncate a URL, a Windows path or a regular
+    expression out of the middle of a configuration and leave a document that still
+    parses, which is the worst shape this can take: no error anywhere and a value that is
+    not the one on the endpoint.
+    """
+    path = tmp_path / "settings.json"
+    # A trailing comma as well, so the strict reader refuses the document and the relaxed
+    # one actually runs. Without it this file parses on the first attempt and the code
+    # under test is never reached, which is how these branches stayed unexecuted.
+    path.write_text(
+        "{\n"
+        '  "url": "https://example.org/a//b",\n'
+        '  "glob": "/src/**/*.py",\n'
+        '  "pattern": "a/*not a comment*/b",\n'
+        '  "quoted": "she said \\"//\\" and meant it",\n'
+        "}\n",
+        encoding="utf-8",
+        newline="",
+    )
+    events = parse(path, "claude_code.user_settings")
+    body = json.dumps([event.raw for event in events])
+    for value in ("example.org/a//b", "/src/**/*.py", "a/*not a comment*/b", "she said"):
+        assert value in body, value
+    assert "trailing comma allowed" in " ".join(event.parse_problem or "" for event in events), (
+        "the relaxed reading has to have run, or this proves nothing about it"
+    )
+
+
+def test_a_file_that_is_not_utf8_is_reported_rather_than_read_as_replacements(
+    tmp_path: Path,
+) -> None:
+    """A settings file in another encoding, or a binary one under a name this parser
+    claims. Read with replacement characters it would be a document full of question
+    marks that still parses, and the case would carry values nobody wrote."""
+    path = tmp_path / "settings.json"
+    path.write_bytes(b'{"a": "\xff\xfe not utf 8"}')
+    events = parse(path, "claude_code.user_settings")
+    assert events
+    assert "did not decode as UTF-8" in " ".join(event.parse_problem or "" for event in events)
