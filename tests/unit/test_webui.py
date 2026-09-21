@@ -14,6 +14,7 @@ nothing leaves the machine.
 
 from __future__ import annotations
 
+import contextlib
 import http.client
 import json
 import re
@@ -862,14 +863,21 @@ def _raw_exchange(port: int, request: bytes) -> str:
     """One request written straight onto the socket, and everything that comes back.
 
     http.client cannot send a request this server should reject, because it builds a
-    well-formed one, so these go out as bytes.
+    well-formed one, so these go out as bytes. Both halves tolerate the connection being
+    reset: the server answers a request it cannot parse and closes at once, and how much
+    of the write has been accepted by then is a property of the platform's network stack
+    rather than of this server. Whatever did come back is what the caller asserts on.
     """
     connection = socket.create_connection(("127.0.0.1", port), timeout=10)
+    raw = b""
     try:
-        connection.sendall(request)
-        raw = b""
+        with contextlib.suppress(BrokenPipeError, ConnectionResetError):
+            connection.sendall(request)
         while True:
-            chunk = connection.recv(4096)
+            try:
+                chunk = connection.recv(4096)
+            except ConnectionResetError:
+                break
             if not chunk:
                 break
             raw += chunk
@@ -884,12 +892,18 @@ def test_a_request_the_base_class_rejects_still_carries_the_security_headers(
     """The base class answers a request it cannot parse before any of this server's code
     runs. Without the override that hands that answer back through the same writer, it
     would be the one response in the server with no content security policy and no nosniff
-    on it, and it is reachable by anybody who can open the socket. An over-long header line
-    is the way to get there with the request line itself intact.
+    on it, and it is reachable by anybody who can open the socket.
+
+    More headers than the parser accepts is the way in, rather than one enormous header
+    line. Both are rejected the same way and with the request line intact, which is what
+    this needs, but the long line is a hundred kilobytes the server stops reading as soon
+    as it has decided: on macOS the write is then reset before it finishes and the client
+    never gets to read the answer it is asking about. A hundred and one short headers fit
+    in the socket buffer, so the exchange completes everywhere.
     """
+    headers = b"".join(b"X-Filler-%d: 1\r\n" % index for index in range(101))
     head = _raw_exchange(
-        client.port,
-        b"GET /api/health HTTP/1.1\r\nHost: 127.0.0.1\r\nX-Long: " + b"a" * 100_000 + b"\r\n\r\n",
+        client.port, b"GET /api/health HTTP/1.1\r\nHost: 127.0.0.1\r\n" + headers + b"\r\n"
     )
     assert head.startswith("HTTP/1."), head[:200]
     assert " 431 " in head.splitlines()[0] or " 400 " in head.splitlines()[0], head[:200]
