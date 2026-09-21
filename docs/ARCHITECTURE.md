@@ -456,6 +456,12 @@ whose dependency tree would have to be vendored.
 **Deterministic output.** Same input, same output, stable ordering everywhere, timestamps
 in UTC ISO 8601 with the endpoint's own timezone recorded once in the manifest. Two runs
 producing different bytes would make a diff meaningless and a hash unusable as a reference.
+The claim is tested rather than intended, and the test has to leave the process to do it:
+Python seeds string hashing at interpreter start, so the iteration order of a set differs
+between runs and a pipeline that lets that order reach its output stays non-deterministic
+through a suite that runs in one process. So one profile is read twice, in two processes
+with different PYTHONHASHSEED values, and the timeline and the findings are compared byte
+for byte.
 
 **Read-only evidence.** The collector and the analyzer never modify, move, rename or delete
 a source artifact and never execute an agent binary on the target. Version information is
