@@ -16,6 +16,8 @@ from __future__ import annotations
 
 import http.client
 import json
+import re
+import socket
 import sqlite3
 import subprocess
 import sys
@@ -775,3 +777,169 @@ console.log(JSON.stringify({
     assert result["rows"] >= 1
     assert result["userMsgs"] >= 1
     assert result["title"]
+
+
+# --------------------------------------------- every route, reached over the socket
+
+# The tests above call the projections directly, which is the right way to check what
+# they return and says nothing about whether the server ever calls them. Between the two
+# sit the routing table, the token prefix, the query parser and the JSON writer, and a
+# handler that raised there would give the analyst an empty panel rather than an error
+# anybody notices. Four of the twelve routes had never been requested over the socket.
+#
+# So one sample request per route, and a guard that the table names every route there is,
+# because a route added without a sample is a panel nothing has ever loaded.
+
+
+def _samples(case: Case) -> dict[str, str]:
+    """One concrete path per route pattern, with real identifiers where a route takes one."""
+    session = api.sessions(case)[0]["key"]
+    event = api.timeline(case, limit=1)["rows"][0]["event_id"]
+    return {
+        r"^/$": "/",
+        r"^/index\.html$": "/index.html",
+        r"^/api/case$": "/api/case",
+        r"^/api/projects$": "/api/projects",
+        r"^/api/sessions/(?P<key>[0-9a-f]{32})/events$": f"/api/sessions/{session}/events",
+        r"^/api/events/(?P<event>[0-9a-f]{32})$": f"/api/events/{event}",
+        r"^/api/timeline$": "/api/timeline",
+        r"^/api/findings$": "/api/findings",
+        r"^/api/instructions$": "/api/instructions",
+        r"^/api/corroboration$": "/api/corroboration",
+        r"^/api/artifacts$": "/api/artifacts",
+        r"^/api/health$": "/api/health",
+    }
+
+
+def test_the_sample_table_names_every_route_the_server_has(case: Case) -> None:
+    served = {pattern.pattern for pattern, _ in webui.ROUTES}
+    assert set(_samples(case)) == served, {
+        "never requested": sorted(served - set(_samples(case))),
+        "not a route": sorted(set(_samples(case)) - served),
+    }
+
+
+def test_every_route_answers_with_something(client: Client, case: Case) -> None:
+    """A 200 and a body with content in it. An endpoint that answers 500, or 200 with
+    nothing, is a view that reads as a case holding nothing of that kind."""
+    for pattern, path in sorted(_samples(case).items()):
+        status, headers, body = client.request(path)
+        assert status == 200, (pattern, path, status, body[:200])
+        assert body, (pattern, path, "an empty body is not an answer")
+        if path.startswith("/api/"):
+            assert "json" in headers["Content-Type"], (path, headers["Content-Type"])
+
+
+def test_an_event_id_that_names_nothing_is_a_404_and_says_what_is_missing(
+    client: Client,
+) -> None:
+    """Not a 500 and not an empty record. An analyst following a link from a finding into
+    an event that is no longer in the case has to be told which of the two happened."""
+    status, _, body = client.request("/api/events/" + "b" * 32)
+    assert status == 404
+    assert b"b" * 32 in body or b"event" in body.lower(), body[:200]
+
+
+def test_a_paging_parameter_that_is_not_a_number_shows_the_first_page(
+    client: Client,
+) -> None:
+    """A hand-edited URL bar is not an attack and must not be an error page: every
+    projection bounds its own limits, so the tolerant reading is the safe one."""
+    status, _, body = client.request("/api/timeline?offset=nonsense&limit=whatever")
+    assert status == 200, body[:200]
+    assert json.loads(body)["rows"], "the first page of a case that has events"
+
+
+# ----------------------------------------------- the answers given when something is wrong
+
+# Every hardening item above is pinned by a test that makes a well-formed request. The
+# responses given when the request is not well formed were not, and those are the ones an
+# attacker sees first: the server's own docstring says so about the malformed-request path
+# and nothing had ever taken it.
+
+
+def _raw_exchange(port: int, request: bytes) -> str:
+    """One request written straight onto the socket, and everything that comes back.
+
+    http.client cannot send a request this server should reject, because it builds a
+    well-formed one, so these go out as bytes.
+    """
+    connection = socket.create_connection(("127.0.0.1", port), timeout=10)
+    try:
+        connection.sendall(request)
+        raw = b""
+        while True:
+            chunk = connection.recv(4096)
+            if not chunk:
+                break
+            raw += chunk
+    finally:
+        connection.close()
+    return raw.decode("latin-1")
+
+
+def test_a_request_the_base_class_rejects_still_carries_the_security_headers(
+    client: Client,
+) -> None:
+    """The base class answers a request it cannot parse before any of this server's code
+    runs. Without the override that hands that answer back through the same writer, it
+    would be the one response in the server with no content security policy and no nosniff
+    on it, and it is reachable by anybody who can open the socket. An over-long header line
+    is the way to get there with the request line itself intact.
+    """
+    head = _raw_exchange(
+        client.port,
+        b"GET /api/health HTTP/1.1\r\nHost: 127.0.0.1\r\nX-Long: " + b"a" * 100_000 + b"\r\n\r\n",
+    )
+    assert head.startswith("HTTP/1."), head[:200]
+    assert " 431 " in head.splitlines()[0] or " 400 " in head.splitlines()[0], head[:200]
+    for name, value in webui.SECURITY_HEADERS:
+        assert f"{name}: {value}" in head, (name, head[:400])
+
+
+def test_a_request_line_too_broken_to_have_a_version_gets_a_body_and_no_headers(
+    client: Client,
+) -> None:
+    """A limit of the protocol rather than of this server, written down so nobody reads
+    the test above as covering it.
+
+    A request line the base class cannot parse at all leaves the version at HTTP/0.9, and
+    that version has no headers to send, so the answer is a bare body. No browser speaks
+    it. What matters is that the body is the same generic error as everywhere else: no
+    token, no path on the analyst's machine, nothing about the case.
+    """
+    body = _raw_exchange(client.port, b"GET\r\n\r\n")
+    assert '"status": 400' in body, body[:200]
+    assert TOKEN not in body
+    assert "Traceback" not in body and ".db" not in body, body[:200]
+
+
+def test_a_query_string_past_the_limit_is_refused_by_length(client: Client) -> None:
+    """Refused for what it is rather than parsed and then found to be nonsense, so the
+    parser never sees a megabyte of it."""
+    status, _, _ = client.request("/api/timeline?agent=" + "a" * (webui.MAX_QUERY + 1))
+    assert status == 414
+
+
+def test_a_handler_that_raises_becomes_an_error_and_not_a_traceback(
+    client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A traceback on the socket would name paths on the analyst's machine and the shape
+    of the case, and it would do it to whoever asked. Nothing had ever made one happen."""
+
+    def explode(*_: object) -> None:
+        raise RuntimeError("the secret path is /home/alice/cases/one.db")
+
+    # The routing table holds the function object, so replacing the module attribute
+    # would leave the table pointing at the original. The table is what is swapped.
+    monkeypatch.setattr(webui, "ROUTES", ((re.compile(r"^/api/health$"), explode),))
+    status, _, body = client.request("/api/health")
+    assert status == 500
+    assert b"Traceback" not in body and b"/home/alice" not in body, body[:400]
+
+
+def test_a_case_that_is_not_there_fails_at_the_command_line(tmp_path: Path) -> None:
+    """Opened once before the socket exists, so a wrong path is a message in the terminal
+    rather than a 503 the analyst meets in a browser with a case they think is loaded."""
+    with pytest.raises(CaseError):
+        webui.build(tmp_path / "no-such-case.db", port=0, token=TOKEN)
