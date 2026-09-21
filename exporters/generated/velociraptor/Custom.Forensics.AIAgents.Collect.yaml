@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 6d280a25de64
+# Catalogue digest: b40636550a30
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1278,6 +1278,7 @@ sources:
     ollama,ollama.backup_dir,C:/Users/*/.ollama/backup/**
     ollama,ollama.cli_config,C:/Users/*/.ollama/config.json
     ollama,ollama.cli_config,C:/Users/*/.ollama/config/config.json
+    ollama,ollama.cli_config,C:/Users/*/.ollama/server.json
     ollama,ollama.cli_prompt_history,C:/Users/*/.ollama/history
     ollama,ollama.env_overrides,C:/Users/*/.bashrc
     ollama,ollama.env_overrides,C:/Users/*/.zshrc
@@ -3769,8 +3770,10 @@ sources:
     ollama,ollama.backup_dir,/var/root/.ollama/backup/**
     ollama,ollama.cli_config,/Users/*/.ollama/config.json
     ollama,ollama.cli_config,/Users/*/.ollama/config/config.json
+    ollama,ollama.cli_config,/Users/*/.ollama/server.json
     ollama,ollama.cli_config,/var/root/.ollama/config.json
     ollama,ollama.cli_config,/var/root/.ollama/config/config.json
+    ollama,ollama.cli_config,/var/root/.ollama/server.json
     ollama,ollama.cli_prompt_history,/Users/*/.ollama/history
     ollama,ollama.cli_prompt_history,/var/root/.ollama/history
     ollama,ollama.env_overrides,/Users/*/.bashrc
@@ -6634,8 +6637,10 @@ sources:
     ollama,ollama.backup_dir,/root/.ollama/backup/**
     ollama,ollama.cli_config,/home/*/.ollama/config.json
     ollama,ollama.cli_config,/home/*/.ollama/config/config.json
+    ollama,ollama.cli_config,/home/*/.ollama/server.json
     ollama,ollama.cli_config,/root/.ollama/config.json
     ollama,ollama.cli_config,/root/.ollama/config/config.json
+    ollama,ollama.cli_config,/root/.ollama/server.json
     ollama,ollama.cli_prompt_history,/home/*/.ollama/history
     ollama,ollama.cli_prompt_history,/root/.ollama/history
     ollama,ollama.env_overrides,/etc/systemd/system/ollama.service

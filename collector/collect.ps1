@@ -9329,7 +9329,9 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "~/.ollama/config.json",
-                        "~/.ollama/config/config.json"
+                        "~/.ollama/config/config.json",
+                        "%USERPROFILE%\\.ollama\\server.json",
+                        "~/.ollama/server.json"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -10618,6 +10620,9 @@ $EmbeddedCatalogueJson = @'
                         "<project>/.clinerules-<mode>",
                         "<project>/.roo/rules-<mode>/",
                         "<project>/.roo/rules/",
+                        "<project>/**/.roo/rules-<mode>/",
+                        "<project>/**/.roo/rules/",
+                        "<project>/.agents/",
                         "<project>/.rooignore",
                         "<project>/.roorules",
                         "<project>/.roorules-<mode>",
@@ -11930,7 +11935,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "7dd0b4cfcc1df3029d526bf1cdb4fc347deb0244246d89eee2451934c9029bd8"
+    "sha256": "62043313b22fa3603cedd75d6a9c6e2ffc77590f84d271044d2c487c6c01df7d"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

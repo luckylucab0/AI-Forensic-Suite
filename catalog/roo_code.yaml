@@ -135,6 +135,9 @@ artifacts:
   - <project>/.clinerules-<mode>
   - <project>/.roo/rules-<mode>/
   - <project>/.roo/rules/
+  - <project>/**/.roo/rules-<mode>/
+  - <project>/**/.roo/rules/
+  - <project>/.agents/
   - <project>/.rooignore
   - <project>/.roorules
   - <project>/.roorules-<mode>
@@ -154,6 +157,10 @@ artifacts:
     Precedence verified from custom-instructions.ts: it first checks '.roo/rules/ directories in order (global, project-local, and optionally subfolders)' and returns them under the header 'Rules from .roo directories'; only if none are found does it 'Fall back to existing behavior for legacy .roorules/.clinerules files' with `const ruleFiles = [".roorules", ".clinerules"]`. Mode-specific equivalents: `.roo/rules-${mode}/` then `.roorules-${mode}` then `.clinerules-${mode}`. Separately it loads agent rules files with `const filenames = ["AGENTS.md", "AGENT.md"]` plus "AGENTS.local.md" for 'personal overrides (not checked in to version control)' - AGENTS.local.md is therefore a high-value uncommitted artifact that will NOT be in git history. .rooignore appears as options.rooIgnoreInstructions (a user-authored file-access boundary). In a monorepo, .roo dirs in SUBDIRECTORIES are also discovered - glob recursively, not just at the repo root.
 
     The verification pass found only a pre-rendered instruction string on the cited page. The ignore controller builds the project-relative pattern, so the path is real but unsourced where this entry points.
+
+    Two additions from reading services/roo-config/index.ts end to end. The product does not look for its directory in the working copy's root alone: discoverRooDirectoriesInWorkspace runs a workspace-wide search for '**/.roo/**' and returns every one it finds at any depth, sorted, so in a monorepo the rules of a package apply when the agent works in it. The catalogue named the root directory only, which means a collection of such a repository took the rules nobody had put in a package and left the ones somebody had.
+
+    And the project half of the vendor-neutral directory: getProjectAgentsDirectoryForCwd(cwd) is join(cwd, '.agents'), the counterpart of the global one this entry's sibling already carries. The vendor's comment calls it a shared directory for agent skills across different AI coding tools, which is the reason it matters twice over: a skill there is read by more than one product, so it explains behaviour in an agent whose own directory holds nothing.
   parser: instructions
 - id: roo_code.tasks
   category: transcript

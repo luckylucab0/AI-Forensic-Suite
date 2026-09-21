@@ -115,6 +115,8 @@ artifacts:
   paths:
   - ~/.ollama/config.json
   - ~/.ollama/config/config.json
+  - '%USERPROFILE%\.ollama\server.json'
+  - ~/.ollama/server.json
   format: json
   sensitivity: normal
   collect_priority: normal
@@ -128,6 +130,8 @@ artifacts:
     Confirmed via GitHub code search content match against cmd/config/config.go and cmd/config/config_test.go rather than a direct page fetch. The Integrations key is interesting: sibling files cmd/launch/claude_desktop_test.go and app/cmd/app/codex_app_darwin_test.go show Ollama now records that a user launched Claude Desktop / Codex Desktop integrations, i.e. Ollama's own store is cross-agent evidence.
 
     Record structure: Code comment reads: "migrateConfig moves the config from the legacy path to ~/.ollama/config.json". Holds an `Integrations` object (cloud/agent integrations) plus unknown top-level fields that are preserved.
+
+    server.json is read by envconfig at startup, from join(UserHomeDir, '.ollama', 'server.json'), and the struct behind it holds one field: disable_ollama_cloud. So it is the file that says whether this installation was configured to keep everything on the machine, which is the question an analyst has about a local model runner. Absent means the default, which is that the cloud was not disabled.
   parser: json_generic
 - id: ollama.env_overrides
   category: config

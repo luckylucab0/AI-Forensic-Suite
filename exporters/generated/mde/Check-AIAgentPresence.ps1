@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 6d280a25de64
+# Catalogue digest: b40636550a30
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1078,6 +1078,7 @@ $targets = @(
     @{ Agent = 'ollama'; Id = 'ollama.backup_dir'; Path = '$profile\.ollama\backup' }
     @{ Agent = 'ollama'; Id = 'ollama.cli_config'; Path = '$profile\.ollama\config.json' }
     @{ Agent = 'ollama'; Id = 'ollama.cli_config'; Path = '$profile\.ollama\config\config.json' }
+    @{ Agent = 'ollama'; Id = 'ollama.cli_config'; Path = '$profile\.ollama\server.json' }
     @{ Agent = 'ollama'; Id = 'ollama.cli_prompt_history'; Path = '$profile\.ollama\history' }
     @{ Agent = 'ollama'; Id = 'ollama.env_overrides'; Path = '$profile\.bashrc' }
     @{ Agent = 'ollama'; Id = 'ollama.env_overrides'; Path = '$profile\.zshrc' }

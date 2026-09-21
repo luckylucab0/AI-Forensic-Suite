@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 6d280a25de64
+// Catalogue digest: b40636550a30
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -2241,8 +2241,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "ollama", "ollama.backup_dir", ".ollama\\backup",
     "ollama", "ollama.cli_config", ".ollama/config.json",
     "ollama", "ollama.cli_config", ".ollama/config/config.json",
+    "ollama", "ollama.cli_config", ".ollama/server.json",
     "ollama", "ollama.cli_config", ".ollama\\config.json",
     "ollama", "ollama.cli_config", ".ollama\\config\\config.json",
+    "ollama", "ollama.cli_config", ".ollama\\server.json",
     "ollama", "ollama.cli_prompt_history", ".ollama/history",
     "ollama", "ollama.cli_prompt_history", ".ollama\\history",
     "ollama", "ollama.env_overrides", "/etc/systemd/system/ollama.service",
