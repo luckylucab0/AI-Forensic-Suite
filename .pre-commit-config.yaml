@@ -112,6 +112,13 @@ repos:
         pass_filenames: false
         files: '^(catalog/|rules/collection_integrity/|scripts/gen_relocation_rule\.py)'
 
+      - id: layout-probes
+        name: the measurement probe lists current with the catalogue
+        entry: uv run python scripts/gen_layout_probes.py --check
+        language: system
+        pass_filenames: false
+        files: '^(catalog/|scripts/measure_layout\.(sh|ps1)|scripts/gen_layout_probes\.py)'
+
       - id: rule-self-test
         name: every rule agrees with its own samples
         entry: uv run agentforensics scan --self-test

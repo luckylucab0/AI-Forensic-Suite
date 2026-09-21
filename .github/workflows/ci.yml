@@ -106,6 +106,13 @@ jobs:
       - name: The relocation rule current with the catalogue
         run: uv run python scripts/gen_relocation_rule.py --check
 
+      # The probe lists the two measurement scripts hand to an operator. A stale list is
+      # the same defect one step earlier than a stale exporter: the operator measures last
+      # month's locations, the catalogue is confirmed against them, and the confirmation is
+      # of the wrong thing. It cost a real measurement to learn that, so it is checked.
+      - name: The measurement probe lists current with the catalogue
+        run: uv run python scripts/gen_layout_probes.py --check
+
       # A rule that fires on everything passes every positive sample it has, so the
       # samples are only worth anything with the negative ones beside them, which the
       # loader enforces. This step is what makes them run outside the test suite too, so a
