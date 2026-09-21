@@ -287,6 +287,15 @@ it cannot be rewritten *quietly*.
   threshold is high enough that a document written on a machine with another code page is
   still read as the document it is.
 
+  **A file nothing could read** is a record of its own, in every one of these readers. A
+  reader handed content that is not the format its catalogue entry claims returns the lines
+  it could make nothing of, with the first of them as the locator and a sentence saying what
+  it was looking for and did not find (ADR 0039). A suite-wide test hands every reader such
+  a file and fails on silence, because a case with no events from an agent reads as an agent
+  that was never used, and that is the one conclusion this tool must not invite. An empty
+  file is the exception and needs no record: the artifact row says it was collected and the
+  zero beside it is true.
+
 - `model/` the unified event model and the SQLite case schema
 - `unified/` the event model on the wire: the JSON Lines format and its schema, plus
   the normalizer that turns a collection into one log without building a case

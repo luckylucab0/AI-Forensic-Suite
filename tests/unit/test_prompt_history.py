@@ -167,6 +167,81 @@ def test_a_history_in_a_profile_claims_no_project(tmp_path: Path) -> None:
     assert event.project_path is None
 
 
+def test_a_file_with_no_entry_in_it_says_so(tmp_path: Path) -> None:
+    """The failure this reader used to have, and the reason ADR 0039 exists.
+
+    A file at this path whose content is not this format produced nothing at all: no event,
+    and so no row in a timeline. An analyst filtering a case to what people typed saw an
+    aider with no prompts, which is what an aider nobody used also looks like. Now the
+    lines are in the case as a record nothing could read, with the reason on it.
+    """
+    path = write(tmp_path / ".aider.input.history", "the quick brown fox\njumps over\n")
+
+    events = parse(path, AIDER)
+
+    assert len(events) == 1
+    assert events[0].kind == "unparsed.record"
+    assert "holds no record of that format" in (events[0].parse_problem or "")
+    # The content, not a count of lines: whether this is the wrong path, a file somebody
+    # replaced or something else is a question only the lines themselves answer.
+    assert events[0].payload["text"] == "the quick brown fox\njumps over"
+    assert events[0].provenance.locator == "line:1"
+
+
+def test_a_file_of_headers_with_no_prompt_under_them_says_so(tmp_path: Path) -> None:
+    """Every line is a shape this format writes and there is still no prompt in it.
+
+    It is the one file that reaches the end of this reader with nothing to report line by
+    line, so it is the case the last statement in the reader is there for. A truncated copy
+    that caught the stamps and none of the content looks like this.
+    """
+    path = write(tmp_path / ".aider.input.history", "\n# 2026-09-05 08:00:00.123456\n\n")
+
+    events = parse(path, AIDER)
+
+    assert [event.kind for event in events] == ["unparsed.record"]
+    assert "holds no record of that format" in (events[0].parse_problem or "")
+
+
+def test_a_stray_line_between_two_prompts_is_reported_and_keeps_both(tmp_path: Path) -> None:
+    """A line the library that owns this file does not write, in a file that parses.
+
+    Both prompts still come out, in order, and the lines in between are a record of their
+    own rather than something that only closed the entry above them. The three events read
+    downwards through the file, because a case ordered by locator is how somebody checks a
+    finding against the bytes.
+    """
+    path = write(
+        tmp_path / ".aider.input.history",
+        "# 2026-09-05 08:00:00.123456\n"
+        "+first prompt\n"
+        "\x00 something else wrote this\n"
+        "# 2026-09-05 09:00:00.123456\n"
+        "+second prompt\n",
+    )
+
+    events = parse(path, AIDER)
+
+    assert [event.kind for event in events] == [
+        "prompt.history",
+        "unparsed.record",
+        "prompt.history",
+    ]
+    assert [event.provenance.locator for event in events] == ["line:2", "line:3", "line:5"]
+    assert events[1].payload["text"] == "\x00 something else wrote this"
+    assert "neither an entry nor the header of one" in (events[1].parse_problem or "")
+    assert events[2].payload["text"] == "second prompt"
+
+
+def test_a_history_of_blank_lines_is_still_silence(tmp_path: Path) -> None:
+    """The one file silence is the true answer for, next to an empty one.
+
+    Nothing was in it, the artifact row says it was collected, and a record claiming
+    unreadable content would be a claim about bytes that are not there.
+    """
+    assert parse(write(tmp_path / ".aider.input.history", "\n\n\n"), AIDER) == []
+
+
 # ---------------------------------------------------------------------- rustyline
 
 

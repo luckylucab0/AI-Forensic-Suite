@@ -19,6 +19,11 @@ https://raw.githubusercontent.com/prompt-toolkit/python-prompt-toolkit/master/sr
 The timestamp is `datetime.now()`, so it is the endpoint's local time with no zone on it.
 It is read the way this suite reads every naive timestamp, as UTC with the note saying so,
 because the alternatives are to drop the record or to apply the analyst's own zone.
+A line that is neither content, a stamp nor blank is not something that library writes, so a
+run of them is reported rather than only closing the entry above it, and a file with no
+content line anywhere is reported as holding no prompt in this format. Both statements exist
+because the alternative is silence, and silence about a prompt history reads as a person who
+never typed anything.
 
 **Amazon Q's chat prompt history** is a rustyline file, and rustyline has two formats. A
 file whose first line is `#V2` is the multiline-aware one: every later line is one entry
@@ -46,7 +51,14 @@ from __future__ import annotations
 from collections.abc import Iterator
 
 from agentforensics.model import Event
-from agentforensics.parsers.base import ParseContext, TextLine, normalise_ts, text_lines
+from agentforensics.parsers.base import (
+    NO_RECORD,
+    ParseContext,
+    TextLine,
+    normalise_ts,
+    text_lines,
+    unreadable_lines,
+)
 
 # rustyline writes this as the first line of a file whose entries are escaped.
 RUSTYLINE_V2 = "#V2"
@@ -67,6 +79,24 @@ SHAPES = {
 # the project the prompts were typed in. That is the only project attribution these files
 # carry, and it is worth having: a prompt history in a repository says which repository.
 IN_THE_PROJECT = frozenset({"aider.input_history"})
+
+
+# Said on a run of lines in an aider history that is neither an entry nor the header of
+# one. prompt_toolkit writes three shapes and only three: a blank line, a `# ` stamp, and a
+# `+` line per line of the prompt. Anything else was not written by the library that owns
+# the file, so it is a partial write, a file somebody edited, or another program appending
+# to it, and all three are worth a sentence. This reader used to let such a line close the
+# open entry and say nothing about the line itself.
+STRAY = (
+    "these lines are neither an entry nor the header of one: this format writes an entry "
+    "as a '# ' stamp and then one '+' line per line of the prompt, and a line that is "
+    "neither ends whatever entry was open. They are kept here because the library that "
+    "writes this file does not produce them"
+)
+
+# How this format announces the content of an entry, for the sentence a file with none of
+# it gets.
+MARKER = "begins with '+', which is how every line of every entry in this format begins"
 
 
 class PromptHistoryParser:
@@ -144,6 +174,17 @@ def _prompt_toolkit(context: ParseContext, lines: list[TextLine]) -> Iterator[Ev
     problems: list[str] = []
     start = 0
     stamp: str | None = None
+    # A run of lines this format does not contain, held until the run ends so that it is
+    # one statement about a damaged region rather than one per line.
+    stray: list[TextLine] = []
+    reported = 0
+    # Whether there is an entry anywhere in this file, read before the file is walked. It
+    # decides which sentence a run of lines that is not an entry gets, and the two are
+    # different findings: lines around entries are a damaged region in a history, and the
+    # same lines with no entry anywhere mean the file at this path is not a history at all.
+    # Knowable in advance because the reader holds the whole file, and worth knowing in
+    # advance because the first run is reported before the last entry has been met.
+    any_entry = any(line.text.startswith("+") for line in lines)
 
     def flush() -> Iterator[Event]:
         if not pending:
@@ -162,8 +203,19 @@ def _prompt_toolkit(context: ParseContext, lines: list[TextLine]) -> Iterator[Ev
             note=" ".join([part for part in [note, *problems] if part]) or None,
         )
 
+    def strays() -> Iterator[Event]:
+        """Whatever has been held, in the place in the file where it sits."""
+        nonlocal stray, reported
+        if stray:
+            reported += 1
+            yield from unreadable_lines(context, stray, STRAY if any_entry else _nothing(lines))
+            stray = []
+
     for line in lines:
         if line.text.startswith("+"):
+            # Before the entry, so the events leave this reader in the order the file has
+            # them and a locator read downwards still walks forwards through the file.
+            yield from strays()
             if not pending:
                 start = line.number
             pending.append(line.text[1:])
@@ -176,7 +228,22 @@ def _prompt_toolkit(context: ParseContext, lines: list[TextLine]) -> Iterator[Ev
         # Only a `# ` line is a stamp. Every other non-content line simply ends the entry,
         # which is what the library does with it.
         stamp = line.text[1:].strip() if line.text.startswith("#") else None
+        if line.text.startswith("#") or not line.text.strip():
+            yield from strays()
+        else:
+            stray.append(line)
     yield from flush()
+    yield from strays()
+    if not any_entry and not reported:
+        # No entry and nothing stray either, which leaves a file of stamps and blank lines:
+        # readable, in this format, and holding no prompt. Silence for it would read as an
+        # agent nobody typed at.
+        yield from unreadable_lines(context, lines, _nothing(lines))
+
+
+def _nothing(lines: list[TextLine]) -> str:
+    """The sentence for a file at this path that holds no entry of this format."""
+    return NO_RECORD.format(what="an aider prompt history", lines=len(lines), marker=MARKER)
 
 
 def _rustyline(context: ParseContext, lines: list[TextLine]) -> Iterator[Event]:

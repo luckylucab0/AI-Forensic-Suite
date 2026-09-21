@@ -191,6 +191,79 @@ def test_the_two_escapes_are_undone_in_one_pass(tmp_path: Path) -> None:
     assert commands(events) == ["printf 'a\\nb'"]
 
 
+def test_a_file_with_no_record_in_it_says_so(tmp_path: Path) -> None:
+    """The failure this reader used to have, and the reason ADR 0039 exists.
+
+    fish announces every entry with `- cmd:`, and this reader skipped everything in front
+    of the first one. A file at this path with no such line was all before-the-first-record,
+    so the reader ran to the end of it and produced nothing: a shell with no commands in the
+    case, which is what a shell nobody typed into also looks like.
+    """
+    events = parse(write(tmp_path / "fish_history", "the quick brown fox\njumps over\n"), FISH)
+
+    assert len(events) == 1
+    assert events[0].kind == "unparsed.record"
+    assert "holds no record of that format" in (events[0].parse_problem or "")
+    assert events[0].payload["text"] == "the quick brown fox\njumps over"
+    assert events[0].provenance.locator == "line:1"
+
+
+def test_a_file_that_begins_part_way_through_a_record_reports_the_remains(
+    tmp_path: Path,
+) -> None:
+    """What a rotated history, a partial copy or an edited file leaves at the top.
+
+    The fields are there and the command they belong to is not, which is a different
+    finding from a file that is not a fish history at all: something was run and this file
+    no longer says what. Both readings need the lines, so they are in the event, and the
+    records below them are read as usual.
+    """
+    events = parse(
+        write(
+            tmp_path / "fish_history",
+            "  when: 1788911000\n"
+            "  paths:\n"
+            "    - src/app/main.py\n"
+            "- cmd: git status\n"
+            "  when: 1788912100\n",
+        ),
+        FISH,
+    )
+
+    assert [event.kind for event in events] == ["unparsed.record", "command.exec"]
+    assert events[0].provenance.locator == "line:1"
+    assert "in front of the first '- cmd:' line" in (events[0].parse_problem or "")
+    assert events[0].raw["lines"] == ["  when: 1788911000", "  paths:", "    - src/app/main.py"]
+    assert commands(events[1:]) == ["git status"]
+
+
+def test_a_history_of_blank_lines_is_still_silence(tmp_path: Path) -> None:
+    """The one file silence is the true answer for, next to an empty one.
+
+    Nothing was in it, the artifact row says it was collected, and a record claiming
+    unreadable content would be a claim about bytes that are not there.
+    """
+    assert parse(write(tmp_path / "fish_history", "\n\n"), FISH) == []
+    assert parse(write(tmp_path / "fish_history", ""), FISH) == []
+
+
+def test_a_fragment_that_did_not_decode_says_so_once(tmp_path: Path) -> None:
+    """The decode note belongs on the record, not once per line of it.
+
+    Every line of a file that is not text carries the same note, and a sentence repeated
+    forty times is a sentence nobody reads to the end of.
+    """
+    path = tmp_path / "fish_history"
+    path.write_bytes(b"\xff\xfe one\n\xff\xfe two\n")
+
+    events = parse(path, FISH)
+
+    assert len(events) == 1
+    problem = events[0].parse_problem or ""
+    assert problem.count("did not decode") == 1
+    assert "holds no record of that format" in problem
+
+
 # ----------------------------------------------------------------------- psreadline
 
 

@@ -21,13 +21,13 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Protocol
 
-from agentforensics.model import Event, Provenance, TsPrecision
+from agentforensics.model import Event, Provenance, TsPrecision, unparsed
 
 
 @dataclass(frozen=True, slots=True)
@@ -171,6 +171,52 @@ def text_lines(path: Path) -> Iterator[TextLine]:
                 else None
             )
             yield TextLine(number, text, problem)
+
+
+# Said when a reader reached the end of a file at a path its own catalogue entry claims and
+# nothing in that file was a record of the format the entry says it is in. The sentence is
+# shared because it is the same answer whichever format it was, and an analyst should not
+# have to recognise two spellings of it. Each reader fills in how its own format announces
+# a record, which is the part that lets somebody tell a wrong catalogue path from a rotated
+# file, a partial copy or a file that was replaced.
+NO_RECORD = (
+    "this file is at a path the catalogue records as {what} and holds no record of that "
+    "format: none of its {lines} line(s) {marker}. What was in the file is here in raw, "
+    "unread, rather than the file passing through the reader and leaving the case with "
+    "nothing to say about it"
+)
+
+
+def unreadable_lines(
+    context: ParseContext, lines: Sequence[TextLine], problem: str
+) -> Iterator[Event]:
+    """One unparsed record for a run of lines a reader could make no record out of.
+
+    A helper because two line readers need it and the mechanics are the part worth keeping
+    in one place: the locator is the first line of the run so somebody can go back to the
+    file, the lines travel in `raw` so the case holds what the reader choked on rather than
+    a count, and a decode note that every line of the run carries is said once instead of
+    repeated for each of them.
+
+    A run of nothing but blank lines produces nothing. An empty file, or a file that is
+    only newlines, held no record and no fragment of one either, and silence is the honest
+    answer there: the artifact row already says the file was collected, with zero events
+    beside it because zero is true.
+    """
+    if not any(line.text.strip() for line in lines):
+        return
+    # dict.fromkeys and not a set, because the order the notes were met in is the order
+    # they are said in, and a set would reorder them differently on different runs.
+    notes = dict.fromkeys(line.problem for line in lines if line.problem)
+    yield unparsed(
+        context.provenance(f"line:{lines[0].number}"),
+        context.agent,
+        {"lines": [line.text for line in lines]},
+        " ".join([*notes, problem]),
+        user=context.user,
+        host=context.host,
+        payload={"text": "\n".join(line.text for line in lines)},
+    )
 
 
 def iter_lines(path: Path, *, limit: int | None = None) -> Iterator[Line]:
@@ -482,6 +528,7 @@ __all__ = [
     "BINARY_SHARE",
     "BINARY_SNIFF_BYTES",
     "JSON_WITH_COMMENTS",
+    "NO_RECORD",
     "Line",
     "ParseContext",
     "Parser",
@@ -493,4 +540,5 @@ __all__ = [
     "read_json",
     "text_lines",
     "text_of",
+    "unreadable_lines",
 ]

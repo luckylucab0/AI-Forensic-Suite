@@ -7,9 +7,11 @@ A reader that is handed a file whose content is not the format it expects, and r
 nothing, produces exactly that.
 
 So: every reader in the suite, handed a file of content it cannot read, at a path its own
-catalogue entry claims, has to produce something. Two do not, and they are named below
-with the reason and with what the case shows instead. The table is the point of the file.
-Without it a third reader can be written the same way and nothing would say so.
+catalogue entry claims, has to produce something. Every reader does. The table below, which
+names the exceptions, is empty, and it stays in the file because it is what a reader written
+the same way as the two that used to be in it has to be added to: an exception here is a
+sentence somebody wrote and a case test somebody owes, and that is a harder thing to do than
+to fix the reader.
 
 The file it is handed is not empty. An empty file is a different answer and silence is the
 right one for it: there was nothing in it, the artifact row says it was collected, and the
@@ -41,27 +43,18 @@ UNREADABLE = {
     "text that is not this format": ("the quick brown fox\n" * 40).encode("utf-8"),
 }
 
-# The readers that answer with nothing, why, and what the case holds instead. Both are
-# line readers for formats whose records are announced by a prefix, and both were written
-# to skip a line that announces nothing rather than to report it. The reason each gives is
-# that the file's own bytes are in the collection either way, which is true, and which is
-# also true of every other reader here, all of which still say something. Kept as a
-# declaration rather than changed, because changing what a reader emits changes what is in
-# a case and that is the owner's call, and the entry below says what an analyst has in the
-# meantime: the artifact row names the reader that ran and puts zero beside it, which is
-# not the same as an agent with no artifacts at all.
-SILENT = {
-    "aider.input_history": (
-        "prompt_toolkit writes an entry as a blank line, a hash and a timestamp, then one "
-        "plus-prefixed line per line of the prompt. A file with no plus-prefixed line has "
-        "no entry in it, and this reader ends without yielding one"
-    ),
-    "crosscutting.shell_fish_history": (
-        "fish announces a record with '- cmd:' and this reader skips everything before the "
-        "first one, which it documents as what a rotated or partially copied file begins "
-        "with. A file with no such line is all before-the-first-record"
-    ),
-}
+# The readers that answer with nothing, and why nothing is the honest answer for that one
+# file. Empty, and that is the point of it being here: two line readers were in it, both
+# for formats whose records are announced by a prefix, and both were written to skip a line
+# that announces nothing rather than to report it. Each gave the same reason, that the
+# file's own bytes are in the collection either way, which is true and is also true of
+# every other reader in the suite, all of which still say something. Both were changed
+# instead: see ADR 0039.
+#
+# An entry here needs a sentence saying why an analyst is better served by silence than by
+# a record saying the file could not be read, and a case test beside the one below showing
+# what they do have. Anything less is a reader nobody got round to finishing.
+SILENT: dict[str, str] = {}
 
 
 # Read once at import. There is one case per reader and per shape, and loading the
@@ -146,16 +139,18 @@ def test_the_silent_table_names_nothing_that_is_not_a_catalogue_entry() -> None:
     assert set(SILENT) <= set(ARTIFACTS), sorted(set(SILENT) - set(ARTIFACTS))
 
 
-def test_a_case_still_shows_the_file_a_silent_reader_read(tmp_path: Path) -> None:
-    """What an analyst has for the two above, and why they are a declaration here rather
-    than a defect fixed on the spot.
+def test_a_case_says_what_was_in_a_file_no_reader_could_read(tmp_path: Path) -> None:
+    """What an analyst has for a file whose content is not the format its path claims.
 
-    The file is in the case: an artifact row with its hash, and the filesystem event this
-    suite writes for every collected file, which carries the times it was written and read.
-    What is not there is anything about its content. So the case does not claim the file
-    was absent, and an analyst who opens the artifact list sees it; an analyst who filters
-    the timeline to what people and agents did sees nothing from it, which is the half
-    worth being uncomfortable about.
+    The whole way through, not only out of the parser: a profile is collected, ingested and
+    queried, because the sentence is only worth anything if it survives into the case.
+
+    Three things are there. The artifact row, with the hash that lets somebody go back to
+    the bytes. The filesystem event this suite writes for every collected file, carrying
+    the times it was written and read. And an unparsed record holding the lines themselves
+    with the reason on it, which is the part that used to be missing: an analyst filtering
+    the timeline to what people and agents did now sees that this file was read and was not
+    a history, instead of seeing nothing and concluding nobody typed at this shell.
     """
     profile = tmp_path / "alice"
     history = profile / ".local" / "share" / "fish" / "fish_history"
@@ -170,16 +165,18 @@ def test_a_case_still_shows_the_file_a_silent_reader_read(tmp_path: Path) -> Non
             "SELECT parser, parse_status, sha256 FROM artifacts "
             "WHERE original_path LIKE '%fish_history' AND collected = 1"
         )
-        kinds = [
-            row["kind"]
-            for row in case.query(
-                "SELECT kind FROM events WHERE original_path LIKE '%fish_history'"
-            )
-        ]
+        events = case.query(
+            "SELECT kind, parse_problem, payload, raw FROM events "
+            "WHERE original_path LIKE '%fish_history' ORDER BY kind"
+        )
     assert rows, "the file has to be in the case as a collected artifact"
     assert rows[0]["parser"] == "shell_history"
     assert rows[0]["parse_status"] == "parsed"
     assert rows[0]["sha256"], "and with the hash that lets somebody go back to the bytes"
-    # The filesystem event and nothing else: the file existed, and the case says nothing
-    # about what was in it.
-    assert kinds == ["artifact.fs"], kinds
+    assert [event["kind"] for event in events] == ["artifact.fs", "unparsed.record"]
+    unreadable = events[1]
+    assert "holds no record of that format" in unreadable["parse_problem"]
+    # The content and not a count of lines: an analyst deciding whether this is the wrong
+    # path, a rotated file or something else needs to read what was actually in it.
+    assert "the quick brown fox" in unreadable["payload"]
+    assert "the quick brown fox" in unreadable["raw"]

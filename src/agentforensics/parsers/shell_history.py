@@ -31,6 +31,11 @@ run again carries both and a command that was typed once does not. It is read by
 with a YAML parser, because the format is fish's own and a strict parser refuses files a
 fish still reads. Source, fetched and read:
 https://raw.githubusercontent.com/fish-shell/fish-shell/master/doc_src/language.rst
+A file can begin part way through a record, which is what a rotation, a partial copy or an
+edit leaves behind, and those leading lines are reported rather than skipped: they are what
+is left of a record whose command is not in the file. A file with no `- cmd:` anywhere is
+reported as holding no record of this format, because silence about it would read as a
+shell nobody typed into.
 
 **PSReadLine** writes plain lines with no timestamp anywhere in the file, and continues a
 multi-line entry with a trailing backtick, which is PowerShell's line continuation.
@@ -59,11 +64,13 @@ from typing import Any
 
 from agentforensics.model import Event
 from agentforensics.parsers.base import (
+    NO_RECORD,
     ParseContext,
     TextLine,
     first_word,
     normalise_ts,
     text_lines,
+    unreadable_lines,
 )
 
 # Which reading each artifact gets. Named rather than sniffed, for the reason the prompt
@@ -88,6 +95,23 @@ NO_TIME = (
     "this history format stores no time for an entry, so the event is undated and the only "
     "clock for it is the file's own timestamps and the order of the lines"
 )
+
+
+# Said on the lines in front of the first record of a fish history, where records follow
+# them. fish writes a file that begins with `- cmd:`, so anything before one is what is
+# left of a record whose own command line is not in the file. Reported rather than skipped,
+# which is what this reader used to do with it: a `when:` with nothing above it says a
+# command was there, and an analyst who is not told cannot know that the file begins part
+# way through.
+FISH_FRAGMENT = (
+    "these lines sit in front of the first '- cmd:' line of the file, so the record they "
+    "belong to began before the file does and the command it ran is not in it. What is "
+    "left of that record is here, which is what a rotated history, a partial copy or a "
+    "file somebody edited looks like from inside the reader"
+)
+
+# How fish announces a record, for the sentence a file with none of them gets.
+FISH_MARKER = "begins with '- cmd:', which is how fish announces every entry it writes"
 
 
 class ShellHistoryParser:
@@ -278,9 +302,18 @@ def _fish(context: ParseContext, lines: list[TextLine]) -> Iterator[Event]:
         )
 
     in_paths = False
+    # The lines in front of the first record, held so that they can be reported rather
+    # than skipped. There is no entry to attach them to, which is the point: they are the
+    # remains of one, and they leave the reader as a record nothing could read.
+    held: list[TextLine] = []
+    seen_a_record = False
     for line in lines:
         text = line.text
         if text.startswith("- cmd:"):
+            if not seen_a_record:
+                yield from unreadable_lines(context, held, FISH_FRAGMENT)
+                held = []
+                seen_a_record = True
             yield from flush()
             command = _fish_unescape(text[len("- cmd:") :].strip())
             when, added, paths, in_paths = None, None, [], False
@@ -288,9 +321,7 @@ def _fish(context: ParseContext, lines: list[TextLine]) -> Iterator[Event]:
             problems = [line.problem] if line.problem else []
             continue
         if command is None:
-            # Anything before the first record, which a rotated or partially copied file
-            # can begin with. Skipped rather than reported: there is no entry to attach it
-            # to, and the file's own bytes are in the case either way.
+            held.append(line)
             continue
         stripped = text.strip()
         if stripped.startswith("when:"):
@@ -311,6 +342,16 @@ def _fish(context: ParseContext, lines: list[TextLine]) -> Iterator[Event]:
         if line.problem:
             problems.append(line.problem)
     yield from flush()
+    if not seen_a_record:
+        # Every line of the file was held, because not one of them announced a record. The
+        # file is at a path the catalogue calls a fish history and it is not one, and that
+        # sentence is the whole finding: silence here would read as a shell nobody typed
+        # into.
+        yield from unreadable_lines(
+            context,
+            held,
+            NO_RECORD.format(what="a fish history", lines=len(held), marker=FISH_MARKER),
+        )
 
 
 def _fish_unescape(text: str) -> str:

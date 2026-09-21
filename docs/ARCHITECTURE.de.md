@@ -318,6 +318,16 @@ ist, dass das nicht *unbemerkt* geht.
   genug, dass ein Dokument von einer Maschine mit anderer Codepage weiterhin als das
   Dokument gelesen wird, das es ist.
 
+  **Eine Datei, die niemand lesen konnte**, ist ein eigener Datensatz, und zwar in jedem
+  dieser Leser. Ein Leser, dem Inhalt übergeben wird, der nicht das Format ist, das sein
+  Katalogeintrag behauptet, gibt die Zeilen zurück, aus denen er nichts machen konnte, mit
+  der ersten davon als Fundstelle und einem Satz dazu, wonach er gesucht und was er nicht
+  gefunden hat (ADR 0039). Ein suiteweiter Test übergibt jedem Leser eine solche Datei und
+  schlägt bei Stille fehl, denn ein Fall ohne Ereignisse zu einem Agenten liest sich wie ein
+  Agent, der nie benutzt wurde, und genau dieser Schluss darf hier nicht naheliegen. Eine
+  leere Datei ist die Ausnahme und braucht keinen Datensatz: die Artefaktzeile sagt, dass
+  sie gesammelt wurde, und die Null daneben ist wahr.
+
 - `model/` das einheitliche Ereignismodell und das SQLite-Fallschema
 - `unified/` das Ereignismodell als Datenstrom: das JSON-Lines-Format und sein Schema,
   dazu der Normalisierer, der eine Sammlung ohne Falldatenbank in ein Log überführt
