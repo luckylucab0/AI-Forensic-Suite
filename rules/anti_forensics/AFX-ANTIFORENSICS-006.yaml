@@ -1,0 +1,101 @@
+id: AFX-ANTIFORENSICS-006
+pack: anti_forensics
+title: The agent was configured to leave no trace of itself in git history
+severity: medium
+description: >
+  A setting or an environment variable turns off the trailers one agent writes into every
+  commit it makes: the thread identifier that links a commit to the conversation behind it,
+  and the co-author line that says an agent wrote the code. Amp spells the settings
+  amp.git.commit.ampThread.enabled and amp.git.commit.coauthor.enabled, and the variables
+  AMP_DISABLE_AMP_THREAD_TRAILER and AMP_DISABLE_AMP_COAUTHOR_TRAILER.
+rationale: >
+  Both trailers are on by default, and the thread identifier is frequently the only link
+  between a commit in a repository and the conversation that produced it, because the
+  conversation itself is not necessarily on the endpoint at all. With them off, the
+  agent's commits are indistinguishable from anybody else's work in the one place an
+  organisation is most likely to look. That makes this the inverse of most findings here:
+  it does not destroy a record, it stops one being written, so there is nothing later to
+  recover and the only evidence that it happened is this configuration. It is also the
+  answer to a question an investigation will otherwise get wrong. A repository whose
+  history carries no agent trailers reads as a repository no agent touched, and that
+  conclusion is only safe once this rule has come back empty.
+applies_to:
+  kinds: [config.snapshot, prompt.history, command.exec, unparsed.record]
+match:
+  field: event_text
+  # Both routes, because the vendor documents both and they are set in different places:
+  # the settings file this catalogue collects, and the process environment, which reaches a
+  # case through a shell profile or through the command line of the run itself.
+  # [^\S\n] rather than \s for the reason the generated relocation rule gives: the text a
+  # rule searches is the record's leaves one per line, so \s would let a name at the end of
+  # one line pair with an unrelated value at the start of the next.
+  regex_any:
+    - 'AMP_DISABLE_AMP_(?:THREAD|COAUTHOR)_TRAILER[^\S\n]*[=:][^\S\n]*\S'
+    - 'amp\.git\.commit\.(?:ampThread|coauthor)\.enabled[^\S\n]*[=:][^\S\n]*false'
+tags:
+  - T1070
+  - T1562.001
+  - attribution-defeated
+false_positives:
+  - >-
+    A commit-message policy. A repository can reject trailers, a team can strip them for
+    tidiness, and a squash or rebase workflow can drop them anyway, so a project that
+    turns them off has an ordinary reason available.
+  - >-
+    A mention rather than a setting. The rule searches the text a record holds, so
+    documentation of the variable that happens to show an assignment matches. A question
+    about it in a conversation is out of scope by kind and cannot reach this rule.
+  - >-
+    A value set after the period under investigation, since a settings file says what is
+    in force and not when the line was written. Compare its mtime against the session
+    times before reading it as intent.
+references:
+  - https://ampcode.com/manual/configuration.md
+tests:
+  - name: the thread trailer disabled in a shell profile
+    match: true
+    event:
+      kind: config.snapshot
+      agent: crosscutting
+      payload:
+        key: "export:AMP_DISABLE_AMP_THREAD_TRAILER"
+        text: "export AMP_DISABLE_AMP_THREAD_TRAILER=1"
+  - name: the co-author trailer disabled for one run on the command line
+    match: true
+    event:
+      kind: command.exec
+      agent: crosscutting
+      payload:
+        commands: [{command: "AMP_DISABLE_AMP_COAUTHOR_TRAILER=1 amp"}]
+  - name: the thread setting turned off in the settings file
+    match: true
+    event:
+      kind: config.snapshot
+      agent: amp
+      payload: {"amp.git.commit.ampThread.enabled": false}
+  - name: the co-author setting turned off in the settings file
+    match: true
+    event:
+      kind: config.snapshot
+      agent: amp
+      payload: {"amp.git.commit.coauthor.enabled": false}
+  - name: the default, which is on
+    match: false
+    event:
+      kind: config.snapshot
+      agent: amp
+      payload: {"amp.git.commit.coauthor.enabled": true}
+  - name: an unrelated setting of this agent
+    match: false
+    event:
+      kind: config.snapshot
+      agent: amp
+      payload: {"amp.showCosts": false}
+  - name: the variable named with no value
+    match: false
+    event:
+      kind: config.snapshot
+      agent: crosscutting
+      payload:
+        key: "export:AMP_DISABLE_AMP_THREAD_TRAILER"
+        text: "# AMP_DISABLE_AMP_THREAD_TRAILER is not set here"

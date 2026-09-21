@@ -21,6 +21,7 @@ Findings are written into the case database next to the events they rest on, and
 |  | [AFX-ANTIFORENSICS-003](#afx-antiforensics-003) | critical |
 |  | [AFX-ANTIFORENSICS-004](#afx-antiforensics-004) | high |
 |  | [AFX-ANTIFORENSICS-005](#afx-antiforensics-005) | low |
+|  | [AFX-ANTIFORENSICS-006](#afx-antiforensics-006) | medium |
 | [`collection_integrity`](#collection-integrity) | [AFX-COLLECTIONINTEGRITY-001](#afx-collectionintegrity-001) | medium |
 |  | [AFX-COLLECTIONINTEGRITY-002](#afx-collectionintegrity-002) | info |
 |  | [AFX-COLLECTIONINTEGRITY-003](#afx-collectionintegrity-003) | low |
@@ -220,6 +221,37 @@ The user's global git excludes file names an agent's saved-permission file. One 
 
 *Samples in the rule file:* 2 / 2 (+/-)
 
+#### AFX-ANTIFORENSICS-006
+
+**The agent was configured to leave no trace of itself in git history**
+
+| | |
+| --- | --- |
+| Severity | medium |
+| Pack | `anti_forensics` |
+| Agents | `any` |
+| Event kinds | `config.snapshot`, `prompt.history`, `command.exec`, `unparsed.record` |
+| Fields read | `event_text` |
+| Tags | `T1070`, `T1562.001`, `attribution-defeated` |
+
+A setting or an environment variable turns off the trailers one agent writes into every commit it makes: the thread identifier that links a commit to the conversation behind it, and the co-author line that says an agent wrote the code. Amp spells the settings amp.git.commit.ampThread.enabled and amp.git.commit.coauthor.enabled, and the variables AMP_DISABLE_AMP_THREAD_TRAILER and AMP_DISABLE_AMP_COAUTHOR_TRAILER.
+
+*What it matches:* `event_text matches /AMP_DISABLE_AMP_(?:THREAD\|COAUTHOR)_TRAILER[^\S\n]*[=:][^\S\n]*\S/ or /amp\.git\.commit\.(?:ampThread\|coauthor)\.enabled[^\S\n]*[=:][^\S\n]*false/`
+
+*Why an analyst cares:* Both trailers are on by default, and the thread identifier is frequently the only link between a commit in a repository and the conversation that produced it, because the conversation itself is not necessarily on the endpoint at all. With them off, the agent's commits are indistinguishable from anybody else's work in the one place an organisation is most likely to look. That makes this the inverse of most findings here: it does not destroy a record, it stops one being written, so there is nothing later to recover and the only evidence that it happened is this configuration. It is also the answer to a question an investigation will otherwise get wrong. A repository whose history carries no agent trailers reads as a repository no agent touched, and that conclusion is only safe once this rule has come back empty.
+
+*Known false positives:*
+
+- A commit-message policy. A repository can reject trailers, a team can strip them for tidiness, and a squash or rebase workflow can drop them anyway, so a project that turns them off has an ordinary reason available.
+- A mention rather than a setting. The rule searches the text a record holds, so documentation of the variable that happens to show an assignment matches. A question about it in a conversation is out of scope by kind and cannot reach this rule.
+- A value set after the period under investigation, since a settings file says what is in force and not when the line was written. Compare its mtime against the session times before reading it as intent.
+
+*References:*
+
+- <https://ampcode.com/manual/configuration.md>
+
+*Samples in the rule file:* 4 / 3 (+/-)
+
 ## collection integrity
 
 Whether what was collected can answer the question it is being asked. Every other pack says something happened on the endpoint; this one says a part of the collection may be looking in the wrong place, which is the one failure that reads exactly like a clean result. Its rule is generated from the catalogue, because a list of catalogue facts copied into a rule file is a list that stops being true without anybody noticing.
@@ -237,11 +269,11 @@ Whether what was collected can answer the question it is being asked. Every othe
 | Fields read | `event_text` |
 | Tags | `collection-integrity`, `relocated-tree` |
 
-A shell profile, or the environment an agent ran in, exports a variable the catalogue records as changing where that agent keeps its data or whether it keeps it. What was collected from the default path is therefore not necessarily what that agent wrote.
+A shell profile, or the environment an agent ran in, exports a variable the catalogue records as changing where that agent keeps its data, whether it keeps it, or what it obeys. What was collected from the default paths is therefore not necessarily what that agent wrote, and not necessarily all of what it was told.
 
 *What it matches:* `event_text matches /\b(AMP_DISABLE_AMP_COAUTHOR_TRAILER\|AMP_DISABLE_AMP_THREAD_TRAILER\|AMP_SKIP_UPDATE_CHECK\|ANTHROPIC_CONFIG_DIR\|CLAUDE_CODE_DEBUG_LOGS_DIR\|CLAUDE_CODE_PLUGIN_CACHE_DIR\|CLAUDE_CODE_PROJECT_DIR_NAME\|CLAUDE_CODE_SKIP_PROMPT_HISTORY\|CLAUDE_CONFIG_DIR\|CLAUDE_DESKTOP_ADD_REPO\|CLAUDE_PLUGIN_ROOT\|CLINE_CONNECTORS_DB_PATH\|CLINE_CONNECTOR_DATA_DIR\|CLINE_CONNECTOR_SETTINGS_PATH\|CLINE_CRON_DB_PATH\|CLINE_DATA_DIR\|CLINE_DB_DATA_DIR\|CLINE_DIR\|CLINE_GLOBAL_SETTINGS_PATH\|CLINE_HOOKS_LOG_PATH\|CLINE_MCP_SETTINGS_PATH\|CLINE_PROVIDER_SETTINGS_PATH\|CLINE_SESSION_DATA_DIR\|CLINE_TASKS_DB_PATH\|CLINE_TEAM_DATA_DIR\|CODEX_HOME\|CODEX_SQLITE_HOME\|CONTEXT_FILE_NAMES\|CONTINUE_GLOBAL_DIR\|COPILOT_CACHE_HOME\|COPILOT_HOME\|COPILOT_PROVIDERS_CONFIG\|CURSOR_CONFIG_DIR\|CURSOR_DATA_DIR\|CURSOR_SANDBOX_POLICY_DIR\|CURSOR_TRANSCRIPT_PATH\|FLATPAK_XDG_CONFIG_HOME\|FLATPAK_XDG_DATA_HOME\|FLATPAK_XDG_STATE_HOME\|GEMINI_CLI_HOME\|GEMINI_CLI_SYSTEM_DEFAULTS_PATH\|GEMINI_CLI_SYSTEM_SETTINGS_PATH\|GEMINI_CLI_TRUSTED_FOLDERS_PATH\|GEMINI_SYSTEM_MD\|GOOSE_DISABLE_KEYRING\|GOOSE_MOIM_MESSAGE_FILE\|GOOSE_MOIM_MESSAGE_TEXT\|GOOSE_PATH_ROOT\|GOOSE_RECIPE_GITHUB_REPO\|GOOSE_RECIPE_PATH\|HERMES_HOME\|KILO_CONFIG_CONTENT\|KILO_DB\|KIRO_ACP_RECORD_PATH\|KIRO_API_KEY\|KIRO_CHAT_LOG_FILE\|KIRO_HOME\|KIRO_LOG_LEVEL\|KIRO_LOG_NO_COLOR\|OLLAMA_MODELS\|OPENCODE_CONFIG\|OPENCODE_CONFIG_CONTENT\|OPENCODE_CONFIG_DIR\|OPENCODE_DB\|OPENCODE_DISABLE_CHANNEL_DB\|OPENCODE_MODELS_PATH\|OPENCODE_PLUGIN_META_FILE\|OPENCODE_TEST_HOME\|OPENCODE_TUI_CONFIG\|PI_CODING_AGENT_DIR\|PI_CODING_AGENT_SESSION_DIR\|QWEN_CODE_FORCE_ENCRYPTED_FILE_STORAGE\|QWEN_CODE_MCP_APPROVALS_PATH\|QWEN_CODE_MEMORY_BASE_DIR\|QWEN_CODE_MEMORY_LOCAL\|QWEN_CODE_MEMORY_PROJECT_SCOPE\|QWEN_CODE_PROFILE_STARTUP\|QWEN_CODE_SYSTEM_DEFAULTS_PATH\|QWEN_CODE_SYSTEM_SETTINGS_PATH\|QWEN_DEBUG_LOG_FILE\|QWEN_HOME\|QWEN_RUNTIME_DIR\|QWEN_SANDBOX\|QWEN_SANDBOX_IMAGE\|QWEN_SANDBOX_NET\|QWEN_TELEMETRY_OUTFILE\|Q_CLI_DATA_DIR\|Q_DISABLE_TELEMETRY\|Q_LOG_LEVEL\|Q_LOG_STDOUT\|Q_ZDOTDIR\|SANDBOX\|SEATBELT_PROFILE\|VSCODE_EXTENSIONS\|VSCODE_PORTABLE\|WINDSURF_CONFIG_DIR)[^\S\n]*[=:][^\S\n]*\S/`
 
-*Why an analyst cares:* This rule is about the case rather than about the endpoint, which is why it exists at all. Every other finding says something happened; this one says a part of the collection may be answering the wrong question. An agent whose home was moved leaves nothing at the path a collection searched, and nothing found there reads exactly like an agent that was never used. The variable is usually set for an ordinary reason, so this is not a suspicion about anybody: it is an instruction to go back and collect the path the variable names before concluding anything from an empty result.
+*Why an analyst cares:* This rule is about the case rather than about the endpoint, which is why it exists at all. Every other finding says something happened; this one says a part of the collection may be answering the wrong question. An agent whose home was moved leaves nothing at the path a collection searched, and nothing found there reads exactly like an agent that was never used. A few of these variables carry the instructions themselves rather than a path, in which case there is nothing further to collect and what the agent was told every turn exists only in the environment of the run. The variable is usually set for an ordinary reason, so this is not a suspicion about anybody: it is an instruction to go back for what the variable names before concluding anything from an empty result.
 
 *Known false positives:*
 

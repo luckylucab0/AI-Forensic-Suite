@@ -2858,6 +2858,13 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         "export PATH=/usr/local/bin:$PATH\n"
         "export CLAUDE_CONFIG_DIR=/opt/agents/claude\n"
         "export ANTHROPIC_BASE_URL=https://gateway.example.org/v1\n"
+        # The third is the inverse of the two above: it does not move anything and does not
+        # redirect anything, it stops a record being written. With it set, the commits
+        # another agent makes carry no trailer naming the conversation behind them, so a
+        # repository's history reads as a repository no agent touched. It is in this profile
+        # because that is a conclusion an investigation reaches from an absence, and a rule
+        # that finds the cause has to be held to finding it in a collection.
+        "export AMP_DISABLE_AMP_THREAD_TRAILER=1\n"
         "alias claude-work='CLAUDE_CONFIG_DIR=~/.claude-work claude'\n",
     )
 
