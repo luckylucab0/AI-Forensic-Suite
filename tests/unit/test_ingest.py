@@ -18,6 +18,7 @@ import pytest
 from agentforensics.bundle import BundleError
 from agentforensics.catalog import Catalogue, load_catalogue
 from agentforensics.ingest import detect, ingest
+from agentforensics.ingest.ingest import IngestReport
 from agentforensics.ingest.match import Matcher
 from agentforensics.ingest.native import NativeBundle
 from agentforensics.ingest.tree import CollectedTree, _is_profile_root
@@ -833,3 +834,104 @@ def test_a_timestamp_a_filesystem_cannot_represent_is_absent_not_1970() -> None:
     assert _stamp(0) == "1970-01-01T00:00:00.000000Z", (
         "a real epoch timestamp is a real timestamp and stays one"
     )
+
+
+# ------------------------------------ the summary an examiner reads after an ingest
+
+# Everything the ingest could not do is in this text and nowhere else, and most of it had
+# never been rendered: the synthetic profile produces a clean run, so the sections about
+# colliding events, files read under another entry, databases missing their log and the
+# trimming of a long list were reached by nothing. An exception or a wrong number in one
+# of them would appear at the moment it matters, in front of the person deciding whether
+# the case is complete.
+#
+# One case per section, plus a run with all of them at once, so a section that stops
+# rendering is caught whether it fails alone or together with the rest.
+
+SECTIONS: dict[str, tuple[dict[str, object], str]] = {
+    "unreadable": ({"unreadable_records": 7}, "7 record(s) nothing could read"),
+    "uninterpreted": (
+        {"uninterpreted_records": 3},
+        "3 record(s) read but in a format nobody has mapped",
+    ),
+    "colliding": (
+        {"colliding_events": ["~/.claude/a.jsonl: two events at line:4"]},
+        "1 file(s) produced events sharing an identity",
+    ),
+    "reattributed": (
+        {"reattributed": ["~/.codex/x.jsonl: codex.rollouts -> codex.sessions"]},
+        "1 file(s) read under a catalogue entry other than the one",
+    ),
+    "no_log": (
+        {"databases_without_their_log": ["~/.config/agent/state.db"]},
+        "1 database(s) journal ahead and arrived without their write-ahead log",
+    ),
+    "gaps": ({"gaps": 4}, "4 gap(s) in the collection"),
+    "unclaimed": (
+        {"unclaimed_paths": ["~/.someagent/history.json"]},
+        "1 path(s) no catalogue entry claims",
+    ),
+}
+
+
+def _report(**fields: object) -> IngestReport:
+    return IngestReport(bundle_uuid="b-1", source_kind="native", source_path="/ev/b", **fields)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("name", sorted(SECTIONS))
+def test_each_thing_an_ingest_could_not_do_is_in_its_summary(name: str) -> None:
+    fields, expected = SECTIONS[name]
+    assert expected in _report(**fields).summary()
+
+
+def test_a_clean_run_says_none_of_it() -> None:
+    """The sections are conditional, so a run with nothing wrong has to read as one.
+
+    A summary that listed every heading with a zero beside it would bury the one that is
+    not zero, which is the only reason any of them is there.
+    """
+    text = _report(artifacts=10, collected=8, events=40).summary()
+    for _, expected in SECTIONS.values():
+        assert expected not in text
+    assert "40 event(s)" in text
+
+
+# The three sections that list paths rather than counting them, each of which trims.
+TRIMMED = ("unclaimed_paths", "reattributed", "databases_without_their_log")
+
+
+@pytest.mark.parametrize("field_name", TRIMMED)
+def test_a_long_list_is_trimmed_and_says_how_much_it_left_out(field_name: str) -> None:
+    """Five and a count. A summary that printed nine hundred paths would be scrolled past,
+    and one that printed five and stopped would say there were five."""
+    paths = [f"~/.agent/{index}.json" for index in range(9)]
+    text = _report(**{field_name: paths}).summary()
+    assert paths[4] in text
+    assert paths[5] not in text
+    assert "... and 4 more" in text
+
+
+def test_the_trimming_table_names_every_section_that_lists_rather_than_counts() -> None:
+    """Without this a fourth list could be added and print all nine hundred of whatever it
+    holds, with the three above still passing."""
+    listing = {
+        name
+        for name, value in vars(_report()).items()
+        # colliding_events is the one list that does not trim this way. It puts its count
+        # in the sentence and then joins five onto the same line, so a run with nine
+        # hundred of them says nine hundred and shows five, which hides nothing even
+        # though it never writes "and more".
+        if isinstance(value, list) and name != "colliding_events"
+    }
+    assert listing == set(TRIMMED), listing
+
+
+def test_every_optional_section_renders_when_they_all_apply() -> None:
+    """Together as well as apart, because they share the list that builds the text and a
+    change that dropped one of them would leave the others passing."""
+    everything: dict[str, object] = {}
+    for fields, _ in SECTIONS.values():
+        everything.update(fields)
+    text = _report(**everything).summary()
+    for _, expected in SECTIONS.values():
+        assert expected in text, text
