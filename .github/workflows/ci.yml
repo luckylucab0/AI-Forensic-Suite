@@ -362,7 +362,14 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${OPSEC_DENYLIST:-}" ]; then
-            echo "No OPSEC_DENYLIST secret is configured."
+            # A green check with nothing behind it is the one failure this project
+            # must not have, so the skip says so where a reader of the run sees it:
+            # an annotation and the run summary, not a line buried in the log.
+            warning="No OPSEC_DENYLIST secret is configured. Nothing was scanned"
+            warning="$warning against a denylist, so this green check does not say the"
+            warning="$warning repository is clean. See CONTRIBUTING."
+            echo "::warning::$warning"
+            echo "- OpSec guard: **no denylist scan ran**. $warning" >> "$GITHUB_STEP_SUMMARY"
             echo "Running the guard anyway, which exercises its skip path, so a fork and"
             echo "an outside contributor are never blocked by a secret they cannot have."
             python3 scripts/opsec_check.py --mode tracked
@@ -374,9 +381,13 @@ jobs:
           printf '%s\n' "$OPSEC_DENYLIST" > .opsec-denylist
           trap 'rm -f .opsec-denylist' EXIT
           python3 scripts/opsec_check.py --mode tracked --require-denylist
-          # The working tree is only the present. History is what actually gets published.
-          if git log -p --all | grep -i -q -f .opsec-denylist; then
-            echo "::error::A denied string appears in git history. See CONTRIBUTING."
-            exit 1
-          fi
+          # The working tree is only the present. History is what actually gets published,
+          # so the object walk runs here too. It is the same check as item 1 of the
+          # pre-publication checklist, not the `git log -p | grep` this step used to do:
+          # a patch omits binary files and shows nothing at all for a merge commit, so the
+          # grep could report a clean history over content it had never read. Half a
+          # minute on this repository's history, which is worth it for the difference
+          # between having looked and appearing to have looked.
+          python3 scripts/opsec_check.py --mode history --require-denylist
           echo "History is clean against the denylist."
+          echo "- OpSec guard: tracked content and full history scanned, clean." >> "$GITHUB_STEP_SUMMARY"

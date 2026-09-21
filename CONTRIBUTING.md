@@ -77,10 +77,16 @@ knowing:
   before publishing. It is item 1 of the procedure below, and the procedure exists because
   the other items are human review that no script can do.
 
-CI runs the same script, reading the denylist from a repository secret when one is
-configured and skipping cleanly otherwise. With a secret configured it goes one step
-further than the local hook can and greps the whole history, because history is what
+CI runs the same script, reading the denylist from a repository secret named
+`OPSEC_DENYLIST` when one is configured and skipping cleanly otherwise. Set it under the
+repository's Settings, Secrets and variables, Actions, with the same content as the local
+file, one string per line. With a secret configured the job goes one step further than the
+local hook can and runs `--mode history` over every object, because history is what
 actually gets published.
+
+Without the secret the job still passes, and it says so: it writes a warning annotation
+and a line in the run summary saying that no denylist scan ran. A green check that scanned
+nothing must not read like a green check that scanned everything.
 
 Leaked credentials are a different problem from a leaked identity and need a different
 tool. What is wired up today is pre-commit's `detect-private-key`, which catches the

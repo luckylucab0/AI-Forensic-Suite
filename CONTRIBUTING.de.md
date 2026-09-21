@@ -87,10 +87,17 @@ Danach scheitert ein Commit lokal, der eine gelistete Zeichenkette einführen w�
   weiter unten, und die Prozedur existiert, weil die übrigen Punkte menschliche Prüfung
   sind, die kein Skript leisten kann.
 
-Die CI führt dasselbe Skript aus, liest die Denylist aus einem Repository-Secret, wenn
-eines konfiguriert ist, und überspringt die Prüfung sonst sauber. Mit konfiguriertem Secret
-geht sie einen Schritt weiter als der lokale Hook und durchsucht die gesamte Historie, denn
+Die CI führt dasselbe Skript aus, liest die Denylist aus einem Repository-Secret namens
+`OPSEC_DENYLIST`, wenn eines konfiguriert ist, und überspringt die Prüfung sonst sauber.
+Gesetzt wird es unter Settings, Secrets and variables, Actions, mit demselben Inhalt wie
+die lokale Datei, ein String pro Zeile. Mit konfiguriertem Secret geht der Job einen
+Schritt weiter als der lokale Hook und läuft mit `--mode history` über jedes Objekt, denn
 veröffentlicht wird die Historie.
+
+Ohne das Secret läuft der Job trotzdem grün durch, und er sagt das auch: Er schreibt eine
+Warnung als Annotation und eine Zeile in die Zusammenfassung des Laufs, dass keine
+Denylist-Prüfung stattgefunden hat. Ein grüner Haken, der nichts geprüft hat, darf nicht
+aussehen wie ein grüner Haken, der alles geprüft hat.
 
 Abgeflossene Zugangsdaten sind ein anderes Problem als eine verratene Identität und
 brauchen ein anderes Werkzeug. Eingerichtet ist heute `detect-private-key` aus pre-commit,
