@@ -1707,12 +1707,12 @@ BUNDLE_REGISTRY_KEYS = {
 
 
 def write_agent_stores(home: Path, mtime: int = RECENT) -> list[Path]:
-    """The six stores whose readers the profile never reached.
+    """The stores whose readers the profile never reached.
 
     Each of these has a reader with its own tests, and each reader was tested against a
     file the test built and handed to it directly. Between a catalogue entry and that
     reader sit the pattern, the glob, the claim order and the attribution, and none of it
-    was exercised for these six: their agents were in the catalogue and not in this tree.
+    was exercised for these: their agents were in the catalogue and not in this tree.
 
     The schemas are the vendors' own, copied from the readers' tests rather than imported,
     for the reason given there: when an agent changes its schema, a fixture that quietly
@@ -1722,7 +1722,7 @@ def write_agent_stores(home: Path, mtime: int = RECENT) -> list[Path]:
     A tree of its own rather than part of build_home, and that is a decision rather than
     tidiness. The main profile is curated: it has a story running through it, several tests
     assert what it contains, and one of them builds a store at one of these very paths and
-    failed outright when this function put a file there first. Six more agents would also
+    failed outright when this function put a file there first. More agents here would also
     change which stores name a conversation, which is what the corroboration view is about.
     So this stands beside it and the reach test ingests both.
     """
@@ -1914,6 +1914,89 @@ def write_agent_stores(home: Path, mtime: int = RECENT) -> list[Path]:
                 ),
             )
         ],
+    )
+
+    # A sixth keeps the conversation in a database and, on a machine that has been
+    # upgraded, keeps the pre-1.10.0 file per session beside it: the vendor states those
+    # files stay on disk and are no longer managed, so both containers are here and one
+    # reader has to answer for both.
+    goose_sessions = home / ".local" / "share" / "goose" / "sessions"
+    store(
+        goose_sessions / "sessions.db",
+        [
+            "CREATE TABLE sessions (id TEXT PRIMARY KEY, name TEXT NOT NULL DEFAULT '', "
+            "description TEXT NOT NULL DEFAULT '', user_set_name BOOLEAN DEFAULT FALSE, "
+            "session_type TEXT NOT NULL DEFAULT 'user', working_dir TEXT NOT NULL, "
+            "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+            "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+            "extension_data TEXT DEFAULT '{}', total_tokens INTEGER, input_tokens INTEGER, "
+            "output_tokens INTEGER, accumulated_cost REAL, schedule_id TEXT, "
+            "recipe_json TEXT, provider_name TEXT, model_config_json TEXT, "
+            "goose_mode TEXT NOT NULL DEFAULT 'auto', archived_at TIMESTAMP, "
+            "project_id TEXT, parent_session_id TEXT)",
+            "CREATE TABLE messages (id INTEGER PRIMARY KEY AUTOINCREMENT, message_id TEXT, "
+            "session_id TEXT NOT NULL, role TEXT NOT NULL, content_json TEXT NOT NULL, "
+            "created_timestamp INTEGER NOT NULL, "
+            "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, tokens INTEGER, "
+            "metadata_json TEXT)",
+        ],
+        [
+            (
+                "INSERT INTO sessions (id, name, session_type, working_dir, created_at, "
+                "updated_at, provider_name, model_config_json, goose_mode) "
+                "VALUES (?,?,?,?,?,?,?,?,?)",
+                (
+                    SESSION_A,
+                    "bump the lockfile",
+                    "user",
+                    project,
+                    "2026-09-06T09:00:00+00:00",
+                    "2026-09-06T09:01:00+00:00",
+                    "example_provider",
+                    json.dumps({"model_name": "example-model-1", "toolshim": False}),
+                    "approve",
+                ),
+            ),
+            (
+                "INSERT INTO messages (message_id, session_id, role, content_json, "
+                "created_timestamp, metadata_json) VALUES (?,?,?,?,?,?)",
+                (
+                    "msg_0001",
+                    SESSION_A,
+                    "user",
+                    json.dumps([{"type": "text", "text": "bump the lockfile"}]),
+                    1788912000,
+                    json.dumps({"userVisible": True, "agentVisible": True}),
+                ),
+            ),
+        ],
+    )
+    written.append(
+        write(
+            goose_sessions / "20260906_085900.jsonl",
+            "".join(
+                json.dumps(record) + "\n"
+                for record in (
+                    {
+                        "description": "bump the lockfile",
+                        "working_dir": project,
+                        "created_at": "2026-09-06T08:59:00+00:00",
+                        "updated_at": "2026-09-06T09:00:00+00:00",
+                        "extension_data": {},
+                        "message_count": 1,
+                        "total_tokens": 200,
+                    },
+                    {
+                        "id": None,
+                        "role": "user",
+                        "created": 1788911940,
+                        "content": [{"type": "text", "text": "bump the lockfile"}],
+                        "metadata": {"userVisible": True, "agentVisible": True},
+                    },
+                )
+            ),
+            mtime,
+        )
     )
 
     # And the preference domain of a desktop product, which on its own platform is where

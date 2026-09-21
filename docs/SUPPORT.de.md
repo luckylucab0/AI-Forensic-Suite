@@ -6,7 +6,7 @@
 
 Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registrierung statt aufgeschrieben. Die Zahlen bewegen sich mit dem Code.
 
-31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 506 von 631 Artefakten werden von 37 Leser-Modulen gelesen, in 23 Ereignisarten. 505 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
+31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 506 von 631 Artefakten werden von 38 Leser-Modulen gelesen, in 23 Ereignisarten. 505 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
 
 **Wie ein leeres Ergebnis zu lesen ist.** Steht ein Agent hier mit gelesenen Artefakten, dann wurden die Pfade durchsucht und die vorhandenen Dateien ausgewertet, also ist ein leeres Ergebnis ein Befund über diese Pfade. Es ist nie ein Befund darüber, dass der Agent nicht benutzt wurde: der Datenbaum kann über eine Variable verschoben sein, die Aufbewahrungsfrist kann ihn gelöscht haben, die Pfade können die unverifizierten sein, oder die Person hat in einem Profil gearbeitet, das niemand gesammelt hat. Wo ein Eintrag unverifiziert ist, sagt `docs/ARTIFACTS.de.md` es pro Artefakt, und der Analyzer wiederholt es in seiner Ausgabe.
 
@@ -30,7 +30,7 @@ Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registri
 | Factory Droid | Linux, macOS, Windows | 2 / 2 | 9 / 10 | 7 | 1 |
 | Gemini CLI | Linux, macOS, Windows | 1 / 1 | 15 / 19 | 8 | 4 |
 | GitHub Copilot CLI | Linux, macOS, Windows | 3 / 4 | 16 / 20 | 11 | 4 |
-| Goose | Linux, macOS, Windows | 4 / 4 | 19 / 20 | 12 | 1 |
+| Goose | Linux, macOS, Windows | 4 / 4 | 19 / 20 | 9 | 1 |
 | Hermes | Linux, macOS, Windows | 10 / 11 | 41 / 56 | 31 | 15 |
 | JetBrains AI Assistant | Linux, macOS, Windows | 1 / 1 | 6 / 8 | 4 | 2 |
 | Junie | Linux, macOS, Windows | 2 / 2 | 7 / 9 | 6 | 2 |
@@ -165,7 +165,7 @@ Zum Zeitpunkt dieser Generierung keine. Dieser Abschnitt nennt die Lesungen, die
 
 ## Wo die Lesung dünn ist
 
-303 Artefakte werden von einem generischen Leser gelesen. Die Datei wird vollständig gelesen und jeder Record steht mit seinem Inhalt im Fall; was der Record bedeutet, ist nicht entschieden, und jeder sagt das an sich selbst. Zwei Arten von Record tragen diese Aussage: `unparsed.record` für etwas, das niemand lesen konnte, und ein als uninterpretiert zurückgegebener Record für etwas Gelesenes, dessen Format niemand abgebildet hat. In jeder Zusammenfassung dieser Suite sind die beiden getrennt gezählt, denn ein Speicher ohne Schema und eine halb geschriebene Datei sind entgegengesetzte Probleme.
+300 Artefakte werden von einem generischen Leser gelesen. Die Datei wird vollständig gelesen und jeder Record steht mit seinem Inhalt im Fall; was der Record bedeutet, ist nicht entschieden, und jeder sagt das an sich selbst. Zwei Arten von Record tragen diese Aussage: `unparsed.record` für etwas, das niemand lesen konnte, und ein als uninterpretiert zurückgegebener Record für etwas Gelesenes, dessen Format niemand abgebildet hat. In jeder Zusammenfassung dieser Suite sind die beiden getrennt gezählt, denn ein Speicher ohne Schema und eine halb geschriebene Datei sind entgegengesetzte Probleme.
 
 ## Wo es weitergeht
 

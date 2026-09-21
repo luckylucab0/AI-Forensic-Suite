@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  37 modules read 506 of the catalogue's 631 artifacts, and what the rest is gets asserted
+  38 modules read 506 of the catalogue's 631 artifacts, and what the rest is gets asserted
   rather than assumed: every entry in a format this suite reads is either read or carries a
   written reason why not, and the credential stores are exempt as a class because the
   collector withholds their content, which a test pins to credential stores alone. What is
@@ -119,8 +119,9 @@ it cannot be rewritten *quietly*.
   and its projection into rows, Copilot CLI, Gemini CLI and Qwen Code (one module, because
   Qwen is a fork and both write the Gemini content shape), Pi, Cline with its forks Roo Code
   and Kilo Code and its separate SDK session store, Continue, Zed and its sidebar, Aider,
-  Amazon Q, opencode, Hermes, and the VS Code state stores. Each takes its artifacts over
-  from the floors below, one verified schema at a time.
+  Amazon Q, opencode, Goose in both the containers its sessions live in, Hermes, and the
+  VS Code state stores. Each takes its artifacts over from the floors below, one verified
+  schema at a time.
 
   **The floors** are about formats rather than agents, and they exist so that a file nobody
   has mapped is visible in a case as records somebody still has to look at rather than as a

@@ -638,7 +638,7 @@ artifacts:
     That leaves the application-support tree as a legacy one rather than a current one, which is why both are still worth collecting: goose's own source keeps the author string 'Block' with the comment that changing it would orphan existing user directories, naming ~/Library/Application Support/Block/goose/ as the example, so a machine that has been upgraded can hold both.
 
     Re-sourced by the verification pass, which found the base path on the cited page only inside command examples. The environment variable guide states the path root and its per-platform defaults. Note the contradiction the pass surfaced: that guide puts the macOS tree under the application support directory while the logs guide maps macOS to the same .local/share path as Linux, so search both. The two sidecars follow from the journal mode and are marked unsourced.
-  parser: sqlite_generic
+  parser: goose
 - id: goose.sessions_db_windows
   category: transcript
   root: user_profile
@@ -659,7 +659,7 @@ artifacts:
     recollection, needs verification
 
     Record structure: Derived, not stated: the environment-variables doc gives the Windows root as %APPDATA%\Block\goose\ and says goose creates config/, data/ and state/ subdirectories under the root, and the logs doc confirms %APPDATA%\Block\goose\data\logs\. The sessions/sessions.db leaf is therefore inferred from the documented Linux layout. Verify on a live image before relying on it.
-  parser: sqlite_generic
+  parser: goose
 - id: goose.sessions_jsonl_legacy
   category: transcript
   root: user_profile
@@ -689,4 +689,4 @@ artifacts:
     Re-sourced by the verification pass: the logs guide states the pre-1.10.0 per-session file layout and the directory it lived in. It carries no Windows path at all, so the Windows spelling is marked unsourced.
 
     The application support spelling is this product's legacy macOS tree and is collected beside the current one rather than instead of it. The reason is in this agent's description: the vendor's environment guide gives that directory as the macOS root and states that a root holds config, data and state subdirectories, while the code at the library version the lockfile pins resolves macOS to the same freedesktop directories as Linux. The leaf under the root is this catalogue's own join of the two documented facts, which is why it is marked unsourced, and an upgraded machine is the case where searching only the current tree finds nothing that is there.
-  parser: jsonl_generic
+  parser: goose

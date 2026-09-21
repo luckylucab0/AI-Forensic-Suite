@@ -35,6 +35,7 @@ from agentforensics.parsers.copilot import CopilotParser
 from agentforensics.parsers.file_snapshot import FileSnapshotParser
 from agentforensics.parsers.gemini import GeminiParser
 from agentforensics.parsers.git_checkpoints import GitCheckpointsParser
+from agentforensics.parsers.goose import GooseParser
 from agentforensics.parsers.hermes import HermesParser
 from agentforensics.parsers.instructions import InstructionsParser
 from agentforensics.parsers.json_generic import JsonGenericParser
@@ -91,6 +92,11 @@ PARSERS: tuple[Parser, ...] = (
     # The checkpoint references two agents write into a repository, which are the only
     # record on an endpoint that dates an agent's edits and survive the conversation.
     GitCheckpointsParser(),
+    # One product's conversation in the two containers it has had: the database it moved to
+    # and the file per session it stopped managing and left on disk. Both hold the same
+    # message model, so one module reads them, and the older one is the half a user cannot
+    # delete from the product's own interface.
+    GooseParser(),
     HermesParser(),
     InstructionsParser(),
     # The same reading as the instruction files, for the notes the agent wrote itself.

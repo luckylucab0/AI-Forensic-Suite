@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 37 Module lesen 506 der 631
+  zählt diese Dateien und sagt, welche es sind. 38 Module lesen 506 der 631
   Katalogartefakte, und was der Rest ist, wird behauptet und nicht angenommen: jeder Eintrag
   in einem Format, das diese Suite liest, wird entweder gelesen oder trägt einen
   aufgeschriebenen Grund, warum nicht, und die Anmeldedatenspeicher sind als Klasse
@@ -128,7 +128,8 @@ ist, dass das nicht *unbemerkt* geht.
   Claude Code, Codex CLI und dessen Projektion in Zeilen, Copilot CLI, Gemini CLI und Qwen
   Code (ein Modul, weil Qwen ein Fork ist und beide die Gemini-Inhaltsform schreiben), Pi,
   Cline mit seinen Forks Roo Code und Kilo Code und dem separaten SDK-Sitzungsspeicher,
-  Continue, Zed und seine Seitenleiste, Aider, Amazon Q, opencode, Hermes und die
+  Continue, Zed und seine Seitenleiste, Aider, Amazon Q, opencode, Goose in beiden
+  Speicherformen, in denen seine Sitzungen liegen, Hermes und die
   VS-Code-Zustandsspeicher. Jeder übernimmt seine Artefakte von den Böden darunter, ein
   verifiziertes Schema nach dem anderen.
 

@@ -64,7 +64,7 @@ def readers_that_ran(tmp_path_factory: pytest.TempPathFactory) -> set[str]:
     build_home(root / "home")
     build_windows_home(root / "image" / "Users" / "alice")
     build_registry_bundle(root / "bundle")
-    # A profile of its own for the six stores that were in no fixture. See the generator
+    # A profile of its own for the stores that were in no fixture. See the generator
     # for why they are not in the main one: it is curated, several tests assert what is in
     # it, and one of them builds a store at one of these paths itself.
     write_agent_stores(root / "stores")

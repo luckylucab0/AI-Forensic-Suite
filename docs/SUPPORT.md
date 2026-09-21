@@ -6,7 +6,7 @@ English | [Deutsch](SUPPORT.de.md)
 
 What this suite reads, per agent, counted from the catalogue and the reader registry rather than written down. The numbers move when the code does.
 
-31 catalogue files, 30 of them a product and one cross-cutting. 506 of 631 artifacts are read by 37 reader modules, into 23 event kinds. 505 artifacts rest on a fetched vendor source.
+31 catalogue files, 30 of them a product and one cross-cutting. 506 of 631 artifacts are read by 38 reader modules, into 23 event kinds. 505 artifacts rest on a fetched vendor source.
 
 **How to read an empty result.** An agent listed here with artifacts read means the paths were searched and the files that were there were parsed, so an empty result is evidence that those paths held nothing. It is never evidence that the agent was not used: the data tree may have been relocated by a variable, the retention period may have swept it, the paths may be the unverified ones, or the user may have worked in a profile nobody collected. Where an entry is unverified, `docs/ARTIFACTS.md` says so per artifact and the analyzer repeats it in its output.
 
@@ -30,7 +30,7 @@ What this suite reads, per agent, counted from the catalogue and the reader regi
 | Factory Droid | Linux, macOS, Windows | 2 / 2 | 9 / 10 | 7 | 1 |
 | Gemini CLI | Linux, macOS, Windows | 1 / 1 | 15 / 19 | 8 | 4 |
 | GitHub Copilot CLI | Linux, macOS, Windows | 3 / 4 | 16 / 20 | 11 | 4 |
-| Goose | Linux, macOS, Windows | 4 / 4 | 19 / 20 | 12 | 1 |
+| Goose | Linux, macOS, Windows | 4 / 4 | 19 / 20 | 9 | 1 |
 | Hermes | Linux, macOS, Windows | 10 / 11 | 41 / 56 | 31 | 15 |
 | JetBrains AI Assistant | Linux, macOS, Windows | 1 / 1 | 6 / 8 | 4 | 2 |
 | Junie | Linux, macOS, Windows | 2 / 2 | 7 / 9 | 6 | 2 |
@@ -165,7 +165,7 @@ None as of this generation. This section names the readings somebody started and
 
 ## Where the reading is thin
 
-303 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
+300 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
 
 ## Where to look next
 

@@ -55,19 +55,28 @@ def store(path: Path, statements: list[str]) -> Path:
     return path
 
 
-def context(path: Path, artifact_id: str = "goose.sessions_db") -> ParseContext:
+# The store these tests are read through has to be one the generic reader still answers for,
+# because what is being tested is the generic reading. It was a Goose session database until
+# a reader with a verified schema took that entry over, at which point every test here was
+# silently exercising that reader instead. The entry named below is a transcript store no
+# product parser claims; when one does, this default has to move again and the tests that
+# assert an uninterpreted row will say so.
+_GENERIC_STORE = "devin.sessions_db"
+
+
+def context(path: Path, artifact_id: str = _GENERIC_STORE) -> ParseContext:
     return ParseContext(
         bundle_uuid="b1",
-        original_path="/home/alice/.local/share/goose/sessions.db",
+        original_path="/home/alice/.local/share/devin/cli/sessions.db",
         local_path=path,
         sha256="aa",
         artifact_id=artifact_id,
-        agent="goose",
+        agent="devin",
         user="alice",
     )
 
 
-def parse(path: Path, artifact_id: str = "goose.sessions_db") -> list:
+def parse(path: Path, artifact_id: str = _GENERIC_STORE) -> list:
     parser = for_artifact(artifact_id)
     assert parser is not None, artifact_id
     return list(parser.parse(context(path, artifact_id)))
