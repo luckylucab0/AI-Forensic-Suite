@@ -249,6 +249,9 @@ Pseudonymisierung, und ein Shell-Kollektor als Rückfallebene.
 - [docs/ARCHITECTURE.de.md](docs/ARCHITECTURE.de.md), wie die Teile zusammenspielen
 - [docs/COLLECTION.de.md](docs/COLLECTION.de.md), was zuerst zu sichern ist und warum,
   und wie eine Sicherung läuft
+- [docs/SUPPORT.de.md](docs/SUPPORT.de.md), die generierte Unterstützungsreferenz: welche
+  Agenten gelesen werden, wie vollständig, und welcher von vier Gründen für alles gilt,
+  was nicht gelesen wird
 - [docs/ARTIFACTS.de.md](docs/ARTIFACTS.de.md), die generierte Artefaktreferenz,
   gruppiert danach, wie schnell ein Artefakt verschwindet
 - [docs/BUNDLE_FORMAT.de.md](docs/BUNDLE_FORMAT.de.md), das Format des Beweismittel-Bundles

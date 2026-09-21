@@ -182,6 +182,7 @@ fehlschlägt, also den Generator ausführen, sobald sich seine Eingabe ändert:
 ```bash
 uv run python scripts/build_collectors.py    # catalog/ in beide Kollektoren einbetten
 uv run python scripts/gen_artifact_docs.py   # docs/ARTIFACTS{,.de}.md neu erzeugen
+uv run python scripts/gen_support_docs.py    # docs/SUPPORT{,.de}.md neu erzeugen
 uv run python scripts/check_translations.py  # deutsche Docs hinter dem englischen Stand
 uv run python scripts/check_viewer.py        # Viewer-Struktur und JavaScript-Syntax
 uv run python scripts/opsec_check.py --mode both

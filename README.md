@@ -227,6 +227,8 @@ pseudonymization, and a shell fallback collector.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), how the parts fit together
 - [docs/COLLECTION.md](docs/COLLECTION.md), what to collect first and why, and how to
   run a collection
+- [docs/SUPPORT.md](docs/SUPPORT.md), the generated support reference: which agents are
+  read, how completely, and which of four reasons applies to everything that is not
 - [docs/ARTIFACTS.md](docs/ARTIFACTS.md), the generated artifact reference, grouped by
   how fast each artifact disappears
 - [docs/BUNDLE_FORMAT.md](docs/BUNDLE_FORMAT.md), the evidence bundle format

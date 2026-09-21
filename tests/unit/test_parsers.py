@@ -9,7 +9,6 @@ still produces a usable, honest timeline is the actual requirement.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
@@ -17,6 +16,12 @@ import pytest
 from agentforensics.model import UNINTERPRETED_MARK
 from agentforensics.parsers import PARSERS, for_artifact
 from agentforensics.parsers.base import ParseContext, iter_lines, normalise_ts, text_of
+from agentforensics.parsers.coverage import (
+    GENERIC_READERS,
+    HANDED_OVER,
+    READABLE_AND_UNREAD,
+    READABLE_FORMATS,
+)
 from agentforensics.parsers.jsonl_generic import UNINTERPRETED as JSONL_UNINTERPRETED
 
 
@@ -1576,73 +1581,37 @@ def test_no_parser_declares_an_artifact_the_catalogue_does_not_have() -> None:
     )
 
 
-# A file this suite can read, in the catalogue, that nothing reads. Each one is a decision
-# somebody made and wrote down; the test below fails on any that is not here, so the
-# question "why does nothing read this" always has an answer next to it.
-#
-# Not listed, and not needing to be: every entry whose sensitivity is secret. The collector
-# records those by metadata and hash and does not copy the content unless it is told to, so
-# there is nothing for a parser to read and a list of them would be a list of the same
-# sentence twenty-six times.
-@dataclass(frozen=True)
-class Excused:
-    """Why one readable entry is read by nothing, and what carries its evidence instead.
+def test_every_generic_reader_named_is_a_reader_that_ships() -> None:
+    """The set that says which readings are thin, held against the readers there are.
 
-    Most of these reasons say the evidence is somewhere else in the catalogue. That is a
-    claim about another entry, written once, and this project keeps finding out the hard
-    way what happens to those: the last line of the last reason here said nothing in this
-    suite reads the registry, which stopped being true the week the registry reader was
-    written, in a commit that corrected the same sentence in eight other places and did not
-    look in a test. So the entries a reason leans on are named rather than described, and
-    the test below holds them to being in the catalogue and being read.
+    It is read by the generated support page, which tells somebody how completely an
+    agent is read before they conclude anything from an empty result. A name that has
+    been renamed away would quietly move an agent from "read at the floor" to "read",
+    which is the one direction that matters.
     """
-
-    reason: str
-    # The entries that carry this one's evidence, if that is the reason. Each one has to be
-    # in the catalogue and has to be read by something, or the reason has outlived its
-    # truth and somebody has to look at this entry again.
-    covered_by: tuple[str, ...] = ()
+    shipped = {parser.name for parser in PARSERS}
+    assert shipped >= GENERIC_READERS, sorted(GENERIC_READERS - shipped)
 
 
-READABLE_AND_UNREAD = {
-    "cline.extension_id": Excused(
-        "the entry is the extension's storage directory, and what is under it is claimed "
-        "by the entries for the task tree and the checkpoints. The id itself is the "
-        "evidence and it is in the path, which the artifact event carries",
-        ("cline.vscode_task_transcripts", "cline.checkpoints_shadow_git_legacy"),
-    ),
-    "crosscutting.homebrew_prefixes": Excused(
-        "an installation prefix, so the evidence is which directories exist under it "
-        "rather than what any one file says"
-    ),
-    "crosscutting.uv_tool_dir": Excused(
-        "declared and deliberately not read by the reader for this format, which says why "
-        "in its own module: the manifests here describe the installer's own bookkeeping "
-        "rather than an agent's activity"
-    ),
-    "jetbrains_ai.base_directories": Excused(
-        "the entry is the product's directory layout, which is what makes the other "
-        "entries for this family resolvable. The files under it are claimed by those",
-        ("jetbrains_ai.aia_task_history", "jetbrains_ai.mcp_config", "jetbrains_ai.ide_logs"),
-    ),
-    "roo_code.extension_id": Excused(
-        "the same shape as the other extension id entry above",
-        ("roo_code.tasks", "roo_code.checkpoints"),
-    ),
-    "windsurf.enterprise_policy_templates": Excused(
-        "group-policy templates, which are XML and say which settings exist rather than "
-        "which were set. What was set is in the registry key of the entry beside this "
-        "one, which a Windows collection carries as a document and this suite reads",
-        ("windsurf.enterprise_policy",),
-    ),
-}
+def test_every_entry_handed_to_another_tool_is_real_and_still_unread() -> None:
+    """The table that says "somebody else's reader is better", held to both halves.
 
-# The formats this suite has a reader for. A catalogue entry in one of these and claimed by
-# nobody is the case worth catching: the others need format work and the filesystem event
-# is the honest answer for them until somebody does it.
-_READABLE_FORMATS = frozenset(
-    {"json", "jsonl", "leveldb", "lmdb", "markdown", "plist", "sqlite", "text", "toml", "yaml"}
-)
+    An id that left the catalogue would leave an excuse standing for nothing, and an entry
+    that gained a reader here would be described to a reader of the support page as handed
+    over when it is not. Both are the same defect as a stale comment, and this project has
+    paid for enough of those.
+    """
+    from agentforensics.catalog import load_catalogue
+
+    catalogue = load_catalogue(Path(__file__).resolve().parents[2] / "catalog")
+    known = {artifact.id for artifact in catalogue.artifacts}
+    for artifact_id, reason in HANDED_OVER.items():
+        assert artifact_id in known, f"{artifact_id} is not in the catalogue"
+        assert for_artifact(artifact_id) is None, (
+            f"{artifact_id} is described as handed to another tool and a reader in this "
+            "suite now claims it"
+        )
+        assert reason.strip(), artifact_id
 
 
 def test_a_readable_artifact_is_read_or_says_why_not() -> None:
@@ -1663,7 +1632,7 @@ def test_a_readable_artifact_is_read_or_says_why_not() -> None:
     unread = {
         artifact.id
         for artifact in catalogue.artifacts
-        if artifact.format in _READABLE_FORMATS
+        if artifact.format in READABLE_FORMATS
         and artifact.sensitivity != "secret"
         and for_artifact(artifact.id) is None
     }

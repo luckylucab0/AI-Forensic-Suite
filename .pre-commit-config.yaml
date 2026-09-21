@@ -84,6 +84,13 @@ repos:
         pass_filenames: false
         files: '^(catalog/|docs/locales/|scripts/gen_artifact_docs\.py)'
 
+      - id: generated-support-docs
+        name: docs/SUPPORT.md current with the catalogue and the readers
+        entry: uv run python scripts/gen_support_docs.py --check
+        language: system
+        pass_filenames: false
+        files: '^(catalog/|src/agentforensics/parsers/|scripts/gen_support_docs\.py|docs/SUPPORT)'
+
       - id: embedded-catalogue
         name: embedded catalogue current in both collectors
         entry: uv run python scripts/build_collectors.py --check

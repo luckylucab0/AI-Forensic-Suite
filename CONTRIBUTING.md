@@ -162,6 +162,7 @@ run the generator whenever you change its input:
 ```bash
 uv run python scripts/build_collectors.py    # embed catalog/ into both collectors
 uv run python scripts/gen_artifact_docs.py   # regenerate docs/ARTIFACTS{,.de}.md
+uv run python scripts/gen_support_docs.py    # regenerate docs/SUPPORT{,.de}.md
 uv run python scripts/check_translations.py  # German docs lagging their English source
 uv run python scripts/check_viewer.py        # viewer structure and JavaScript parse
 uv run python scripts/opsec_check.py --mode both

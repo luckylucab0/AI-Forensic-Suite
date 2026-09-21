@@ -42,6 +42,7 @@ ENGLISH_ONLY_FILES: list[str] = []
 GENERATED_PAIRS = [
     Path("docs") / "ARTIFACTS.md",
     Path("docs") / "RULES.md",
+    Path("docs") / "SUPPORT.md",
 ]
 
 EXIT_OK = 0
