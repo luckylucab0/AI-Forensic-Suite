@@ -197,3 +197,39 @@ artifacts:
 
     Record structure: FORMAT of .events: NOT SQLite. First line is the literal header 'AUI_EVENTS_V1', then newline-delimited base64-encoded JSON records. Record types (fully-qualified): com.intellij.ml.llm.chat.shared.ChatSessionUserPromptEvent (fields: type, id.id, prompt, attachments[].url as file:// URIs, agentId.id) and com.intellij.ml.llm.chat.shared.ChatSessionMessageBlockEvent (wrapping event.kind from com.intellij.ml.llm.aui.events.api.*). Known block kinds: AgentThoughtBlockUpdatedEvent, MarkdownBlockUpdatedEvent, ToolBlockUpdatedEvent (text, status, details, toolType), TerminalBlockUpdatedEvent, ViewFilesBlockUpdatedEvent, FileChangesBlockUpdatedEvent, ResultBlockUpdatedEvent. TerminalBlockUpdatedEvent and FileChangesBlockUpdatedEvent are the execution-evidence goldmine. Correlation to the workspace XML is by exact prompt-text match, not by uid (junie-export notes 'the XML message UIDs are not directly present as primary keys in the .events stream').
   parser: prose_document
+- id: jetbrains_ai.path_properties
+  title: Path properties and VM options
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_CONFIG_HOME/JetBrains/<Product><Version>/*.vmoptions
+  - $XDG_CONFIG_HOME/JetBrains/<Product><Version>/idea.properties
+  - '%APPDATA%\JetBrains\<Product><Version>\*.vmoptions'
+  - '%APPDATA%\JetBrains\<Product><Version>\idea.properties'
+  - '%USERPROFILE%\idea.properties'
+  - ~/.config/JetBrains/<Product><Version>/*.vmoptions
+  - ~/.config/JetBrains/<Product><Version>/idea.properties
+  - ~/Library/Application Support/JetBrains/<Product><Version>/*.vmoptions
+  - ~/Library/Application Support/JetBrains/<Product><Version>/idea.properties
+  - ~/idea.properties
+  format: text
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/util/src/com/intellij/openapi/application/PathManager.java
+  source_kind: source_code
+  volatility: |-
+    Written by hand or by the IDE's own "edit custom properties" action and never pruned, so one of these files usually predates everything else in the tree it describes.
+  notes: |-
+    THE RELOCATION CHANNEL OF THIS WHOLE FAMILY, and the catalogue had no entry for it. Every other product here moves its data tree with an environment variable, which this catalogue declares and the collectors read. These IDEs move theirs with a properties file instead, so there is nothing in the environment to read and a collection of the documented directories comes back empty with no way to tell that from an IDE nobody used.
+
+    Five properties do it, all of them from platform/util/src/com/intellij/openapi/application/PathManager.java: idea.config.path, idea.system.path, idea.plugins.path, idea.log.path and idea.paths.selector, the last of which renames the per-product directory that every path in this catalogue's other entries is keyed by.
+
+    Where the files are, in the order loadProperties() reads them: the file named by the idea.properties.file property, then idea.properties in the custom options directory, which is the default configuration path for the product, then idea.properties in the user's home directory, then one per installation bin directory. The first and the last are not globbable from a profile, so they are not paths here: the first is named by a property whose value is only in the process, and the last is inside whatever installation directory the IDE was installed into. The two that are collectable are here, and they are the ones a user actually edits.
+
+    The *.vmoptions files beside them matter for the same reason. The launcher passes their contents to the JVM, so a -Didea.config.path=... line in one of them relocates the tree exactly as the properties file does, and the file is also where an analyst sees that somebody changed the agent's memory limits or added an agent flag.
+  parser: text_config

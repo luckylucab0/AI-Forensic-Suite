@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: b40636550a30
+// Catalogue digest: 82ef38d79ba0
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -2092,6 +2092,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "jetbrains_ai", "jetbrains_ai.password_safe", ".config\\JetBrains",
     "jetbrains_ai", "jetbrains_ai.password_safe", "Library/Application Support/JetBrains",
     "jetbrains_ai", "jetbrains_ai.password_safe", "Library\\Application Support\\JetBrains",
+    "jetbrains_ai", "jetbrains_ai.path_properties", ".config/JetBrains",
+    "jetbrains_ai", "jetbrains_ai.path_properties", ".config\\JetBrains",
+    "jetbrains_ai", "jetbrains_ai.path_properties", "Library/Application Support/JetBrains",
+    "jetbrains_ai", "jetbrains_ai.path_properties", "Library\\Application Support\\JetBrains",
     "junie", "junie.allowlist", ".junie/allowlist.json",
     "junie", "junie.allowlist", ".junie\\allowlist.json",
     "junie", "junie.cli_sessions", ".junie/sessions",

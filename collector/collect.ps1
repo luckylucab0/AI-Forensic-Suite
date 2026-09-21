@@ -8397,6 +8397,31 @@ $EmbeddedCatalogueJson = @'
                     "root": "user_profile",
                     "sensitivity": "secret",
                     "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "jetbrains_ai.path_properties",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/JetBrains/<Product><Version>/*.vmoptions",
+                        "$XDG_CONFIG_HOME/JetBrains/<Product><Version>/idea.properties",
+                        "%APPDATA%\\JetBrains\\<Product><Version>\\*.vmoptions",
+                        "%APPDATA%\\JetBrains\\<Product><Version>\\idea.properties",
+                        "%USERPROFILE%\\idea.properties",
+                        "~/.config/JetBrains/<Product><Version>/*.vmoptions",
+                        "~/.config/JetBrains/<Product><Version>/idea.properties",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/*.vmoptions",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/idea.properties",
+                        "~/idea.properties"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 }
             ]
         },
@@ -11935,7 +11960,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "62043313b22fa3603cedd75d6a9c6e2ffc77590f84d271044d2c487c6c01df7d"
+    "sha256": "4ab1501239b8134f16efb1d29b6c496eaf514e392027ff909ebd8b1363d882a5"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

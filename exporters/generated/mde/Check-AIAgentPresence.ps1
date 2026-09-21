@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b40636550a30
+# Catalogue digest: 82ef38d79ba0
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1023,6 +1023,8 @@ $targets = @(
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.log_data'; Path = '$profile\AppData\Local\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.mcp_config'; Path = '$profile\AppData\Roaming\JetBrains\Air\mcp.json' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.password_safe'; Path = '$profile\AppData\Roaming\JetBrains' }
+    @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.path_properties'; Path = '$profile\AppData\Roaming\JetBrains' }
+    @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.path_properties'; Path = '$profile\idea.properties' }
     @{ Agent = 'junie'; Id = 'junie.allowlist'; Path = '$profile\.junie\allowlist.json' }
     @{ Agent = 'junie'; Id = 'junie.cli_sessions'; Path = '$profile\.junie\sessions' }
     @{ Agent = 'junie'; Id = 'junie.home_config'; Path = '$profile\.junie\AGENTS.md' }

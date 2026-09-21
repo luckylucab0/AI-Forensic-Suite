@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b40636550a30
+# Catalogue digest: 82ef38d79ba0
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1214,6 +1214,9 @@ sources:
     jetbrains_ai,jetbrains_ai.mcp_config,C:/Users/*/AppData/Roaming/JetBrains/Air/mcp.json
     jetbrains_ai,jetbrains_ai.password_safe,C:/Users/*/AppData/Roaming/JetBrains/**/c.kdbx
     jetbrains_ai,jetbrains_ai.password_safe,C:/Users/*/AppData/Roaming/JetBrains/**/c.pwd
+    jetbrains_ai,jetbrains_ai.path_properties,C:/Users/*/AppData/Roaming/JetBrains/**/*.vmoptions
+    jetbrains_ai,jetbrains_ai.path_properties,C:/Users/*/AppData/Roaming/JetBrains/**/idea.properties
+    jetbrains_ai,jetbrains_ai.path_properties,C:/Users/*/idea.properties
     junie,junie.allowlist,C:/Users/*/.junie/allowlist.json
     junie,junie.cli_sessions,C:/Users/*/.junie/sessions/*/**
     junie,junie.cli_sessions,C:/Users/*/.junie/sessions/*/events.jsonl
@@ -3603,6 +3606,16 @@ sources:
     jetbrains_ai,jetbrains_ai.password_safe,/var/root/Library/Application Support/JetBrains/**/c.kdbx
     jetbrains_ai,jetbrains_ai.password_safe,/var/root/Library/Application Support/JetBrains/**/c.pwd
     jetbrains_ai,jetbrains_ai.password_safe,/var/root/Library/Application Support/JetBrains/**/options/security.xml
+    jetbrains_ai,jetbrains_ai.path_properties,/Users/*/.config/JetBrains/**/*.vmoptions
+    jetbrains_ai,jetbrains_ai.path_properties,/Users/*/.config/JetBrains/**/idea.properties
+    jetbrains_ai,jetbrains_ai.path_properties,/Users/*/Library/Application Support/JetBrains/**/*.vmoptions
+    jetbrains_ai,jetbrains_ai.path_properties,/Users/*/Library/Application Support/JetBrains/**/idea.properties
+    jetbrains_ai,jetbrains_ai.path_properties,/Users/*/idea.properties
+    jetbrains_ai,jetbrains_ai.path_properties,/var/root/.config/JetBrains/**/*.vmoptions
+    jetbrains_ai,jetbrains_ai.path_properties,/var/root/.config/JetBrains/**/idea.properties
+    jetbrains_ai,jetbrains_ai.path_properties,/var/root/Library/Application Support/JetBrains/**/*.vmoptions
+    jetbrains_ai,jetbrains_ai.path_properties,/var/root/Library/Application Support/JetBrains/**/idea.properties
+    jetbrains_ai,jetbrains_ai.path_properties,/var/root/idea.properties
     junie,junie.allowlist,/Users/*/.junie/allowlist.json
     junie,junie.allowlist,/var/root/.junie/allowlist.json
     junie,junie.cli_sessions,/Users/*/.junie/sessions/*/events.jsonl
@@ -6482,6 +6495,16 @@ sources:
     jetbrains_ai,jetbrains_ai.password_safe,/root/Library/Application Support/JetBrains/**/c.kdbx
     jetbrains_ai,jetbrains_ai.password_safe,/root/Library/Application Support/JetBrains/**/c.pwd
     jetbrains_ai,jetbrains_ai.password_safe,/root/Library/Application Support/JetBrains/**/options/security.xml
+    jetbrains_ai,jetbrains_ai.path_properties,/home/*/.config/JetBrains/**/*.vmoptions
+    jetbrains_ai,jetbrains_ai.path_properties,/home/*/.config/JetBrains/**/idea.properties
+    jetbrains_ai,jetbrains_ai.path_properties,/home/*/Library/Application Support/JetBrains/**/*.vmoptions
+    jetbrains_ai,jetbrains_ai.path_properties,/home/*/Library/Application Support/JetBrains/**/idea.properties
+    jetbrains_ai,jetbrains_ai.path_properties,/home/*/idea.properties
+    jetbrains_ai,jetbrains_ai.path_properties,/root/.config/JetBrains/**/*.vmoptions
+    jetbrains_ai,jetbrains_ai.path_properties,/root/.config/JetBrains/**/idea.properties
+    jetbrains_ai,jetbrains_ai.path_properties,/root/Library/Application Support/JetBrains/**/*.vmoptions
+    jetbrains_ai,jetbrains_ai.path_properties,/root/Library/Application Support/JetBrains/**/idea.properties
+    jetbrains_ai,jetbrains_ai.path_properties,/root/idea.properties
     junie,junie.allowlist,/home/*/.junie/allowlist.json
     junie,junie.allowlist,/root/.junie/allowlist.json
     junie,junie.cli_sessions,/home/*/.junie/sessions/*/events.jsonl

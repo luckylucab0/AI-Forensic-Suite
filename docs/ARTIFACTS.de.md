@@ -6,7 +6,7 @@
 
 Erzeugt aus catalog/ durch scripts/gen_artifact_docs.py. Nicht von Hand bearbeiten: die CI erzeugt diese Datei neu und schlägt fehl, wenn sie abweicht.
 
-599 Artefakte über 31 Agent(en), davon 474 auf einer abgerufenen Herstellerquelle beruhend.
+600 Artefakte über 31 Agent(en), davon 475 auf einer abgerufenen Herstellerquelle beruhend.
 
 Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
 
@@ -1041,6 +1041,14 @@ Vendor: JetBrains
 | `jetbrains_ai.log_data` | log data | log | Windows, macOS, Linux | `%LOCALAPPDATA%\JetBrains\<Product><Version>\ai-assistant-log-data\`<br>`~/.cache/JetBrains/<Product><Version>/ai-assistant-log-data/`<br>`~/Library/Caches/JetBrains/<Product><Version>/ai-assistant-log-data/` | text | normal | [EN] Explicitly enumerated as a deletion target by disk-cleanup scripts. | **unbestätigt** | [community](https://github.com/alanchik66/HUNDESALON_NIKA/blob/main/tools/optimize-webstorm-memory.ps1) |
 | `jetbrains_ai.mcp_config` | mcp config | mcp_config | macOS, Windows, Linux | `$XDG_CONFIG_HOME/JetBrains/Air/mcp.json`<br>`%APPDATA%\JetBrains\Air\mcp.json`<br>`<project>/.air/mcp.json`<br>`~/.config/JetBrains/Air/mcp.json`<br>`~/Library/Application Support/JetBrains/Air/mcp.json` | json | normal |  | bestätigt | [official](https://raw.githubusercontent.com/JetBrains/intellij-community/master/plugins/mcp-server/src/com/intellij/mcpserver/impl/McpClientDetector.kt) |
 | `jetbrains_ai.password_safe` | password safe | credentials | macOS, Windows, Linux | `%APPDATA%\JetBrains\<Product><Version>\c.kdbx`<br>`%APPDATA%\JetBrains\<Product><Version>\c.pwd`<br>`~/.config/JetBrains/<Product><Version>/c.kdbx`<br>`~/.config/JetBrains/<Product><Version>/c.pwd`<br>`~/Library/Application Support/JetBrains/<Product><Version>/c.kdbx`<br>`~/Library/Application Support/JetBrains/<Product><Version>/c.pwd`<br>`~/Library/Application Support/JetBrains/<Product><Version>/options/security.xml` [unbelegt] | binary | secret | [EN] A kdbx moved to another machine WITHOUT its main-key file causes the platform to silently generate a new main password and WIPE the KeePass contents - so never let an acquired copy be opened by a live IDE. | bestätigt | [source_code](https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/credential-store-impl/src/credentialStore/keePass/mainKey.kt) |
+
+### durable
+
+**Meist noch vorhanden.** Vom Aufräumlauf nicht erfasst und überleben damit regelmässig die Transkripte, die sie beschreiben. Sind die Transkripte schon weg, ist diese Gruppe das, was bleibt, und sie genügt oft, um zu belegen, dass ein Agent lief, was er durfte und was gefragt wurde.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `jetbrains_ai.path_properties` | Path properties and VM options | config | macOS, Linux, Windows | `$XDG_CONFIG_HOME/JetBrains/<Product><Version>/*.vmoptions`<br>`$XDG_CONFIG_HOME/JetBrains/<Product><Version>/idea.properties`<br>`%APPDATA%\JetBrains\<Product><Version>\*.vmoptions`<br>`%APPDATA%\JetBrains\<Product><Version>\idea.properties`<br>`%USERPROFILE%\idea.properties`<br>`~/.config/JetBrains/<Product><Version>/*.vmoptions`<br>`~/.config/JetBrains/<Product><Version>/idea.properties`<br>`~/Library/Application Support/JetBrains/<Product><Version>/*.vmoptions`<br>`~/Library/Application Support/JetBrains/<Product><Version>/idea.properties`<br>`~/idea.properties` | text | normal | [EN] Written by hand or by the IDE's own "edit custom properties" action and never pruned, so one of these files usually predates everything else in the tree it describes. | bestätigt | [source_code](https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/util/src/com/intellij/openapi/application/PathManager.java) |
 
 ### Veraltete Pfade
 
