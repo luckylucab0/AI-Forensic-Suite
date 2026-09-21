@@ -46,3 +46,8 @@ Add one with the next free number, using [0000-template.md](0000-template.md).
 | [0036](0036-a-settings-file-is-read-the-way-its-own-product-reads-it.md) | A JSON document that is not strict JSON is read the way the product that wrote it reads it, with the relaxation named on the event and the text carried with it |
 | [0037](0037-a-first-hand-measurement-may-refute-a-path-but-never-verifies-one.md) | A first-hand measurement may add, correct or refute a catalogue path, and never makes one verified |
 | [0038](0038-a-store-is-read-with-the-file-that-says-which-project-it-is.md) | A per-workspace store is read with the file beside it that names its folder, and every row carries that folder |
+| [0039](0039-a-file-nothing-could-read-is-a-record-in-the-case.md) | A file nothing could read is a record in the case |
+| [0040](0040-a-redirected-known-folder-is-another-spelling-of-the-same-path.md) | A redirected known folder is another spelling of the same path |
+| [0041](0041-a-patterns-anchor-is-a-property-of-the-pattern.md) | A pattern's anchor is a property of the pattern, not of its entry |
+| [0042](0042-a-view-names-the-field-the-evidence-does-not-hold.md) | A view names the field the design asked for and the evidence does not hold, rather than leaving it blank |
+| [0043](0043-a-filter-applies-as-it-is-set.md) | A filter applies as it is set, so the count of what it hides is never stale |
