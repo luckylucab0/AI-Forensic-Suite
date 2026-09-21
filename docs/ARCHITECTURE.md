@@ -107,7 +107,7 @@ it cannot be rewritten *quietly*.
   events. A parser is chosen by the catalogue entry that claimed the file, so it can never
   disagree with the catalogue about what a file is. A file with no parser is recorded as
   unsupported rather than skipped, and the case counts those files and says which they are.
-  37 modules read 505 of the catalogue's 630 artifacts, and what the rest is gets asserted
+  37 modules read 506 of the catalogue's 631 artifacts, and what the rest is gets asserted
   rather than assumed: every entry in a format this suite reads is either read or carries a
   written reason why not, and the credential stores are exempt as a class because the
   collector withholds their content, which a test pins to credential stores alone. What is

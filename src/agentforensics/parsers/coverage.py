@@ -187,15 +187,12 @@ READABLE_FORMATS = frozenset(
 # The test in tests/unit/test_parsers.py holds every id here to being in the catalogue, so a
 # renamed or deleted entry takes its promise with it rather than leaving the page making a
 # commitment about a file that is gone.
-UNFINISHED = {
-    "goose.plugins": (
-        "the plugin tree is collected whole and read as text, which is right for the shell "
-        "scripts in it and wrong for the hooks/hooks.json beside them. That file registers "
-        "the commands the product runs on tool events, and the matcher that decides which "
-        "calls they fire on, so until something reads it as the registry it is, a case "
-        "holds it as prose and no rule can ask what a hook was permitted to do"
-    ),
-}
+# Empty, and the table stays rather than going with its last entry. It is the only place a
+# sentence of this kind may live, so an empty one is the statement that nobody currently
+# owes this catalogue a reading, and the next person who defers one has somewhere to say so
+# instead of leaving it in a note nobody generates a page from. Both entries it held were
+# closed by writing the readers rather than by deleting the promise.
+UNFINISHED: dict[str, str] = {}
 
 
 __all__ = ["READABLE_AND_UNREAD", "READABLE_FORMATS", "UNFINISHED", "Excused"]

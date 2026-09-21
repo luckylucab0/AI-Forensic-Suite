@@ -6869,6 +6869,27 @@ $EmbeddedCatalogueJson = @'
                     "status": "verified"
                 },
                 {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "goose.hooks",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.agents\\plugins\\*\\hooks\\hooks.json",
+                        "%USERPROFILE%\\.agents\\plugins\\*\\plugin.json",
+                        "<project>/.agents/plugins/*/hooks/hooks.json",
+                        "<project>/.agents/plugins/*/plugin.json",
+                        "~/.agents/plugins/*/hooks/hooks.json",
+                        "~/.agents/plugins/*/plugin.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "transcript",
                     "collect_priority": "first",
                     "id": "goose.llm_request_logs",
@@ -12575,7 +12596,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "d03c9305341cd5567dfe288a43e5c7db97762b0beeeec4346fba5d33ea1d4e64"
+    "sha256": "7d74607bcde444c0a43c8c395f45b353e2d7173225b1fe55b253ecf86f330139"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

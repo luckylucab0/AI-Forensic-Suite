@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 07a1ab5e2fca
+// Catalogue digest: 6671aaccb0c5
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1495,6 +1495,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "goose", "goose.hints", "Block\\goose\\config\\.goosehints",
     "goose", "goose.hints", "Library/Application Support/Block/goose/config/.goosehints",
     "goose", "goose.hints", "Library\\Application Support\\Block\\goose\\config\\.goosehints",
+    "goose", "goose.hooks", ".agents/plugins",
+    "goose", "goose.hooks", ".agents\\plugins",
     "goose", "goose.llm_request_logs", ".local/state/goose/logs/llm_request.",
     "goose", "goose.llm_request_logs", ".local\\state\\goose\\logs\\llm_request.",
     "goose", "goose.llm_request_logs", "Block/goose/data/logs/llm_request.",

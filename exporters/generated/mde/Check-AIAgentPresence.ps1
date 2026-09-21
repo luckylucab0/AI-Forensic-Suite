@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 07a1ab5e2fca
+# Catalogue digest: 6671aaccb0c5
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -147,6 +147,7 @@
 #     gemini_cli.policies
 #     goose.agents
 #     goose.hints
+#     goose.hooks
 #     goose.plugins
 #     goose.settings
 #     goose.skills
@@ -735,6 +736,7 @@ $targets = @(
     @{ Agent = 'goose'; Id = 'goose.config'; Path = '$profile\AppData\Roaming\Block\goose\config\config.yaml' }
     @{ Agent = 'goose'; Id = 'goose.desktop_log'; Path = '$profile\AppData\Roaming\Block\goose\logs\main.log' }
     @{ Agent = 'goose'; Id = 'goose.hints'; Path = '$profile\AppData\Roaming\Block\goose\config\.goosehints' }
+    @{ Agent = 'goose'; Id = 'goose.hooks'; Path = '$profile\.agents\plugins' }
     @{ Agent = 'goose'; Id = 'goose.llm_request_logs'; Path = '$profile\AppData\Roaming\Block\goose\data\logs\llm_request.' }
     @{ Agent = 'goose'; Id = 'goose.permissions'; Path = '$profile\AppData\Roaming\Block\goose\config\permission.yaml' }
     @{ Agent = 'goose'; Id = 'goose.permissions'; Path = '$profile\AppData\Roaming\Block\goose\config\permissions\tool_permissions.json' }

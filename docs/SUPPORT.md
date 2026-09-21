@@ -6,7 +6,7 @@ English | [Deutsch](SUPPORT.de.md)
 
 What this suite reads, per agent, counted from the catalogue and the reader registry rather than written down. The numbers move when the code does.
 
-31 catalogue files, 30 of them a product and one cross-cutting. 505 of 630 artifacts are read by 37 reader modules, into 23 event kinds. 504 artifacts rest on a fetched vendor source.
+31 catalogue files, 30 of them a product and one cross-cutting. 506 of 631 artifacts are read by 37 reader modules, into 23 event kinds. 505 artifacts rest on a fetched vendor source.
 
 **How to read an empty result.** An agent listed here with artifacts read means the paths were searched and the files that were there were parsed, so an empty result is evidence that those paths held nothing. It is never evidence that the agent was not used: the data tree may have been relocated by a variable, the retention period may have swept it, the paths may be the unverified ones, or the user may have worked in a profile nobody collected. Where an entry is unverified, `docs/ARTIFACTS.md` says so per artifact and the analyzer repeats it in its output.
 
@@ -30,7 +30,7 @@ What this suite reads, per agent, counted from the catalogue and the reader regi
 | Factory Droid | Linux, macOS, Windows | 2 / 2 | 9 / 10 | 7 | 1 |
 | Gemini CLI | Linux, macOS, Windows | 1 / 1 | 15 / 19 | 8 | 4 |
 | GitHub Copilot CLI | Linux, macOS, Windows | 3 / 4 | 16 / 20 | 11 | 4 |
-| Goose | Linux, macOS, Windows | 4 / 4 | 18 / 19 | 11 | 1 |
+| Goose | Linux, macOS, Windows | 4 / 4 | 19 / 20 | 12 | 1 |
 | Hermes | Linux, macOS, Windows | 10 / 11 | 41 / 56 | 31 | 15 |
 | JetBrains AI Assistant | Linux, macOS, Windows | 1 / 1 | 6 / 8 | 4 | 2 |
 | Junie | Linux, macOS, Windows | 2 / 2 | 7 / 9 | 6 | 2 |
@@ -161,13 +161,11 @@ None as of this generation. The check behind this section looks for a catalogue 
 
 ## Started and not finished
 
-One entry where somebody wrote down that the reading is incomplete. Everything above is a decision; this is a list of work. It may also appear above, in whichever group its current state puts it, because `read` on this page is a yes or a no and an analyst deciding whether a case can be quoted needs the third answer. The declaration lives in `src/agentforensics/parsers/coverage.py` and a test holds it to still existing in the catalogue, so this list cannot outlive what it promises.
-
-- `goose.plugins`: the plugin tree is collected whole and read as text, which is right for the shell scripts in it and wrong for the hooks/hooks.json beside them. That file registers the commands the product runs on tool events, and the matcher that decides which calls they fire on, so until something reads it as the registry it is, a case holds it as prose and no rule can ask what a hook was permitted to do
+None as of this generation. This section names the readings somebody started and did not finish, declared in `src/agentforensics/parsers/coverage.py`, and there are none.
 
 ## Where the reading is thin
 
-302 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
+303 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
 
 ## Where to look next
 

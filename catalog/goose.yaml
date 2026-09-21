@@ -566,8 +566,43 @@ artifacts:
 
     The directory is shared with other products in this catalogue, so a plugin found there is not by itself evidence that this agent ran.
 
-    Not read as records. The tree holds JSON, markdown and shell scripts together, so it is collected whole and read as text, and the hook configuration inside it has no parser of its own yet.
+    The tree holds JSON, markdown and shell scripts together, so it is collected whole and read as text, which is the right reading for the scripts and the documentation in it. The two JSON files that are not prose, the hook rules and the plugin manifest, have an entry of their own beside this one and are read as configuration.
   parser: instructions
+- id: goose.hooks
+  category: config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.agents\plugins\*\hooks\hooks.json'
+  - '%USERPROFILE%\.agents\plugins\*\plugin.json'
+  - <project>/.agents/plugins/*/hooks/hooks.json
+  - <project>/.agents/plugins/*/plugin.json
+  - ~/.agents/plugins/*/hooks/hooks.json
+  - ~/.agents/plugins/*/plugin.json
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/context-engineering/hooks.md
+  source_kind: official
+  volatility: |-
+    Not swept. A plugin installed with automatic updates is replaced from its git source before its skills load, so the file on disk can be newer than the one that ran and the older rule set exists only in that remote repository.
+  notes: |-
+    The rules, split out of the plugin tree beside it so they are read as the configuration they are rather than as prose. Every other product in this catalogue with hooks has them in a JSON entry of its own; this family had them inside a directory collected as text, which is the one thing that stopped a rule from being able to ask what a hook was allowed to do.
+
+    What the file says, from the vendor's own table. Twelve named events, from a session starting and a prompt being submitted to before and after a tool call, a file read, a file edit and a shell execution. Each rule carries a command that the product runs with a shell, a timeout defaulting to thirty seconds, and an optional matcher. So this file is the list of commands that ran automatically on this machine, attributable to configuration rather than to anything in a transcript.
+
+    A PreToolUse rule can deny the tool call outright, and that is the half an analyst will not find anywhere else: the session shows a call that did not happen, and the reason is here. The vendor documents the observation event beside it as best effort and not durable, saying in as many words that no record is kept if the hook does not run, so the absence of a record is not evidence that nothing was blocked.
+
+    One quirk worth checking before reading a rule as broad. The matcher is a regular expression and not a glob, and the vendor states that a bare asterisk is an invalid expression, so a rule written that way is skipped silently with only a warning in the log. A hook that looks like it applied to everything applied to nothing, and the product's own logs, which this catalogue collects, are where that shows.
+
+    The manifest is in the same entry because it is the only thing that names and versions the plugin a rule belongs to, and because a plugin copied in by hand has no install metadata at all: the vendor states that such a plugin is still discovered and is simply not managed by the update command.
+
+    Whether a rule actually ran is not in this file. A plugin named in the settings file's disabled list is skipped during discovery, and that file is a separate entry.
+  parser: json_generic
 - id: goose.sessions_db
   category: transcript
   root: user_profile
