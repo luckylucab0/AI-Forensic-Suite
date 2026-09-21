@@ -201,10 +201,19 @@ class LevelDbStoreParser:
 
     def _manifest(self, context: ParseContext) -> Iterator[Event]:
         """How many version edits the manifest holds, and that they are not read here."""
+        # Counted as they arrive rather than with a sum over the whole iterator, because
+        # a manifest that ends mid record hands over what it had and then says so, and a
+        # sum would discard that count along with the exception.
+        edits = 0
         try:
-            edits = sum(1 for _ in leveldb.log_records(context.local_path))
+            for _ in leveldb.log_records(context.local_path):
+                edits += 1
         except (leveldb.LevelDbError, OSError) as error:
-            yield self._file(context, f"this manifest would not read: {error}")
+            yield self._file(
+                context,
+                f"this manifest gave up {edits} record(s), the last of them cut short, "
+                f"and then stopped: {error}",
+            )
             return
         yield self._file(
             context,

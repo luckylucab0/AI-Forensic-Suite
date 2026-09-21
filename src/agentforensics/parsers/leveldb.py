@@ -35,6 +35,13 @@ a count, and then the puts and deletes themselves. Those are often the newest co
 in the store, so a reader that took only the tables would return everything except what
 happened last.
 
+**A log that stops in the middle of a record.** Common rather than exotic: the file is
+preallocated and written into, so a copy taken while the agent is running, and anything
+left by a crash, ends inside a record. What the file did hold of that record is handed over
+and then the truncation is raised, so the entries that were whole stay in the case and the
+cut is a line an analyst reads rather than an absence. This reader used to drop the
+unterminated record, which meant the newest part of a conversation left no trace at all.
+
 Format references, read while writing this:
 https://raw.githubusercontent.com/google/leveldb/main/doc/table_format.md
 https://raw.githubusercontent.com/google/leveldb/main/doc/log_format.md
@@ -72,6 +79,17 @@ MAX_RECORDS = 200_000
 
 class LevelDbError(ValueError):
     """The file is not the shape this reader expects."""
+
+
+# Said by both log readers, so the two cannot drift into describing the same file
+# differently. It is a report rather than a refusal: the bytes that did arrive have already
+# been handed over by the time it is raised.
+_TRUNCATED = (
+    "the file ends inside the record that starts at offset {}: {} byte(s) of that record "
+    "were in the file and the rest was never written or was not collected. What was "
+    "readable in it is in the case, and the bytes themselves are in the collection at that "
+    "offset"
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -135,16 +153,28 @@ def log_records(path: Path) -> Iterator[bytes]:
     batch, which `read_log` below takes apart. In a manifest a record is a version edit
     saying which table files are live, and this collection has no verified reading for one,
     so a caller that only needs to know how many there are gets them whole.
+
+    A record the file ends in the middle of is yielded as well, because the bytes that did
+    arrive are still evidence, and then the truncation is raised so the caller can say so.
     """
-    for record, _ in _log_records(path.read_bytes()):
-        yield record
+    truncated = None
+    for framed in _log_records(path.read_bytes()):
+        yield framed.record
+        if not framed.complete:
+            truncated = framed
+    if truncated is not None:
+        raise LevelDbError(_TRUNCATED.format(truncated.at, len(truncated.record)))
 
 
 def read_log(path: Path, limit: int = MAX_RECORDS) -> Iterator[Record]:
     """Every put and delete in the write-ahead log, in the order it was written."""
     data = path.read_bytes()
     seen = 0
-    for batch, at in _log_records(data):
+    truncated = None
+    for framed in _log_records(data):
+        if not framed.complete:
+            truncated = framed
+        batch = framed.record
         if len(batch) < 12:
             continue
         sequence = int.from_bytes(batch[0:8], "little")
@@ -155,15 +185,25 @@ def read_log(path: Path, limit: int = MAX_RECORDS) -> Iterator[Record]:
                 break
             kind = batch[cursor]
             cursor += 1
-            key, cursor = _length_prefixed(batch, cursor)
-            if kind == 1:
-                value, cursor = _length_prefixed(batch, cursor)
-                deleted = False
-            elif kind == 0:
-                value, deleted = None, True
-            else:
-                # A record type this reader does not know. The batch is abandoned rather
-                # than guessed at, because the next field's position depends on this one.
+            try:
+                key, cursor = _length_prefixed(batch, cursor)
+                if kind == 1:
+                    value, cursor = _length_prefixed(batch, cursor)
+                    deleted = False
+                elif kind == 0:
+                    value, deleted = None, True
+                else:
+                    # A record type this reader does not know. The batch is abandoned
+                    # rather than guessed at, because the next field's position depends on
+                    # this one.
+                    break
+            except LevelDbError:
+                # In a whole batch this is a malformed file and the caller has to hear it.
+                # In a batch the log ends in the middle of it is the expected shape of the
+                # last entry, so the entries before it stay in the case and the truncation
+                # is reported once, below, instead of as a failure to read the file.
+                if framed.complete:
+                    raise
                 break
             if seen >= limit:
                 return
@@ -171,16 +211,28 @@ def read_log(path: Path, limit: int = MAX_RECORDS) -> Iterator[Record]:
             yield Record(
                 key=key,
                 value=value,
-                locator=f"log:{at} record:{index}",
+                locator=f"log:{framed.at} record:{index}",
                 deleted=deleted,
                 sequence=sequence + index,
             )
+    if truncated is not None:
+        raise LevelDbError(_TRUNCATED.format(truncated.at, len(truncated.record)))
 
 
 @dataclass(frozen=True, slots=True)
 class _Entry:
     key: bytes
     value: bytes
+
+
+@dataclass(frozen=True, slots=True)
+class _Framed:
+    """One record out of the log framing, and whether the file held all of it."""
+
+    record: bytes
+    # The offset of the header of the fragment this record starts in.
+    at: int
+    complete: bool
 
 
 def _block(data: bytes, offset: int, size: int) -> bytes:
@@ -233,8 +285,16 @@ def _entries(block: bytes) -> Iterator[_Entry]:
         yield _Entry(key=key, value=value)
 
 
-def _log_records(data: bytes) -> Iterator[tuple[bytes, int]]:
-    """Reassembled records out of the log's fragments, with the offset each started at."""
+def _log_records(data: bytes) -> Iterator[_Framed]:
+    """Reassembled records out of the log's fragments, with the offset each started at.
+
+    A record that the file ends in the middle of is yielded too, marked incomplete. It is
+    the case worth getting right rather than the exotic one: this log holds whatever the
+    store has not folded into a table, so its tail is the newest conversation in the
+    store, and a log copied off a running endpoint or left behind by a crash routinely
+    ends mid record. Dropping those bytes would take the most recent part of the evidence
+    out of the case with nothing saying it had been there.
+    """
     at = 0
     pending = bytearray()
     started = 0
@@ -244,17 +304,26 @@ def _log_records(data: bytes) -> Iterator[tuple[bytes, int]]:
             # starts at the beginning of the next block.
             at += LOG_BLOCK - (at % LOG_BLOCK)
             continue
+        # Where this fragment's header sits, which is where the record it starts begins.
+        # The offset travels into an event's locator, so it has to be somewhere an analyst
+        # can seek to and find the record, not the position after it.
+        header_at = at
         length = int.from_bytes(data[at + 4 : at + 6], "little")
         kind = data[at + 6]
         body = data[at + LOG_HEADER : at + LOG_HEADER + length]
         if len(body) < length:
+            # The file ends inside this fragment's payload.
+            if kind in (FULL, FIRST):
+                yield _Framed(bytes(body), header_at, False)
+            elif pending:
+                yield _Framed(bytes(pending + body), started, False)
             return
         at += LOG_HEADER + length
         if kind == FULL:
-            yield bytes(body), at
+            yield _Framed(bytes(body), header_at, True)
         elif kind == FIRST:
             pending = bytearray(body)
-            started = at
+            started = header_at
         elif kind in (MIDDLE, LAST):
             if not pending:
                 # A fragment with no start, which is what a log truncated at the front
@@ -262,13 +331,17 @@ def _log_records(data: bytes) -> Iterator[tuple[bytes, int]]:
                 continue
             pending += body
             if kind == LAST:
-                yield bytes(pending), started
+                yield _Framed(bytes(pending), started, True)
                 pending = bytearray()
         elif kind == 0 and length == 0:
             # Zero padding at the end of a preallocated file.
             continue
         else:
             raise LevelDbError(f"a log fragment has a type this reader does not know: {kind}")
+
+    if pending:
+        # The last record began and the file ran out before the fragment that would end it.
+        yield _Framed(bytes(pending), started, False)
 
 
 def _length_prefixed(data: bytes, at: int) -> tuple[bytes, int]:

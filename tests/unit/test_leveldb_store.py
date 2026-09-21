@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from test_leveldb import batch, log, table
+from test_leveldb import LOG_BLOCK, batch, framed, log, table
 
 from agentforensics.model import is_uninterpreted
 from agentforensics.parsers import ParseContext, for_artifact
@@ -158,3 +158,44 @@ def test_a_table_that_breaks_halfway_keeps_what_came_out_before_it(tmp_path: Pat
     events = parse(path)
     assert events
     assert any("stopped reading" in (event.parse_problem or "") for event in events)
+
+
+def test_a_log_cut_at_the_end_reaches_the_case_as_a_log_cut_at_the_end(
+    tmp_path: Path,
+) -> None:
+    """The store layer has to carry the reader's report, not swallow it into an empty read.
+
+    This is the tail of a write-ahead log, so it is the newest conversation in the store
+    and the part an examiner opens the case for. It used to disappear: the framing reader
+    dropped an unterminated record, this layer saw a log that simply ended, and the case
+    said the store held whatever the tables held and nothing about the rest. Nothing is
+    worse here than showing nothing, because an analyst reads nothing as nothing was there.
+    """
+    entries = [(f"prompt/{index}".encode(), b"a message " * 200) for index in range(30)]
+    whole = framed([batch(entries, 100)])
+    path = tmp_path / "000019.log"
+    path.write_bytes(whole[: LOG_BLOCK + 400])
+
+    events = parse(path)
+    assert any("prompt/0" in str(event.payload) for event in events), (
+        "the records that were whole before the cut have to be in the case"
+    )
+    problems = [event.parse_problem or "" for event in events]
+    assert any("stopped reading" in problem for problem in problems), problems
+    assert any("ends inside the record that starts at offset" in problem for problem in problems)
+
+
+def test_a_manifest_cut_at_the_end_still_reports_what_it_counted(tmp_path: Path) -> None:
+    """A count and a problem, not one instead of the other.
+
+    Counting with a sum over the whole iterator threw the count away with the exception,
+    so a manifest that read forty edits and then stopped said only that it would not read.
+    """
+    path = tmp_path / "MANIFEST-000020"
+    path.write_bytes(framed([b"\x00" * 12, b"e" * 70_000])[: LOG_BLOCK + 200])
+    events = parse(path)
+    problem = events[0].parse_problem or ""
+    # Two: the whole edit, and the one the file ends inside, which is handed over rather
+    # than dropped and is what "the last of them cut short" names.
+    assert "gave up 2 record(s), the last of them cut short" in problem, problem
+    assert "ends inside the record that starts at offset" in problem, problem
