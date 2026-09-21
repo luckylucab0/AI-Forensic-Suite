@@ -15,9 +15,11 @@ from pathlib import Path
 
 import pytest
 
+from agentforensics.bundle import BundleError
 from agentforensics.catalog import Catalogue, load_catalogue
 from agentforensics.ingest import detect, ingest
 from agentforensics.ingest.match import Matcher
+from agentforensics.ingest.native import NativeBundle
 from agentforensics.ingest.tree import CollectedTree, _is_profile_root
 from agentforensics.model import Case
 
@@ -713,3 +715,121 @@ def test_no_parser_hands_out_two_events_with_one_identity(tmp_path: Path) -> Non
     with Case.open(tmp_path / "case.db") as case:
         report = ingest(case, home, load_catalogue(root / "catalog"))
     assert report.colliding_events == []
+
+
+# ---------------------------------------------- what a manifest says went wrong
+
+
+def _bundle(tmp_path: Path, **extra: object) -> Path:
+    """The smallest native bundle, plus whatever a case wants to put in its manifest."""
+    bundle = tmp_path / "bundle"
+    (bundle / "files").mkdir(parents=True)
+    manifest: dict[str, object] = {
+        "format_version": 1,
+        "collection": {"uuid": "u-1", "os": "linux", "hostname": "vm"},
+        "tool": {"name": "collect.py", "version": "0"},
+        "files": [],
+    }
+    manifest.update(extra)
+    (bundle / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    return bundle
+
+
+def test_what_the_collector_could_not_read_reaches_the_case(
+    tmp_path: Path, catalogue: Catalogue
+) -> None:
+    """The errors the endpoint reported are holes in the evidence, and they were not read.
+
+    A collection that hit forty permission denials and one locked database produced a
+    manifest saying so and a case saying nothing, so the analyst saw an agent with fewer
+    files than it had and no reason given. Both shapes are accepted because the field is
+    read by anything that can write a bundle, not only by the two collectors here.
+    """
+    bundle = _bundle(
+        tmp_path,
+        errors=[
+            {"kind": "unreadable", "path": "/home/alice/.claude/state.db", "reason": "locked"},
+            "a producer that wrote a bare string",
+        ],
+    )
+    with Case.open(tmp_path / "case.sqlite") as case:
+        ingest(case, bundle, catalogue)
+        gaps = case.query("SELECT kind, detail, reason FROM collection_gaps")
+    kinds = {row["kind"] for row in gaps}
+    assert "unreadable" in kinds, kinds
+    assert "error" in kinds, kinds
+    assert any("state.db" in (row["detail"] or "") for row in gaps)
+
+
+def test_a_project_root_written_as_a_plain_string_is_still_read(
+    tmp_path: Path, catalogue: Catalogue
+) -> None:
+    """Both collectors write an object per root. Another producer may write a string, and
+    an unread project root turns every project file into an unattributed one."""
+    bundle = _bundle(tmp_path, project_roots=["/home/alice/work/repo", {"path": "/srv/app"}])
+
+    assert NativeBundle(bundle).project_roots == ["/home/alice/work/repo", "/srv/app"]
+
+
+def test_a_manifest_that_is_not_json_says_so_rather_than_reading_as_empty(
+    tmp_path: Path,
+) -> None:
+    """A bundle whose manifest is damaged must not open as a bundle with no files in it."""
+    bundle = tmp_path / "bundle"
+    (bundle / "files").mkdir(parents=True)
+    (bundle / "manifest.json").write_text("{not json", encoding="utf-8")
+    with pytest.raises(BundleError, match="could not be read"):
+        NativeBundle(bundle)
+
+
+def test_a_json_document_that_is_not_a_manifest_is_refused(tmp_path: Path) -> None:
+    """Valid JSON with the wrong shape, which is what a file renamed into place looks
+    like. Read as a manifest it would report a collection that found nothing."""
+    bundle = tmp_path / "bundle"
+    (bundle / "files").mkdir(parents=True)
+    (bundle / "manifest.json").write_text('{"hello": "world"}', encoding="utf-8")
+    with pytest.raises(BundleError, match="is not a bundle manifest"):
+        NativeBundle(bundle)
+
+
+def test_a_directory_with_no_manifest_is_not_a_native_bundle(tmp_path: Path) -> None:
+
+    (tmp_path / "files").mkdir()
+    assert not NativeBundle.looks_like(tmp_path)
+    with pytest.raises(BundleError, match=r"has no manifest\.json"):
+        NativeBundle(tmp_path)
+
+
+def test_a_link_whose_target_was_not_collected_is_a_gap_not_a_silence(
+    tmp_path: Path, catalogue: Catalogue
+) -> None:
+    """A tree full of links to files nobody copied is what a partial collection looks like.
+
+    The walk yields the link, because the fact that it was there is evidence, and then
+    everything that wants its content fails: the hash, the size and the timestamps. All of
+    that used to happen without a word, so the case held an entry with no hash beside
+    entries with one and nothing said which of the two states it was in.
+    """
+    profile = tmp_path / "alice"
+    (profile / ".claude").mkdir(parents=True)
+    (profile / ".claude" / "settings.json").symlink_to(tmp_path / "never-collected.json")
+
+    with Case.open(tmp_path / "case.sqlite") as case:
+        ingest(case, profile, catalogue)
+        gaps = case.query("SELECT kind, detail, reason FROM collection_gaps")
+    unreadable = [row for row in gaps if row["kind"] == "unreadable_file"]
+    assert unreadable, [dict(row) for row in gaps]
+    assert "settings.json" in unreadable[0]["detail"]
+    assert "could not be read" in (unreadable[0]["reason"] or "")
+
+
+def test_a_timestamp_a_filesystem_cannot_represent_is_absent_not_1970() -> None:
+    """A zeroed or deliberately corrupted inode carries one, and a date this suite cannot
+    vouch for must not appear on a timeline as if it could."""
+    from agentforensics.ingest.tree import _stamp
+
+    assert _stamp(None) is None
+    assert _stamp(1e300) is None
+    assert _stamp(0) == "1970-01-01T00:00:00.000000Z", (
+        "a real epoch timestamp is a real timestamp and stays one"
+    )
