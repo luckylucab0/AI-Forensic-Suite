@@ -755,9 +755,9 @@ A skill, command, workflow or agent definition on the endpoint declares the tool
 | Fields read | `raw.permissions.defaultMode`, `raw.defaultMode`, `payload.defaultMode`, `event_text`, `raw.approvalMode`, `payload.approvalMode`, `raw.approval_policy` |
 | Tags | `T1562.001`, `permission-bypass` |
 
-A configuration sets the mode a session starts in to one that approves tool calls without asking. Claude Code spells this defaultMode bypassPermissions in its settings files, Cline calls the equivalent mode yolo, which its own preset code describes as guaranteeing that tool policies are enabled and auto-approved, and Codex spells it approval_policy = never, which its vendor names as one of the two settings an organization forbids through its managed requirements file.
+A configuration sets the mode a session starts in to one that approves tool calls without asking. Claude Code spells this defaultMode bypassPermissions in its settings files, Cline calls the equivalent mode yolo, which its own preset code describes as guaranteeing that tool policies are enabled and auto-approved, Codex spells it approval_policy = never, which its vendor names as one of the two settings an organization forbids through its managed requirements file, and Warp's command line agent sets a per-action value to always_allow in the execution profile in its settings file.
 
-*What it matches:* `(raw.permissions.defaultMode is 'bypassPermissions' or raw.defaultMode is 'bypassPermissions' or payload.defaultMode is 'bypassPermissions' or event_text matches /(?m)^[^\S\n]*defaultMode[^\S\n]*=[^\S\n]*bypassPermissions[^\S\n]*$/ or event_text matches /(?m)^[^\S\n]*mode[^\S\n]*=[^\S\n]*yolo[^\S\n]*$/ or raw.approvalMode is 'unrestricted' or payload.approvalMode is 'unrestricted' or event_text matches /(?m)^[^\S\n]*approvalMode[^\S\n]*=[^\S\n]*unrestricted[^\S\n]*$/ or raw.approval_policy is 'never' or event_text matches /(?m)^[^\S\n]*approval_policy[^\S\n]*=[^\S\n]*never[^\S\n]*$/)`
+*What it matches:* `(raw.permissions.defaultMode is 'bypassPermissions' or raw.defaultMode is 'bypassPermissions' or payload.defaultMode is 'bypassPermissions' or event_text matches /(?m)^[^\S\n]*defaultMode[^\S\n]*=[^\S\n]*bypassPermissions[^\S\n]*$/ or event_text matches /(?m)^[^\S\n]*mode[^\S\n]*=[^\S\n]*yolo[^\S\n]*$/ or raw.approvalMode is 'unrestricted' or payload.approvalMode is 'unrestricted' or event_text matches /(?m)^[^\S\n]*approvalMode[^\S\n]*=[^\S\n]*unrestricted[^\S\n]*$/ or raw.approval_policy is 'never' or event_text matches /(?m)^[^\S\n]*approval_policy[^\S\n]*=[^\S\n]*never[^\S\n]*$/ or event_text matches /(?m)^[^\S\n]*(?:execute_commands\|apply_code_diffs)[^\S\n]*=[^\S\n]*always_allow[^\S\n]*$/)`
 
 *Why an analyst cares:* The two rules beside this one find a bypass somebody typed: a flag on a command line, or a mode changed part way through a session. This one is the version that needs typing once. A line in a settings file or in a schedule the agent wrote for itself means every session from then on starts with the prompt already answered, including the sessions nobody is present for. It also explains an absence twice over. A transcript with no approvals in it reads differently once this is known, and for Cline it removes evidence rather than only approvals: the vendor's own hook documentation states that hooks are disabled in yolo mode, and the hook log is the artifact that dates this agent's prompts. So a scheduled run in yolo mode approves everything and writes no audit line about any of it, and the vendor's cron documentation lists yolo as the default mode for a scheduled run.
 
@@ -769,13 +769,14 @@ A configuration sets the mode a session starts in to one that approves tool call
 *References:*
 
 - <https://code.claude.com/docs/en/permissions>
+- <https://docs.warp.dev/agents/cli/permissions-and-profiles/>
 - <https://cursor.com/docs/cli/reference/configuration>
 - <https://raw.githubusercontent.com/cline/cline/main/sdk/packages/core/src/extensions/tools/presets.ts>
 - <https://raw.githubusercontent.com/cline/cline/main/sdk/examples/hooks/README.md>
 - <https://raw.githubusercontent.com/cline/cline/main/sdk/examples/cron/README.md>
 - <https://developers.openai.com/codex/config-basic>
 
-*Samples in the rule file:* 5 / 5 (+/-)
+*Samples in the rule file:* 6 / 7 (+/-)
 
 #### AFX-PERMISSIONBYPASS-006
 

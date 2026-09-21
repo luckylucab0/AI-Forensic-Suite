@@ -6,9 +6,10 @@ description: >
   A configuration sets the mode a session starts in to one that approves tool calls without
   asking. Claude Code spells this defaultMode bypassPermissions in its settings files, Cline
   calls the equivalent mode yolo, which its own preset code describes as guaranteeing that
-  tool policies are enabled and auto-approved, and Codex spells it approval_policy = never,
+  tool policies are enabled and auto-approved, Codex spells it approval_policy = never,
   which its vendor names as one of the two settings an organization forbids through its
-  managed requirements file.
+  managed requirements file, and Warp's command line agent sets a per-action value to
+  always_allow in the execution profile in its settings file.
 rationale: >
   The two rules beside this one find a bypass somebody typed: a flag on a command line, or
   a mode changed part way through a session. This one is the version that needs typing
@@ -59,6 +60,17 @@ match:
       equals: never
     - field: event_text
       regex: '(?m)^[^\S\n]*approval_policy[^\S\n]*=[^\S\n]*never[^\S\n]*$'
+    # Warp's command line agent, whose execution profile sets each action independently.
+    # The vendor names three values and defines them: always_ask prompts, agent_decides
+    # lets the agent choose and still prompts for a file edit every time, and always_allow
+    # does not ask. Only the last is matched, and only for the two actions that change
+    # something: reading a file without asking is not this finding. The same document also
+    # carries a flag deciding whether auto-approve overrides the user's own command
+    # denylist, and that one is deliberately not matched: its default is to override, so a
+    # file that spells it out says nothing, and a file that sets it to false is somebody
+    # tightening the control rather than loosening it.
+    - field: event_text
+      regex: '(?m)^[^\S\n]*(?:execute_commands|apply_code_diffs)[^\S\n]*=[^\S\n]*always_allow[^\S\n]*$'
 tags:
   - T1562.001
   - permission-bypass
@@ -73,6 +85,7 @@ false_positives:
     is why the finding names the file it came from.
 references:
   - https://code.claude.com/docs/en/permissions
+  - https://docs.warp.dev/agents/cli/permissions-and-profiles/
   - https://cursor.com/docs/cli/reference/configuration
   - https://raw.githubusercontent.com/cline/cline/main/sdk/packages/core/src/extensions/tools/presets.ts
   - https://raw.githubusercontent.com/cline/cline/main/sdk/examples/hooks/README.md
@@ -165,3 +178,21 @@ tests:
       # rule. A pattern that matched every mode with ask in the name would be wrong here.
       raw:
         permissions: {defaultMode: dontAsk}
+  - name: one agent's execution profile allows every command without asking
+    match: true
+    event:
+      kind: config.snapshot
+      agent: warp
+      payload: {execute_commands: always_allow}
+  - name: the same profile's value that still prompts
+    match: false
+    event:
+      kind: config.snapshot
+      agent: warp
+      payload: {execute_commands: agent_decides}
+  - name: reading files without asking, which is not this finding
+    match: false
+    event:
+      kind: config.snapshot
+      agent: warp
+      payload: {read_files: always_allow}
