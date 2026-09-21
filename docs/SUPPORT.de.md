@@ -6,7 +6,7 @@
 
 Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registrierung statt aufgeschrieben. Die Zahlen bewegen sich mit dem Code.
 
-31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 498 von 624 Artefakten werden von 37 Leser-Modulen gelesen, in 23 Ereignisarten. 499 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
+31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 499 von 625 Artefakten werden von 37 Leser-Modulen gelesen, in 23 Ereignisarten. 500 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
 
 **Wie ein leeres Ergebnis zu lesen ist.** Steht ein Agent hier mit gelesenen Artefakten, dann wurden die Pfade durchsucht und die vorhandenen Dateien ausgewertet, also ist ein leeres Ergebnis ein Befund über diese Pfade. Es ist nie ein Befund darüber, dass der Agent nicht benutzt wurde: der Datenbaum kann über eine Variable verschoben sein, die Aufbewahrungsfrist kann ihn gelöscht haben, die Pfade können die unverifizierten sein, oder die Person hat in einem Profil gearbeitet, das niemand gesammelt hat. Wo ein Eintrag unverifiziert ist, sagt `docs/ARTIFACTS.de.md` es pro Artefakt, und der Analyzer wiederholt es in seiner Ausgabe.
 
@@ -32,7 +32,7 @@ Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registri
 | GitHub Copilot CLI | Linux, macOS, Windows | 3 / 4 | 16 / 20 | 11 | 4 |
 | Goose | Linux, macOS, Windows | 4 / 4 | 18 / 19 | 11 | 1 |
 | Hermes | Linux, macOS, Windows | 10 / 11 | 41 / 56 | 31 | 15 |
-| JetBrains AI Assistant | Linux, macOS, Windows | 1 / 1 | 5 / 7 | 4 | 2 |
+| JetBrains AI Assistant | Linux, macOS, Windows | 1 / 1 | 6 / 8 | 4 | 2 |
 | Junie | Linux, macOS, Windows | 2 / 2 | 7 / 9 | 6 | 2 |
 | Kilo Code | Linux, macOS, Windows | 2 / 2 | 7 / 7 | 4 | 0 |
 | Kiro | Linux, macOS, Windows | 5 / 5 | 20 / 22 | 14 | 2 |

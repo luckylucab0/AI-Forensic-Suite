@@ -2,7 +2,7 @@
 
 <!-- Generated from the artifact catalogue. Do not edit by hand:
 <!-- run `afx export-collection` and commit the result.
-<!-- Catalogue digest: b550d61b348f
+<!-- Catalogue digest: 339bf7c9bec5
 <!--
 <!-- An empty result from this rule means the paths it searched held nothing. It does
 <!-- not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -80,7 +80,7 @@ Windows-relevant catalogue entries, as a sense of what a collection will cover:
 | GitHub Copilot CLI | `copilot` | 20 |
 | Goose | `goose` | 18 |
 | Hermes | `hermes` | 56 |
-| JetBrains AI Assistant | `jetbrains_ai` | 7 |
+| JetBrains AI Assistant | `jetbrains_ai` | 8 |
 | Junie | `junie` | 9 |
 | Kilo Code | `kilo_code` | 7 |
 | Kiro | `kiro` | 21 |

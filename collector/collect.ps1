@@ -8519,6 +8519,24 @@ $EmbeddedCatalogueJson = @'
                     "status": "verified"
                 },
                 {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "jetbrains_ai.disabled_plugins",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\JetBrains\\<Product><Version>\\disabled_plugins.txt",
+                        "~/.config/JetBrains/<Product><Version>/disabled_plugins.txt",
+                        "~/Library/Application Support/JetBrains/<Product><Version>/disabled_plugins.txt"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "log",
                     "collect_priority": "normal",
                     "id": "jetbrains_ai.ide_logs",
@@ -8750,7 +8768,9 @@ $EmbeddedCatalogueJson = @'
                         "linux"
                     ],
                     "paths": [
+                        "%APPDATA%\\JetBrains\\<Product><Version>\\options\\InstallJunieHubActionManager.xml",
                         "%APPDATA%\\JetBrains\\<Product><Version>\\plugins\\ml-llm\\",
+                        "~/.config/JetBrains/<Product><Version>/options/InstallJunieHubActionManager.xml",
                         "~/.local/share/JetBrains/<Product><Version>/ml-llm/",
                         "~/Library/Application Support/JetBrains/<Product><Version>/options/InstallJunieHubActionManager.xml",
                         "~/Library/Application Support/JetBrains/<Product><Version>/plugins/ml-llm/lib/modules/intellij.ml.llm.junie.*.jar"
@@ -12457,7 +12477,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "3b6f56f91459658b64c8d77a9be3608caca5eb4e842553660a8e221208f4b9c0"
+    "sha256": "3dcee998050afbf142c890e9947e3c2574671f2b5310102a1e20058bb4ab356f"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

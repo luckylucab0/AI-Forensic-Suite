@@ -84,7 +84,9 @@ artifacts:
   - windows
   - linux
   paths:
+  - '%APPDATA%\JetBrains\<Product><Version>\options\InstallJunieHubActionManager.xml'
   - '%APPDATA%\JetBrains\<Product><Version>\plugins\ml-llm\'
+  - ~/.config/JetBrains/<Product><Version>/options/InstallJunieHubActionManager.xml
   - ~/.local/share/JetBrains/<Product><Version>/ml-llm/
   - ~/Library/Application Support/JetBrains/<Product><Version>/options/InstallJunieHubActionManager.xml
   - |-
@@ -98,6 +100,9 @@ artifacts:
   source_kind: community
   notes: |-
     Junie is NOT a standalone app and NOT a separate top-level plugin directory: it ships inside the ml-llm plugin (marketplace listing 'Junie, the AI coding agent by JetBrains', plugin id com.intellij.ml.llm, codename matterhorn) which is bundled into IntelliJ-platform IDEs. The macOS jar path and the options file were directly observed on a live install by the aikill researcher ([verified], with the options file content quoted as `<option name="wasBadgeRead" value="true"/>`). Linux/Windows equivalents are [docs+inferred] there. options/InstallJunieHubActionManager.xml is a tiny but useful presence/interaction marker. Also check <config>/plugins/ generally and the IDE's disabled_plugins.txt for whether AI features were turned off.
+    The interaction marker was searched on one platform while this entry claimed three. It sits in the IDE's configuration directory, which this family's base directory entry records per platform out of the platform's own path manager, and only the macOS spelling was here because that is the one the researcher observed. The other two are this catalogue's join of the observed filename onto the documented directory, which is why this entry stays unverified rather than gaining a sourced path.
+
+    Whether the feature was switched off is a separate file and now has an entry of its own under this family's other product: the platform writes the disabled plugin identifiers to a list in the same configuration directory, and this entry's own note has been telling somebody to look at it since it was written.
   parser: null
 - id: junie.jcp_outbox
   category: log

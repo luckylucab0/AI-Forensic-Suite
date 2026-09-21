@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b550d61b348f
+# Catalogue digest: 339bf7c9bec5
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1044,6 +1044,7 @@ $targets = @(
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.aia_task_history'; Path = '$profile\AppData\Roaming\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.base_directories'; Path = '$profile\AppData\Local\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.base_directories'; Path = '$profile\AppData\Roaming\JetBrains' }
+    @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.disabled_plugins'; Path = '$profile\AppData\Roaming\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.ide_logs'; Path = '$profile\AppData\Local\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.log_data'; Path = '$profile\AppData\Local\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.mcp_config'; Path = '$profile\AppData\Roaming\JetBrains\Air\mcp.json' }

@@ -6,7 +6,7 @@ English | [Deutsch](SUPPORT.de.md)
 
 What this suite reads, per agent, counted from the catalogue and the reader registry rather than written down. The numbers move when the code does.
 
-31 catalogue files, 30 of them a product and one cross-cutting. 498 of 624 artifacts are read by 37 reader modules, into 23 event kinds. 499 artifacts rest on a fetched vendor source.
+31 catalogue files, 30 of them a product and one cross-cutting. 499 of 625 artifacts are read by 37 reader modules, into 23 event kinds. 500 artifacts rest on a fetched vendor source.
 
 **How to read an empty result.** An agent listed here with artifacts read means the paths were searched and the files that were there were parsed, so an empty result is evidence that those paths held nothing. It is never evidence that the agent was not used: the data tree may have been relocated by a variable, the retention period may have swept it, the paths may be the unverified ones, or the user may have worked in a profile nobody collected. Where an entry is unverified, `docs/ARTIFACTS.md` says so per artifact and the analyzer repeats it in its output.
 
@@ -32,7 +32,7 @@ What this suite reads, per agent, counted from the catalogue and the reader regi
 | GitHub Copilot CLI | Linux, macOS, Windows | 3 / 4 | 16 / 20 | 11 | 4 |
 | Goose | Linux, macOS, Windows | 4 / 4 | 18 / 19 | 11 | 1 |
 | Hermes | Linux, macOS, Windows | 10 / 11 | 41 / 56 | 31 | 15 |
-| JetBrains AI Assistant | Linux, macOS, Windows | 1 / 1 | 5 / 7 | 4 | 2 |
+| JetBrains AI Assistant | Linux, macOS, Windows | 1 / 1 | 6 / 8 | 4 | 2 |
 | Junie | Linux, macOS, Windows | 2 / 2 | 7 / 9 | 6 | 2 |
 | Kilo Code | Linux, macOS, Windows | 2 / 2 | 7 / 7 | 4 | 0 |
 | Kiro | Linux, macOS, Windows | 5 / 5 | 20 / 22 | 14 | 2 |

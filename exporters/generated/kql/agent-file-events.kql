@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: b550d61b348f
+// Catalogue digest: 339bf7c9bec5
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -2166,6 +2166,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "jetbrains_ai", "jetbrains_ai.base_directories", "Library\\Application Support\\JetBrains",
     "jetbrains_ai", "jetbrains_ai.base_directories", "Library\\Caches\\JetBrains",
     "jetbrains_ai", "jetbrains_ai.base_directories", "Library\\Logs\\JetBrains",
+    "jetbrains_ai", "jetbrains_ai.disabled_plugins", ".config/JetBrains",
+    "jetbrains_ai", "jetbrains_ai.disabled_plugins", ".config\\JetBrains",
+    "jetbrains_ai", "jetbrains_ai.disabled_plugins", "Library/Application Support/JetBrains",
+    "jetbrains_ai", "jetbrains_ai.disabled_plugins", "Library\\Application Support\\JetBrains",
     "jetbrains_ai", "jetbrains_ai.ide_logs", ".cache/JetBrains",
     "jetbrains_ai", "jetbrains_ai.ide_logs", ".cache\\JetBrains",
     "jetbrains_ai", "jetbrains_ai.ide_logs", "Library/Logs/JetBrains",
@@ -2208,6 +2212,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "junie", "junie.matterhorn_project_logs", "Library\\Caches\\JetBrains",
     "junie", "junie.mcp_config", ".junie/mcp/mcp.json",
     "junie", "junie.mcp_config", ".junie\\mcp\\mcp.json",
+    "junie", "junie.plugin_install_evidence", ".config/JetBrains",
+    "junie", "junie.plugin_install_evidence", ".config\\JetBrains",
     "junie", "junie.plugin_install_evidence", ".local/share/JetBrains",
     "junie", "junie.plugin_install_evidence", ".local\\share\\JetBrains",
     "junie", "junie.plugin_install_evidence", "Library/Application Support/JetBrains",

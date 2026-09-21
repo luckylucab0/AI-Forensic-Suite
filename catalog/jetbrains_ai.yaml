@@ -97,6 +97,35 @@ artifacts:
 
     Re-sourced by the verification pass: the store cited before really does build the database file against the configuration directory, but the main key filename is only imported there and is defined in this file. The settings file that records which storage backend is in use is declared in a third file, so it is marked unsourced here.
   parser: null
+- id: jetbrains_ai.disabled_plugins
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%APPDATA%\JetBrains\<Product><Version>\disabled_plugins.txt'
+  - ~/.config/JetBrains/<Product><Version>/disabled_plugins.txt
+  - ~/Library/Application Support/JetBrains/<Product><Version>/disabled_plugins.txt
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: |-
+    https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/core-impl/src/com/intellij/ide/plugins/DisabledPluginsState.kt
+  source_kind: source_code
+  volatility: |-
+    Rewritten whole whenever a plugin is enabled or disabled, so it holds the current state and one mtime rather than a history. An identifier that was disabled and re-enabled leaves nothing behind here.
+  notes: |-
+    One plugin identifier per line, and the line that matters for this family is the one naming the AI plugin. Several entries in this catalogue tell an analyst to check whether the AI features were turned off, and until now nothing collected the file that says so: the agent's own directories look identical whether the plugin was disabled yesterday or never installed, because a disabled plugin still has its configuration, its caches and its history on disk from before.
+
+    So this is what makes an absence readable. A conversation store that stops on a date, with this file naming the AI plugin and carrying an mtime on that date, is a user who switched the feature off. The same store with no such line is a user who stopped using it, or a retention period, or a collection that missed a tree.
+
+    The file is in the configuration directory, which the platform's own path manager resolves per platform and which the entry for this family's base directories records. It is therefore relocated by the same properties that move everything else here, and the entry for those properties is the one to read first on a host where this file is absent from all three documented places.
+
+    Not this product's file. It belongs to the IDE platform, so it lists whatever the user disabled, and a line about the AI plugin is one line among however many others.
+  parser: text_config
 - id: jetbrains_ai.ide_logs
   category: log
   root: user_profile
