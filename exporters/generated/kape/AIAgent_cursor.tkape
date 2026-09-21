@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b24d051837fd
+# Catalogue digest: 0b2cac47244d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 39 of the 583 catalogue artifacts declare
+# KAPE is Windows only. 39 of the 584 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -18,17 +18,18 @@
 #     cursor.install_and_machine_identity
 #     cursor.url_handler
 #   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
-#     cursor.cli_config
 #     cursor.commands_and_plans
-#     cursor.hooks
-#     cursor.mcp_config
 #     cursor.project_instructions
-#     cursor.skills
-#     cursor.subagents
 #     cursor.worktree_setup
 #   no Windows path that a drive-and-mask target can express
 #     cursor.retrieval_index
 #     cursor.worker_data
+#   some of its paths are anchored at a working copy, whose location only the agent's own state file gives, so those are not in this rule. Its profile and system wide paths are. Run the suite's collector for the rest, which reads that state file
+#     cursor.cli_config
+#     cursor.hooks
+#     cursor.mcp_config
+#     cursor.skills
+#     cursor.subagents
 Description: AI coding agent artifacts, Cursor
 Author: agentforensics
 Version: 1.0
@@ -264,6 +265,18 @@ Targets:
         FileMask: "store.db-wal"
         Recursive: false
     -
+        Name: cursor.cli_config
+        Category: permissions
+        Path: C:\Users\%user%\.cursor
+        FileMask: "cli-config.json"
+        Recursive: false
+    -
+        Name: cursor.cli_config
+        Category: permissions
+        Path: C:\Users\%user%\.cursor
+        FileMask: "cli-config.json.bad"
+        Recursive: false
+    -
         Name: cursor.cli_workspaces
         Category: config
         Path: C:\Users\%user%\.cursor
@@ -360,6 +373,24 @@ Targets:
         FileMask: "state.vscdb-wal"
         Recursive: false
     -
+        Name: cursor.hooks
+        Category: config
+        Path: C:\ProgramData\Cursor
+        FileMask: "hooks.json"
+        Recursive: false
+    -
+        Name: cursor.hooks
+        Category: config
+        Path: C:\Users\%user%\.cursor
+        FileMask: "hooks.json"
+        Recursive: false
+    -
+        Name: cursor.hooks
+        Category: config
+        Path: C:\Users\%user%\.cursor\hooks
+        FileMask: "*"
+        Recursive: true
+    -
         Name: cursor.install_dirs
         Category: install_evidence
         Path: C:\Users\%user%\AppData\Local\Programs\cursor
@@ -419,6 +450,12 @@ Targets:
         Path: C:\Users\%user%\AppData\Roaming\Cursor\machineid
         FileMask: "*"
         Recursive: true
+    -
+        Name: cursor.mcp_config
+        Category: mcp_config
+        Path: C:\Users\%user%\.cursor
+        FileMask: "mcp.json"
+        Recursive: false
     -
         Name: cursor.mdm_policy
         Category: permissions
@@ -492,9 +529,39 @@ Targets:
         FileMask: "argv.json"
         Recursive: false
     -
+        Name: cursor.skills
+        Category: instructions
+        Path: C:\Users\%user%\.agents\skills
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.skills
+        Category: instructions
+        Path: C:\Users\%user%\.cursor\skills
+        FileMask: "*"
+        Recursive: true
+    -
         Name: cursor.subagent_output
         Category: transcript
         Path: C:\Users\%user%\.cursor\subagents
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.subagents
+        Category: instructions
+        Path: C:\Users\%user%\.claude\agents
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.subagents
+        Category: instructions
+        Path: C:\Users\%user%\.codex\agents
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: cursor.subagents
+        Category: instructions
+        Path: C:\Users\%user%\.cursor\agents
         FileMask: "*"
         Recursive: true
     -

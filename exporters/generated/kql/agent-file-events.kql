@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: b24d051837fd
+// Catalogue digest: 0b2cac47244d
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -31,30 +31,15 @@
 //     windsurf.url_handlers
 //   anchored at a working copy, so its absolute path is not knowable in advance: hunt on the filename instead, or run the suite's collector
 //     aider.chat_history
-//     aider.config
-//     aider.dotenv
 //     aider.ignore
 //     aider.input_history
 //     aider.llm_history
-//     aider.model_metadata
-//     aider.model_settings
 //     aider.tags_cache
-//     amazonq.cli_agents
-//     amazonq.cli_mcp_config
 //     amazonq.cli_subagent_executions
 //     amazonq.cli_todo_lists
-//     amazonq.ide_agent_config
 //     amazonq.ide_chat_export
 //     amazonq.memory_bank
 //     amazonq.project_rules
-//     amazonq.prompt_library
-//     amp.settings
-//     amp.skills
-//     claude_code.agent_memory
-//     claude_code.agents
-//     claude_code.commands
-//     claude_code.loop_instructions
-//     claude_code.output_styles
 //     claude_code.plugin_manifests
 //     claude_code.project_claude_local_md
 //     claude_code.project_claude_md
@@ -62,94 +47,44 @@
 //     claude_code.project_rules
 //     claude_code.project_settings
 //     claude_code.project_settings_local
-//     claude_code.settings_referenced_executables
-//     claude_code.skills
-//     claude_code.workflows
 //     claude_code.worktreeinclude
 //     claude_code.worktrees
 //     claude_desktop.code_launch_config
 //     cline.checkpoint_refs_in_workspace
 //     cline.rules_project
+//     cline.workspace_config_tree
 //     cline.workspace_specs
-//     continue.agents
-//     continue.config
-//     continue.hook_settings
-//     continue.rules_and_skills
 //     copilot.lsp_config_repo
-//     crosscutting.hook_scripts
 //     crosscutting.instructions_agents_md
-//     crosscutting.instructions_claude_md
-//     crosscutting.instructions_clinerules
-//     crosscutting.instructions_copilot_instructions
 //     crosscutting.instructions_cursor_rules
-//     crosscutting.instructions_gemini_md
 //     crosscutting.instructions_junie_guidelines
 //     crosscutting.instructions_kiro_steering
 //     crosscutting.instructions_windsurf_rules
-//     crosscutting.mcp_config_files
-//     cursor.cli_config
 //     cursor.commands_and_plans
-//     cursor.hooks
-//     cursor.mcp_config
 //     cursor.project_instructions
-//     cursor.skills
-//     cursor.subagents
 //     cursor.worktree_setup
-//     factory_droid.config
-//     factory_droid.mcp_and_hooks
-//     factory_droid.output_styles
-//     factory_droid.sessions
-//     factory_droid.skills_and_droids
-//     gemini_cli.agent_definitions
-//     gemini_cli.commands
-//     gemini_cli.policies
 //     gemini_cli.project_config
 //     goose.hints
-//     goose.memory
 //     goose.recipes
-//     jetbrains_ai.mcp_config
-//     junie.mcp_config
 //     junie.project_dir
-//     kilo_code.agents
-//     kilo_code.config
-//     kilo_code.home_dir
 //     kilo_code.rules
-//     kiro.agents
-//     kiro.hooks
 //     kiro.kiroignore
-//     kiro.legacy_amazonq_config
 //     kiro.mcp_config_project
-//     kiro.prompt_library
-//     kiro.skills_powers
 //     kiro.specs
 //     kiro.steering_project
-//     opencode.agents_commands
-//     opencode.config
-//     opencode.tui_config
-//     pi.agents_skills
-//     pi.extensions
-//     pi.prompts
-//     pi.settings
-//     pi.skills
-//     qwen_code.auto_memory
-//     qwen_code.env_files
 //     qwen_code.ignore_files
 //     qwen_code.openai_api_logs
 //     qwen_code.project_extension_points
 //     qwen_code.project_instructions
 //     qwen_code.project_mcp_config
 //     qwen_code.project_settings
-//     roo_code.custom_storage_path
 //     roo_code.rules
-//     vscode.mcp_config
-//     windsurf.hooks
-//     windsurf.ignore_files
-//     windsurf.mcp_config
-//     windsurf.plans
 //     windsurf.project_instructions
-//     windsurf.workflows_and_skills
-//     zed.settings
 //   no path distinctive enough to match on: after removing the profile and everything from the first wildcard, less than two path segments were left
+//     aider.config
+//     aider.dotenv
+//     aider.model_metadata
+//     aider.model_settings
 //     chatgpt_desktop.macos_codex_home
 //     cline.cache_and_remote_config
 //     cline.checkpoints_shadow_git_legacy
@@ -157,16 +92,20 @@
 //     cline.vscode_task_transcripts
 //     codex.sqlite_glob
 //     codex.sqlite_write_ahead_logs
+//     crosscutting.mcp_config_files
 //     crosscutting.windows_execution_evidence_files
 //     factory_droid.auth
 //     gemini_cli.home_tree
 //     roo_code.checkpoints
+//     roo_code.custom_storage_path
 //     roo_code.extension_id
 //     roo_code.settings
 //     roo_code.tasks
+//     vscode.mcp_config
 //     windsurf.server_data
 //   reachable only through a relocation variable, which is not in the event data: read the variable off the endpoint
 //     claude_code.global_config
+//     crosscutting.instructions_copilot_instructions
 //     crosscutting.shell_bash_history
 //     crosscutting.shell_zsh_history
 //     kiro.acp_wire_record
@@ -181,12 +120,16 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "aider", "aider.installs", ".aider\\installs.json",
     "aider", "aider.oauth_keys", ".aider/oauth-keys.env",
     "aider", "aider.oauth_keys", ".aider\\oauth-keys.env",
+    "amazonq", "amazonq.cli_agents", ".aws/amazonq/cli-agents",
+    "amazonq", "amazonq.cli_agents", ".aws\\amazonq\\cli-agents",
     "amazonq", "amazonq.cli_checkpoints", ".aws/amazonq/cli-checkouts",
     "amazonq", "amazonq.cli_checkpoints", ".aws\\amazonq\\cli-checkouts",
     "amazonq", "amazonq.cli_logs", "/tmp/qlog",
     "amazonq", "amazonq.cli_logs", "\\tmp\\qlog",
     "amazonq", "amazonq.cli_logs", "amazon-q/logs",
     "amazonq", "amazonq.cli_logs", "amazon-q\\logs",
+    "amazonq", "amazonq.cli_mcp_config", ".aws/amazonq/mcp.json",
+    "amazonq", "amazonq.cli_mcp_config", ".aws\\amazonq\\mcp.json",
     "amazonq", "amazonq.cli_prompt_history", ".aws/amazonq/.cli_bash_history",
     "amazonq", "amazonq.cli_prompt_history", ".aws\\amazonq\\.cli_bash_history",
     "amazonq", "amazonq.cli_settings", ".local/share/amazon-q/settings.json",
@@ -215,6 +158,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "amazonq", "amazonq.cli_state_database", "amazon-q\\data.sqlite3-wal",
     "amazonq", "amazonq.cli_user_rules", ".aws/amazonq/rules",
     "amazonq", "amazonq.cli_user_rules", ".aws\\amazonq\\rules",
+    "amazonq", "amazonq.ide_agent_config", ".aws/amazonq/agents/default.json",
+    "amazonq", "amazonq.ide_agent_config", ".aws/amazonq/default.json",
+    "amazonq", "amazonq.ide_agent_config", ".aws\\amazonq\\agents\\default.json",
+    "amazonq", "amazonq.ide_agent_config", ".aws\\amazonq\\default.json",
     "amazonq", "amazonq.ide_chat_history", ".aws/amazonq/history",
     "amazonq", "amazonq.ide_chat_history", ".aws/amazonq/history/chat-history-",
     "amazonq", "amazonq.ide_chat_history", ".aws/amazonq/history/chat-history-no-workspace.json",
@@ -231,6 +178,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "amazonq", "amazonq.legacy_profiles_and_context", ".aws/amazonq/profiles",
     "amazonq", "amazonq.legacy_profiles_and_context", ".aws\\amazonq\\global_context.json",
     "amazonq", "amazonq.legacy_profiles_and_context", ".aws\\amazonq\\profiles",
+    "amazonq", "amazonq.prompt_library", ".aws/amazonq/prompts",
+    "amazonq", "amazonq.prompt_library", ".aws\\amazonq\\prompts",
     "amazonq", "amazonq.sso_token_cache", ".aws/sso/cache",
     "amazonq", "amazonq.sso_token_cache", ".aws/sso/cache/aws-toolkit-vscode-client-id-",
     "amazonq", "amazonq.sso_token_cache", ".aws\\sso\\cache",
@@ -249,6 +198,24 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "amp", "amp.secrets", "amp\\secrets.json",
     "amp", "amp.session_pointer", ".local/share/amp/session.json",
     "amp", "amp.session_pointer", ".local\\share\\amp\\session.json",
+    "amp", "amp.settings", ".config/amp/settings.json",
+    "amp", "amp.settings", ".config/amp/settings.jsonc",
+    "amp", "amp.settings", ".config\\amp\\settings.json",
+    "amp", "amp.settings", ".config\\amp\\settings.jsonc",
+    "amp", "amp.settings", "/Library/Application Support/ampcode/managed-settings.json",
+    "amp", "amp.settings", "/etc/ampcode/managed-settings.json",
+    "amp", "amp.settings", "\\Library\\Application Support\\ampcode\\managed-settings.json",
+    "amp", "amp.settings", "\\etc\\ampcode\\managed-settings.json",
+    "amp", "amp.skills", ".agents/skills",
+    "amp", "amp.skills", ".agents\\skills",
+    "amp", "amp.skills", ".claude/plugins/cache",
+    "amp", "amp.skills", ".claude/skills",
+    "amp", "amp.skills", ".claude\\plugins\\cache",
+    "amp", "amp.skills", ".claude\\skills",
+    "amp", "amp.skills", ".config/agents/skills",
+    "amp", "amp.skills", ".config/amp/skills",
+    "amp", "amp.skills", ".config\\agents\\skills",
+    "amp", "amp.skills", ".config\\amp\\skills",
     "amp", "amp.thread_logs", ".cache/amp/logs/threads",
     "amp", "amp.threads", ".local/share/amp/threads/T-",
     "amp", "amp.threads", ".local\\share\\amp\\threads\\T-",
@@ -294,6 +261,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "chatgpt_desktop", "chatgpt_desktop.windows_msix_localcache", "Packages\\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\\LocalCache\\Roaming\\ChatGPT",
     "chatgpt_desktop", "chatgpt_desktop.windows_msix_localcache", "Packages\\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\\LocalCache\\Roaming\\ChatGPT\\IndexedDB\\https_chatgpt.com_0.indexeddb.leveldb",
     "chatgpt_desktop", "chatgpt_desktop.windows_msix_localcache", "Packages\\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\\LocalCache\\Roaming\\ChatGPT\\Local Storage\\leveldb",
+    "claude_code", "claude_code.agent_memory", ".claude/agent-memory",
+    "claude_code", "claude_code.agent_memory", ".claude\\agent-memory",
+    "claude_code", "claude_code.agents", ".claude/agents",
+    "claude_code", "claude_code.agents", ".claude\\agents",
     "claude_code", "claude_code.anthropic_active_config", ".config/anthropic/active_config",
     "claude_code", "claude_code.anthropic_active_config", ".config\\anthropic\\active_config",
     "claude_code", "claude_code.anthropic_active_config", "Anthropic/active_config",
@@ -310,6 +281,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "claude_code", "claude_code.auto_memory", ".claude\\projects",
     "claude_code", "claude_code.changelog_cache", ".claude/cache/changelog.md",
     "claude_code", "claude_code.changelog_cache", ".claude\\cache\\changelog.md",
+    "claude_code", "claude_code.commands", ".claude/commands",
+    "claude_code", "claude_code.commands", ".claude\\commands",
     "claude_code", "claude_code.config_backups", ".claude/backups",
     "claude_code", "claude_code.config_backups", ".claude/backups/.claude.json.corrupted.",
     "claude_code", "claude_code.config_backups", ".claude\\backups",
@@ -380,6 +353,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "claude_code", "claude_code.legacy_state_dirs", ".claude\\logs",
     "claude_code", "claude_code.legacy_state_dirs", ".claude\\statsig",
     "claude_code", "claude_code.legacy_state_dirs", ".claude\\todos",
+    "claude_code", "claude_code.loop_instructions", ".claude/loop.md",
+    "claude_code", "claude_code.loop_instructions", ".claude\\loop.md",
     "claude_code", "claude_code.macos_keychain_credentials", "Library/Keychains/login.keychain-db",
     "claude_code", "claude_code.managed_claude_md", "/Library/Application Support/ClaudeCode/CLAUDE.md",
     "claude_code", "claude_code.managed_claude_md", "/etc/claude-code/CLAUDE.md",
@@ -419,6 +394,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "claude_code", "claude_code.org_policy_cache", ".claude/remote-settings.json",
     "claude_code", "claude_code.org_policy_cache", ".claude\\policy-limits.json",
     "claude_code", "claude_code.org_policy_cache", ".claude\\remote-settings.json",
+    "claude_code", "claude_code.output_styles", ".claude/output-styles",
+    "claude_code", "claude_code.output_styles", ".claude\\output-styles",
     "claude_code", "claude_code.paste_cache", ".claude/paste-cache",
     "claude_code", "claude_code.paste_cache", ".claude\\paste-cache",
     "claude_code", "claude_code.plans", ".claude/plans",
@@ -439,11 +416,21 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "claude_code", "claude_code.session_env", ".claude\\session-env",
     "claude_code", "claude_code.sessions_dir", ".claude/sessions",
     "claude_code", "claude_code.sessions_dir", ".claude\\sessions",
+    "claude_code", "claude_code.settings_referenced_executables", ".claude/hooks",
+    "claude_code", "claude_code.settings_referenced_executables", ".claude\\hooks",
     "claude_code", "claude_code.shell_profile_evidence", ".config/fish/config.fish",
     "claude_code", "claude_code.shell_snapshots", ".claude/shell-snapshots",
     "claude_code", "claude_code.shell_snapshots", ".claude\\shell-snapshots",
     "claude_code", "claude_code.shell_snapshots", "/tmp/claude-shell-snapshot",
     "claude_code", "claude_code.shell_snapshots", "\\tmp\\claude-shell-snapshot",
+    "claude_code", "claude_code.skills", ".claude/skills",
+    "claude_code", "claude_code.skills", ".claude\\skills",
+    "claude_code", "claude_code.skills", "/Library/Application Support/ClaudeCode/.claude/skills",
+    "claude_code", "claude_code.skills", "/etc/claude-code/.claude/skills",
+    "claude_code", "claude_code.skills", "C:/Program Files/ClaudeCode/.claude/skills",
+    "claude_code", "claude_code.skills", "C:\\Program Files\\ClaudeCode\\.claude\\skills",
+    "claude_code", "claude_code.skills", "\\Library\\Application Support\\ClaudeCode\\.claude\\skills",
+    "claude_code", "claude_code.skills", "\\etc\\claude-code\\.claude\\skills",
     "claude_code", "claude_code.skills_trash", ".claude/skills/.trash",
     "claude_code", "claude_code.skills_trash", ".claude\\skills\\.trash",
     "claude_code", "claude_code.stats_cache", ".claude/stats-cache.json",
@@ -482,6 +469,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "claude_code", "claude_code.user_settings_local", ".claude\\settings.local.json",
     "claude_code", "claude_code.workflow_runs", ".claude/projects",
     "claude_code", "claude_code.workflow_runs", ".claude\\projects",
+    "claude_code", "claude_code.workflows", ".claude/workflows",
+    "claude_code", "claude_code.workflows", ".claude\\workflows",
     "claude_desktop", "claude_desktop.app_logs", ".config/Claude-3p/logs/main.log",
     "claude_desktop", "claude_desktop.app_logs", ".config/Claude/logs/main.log",
     "claude_desktop", "claude_desktop.app_logs", ".config\\Claude-3p\\logs\\main.log",
@@ -752,6 +741,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cline", "cline.home_config_tree", ".cline\\skills",
     "cline", "cline.home_config_tree", ".cline\\tasks",
     "cline", "cline.home_config_tree", ".cline\\workflows",
+    "cline", "cline.home_config_tree", "Documents/Cline/Agents",
+    "cline", "cline.home_config_tree", "Documents/Cline/Plugins",
+    "cline", "cline.home_config_tree", "Documents\\Cline\\Agents",
+    "cline", "cline.home_config_tree", "Documents\\Cline\\Plugins",
     "cline", "cline.hooks_audit_log", ".cline/data/logs/hooks.jsonl",
     "cline", "cline.hooks_audit_log", ".cline\\data\\logs\\hooks.jsonl",
     "cline", "cline.mcp_settings", ".cline/data/settings/cline_mcp_settings.json",
@@ -826,6 +819,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "codex", "codex.state_databases", ".codex\\queue_1.sqlite",
     "codex", "codex.state_databases", ".codex\\state_5.sqlite",
     "codex", "codex.state_databases", ".codex\\thread_history_1.sqlite",
+    "continue", "continue.agents", ".continue/agents",
+    "continue", "continue.agents", ".continue/assistants",
+    "continue", "continue.agents", ".continue\\agents",
+    "continue", "continue.agents", ".continue\\assistants",
     "continue", "continue.aux_config", ".continue/.configs",
     "continue", "continue.aux_config", ".continue/.continueignore",
     "continue", "continue.aux_config", ".continue/.migrations",
@@ -834,6 +831,12 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "continue", "continue.aux_config", ".continue\\.migrations",
     "continue", "continue.cli_auth", ".continue/auth.json",
     "continue", "continue.cli_auth", ".continue\\auth.json",
+    "continue", "continue.config", ".continue/config.json",
+    "continue", "continue.config", ".continue/config.ts",
+    "continue", "continue.config", ".continue/config.yaml",
+    "continue", "continue.config", ".continue\\config.json",
+    "continue", "continue.config", ".continue\\config.ts",
+    "continue", "continue.config", ".continue\\config.yaml",
     "continue", "continue.dev_data", ".continue/dev_data",
     "continue", "continue.dev_data", ".continue/logs/core.log",
     "continue", "continue.dev_data", ".continue\\dev_data",
@@ -861,6 +864,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "continue", "continue.global_context", ".continue/sharedConfig.json",
     "continue", "continue.global_context", ".continue\\index\\globalContext.json",
     "continue", "continue.global_context", ".continue\\sharedConfig.json",
+    "continue", "continue.hook_settings", ".continue/settings.json",
+    "continue", "continue.hook_settings", ".continue\\settings.json",
     "continue", "continue.index", ".continue/.utils/repo_map.txt",
     "continue", "continue.index", ".continue/index/autocompleteCache.sqlite",
     "continue", "continue.index", ".continue/index/autocompleteCache.sqlite-shm",
@@ -889,6 +894,12 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "continue", "continue.logs", ".continue\\logs",
     "continue", "continue.permissions", ".continue/permissions.yaml",
     "continue", "continue.permissions", ".continue\\permissions.yaml",
+    "continue", "continue.rules_and_skills", ".continue/prompts",
+    "continue", "continue.rules_and_skills", ".continue/rules",
+    "continue", "continue.rules_and_skills", ".continue/skills",
+    "continue", "continue.rules_and_skills", ".continue\\prompts",
+    "continue", "continue.rules_and_skills", ".continue\\rules",
+    "continue", "continue.rules_and_skills", ".continue\\skills",
     "continue", "continue.sessions", ".continue/sessions",
     "continue", "continue.sessions", ".continue/sessions/sessions.json",
     "continue", "continue.sessions", ".continue\\sessions",
@@ -959,6 +970,24 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "crosscutting", "crosscutting.homebrew_prefixes", "/opt/homebrew/bin",
     "crosscutting", "crosscutting.homebrew_prefixes", "/usr/local",
     "crosscutting", "crosscutting.homebrew_prefixes", "/usr/local/Cellar",
+    "crosscutting", "crosscutting.hook_scripts", "Documents/Cline/Hooks",
+    "crosscutting", "crosscutting.hook_scripts", "Documents\\Cline\\Hooks",
+    "crosscutting", "crosscutting.instructions_claude_md", ".claude/CLAUDE.md",
+    "crosscutting", "crosscutting.instructions_claude_md", ".claude/rules",
+    "crosscutting", "crosscutting.instructions_claude_md", ".claude\\CLAUDE.md",
+    "crosscutting", "crosscutting.instructions_claude_md", ".claude\\rules",
+    "crosscutting", "crosscutting.instructions_claude_md", "/Library/Application Support/ClaudeCode/CLAUDE.md",
+    "crosscutting", "crosscutting.instructions_claude_md", "/etc/claude-code/CLAUDE.md",
+    "crosscutting", "crosscutting.instructions_claude_md", "C:/Program Files/ClaudeCode/CLAUDE.md",
+    "crosscutting", "crosscutting.instructions_claude_md", "C:\\Program Files\\ClaudeCode\\CLAUDE.md",
+    "crosscutting", "crosscutting.instructions_claude_md", "\\Library\\Application Support\\ClaudeCode\\CLAUDE.md",
+    "crosscutting", "crosscutting.instructions_claude_md", "\\etc\\claude-code\\CLAUDE.md",
+    "crosscutting", "crosscutting.instructions_clinerules", "Documents/Cline/Rules",
+    "crosscutting", "crosscutting.instructions_clinerules", "Documents/Cline/Workflows",
+    "crosscutting", "crosscutting.instructions_clinerules", "Documents\\Cline\\Rules",
+    "crosscutting", "crosscutting.instructions_clinerules", "Documents\\Cline\\Workflows",
+    "crosscutting", "crosscutting.instructions_gemini_md", ".gemini/GEMINI.md",
+    "crosscutting", "crosscutting.instructions_gemini_md", ".gemini\\GEMINI.md",
     "crosscutting", "crosscutting.macos_download_provenance", "Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2",
     "crosscutting", "crosscutting.macos_download_provenance", "Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2-shm",
     "crosscutting", "crosscutting.macos_download_provenance", "Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2-wal",
@@ -1064,6 +1093,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.chat_session_prompt_history", ".cursor\\chats",
     "cursor", "cursor.chat_store_db", ".cursor/chats",
     "cursor", "cursor.chat_store_db", ".cursor\\chats",
+    "cursor", "cursor.cli_config", ".cursor/cli-config.json",
+    "cursor", "cursor.cli_config", ".cursor/cli-config.json.bad",
+    "cursor", "cursor.cli_config", ".cursor\\cli-config.json",
+    "cursor", "cursor.cli_config", ".cursor\\cli-config.json.bad",
     "cursor", "cursor.cli_workspaces", ".cursor/cli-workspaces.json",
     "cursor", "cursor.cli_workspaces", ".cursor/ide_state.json",
     "cursor", "cursor.cli_workspaces", ".cursor\\cli-workspaces.json",
@@ -1132,6 +1165,16 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.global_state_vscdb", "Library\\Application Support\\Cursor\\User\\globalStorage\\state.vscdb-shm",
     "cursor", "cursor.global_state_vscdb", "Library\\Application Support\\Cursor\\User\\globalStorage\\state.vscdb-wal",
     "cursor", "cursor.global_state_vscdb", "Library\\Application Support\\Cursor\\User\\globalStorage\\state.vscdb.backup",
+    "cursor", "cursor.hooks", ".cursor/hooks",
+    "cursor", "cursor.hooks", ".cursor/hooks.json",
+    "cursor", "cursor.hooks", ".cursor\\hooks",
+    "cursor", "cursor.hooks", ".cursor\\hooks.json",
+    "cursor", "cursor.hooks", "/Library/Application Support/Cursor/hooks.json",
+    "cursor", "cursor.hooks", "/etc/cursor/hooks.json",
+    "cursor", "cursor.hooks", "C:/ProgramData/Cursor/hooks.json",
+    "cursor", "cursor.hooks", "C:\\ProgramData\\Cursor\\hooks.json",
+    "cursor", "cursor.hooks", "\\Library\\Application Support\\Cursor\\hooks.json",
+    "cursor", "cursor.hooks", "\\etc\\cursor\\hooks.json",
     "cursor", "cursor.install_dirs", "Programs\\cursor",
     "cursor", "cursor.install_dirs", "cursor-agent\\versions",
     "cursor", "cursor.local_file_history", ".config/Cursor/User/History",
@@ -1173,6 +1216,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.macos_update_state", "Library/Application Support/Cursor/Backups",
     "cursor", "cursor.macos_update_state", "Library/Application Support/Cursor/Crashpad",
     "cursor", "cursor.macos_update_state", "Library/Caches/com.todesktop.230313mzl4w4u92.ShipIt",
+    "cursor", "cursor.mcp_config", ".cursor/mcp.json",
+    "cursor", "cursor.mcp_config", ".cursor\\mcp.json",
     "cursor", "cursor.mdm_policy", ".cursor/policy.json",
     "cursor", "cursor.mdm_policy", ".cursor\\policy.json",
     "cursor", "cursor.pasted_text", ".cursor/chats",
@@ -1201,8 +1246,18 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "cursor", "cursor.retrieval_index", "Library\\Caches\\cursor-compile-cache\\v",
     "cursor", "cursor.runtime_arguments", ".cursor/argv.json",
     "cursor", "cursor.runtime_arguments", ".cursor\\argv.json",
+    "cursor", "cursor.skills", ".agents/skills",
+    "cursor", "cursor.skills", ".agents\\skills",
+    "cursor", "cursor.skills", ".cursor/skills",
+    "cursor", "cursor.skills", ".cursor\\skills",
     "cursor", "cursor.subagent_output", ".cursor/subagents",
     "cursor", "cursor.subagent_output", ".cursor\\subagents",
+    "cursor", "cursor.subagents", ".claude/agents",
+    "cursor", "cursor.subagents", ".claude\\agents",
+    "cursor", "cursor.subagents", ".codex/agents",
+    "cursor", "cursor.subagents", ".codex\\agents",
+    "cursor", "cursor.subagents", ".cursor/agents",
+    "cursor", "cursor.subagents", ".cursor\\agents",
     "cursor", "cursor.temp_residue", "Temp\\cursor-agent-logs-",
     "cursor", "cursor.worker_data", ".local/share/cursor-agent",
     "cursor", "cursor.worker_data", ".local\\share\\cursor-agent",
@@ -1240,20 +1295,50 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "devin", "devin.sessions_db", "Library\\Application Support\\devin\\cli\\sessions.db-shm",
     "devin", "devin.sessions_db", "Library\\Application Support\\devin\\cli\\sessions.db-wal",
     "devin", "devin.sessions_db", "Library\\Application Support\\devin\\cli\\transcripts",
+    "factory_droid", "factory_droid.config", ".factory/config.json",
+    "factory_droid", "factory_droid.config", ".factory/settings.json",
+    "factory_droid", "factory_droid.config", ".factory/settings.local.json",
+    "factory_droid", "factory_droid.config", ".factory\\config.json",
+    "factory_droid", "factory_droid.config", ".factory\\settings.json",
+    "factory_droid", "factory_droid.config", ".factory\\settings.local.json",
     "factory_droid", "factory_droid.logs", ".factory/bug-reports",
     "factory_droid", "factory_droid.logs", ".factory/logs",
     "factory_droid", "factory_droid.logs", ".factory\\bug-reports",
     "factory_droid", "factory_droid.logs", ".factory\\logs",
+    "factory_droid", "factory_droid.mcp_and_hooks", ".factory/hooks.json",
+    "factory_droid", "factory_droid.mcp_and_hooks", ".factory/mcp.json",
+    "factory_droid", "factory_droid.mcp_and_hooks", ".factory\\hooks.json",
+    "factory_droid", "factory_droid.mcp_and_hooks", ".factory\\mcp.json",
+    "factory_droid", "factory_droid.output_styles", ".factory/output-styles",
+    "factory_droid", "factory_droid.output_styles", ".factory\\output-styles",
+    "factory_droid", "factory_droid.sessions", ".factory/sessions",
+    "factory_droid", "factory_droid.sessions", ".factory\\sessions",
+    "factory_droid", "factory_droid.skills_and_droids", ".claude/agents",
+    "factory_droid", "factory_droid.skills_and_droids", ".claude\\agents",
+    "factory_droid", "factory_droid.skills_and_droids", ".factory/commands",
+    "factory_droid", "factory_droid.skills_and_droids", ".factory/droids",
+    "factory_droid", "factory_droid.skills_and_droids", ".factory/skills",
+    "factory_droid", "factory_droid.skills_and_droids", ".factory\\commands",
+    "factory_droid", "factory_droid.skills_and_droids", ".factory\\droids",
+    "factory_droid", "factory_droid.skills_and_droids", ".factory\\skills",
     "factory_droid", "factory_droid.specs", ".factory/specs",
     "factory_droid", "factory_droid.specs", ".factory\\specs",
     "factory_droid", "factory_droid.worktrees", ".factory/worktrees",
     "factory_droid", "factory_droid.worktrees", ".factory\\worktrees",
+    "gemini_cli", "gemini_cli.agent_definitions", ".agents/skills",
+    "gemini_cli", "gemini_cli.agent_definitions", ".agents\\skills",
+    "gemini_cli", "gemini_cli.agent_definitions", ".gemini/agents",
+    "gemini_cli", "gemini_cli.agent_definitions", ".gemini/skills",
+    "gemini_cli", "gemini_cli.agent_definitions", ".gemini\\agents",
+    "gemini_cli", "gemini_cli.agent_definitions", ".gemini\\skills",
     "gemini_cli", "gemini_cli.chats", ".cache/.gemini/tmp",
     "gemini_cli", "gemini_cli.chats", ".cache\\.gemini\\tmp",
     "gemini_cli", "gemini_cli.chats", ".gemini/sessions",
     "gemini_cli", "gemini_cli.chats", ".gemini/tmp",
     "gemini_cli", "gemini_cli.chats", ".gemini\\sessions",
     "gemini_cli", "gemini_cli.chats", ".gemini\\tmp",
+    "gemini_cli", "gemini_cli.commands", ".gemini/commands",
+    "gemini_cli", "gemini_cli.commands", ".gemini\\commands",
     "gemini_cli", "gemini_cli.credentials", ".gemini/oauth_creds.json",
     "gemini_cli", "gemini_cli.credentials", ".gemini\\oauth_creds.json",
     "gemini_cli", "gemini_cli.google_accounts", ".gemini/google_accounts.json",
@@ -1262,6 +1347,12 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "gemini_cli", "gemini_cli.mcp_oauth_tokens", ".gemini/mcp-oauth-tokens.json",
     "gemini_cli", "gemini_cli.mcp_oauth_tokens", ".gemini\\a2a-oauth-tokens.json",
     "gemini_cli", "gemini_cli.mcp_oauth_tokens", ".gemini\\mcp-oauth-tokens.json",
+    "gemini_cli", "gemini_cli.policies", ".gemini/policies",
+    "gemini_cli", "gemini_cli.policies", ".gemini\\policies",
+    "gemini_cli", "gemini_cli.policies", "/Library/Application Support/GeminiCli/policies",
+    "gemini_cli", "gemini_cli.policies", "/etc/gemini-cli/policies",
+    "gemini_cli", "gemini_cli.policies", "\\Library\\Application Support\\GeminiCli\\policies",
+    "gemini_cli", "gemini_cli.policies", "\\etc\\gemini-cli\\policies",
     "gemini_cli", "gemini_cli.shell_history", ".gemini/tmp",
     "gemini_cli", "gemini_cli.shell_history", ".gemini\\tmp",
     "gemini_cli", "gemini_cli.system_settings", "/Library/Application Support/GeminiCli/settings.json",
@@ -1300,6 +1391,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "goose", "goose.llm_request_logs", ".local\\state\\goose\\logs\\llm_request.",
     "goose", "goose.llm_request_logs", "Block/goose/data/logs/llm_request.",
     "goose", "goose.llm_request_logs", "Block\\goose\\data\\logs\\llm_request.",
+    "goose", "goose.memory", ".config/goose/memory",
+    "goose", "goose.memory", ".config\\goose\\memory",
     "goose", "goose.permissions", ".config/goose/permission.yaml",
     "goose", "goose.permissions", ".config/goose/permissions/tool_permissions.json",
     "goose", "goose.permissions", ".config\\goose\\permission.yaml",
@@ -1953,6 +2046,12 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "jetbrains_ai", "jetbrains_ai.log_data", ".cache\\JetBrains",
     "jetbrains_ai", "jetbrains_ai.log_data", "Library/Caches/JetBrains",
     "jetbrains_ai", "jetbrains_ai.log_data", "Library\\Caches\\JetBrains",
+    "jetbrains_ai", "jetbrains_ai.mcp_config", ".config/JetBrains/Air/mcp.json",
+    "jetbrains_ai", "jetbrains_ai.mcp_config", ".config\\JetBrains\\Air\\mcp.json",
+    "jetbrains_ai", "jetbrains_ai.mcp_config", "JetBrains/Air/mcp.json",
+    "jetbrains_ai", "jetbrains_ai.mcp_config", "JetBrains\\Air\\mcp.json",
+    "jetbrains_ai", "jetbrains_ai.mcp_config", "Library/Application Support/JetBrains/Air/mcp.json",
+    "jetbrains_ai", "jetbrains_ai.mcp_config", "Library\\Application Support\\JetBrains\\Air\\mcp.json",
     "jetbrains_ai", "jetbrains_ai.password_safe", ".config/JetBrains",
     "jetbrains_ai", "jetbrains_ai.password_safe", ".config\\JetBrains",
     "jetbrains_ai", "jetbrains_ai.password_safe", "Library/Application Support/JetBrains",
@@ -1975,6 +2074,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "junie", "junie.matterhorn_project_logs", ".cache\\JetBrains",
     "junie", "junie.matterhorn_project_logs", "Library/Caches/JetBrains",
     "junie", "junie.matterhorn_project_logs", "Library\\Caches\\JetBrains",
+    "junie", "junie.mcp_config", ".junie/mcp/mcp.json",
+    "junie", "junie.mcp_config", ".junie\\mcp\\mcp.json",
     "junie", "junie.plugin_install_evidence", ".local/share/JetBrains",
     "junie", "junie.plugin_install_evidence", ".local\\share\\JetBrains",
     "junie", "junie.plugin_install_evidence", "Library/Application Support/JetBrains",
@@ -1983,12 +2084,16 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "junie", "junie.trust_and_auth_key", ".junie/trust/authentication-key",
     "junie", "junie.trust_and_auth_key", ".junie\\trust",
     "junie", "junie.trust_and_auth_key", ".junie\\trust\\authentication-key",
+    "kilo_code", "kilo_code.agents", ".config/kilo/agent",
+    "kilo_code", "kilo_code.agents", ".config\\kilo\\agent",
     "kilo_code", "kilo_code.cli_db", ".local/share/kilo/kilo.db",
     "kilo_code", "kilo_code.cli_db", ".local/share/kilo/kilo.db-shm",
     "kilo_code", "kilo_code.cli_db", ".local/share/kilo/kilo.db-wal",
     "kilo_code", "kilo_code.cli_db", ".local\\share\\kilo\\kilo.db",
     "kilo_code", "kilo_code.cli_db", ".local\\share\\kilo\\kilo.db-shm",
     "kilo_code", "kilo_code.cli_db", ".local\\share\\kilo\\kilo.db-wal",
+    "kilo_code", "kilo_code.config", ".config/kilo/kilo.jsonc",
+    "kilo_code", "kilo_code.config", ".config\\kilo\\kilo.jsonc",
     "kilo_code", "kilo_code.extension_id_legacy_tree", ".config/Code/User/globalStorage/kilocode.kilo-code/tasks",
     "kilo_code", "kilo_code.extension_id_legacy_tree", ".config\\Code\\User\\globalStorage\\kilocode.kilo-code\\tasks",
     "kilo_code", "kilo_code.extension_id_legacy_tree", ".vscode-server/data/User/globalStorage/kilocode.kilo-code/tasks",
@@ -1997,12 +2102,16 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "kilo_code", "kilo_code.extension_id_legacy_tree", "Code\\User\\globalStorage\\kilocode.kilo-code\\tasks",
     "kilo_code", "kilo_code.extension_id_legacy_tree", "Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/tasks",
     "kilo_code", "kilo_code.extension_id_legacy_tree", "Library\\Application Support\\Code\\User\\globalStorage\\kilocode.kilo-code\\tasks",
+    "kilo_code", "kilo_code.home_dir", ".kilocode/cli/global/settings/custom_modes.yaml",
+    "kilo_code", "kilo_code.home_dir", ".kilocode\\cli\\global\\settings\\custom_modes.yaml",
     "kilo_code", "kilo_code.settings", ".config/Code/User/globalStorage/kilocode.kilo-code/settings/custom_modes.yaml",
     "kilo_code", "kilo_code.settings", ".config\\Code\\User\\globalStorage\\kilocode.kilo-code\\settings\\custom_modes.yaml",
     "kilo_code", "kilo_code.settings", "Code/User/globalStorage/kilocode.kilo-code/settings/custom_modes.yaml",
     "kilo_code", "kilo_code.settings", "Code\\User\\globalStorage\\kilocode.kilo-code\\settings\\custom_modes.yaml",
     "kilo_code", "kilo_code.settings", "Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/settings/custom_modes.yaml",
     "kilo_code", "kilo_code.settings", "Library\\Application Support\\Code\\User\\globalStorage\\kilocode.kilo-code\\settings\\custom_modes.yaml",
+    "kiro", "kiro.agents", ".kiro/agents",
+    "kiro", "kiro.agents", ".kiro\\agents",
     "kiro", "kiro.cli_install", ".local/bin/kiro-cli",
     "kiro", "kiro.cli_install", ".local/bin/kirocli",
     "kiro", "kiro.cli_install", ".local/bin/q",
@@ -2014,6 +2123,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "kiro", "kiro.cli_session_files", ".kiro\\sessions\\cli",
     "kiro", "kiro.cli_settings", ".kiro/settings/cli.json",
     "kiro", "kiro.cli_settings", ".kiro\\settings\\cli.json",
+    "kiro", "kiro.hooks", ".kiro/hooks",
+    "kiro", "kiro.hooks", ".kiro\\hooks",
     "kiro", "kiro.ide_legacy_global_storage", ".config/Kiro/User/globalStorage/kiro.kiroagent",
     "kiro", "kiro.ide_legacy_global_storage", ".config\\Kiro\\User\\globalStorage\\kiro.kiroagent",
     "kiro", "kiro.ide_legacy_global_storage", "Kiro/User/globalStorage/kiro.kiroagent",
@@ -2024,6 +2135,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "kiro", "kiro.ide_legacy_global_storage", "Library\\Application Support\\kiro\\User\\globalStorage\\kiro.kiroagent",
     "kiro", "kiro.ide_session_files", ".kiro/sessions",
     "kiro", "kiro.ide_session_files", ".kiro\\sessions",
+    "kiro", "kiro.legacy_amazonq_config", ".aws/amazonq",
+    "kiro", "kiro.legacy_amazonq_config", ".aws\\amazonq",
     "kiro", "kiro.managed_settings", "/Library/Application Support/Kiro/managed-settings.json",
     "kiro", "kiro.managed_settings", "/etc/kiro/managed-settings.json",
     "kiro", "kiro.managed_settings", "C:/ProgramData/Kiro/managed-settings.json",
@@ -2036,6 +2149,12 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "kiro", "kiro.permissions_user", ".kiro\\settings\\permissions.yaml",
     "kiro", "kiro.permissions_workspace", ".kiro/workspace-roots",
     "kiro", "kiro.permissions_workspace", ".kiro\\workspace-roots",
+    "kiro", "kiro.prompt_library", ".kiro/prompts",
+    "kiro", "kiro.prompt_library", ".kiro\\prompts",
+    "kiro", "kiro.skills_powers", ".kiro/powers",
+    "kiro", "kiro.skills_powers", ".kiro/skills",
+    "kiro", "kiro.skills_powers", ".kiro\\powers",
+    "kiro", "kiro.skills_powers", ".kiro\\skills",
     "kiro", "kiro.steering_user", ".kiro/steering",
     "kiro", "kiro.steering_user", ".kiro/steering/AGENTS.md",
     "kiro", "kiro.steering_user", ".kiro\\steering",
@@ -2123,10 +2242,18 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "ollama", "ollama.private_key", ".ollama/id_ed25519.pub",
     "ollama", "ollama.private_key", ".ollama\\id_ed25519",
     "ollama", "ollama.private_key", ".ollama\\id_ed25519.pub",
+    "opencode", "opencode.agents_commands", ".config/opencode/agents",
+    "opencode", "opencode.agents_commands", ".config/opencode/commands",
+    "opencode", "opencode.agents_commands", ".config\\opencode\\agents",
+    "opencode", "opencode.agents_commands", ".config\\opencode\\commands",
     "opencode", "opencode.auth", ".local/share/opencode/auth.json",
     "opencode", "opencode.auth", ".local\\share\\opencode\\auth.json",
     "opencode", "opencode.auth", "opencode/auth.json",
     "opencode", "opencode.auth", "opencode\\auth.json",
+    "opencode", "opencode.config", ".config/opencode/opencode.json",
+    "opencode", "opencode.config", ".config/opencode/opencode.jsonc",
+    "opencode", "opencode.config", ".config\\opencode\\opencode.json",
+    "opencode", "opencode.config", ".config\\opencode\\opencode.jsonc",
     "opencode", "opencode.db", ".local/share/opencode/opencode-",
     "opencode", "opencode.db", ".local/share/opencode/opencode.db",
     "opencode", "opencode.db", ".local/share/opencode/opencode.db-shm",
@@ -2153,6 +2280,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "opencode", "opencode.mcp_auth", ".local\\share\\opencode\\mcp-auth.json",
     "opencode", "opencode.repos_cache", ".local/share/opencode/repos",
     "opencode", "opencode.repos_cache", ".local\\share\\opencode\\repos",
+    "opencode", "opencode.tui_config", ".config/opencode/tui.json",
+    "opencode", "opencode.tui_config", ".config\\opencode\\tui.json",
+    "pi", "pi.agents_skills", ".agents/skills",
+    "pi", "pi.agents_skills", ".agents\\skills",
     "pi", "pi.auth", ".pi/agent/auth.json",
     "pi", "pi.auth", ".pi\\agent\\auth.json",
     "pi", "pi.bin", ".pi/agent/bin",
@@ -2163,10 +2294,26 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "pi", "pi.bin", ".pi\\server",
     "pi", "pi.debug_log", ".pi/agent/pi-debug.log",
     "pi", "pi.debug_log", ".pi\\agent\\pi-debug.log",
+    "pi", "pi.extensions", ".pi/agent/extensions",
+    "pi", "pi.extensions", ".pi/agent/tools",
+    "pi", "pi.extensions", ".pi\\agent\\extensions",
+    "pi", "pi.extensions", ".pi\\agent\\tools",
     "pi", "pi.models", ".pi/agent/models.json",
     "pi", "pi.models", ".pi\\agent\\models.json",
+    "pi", "pi.prompts", ".pi/agent/prompts",
+    "pi", "pi.prompts", ".pi\\agent\\prompts",
     "pi", "pi.sessions", ".pi/agent/sessions/--",
     "pi", "pi.sessions", ".pi\\agent\\sessions\\--",
+    "pi", "pi.settings", ".pi/agent/settings.json",
+    "pi", "pi.settings", ".pi\\agent\\settings.json",
+    "pi", "pi.skills", ".pi/agent/skills",
+    "pi", "pi.skills", ".pi\\agent\\skills",
+    "qwen_code", "qwen_code.auto_memory", ".qwen/memories",
+    "qwen_code", "qwen_code.auto_memory", ".qwen/memories/MEMORY.md",
+    "qwen_code", "qwen_code.auto_memory", ".qwen/projects",
+    "qwen_code", "qwen_code.auto_memory", ".qwen\\memories",
+    "qwen_code", "qwen_code.auto_memory", ".qwen\\memories\\MEMORY.md",
+    "qwen_code", "qwen_code.auto_memory", ".qwen\\projects",
     "qwen_code", "qwen_code.channels_scheduled_tasks", ".qwen/channels/cron.json",
     "qwen_code", "qwen_code.channels_scheduled_tasks", ".qwen/channels/daemon",
     "qwen_code", "qwen_code.channels_scheduled_tasks", ".qwen/channels/service.pid",
@@ -2179,6 +2326,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "qwen_code", "qwen_code.conversation_transcript", ".qwen\\projects",
     "qwen_code", "qwen_code.debug_logs", ".qwen/debug",
     "qwen_code", "qwen_code.debug_logs", ".qwen\\debug",
+    "qwen_code", "qwen_code.env_files", ".qwen/.env",
+    "qwen_code", "qwen_code.env_files", ".qwen\\.env",
     "qwen_code", "qwen_code.file_history_backups", ".qwen/file-history",
     "qwen_code", "qwen_code.file_history_backups", ".qwen\\file-history",
     "qwen_code", "qwen_code.install_evidence", ".qwen/bin",
@@ -2432,6 +2581,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "windsurf", "windsurf.global_rules", ".codeium\\windsurf-insiders\\memories\\global_rules.md",
     "windsurf", "windsurf.global_rules", ".codeium\\windsurf-next\\memories\\global_rules.md",
     "windsurf", "windsurf.global_rules", ".codeium\\windsurf\\memories\\global_rules.md",
+    "windsurf", "windsurf.hooks", ".codeium/hooks.json",
+    "windsurf", "windsurf.hooks", ".codeium/windsurf/hooks.json",
+    "windsurf", "windsurf.hooks", ".codeium\\hooks.json",
+    "windsurf", "windsurf.hooks", ".codeium\\windsurf\\hooks.json",
     "windsurf", "windsurf.ide_global_state_vscdb", ".config/Devin/User/globalStorage/state.vscdb",
     "windsurf", "windsurf.ide_global_state_vscdb", ".config/Devin/User/globalStorage/state.vscdb-shm",
     "windsurf", "windsurf.ide_global_state_vscdb", ".config/Devin/User/globalStorage/state.vscdb-wal",
@@ -2558,6 +2711,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "windsurf", "windsurf.ide_workspace_state_vscdb", "Library\\Application Support\\Windsurf\\User\\workspaceStorage",
     "windsurf", "windsurf.ide_workspace_state_vscdb", "Windsurf/User/workspaceStorage",
     "windsurf", "windsurf.ide_workspace_state_vscdb", "Windsurf\\User\\workspaceStorage",
+    "windsurf", "windsurf.ignore_files", ".codeium/.codeiumignore",
+    "windsurf", "windsurf.ignore_files", ".codeium\\.codeiumignore",
     "windsurf", "windsurf.implicit_trajectories", ".codeium/windsurf/implicit",
     "windsurf", "windsurf.implicit_trajectories", ".codeium\\windsurf\\implicit",
     "windsurf", "windsurf.language_server_binaries_and_logs", ".devin-server/data/logs",
@@ -2587,6 +2742,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "windsurf", "windsurf.macos_update_state", "Library/Application Support/Devin/Backups",
     "windsurf", "windsurf.macos_update_state", "Library/Application Support/Devin/Crashpad",
     "windsurf", "windsurf.macos_update_state", "Library/Caches/com.exafunction.windsurf.ShipIt",
+    "windsurf", "windsurf.mcp_config", ".codeium/windsurf/mcp_config.json",
+    "windsurf", "windsurf.mcp_config", ".codeium\\windsurf\\mcp_config.json",
     "windsurf", "windsurf.mcp_oauth_state", ".config/Devin/mcp/oauth",
     "windsurf", "windsurf.mcp_oauth_state", ".config\\Devin\\mcp\\oauth",
     "windsurf", "windsurf.mcp_oauth_state", "Devin/mcp/oauth",
@@ -2599,6 +2756,12 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "windsurf", "windsurf.memories", ".codeium\\windsurf-insiders\\memories",
     "windsurf", "windsurf.memories", ".codeium\\windsurf-next\\memories",
     "windsurf", "windsurf.memories", ".codeium\\windsurf\\memories",
+    "windsurf", "windsurf.plans", ".devin/plans",
+    "windsurf", "windsurf.plans", ".devin/plans/plan-",
+    "windsurf", "windsurf.plans", ".devin\\plans",
+    "windsurf", "windsurf.plans", ".devin\\plans\\plan-",
+    "windsurf", "windsurf.plans", ".windsurf/plans",
+    "windsurf", "windsurf.plans", ".windsurf\\plans",
     "windsurf", "windsurf.plugin_log", ".codeium/codeium.log",
     "windsurf", "windsurf.plugin_log", ".codeium\\codeium.log",
     "windsurf", "windsurf.shared_storage", ".devin-shared/sharedStorage/state.vscdb",
@@ -2636,6 +2799,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "windsurf", "windsurf.temp_residue", "Temp\\devin-inno-updater-",
     "windsurf", "windsurf.temp_residue", "Temp\\unleash-backup-codeium-extension.json",
     "windsurf", "windsurf.temp_residue", "Temp\\unleash-repo-schema-v1-codeium-language-server.json",
+    "windsurf", "windsurf.workflows_and_skills", ".codeium/windsurf/global_workflows",
+    "windsurf", "windsurf.workflows_and_skills", ".codeium/windsurf/skills",
+    "windsurf", "windsurf.workflows_and_skills", ".codeium\\windsurf\\global_workflows",
+    "windsurf", "windsurf.workflows_and_skills", ".codeium\\windsurf\\skills",
     "windsurf", "windsurf.worktrees", ".devin/worktrees",
     "windsurf", "windsurf.worktrees", ".devin\\worktrees",
     "windsurf", "windsurf.worktrees", ".windsurf/worktrees",
@@ -2667,6 +2834,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "zed", "zed.prompt_library", ".local\\share\\zed\\prompts",
     "zed", "zed.prompt_library", "Zed/prompts",
     "zed", "zed.prompt_library", "Zed\\prompts",
+    "zed", "zed.settings", ".config/zed/settings.json",
+    "zed", "zed.settings", ".config\\zed\\settings.json",
+    "zed", "zed.settings", "Zed/settings.json",
+    "zed", "zed.settings", "Zed\\settings.json",
     "zed", "zed.sidebar_threads", "Library/Application Support/Zed/db/0-stable/db.sqlite",
     "zed", "zed.sidebar_threads", "Library/Application Support/Zed/db/0-stable/db.sqlite-shm",
     "zed", "zed.sidebar_threads", "Library/Application Support/Zed/db/0-stable/db.sqlite-wal",

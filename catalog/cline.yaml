@@ -202,14 +202,55 @@ artifacts:
   - ~/.cline/skills/
   - ~/.cline/tasks/
   - ~/.cline/workflows/
+  - ~/Documents/Cline/Agents/
+  - ~/Documents/Cline/Plugins/
+  - ~/OneDrive*/Documents/Cline/Agents/
+  - ~/OneDrive*/Documents/Cline/Plugins/
   format: text
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
   source_kind: source_code
+  unsourced_paths:
+  - ~/OneDrive*/Documents/Cline/Agents/
+  - ~/OneDrive*/Documents/Cline/Plugins/
   notes: |-
     Verified resolvers in paths.ts: resolveRulesConfigSearchPaths/resolveWorkflowsConfigSearchPaths/resolveSkillsConfigSearchPaths/resolveHooksConfigSearchPaths/resolveAgentsConfigDirPath/resolvePluginConfigSearchPaths each include join(resolveClineDir(), <name>); resolveGlobalTaskSpecsDir() = join(resolveClineDir(),"tasks"); resolveGlobalCronSpecsDir() = join(resolveClineDir(),"cron"); resolveAgentPluginSearchPaths() = join(HOME, ".agents", "plugins") with AGENT_PLUGIN_MANIFEST_FILE_NAME = "plugin.json". ~/.cline/hooks and ~/.cline/plugins are executable-content artifacts (persistence / tampering interest). ~/.cline/cron plus data/db/cron.db together describe scheduled autonomous agent runs.
+
+    The two Documents directories come from the same file and are the extension's side of the same discovery: resolveDocumentsClineDirectoryPath() = join(HOME, "Documents", "Cline") and resolveDocumentsExtensionPath(name) joins one of exactly five names to it, Agents, Hooks, Rules, Workflows and Plugins. The catalogue carried three of the five and not these two, so a global agent definition or plugin was searched nowhere. Rules and Workflows are claimed by crosscutting.instructions_clinerules, Hooks by crosscutting.hook_scripts, and the MCP directory beside them by this product's MCP entry.
+
+    Windows redirection, which applies to all five of those names: this resolver joins the profile and "Documents" literally, while the extension asks the operating system for the real Documents folder, and OneDrive's Known Folder Move commonly puts that under the OneDrive tree instead. A collection of the literal path then finds nothing on a redirected machine and the absence reads as a profile with no global rules, no agents and no plugins. The redirected spelling is here as a second spelling of the same artifact, globbed because the commercial folder carries the tenant's name and a glob matches it without putting a name in this catalogue. See ADR 0040.
+  parser: instructions
+- id: cline.workspace_config_tree
+  category: instructions
+  root: project
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - <project>/.cline/agents/
+  - <project>/.cline/hooks/
+  - <project>/.cline/plugins/
+  - <project>/.cline/rules/
+  - <project>/.cline/workflows/
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
+  source_kind: source_code
+  volatility: |-
+    A workspace tree arrives with the repository, so a clone brings these directories back after any local cleanup, and a directory that is absent locally may still be in the remote's history. The reverse matters more: a hook or a plugin that is here and in no commit was put here by something other than a checkout.
+  notes: |-
+    The workspace half of this product's discovery paths, and every one of them was missing. The catalogue carried the .clinerules spellings and none of the .cline ones, so on a repository using the current layout the rules, the hooks, the plugins, the workflows and the agent definitions were all searched in the one place they are not and the collection reported a project with none of them.
+
+    Read from the resolvers in paths.ts, which build both layouts: resolveHooksConfigSearchPaths(workspacePath) pushes join(workspacePath, ".clinerules", "hooks") and join(workspacePath, ".cline", "hooks"); resolveWorkspaceRulesConfigPaths(workspacePath) returns join(workspacePath, ".clinerules") and join(workspacePath, ".cline", "rules"); resolveWorkflowsConfigSearchPaths, resolvePluginConfigSearchPaths and resolveAgentConfigSearchPaths each include the matching directory under join(workspacePath, ".cline"). The vendor's own comment above the rules resolver says that a host honouring only one of the two layouts silently drops the other's rules, which is exactly what a collection did here.
+
+    Two of the five are executable content and are the sharpest of them. A hook is code the agent runs on tool use or prompt submission and it travels with the repository, so cloning a repository and enabling hooks is remote code execution by design; the plugin directory is the same shape for .js and .ts modules. Collect the bodies verbatim, they are evidence rather than secrets, together with mode, owner and mtime, and diff them against the repository's own git history.
+
+    The global counterparts of all five are in cline.home_config_tree, and the legacy .clinerules spellings of the rules, the hooks, the skills and the workflows are in crosscutting.instructions_clinerules and crosscutting.hook_scripts. One path is claimed once: this entry adds the .cline layout and takes none of theirs.
   parser: instructions
 - id: cline.workspace_specs
   category: config
@@ -444,16 +485,24 @@ artifacts:
   - <vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json
   - ~/.cline/data/settings/cline_mcp_settings.json
   - ~/Documents/Cline/MCP/
+  - ~/OneDrive*/Documents/Cline/MCP/
   format: json
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://raw.githubusercontent.com/cline/cline/main/sdk/packages/shared/src/storage/paths.ts
   source_kind: source_code
+  unsourced_paths:
+  - ~/Documents/Cline/MCP/
+  - ~/OneDrive*/Documents/Cline/MCP/
   notes: |-
     Two live locations. disk.ts: GlobalFileNames.mcpSettings = "cline_mcp_settings.json" and getMcpSettingsFilePath() resolves it inside ensureSettingsDirectoryExists() = getGlobalStorageDir("settings"); ensureMcpServersDirectoryExists() points at "Cline/MCP" under Documents (installed MCP server code). paths.ts: CLINE_MCP_SETTINGS_FILE_NAME = "cline_mcp_settings.json", resolveMcpSettingsPath() = join(resolveClineDataDir(), "settings", <that>). The brief's path is correct but incomplete - the ~/.cline copy must be collected too. Treat as normal sensitivity but expect embedded env vars / bearer tokens for remote MCP servers; flag for review.
 
     Re-sourced by the verification pass, same cause as the global rules entry.
+
+    The Documents directory is unsourced as of this pass. It rests on disk.ts, where ensureMcpServersDirectoryExists points at Cline/MCP under Documents, and this entry cites paths.ts, which states the settings path under the data directory and the CLINE_MCP_SETTINGS_PATH override and lists exactly five Documents subdirectory names, Agents, Hooks, Rules, Workflows and Plugins, none of them MCP. So the claim is the vendor's and the page behind this entry does not carry it, which is what unsourced means here. Nothing changes about collection; a miss under it now reads as inconclusive.
+
+    Windows redirection: OneDrive's Known Folder Move puts the real Documents folder under the OneDrive tree, so a collection of the literal profile path finds nothing on a redirected machine and the absence reads as a profile that never had this. The redirected spelling is here as a second spelling of the same artifact, globbed because the commercial folder carries the tenant's name and a glob matches it without putting a name in this catalogue. See ADR 0040.
   parser: json_generic
 - id: cline.rules_project
   category: project_instructions

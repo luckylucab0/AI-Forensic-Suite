@@ -722,6 +722,7 @@ artifacts:
   - ~/Claude/
   - ~/Claude/Projects/<name>/
   - ~/Documents/Claude/
+  - ~/OneDrive*/Documents/Claude/
   format: directory
   sensitivity: normal
   collect_priority: first
@@ -731,6 +732,7 @@ artifacts:
   unsourced_paths:
   - '%USERPROFILE%\Claude\'
   - '%USERPROFILE%\Claude\Projects\<name>\'
+  - ~/OneDrive*/Documents/Claude/
   record_types:
   - artifact file
   - project folder
@@ -739,6 +741,8 @@ artifacts:
     The vendor states this folder 'is not removed when you delete the application-data directory', which makes it the most durable place agent output survives. Cowork project folders live under ~/Claude/Projects/<name>.
   notes: |-
     Two first-party sources. The data-storage page states Claude Desktop writes user-visible outputs, Artifacts and scheduled-task results, to ~/Claude/ in the home directory, or ~/Documents/Claude/ on legacy installs. Anthropic's Cowork changelog independently names ~/Claude/Projects/<Name> as the project folder and records that the new-project folder picker now defaults to ~/Claude/Projects instead of ~/Documents. For an analyst this is where agent product landed in a place the user can see, and it is the right place to look first for what left the sandbox. The Windows spellings are inferred from the POSIX form and are unsourced.
+
+    Windows redirection: OneDrive's Known Folder Move puts the real Documents folder under the OneDrive tree, so a collection of the literal profile path finds nothing on a redirected machine and the absence reads as a profile that never had this. The redirected spelling is here as a second spelling of the same artifact, globbed because the commercial folder carries the tenant's name and a glob matches it without putting a name in this catalogue. See ADR 0040.
   parser: null
 - id: claude_desktop.renderer_state
   title: Electron renderer state and caches

@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from agentforensics.catalog import Artifact, Catalogue
 from agentforensics.exporters.common import (
+    ANCHORED_REASON,
     Rendered,
     Skip,
     agents,
@@ -29,6 +30,7 @@ from agentforensics.exporters.common import (
     is_registry,
     iter_paths,
     needs_discovery,
+    partly_discovered,
     registry_reason,
     skip_lines,
     wildcard_segments,
@@ -111,6 +113,16 @@ def _recurse(glob: str) -> str:
     return glob.rstrip("/") + "/**" if glob.endswith("/") else glob
 
 
+def _partial(artifact: Artifact) -> str | None:
+    """The header line for the working-copy half of an entry whose other half is here.
+
+    A mixed entry used to be reported as covered by nothing at all, so its profile and
+    system paths were in no rule and nothing said so. Now the paths are rendered and the
+    part that needs a working copy is what the header names.
+    """
+    return ANCHORED_REASON if partly_discovered(artifact) else None
+
+
 def _covered(artifact: Artifact, os_name: str) -> tuple[list[str], str | None]:
     """The globs for one artifact, or the reason there are none."""
     if is_registry(artifact):
@@ -131,7 +143,7 @@ def _covered(artifact: Artifact, os_name: str) -> tuple[list[str], str | None]:
             continue
         globs.extend(_translate(path, os_name))
     if globs:
-        return sorted(set(globs)), None
+        return sorted(set(globs)), _partial(artifact)
     if saw_variable:
         return [], (
             "reachable only through a relocation variable, which a static glob cannot "
@@ -171,6 +183,7 @@ def _collection(catalogue: Catalogue, digest: str) -> Rendered:
                 globs, reason = _covered(artifact, os_name)
                 if reason:
                     skipped.append(Skip(artifact.id, reason))
+                if not globs:
                     continue
                 for glob in globs:
                     rows.append((agent.agent, artifact.id, glob))
@@ -260,8 +273,8 @@ def _presence(catalogue: Catalogue, digest: str) -> Rendered:
             for artifact in artifacts_for(agent, os_name):
                 if artifact.collect_priority != "first":
                     continue
-                globs, reason = _covered(artifact, os_name)
-                if reason:
+                globs, _ = _covered(artifact, os_name)
+                if not globs:
                     continue
                 for glob in globs:
                     rows.append((agent.agent, glob))

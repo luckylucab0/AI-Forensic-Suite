@@ -17,6 +17,7 @@ import re
 
 from agentforensics.catalog import Artifact, Catalogue
 from agentforensics.exporters.common import (
+    ANCHORED_REASON,
     Rendered,
     Skip,
     agents,
@@ -30,6 +31,7 @@ from agentforensics.exporters.common import (
     is_registry,
     iter_paths,
     needs_discovery,
+    partly_discovered,
     skip_lines,
     wildcard_segments,
 )
@@ -74,6 +76,16 @@ def _probe(path: str) -> str | None:
     return text
 
 
+def _partial(artifact: Artifact) -> str | None:
+    """The header line for the working-copy half of an entry whose other half is here.
+
+    A mixed entry used to be reported as covered by nothing at all, so its profile and
+    system paths were in no rule and nothing said so. Now the paths are rendered and the
+    part that needs a working copy is what the header names.
+    """
+    return ANCHORED_REASON if partly_discovered(artifact) else None
+
+
 def _probes(artifact: Artifact) -> tuple[list[str], str | None]:
     if is_registry(artifact):
         return [], "a registry key, which the runbook's collector reads instead"
@@ -92,7 +104,7 @@ def _probes(artifact: Artifact) -> tuple[list[str], str | None]:
         if probe:
             probes.append(probe)
     if probes:
-        return sorted(set(probes)), None
+        return sorted(set(probes)), _partial(artifact)
     if saw_variable:
         return [], (
             "reachable only through a relocation variable: the runbook's collector reads "
@@ -114,6 +126,7 @@ def _presence_script(catalogue: Catalogue, digest: str) -> Rendered:
             probes, reason = _probes(artifact)
             if reason:
                 skipped.append(Skip(artifact.id, reason))
+            if not probes:
                 continue
             for probe in probes:
                 rows.append((agent.agent, artifact.id, probe))

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b24d051837fd
+# Catalogue digest: 0b2cac47244d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 39 of the 583 catalogue artifacts declare
+# KAPE is Windows only. 39 of the 584 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -18,11 +18,12 @@
 #     windsurf.enterprise_policy
 #     windsurf.url_handlers
 #   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     windsurf.project_instructions
+#   some of its paths are anchored at a working copy, whose location only the agent's own state file gives, so those are not in this rule. Its profile and system wide paths are. Run the suite's collector for the rest, which reads that state file
 #     windsurf.hooks
 #     windsurf.ignore_files
 #     windsurf.mcp_config
 #     windsurf.plans
-#     windsurf.project_instructions
 #     windsurf.workflows_and_skills
 Description: AI coding agent artifacts, Windsurf
 Author: agentforensics
@@ -307,6 +308,18 @@ Targets:
         FileMask: "global_rules.md"
         Recursive: false
     -
+        Name: windsurf.hooks
+        Category: config
+        Path: C:\Users\%user%\.codeium
+        FileMask: "hooks.json"
+        Recursive: false
+    -
+        Name: windsurf.hooks
+        Category: config
+        Path: C:\Users\%user%\.codeium\windsurf
+        FileMask: "hooks.json"
+        Recursive: false
+    -
         Name: windsurf.ide_global_state_vscdb
         Category: config
         Path: C:\Users\%user%\AppData\Roaming\Devin\User\globalStorage
@@ -499,6 +512,12 @@ Targets:
         FileMask: "workspace.json"
         Recursive: false
     -
+        Name: windsurf.ignore_files
+        Category: config
+        Path: C:\Users\%user%\.codeium
+        FileMask: ".codeiumignore"
+        Recursive: false
+    -
         Name: windsurf.implicit_trajectories
         Category: transcript
         Path: C:\Users\%user%\.codeium\windsurf\implicit
@@ -547,6 +566,12 @@ Targets:
         FileMask: "*"
         Recursive: true
     -
+        Name: windsurf.mcp_config
+        Category: mcp_config
+        Path: C:\Users\%user%\.codeium\windsurf
+        FileMask: "mcp_config.json"
+        Recursive: false
+    -
         Name: windsurf.mcp_oauth_state
         Category: credentials
         Path: C:\Users\%user%\AppData\Roaming\Devin\mcp\oauth
@@ -576,6 +601,24 @@ Targets:
         Path: C:\Users\%user%\.codeium\windsurf\memories
         FileMask: "*.pb"
         Recursive: false
+    -
+        Name: windsurf.plans
+        Category: transcript
+        Path: C:\Users\%user%\.devin\plans
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: windsurf.plans
+        Category: transcript
+        Path: C:\Users\%user%\.devin\plans
+        FileMask: "plan-*.md"
+        Recursive: false
+    -
+        Name: windsurf.plans
+        Category: transcript
+        Path: C:\Users\%user%\.windsurf\plans
+        FileMask: "*"
+        Recursive: true
     -
         Name: windsurf.plugin_log
         Category: log
@@ -660,6 +703,18 @@ Targets:
         Path: C:\Users\%user%\AppData\Local\Temp
         FileMask: "unleash-repo-schema-v1-codeium-language-server.json"
         Recursive: false
+    -
+        Name: windsurf.workflows_and_skills
+        Category: instructions
+        Path: C:\Users\%user%\.codeium\windsurf\global_workflows
+        FileMask: "*.md"
+        Recursive: false
+    -
+        Name: windsurf.workflows_and_skills
+        Category: instructions
+        Path: C:\Users\%user%\.codeium\windsurf\skills
+        FileMask: "*"
+        Recursive: true
     -
         Name: windsurf.worktrees
         Category: file_snapshot

@@ -91,6 +91,7 @@ SOURCES = frozenset(
         "cline.home_config_tree",
         "cline.rules_global",
         "cline.rules_project",
+        "cline.workspace_config_tree",
         "continue.rules_and_skills",
         "copilot.agents_skills_hooks",
         "copilot.instructions",

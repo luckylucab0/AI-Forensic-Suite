@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b24d051837fd
+# Catalogue digest: 0b2cac47244d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -27,9 +27,13 @@ sources:
       accessor='data',
       filename='''agent,glob
     amazonq,/Users/*/.aws/amazonq/.cli_bash_history
+    amazonq,/Users/*/.aws/amazonq/agents/default.json
+    amazonq,/Users/*/.aws/amazonq/cli-agents/*.json
+    amazonq,/Users/*/.aws/amazonq/default.json
     amazonq,/Users/*/.aws/amazonq/history/*.json
     amazonq,/Users/*/.aws/amazonq/history/chat-history-*.json
     amazonq,/Users/*/.aws/amazonq/history/chat-history-no-workspace.json
+    amazonq,/Users/*/.aws/amazonq/mcp.json
     amazonq,/Users/*/.aws/sso/cache/*.json
     amazonq,/Users/*/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
     amazonq,/Users/*/.local/share/amazon-q/data.sqlite3
@@ -39,9 +43,13 @@ sources:
     amazonq,/Users/*/Library/Application Support/amazon-q/data.sqlite3-shm
     amazonq,/Users/*/Library/Application Support/amazon-q/data.sqlite3-wal
     amazonq,/home/*/.aws/amazonq/.cli_bash_history
+    amazonq,/home/*/.aws/amazonq/agents/default.json
+    amazonq,/home/*/.aws/amazonq/cli-agents/*.json
+    amazonq,/home/*/.aws/amazonq/default.json
     amazonq,/home/*/.aws/amazonq/history/*.json
     amazonq,/home/*/.aws/amazonq/history/chat-history-*.json
     amazonq,/home/*/.aws/amazonq/history/chat-history-no-workspace.json
+    amazonq,/home/*/.aws/amazonq/mcp.json
     amazonq,/home/*/.aws/sso/cache/*.json
     amazonq,/home/*/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
     amazonq,/home/*/.local/share/amazon-q/data.sqlite3
@@ -51,9 +59,13 @@ sources:
     amazonq,/home/*/Library/Application Support/amazon-q/data.sqlite3-shm
     amazonq,/home/*/Library/Application Support/amazon-q/data.sqlite3-wal
     amazonq,/root/.aws/amazonq/.cli_bash_history
+    amazonq,/root/.aws/amazonq/agents/default.json
+    amazonq,/root/.aws/amazonq/cli-agents/*.json
+    amazonq,/root/.aws/amazonq/default.json
     amazonq,/root/.aws/amazonq/history/*.json
     amazonq,/root/.aws/amazonq/history/chat-history-*.json
     amazonq,/root/.aws/amazonq/history/chat-history-no-workspace.json
+    amazonq,/root/.aws/amazonq/mcp.json
     amazonq,/root/.aws/sso/cache/*.json
     amazonq,/root/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
     amazonq,/root/.local/share/amazon-q/data.sqlite3
@@ -63,9 +75,13 @@ sources:
     amazonq,/root/Library/Application Support/amazon-q/data.sqlite3-shm
     amazonq,/root/Library/Application Support/amazon-q/data.sqlite3-wal
     amazonq,/var/root/.aws/amazonq/.cli_bash_history
+    amazonq,/var/root/.aws/amazonq/agents/default.json
+    amazonq,/var/root/.aws/amazonq/cli-agents/*.json
+    amazonq,/var/root/.aws/amazonq/default.json
     amazonq,/var/root/.aws/amazonq/history/*.json
     amazonq,/var/root/.aws/amazonq/history/chat-history-*.json
     amazonq,/var/root/.aws/amazonq/history/chat-history-no-workspace.json
+    amazonq,/var/root/.aws/amazonq/mcp.json
     amazonq,/var/root/.aws/sso/cache/*.json
     amazonq,/var/root/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
     amazonq,/var/root/.local/share/amazon-q/data.sqlite3
@@ -75,9 +91,13 @@ sources:
     amazonq,/var/root/Library/Application Support/amazon-q/data.sqlite3-shm
     amazonq,/var/root/Library/Application Support/amazon-q/data.sqlite3-wal
     amazonq,C:/Users/*/.aws/amazonq/.cli_bash_history
+    amazonq,C:/Users/*/.aws/amazonq/agents/default.json
+    amazonq,C:/Users/*/.aws/amazonq/cli-agents/*.json
+    amazonq,C:/Users/*/.aws/amazonq/default.json
     amazonq,C:/Users/*/.aws/amazonq/history/*.json
     amazonq,C:/Users/*/.aws/amazonq/history/chat-history-*.json
     amazonq,C:/Users/*/.aws/amazonq/history/chat-history-no-workspace.json
+    amazonq,C:/Users/*/.aws/amazonq/mcp.json
     amazonq,C:/Users/*/.aws/sso/cache/*.json
     amazonq,C:/Users/*/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
     amazonq,C:/Users/*/AppData/Local/amazon-q/data.sqlite3
@@ -258,6 +278,7 @@ sources:
     claude_desktop,/Users/*/Library/Logs/Claude/main.log
     claude_desktop,/Users/*/Library/Logs/Claude/mcp-server-*.log
     claude_desktop,/Users/*/Library/Logs/Claude/mcp.log
+    claude_desktop,/Users/*/OneDrive*/Documents/Claude/**
     claude_desktop,/home/*/.claude/scheduled-tasks/*/SKILL.md
     claude_desktop,/home/*/.config/Claude-3p/local-agent-mode-sessions/*/*/local_*/**
     claude_desktop,/home/*/.config/Claude-3p/logs/main.log
@@ -291,6 +312,7 @@ sources:
     claude_desktop,/home/*/Library/Logs/Claude/main.log
     claude_desktop,/home/*/Library/Logs/Claude/mcp-server-*.log
     claude_desktop,/home/*/Library/Logs/Claude/mcp.log
+    claude_desktop,/home/*/OneDrive*/Documents/Claude/**
     claude_desktop,/root/.claude/scheduled-tasks/*/SKILL.md
     claude_desktop,/root/.config/Claude-3p/local-agent-mode-sessions/*/*/local_*/**
     claude_desktop,/root/.config/Claude-3p/logs/main.log
@@ -324,6 +346,7 @@ sources:
     claude_desktop,/root/Library/Logs/Claude/main.log
     claude_desktop,/root/Library/Logs/Claude/mcp-server-*.log
     claude_desktop,/root/Library/Logs/Claude/mcp.log
+    claude_desktop,/root/OneDrive*/Documents/Claude/**
     claude_desktop,/var/root/.claude/scheduled-tasks/*/SKILL.md
     claude_desktop,/var/root/.config/Claude-3p/local-agent-mode-sessions/*/*/local_*/**
     claude_desktop,/var/root/.config/Claude-3p/logs/main.log
@@ -358,6 +381,7 @@ sources:
     claude_desktop,/var/root/Library/Logs/Claude/main.log
     claude_desktop,/var/root/Library/Logs/Claude/mcp-server-*.log
     claude_desktop,/var/root/Library/Logs/Claude/mcp.log
+    claude_desktop,/var/root/OneDrive*/Documents/Claude/**
     claude_desktop,C:/Users/*/.claude/scheduled-tasks/*/SKILL.md
     claude_desktop,C:/Users/*/AppData/Local/Claude-3p/claude-code-sessions/**
     claude_desktop,C:/Users/*/AppData/Local/Claude-3p/cowork_plugins/**
@@ -389,6 +413,7 @@ sources:
     claude_desktop,C:/Users/*/AppData/Roaming/Claude/logs/main.log
     claude_desktop,C:/Users/*/Claude/**
     claude_desktop,C:/Users/*/Claude/Projects/*/**
+    claude_desktop,C:/Users/*/OneDrive*/Documents/Claude/**
     cline,/Users/*/.cline/data/workspaces/chat/**
     cline,/Users/*/.cline/schedules/**
     cline,/home/*/.cline/data/workspaces/chat/**
@@ -482,18 +507,38 @@ sources:
     continue,/Users/*/.continue/input_history.json
     continue,/Users/*/.continue/logs/**
     continue,/Users/*/.continue/permissions.yaml
+    continue,/Users/*/.continue/prompts/**
+    continue,/Users/*/.continue/rules/**
+    continue,/Users/*/.continue/settings.json
+    continue,/Users/*/.continue/skills/**
     continue,/home/*/.continue/input_history.json
     continue,/home/*/.continue/logs/**
     continue,/home/*/.continue/permissions.yaml
+    continue,/home/*/.continue/prompts/**
+    continue,/home/*/.continue/rules/**
+    continue,/home/*/.continue/settings.json
+    continue,/home/*/.continue/skills/**
     continue,/root/.continue/input_history.json
     continue,/root/.continue/logs/**
     continue,/root/.continue/permissions.yaml
+    continue,/root/.continue/prompts/**
+    continue,/root/.continue/rules/**
+    continue,/root/.continue/settings.json
+    continue,/root/.continue/skills/**
     continue,/var/root/.continue/input_history.json
     continue,/var/root/.continue/logs/**
     continue,/var/root/.continue/permissions.yaml
+    continue,/var/root/.continue/prompts/**
+    continue,/var/root/.continue/rules/**
+    continue,/var/root/.continue/settings.json
+    continue,/var/root/.continue/skills/**
     continue,C:/Users/*/.continue/input_history.json
     continue,C:/Users/*/.continue/logs/**
     continue,C:/Users/*/.continue/permissions.yaml
+    continue,C:/Users/*/.continue/prompts/**
+    continue,C:/Users/*/.continue/rules/**
+    continue,C:/Users/*/.continue/settings.json
+    continue,C:/Users/*/.continue/skills/**
     copilot,/Users/*/.copilot/command-history-state/**
     copilot,/Users/*/.copilot/logs/**
     copilot,/Users/*/.copilot/session-state/**
@@ -540,8 +585,11 @@ sources:
     crosscutting,C:/Users/*/AppData/Local/npm-cache/_logs/*-debug-*.log
     crosscutting,C:/Users/*/AppData/Roaming/npm/**
     crosscutting,C:/Users/*/AppData/Roaming/npm/node_modules/**
+    cursor,/Library/Application Support/Cursor/hooks.json
     cursor,/Users/*/.cache/cursor-compile-cache/**
     cursor,/Users/*/.cursor/cursor-computer-use/**
+    cursor,/Users/*/.cursor/hooks.json
+    cursor,/Users/*/.cursor/hooks/**
     cursor,/Users/*/.cursor/policy.json
     cursor,/Users/*/.cursor/subagents/**
     cursor,/Users/*/.cursor/worktrees/*
@@ -551,8 +599,11 @@ sources:
     cursor,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/anysphere.cursor-retrieval/high_level_folder_description.txt
     cursor,/Users/*/Library/Caches/cursor-compile-cache/**
     cursor,/Users/*/Library/Caches/cursor-compile-cache/v*-*-*-*/**
+    cursor,/etc/cursor/hooks.json
     cursor,/home/*/.cache/cursor-compile-cache/**
     cursor,/home/*/.cursor/cursor-computer-use/**
+    cursor,/home/*/.cursor/hooks.json
+    cursor,/home/*/.cursor/hooks/**
     cursor,/home/*/.cursor/policy.json
     cursor,/home/*/.cursor/subagents/**
     cursor,/home/*/.cursor/worktrees/*
@@ -565,6 +616,8 @@ sources:
     cursor,/opt/cursor/**
     cursor,/root/.cache/cursor-compile-cache/**
     cursor,/root/.cursor/cursor-computer-use/**
+    cursor,/root/.cursor/hooks.json
+    cursor,/root/.cursor/hooks/**
     cursor,/root/.cursor/policy.json
     cursor,/root/.cursor/subagents/**
     cursor,/root/.cursor/worktrees/*
@@ -576,6 +629,8 @@ sources:
     cursor,/root/Library/Caches/cursor-compile-cache/v*-*-*-*/**
     cursor,/var/root/.cache/cursor-compile-cache/**
     cursor,/var/root/.cursor/cursor-computer-use/**
+    cursor,/var/root/.cursor/hooks.json
+    cursor,/var/root/.cursor/hooks/**
     cursor,/var/root/.cursor/policy.json
     cursor,/var/root/.cursor/subagents/**
     cursor,/var/root/.cursor/worktrees/*
@@ -586,10 +641,17 @@ sources:
     cursor,/var/root/Library/Caches/cursor-compile-cache/**
     cursor,/var/root/Library/Caches/cursor-compile-cache/v*-*-*-*/**
     cursor,C:/Users/*/.cursor/cursor-computer-use/**
+    cursor,C:/Users/*/.cursor/hooks.json
+    cursor,C:/Users/*/.cursor/hooks/**
     cursor,C:/Users/*/.cursor/policy.json
     cursor,C:/Users/*/.cursor/subagents/**
     cursor,C:/Users/*/.cursor/worktrees/*
     cursor,C:/Users/*/AppData/Local/Temp/cursor-agent-logs-*/*
+    factory_droid,/Users/*/.factory/output-styles/*.md
+    factory_droid,/home/*/.factory/output-styles/*.md
+    factory_droid,/root/.factory/output-styles/*.md
+    factory_droid,/var/root/.factory/output-styles/*.md
+    factory_droid,C:/Users/*/.factory/output-styles/*.md
     gemini_cli,/Users/*/.cache/.gemini/tmp/*/chats/**
     gemini_cli,/Users/*/.gemini/**
     gemini_cli,/Users/*/.gemini/sessions/**
@@ -949,9 +1011,12 @@ sources:
     hermes,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/state.db-shm
     hermes,C:/Users/*/AppData/Local/hermes/state.db.retired-wal-*/state.db-wal
     hermes,C:/Users/*/AppData/Local/hermes/vercel_sandbox_snapshots.json
+    kiro,/Users/*/.aws/amazonq/**
     kiro,/Users/*/.kiro/*.sqlite3
     kiro,/Users/*/.kiro/*.sqlite3-shm
     kiro,/Users/*/.kiro/*.sqlite3-wal
+    kiro,/Users/*/.kiro/agents/*
+    kiro,/Users/*/.kiro/hooks/*.json
     kiro,/Users/*/.kiro/sessions/*/*/messages.jsonl
     kiro,/Users/*/.kiro/sessions/*/*/session.json
     kiro,/Users/*/.kiro/sessions/*/*/sub-executions/*.jsonl
@@ -961,9 +1026,12 @@ sources:
     kiro,/Users/*/.kiro/settings/mcp.json
     kiro,/Users/*/.kiro/settings/permissions.yaml
     kiro,/Users/*/.kiro/workspace-roots/*/permissions.yaml
+    kiro,/home/*/.aws/amazonq/**
     kiro,/home/*/.kiro/*.sqlite3
     kiro,/home/*/.kiro/*.sqlite3-shm
     kiro,/home/*/.kiro/*.sqlite3-wal
+    kiro,/home/*/.kiro/agents/*
+    kiro,/home/*/.kiro/hooks/*.json
     kiro,/home/*/.kiro/sessions/*/*/messages.jsonl
     kiro,/home/*/.kiro/sessions/*/*/session.json
     kiro,/home/*/.kiro/sessions/*/*/sub-executions/*.jsonl
@@ -973,9 +1041,12 @@ sources:
     kiro,/home/*/.kiro/settings/mcp.json
     kiro,/home/*/.kiro/settings/permissions.yaml
     kiro,/home/*/.kiro/workspace-roots/*/permissions.yaml
+    kiro,/root/.aws/amazonq/**
     kiro,/root/.kiro/*.sqlite3
     kiro,/root/.kiro/*.sqlite3-shm
     kiro,/root/.kiro/*.sqlite3-wal
+    kiro,/root/.kiro/agents/*
+    kiro,/root/.kiro/hooks/*.json
     kiro,/root/.kiro/sessions/*/*/messages.jsonl
     kiro,/root/.kiro/sessions/*/*/session.json
     kiro,/root/.kiro/sessions/*/*/sub-executions/*.jsonl
@@ -985,9 +1056,12 @@ sources:
     kiro,/root/.kiro/settings/mcp.json
     kiro,/root/.kiro/settings/permissions.yaml
     kiro,/root/.kiro/workspace-roots/*/permissions.yaml
+    kiro,/var/root/.aws/amazonq/**
     kiro,/var/root/.kiro/*.sqlite3
     kiro,/var/root/.kiro/*.sqlite3-shm
     kiro,/var/root/.kiro/*.sqlite3-wal
+    kiro,/var/root/.kiro/agents/*
+    kiro,/var/root/.kiro/hooks/*.json
     kiro,/var/root/.kiro/sessions/*/*/messages.jsonl
     kiro,/var/root/.kiro/sessions/*/*/session.json
     kiro,/var/root/.kiro/sessions/*/*/sub-executions/*.jsonl
@@ -997,9 +1071,12 @@ sources:
     kiro,/var/root/.kiro/settings/mcp.json
     kiro,/var/root/.kiro/settings/permissions.yaml
     kiro,/var/root/.kiro/workspace-roots/*/permissions.yaml
+    kiro,C:/Users/*/.aws/amazonq/**
     kiro,C:/Users/*/.kiro/*.sqlite3
     kiro,C:/Users/*/.kiro/*.sqlite3-shm
     kiro,C:/Users/*/.kiro/*.sqlite3-wal
+    kiro,C:/Users/*/.kiro/agents/*
+    kiro,C:/Users/*/.kiro/hooks/*.json
     kiro,C:/Users/*/.kiro/sessions/*/*/messages.jsonl
     kiro,C:/Users/*/.kiro/sessions/*/*/session.json
     kiro,C:/Users/*/.kiro/sessions/*/*/sub-executions/*.jsonl
@@ -1014,7 +1091,19 @@ sources:
     ollama,/root/.ollama/history
     ollama,/var/root/.ollama/history
     ollama,C:/Users/*/.ollama/history
+    pi,/Users/*/.agents/skills/**
+    pi,/Users/*/.pi/agent/skills/**
+    pi,/home/*/.agents/skills/**
+    pi,/home/*/.pi/agent/skills/**
+    pi,/root/.agents/skills/**
+    pi,/root/.pi/agent/skills/**
+    pi,/var/root/.agents/skills/**
+    pi,/var/root/.pi/agent/skills/**
+    pi,C:/Users/*/.agents/skills/**
+    pi,C:/Users/*/.pi/agent/skills/**
     qwen_code,/Users/*/.agents/skills/**
+    qwen_code,/Users/*/.env
+    qwen_code,/Users/*/.qwen/.env
     qwen_code,/Users/*/.qwen/AGENTS.md
     qwen_code,/Users/*/.qwen/QWEN.md
     qwen_code,/Users/*/.qwen/agents/*.md
@@ -1048,6 +1137,8 @@ sources:
     qwen_code,/Users/*/.qwen/usage_record.jsonl
     qwen_code,/Users/*/.qwen/workflows/*.js
     qwen_code,/home/*/.agents/skills/**
+    qwen_code,/home/*/.env
+    qwen_code,/home/*/.qwen/.env
     qwen_code,/home/*/.qwen/AGENTS.md
     qwen_code,/home/*/.qwen/QWEN.md
     qwen_code,/home/*/.qwen/agents/*.md
@@ -1081,6 +1172,8 @@ sources:
     qwen_code,/home/*/.qwen/usage_record.jsonl
     qwen_code,/home/*/.qwen/workflows/*.js
     qwen_code,/root/.agents/skills/**
+    qwen_code,/root/.env
+    qwen_code,/root/.qwen/.env
     qwen_code,/root/.qwen/AGENTS.md
     qwen_code,/root/.qwen/QWEN.md
     qwen_code,/root/.qwen/agents/*.md
@@ -1114,6 +1207,8 @@ sources:
     qwen_code,/root/.qwen/usage_record.jsonl
     qwen_code,/root/.qwen/workflows/*.js
     qwen_code,/var/root/.agents/skills/**
+    qwen_code,/var/root/.env
+    qwen_code,/var/root/.qwen/.env
     qwen_code,/var/root/.qwen/AGENTS.md
     qwen_code,/var/root/.qwen/QWEN.md
     qwen_code,/var/root/.qwen/agents/*.md
@@ -1147,6 +1242,8 @@ sources:
     qwen_code,/var/root/.qwen/usage_record.jsonl
     qwen_code,/var/root/.qwen/workflows/*.js
     qwen_code,C:/Users/*/.agents/skills/**
+    qwen_code,C:/Users/*/.env
+    qwen_code,C:/Users/*/.qwen/.env
     qwen_code,C:/Users/*/.qwen/AGENTS.md
     qwen_code,C:/Users/*/.qwen/QWEN.md
     qwen_code,C:/Users/*/.qwen/agents/*.md
@@ -1187,9 +1284,12 @@ sources:
     windsurf,/Users/*/.config/Devin/User/acp-messages/*.db-shm
     windsurf,/Users/*/.config/Devin/User/acp-messages/*.db-wal
     windsurf,/Users/*/.devin-server/**
+    windsurf,/Users/*/.devin/plans/**
+    windsurf,/Users/*/.devin/plans/plan-*.md
     windsurf,/Users/*/.devin/transcripts/*.jsonl
     windsurf,/Users/*/.devin/worktrees/*
     windsurf,/Users/*/.windsurf-server/**
+    windsurf,/Users/*/.windsurf/plans/**
     windsurf,/Users/*/.windsurf/transcripts/*.jsonl
     windsurf,/Users/*/.windsurf/worktrees/*
     windsurf,/Users/*/Library/Application Support/Devin/User/acp-messages/*.db
@@ -1203,9 +1303,12 @@ sources:
     windsurf,/home/*/.config/Devin/User/acp-messages/*.db-shm
     windsurf,/home/*/.config/Devin/User/acp-messages/*.db-wal
     windsurf,/home/*/.devin-server/**
+    windsurf,/home/*/.devin/plans/**
+    windsurf,/home/*/.devin/plans/plan-*.md
     windsurf,/home/*/.devin/transcripts/*.jsonl
     windsurf,/home/*/.devin/worktrees/*
     windsurf,/home/*/.windsurf-server/**
+    windsurf,/home/*/.windsurf/plans/**
     windsurf,/home/*/.windsurf/transcripts/*.jsonl
     windsurf,/home/*/.windsurf/worktrees/*
     windsurf,/home/*/Library/Application Support/Devin/User/acp-messages/*.db
@@ -1219,9 +1322,12 @@ sources:
     windsurf,/root/.config/Devin/User/acp-messages/*.db-shm
     windsurf,/root/.config/Devin/User/acp-messages/*.db-wal
     windsurf,/root/.devin-server/**
+    windsurf,/root/.devin/plans/**
+    windsurf,/root/.devin/plans/plan-*.md
     windsurf,/root/.devin/transcripts/*.jsonl
     windsurf,/root/.devin/worktrees/*
     windsurf,/root/.windsurf-server/**
+    windsurf,/root/.windsurf/plans/**
     windsurf,/root/.windsurf/transcripts/*.jsonl
     windsurf,/root/.windsurf/worktrees/*
     windsurf,/root/Library/Application Support/Devin/User/acp-messages/*.db
@@ -1235,9 +1341,12 @@ sources:
     windsurf,/var/root/.config/Devin/User/acp-messages/*.db-shm
     windsurf,/var/root/.config/Devin/User/acp-messages/*.db-wal
     windsurf,/var/root/.devin-server/**
+    windsurf,/var/root/.devin/plans/**
+    windsurf,/var/root/.devin/plans/plan-*.md
     windsurf,/var/root/.devin/transcripts/*.jsonl
     windsurf,/var/root/.devin/worktrees/*
     windsurf,/var/root/.windsurf-server/**
+    windsurf,/var/root/.windsurf/plans/**
     windsurf,/var/root/.windsurf/transcripts/*.jsonl
     windsurf,/var/root/.windsurf/worktrees/*
     windsurf,/var/root/Library/Application Support/Devin/User/acp-messages/*.db
@@ -1248,9 +1357,12 @@ sources:
     windsurf,C:/Users/*/.codeium/windsurf-next/memories/global_rules.md
     windsurf,C:/Users/*/.codeium/windsurf/memories/global_rules.md
     windsurf,C:/Users/*/.devin-server/**
+    windsurf,C:/Users/*/.devin/plans/**
+    windsurf,C:/Users/*/.devin/plans/plan-*.md
     windsurf,C:/Users/*/.devin/transcripts/*.jsonl
     windsurf,C:/Users/*/.devin/worktrees/*
     windsurf,C:/Users/*/.windsurf-server/**
+    windsurf,C:/Users/*/.windsurf/plans/**
     windsurf,C:/Users/*/.windsurf/transcripts/*.jsonl
     windsurf,C:/Users/*/.windsurf/worktrees/*
     windsurf,C:/Users/*/AppData/Local/Temp/devin-inno-updater-*.log

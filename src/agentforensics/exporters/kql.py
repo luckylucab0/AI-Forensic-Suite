@@ -32,6 +32,7 @@ import re
 
 from agentforensics.catalog import Artifact, Catalogue
 from agentforensics.exporters.common import (
+    ANCHORED_REASON,
     Rendered,
     Skip,
     agents,
@@ -43,6 +44,7 @@ from agentforensics.exporters.common import (
     header,
     is_registry,
     needs_discovery,
+    partly_discovered,
     skip_lines,
     wildcard_segments,
 )
@@ -80,6 +82,16 @@ def _fragment(path: str, separator: str = "\\") -> str | None:
     return text if separator == "\\" else text.replace("\\", separator)
 
 
+def _partial(artifact: Artifact) -> str | None:
+    """The header line for the working-copy half of an entry whose other half is here.
+
+    A mixed entry used to be reported as covered by nothing at all, so its profile and
+    system paths were in no rule and nothing said so. Now the paths are rendered and the
+    part that needs a working copy is what the header names.
+    """
+    return ANCHORED_REASON if partly_discovered(artifact) else None
+
+
 def _fragments(artifact: Artifact, separator: str = "\\") -> tuple[list[str], str | None]:
     if is_registry(artifact):
         return [], "a registry key, which is a different Advanced Hunting table"
@@ -98,7 +110,7 @@ def _fragments(artifact: Artifact, separator: str = "\\") -> tuple[list[str], st
         if fragment:
             fragments.append(fragment)
     if fragments:
-        return sorted(set(fragments)), None
+        return sorted(set(fragments)), _partial(artifact)
     if saw_variable:
         return [], (
             "reachable only through a relocation variable, which is not in the event data: "
@@ -168,6 +180,7 @@ def _file_query(catalogue: Catalogue, digest: str) -> Rendered:
                 fragments, reason = _fragments(artifact, separator)
                 if reason:
                     reasons.append(reason)
+                if not fragments:
                     continue
                 covered = True
                 for fragment in fragments:

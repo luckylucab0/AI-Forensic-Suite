@@ -133,8 +133,45 @@ def registry_reason(tool: str) -> str:
     )
 
 
+def is_anchored(path: str) -> bool:
+    """Whether this pattern needs a working copy the exporter cannot name.
+
+    Anchoring is a property of the pattern and not of the entry it sits in. Sixty entries
+    are about one logical thing at two scopes, the working copy's own file and the profile
+    or system wide one the same agent reads beside it, and asking the entry made every
+    exporter drop 191 profile and system paths: a KAPE target for one agent left out the
+    user's own agent definitions, and the managed settings under /etc and %PROGRAMDATA%
+    were in no generated rule at all.
+
+    <vscode-user> is not one of these: iter_paths expands it from the profile.
+    """
+    return path.startswith("<") and not path.startswith("<vscode-user>")
+
+
 def needs_discovery(artifact: Artifact) -> bool:
-    return artifact.root in DISCOVERED_ROOTS
+    """Whether a static rule can reach nothing of this artifact.
+
+    True only when every path it has is anchored at a working copy. An entry that also
+    carries a profile or a system path is rendered for those, and the header says which
+    half is missing.
+    """
+    return artifact.root in DISCOVERED_ROOTS and all(is_anchored(path) for path in artifact.paths)
+
+
+def partly_discovered(artifact: Artifact) -> bool:
+    """Whether some of this artifact's paths are anchored at a working copy and some are not."""
+    return artifact.root in DISCOVERED_ROOTS and not needs_discovery(artifact)
+
+
+# The header line for the half of a mixed entry that no static rule can reach. One line for
+# all of them rather than one per count: the number of hidden paths is in the catalogue, and
+# a header that repeats the same paragraph three times because three entries hide a
+# different number of paths buries the entries it is trying to name.
+ANCHORED_REASON = (
+    "some of its paths are anchored at a working copy, whose location only the agent's own "
+    "state file gives, so those are not in this rule. Its profile and system wide paths "
+    "are. Run the suite's collector for the rest, which reads that state file"
+)
 
 
 def bare_variable(path: str) -> bool:
@@ -262,6 +299,11 @@ def iter_paths(artifact: Artifact, os_name: str) -> Iterator[str]:
         # through as a literal searches for a directory named "<vscode-user>".
         if path.startswith("<vscode-user>"):
             yield from expand_vscode_user(path, os_name)
+            continue
+        if is_anchored(path):
+            # A working copy this exporter cannot name. Skipped here rather than in each
+            # renderer, and reported in the header by the caller, because rendering it as
+            # a literal would emit a rule searching for a directory called "<project>".
             continue
         windows = bool(re.match(r"^%[A-Za-z_()]+%|^[A-Za-z]:\\|^HKEY_|^HKLM|^HKCU", path))
         if os_name == "windows":

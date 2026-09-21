@@ -19,6 +19,7 @@ import re
 
 from agentforensics.catalog import Artifact, Catalogue
 from agentforensics.exporters.common import (
+    ANCHORED_REASON,
     Rendered,
     Skip,
     agents,
@@ -31,6 +32,7 @@ from agentforensics.exporters.common import (
     is_registry,
     iter_paths,
     needs_discovery,
+    partly_discovered,
     registry_reason,
     skip_lines,
     wildcard_segments,
@@ -104,6 +106,16 @@ def _translate(path: str, os_name: str) -> str | None:
     return text.rstrip(separator) + separator + "%%" if text.endswith(separator) else text
 
 
+def _partial(artifact: Artifact) -> str | None:
+    """The header line for the working-copy half of an entry whose other half is here.
+
+    A mixed entry used to be reported as covered by nothing at all, so its profile and
+    system paths were in no rule and nothing said so. Now the paths are rendered and the
+    part that needs a working copy is what the header names.
+    """
+    return ANCHORED_REASON if partly_discovered(artifact) else None
+
+
 def _patterns(artifact: Artifact, os_name: str) -> tuple[list[str], str | None]:
     if is_registry(artifact):
         return [], registry_reason("osquery's registry table")
@@ -125,7 +137,7 @@ def _patterns(artifact: Artifact, os_name: str) -> tuple[list[str], str | None]:
         if translated:
             patterns.append(translated)
     if patterns:
-        return sorted(set(patterns)), None
+        return sorted(set(patterns)), _partial(artifact)
     if unbounded_name:
         return [], ("a filename at unbounded depth, which osquery's glob language cannot express")
     if saw_variable:
@@ -168,6 +180,7 @@ def render(catalogue: Catalogue) -> list[Rendered]:
                 patterns, reason = _patterns(artifact, os_name)
                 if reason:
                     skipped.append(Skip(artifact.id, reason))
+                if not patterns:
                     continue
                 per_os.setdefault(os_name, []).extend(patterns)
                 covered.setdefault(os_name, []).append(artifact.id)

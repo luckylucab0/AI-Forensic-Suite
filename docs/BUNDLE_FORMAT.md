@@ -181,7 +181,7 @@ Field notes that are not obvious:
   the pattern as written, how far it got expanding it, and one of `not_absolute`,
   `wildcard_too_broad`, `wildcard_only`, `malformed_variable`,
   `environment_unreadable_offline`, `environment_unreadable_other_user`,
-  `profile_is_a_symlink` or `registry_key`. The last one is a whole class rather than a
+  `profile_is_a_symlink`, `no_project_root` or `registry_key`. The last one is a whole class rather than a
   defect in one pattern: the file pass reads the filesystem and a key is not a path in it,
   so a catalogued key it cannot search is declined by name. It appears only for the
   registry entries this collector does not read at all, since the four it does read are
@@ -206,6 +206,15 @@ Field notes that are not obvious:
   user's directory and file what it found under that user's name. Their variable is theirs
   to read: look in their shell profile or their registry, and collect that profile again
   from their session.
+
+  `no_project_root` records a pattern anchored at a working copy on a run where none was
+  discovered. Only the agents' own state files say which directories a user had open, and
+  when they name none, or when there are none to read, the project tier of the catalogue
+  cannot be searched at all. One line per pattern, so the count is the size of the hole,
+  and the answer is to collect again with `--project-root` once somebody knows where the
+  repositories are. It is reported per pattern rather than once per entry because an entry
+  commonly holds both scopes: the profile and system wide paths of the same entry were
+  searched, and this is about the other half (ADR 0041).
 
   `profile_is_a_symlink` records a profile directory the collector did not descend into.
   Where such a link points is not known to be inside the tree being collected: on a live

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b24d051837fd
+# Catalogue digest: 0b2cac47244d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,13 +8,13 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 39 of the 583 catalogue artifacts declare
+# KAPE is Windows only. 39 of the 584 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
 #
 # Not covered by this rule:
-#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#   some of its paths are anchored at a working copy, whose location only the agent's own state file gives, so those are not in this rule. Its profile and system wide paths are. Run the suite's collector for the rest, which reads that state file
 #     continue.agents
 #     continue.config
 #     continue.hook_settings
@@ -25,6 +25,18 @@ Version: 1.0
 Id: 75d1d515-08af-8585-80bd-79eef179552a
 RecreateDirectories: true
 Targets:
+    -
+        Name: continue.agents
+        Category: config
+        Path: C:\Users\%user%\.continue\agents
+        FileMask: "*.yaml"
+        Recursive: false
+    -
+        Name: continue.agents
+        Category: config
+        Path: C:\Users\%user%\.continue\assistants
+        FileMask: "*.yaml"
+        Recursive: false
     -
         Name: continue.aux_config
         Category: config
@@ -48,6 +60,24 @@ Targets:
         Category: credentials
         Path: C:\Users\%user%\.continue
         FileMask: "auth.json"
+        Recursive: false
+    -
+        Name: continue.config
+        Category: config
+        Path: C:\Users\%user%\.continue
+        FileMask: "config.json"
+        Recursive: false
+    -
+        Name: continue.config
+        Category: config
+        Path: C:\Users\%user%\.continue
+        FileMask: "config.ts"
+        Recursive: false
+    -
+        Name: continue.config
+        Category: config
+        Path: C:\Users\%user%\.continue
+        FileMask: "config.yaml"
         Recursive: false
     -
         Name: continue.dev_data
@@ -126,6 +156,12 @@ Targets:
         Category: config
         Path: C:\Users\%user%\.continue\index
         FileMask: "globalContext.json"
+        Recursive: false
+    -
+        Name: continue.hook_settings
+        Category: config
+        Path: C:\Users\%user%\.continue
+        FileMask: "settings.json"
         Recursive: false
     -
         Name: continue.index
@@ -211,6 +247,24 @@ Targets:
         Path: C:\Users\%user%\.continue
         FileMask: "permissions.yaml"
         Recursive: false
+    -
+        Name: continue.rules_and_skills
+        Category: instructions
+        Path: C:\Users\%user%\.continue\prompts
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: continue.rules_and_skills
+        Category: instructions
+        Path: C:\Users\%user%\.continue\rules
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: continue.rules_and_skills
+        Category: instructions
+        Path: C:\Users\%user%\.continue\skills
+        FileMask: "*"
+        Recursive: true
     -
         Name: continue.sessions
         Category: transcript

@@ -56,6 +56,34 @@ def test_rendering_twice_produces_identical_bytes(catalogue: Catalogue) -> None:
     assert first == second
 
 
+def test_a_mixed_entry_renders_its_profile_paths_and_declares_the_rest(rendered: list) -> None:
+    """An entry anchored at a working copy AND at the profile is half expressible.
+
+    Every exporter used to ask the entry's root and skip the whole entry, so 191 profile
+    and system paths across sixty entries were in no generated rule and the header said
+    only that the entry was anchored at a working copy. A reader of the rule could not
+    tell that from an entry with nothing in it.
+
+    Both halves are asserted, because either one alone is a way to be wrong: the paths
+    have to be in the rule, and the header has to say that the working-copy half is not.
+    """
+    mixed = "claude_code.agents"
+    kape = next(item for item in rendered if item.path.endswith("AIAgent_claude_code.tkape"))
+
+    assert f"Name: {mixed}" in kape.text, (
+        "the profile half of a mixed entry is still in no rule, so a target for this "
+        "agent leaves out the agent definitions the user wrote"
+    )
+    header, _, _body = kape.text.partition("\n    -")
+    assert "some of its paths are anchored at a working copy" in header
+    declared = [
+        line.strip().lstrip("# ")
+        for line in header.splitlines()
+        if line.strip().lstrip("# ") == mixed
+    ]
+    assert declared, "the entry is rendered and the header does not say what it leaves out"
+
+
 def test_every_artifact_is_covered_or_declared(catalogue: Catalogue, rendered: list) -> None:
     """The rule this package exists for.
 

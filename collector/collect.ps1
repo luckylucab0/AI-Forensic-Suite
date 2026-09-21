@@ -2993,7 +2993,8 @@ $EmbeddedCatalogueJson = @'
                         "%USERPROFILE%\\Claude\\Projects\\<name>\\",
                         "~/Claude/",
                         "~/Claude/Projects/<name>/",
-                        "~/Documents/Claude/"
+                        "~/Documents/Claude/",
+                        "~/OneDrive*/Documents/Claude/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -3264,7 +3265,11 @@ $EmbeddedCatalogueJson = @'
                         "~/.cline/rules/",
                         "~/.cline/skills/",
                         "~/.cline/tasks/",
-                        "~/.cline/workflows/"
+                        "~/.cline/workflows/",
+                        "~/Documents/Cline/Agents/",
+                        "~/Documents/Cline/Plugins/",
+                        "~/OneDrive*/Documents/Cline/Agents/",
+                        "~/OneDrive*/Documents/Cline/Plugins/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -3298,7 +3303,8 @@ $EmbeddedCatalogueJson = @'
                     "paths": [
                         "<vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json",
                         "~/.cline/data/settings/cline_mcp_settings.json",
-                        "~/Documents/Cline/MCP/"
+                        "~/Documents/Cline/MCP/",
+                        "~/OneDrive*/Documents/Cline/MCP/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -3438,6 +3444,26 @@ $EmbeddedCatalogueJson = @'
                         "<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/ui_messages.json"
                     ],
                     "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "cline.workspace_config_tree",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.cline/agents/",
+                        "<project>/.cline/hooks/",
+                        "<project>/.cline/plugins/",
+                        "<project>/.cline/rules/",
+                        "<project>/.cline/workflows/"
+                    ],
+                    "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -4468,7 +4494,8 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "<project>/.clinerules/hooks/",
-                        "~/Documents/Cline/Hooks/"
+                        "~/Documents/Cline/Hooks/",
+                        "~/OneDrive*/Documents/Cline/Hooks/"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -4537,7 +4564,9 @@ $EmbeddedCatalogueJson = @'
                         "<project>/.clinerules/skills/",
                         "<project>/.clinerules/workflows/",
                         "~/Documents/Cline/Rules/",
-                        "~/Documents/Cline/Workflows/"
+                        "~/Documents/Cline/Workflows/",
+                        "~/OneDrive*/Documents/Cline/Rules/",
+                        "~/OneDrive*/Documents/Cline/Workflows/"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -11593,7 +11622,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "debb272fa76fc56dc9dc3cb327b9896e52eff57e17e7595c2b559d3773a0468f"
+    "sha256": "ea68296eb1a811b5818cc878682adefb2fab3f17b498c717d83d6f5651e2a42a"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json
@@ -12066,6 +12095,24 @@ $script:PatternRefusals = [System.Collections.Generic.List[object]]::new()
 # comes from. Surfaced in the manifest's errors, for the reason ADR 0009 gives: a record
 # that is dropped reads as a record that never existed.
 $script:StateReadProblems = [System.Collections.Generic.List[object]]::new()
+
+function Test-PatternIsAnchored {
+    <#
+    .SYNOPSIS
+        Whether this pattern needs a discovered working copy before it can be searched.
+    .DESCRIPTION
+        Anchoring is a property of the pattern, not of the entry it sits in. The
+        catalogue's root field says what the entry is about, and sixty entries are about
+        one logical thing at two scopes: the working copy's own file and the profile or
+        system wide one the same agent reads beside it. Deciding by the entry meant 191
+        profile and system paths were only searched on a host where a working copy
+        happened to be found. <vscode-user> is not an anchor: the expander resolves it
+        from the profile on its own. Mirrors pattern_is_anchored in collect.py.
+    #>
+    param([string] $Pattern)
+    return $Pattern.StartsWith('<', [System.StringComparison]::Ordinal) -and
+        -not $Pattern.StartsWith('<vscode-user>', [System.StringComparison]::Ordinal)
+}
 
 function Add-PatternRefusal {
     <#
@@ -13700,29 +13747,37 @@ function Invoke-Collection {
             # entry that carries the key's contents. The registry keys this collector does
             # not read still go through the expander and are refused by name.
             if (($artifact.PSObject.Properties.Name -ccontains 'read_registry') -and $artifact.read_registry) { continue }
-            $anchors = [System.Collections.Generic.List[string]]::new()
-            if (@('project', 'repo_root', 'plugin') -ccontains [string]$artifact.root) {
-                foreach ($anchorItem in $projectRoots) {
-                    $anchors.Add([string]([System.Collections.IDictionary]$anchorItem)['path'])
-                }
-                if ($anchors.Count -eq 0) { continue }
-            } else {
-                $anchors.Add($profileHome)
-            }
-            foreach ($anchor in $anchors) {
-                foreach ($pattern in $artifact.paths) {
-                    $concrete = [string]$pattern
-                    if (@('project', 'repo_root', 'plugin') -ccontains [string]$artifact.root) {
+            foreach ($pattern in $artifact.paths) {
+                # One pattern at a time, and only the anchored ones are anchored. This
+                # loop used to ask the entry: a project-rooted entry had every one of its
+                # patterns substituted with the discovered working copies and was skipped
+                # whole when there were none. Sixty entries carry both scopes, so a host
+                # where no working copy was discovered collected none of the global and
+                # machine wide instruction files either, and the bundle said nothing about
+                # it. Mirrors collect.py.
+                $concretes = [System.Collections.Generic.List[string]]::new()
+                if (Test-PatternIsAnchored ([string]$pattern)) {
+                    foreach ($anchorItem in $projectRoots) {
+                        $anchor = [string]([System.Collections.IDictionary]$anchorItem)['path']
                         # Matched and sliced rather than passed to Replace. A .NET
                         # replacement string interprets $ as a group reference, and a
                         # directory name may contain one; the Python side had the same
                         # shape and re.sub interprets backslashes, which killed the whole
                         # collection on the first Windows project root it found.
-                        $anchorMatch = [regex]::Match($concrete, '^<[^>]+>')
-                        if ($anchorMatch.Success) {
-                            $concrete = $anchor.TrimEnd('/', '\') + $concrete.Substring($anchorMatch.Length)
-                        }
+                        $anchorMatch = [regex]::Match([string]$pattern, '^<[^>]+>')
+                        $concretes.Add($anchor.TrimEnd('/', '\') + ([string]$pattern).Substring($anchorMatch.Length))
                     }
+                    if ($concretes.Count -eq 0) {
+                        # Nothing to anchor it at. Reported rather than dropped: it means
+                        # the whole project tier is absent from this bundle because no
+                        # working copy was found, which is a fact about the host and not
+                        # about the agent.
+                        Add-PatternRefusal -Pattern ([string]$pattern) -Expanded ([string]$pattern) -Reason 'no_project_root'
+                    }
+                } else {
+                    $concretes.Add([string]$pattern)
+                }
+                foreach ($concrete in $concretes) {
                     foreach ($expanded in (Expand-CataloguePath -Pattern $concrete -ProfileHome $profileHome -TargetOs $TargetOs -Root $Root)) {
                         foreach ($match in (Get-GlobMatches $expanded)) {
                             $targets = [System.Collections.Generic.List[string]]::new()

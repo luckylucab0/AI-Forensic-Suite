@@ -2939,7 +2939,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "%USERPROFILE%\\Claude\\Projects\\<name>\\",
                         "~/Claude/",
                         "~/Claude/Projects/<name>/",
-                        "~/Documents/Claude/"
+                        "~/Documents/Claude/",
+                        "~/OneDrive*/Documents/Claude/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -3210,7 +3211,11 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.cline/rules/",
                         "~/.cline/skills/",
                         "~/.cline/tasks/",
-                        "~/.cline/workflows/"
+                        "~/.cline/workflows/",
+                        "~/Documents/Cline/Agents/",
+                        "~/Documents/Cline/Plugins/",
+                        "~/OneDrive*/Documents/Cline/Agents/",
+                        "~/OneDrive*/Documents/Cline/Plugins/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -3244,7 +3249,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "<vscode-user>/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json",
                         "~/.cline/data/settings/cline_mcp_settings.json",
-                        "~/Documents/Cline/MCP/"
+                        "~/Documents/Cline/MCP/",
+                        "~/OneDrive*/Documents/Cline/MCP/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -3384,6 +3390,26 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "<vscode-user>/globalStorage/saoudrizwan.claude-dev/tasks/<taskId>/ui_messages.json"
                     ],
                     "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "cline.workspace_config_tree",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "<project>/.cline/agents/",
+                        "<project>/.cline/hooks/",
+                        "<project>/.cline/plugins/",
+                        "<project>/.cline/rules/",
+                        "<project>/.cline/workflows/"
+                    ],
+                    "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -4414,7 +4440,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "<project>/.clinerules/hooks/",
-                        "~/Documents/Cline/Hooks/"
+                        "~/Documents/Cline/Hooks/",
+                        "~/OneDrive*/Documents/Cline/Hooks/"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -4483,7 +4510,9 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "<project>/.clinerules/skills/",
                         "<project>/.clinerules/workflows/",
                         "~/Documents/Cline/Rules/",
-                        "~/Documents/Cline/Workflows/"
+                        "~/Documents/Cline/Workflows/",
+                        "~/OneDrive*/Documents/Cline/Rules/",
+                        "~/OneDrive*/Documents/Cline/Workflows/"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -11539,7 +11568,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "debb272fa76fc56dc9dc3cb327b9896e52eff57e17e7595c2b559d3773a0468f"
+    "sha256": "ea68296eb1a811b5818cc878682adefb2fab3f17b498c717d83d6f5651e2a42a"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)
@@ -11994,6 +12023,20 @@ def refuse_pattern(pattern, expanded, reason):
     if record not in PATTERN_REFUSALS:
         PATTERN_REFUSALS.append(record)
     return []
+
+
+def pattern_is_anchored(pattern: str) -> bool:
+    """Whether this pattern needs a discovered working copy before it can be searched.
+
+    Anchoring is a property of the pattern, not of the entry it sits in. The catalogue's
+    `root` field says what the entry is about, and sixty entries are about one logical
+    thing at two scopes: the working copy's own file and the profile or system wide one the
+    same agent reads beside it. Deciding by the entry meant 191 profile and system paths
+    were only searched on a host where a working copy happened to be found.
+
+    <vscode-user> is not an anchor: the expander resolves it from the profile on its own.
+    """
+    return pattern.startswith("<") and not pattern.startswith("<vscode-user>")
 
 
 def substitute_anchor(pattern: str, anchor: str) -> str:
@@ -12958,6 +13001,9 @@ def run(args: argparse.Namespace) -> dict:
         for root in roots:
             if all(r["path"] != root["path"] for r in project_roots):
                 project_roots.append(root)
+        # The working copies this user's patterns anchor at, in one list because every
+        # anchored pattern is substituted with all of them.
+        project_anchors = [r["path"] for r in roots]
 
         # Two passes, not one.
         #
@@ -12978,15 +13024,25 @@ def run(args: argparse.Namespace) -> dict:
                 # this collector does not read still go through the expander and are
                 # refused by name, which is the answer for them.
                 continue
-            is_project = artifact.get("root") in ("project", "repo_root", "plugin")
-            anchors = [home]
-            if is_project:
-                anchors = [r["path"] for r in roots]
-                if not anchors:
-                    continue
-            for anchor in anchors:
-                for pattern in artifact["paths"]:
-                    concrete = substitute_anchor(pattern, anchor) if is_project else pattern
+            for pattern in artifact["paths"]:
+                # One pattern at a time, and only the anchored ones are anchored. This
+                # loop used to ask the entry: a project-rooted entry had every one of its
+                # patterns substituted with the discovered working copies and was skipped
+                # whole when there were none. Sixty entries carry both scopes, so a host
+                # where no working copy was discovered collected none of the global and
+                # machine wide instruction files either, a user's own CLAUDE.md,
+                # ~/.cursor/hooks.json, the managed settings under /etc and %PROGRAMDATA%
+                # among them, and the bundle said nothing about it.
+                concretes = [pattern]
+                if pattern_is_anchored(pattern):
+                    concretes = [substitute_anchor(pattern, a) for a in project_anchors]
+                    if not concretes:
+                        # Nothing to anchor it at. Reported rather than dropped: it means
+                        # the whole project tier is absent from this bundle because no
+                        # working copy was found, which is a fact about the host and not
+                        # about the agent.
+                        refuse_pattern(pattern, pattern, "no_project_root")
+                for concrete in concretes:
                     for expanded in expand_paths(concrete, home, target_os, root_prefix):
                         for match in iter_matches(expanded):
                             targets = [match]

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b24d051837fd
+# Catalogue digest: 0b2cac47244d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 39 of the 583 catalogue artifacts declare
+# KAPE is Windows only. 39 of the 584 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -16,14 +16,15 @@
 # Not covered by this rule:
 #   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
 #     aider.chat_history
-#     aider.config
-#     aider.dotenv
 #     aider.ignore
 #     aider.input_history
 #     aider.llm_history
+#     aider.tags_cache
+#   some of its paths are anchored at a working copy, whose location only the agent's own state file gives, so those are not in this rule. Its profile and system wide paths are. Run the suite's collector for the rest, which reads that state file
+#     aider.config
+#     aider.dotenv
 #     aider.model_metadata
 #     aider.model_settings
-#     aider.tags_cache
 Description: AI coding agent artifacts, Aider
 Author: agentforensics
 Version: 1.0
@@ -43,10 +44,34 @@ Targets:
         FileMask: "*"
         Recursive: true
     -
+        Name: aider.config
+        Category: config
+        Path: C:\Users\%user%
+        FileMask: ".aider.conf.yml"
+        Recursive: false
+    -
+        Name: aider.dotenv
+        Category: credentials
+        Path: C:\Users\%user%
+        FileMask: ".env"
+        Recursive: false
+    -
         Name: aider.installs
         Category: install_evidence
         Path: C:\Users\%user%\.aider
         FileMask: "installs.json"
+        Recursive: false
+    -
+        Name: aider.model_metadata
+        Category: config
+        Path: C:\Users\%user%
+        FileMask: ".aider.model.metadata.json"
+        Recursive: false
+    -
+        Name: aider.model_settings
+        Category: config
+        Path: C:\Users\%user%
+        FileMask: ".aider.model.settings.yml"
         Recursive: false
     -
         Name: aider.oauth_keys

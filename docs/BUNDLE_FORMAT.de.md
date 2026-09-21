@@ -103,7 +103,7 @@ Fassungen nicht auseinanderlaufen. Die Felder, die nicht selbsterklärend sind:
   jeweils mit dem Muster wie geschrieben, dem Stand der Auflösung und einem der Gründe
   `not_absolute`, `wildcard_too_broad`, `wildcard_only`, `malformed_variable`,
   `environment_unreadable_offline`, `environment_unreadable_other_user`,
-  `profile_is_a_symlink` oder `registry_key`. Der letzte ist eine ganze Klasse und kein
+  `profile_is_a_symlink`, `no_project_root` oder `registry_key`. Der letzte ist eine ganze Klasse und kein
   Defekt an einem einzelnen Muster: der Dateidurchgang liest das Dateisystem, und ein
   Schlüssel ist darin kein Pfad, also wird ein katalogisierter Schlüssel, den er nicht
   durchsuchen kann, namentlich abgelehnt. Er erscheint nur für die Registry-Einträge, die
@@ -131,6 +131,16 @@ Fassungen nicht auseinanderlaufen. Die Felder, die nicht selbsterklärend sind:
   unter dem Namen des anderen ablegen. Die Variable der anderen Person gehört ihr: Suchen
   Sie sie in deren Shell-Profil oder deren Registry und sammeln Sie dieses Profil aus
   deren Sitzung heraus erneut.
+
+  `no_project_root` hält ein Muster fest, das an einer Arbeitskopie verankert ist, bei
+  einem Lauf, der keine gefunden hat. Nur die Statusdateien der Agenten selbst sagen,
+  welche Verzeichnisse eine Benutzerin offen hatte, und wenn sie keine nennen oder keine
+  zu lesen sind, lässt sich die Projektebene des Katalogs überhaupt nicht durchsuchen.
+  Eine Zeile pro Muster, damit die Anzahl die Grösse der Lücke ist, und die Antwort
+  darauf ist ein erneuter Lauf mit `--project-root`, sobald jemand weiss, wo die
+  Repositories liegen. Festgehalten wird pro Muster und nicht einmal pro Eintrag, weil ein
+  Eintrag häufig beide Ebenen führt: die Profil- und systemweiten Pfade desselben
+  Eintrags wurden durchsucht, und hier geht es um die andere Hälfte (ADR 0041).
 
   `profile_is_a_symlink` hält ein Profilverzeichnis fest, in das der Collector nicht
   hineingelaufen ist. Wohin ein solcher Link zeigt, ist nicht bekanntermassen innerhalb

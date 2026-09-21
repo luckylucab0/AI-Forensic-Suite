@@ -19,6 +19,7 @@ import re
 
 from agentforensics.catalog import Artifact, Catalogue
 from agentforensics.exporters.common import (
+    ANCHORED_REASON,
     Rendered,
     Skip,
     agents,
@@ -32,6 +33,7 @@ from agentforensics.exporters.common import (
     is_registry,
     iter_paths,
     needs_discovery,
+    partly_discovered,
     registry_reason,
     skip_lines,
     wildcard_segments,
@@ -93,6 +95,16 @@ def _split(path: str) -> tuple[str, str, bool] | None:
     return head, tail, recursive
 
 
+def _partial(artifact: Artifact) -> str | None:
+    """The header line for the working-copy half of an entry whose other half is here.
+
+    A mixed entry used to be reported as covered by nothing at all, so its profile and
+    system paths were in no rule and nothing said so. Now the paths are rendered and the
+    part that needs a working copy is what the header names.
+    """
+    return ANCHORED_REASON if partly_discovered(artifact) else None
+
+
 def _rows(artifact: Artifact) -> tuple[list[tuple[str, str, bool]], str | None]:
     if is_registry(artifact):
         return [], registry_reason("a KAPE registry target of your own")
@@ -112,7 +124,7 @@ def _rows(artifact: Artifact) -> tuple[list[tuple[str, str, bool]], str | None]:
             continue
         rows.append(split)
     if rows:
-        return sorted(set(rows)), None
+        return sorted(set(rows)), _partial(artifact)
     if saw_variable:
         return [], (
             "reachable only through a relocation variable, which KAPE cannot resolve: read "
@@ -154,6 +166,10 @@ def render(catalogue: Catalogue) -> list[Rendered]:
             rows, reason = _rows(artifact)
             if reason:
                 skipped.append(Skip(artifact.id, reason))
+            if not rows:
+                # A reason and no rows is an artifact this target cannot express at all. A
+                # reason with rows is the mixed entry: what is here is rendered and the
+                # header says which half is not.
                 continue
             for path, mask, recursive in rows:
                 entries.append(

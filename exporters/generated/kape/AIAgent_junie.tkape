@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b24d051837fd
+# Catalogue digest: 0b2cac47244d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,15 +8,16 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 39 of the 583 catalogue artifacts declare
+# KAPE is Windows only. 39 of the 584 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
 #
 # Not covered by this rule:
 #   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
-#     junie.mcp_config
 #     junie.project_dir
+#   some of its paths are anchored at a working copy, whose location only the agent's own state file gives, so those are not in this rule. Its profile and system wide paths are. Run the suite's collector for the rest, which reads that state file
+#     junie.mcp_config
 Description: AI coding agent artifacts, Junie
 Author: agentforensics
 Version: 1.0
@@ -83,6 +84,12 @@ Targets:
         Path: C:\Users\%user%\AppData\Local\JetBrains\projects\*\matterhorn
         FileMask: ".matterhorn"
         Recursive: true
+    -
+        Name: junie.mcp_config
+        Category: mcp_config
+        Path: C:\Users\%user%\.junie\mcp
+        FileMask: "mcp.json"
+        Recursive: false
     -
         Name: junie.plugin_install_evidence
         Category: install_evidence

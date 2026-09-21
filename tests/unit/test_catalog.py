@@ -1099,6 +1099,47 @@ def test_all_users_finds_the_profiles_on_a_live_windows_host() -> None:
         assert user["name"].lower() not in collect._PSEUDO_PROFILES
 
 
+# ------------------------------ a pattern's anchor, which is not the entry's root
+
+
+def test_a_profile_path_in_a_project_rooted_entry_is_searched_with_no_working_copy(
+    tmp_path,
+) -> None:
+    """Anchoring is a property of the pattern. Deciding it by the entry cost 191 paths.
+
+    Sixty catalogue entries are one logical thing at two scopes: the working copy's own
+    file and the profile or system wide one the same agent reads beside it. The collector
+    substituted every pattern of such an entry with the discovered working copies and
+    skipped the entry whole when there were none, so a host where no repository was found
+    collected none of the global and machine wide instruction files either: a user's own
+    CLAUDE.md, the hooks file of one editor, the managed settings under /etc and
+    %PROGRAMDATA%. The bundle said nothing about it, which is the shape this project treats
+    as worse than an error.
+
+    The tree here deliberately holds no working copy at all.
+    """
+    collect = _load_collector()
+    home = tmp_path / "image" / "home" / "alice"
+    (home / ".claude").mkdir(parents=True)
+    (home / ".claude" / "CLAUDE.md").write_text("Never push to main.\n", encoding="utf-8")
+    out = tmp_path / "bundle"
+
+    code = collect.main(["--out", str(out), "--root", str(tmp_path / "image"), "--os", "linux"])
+    manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+
+    assert code in (collect.EXIT_OK, collect.EXIT_ERRORS)
+    assert not manifest["project_roots"], "the point of the tree is that it has none"
+    collected = [entry["original_path"] for entry in manifest["files"] if entry.get("collected")]
+    assert any(path.endswith("/.claude/CLAUDE.md") for path in collected), (
+        "the user's own instruction file was not collected from a profile with no "
+        f"repository in it: {collected}"
+    )
+    # And the other half of the same entries is reported rather than dropped, because a
+    # bundle with no project tier in it has to say that nothing was searched for one.
+    refusals = {refusal["reason"] for refusal in manifest["refused_patterns"]}
+    assert "no_project_root" in refusals, sorted(refusals)
+
+
 # ------------------------- the fixes that had reached only one of the two collectors
 
 

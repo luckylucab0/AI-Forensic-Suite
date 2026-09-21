@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b24d051837fd
+# Catalogue digest: 0b2cac47244d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -34,22 +34,79 @@
 #     windsurf.url_handlers
 #   anchored at a working copy, whose location only the agent's own state file gives: the runbook's collector reads it, this check cannot
 #     aider.chat_history
-#     aider.config
-#     aider.dotenv
 #     aider.ignore
 #     aider.input_history
 #     aider.llm_history
-#     aider.model_metadata
-#     aider.model_settings
 #     aider.tags_cache
-#     amazonq.cli_agents
-#     amazonq.cli_mcp_config
 #     amazonq.cli_subagent_executions
 #     amazonq.cli_todo_lists
-#     amazonq.ide_agent_config
 #     amazonq.ide_chat_export
 #     amazonq.memory_bank
 #     amazonq.project_rules
+#     claude_code.plugin_manifests
+#     claude_code.project_claude_local_md
+#     claude_code.project_claude_md
+#     claude_code.project_mcp_json
+#     claude_code.project_rules
+#     claude_code.project_settings
+#     claude_code.project_settings_local
+#     claude_code.worktreeinclude
+#     claude_code.worktrees
+#     claude_desktop.code_launch_config
+#     cline.checkpoint_refs_in_workspace
+#     cline.rules_project
+#     cline.workspace_config_tree
+#     cline.workspace_specs
+#     copilot.lsp_config_repo
+#     crosscutting.instructions_agents_md
+#     crosscutting.instructions_cursor_rules
+#     crosscutting.instructions_junie_guidelines
+#     crosscutting.instructions_kiro_steering
+#     crosscutting.instructions_windsurf_rules
+#     cursor.commands_and_plans
+#     cursor.project_instructions
+#     cursor.worktree_setup
+#     gemini_cli.project_config
+#     goose.hints
+#     goose.recipes
+#     junie.project_dir
+#     kilo_code.rules
+#     kiro.kiroignore
+#     kiro.mcp_config_project
+#     kiro.specs
+#     kiro.steering_project
+#     qwen_code.ignore_files
+#     qwen_code.openai_api_logs
+#     qwen_code.project_extension_points
+#     qwen_code.project_instructions
+#     qwen_code.project_mcp_config
+#     qwen_code.project_settings
+#     roo_code.rules
+#     windsurf.project_instructions
+#   no Windows path with a testable fixed prefix
+#     amp.continuations
+#     amp.session_pointer
+#     cursor.retrieval_index
+#     cursor.worker_data
+#     goose.memory
+#     opencode.agents_commands
+#     opencode.legacy_json_storage
+#     opencode.tui_config
+#   reachable only through a relocation variable: the runbook's collector reads the variable, this check does not
+#     claude_code.git_global_excludes
+#     crosscutting.instructions_copilot_instructions
+#     kiro.acp_wire_record
+#     opencode.config
+#     opencode.mcp_auth
+#     opencode.repos_cache
+#   some of its paths are anchored at a working copy, whose location only the agent's own state file gives, so those are not in this rule. Its profile and system wide paths are. Run the suite's collector for the rest, which reads that state file
+#     aider.config
+#     aider.dotenv
+#     aider.model_metadata
+#     aider.model_settings
+#     amazonq.cli_agents
+#     amazonq.cli_mcp_config
+#     amazonq.ide_agent_config
 #     amazonq.prompt_library
 #     amp.settings
 #     amp.skills
@@ -58,46 +115,23 @@
 #     claude_code.commands
 #     claude_code.loop_instructions
 #     claude_code.output_styles
-#     claude_code.plugin_manifests
-#     claude_code.project_claude_local_md
-#     claude_code.project_claude_md
-#     claude_code.project_mcp_json
-#     claude_code.project_rules
-#     claude_code.project_settings
-#     claude_code.project_settings_local
 #     claude_code.settings_referenced_executables
 #     claude_code.skills
 #     claude_code.workflows
-#     claude_code.worktreeinclude
-#     claude_code.worktrees
-#     claude_desktop.code_launch_config
-#     cline.checkpoint_refs_in_workspace
-#     cline.rules_project
-#     cline.workspace_specs
 #     continue.agents
 #     continue.config
 #     continue.hook_settings
 #     continue.rules_and_skills
-#     copilot.lsp_config_repo
 #     crosscutting.hook_scripts
-#     crosscutting.instructions_agents_md
 #     crosscutting.instructions_claude_md
 #     crosscutting.instructions_clinerules
-#     crosscutting.instructions_copilot_instructions
-#     crosscutting.instructions_cursor_rules
 #     crosscutting.instructions_gemini_md
-#     crosscutting.instructions_junie_guidelines
-#     crosscutting.instructions_kiro_steering
-#     crosscutting.instructions_windsurf_rules
 #     crosscutting.mcp_config_files
 #     cursor.cli_config
-#     cursor.commands_and_plans
 #     cursor.hooks
 #     cursor.mcp_config
-#     cursor.project_instructions
 #     cursor.skills
 #     cursor.subagents
-#     cursor.worktree_setup
 #     factory_droid.config
 #     factory_droid.mcp_and_hooks
 #     factory_droid.output_styles
@@ -106,29 +140,16 @@
 #     gemini_cli.agent_definitions
 #     gemini_cli.commands
 #     gemini_cli.policies
-#     gemini_cli.project_config
-#     goose.hints
-#     goose.memory
-#     goose.recipes
 #     jetbrains_ai.mcp_config
 #     junie.mcp_config
-#     junie.project_dir
 #     kilo_code.agents
 #     kilo_code.config
 #     kilo_code.home_dir
-#     kilo_code.rules
 #     kiro.agents
 #     kiro.hooks
-#     kiro.kiroignore
 #     kiro.legacy_amazonq_config
-#     kiro.mcp_config_project
 #     kiro.prompt_library
 #     kiro.skills_powers
-#     kiro.specs
-#     kiro.steering_project
-#     opencode.agents_commands
-#     opencode.config
-#     opencode.tui_config
 #     pi.agents_skills
 #     pi.extensions
 #     pi.prompts
@@ -136,33 +157,14 @@
 #     pi.skills
 #     qwen_code.auto_memory
 #     qwen_code.env_files
-#     qwen_code.ignore_files
-#     qwen_code.openai_api_logs
-#     qwen_code.project_extension_points
-#     qwen_code.project_instructions
-#     qwen_code.project_mcp_config
-#     qwen_code.project_settings
 #     roo_code.custom_storage_path
-#     roo_code.rules
 #     vscode.mcp_config
 #     windsurf.hooks
 #     windsurf.ignore_files
 #     windsurf.mcp_config
 #     windsurf.plans
-#     windsurf.project_instructions
 #     windsurf.workflows_and_skills
 #     zed.settings
-#   no Windows path with a testable fixed prefix
-#     amp.continuations
-#     amp.session_pointer
-#     cursor.retrieval_index
-#     cursor.worker_data
-#     opencode.legacy_json_storage
-#   reachable only through a relocation variable: the runbook's collector reads the variable, this check does not
-#     claude_code.git_global_excludes
-#     kiro.acp_wire_record
-#     opencode.mcp_auth
-#     opencode.repos_cache
 
 $ErrorActionPreference = 'Stop'
 # Every profile on the machine, not just the interactive user's: an agent driven by
@@ -179,17 +181,25 @@ try {
 $targets = @(
     @{ Agent = 'aider'; Id = 'aider.analytics'; Path = '$profile\.aider\analytics.json' }
     @{ Agent = 'aider'; Id = 'aider.caches'; Path = '$profile\.aider\caches' }
+    @{ Agent = 'aider'; Id = 'aider.config'; Path = '$profile\.aider.conf.yml' }
+    @{ Agent = 'aider'; Id = 'aider.dotenv'; Path = '$profile\.env' }
     @{ Agent = 'aider'; Id = 'aider.installs'; Path = '$profile\.aider\installs.json' }
+    @{ Agent = 'aider'; Id = 'aider.model_metadata'; Path = '$profile\.aider.model.metadata.json' }
+    @{ Agent = 'aider'; Id = 'aider.model_settings'; Path = '$profile\.aider.model.settings.yml' }
     @{ Agent = 'aider'; Id = 'aider.oauth_keys'; Path = '$profile\.aider\oauth-keys.env' }
+    @{ Agent = 'amazonq'; Id = 'amazonq.cli_agents'; Path = '$profile\.aws\amazonq\cli-agents' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_checkpoints'; Path = '$profile\.aws\amazonq\cli-checkouts' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_logs'; Path = '$profile\AppData\Local\Temp\amazon-q\logs' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_logs'; Path = '$profile\AppData\Local\Temp\qlog' }
+    @{ Agent = 'amazonq'; Id = 'amazonq.cli_mcp_config'; Path = '$profile\.aws\amazonq\mcp.json' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_prompt_history'; Path = '$profile\.aws\amazonq\.cli_bash_history' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_settings'; Path = '$profile\AppData\Local\amazon-q\settings.json' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_state_database'; Path = '$profile\AppData\Local\amazon-q\data.sqlite3' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_state_database'; Path = '$profile\AppData\Local\amazon-q\data.sqlite3-shm' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_state_database'; Path = '$profile\AppData\Local\amazon-q\data.sqlite3-wal' }
     @{ Agent = 'amazonq'; Id = 'amazonq.cli_user_rules'; Path = '$profile\.aws\amazonq\rules' }
+    @{ Agent = 'amazonq'; Id = 'amazonq.ide_agent_config'; Path = '$profile\.aws\amazonq\agents\default.json' }
+    @{ Agent = 'amazonq'; Id = 'amazonq.ide_agent_config'; Path = '$profile\.aws\amazonq\default.json' }
     @{ Agent = 'amazonq'; Id = 'amazonq.ide_chat_history'; Path = '$profile\.aws\amazonq\history' }
     @{ Agent = 'amazonq'; Id = 'amazonq.ide_chat_history'; Path = '$profile\.aws\amazonq\history\chat-history-' }
     @{ Agent = 'amazonq'; Id = 'amazonq.ide_chat_history'; Path = '$profile\.aws\amazonq\history\chat-history-no-workspace.json' }
@@ -198,20 +208,30 @@ $targets = @(
     @{ Agent = 'amazonq'; Id = 'amazonq.knowledge_bases'; Path = '$profile\.aws\amazonq\knowledge_bases' }
     @{ Agent = 'amazonq'; Id = 'amazonq.legacy_profiles_and_context'; Path = '$profile\.aws\amazonq\global_context.json' }
     @{ Agent = 'amazonq'; Id = 'amazonq.legacy_profiles_and_context'; Path = '$profile\.aws\amazonq\profiles' }
+    @{ Agent = 'amazonq'; Id = 'amazonq.prompt_library'; Path = '$profile\.aws\amazonq\prompts' }
     @{ Agent = 'amazonq'; Id = 'amazonq.sso_token_cache'; Path = '$profile\.aws\sso\cache' }
     @{ Agent = 'amazonq'; Id = 'amazonq.sso_token_cache'; Path = '$profile\.aws\sso\cache\aws-toolkit-vscode-client-id-' }
     @{ Agent = 'amp'; Id = 'amp.ledger'; Path = '$profile\AppData\Roaming\amp\ledger.jsonl' }
     @{ Agent = 'amp'; Id = 'amp.secrets'; Path = '$profile\.amp\oauth' }
     @{ Agent = 'amp'; Id = 'amp.secrets'; Path = '$profile\AppData\Roaming\amp\secrets.json' }
+    @{ Agent = 'amp'; Id = 'amp.settings'; Path = '$profile\.config\amp\settings.json' }
+    @{ Agent = 'amp'; Id = 'amp.settings'; Path = '$profile\.config\amp\settings.jsonc' }
+    @{ Agent = 'amp'; Id = 'amp.settings'; Path = 'C:\ProgramData\ampcode\managed-settings.json' }
+    @{ Agent = 'amp'; Id = 'amp.skills'; Path = '$profile\.agents\skills' }
+    @{ Agent = 'amp'; Id = 'amp.skills'; Path = '$profile\.claude\plugins\cache' }
+    @{ Agent = 'amp'; Id = 'amp.skills'; Path = '$profile\.claude\skills' }
     @{ Agent = 'amp'; Id = 'amp.threads'; Path = '$profile\AppData\Roaming\amp\threads\T-' }
     @{ Agent = 'chatgpt_desktop'; Id = 'chatgpt_desktop.windows_msix_localcache'; Path = '$profile\AppData\Local\Packages\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\LocalCache\Roaming\ChatGPT' }
     @{ Agent = 'chatgpt_desktop'; Id = 'chatgpt_desktop.windows_msix_localcache'; Path = '$profile\AppData\Local\Packages\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\LocalCache\Roaming\ChatGPT\IndexedDB\https_chatgpt.com_0.indexeddb.leveldb' }
     @{ Agent = 'chatgpt_desktop'; Id = 'chatgpt_desktop.windows_msix_localcache'; Path = '$profile\AppData\Local\Packages\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0\LocalCache\Roaming\ChatGPT\Local Storage\leveldb' }
+    @{ Agent = 'claude_code'; Id = 'claude_code.agent_memory'; Path = '$profile\.claude\agent-memory' }
+    @{ Agent = 'claude_code'; Id = 'claude_code.agents'; Path = '$profile\.claude\agents' }
     @{ Agent = 'claude_code'; Id = 'claude_code.anthropic_active_config'; Path = '$profile\AppData\Roaming\Anthropic\active_config' }
     @{ Agent = 'claude_code'; Id = 'claude_code.anthropic_profile_configs'; Path = '$profile\AppData\Roaming\Anthropic\configs' }
     @{ Agent = 'claude_code'; Id = 'claude_code.anthropic_profile_credentials'; Path = '$profile\AppData\Roaming\Anthropic\credentials' }
     @{ Agent = 'claude_code'; Id = 'claude_code.auto_memory'; Path = '$profile\.claude\projects' }
     @{ Agent = 'claude_code'; Id = 'claude_code.changelog_cache'; Path = '$profile\.claude\cache\changelog.md' }
+    @{ Agent = 'claude_code'; Id = 'claude_code.commands'; Path = '$profile\.claude\commands' }
     @{ Agent = 'claude_code'; Id = 'claude_code.config_backups'; Path = '$profile\.claude\backups' }
     @{ Agent = 'claude_code'; Id = 'claude_code.config_backups'; Path = '$profile\.claude\backups\.claude.json.corrupted.' }
     @{ Agent = 'claude_code'; Id = 'claude_code.credentials'; Path = '$profile\.claude\.credentials.json' }
@@ -241,6 +261,7 @@ $targets = @(
     @{ Agent = 'claude_code'; Id = 'claude_code.legacy_state_dirs'; Path = '$profile\.claude\logs' }
     @{ Agent = 'claude_code'; Id = 'claude_code.legacy_state_dirs'; Path = '$profile\.claude\statsig' }
     @{ Agent = 'claude_code'; Id = 'claude_code.legacy_state_dirs'; Path = '$profile\.claude\todos' }
+    @{ Agent = 'claude_code'; Id = 'claude_code.loop_instructions'; Path = '$profile\.claude\loop.md' }
     @{ Agent = 'claude_code'; Id = 'claude_code.managed_claude_md'; Path = 'C:\Program Files\ClaudeCode\CLAUDE.md' }
     @{ Agent = 'claude_code'; Id = 'claude_code.managed_mcp_json'; Path = 'C:\Program Files\ClaudeCode\managed-mcp.json' }
     @{ Agent = 'claude_code'; Id = 'claude_code.managed_settings_dropins'; Path = 'C:\Program Files\ClaudeCode\managed-settings.d' }
@@ -249,6 +270,7 @@ $targets = @(
     @{ Agent = 'claude_code'; Id = 'claude_code.mcp_logs'; Path = '$profile\AppData\Local\claude-cli-nodejs\Cache' }
     @{ Agent = 'claude_code'; Id = 'claude_code.org_policy_cache'; Path = '$profile\.claude\policy-limits.json' }
     @{ Agent = 'claude_code'; Id = 'claude_code.org_policy_cache'; Path = '$profile\.claude\remote-settings.json' }
+    @{ Agent = 'claude_code'; Id = 'claude_code.output_styles'; Path = '$profile\.claude\output-styles' }
     @{ Agent = 'claude_code'; Id = 'claude_code.paste_cache'; Path = '$profile\.claude\paste-cache' }
     @{ Agent = 'claude_code'; Id = 'claude_code.plans'; Path = '$profile\.claude\plans' }
     @{ Agent = 'claude_code'; Id = 'claude_code.plugin_cache'; Path = '$profile\.claude\plugins\cache' }
@@ -259,7 +281,10 @@ $targets = @(
     @{ Agent = 'claude_code'; Id = 'claude_code.policy_limits'; Path = '$profile\.claude\policy-limits.json' }
     @{ Agent = 'claude_code'; Id = 'claude_code.session_env'; Path = '$profile\.claude\session-env' }
     @{ Agent = 'claude_code'; Id = 'claude_code.sessions_dir'; Path = '$profile\.claude\sessions' }
+    @{ Agent = 'claude_code'; Id = 'claude_code.settings_referenced_executables'; Path = '$profile\.claude\hooks' }
     @{ Agent = 'claude_code'; Id = 'claude_code.shell_snapshots'; Path = '$profile\.claude\shell-snapshots' }
+    @{ Agent = 'claude_code'; Id = 'claude_code.skills'; Path = '$profile\.claude\skills' }
+    @{ Agent = 'claude_code'; Id = 'claude_code.skills'; Path = 'C:\Program Files\ClaudeCode\.claude\skills' }
     @{ Agent = 'claude_code'; Id = 'claude_code.skills_trash'; Path = '$profile\.claude\skills\.trash' }
     @{ Agent = 'claude_code'; Id = 'claude_code.stats_cache'; Path = '$profile\.claude\stats-cache.json' }
     @{ Agent = 'claude_code'; Id = 'claude_code.subagent_transcripts'; Path = '$profile\.claude\projects' }
@@ -279,6 +304,7 @@ $targets = @(
     @{ Agent = 'claude_code'; Id = 'claude_code.user_settings'; Path = '$profile\.claude\settings.json' }
     @{ Agent = 'claude_code'; Id = 'claude_code.user_settings_local'; Path = '$profile\.claude\settings.local.json' }
     @{ Agent = 'claude_code'; Id = 'claude_code.workflow_runs'; Path = '$profile\.claude\projects' }
+    @{ Agent = 'claude_code'; Id = 'claude_code.workflows'; Path = '$profile\.claude\workflows' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.app_logs'; Path = '$profile\AppData\Local\Claude-3p\logs\main.log' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.app_logs'; Path = '$profile\AppData\Local\Claude\Logs\main.log' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.app_logs'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\logs' }
@@ -339,6 +365,7 @@ $targets = @(
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.transient_session_credentials'; Path = '$profile\AppData\Roaming\Claude\host-creds-' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.user_output_folder'; Path = '$profile\Claude' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.user_output_folder'; Path = '$profile\Claude\Projects' }
+    @{ Agent = 'claude_desktop'; Id = 'claude_desktop.user_output_folder'; Path = '$profile\OneDrive' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.user_plugins'; Path = '$profile\AppData\Local\Claude-3p\cowork_plugins' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.user_plugins'; Path = '$profile\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\cowork_plugins' }
     @{ Agent = 'claude_desktop'; Id = 'claude_desktop.user_plugins'; Path = '$profile\AppData\Roaming\Claude\cowork_plugins' }
@@ -404,6 +431,7 @@ $targets = @(
     @{ Agent = 'cline'; Id = 'cline.home_config_tree'; Path = '$profile\.cline\skills' }
     @{ Agent = 'cline'; Id = 'cline.home_config_tree'; Path = '$profile\.cline\tasks' }
     @{ Agent = 'cline'; Id = 'cline.home_config_tree'; Path = '$profile\.cline\workflows' }
+    @{ Agent = 'cline'; Id = 'cline.home_config_tree'; Path = '$profile\OneDrive' }
     @{ Agent = 'cline'; Id = 'cline.hooks_audit_log'; Path = '$profile\.cline\data\logs\hooks.jsonl' }
     @{ Agent = 'cline'; Id = 'cline.mcp_settings'; Path = '$profile\.cline\data\settings\cline_mcp_settings.json' }
     @{ Agent = 'cline'; Id = 'cline.mcp_settings'; Path = '$profile\AppData\Roaming\Code - Insiders\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json' }
@@ -414,6 +442,7 @@ $targets = @(
     @{ Agent = 'cline'; Id = 'cline.mcp_settings'; Path = '$profile\AppData\Roaming\Trae\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json' }
     @{ Agent = 'cline'; Id = 'cline.mcp_settings'; Path = '$profile\AppData\Roaming\VSCodium\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json' }
     @{ Agent = 'cline'; Id = 'cline.mcp_settings'; Path = '$profile\AppData\Roaming\Windsurf\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json' }
+    @{ Agent = 'cline'; Id = 'cline.mcp_settings'; Path = '$profile\OneDrive' }
     @{ Agent = 'cline'; Id = 'cline.provider_settings'; Path = '$profile\.cline\data\settings\providers.json' }
     @{ Agent = 'cline'; Id = 'cline.rules_global'; Path = '$profile\Cline\Rules' }
     @{ Agent = 'cline'; Id = 'cline.secrets_json'; Path = '$profile\.cline\data\secrets.json' }
@@ -456,10 +485,15 @@ $targets = @(
     @{ Agent = 'codex'; Id = 'codex.state_databases'; Path = '$profile\.codex\queue_1.sqlite' }
     @{ Agent = 'codex'; Id = 'codex.state_databases'; Path = '$profile\.codex\state_5.sqlite' }
     @{ Agent = 'codex'; Id = 'codex.state_databases'; Path = '$profile\.codex\thread_history_1.sqlite' }
+    @{ Agent = 'continue'; Id = 'continue.agents'; Path = '$profile\.continue\agents' }
+    @{ Agent = 'continue'; Id = 'continue.agents'; Path = '$profile\.continue\assistants' }
     @{ Agent = 'continue'; Id = 'continue.aux_config'; Path = '$profile\.continue\.configs' }
     @{ Agent = 'continue'; Id = 'continue.aux_config'; Path = '$profile\.continue\.continueignore' }
     @{ Agent = 'continue'; Id = 'continue.aux_config'; Path = '$profile\.continue\.migrations' }
     @{ Agent = 'continue'; Id = 'continue.cli_auth'; Path = '$profile\.continue\auth.json' }
+    @{ Agent = 'continue'; Id = 'continue.config'; Path = '$profile\.continue\config.json' }
+    @{ Agent = 'continue'; Id = 'continue.config'; Path = '$profile\.continue\config.ts' }
+    @{ Agent = 'continue'; Id = 'continue.config'; Path = '$profile\.continue\config.yaml' }
     @{ Agent = 'continue'; Id = 'continue.dev_data'; Path = '$profile\.continue\dev_data' }
     @{ Agent = 'continue'; Id = 'continue.dev_data'; Path = '$profile\.continue\logs\core.log' }
     @{ Agent = 'continue'; Id = 'continue.dev_data_db'; Path = '$profile\.continue\dev_data\devdata.sqlite' }
@@ -473,6 +507,7 @@ $targets = @(
     @{ Agent = 'continue'; Id = 'continue.environment_markers'; Path = '$profile\.continue\.staging' }
     @{ Agent = 'continue'; Id = 'continue.global_context'; Path = '$profile\.continue\index\globalContext.json' }
     @{ Agent = 'continue'; Id = 'continue.global_context'; Path = '$profile\.continue\sharedConfig.json' }
+    @{ Agent = 'continue'; Id = 'continue.hook_settings'; Path = '$profile\.continue\settings.json' }
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\.utils\repo_map.txt' }
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\autocompleteCache.sqlite' }
     @{ Agent = 'continue'; Id = 'continue.index'; Path = '$profile\.continue\index\autocompleteCache.sqlite-shm' }
@@ -487,6 +522,9 @@ $targets = @(
     @{ Agent = 'continue'; Id = 'continue.input_history'; Path = '$profile\.continue\input_history.json' }
     @{ Agent = 'continue'; Id = 'continue.logs'; Path = '$profile\.continue\logs' }
     @{ Agent = 'continue'; Id = 'continue.permissions'; Path = '$profile\.continue\permissions.yaml' }
+    @{ Agent = 'continue'; Id = 'continue.rules_and_skills'; Path = '$profile\.continue\prompts' }
+    @{ Agent = 'continue'; Id = 'continue.rules_and_skills'; Path = '$profile\.continue\rules' }
+    @{ Agent = 'continue'; Id = 'continue.rules_and_skills'; Path = '$profile\.continue\skills' }
     @{ Agent = 'continue'; Id = 'continue.sessions'; Path = '$profile\.continue\sessions' }
     @{ Agent = 'continue'; Id = 'continue.sessions'; Path = '$profile\.continue\sessions\sessions.json' }
     @{ Agent = 'copilot'; Id = 'copilot.agents_skills_hooks'; Path = '$profile\.copilot\agents' }
@@ -515,6 +553,13 @@ $targets = @(
     @{ Agent = 'copilot'; Id = 'copilot.session_store_sidecars'; Path = '$profile\.copilot\session-store.db-shm' }
     @{ Agent = 'copilot'; Id = 'copilot.session_store_sidecars'; Path = '$profile\.copilot\session-store.db-wal' }
     @{ Agent = 'copilot'; Id = 'copilot.settings'; Path = '$profile\.copilot\settings.json' }
+    @{ Agent = 'crosscutting'; Id = 'crosscutting.hook_scripts'; Path = '$profile\OneDrive' }
+    @{ Agent = 'crosscutting'; Id = 'crosscutting.instructions_claude_md'; Path = '$profile\.claude\CLAUDE.md' }
+    @{ Agent = 'crosscutting'; Id = 'crosscutting.instructions_claude_md'; Path = '$profile\.claude\rules' }
+    @{ Agent = 'crosscutting'; Id = 'crosscutting.instructions_claude_md'; Path = 'C:\Program Files\ClaudeCode\CLAUDE.md' }
+    @{ Agent = 'crosscutting'; Id = 'crosscutting.instructions_clinerules'; Path = '$profile\OneDrive' }
+    @{ Agent = 'crosscutting'; Id = 'crosscutting.instructions_gemini_md'; Path = '$profile\.gemini\GEMINI.md' }
+    @{ Agent = 'crosscutting'; Id = 'crosscutting.mcp_config_files'; Path = '$profile\.claude.json' }
     @{ Agent = 'crosscutting'; Id = 'crosscutting.npm_debug_logs'; Path = '$profile\.npm\_logs' }
     @{ Agent = 'crosscutting'; Id = 'crosscutting.npm_debug_logs'; Path = '$profile\AppData\Local\npm-cache\_logs' }
     @{ Agent = 'crosscutting'; Id = 'crosscutting.npm_global_install_dirs'; Path = '$profile\.nvm\versions\node' }
@@ -560,6 +605,8 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.chat_session_meta_json'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.chat_session_prompt_history'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.chat_store_db'; Path = '$profile\.cursor\chats' }
+    @{ Agent = 'cursor'; Id = 'cursor.cli_config'; Path = '$profile\.cursor\cli-config.json' }
+    @{ Agent = 'cursor'; Id = 'cursor.cli_config'; Path = '$profile\.cursor\cli-config.json.bad' }
     @{ Agent = 'cursor'; Id = 'cursor.cli_workspaces'; Path = '$profile\.cursor\cli-workspaces.json' }
     @{ Agent = 'cursor'; Id = 'cursor.cli_workspaces'; Path = '$profile\.cursor\ide_state.json' }
     @{ Agent = 'cursor'; Id = 'cursor.commit_checkpoints'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\anysphere.cursor-commits\checkpoints' }
@@ -576,6 +623,9 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.global_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\state.vscdb' }
     @{ Agent = 'cursor'; Id = 'cursor.global_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\state.vscdb-shm' }
     @{ Agent = 'cursor'; Id = 'cursor.global_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\state.vscdb-wal' }
+    @{ Agent = 'cursor'; Id = 'cursor.hooks'; Path = '$profile\.cursor\hooks' }
+    @{ Agent = 'cursor'; Id = 'cursor.hooks'; Path = '$profile\.cursor\hooks.json' }
+    @{ Agent = 'cursor'; Id = 'cursor.hooks'; Path = 'C:\ProgramData\Cursor\hooks.json' }
     @{ Agent = 'cursor'; Id = 'cursor.install_dirs'; Path = '$profile\AppData\Local\Programs\cursor' }
     @{ Agent = 'cursor'; Id = 'cursor.install_dirs'; Path = '$profile\AppData\Local\cursor-agent' }
     @{ Agent = 'cursor'; Id = 'cursor.install_dirs'; Path = '$profile\AppData\Local\cursor-agent\versions' }
@@ -585,6 +635,7 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.logs'; Path = '$profile\AppData\Roaming\Cursor\logs' }
     @{ Agent = 'cursor'; Id = 'cursor.machine_identity_file'; Path = '$profile\AppData\Roaming\Cursor\SharedStorage' }
     @{ Agent = 'cursor'; Id = 'cursor.machine_identity_file'; Path = '$profile\AppData\Roaming\Cursor\machineid' }
+    @{ Agent = 'cursor'; Id = 'cursor.mcp_config'; Path = '$profile\.cursor\mcp.json' }
     @{ Agent = 'cursor'; Id = 'cursor.mdm_policy'; Path = '$profile\.cursor\policy.json' }
     @{ Agent = 'cursor'; Id = 'cursor.pasted_text'; Path = '$profile\.cursor\chats' }
     @{ Agent = 'cursor'; Id = 'cursor.plugins'; Path = '$profile\.cursor\plugins' }
@@ -594,7 +645,12 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.project_metadata'; Path = '$profile\.cursor\projects' }
     @{ Agent = 'cursor'; Id = 'cursor.project_metadata'; Path = '$profile\.cursor\projects-metadata.json' }
     @{ Agent = 'cursor'; Id = 'cursor.runtime_arguments'; Path = '$profile\.cursor\argv.json' }
+    @{ Agent = 'cursor'; Id = 'cursor.skills'; Path = '$profile\.agents\skills' }
+    @{ Agent = 'cursor'; Id = 'cursor.skills'; Path = '$profile\.cursor\skills' }
     @{ Agent = 'cursor'; Id = 'cursor.subagent_output'; Path = '$profile\.cursor\subagents' }
+    @{ Agent = 'cursor'; Id = 'cursor.subagents'; Path = '$profile\.claude\agents' }
+    @{ Agent = 'cursor'; Id = 'cursor.subagents'; Path = '$profile\.codex\agents' }
+    @{ Agent = 'cursor'; Id = 'cursor.subagents'; Path = '$profile\.cursor\agents' }
     @{ Agent = 'cursor'; Id = 'cursor.temp_residue'; Path = '$profile\AppData\Local\Temp\cursor-agent-logs-' }
     @{ Agent = 'cursor'; Id = 'cursor.workspace_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\workspaceStorage' }
     @{ Agent = 'cursor'; Id = 'cursor.worktrees'; Path = '$profile\.cursor\worktrees' }
@@ -603,17 +659,34 @@ $targets = @(
     @{ Agent = 'devin'; Id = 'devin.sessions_db'; Path = '$profile\.local\share\devin\cli\sessions.db-shm' }
     @{ Agent = 'devin'; Id = 'devin.sessions_db'; Path = '$profile\.local\share\devin\cli\sessions.db-wal' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.auth'; Path = '$profile\.factory' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.config'; Path = '$profile\.factory\config.json' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.config'; Path = '$profile\.factory\settings.json' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.config'; Path = '$profile\.factory\settings.local.json' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.logs'; Path = '$profile\.factory\bug-reports' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.logs'; Path = '$profile\.factory\logs' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.mcp_and_hooks'; Path = '$profile\.factory\hooks.json' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.mcp_and_hooks'; Path = '$profile\.factory\mcp.json' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.output_styles'; Path = '$profile\.factory\output-styles' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.sessions'; Path = '$profile\.factory\sessions' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.skills_and_droids'; Path = '$profile\.claude\agents' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.skills_and_droids'; Path = '$profile\.factory\commands' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.skills_and_droids'; Path = '$profile\.factory\droids' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.skills_and_droids'; Path = '$profile\.factory\skills' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.specs'; Path = '$profile\.factory\specs' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.worktrees'; Path = '$profile\.factory\worktrees' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.agent_definitions'; Path = '$profile\.agents\skills' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.agent_definitions'; Path = '$profile\.gemini\agents' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.agent_definitions'; Path = '$profile\.gemini\skills' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.chats'; Path = '$profile\.gemini\sessions' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.chats'; Path = '$profile\.gemini\tmp' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.commands'; Path = '$profile\.gemini\commands' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.credentials'; Path = '$profile\.gemini\oauth_creds.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.google_accounts'; Path = '$profile\.gemini\google_accounts.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.home_tree'; Path = '$profile\.gemini' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.mcp_oauth_tokens'; Path = '$profile\.gemini\a2a-oauth-tokens.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.mcp_oauth_tokens'; Path = '$profile\.gemini\mcp-oauth-tokens.json' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.policies'; Path = '$profile\.gemini\policies' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.policies'; Path = 'C:\ProgramData\gemini-cli\policies' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.shell_history'; Path = '$profile\.gemini\tmp' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.system_settings'; Path = 'C:\ProgramData\gemini-cli\settings.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.system_settings'; Path = 'C:\ProgramData\gemini-cli\system-defaults.json' }
@@ -936,6 +1009,7 @@ $targets = @(
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.base_directories'; Path = '$profile\AppData\Roaming\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.ide_logs'; Path = '$profile\AppData\Local\JetBrains' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.log_data'; Path = '$profile\AppData\Local\JetBrains' }
+    @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.mcp_config'; Path = '$profile\AppData\Roaming\JetBrains\Air\mcp.json' }
     @{ Agent = 'jetbrains_ai'; Id = 'jetbrains_ai.password_safe'; Path = '$profile\AppData\Roaming\JetBrains' }
     @{ Agent = 'junie'; Id = 'junie.allowlist'; Path = '$profile\.junie\allowlist.json' }
     @{ Agent = 'junie'; Id = 'junie.cli_sessions'; Path = '$profile\.junie\sessions' }
@@ -944,25 +1018,35 @@ $targets = @(
     @{ Agent = 'junie'; Id = 'junie.home_config'; Path = '$profile\.junie\settings.json' }
     @{ Agent = 'junie'; Id = 'junie.jcp_outbox'; Path = '$profile\AppData\Local\JetBrains' }
     @{ Agent = 'junie'; Id = 'junie.matterhorn_project_logs'; Path = '$profile\AppData\Local\JetBrains' }
+    @{ Agent = 'junie'; Id = 'junie.mcp_config'; Path = '$profile\.junie\mcp\mcp.json' }
     @{ Agent = 'junie'; Id = 'junie.plugin_install_evidence'; Path = '$profile\AppData\Roaming\JetBrains' }
     @{ Agent = 'junie'; Id = 'junie.trust_and_auth_key'; Path = '$profile\.junie\trust' }
     @{ Agent = 'junie'; Id = 'junie.trust_and_auth_key'; Path = '$profile\.junie\trust\authentication-key' }
+    @{ Agent = 'kilo_code'; Id = 'kilo_code.agents'; Path = '$profile\.config\kilo\agent' }
     @{ Agent = 'kilo_code'; Id = 'kilo_code.cli_db'; Path = '$profile\.local\share\kilo\kilo.db' }
     @{ Agent = 'kilo_code'; Id = 'kilo_code.cli_db'; Path = '$profile\.local\share\kilo\kilo.db-shm' }
     @{ Agent = 'kilo_code'; Id = 'kilo_code.cli_db'; Path = '$profile\.local\share\kilo\kilo.db-wal' }
+    @{ Agent = 'kilo_code'; Id = 'kilo_code.config'; Path = '$profile\.config\kilo\kilo.jsonc' }
     @{ Agent = 'kilo_code'; Id = 'kilo_code.extension_id_legacy_tree'; Path = '$profile\.vscode-server\data\User\globalStorage\kilocode.kilo-code\tasks' }
     @{ Agent = 'kilo_code'; Id = 'kilo_code.extension_id_legacy_tree'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\kilocode.kilo-code\tasks' }
+    @{ Agent = 'kilo_code'; Id = 'kilo_code.home_dir'; Path = '$profile\.kilocode\cli\global\settings\custom_modes.yaml' }
     @{ Agent = 'kilo_code'; Id = 'kilo_code.settings'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\kilocode.kilo-code\settings\custom_modes.yaml' }
+    @{ Agent = 'kiro'; Id = 'kiro.agents'; Path = '$profile\.kiro\agents' }
     @{ Agent = 'kiro'; Id = 'kiro.cli_log'; Path = '$profile\AppData\Local\Temp\kiro-log\logs\kiro-chat.log' }
     @{ Agent = 'kiro'; Id = 'kiro.cli_session_database'; Path = '$profile\.kiro' }
     @{ Agent = 'kiro'; Id = 'kiro.cli_session_files'; Path = '$profile\.kiro\sessions\cli' }
     @{ Agent = 'kiro'; Id = 'kiro.cli_settings'; Path = '$profile\.kiro\settings\cli.json' }
+    @{ Agent = 'kiro'; Id = 'kiro.hooks'; Path = '$profile\.kiro\hooks' }
     @{ Agent = 'kiro'; Id = 'kiro.ide_legacy_global_storage'; Path = '$profile\AppData\Roaming\Kiro\User\globalStorage\kiro.kiroagent' }
     @{ Agent = 'kiro'; Id = 'kiro.ide_session_files'; Path = '$profile\.kiro\sessions' }
+    @{ Agent = 'kiro'; Id = 'kiro.legacy_amazonq_config'; Path = '$profile\.aws\amazonq' }
     @{ Agent = 'kiro'; Id = 'kiro.managed_settings'; Path = 'C:\ProgramData\Kiro\managed-settings.json' }
     @{ Agent = 'kiro'; Id = 'kiro.mcp_config_user'; Path = '$profile\.kiro\settings\mcp.json' }
     @{ Agent = 'kiro'; Id = 'kiro.permissions_user'; Path = '$profile\.kiro\settings\permissions.yaml' }
     @{ Agent = 'kiro'; Id = 'kiro.permissions_workspace'; Path = '$profile\.kiro\workspace-roots' }
+    @{ Agent = 'kiro'; Id = 'kiro.prompt_library'; Path = '$profile\.kiro\prompts' }
+    @{ Agent = 'kiro'; Id = 'kiro.skills_powers'; Path = '$profile\.kiro\powers' }
+    @{ Agent = 'kiro'; Id = 'kiro.skills_powers'; Path = '$profile\.kiro\skills' }
     @{ Agent = 'kiro'; Id = 'kiro.steering_user'; Path = '$profile\.kiro\steering' }
     @{ Agent = 'kiro'; Id = 'kiro.steering_user'; Path = '$profile\.kiro\steering\AGENTS.md' }
     @{ Agent = 'lmstudio'; Id = 'lmstudio.cli_and_server'; Path = '$profile\.lmstudio\bin\lms' }
@@ -1002,19 +1086,30 @@ $targets = @(
     @{ Agent = 'opencode'; Id = 'opencode.install_and_runtime_trees'; Path = '$profile\.cache\opencode\bin' }
     @{ Agent = 'opencode'; Id = 'opencode.log'; Path = '$profile\.local\share\opencode\log' }
     @{ Agent = 'opencode'; Id = 'opencode.managed_config'; Path = 'C:\ProgramData\opencode' }
+    @{ Agent = 'pi'; Id = 'pi.agents_skills'; Path = '$profile\.agents\skills' }
     @{ Agent = 'pi'; Id = 'pi.auth'; Path = '$profile\.pi\agent\auth.json' }
     @{ Agent = 'pi'; Id = 'pi.bin'; Path = '$profile\.pi\agent\bin' }
     @{ Agent = 'pi'; Id = 'pi.bin'; Path = '$profile\.pi\agent\themes' }
     @{ Agent = 'pi'; Id = 'pi.bin'; Path = '$profile\.pi\server' }
     @{ Agent = 'pi'; Id = 'pi.debug_log'; Path = '$profile\.pi\agent\pi-debug.log' }
+    @{ Agent = 'pi'; Id = 'pi.extensions'; Path = '$profile\.pi\agent\extensions' }
+    @{ Agent = 'pi'; Id = 'pi.extensions'; Path = '$profile\.pi\agent\tools' }
     @{ Agent = 'pi'; Id = 'pi.models'; Path = '$profile\.pi\agent\models.json' }
+    @{ Agent = 'pi'; Id = 'pi.prompts'; Path = '$profile\.pi\agent\prompts' }
     @{ Agent = 'pi'; Id = 'pi.sessions'; Path = '$profile\.pi\agent\sessions\--' }
+    @{ Agent = 'pi'; Id = 'pi.settings'; Path = '$profile\.pi\agent\settings.json' }
+    @{ Agent = 'pi'; Id = 'pi.skills'; Path = '$profile\.pi\agent\skills' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.auto_memory'; Path = '$profile\.qwen\memories' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.auto_memory'; Path = '$profile\.qwen\memories\MEMORY.md' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.auto_memory'; Path = '$profile\.qwen\projects' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.channels_scheduled_tasks'; Path = '$profile\.qwen\channels\cron.json' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.channels_scheduled_tasks'; Path = '$profile\.qwen\channels\daemon' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.channels_scheduled_tasks'; Path = '$profile\.qwen\channels\service.pid' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.channels_scheduled_tasks'; Path = '$profile\.qwen\channels\sessions.json' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.conversation_transcript'; Path = '$profile\.qwen\projects' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.debug_logs'; Path = '$profile\.qwen\debug' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.env_files'; Path = '$profile\.env' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.env_files'; Path = '$profile\.qwen\.env' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.file_history_backups'; Path = '$profile\.qwen\file-history' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.install_evidence'; Path = '$profile\.qwen\bin' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.install_evidence'; Path = '$profile\.qwen\installation_id' }
@@ -1068,6 +1163,14 @@ $targets = @(
     @{ Agent = 'roo_code'; Id = 'roo_code.checkpoints'; Path = '$profile\AppData\Roaming\VSCodium\User\globalStorage\rooveterinaryinc.roo-cline\tasks' }
     @{ Agent = 'roo_code'; Id = 'roo_code.checkpoints'; Path = '$profile\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\checkpoints' }
     @{ Agent = 'roo_code'; Id = 'roo_code.checkpoints'; Path = '$profile\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\tasks' }
+    @{ Agent = 'roo_code'; Id = 'roo_code.custom_storage_path'; Path = '$profile\AppData\Roaming\Code - Insiders\User\settings.json' }
+    @{ Agent = 'roo_code'; Id = 'roo_code.custom_storage_path'; Path = '$profile\AppData\Roaming\Code\User\settings.json' }
+    @{ Agent = 'roo_code'; Id = 'roo_code.custom_storage_path'; Path = '$profile\AppData\Roaming\Cursor\User\settings.json' }
+    @{ Agent = 'roo_code'; Id = 'roo_code.custom_storage_path'; Path = '$profile\AppData\Roaming\Kiro\User\settings.json' }
+    @{ Agent = 'roo_code'; Id = 'roo_code.custom_storage_path'; Path = '$profile\AppData\Roaming\Positron\User\settings.json' }
+    @{ Agent = 'roo_code'; Id = 'roo_code.custom_storage_path'; Path = '$profile\AppData\Roaming\Trae\User\settings.json' }
+    @{ Agent = 'roo_code'; Id = 'roo_code.custom_storage_path'; Path = '$profile\AppData\Roaming\VSCodium\User\settings.json' }
+    @{ Agent = 'roo_code'; Id = 'roo_code.custom_storage_path'; Path = '$profile\AppData\Roaming\Windsurf\User\settings.json' }
     @{ Agent = 'roo_code'; Id = 'roo_code.extension_id'; Path = '$profile\AppData\Roaming\Code - Insiders\User\globalStorage\rooveterinaryinc.roo-cline' }
     @{ Agent = 'roo_code'; Id = 'roo_code.extension_id'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\rooveterinaryinc.roo-cline' }
     @{ Agent = 'roo_code'; Id = 'roo_code.extension_id'; Path = '$profile\AppData\Roaming\Cursor\User\globalStorage\rooveterinaryinc.roo-cline' }
@@ -1123,6 +1226,14 @@ $targets = @(
     @{ Agent = 'vscode'; Id = 'vscode.extension_install_evidence'; Path = '$profile\.vscode\extensions\kilocode.kilo-code-' }
     @{ Agent = 'vscode'; Id = 'vscode.extension_install_evidence'; Path = '$profile\.vscode\extensions\rooveterinaryinc.roo-cline-' }
     @{ Agent = 'vscode'; Id = 'vscode.extension_install_evidence'; Path = '$profile\.vscode\extensions\saoudrizwan.claude-dev-' }
+    @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\Code - Insiders\User\mcp.json' }
+    @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\Code\User\mcp.json' }
+    @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\Cursor\User\mcp.json' }
+    @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\Kiro\User\mcp.json' }
+    @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\Positron\User\mcp.json' }
+    @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\Trae\User\mcp.json' }
+    @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\VSCodium\User\mcp.json' }
+    @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\Windsurf\User\mcp.json' }
     @{ Agent = 'vscode'; Id = 'vscode.state_vscdb'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\state.vscdb' }
     @{ Agent = 'vscode'; Id = 'vscode.state_vscdb'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\state.vscdb-shm' }
     @{ Agent = 'vscode'; Id = 'vscode.state_vscdb'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\state.vscdb-wal' }
@@ -1170,6 +1281,8 @@ $targets = @(
     @{ Agent = 'windsurf'; Id = 'windsurf.global_rules'; Path = '$profile\.codeium\windsurf-insiders\memories\global_rules.md' }
     @{ Agent = 'windsurf'; Id = 'windsurf.global_rules'; Path = '$profile\.codeium\windsurf-next\memories\global_rules.md' }
     @{ Agent = 'windsurf'; Id = 'windsurf.global_rules'; Path = '$profile\.codeium\windsurf\memories\global_rules.md' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.hooks'; Path = '$profile\.codeium\hooks.json' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.hooks'; Path = '$profile\.codeium\windsurf\hooks.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Devin\User\globalStorage\state.vscdb' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Devin\User\globalStorage\state.vscdb-shm' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_global_state_vscdb'; Path = '$profile\AppData\Roaming\Devin\User\globalStorage\state.vscdb-wal' }
@@ -1195,16 +1308,21 @@ $targets = @(
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_user_data'; Path = '$profile\AppData\Roaming\Windsurf\argv.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_workspace_state_vscdb'; Path = '$profile\AppData\Roaming\Devin\User\workspaceStorage' }
     @{ Agent = 'windsurf'; Id = 'windsurf.ide_workspace_state_vscdb'; Path = '$profile\AppData\Roaming\Windsurf\User\workspaceStorage' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.ignore_files'; Path = '$profile\.codeium\.codeiumignore' }
     @{ Agent = 'windsurf'; Id = 'windsurf.implicit_trajectories'; Path = '$profile\.codeium\windsurf\implicit' }
     @{ Agent = 'windsurf'; Id = 'windsurf.language_server_binaries_and_logs'; Path = '$profile\.codeium' }
     @{ Agent = 'windsurf'; Id = 'windsurf.language_server_binaries_and_logs'; Path = '$profile\.devin-server\data\logs' }
     @{ Agent = 'windsurf'; Id = 'windsurf.language_server_binaries_and_logs'; Path = '$profile\.windsurf-server\data\logs' }
     @{ Agent = 'windsurf'; Id = 'windsurf.language_server_binaries_and_logs'; Path = '$profile\AppData\Local\Programs\Windsurf' }
     @{ Agent = 'windsurf'; Id = 'windsurf.language_server_binaries_and_logs'; Path = 'C:\Program Files\Windsurf' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.mcp_config'; Path = '$profile\.codeium\windsurf\mcp_config.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.mcp_oauth_state'; Path = '$profile\AppData\Roaming\Devin\mcp\oauth' }
     @{ Agent = 'windsurf'; Id = 'windsurf.memories'; Path = '$profile\.codeium\windsurf-insiders\memories' }
     @{ Agent = 'windsurf'; Id = 'windsurf.memories'; Path = '$profile\.codeium\windsurf-next\memories' }
     @{ Agent = 'windsurf'; Id = 'windsurf.memories'; Path = '$profile\.codeium\windsurf\memories' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.plans'; Path = '$profile\.devin\plans' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.plans'; Path = '$profile\.devin\plans\plan-' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.plans'; Path = '$profile\.windsurf\plans' }
     @{ Agent = 'windsurf'; Id = 'windsurf.plugin_log'; Path = '$profile\.codeium\codeium.log' }
     @{ Agent = 'windsurf'; Id = 'windsurf.server_data'; Path = '$profile\.devin-server' }
     @{ Agent = 'windsurf'; Id = 'windsurf.server_data'; Path = '$profile\.windsurf-server' }
@@ -1219,6 +1337,8 @@ $targets = @(
     @{ Agent = 'windsurf'; Id = 'windsurf.temp_residue'; Path = '$profile\AppData\Local\Temp\devin-inno-updater-' }
     @{ Agent = 'windsurf'; Id = 'windsurf.temp_residue'; Path = '$profile\AppData\Local\Temp\unleash-backup-codeium-extension.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.temp_residue'; Path = '$profile\AppData\Local\Temp\unleash-repo-schema-v1-codeium-language-server.json' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.workflows_and_skills'; Path = '$profile\.codeium\windsurf\global_workflows' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.workflows_and_skills'; Path = '$profile\.codeium\windsurf\skills' }
     @{ Agent = 'windsurf'; Id = 'windsurf.worktrees'; Path = '$profile\.devin\worktrees' }
     @{ Agent = 'windsurf'; Id = 'windsurf.worktrees'; Path = '$profile\.windsurf\worktrees' }
     @{ Agent = 'zed'; Id = 'zed.extensions'; Path = '$profile\AppData\Local\Zed\debug_adapters' }
@@ -1227,6 +1347,7 @@ $targets = @(
     @{ Agent = 'zed'; Id = 'zed.extensions'; Path = '$profile\AppData\Local\Zed\prompt_overrides' }
     @{ Agent = 'zed'; Id = 'zed.logs'; Path = '$profile\AppData\Local\Zed\logs' }
     @{ Agent = 'zed'; Id = 'zed.prompt_library'; Path = '$profile\AppData\Local\Zed\prompts' }
+    @{ Agent = 'zed'; Id = 'zed.settings'; Path = '$profile\AppData\Roaming\Zed\settings.json' }
     @{ Agent = 'zed'; Id = 'zed.sidebar_threads'; Path = '$profile\AppData\Local\Zed\db\0-' }
     @{ Agent = 'zed'; Id = 'zed.threads_db'; Path = '$profile\AppData\Local\Zed\threads\threads.db' }
     @{ Agent = 'zed'; Id = 'zed.threads_db'; Path = '$profile\AppData\Local\Zed\threads\threads.db-shm' }

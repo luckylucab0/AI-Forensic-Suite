@@ -381,16 +381,21 @@ artifacts:
   paths:
   - <project>/.clinerules/hooks/
   - ~/Documents/Cline/Hooks/
+  - ~/OneDrive*/Documents/Cline/Hooks/
   format: text
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://github.com/cline/cline/blob/main/.clinerules/hooks/README.md
   source_kind: official
+  unsourced_paths:
+  - ~/OneDrive*/Documents/Cline/Hooks/
   volatility: |-
     Executable bits and mtimes matter as much as the content - record mode, owner and timestamps, not just the script text.
   notes: |-
     THE SHARPEST INJECTION SURFACE IN THIS WHOLE FAMILY, and the one most likely to be missed. A hook is arbitrary code that the agent runs automatically on tool use or prompt submission, and a workspace hook arrives with the repository - so cloning a hostile repo plus enabling hooks is remote code execution by design. Collect the script bodies verbatim (they are evidence, not secrets), plus mode/owner/mtime, and diff workspace hooks against the repo's git history to spot ones that were never committed. Cline's own docs even ship a PreToolUse guard example (docs/customization/clineignore.mdx) showing the copy-and-chmod workflow, which is what to grep shell history for.
+
+    Windows redirection: OneDrive's Known Folder Move puts the real Documents folder under the OneDrive tree, so a collection of the literal profile path finds nothing on a redirected machine and the absence reads as a profile that never had this. The redirected spelling is here as a second spelling of the same artifact, globbed because the commercial folder carries the tenant's name and a glob matches it without putting a name in this catalogue. See ADR 0040.
   parser: instructions
 - id: crosscutting.mcp_config_files
   category: mcp_config
@@ -492,6 +497,8 @@ artifacts:
   - <project>/.clinerules/workflows/
   - ~/Documents/Cline/Rules/
   - ~/Documents/Cline/Workflows/
+  - ~/OneDrive*/Documents/Cline/Rules/
+  - ~/OneDrive*/Documents/Cline/Workflows/
   format: markdown
   sensitivity: normal
   collect_priority: normal
@@ -507,6 +514,8 @@ artifacts:
   - <project>/.clinerules/skills/
   - <project>/.clinerules/workflows/
   - ~/Documents/Cline/Workflows/
+  - ~/OneDrive*/Documents/Cline/Rules/
+  - ~/OneDrive*/Documents/Cline/Workflows/
   volatility: |-
     When Cline converts a legacy single-file .clinerules into a directory it renames the original to `.clinerules.bak` as a backup - look for that file, it preserves the pre-migration instruction text.
   notes: |-
@@ -517,6 +526,10 @@ artifacts:
     The remote configuration channel was looked for again and the vendor documents the feature without naming a directory: its enterprise pages describe administrators pushing configuration to members through the hosted service at the vendor's own site, and say nothing about where a client writes it. So the directory name here still rests on the community source and stays unsourced, while the behaviour it is about is vendor stated: an instruction can arrive on a workstation from a console the workstation's user does not control, with no repository history to audit. Collect the directory and flag anything in it as centrally delivered rather than locally authored.
 
     The ignore file has since been found on a vendor page of its own (docs/customization/clineignore.mdx in the vendor's repository), which changes how a hit on it should be read rather than only where the path comes from. The vendor is deprecating the feature and states plainly that it "is not a security or access-control boundary - ignored files can still be read via explicit @ mentions or shell commands". So a .clineignore listing a path is NOT evidence that the agent did not read it, and the vendor's own replacement is a PreToolUse hook that blocks the call, which lives in the hook directories this entry already collects. An investigation that finds the ignore file and no such hook should expect the ignored paths to have been reachable.
+
+    The redirected Rules directory is one the vendor does state, in a file this entry does not cite: resolveGlobalRulesConfigPaths in the SDK's paths.ts reads OneDrive, OneDriveConsumer and OneDriveCommercial and joins Documents/Cline/Rules to each of them. It is listed as unsourced because the rule here is about the cited page, and an entry carries one source. The workspace side of the same file's resolvers is in cline.workspace_config_tree.
+
+    Windows redirection: OneDrive's Known Folder Move puts the real Documents folder under the OneDrive tree, so a collection of the literal profile path finds nothing on a redirected machine and the absence reads as a profile that never had this. The redirected spelling is here as a second spelling of the same artifact, globbed because the commercial folder carries the tenant's name and a glob matches it without putting a name in this catalogue. See ADR 0040.
   parser: instructions
 - id: crosscutting.instructions_copilot_instructions
   category: project_instructions

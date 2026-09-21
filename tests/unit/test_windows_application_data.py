@@ -345,14 +345,16 @@ def test_the_same_task_reads_the_same_from_both_shapes(
 def test_the_fixture_declares_why_each_artifact_is_in_it() -> None:
     """The fixture names its own coverage, so a gap is a sentence rather than an absence.
 
-    Ten artifacts out of the eighty-four the catalogue has under the two application-data
-    roots. The number is not the point and raising it is not automatically an improvement:
-    what this pins is that the chain works for every shape in the fixture, and that
-    somebody said out loud which shapes those are.
+    Eleven artifacts, ten of them under the two application-data roots out of the
+    eighty-four the catalogue has there, and one under the profile's Documents folder as
+    OneDrive's Known Folder Move leaves it. The number is not the point and raising it is
+    not automatically an improvement: what this pins is that the chain works for every
+    shape in the fixture, and that somebody said out loud which shapes those are.
     """
     assert set(WINDOWS_ARTIFACTS) == {
         "claude_code.mcp_logs",
         "claude_desktop.renderer_state",
+        "crosscutting.instructions_clinerules",
         "crosscutting.shell_psreadline_history",
         "cursor.workspace_state_vscdb",
         "goose.config",

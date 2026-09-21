@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b24d051837fd
+# Catalogue digest: 0b2cac47244d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 39 of the 583 catalogue artifacts declare
+# KAPE is Windows only. 39 of the 584 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -17,11 +17,6 @@
 #   a registry key, and this rule addresses files. No rule generated here covers one: query these keys with a KAPE registry target of your own. The suite's own collectors read four of the catalogue's registry entries on a live Windows host and write each as a document in the bundle, so a collection from a live host already carries those; this is the answer for a rule and for the entries the collectors decline. docs/ARTIFACTS.md names them
 #     claude_code.managed_settings_registry
 #   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
-#     claude_code.agent_memory
-#     claude_code.agents
-#     claude_code.commands
-#     claude_code.loop_instructions
-#     claude_code.output_styles
 #     claude_code.plugin_manifests
 #     claude_code.project_claude_local_md
 #     claude_code.project_claude_md
@@ -29,19 +24,43 @@
 #     claude_code.project_rules
 #     claude_code.project_settings
 #     claude_code.project_settings_local
-#     claude_code.settings_referenced_executables
-#     claude_code.skills
-#     claude_code.workflows
 #     claude_code.worktreeinclude
 #     claude_code.worktrees
 #   reachable only through a relocation variable, which KAPE cannot resolve: read the variable off the endpoint
 #     claude_code.git_global_excludes
+#   some of its paths are anchored at a working copy, whose location only the agent's own state file gives, so those are not in this rule. Its profile and system wide paths are. Run the suite's collector for the rest, which reads that state file
+#     claude_code.agent_memory
+#     claude_code.agents
+#     claude_code.commands
+#     claude_code.loop_instructions
+#     claude_code.output_styles
+#     claude_code.settings_referenced_executables
+#     claude_code.skills
+#     claude_code.workflows
 Description: AI coding agent artifacts, Claude Code
 Author: agentforensics
 Version: 1.0
 Id: b07724b6-6c28-de05-6cf3-06edc21845ab
 RecreateDirectories: true
 Targets:
+    -
+        Name: claude_code.agent_memory
+        Category: memory
+        Path: C:\Users\%user%\.claude\agent-memory
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.agent_memory
+        Category: memory
+        Path: C:\Users\%user%\.claude\agent-memory\*
+        FileMask: "MEMORY.md"
+        Recursive: false
+    -
+        Name: claude_code.agents
+        Category: instructions
+        Path: C:\Users\%user%\.claude\agents
+        FileMask: "*.md"
+        Recursive: false
     -
         Name: claude_code.anthropic_active_config
         Category: config
@@ -77,6 +96,12 @@ Targets:
         Category: install_evidence
         Path: C:\Users\%user%\.claude\cache
         FileMask: "changelog.md"
+        Recursive: false
+    -
+        Name: claude_code.commands
+        Category: instructions
+        Path: C:\Users\%user%\.claude\commands
+        FileMask: "*.md"
         Recursive: false
     -
         Name: claude_code.config_backups
@@ -313,6 +338,12 @@ Targets:
         FileMask: "*"
         Recursive: true
     -
+        Name: claude_code.loop_instructions
+        Category: instructions
+        Path: C:\Users\%user%\.claude
+        FileMask: "loop.md"
+        Recursive: false
+    -
         Name: claude_code.managed_claude_md
         Category: instructions
         Path: C:\Program Files\ClaudeCode
@@ -359,6 +390,12 @@ Targets:
         Category: config
         Path: C:\Users\%user%\.claude
         FileMask: "remote-settings.json"
+        Recursive: false
+    -
+        Name: claude_code.output_styles
+        Category: instructions
+        Path: C:\Users\%user%\.claude\output-styles
+        FileMask: "*.md"
         Recursive: false
     -
         Name: claude_code.paste_cache
@@ -439,6 +476,18 @@ Targets:
         FileMask: "*"
         Recursive: true
     -
+        Name: claude_code.settings_referenced_executables
+        Category: instructions
+        Path: C:\Users\%user%\.claude\hooks
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: claude_code.settings_referenced_executables
+        Category: instructions
+        Path: C:\Users\%user%\.claude\hooks
+        FileMask: "*"
+        Recursive: true
+    -
         Name: claude_code.shell_snapshots
         Category: shell_history
         Path: C:\Users\%user%\.claude\shell-snapshots
@@ -450,6 +499,18 @@ Targets:
         Path: C:\Users\%user%\.claude\shell-snapshots
         FileMask: "*"
         Recursive: true
+    -
+        Name: claude_code.skills
+        Category: instructions
+        Path: C:\Program Files\ClaudeCode\.claude\skills\*
+        FileMask: "SKILL.md"
+        Recursive: false
+    -
+        Name: claude_code.skills
+        Category: instructions
+        Path: C:\Users\%user%\.claude\skills\*
+        FileMask: "SKILL.md"
+        Recursive: false
     -
         Name: claude_code.skills_trash
         Category: instructions
@@ -629,4 +690,10 @@ Targets:
         Category: transcript
         Path: C:\Users\%user%\.claude\projects\*\*\workflows
         FileMask: "*.json"
+        Recursive: false
+    -
+        Name: claude_code.workflows
+        Category: instructions
+        Path: C:\Users\%user%\.claude\workflows
+        FileMask: "*.js"
         Recursive: false

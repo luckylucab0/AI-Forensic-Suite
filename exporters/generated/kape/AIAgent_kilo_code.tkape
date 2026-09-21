@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b24d051837fd
+# Catalogue digest: 0b2cac47244d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,23 +8,30 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 39 of the 583 catalogue artifacts declare
+# KAPE is Windows only. 39 of the 584 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
 #
 # Not covered by this rule:
 #   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     kilo_code.rules
+#   some of its paths are anchored at a working copy, whose location only the agent's own state file gives, so those are not in this rule. Its profile and system wide paths are. Run the suite's collector for the rest, which reads that state file
 #     kilo_code.agents
 #     kilo_code.config
 #     kilo_code.home_dir
-#     kilo_code.rules
 Description: AI coding agent artifacts, Kilo Code
 Author: agentforensics
 Version: 1.0
 Id: 228b86e2-dde3-07c1-769f-7fe7610f9acd
 RecreateDirectories: true
 Targets:
+    -
+        Name: kilo_code.agents
+        Category: instructions
+        Path: C:\Users\%user%\.config\kilo\agent
+        FileMask: "*.md"
+        Recursive: true
     -
         Name: kilo_code.cli_db
         Category: transcript
@@ -44,6 +51,12 @@ Targets:
         FileMask: "kilo.db-wal"
         Recursive: false
     -
+        Name: kilo_code.config
+        Category: config
+        Path: C:\Users\%user%\.config\kilo
+        FileMask: "kilo.jsonc"
+        Recursive: false
+    -
         Name: kilo_code.extension_id_legacy_tree
         Category: transcript
         Path: C:\Users\%user%\.vscode-server\data\User\globalStorage\kilocode.kilo-code\tasks
@@ -55,6 +68,12 @@ Targets:
         Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage\kilocode.kilo-code\tasks
         FileMask: "*"
         Recursive: true
+    -
+        Name: kilo_code.home_dir
+        Category: config
+        Path: C:\Users\%user%\.kilocode\cli\global\settings
+        FileMask: "custom_modes.yaml"
+        Recursive: false
     -
         Name: kilo_code.settings
         Category: config

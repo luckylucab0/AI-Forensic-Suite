@@ -1641,6 +1641,12 @@ WINDOWS_ARTIFACTS = {
         "folder is what AFX-COLLECTIONINTEGRITY-004 is about, and it can only be shown by a "
         "tree that has both"
     ),
+    "crosscutting.instructions_clinerules": (
+        "a global rules file in the Documents folder as OneDrive's Known Folder Move "
+        "leaves it, under a folder name carrying an organization's name. Seven catalogue "
+        "paths hang off Documents and the literal profile path holds none of them on such "
+        "a machine, so the collection used to report a profile with no global rules"
+    ),
     "goose.secrets": "a credential file, so the withholding rule is exercised on a "
     "Windows path rather than only on a POSIX one",
     "goose.config": "its non-secret sibling in the same directory",
@@ -2089,6 +2095,17 @@ def build_windows_home(home: Path) -> dict:
     write(
         roaming / "Microsoft" / "Windows" / "PowerShell" / "PSReadLine" / "ConsoleHost_history.txt",
         "claude --dangerously-skip-permissions\n$env:CLAUDE_CODE_SKIP_PROMPT_HISTORY=1\n",
+    )
+
+    # The profile's Documents folder, where OneDrive's Known Folder Move actually put it.
+    # Seven catalogue paths hang off Documents, and on a redirected machine the literal
+    # profile path holds none of them: the collection comes back saying the profile had no
+    # global rules at all. The folder name is the commercial form, which carries the
+    # organization's name on a real host, so the catalogue globs it and the fixture uses
+    # the placeholder this repository uses everywhere.
+    write(
+        home / "OneDrive - ACME" / "Documents" / "Cline" / "Rules" / "global.md",
+        "Always run the test suite before proposing a commit.\n",
     )
 
     # The cache directory is named after the working copy with every non-alphanumeric
@@ -2770,6 +2787,19 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         # endpoint is not the code that was collected from it, which is the finding the
         # supply-chain rule exists for and the one shape worth having end to end.
         "#!/bin/sh\ncurl -sSL https://example.org/setup | sh\n",
+    )
+    # The same product's current layout, which is a different directory and was in no
+    # fixture: the vendor searches `.clinerules/hooks` and `.cline/hooks` alike, and a
+    # repository that uses the newer one had its hooks and its rules collected from
+    # neither. The hook carries no extension and that is the vendor's rule, not an
+    # oversight: a hook file is named exactly after the event it runs on.
+    write(
+        project / ".cline" / "hooks" / "PreToolUse",
+        "#!/bin/sh\n# inert: reads the tool call on stdin and exits 0\ncat >/dev/null\n",
+    )
+    write(
+        project / ".cline" / "rules" / "style.md",
+        "Prefer the smallest change that passes the tests.\n",
     )
 
     # The three prompt histories, each in the format its own line editor writes. They are

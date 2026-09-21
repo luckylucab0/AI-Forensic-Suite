@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b24d051837fd
+# Catalogue digest: 0b2cac47244d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -9,7 +9,7 @@
 # relocation variables and the agents' own state files, which no static rule can.
 #
 # Scope: the 105 artifacts the catalogue files under transcript and prompt_history.
-# The other 478 are configuration, credentials, caches, logs and install
+# The other 479 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
 # credential store what an analyst wants is the file, which is what the Collect
@@ -70,13 +70,14 @@
 #     aider.input_history
 #     aider.llm_history
 #     amazonq.ide_chat_export
-#     factory_droid.sessions
-#     windsurf.plans
 #   no path for this operating system that this target can express
 #     amp.continuations
 #     opencode.legacy_json_storage
 #   reachable only through a relocation variable, which a static glob cannot resolve: read the variable off the endpoint
 #     kiro.acp_wire_record
+#   some of its paths are anchored at a working copy, whose location only the agent's own state file gives, so those are not in this rule. Its profile and system wide paths are. Run the suite's collector for the rest, which reads that state file
+#     factory_droid.sessions
+#     windsurf.plans
 name: Custom.Forensics.AIAgents.UnifiedLog
 description: |
   Read the on-disk history of AI coding agents on this host and return it as a

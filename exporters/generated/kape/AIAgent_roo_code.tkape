@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: b24d051837fd
+# Catalogue digest: 0b2cac47244d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,15 +8,16 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 39 of the 583 catalogue artifacts declare
+# KAPE is Windows only. 39 of the 584 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
 #
 # Not covered by this rule:
 #   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
-#     roo_code.custom_storage_path
 #     roo_code.rules
+#   some of its paths are anchored at a working copy, whose location only the agent's own state file gives, so those are not in this rule. Its profile and system wide paths are. Run the suite's collector for the rest, which reads that state file
+#     roo_code.custom_storage_path
 Description: AI coding agent artifacts, Roo Code
 Author: agentforensics
 Version: 1.0
@@ -167,6 +168,54 @@ Targets:
         Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\tasks\*\checkpoints
         FileMask: "*"
         Recursive: true
+    -
+        Name: roo_code.custom_storage_path
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: roo_code.custom_storage_path
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code\User
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: roo_code.custom_storage_path
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: roo_code.custom_storage_path
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: roo_code.custom_storage_path
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: roo_code.custom_storage_path
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: roo_code.custom_storage_path
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User
+        FileMask: "settings.json"
+        Recursive: false
+    -
+        Name: roo_code.custom_storage_path
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User
+        FileMask: "settings.json"
+        Recursive: false
     -
         Name: roo_code.extension_id
         Category: install_evidence
