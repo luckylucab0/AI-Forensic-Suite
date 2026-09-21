@@ -50,7 +50,7 @@ What this suite reads, per agent, counted from the catalogue and the reader regi
 
 ## What is not read, and why
 
-Every artifact in the catalogue is collected and appears in a case, whether a reader claims it or not: an entry with no reader still produces one filesystem event carrying its path, hash and timestamps. What follows is what is missing beyond that, in four groups, because they are four different answers.
+Every artifact in the catalogue is collected and appears in a case, whether a reader claims it or not: an entry with no reader still produces one filesystem event carrying its path, hash and timestamps. What follows is what is missing beyond that, in five groups, because they are five different answers.
 
 ### Credential stores: metadata and a hash, by design
 
@@ -157,6 +157,13 @@ Every artifact in the catalogue is collected and appears in a case, whether a re
 ### Unfinished work on a format that is already read
 
 None as of this generation. The check behind this section looks for a catalogue entry in a format this suite already reads, with no reader and no reason: that is the shape unfinished work takes here, and there is none.
+
+## Started and not finished
+
+2 entries where somebody wrote down that the reading is incomplete. Everything above is a decision; this is a list of work. An entry here may also appear above, in whichever group its current state puts it, because `read` on this page is a yes or a no and an analyst deciding whether a case can be quoted needs the third answer. The declaration lives in `src/agentforensics/parsers/coverage.py` and a test holds each entry to still existing in the catalogue, so this list cannot outlive what it promises.
+
+- `goose.plugins`: the plugin tree is collected whole and read as text, which is right for the shell scripts in it and wrong for the hooks/hooks.json beside them. That file registers the commands the product runs on tool events, and the matcher that decides which calls they fire on, so until something reads it as the registry it is, a case holds it as prose and no rule can ask what a hook was permitted to do
+- `vscode.local_history`: the editor's own copy of a file from before each change, which an agent's edits land in like anybody else's. The index inside is JSON and the versions beside it are the file contents, and reading the pair as a snapshot store is format work nobody here has done. The directory is collected and is on the timeline; the earlier text inside it is not on the timeline as anything
 
 ## Where the reading is thin
 

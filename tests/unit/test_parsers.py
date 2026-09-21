@@ -21,6 +21,7 @@ from agentforensics.parsers.coverage import (
     HANDED_OVER,
     READABLE_AND_UNREAD,
     READABLE_FORMATS,
+    UNFINISHED,
 )
 from agentforensics.parsers.jsonl_generic import UNINTERPRETED as JSONL_UNINTERPRETED
 
@@ -1699,6 +1700,32 @@ def test_a_readable_artifact_is_read_or_says_why_not() -> None:
                 f"{artifact_id} is excused because {other} carries its evidence, and "
                 "nothing reads that either, so the evidence is in no case at all"
             )
+
+
+def test_the_unfinished_readings_still_describe_something_that_exists() -> None:
+    """The one list on the support page that is a promise rather than a decision.
+
+    Everything else in coverage.py says why an entry is not read, and a stale line there
+    makes the tool look less capable than it is. This one says an entry is read and not
+    read completely, which makes it look more capable than it is if the sentence outlives
+    the file it is about. So both halves are held: the entry is still in the catalogue, and
+    the sentence is not empty.
+
+    Not asserted: that the work is still unfinished. Nothing in the code can know that, and
+    a check that pretended to would be the kind of comment this project keeps paying for.
+    Finishing one of these means deleting its line here, and the page is generated from
+    this table, so the deletion is what removes the claim.
+    """
+    from agentforensics.catalog import load_catalogue
+
+    catalogue = load_catalogue(Path(__file__).resolve().parents[2] / "catalog")
+    known = {artifact.id for artifact in catalogue.artifacts}
+    for artifact_id, reason in UNFINISHED.items():
+        assert artifact_id in known, (
+            f"{artifact_id} is named on the support page as a reading somebody started, "
+            "and the catalogue has no such entry any more"
+        )
+        assert reason.strip(), artifact_id
 
 
 def test_a_withheld_artifact_is_the_only_thing_excused_without_a_reason() -> None:

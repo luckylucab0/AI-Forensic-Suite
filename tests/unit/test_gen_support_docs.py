@@ -5,8 +5,10 @@ failure worth guarding against is not a broken table. It is a page that says mor
 than there is: a number copied from the day it was written, a gap that quietly stops being
 listed, or an entry that slides from "unfinished work" into no section at all.
 
-So the assertions are about the arithmetic and about the four groups adding up, and the
-`--check` mode is what keeps the committed copy honest.
+So the assertions are about the arithmetic, about the five groups adding up, and about the
+one section that is a promise rather than a decision: the readings somebody started and
+did not finish have to appear with their reasons rather than as a number. The `--check`
+mode is what keeps the committed copy honest.
 """
 
 from __future__ import annotations
@@ -20,7 +22,12 @@ import pytest
 
 from agentforensics.catalog import load_catalogue
 from agentforensics.parsers import PARSERS, for_artifact
-from agentforensics.parsers.coverage import HANDED_OVER, READABLE_AND_UNREAD, READABLE_FORMATS
+from agentforensics.parsers.coverage import (
+    HANDED_OVER,
+    READABLE_AND_UNREAD,
+    READABLE_FORMATS,
+    UNFINISHED,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "scripts" / "gen_support_docs.py"
@@ -81,7 +88,7 @@ def test_the_counts_in_the_page_are_the_counts_in_the_code() -> None:
 
 
 def test_every_unread_artifact_is_in_exactly_one_group() -> None:
-    """The four groups have to partition what is not read, or the page hides something.
+    """The groups have to partition what is not read, or the page hides something.
 
     An entry that falls through every group would appear in the totals as not read and be
     described nowhere, which is the shape of the gap this page exists to close.
@@ -126,3 +133,26 @@ def test_unfinished_work_is_named_rather_than_counted() -> None:
             assert artifact.id in section, artifact.id
     else:
         assert "None as of this generation" in section
+
+
+@pytest.mark.parametrize("name", NAMES)
+def test_a_reading_that_was_started_is_named_with_what_is_missing(name: str) -> None:
+    """The section that says "read" is not the same as "read completely".
+
+    An analyst reads the per-agent table and gets a yes or a no. This section is the third
+    answer, and it is only worth having if it is specific: an id and the sentence saying
+    which part of the file nobody has mapped. A count would read as a footnote and be
+    skipped, which is why the generator is held to naming them in both languages.
+    """
+    heading = (
+        "## Started and not finished" if name == "SUPPORT.md" else "## Angefangen und nicht fertig"
+    )
+    text = (DOCS / name).read_text(encoding="utf-8")
+    assert heading in text, name
+    section = text.split(heading, 1)[1].split("\n## ", 1)[0]
+    for artifact_id, reason in UNFINISHED.items():
+        assert artifact_id in section, f"{artifact_id} is declared unfinished and is not on {name}"
+        if name == "SUPPORT.md":
+            assert reason in section, artifact_id
+    if not UNFINISHED:
+        assert "None as of this generation" in section or "keine" in section

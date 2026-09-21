@@ -48,6 +48,7 @@ from agentforensics.parsers.coverage import (  # noqa: E402
     HANDED_OVER,
     READABLE_AND_UNREAD,
     READABLE_FORMATS,
+    UNFINISHED,
 )
 
 CATALOG_DIR = REPO_ROOT / "catalog"
@@ -97,7 +98,7 @@ TEXT = {
             "Every artifact in the catalogue is collected and appears in a case, whether a "
             "reader claims it or not: an entry with no reader still produces one filesystem "
             "event carrying its path, hash and timestamps. What follows is what is missing "
-            "beyond that, in four groups, because they are four different answers."
+            "beyond that, in five groups, because they are five different answers."
         ),
         "credentials_title": "### Credential stores: metadata and a hash, by design",
         "credentials": (
@@ -137,6 +138,21 @@ TEXT = {
             "These entries are in a format this suite already reads, have no reader and no "
             "recorded reason. That is unfinished work and it is named here rather than left "
             "for somebody to infer from a thin case:"
+        ),
+        "started_title": "## Started and not finished",
+        "started_some": (
+            "%(count)d entries where somebody wrote down that the reading is incomplete. "
+            "Everything above is a decision; this is a list of work. An entry here may also "
+            "appear above, in whichever group its current state puts it, because `read` on "
+            "this page is a yes or a no and an analyst deciding whether a case can be quoted "
+            "needs the third answer. The declaration lives in "
+            "`src/agentforensics/parsers/coverage.py` and a test holds each entry to still "
+            "existing in the catalogue, so this list cannot outlive what it promises."
+        ),
+        "started_none": (
+            "None as of this generation. This section names the readings somebody started "
+            "and did not finish, declared in `src/agentforensics/parsers/coverage.py`, and "
+            "there are none."
         ),
         "thin_title": "## Where the reading is thin",
         "thin": (
@@ -196,7 +212,7 @@ TEXT = {
             "Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es "
             "beansprucht oder nicht: ein Eintrag ohne Leser erzeugt weiterhin ein "
             "Dateisystem-Ereignis mit Pfad, Hash und Zeitstempeln. Was folgt, ist das, was "
-            "darüber hinaus fehlt, in vier Gruppen, weil es vier verschiedene Antworten sind."
+            "darüber hinaus fehlt, in fünf Gruppen, weil es fünf verschiedene Antworten sind."
         ),
         "credentials_title": "### Credential-Speicher: Metadaten und Hash, absichtlich",
         "credentials": (
@@ -237,6 +253,22 @@ TEXT = {
             "Diese Einträge liegen in einem Format, das diese Suite schon liest, haben keinen "
             "Leser und keine festgehaltene Begründung. Das ist unfertige Arbeit, und sie steht "
             "hier, statt dass jemand sie aus einem dünnen Fall erschliessen muss:"
+        ),
+        "started_title": "## Angefangen und nicht fertig",
+        "started_some": (
+            "%(count)d Einträge, bei denen jemand aufgeschrieben hat, dass die Lesung "
+            "unvollständig ist. Alles darüber ist eine Entscheidung; das hier ist eine Liste "
+            "von Arbeit. Ein Eintrag kann zusätzlich oben stehen, in der Gruppe, in die sein "
+            "jetziger Zustand ihn setzt, denn `Gelesen` ist auf dieser Seite ein Ja oder ein "
+            "Nein, und wer entscheidet, ob ein Fall zitierbar ist, braucht die dritte "
+            "Antwort. Die Deklaration steht in `src/agentforensics/parsers/coverage.py`, und "
+            "ein Test hält jeden Eintrag daran fest, dass es ihn im Katalog noch gibt, damit "
+            "diese Liste nicht überlebt, was sie zusagt."
+        ),
+        "started_none": (
+            "Zum Zeitpunkt dieser Generierung keine. Dieser Abschnitt nennt die Lesungen, "
+            "die jemand angefangen und nicht fertiggestellt hat, deklariert in "
+            "`src/agentforensics/parsers/coverage.py`, und es gibt keine."
         ),
         "thin_title": "## Wo die Lesung dünn ist",
         "thin": (
@@ -398,6 +430,15 @@ def render(catalogue: Catalogue, lang: str) -> str:
             out.append("- `%s` (%s)" % (artifact.id, artifact.format))
     else:
         out.append(text["unfinished_none"])
+    out.extend(["", text["started_title"], ""])
+    started = sorted(UNFINISHED)
+    if started:
+        out.append(text["started_some"] % {"count": len(started)})
+        out.append("")
+        for artifact_id in started:
+            out.append("- `%s`: %s" % (artifact_id, UNFINISHED[artifact_id]))
+    else:
+        out.append(text["started_none"])
     floor = [a for a in read if reader_name(a) in GENERIC_READERS]
     out.extend(
         [

@@ -50,7 +50,7 @@ Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registri
 
 ## Was nicht gelesen wird, und warum
 
-Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es beansprucht oder nicht: ein Eintrag ohne Leser erzeugt weiterhin ein Dateisystem-Ereignis mit Pfad, Hash und Zeitstempeln. Was folgt, ist das, was darüber hinaus fehlt, in vier Gruppen, weil es vier verschiedene Antworten sind.
+Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es beansprucht oder nicht: ein Eintrag ohne Leser erzeugt weiterhin ein Dateisystem-Ereignis mit Pfad, Hash und Zeitstempeln. Was folgt, ist das, was darüber hinaus fehlt, in fünf Gruppen, weil es fünf verschiedene Antworten sind.
 
 ### Credential-Speicher: Metadaten und Hash, absichtlich
 
@@ -157,6 +157,13 @@ Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es 
 ### Unfertige Arbeit an einem Format, das schon gelesen wird
 
 Zum Zeitpunkt dieser Generierung keine. Die Prüfung hinter diesem Abschnitt sucht einen Katalogeintrag in einem Format, das diese Suite schon liest, ohne Leser und ohne Begründung: so sieht unfertige Arbeit hier aus, und es gibt keine.
+
+## Angefangen und nicht fertig
+
+2 Einträge, bei denen jemand aufgeschrieben hat, dass die Lesung unvollständig ist. Alles darüber ist eine Entscheidung; das hier ist eine Liste von Arbeit. Ein Eintrag kann zusätzlich oben stehen, in der Gruppe, in die sein jetziger Zustand ihn setzt, denn `Gelesen` ist auf dieser Seite ein Ja oder ein Nein, und wer entscheidet, ob ein Fall zitierbar ist, braucht die dritte Antwort. Die Deklaration steht in `src/agentforensics/parsers/coverage.py`, und ein Test hält jeden Eintrag daran fest, dass es ihn im Katalog noch gibt, damit diese Liste nicht überlebt, was sie zusagt.
+
+- `goose.plugins`: the plugin tree is collected whole and read as text, which is right for the shell scripts in it and wrong for the hooks/hooks.json beside them. That file registers the commands the product runs on tool events, and the matcher that decides which calls they fire on, so until something reads it as the registry it is, a case holds it as prose and no rule can ask what a hook was permitted to do
+- `vscode.local_history`: the editor's own copy of a file from before each change, which an agent's edits land in like anybody else's. The index inside is JSON and the versions beside it are the file contents, and reading the pair as a snapshot store is format work nobody here has done. The directory is collected and is on the timeline; the earlier text inside it is not on the timeline as anything
 
 ## Wo die Lesung dünn ist
 

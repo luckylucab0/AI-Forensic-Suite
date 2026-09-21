@@ -7,7 +7,7 @@ same list, which is why it is here rather than in a test: the test that holds it
 the catalogue, and the generator behind docs/SUPPORT.md, which is the page somebody reads
 before deciding whether an empty result means anything.
 
-A gap is one of four things, and the difference is the point:
+A gap is one of five things, and the difference is the point:
 
   * a format nobody has a reader for, which for this catalogue is a binary or a directory
     container with no documented layout. Counted, never excused: the entry is still
@@ -16,9 +16,17 @@ A gap is one of four things, and the difference is the point:
     design, so there is nothing for a reader to read.
   * an entry in a format this suite does read, claimed by no reader, with a reason written
     down below. That is the list that has to stay short and has to stay true.
+  * an entry handed to a better reader, where the file is in the bundle whole and the
+    tool that should parse it is named rather than reimplemented.
   * unfinished work, which is the one thing this file must never quietly become. An entry
     in a readable format with no reason here fails the test in tests/unit/test_parsers.py,
     so it cannot sit in the catalogue unremarked.
+
+There is one more list at the bottom, and it is a different question. The four above ask
+whether an entry is read; UNFINISHED asks whether it is read completely, which is the answer
+somebody needs before quoting a case. An entry can be read, appear nowhere in the lists
+above, and still have a piece of its format that nobody has mapped, and that is worth a
+sentence rather than a reader's silence.
 """
 
 from __future__ import annotations
@@ -165,4 +173,36 @@ READABLE_FORMATS = frozenset(
 )
 
 
-__all__ = ["READABLE_AND_UNREAD", "READABLE_FORMATS", "Excused"]
+# The readings somebody started and did not finish, each saying what is missing. Everything
+# above is a decision and this is a list of work, which is why it is separate: a reader of
+# the support page asking "is this agent covered" and a reader asking "what is left to do"
+# want different answers out of the same fact, and an entry here can be in both places.
+#
+# What belongs here is narrow on purpose. Not an entry a generic reader reads, because that
+# is true of nearly three hundred of them and the page counts those as a class. Not an entry
+# nobody has a format for, because that is the group above. This is for a file whose format
+# somebody has already described, in the entry or in a reader, where the described part is
+# not the part being read.
+#
+# The test in tests/unit/test_parsers.py holds every id here to being in the catalogue, so a
+# renamed or deleted entry takes its promise with it rather than leaving the page making a
+# commitment about a file that is gone.
+UNFINISHED = {
+    "goose.plugins": (
+        "the plugin tree is collected whole and read as text, which is right for the shell "
+        "scripts in it and wrong for the hooks/hooks.json beside them. That file registers "
+        "the commands the product runs on tool events, and the matcher that decides which "
+        "calls they fire on, so until something reads it as the registry it is, a case "
+        "holds it as prose and no rule can ask what a hook was permitted to do"
+    ),
+    "vscode.local_history": (
+        "the editor's own copy of a file from before each change, which an agent's edits "
+        "land in like anybody else's. The index inside is JSON and the versions beside it "
+        "are the file contents, and reading the pair as a snapshot store is format work "
+        "nobody here has done. The directory is collected and is on the timeline; the "
+        "earlier text inside it is not on the timeline as anything"
+    ),
+}
+
+
+__all__ = ["READABLE_AND_UNREAD", "READABLE_FORMATS", "UNFINISHED", "Excused"]
