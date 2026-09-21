@@ -12,6 +12,16 @@
 agent: goose
 title: Goose
 vendor: Block
+description: |-
+  The Goose command line agent and the Goose desktop app, which share one configuration
+  tree and one session store. Three things make this family awkward and all three cost
+  evidence if they are not known. The product keeps its data in three directories rather
+  than one, splitting configuration, data and state the way the freedesktop specification
+  does, so the conversations and the logs are not siblings. macOS has two trees rather than
+  one: the vendor's environment guide gives the application support directory as the macOS
+  root, while the code at the library version the lockfile pins resolves macOS to the same
+  freedesktop directories as Linux, so an upgraded machine can hold both and a recent
+  install holds only the second. And one environment variable relocates all of it at once.
 # URL prefixes that count as first party for this agent. status: verified requires the
 # source to start with one of them, because a third party who reverse-engineered a path
 # writes it down just as confidently as the vendor does and an analyst cannot tell the
@@ -26,6 +36,37 @@ references:
 - https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md
 - https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md
 - https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/recipes/session-recipes.md
+- https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/context-engineering/index.md
+- https://raw.githubusercontent.com/block/goose/main/crates/goose/src/config/paths.rs
+env_overrides:
+- name: GOOSE_PATH_ROOT
+  effect: |-
+    Moves the whole tree. config/paths.rs reads this variable first and, when it holds an absolute path, builds every directory under it as <root>/config, <root>/data, <root>/state and <root>/.agents, ignoring the platform defaults entirely. A relative value is discarded and the defaults apply, which the module has a test for. Every path in this file is then wrong by exactly one prefix, and a collection keyed on the defaults reports an agent that never ran.
+  source: https://raw.githubusercontent.com/block/goose/main/crates/goose/src/config/paths.rs
+- name: GOOSE_MOIM_MESSAGE_FILE
+  effect: |-
+    Names a file whose contents are injected into the model's working memory on every turn, anywhere on disk. It is standing instructions to the agent at a path nothing else in this catalogue records, so it is collected only if somebody reads the variable off the environment first. The vendor's own example of what belongs in it is a set of security guardrails, which makes its absence or its alteration the difference between an agent that was told not to send code off the machine and one that was not.
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md
+- name: GOOSE_MOIM_MESSAGE_TEXT
+  effect: |-
+    The same injection carried as literal text rather than as a file, concatenated with the file when both are set. There is then no file to collect at all: what the agent was told every turn exists only in the environment of the process, so look for it in shell profiles, service definitions and pipeline configuration rather than on the filesystem.
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md
+- name: CONTEXT_FILE_NAMES
+  effect: |-
+    Replaces the filenames that count as hint files. The default is the two this catalogue records and the variable takes a JSON array of any names at all, including another product's rule file. A collection that searches for the documented two then finds nothing while the agent was reading standing instructions out of a third filename on every turn.
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md
+- name: GOOSE_RECIPE_PATH
+  effect: |-
+    Additional directories recipes are read from, separated by colons on Unix and by semicolons on Windows. No default recipe directory is documented at all, so this variable is frequently the only record of where the reusable agent runs on a host actually live.
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md
+- name: GOOSE_RECIPE_GITHUB_REPO
+  effect: |-
+    A repository recipes are searched in, given as an owner and a name. A recipe that ran from there was never on the endpoint as a file, so the instruction the agent followed is in no filesystem collection and the session record is the only local trace of it.
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md
+- name: GOOSE_DISABLE_KEYRING
+  effect: |-
+    Decides whether the provider credentials exist on disk at all. Unset, the secrets are in the operating system's keyring and there is no file; set to anything, the product writes them to secrets.yaml in plain text. So this variable is what turns the credential entry in this file from something that is never there into something that is, and its presence in a profile is itself worth reporting.
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md
 artifacts:
 - id: goose.config
   category: config
@@ -37,17 +78,22 @@ artifacts:
   paths:
   - '%APPDATA%\Block\goose\config\config.yaml'
   - ~/.config/goose/config.yaml
+  - ~/Library/Application Support/Block/goose/config/config.yaml
   format: yaml
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md
   source_kind: official
+  unsourced_paths:
+  - ~/Library/Application Support/Block/goose/config/config.yaml
   volatility: Persistent until edited.
   notes: |-
     The 'extensions' block is the MCP inventory: which external tools the agent could reach, with full command lines. Provider API keys are documented as NOT belonging here (keyring is preferred) but operators often put them here anyway.
 
     Record structure: Holds provider selection, model, enabled extensions (including MCP servers and their commands/args), context strategy and memory limits. Doubles as the MCP config - there is no separate mcp.json.
+
+    The application support spelling is this product's legacy macOS tree and is collected beside the current one rather than instead of it. The reason is in this agent's description: the vendor's environment guide gives that directory as the macOS root and states that a root holds config, data and state subdirectories, while the code at the library version the lockfile pins resolves macOS to the same freedesktop directories as Linux. The leaf under the root is this catalogue's own join of the two documented facts, which is why it is marked unsourced, and an upgraded machine is the case where searching only the current tree finds nothing that is there.
   parser: yaml_generic
 - id: goose.recipes
   category: config
@@ -75,6 +121,8 @@ artifacts:
     A collection takes this and a reading of a directory tree cannot attribute it, which is worth knowing before an empty result is read as an absence. The pattern is any file of one extension in the working copy, which is what the product means by a recipe and is true. The collector can act on it because it knows where the working copies are, out of the agent's own state. The analyzer's matcher does not: it has no state file and matches below any directory, so acting on this pattern there would hand every file of that extension on the disk to this agent, and it refuses it instead.
 
         The consequence is narrow and worth stating plainly. In a bundle the file arrives with this entry's name on it, because the collector wrote the attribution into the manifest. In a directory tree or a mounted image read without one, the file is collected and reported as claimed by nothing, which is a lead somebody follows rather than an answer.
+
+    Two ways to find one after all, both added by the pass that read the vendor's own guides. The configuration file lists slash commands as a command name and the path to the recipe it runs, so config.yaml, which this catalogue already collects, names recipe files by absolute path and is the cheapest place to start. And GOOSE_RECIPE_GITHUB_REPO points recipe lookup at a remote repository, in which case the recipe that ran was never a file on this machine at all.
   parser: yaml_generic
 - id: goose.secrets
   category: credentials
@@ -86,17 +134,22 @@ artifacts:
   paths:
   - '%APPDATA%\Block\goose\config\secrets.yaml'
   - ~/.config/goose/secrets.yaml
+  - ~/Library/Application Support/Block/goose/config/secrets.yaml
   format: yaml
   sensitivity: secret
   collect_priority: normal
   status: verified
   source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/environment-variables.md
   source_kind: official
+  unsourced_paths:
+  - ~/Library/Application Support/Block/goose/config/secrets.yaml
   volatility: Persistent until edited.
   notes: |-
     Record metadata and hash only. Presence of this file (rather than keyring use) is itself notable: it means GOOSE_DISABLE_KEYRING was set, often in headless/CI or deliberately non-standard deployments.
 
     Record structure: Only present when file-based secret storage is in use, i.e. GOOSE_DISABLE_KEYRING is set. Otherwise secrets live in the OS keyring (macOS Keychain / Windows Credential Manager / libsecret) and are not in the filesystem at all.
+
+    The application support spelling is this product's legacy macOS tree and is collected beside the current one rather than instead of it. The reason is in this agent's description: the vendor's environment guide gives that directory as the macOS root and states that a root holds config, data and state subdirectories, while the code at the library version the lockfile pins resolves macOS to the same freedesktop directories as Linux. The leaf under the root is this catalogue's own join of the two documented facts, which is why it is marked unsourced, and an upgraded machine is the case where searching only the current tree finds nothing that is there.
   parser: null
 - id: goose.prompts
   category: instructions
@@ -108,17 +161,22 @@ artifacts:
   paths:
   - '%APPDATA%\Block\goose\config\prompts\'
   - ~/.config/goose/prompts/
+  - ~/Library/Application Support/Block/goose/config/prompts/
   format: text
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md
   source_kind: official
+  unsourced_paths:
+  - ~/Library/Application Support/Block/goose/config/prompts/
   volatility: Persistent until edited.
   notes: |-
     Custom prompts are where jailbreak or policy-evasion instructions are usually planted; compare mtimes against session times.
 
     Record structure: Custom prompt templates.
+
+    The application support spelling is this product's legacy macOS tree and is collected beside the current one rather than instead of it. The reason is in this agent's description: the vendor's environment guide gives that directory as the macOS root and states that a root holds config, data and state subdirectories, while the code at the library version the lockfile pins resolves macOS to the same freedesktop directories as Linux. The leaf under the root is this catalogue's own join of the two documented facts, which is why it is marked unsourced, and an upgraded machine is the case where searching only the current tree finds nothing that is there.
   parser: instructions
 - id: goose.cli_logs
   category: log
@@ -131,18 +189,27 @@ artifacts:
   - '%APPDATA%\Block\goose\data\logs\cli\'
   - ~/.local/state/goose/logs/cli/
   - ~/.local/state/goose/logs/cli/YYYY-MM-DD/
+  - ~/Library/Application Support/Block/goose/data/logs/cli/
+  - ~/Library/Application Support/Block/goose/state/logs/cli/
   format: text
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md
   source_kind: official
+  unsourced_paths:
+  - ~/Library/Application Support/Block/goose/data/logs/cli/
+  - ~/Library/Application Support/Block/goose/state/logs/cli/
   volatility: |-
     SELF-DELETING: organised into date-based subdirectories with automatic deletion of entries older than two weeks. Collect first.
   notes: |-
     Highest-volatility artifact in the Goose family. If the endpoint has been powered on for more than two weeks after the incident these are already gone.
 
     Record structure: Date-stamped subdirectories (e.g. cli/2025-11-13/). Note logs live under the XDG STATE dir (~/.local/state/goose) while sessions live under the DATA dir (~/.local/share/goose) - two different trees.
+
+    The application support spelling is this product's legacy macOS tree and is collected beside the current one rather than instead of it. The reason is in this agent's description: the vendor's environment guide gives that directory as the macOS root and states that a root holds config, data and state subdirectories, while the code at the library version the lockfile pins resolves macOS to the same freedesktop directories as Linux. The leaf under the root is this catalogue's own join of the two documented facts, which is why it is marked unsourced, and an upgraded machine is the case where searching only the current tree finds nothing that is there.
+
+    Two macOS legacy spellings rather than one, and the reason is worth stating. This file lives in the state directory on Linux, and neither the application support layout nor the Windows one has a state directory at all: the code falls back to the data directory where the platform has none, which is where the data segment in the Windows path comes from, while the vendor's environment guide says a root holds a state subdirectory. Nobody has said which of the two an upgraded macOS machine has, so both are searched. At most one of them will exist and an empty search is the cheaper failure.
   parser: text_log
 - id: goose.desktop_log
   category: log
@@ -175,17 +242,26 @@ artifacts:
   paths:
   - '%APPDATA%\Block\goose\data\logs\server\'
   - ~/.local/state/goose/logs/server/
+  - ~/Library/Application Support/Block/goose/data/logs/server/
+  - ~/Library/Application Support/Block/goose/state/logs/server/
   format: text
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/logs.md
   source_kind: official
+  unsourced_paths:
+  - ~/Library/Application Support/Block/goose/data/logs/server/
+  - ~/Library/Application Support/Block/goose/state/logs/server/
   volatility: 'SELF-DELETING: same two-week automatic cleanup as the CLI logs.'
   notes: |-
     The JSON-RPC capture is the best available record of actual MCP tool invocations and their arguments - often the only place the agent's side effects are logged verbatim. Two-week window: collect first.
 
     Record structure: Captures goosed daemon activity, JSON-RPC traffic and extension (MCP) initialisation.
+
+    The application support spelling is this product's legacy macOS tree and is collected beside the current one rather than instead of it. The reason is in this agent's description: the vendor's environment guide gives that directory as the macOS root and states that a root holds config, data and state subdirectories, while the code at the library version the lockfile pins resolves macOS to the same freedesktop directories as Linux. The leaf under the root is this catalogue's own join of the two documented facts, which is why it is marked unsourced, and an upgraded machine is the case where searching only the current tree finds nothing that is there.
+
+    Two macOS legacy spellings rather than one, and the reason is worth stating. This file lives in the state directory on Linux, and neither the application support layout nor the Windows one has a state directory at all: the code falls back to the data directory where the platform has none, which is where the data segment in the Windows path comes from, while the vendor's environment guide says a root holds a state subdirectory. Nobody has said which of the two an upgraded macOS machine has, so both are searched. At most one of them will exist and an empty search is the cheaper failure.
   parser: text_log
 - id: goose.llm_request_logs
   category: transcript
@@ -197,6 +273,8 @@ artifacts:
   paths:
   - '%APPDATA%\Block\goose\data\logs\llm_request.*.jsonl'
   - ~/.local/state/goose/logs/llm_request.*.jsonl
+  - ~/Library/Application Support/Block/goose/data/logs/llm_request.*.jsonl
+  - ~/Library/Application Support/Block/goose/state/logs/llm_request.*.jsonl
   format: jsonl
   sensitivity: normal
   collect_priority: first
@@ -205,6 +283,9 @@ artifacts:
   source_kind: official
   record_types:
   - 'one request and response per file: model configuration, input payload, response data, token usage'
+  unsourced_paths:
+  - ~/Library/Application Support/Block/goose/data/logs/llm_request.*.jsonl
+  - ~/Library/Application Support/Block/goose/state/logs/llm_request.*.jsonl
   volatility: |-
     A numbered rotation of ten. The vendor states the files keep the ten most recent completed requests, llm_request.0.jsonl through llm_request.9.jsonl, so the eleventh request back is overwritten rather than aged out. On a machine that has kept working after the incident these hold minutes rather than days.
   notes: |-
@@ -213,6 +294,10 @@ artifacts:
     It sits directly under the logs directory rather than in the cli/ or server/ subdirectory, which is why the two entries for those do not reach it: their patterns end at the subdirectory. Collect it first, because ten files is a very short window.
 
     Caution on reading it: this is what left the device. An analyst asking which data was sent to a provider can answer that question from these files and from nothing else in this family.
+
+    The application support spelling is this product's legacy macOS tree and is collected beside the current one rather than instead of it. The reason is in this agent's description: the vendor's environment guide gives that directory as the macOS root and states that a root holds config, data and state subdirectories, while the code at the library version the lockfile pins resolves macOS to the same freedesktop directories as Linux. The leaf under the root is this catalogue's own join of the two documented facts, which is why it is marked unsourced, and an upgraded machine is the case where searching only the current tree finds nothing that is there.
+
+    Two macOS legacy spellings rather than one, and the reason is worth stating. This file lives in the state directory on Linux, and neither the application support layout nor the Windows one has a state directory at all: the code falls back to the data directory where the platform has none, which is where the data segment in the Windows path comes from, while the vendor's environment guide says a root holds a state subdirectory. Nobody has said which of the two an upgraded macOS machine has, so both are searched. At most one of them will exist and an empty search is the cheaper failure.
   parser: jsonl_generic
 - id: goose.command_history
   category: prompt_history
@@ -225,6 +310,9 @@ artifacts:
   - '%APPDATA%\Block\goose\data\history.txt'
   - ~/.config/goose/history.txt
   - ~/.local/state/goose/history.txt
+  - ~/Library/Application Support/Block/goose/config/history.txt
+  - ~/Library/Application Support/Block/goose/data/history.txt
+  - ~/Library/Application Support/Block/goose/state/history.txt
   format: text
   sensitivity: normal
   collect_priority: normal
@@ -233,6 +321,10 @@ artifacts:
   source_kind: official
   record_types:
   - one typed line per entry
+  unsourced_paths:
+  - ~/Library/Application Support/Block/goose/config/history.txt
+  - ~/Library/Application Support/Block/goose/data/history.txt
+  - ~/Library/Application Support/Block/goose/state/history.txt
   volatility: |-
     Persistent across sessions by design, and no expiry is documented. Deleting a session does not touch it.
   notes: |-
@@ -240,9 +332,13 @@ artifacts:
 
     Forensically this is the prompt history of this agent and it survives the deletion of the session it belongs to, which makes it the one place a question the user asked stays after they have removed the conversation.
 
-    Three paths because the product reads two and writes one. crates/goose-cli/src/session/mod.rs sets history_file to Paths::state_dir().join('history.txt') and old_history_file to Paths::config_dir().join('history.txt'), then loads whichever of the two exists and always saves to the first. So the current Unix-like location is ~/.local/state/goose/history.txt and ~/.config/goose/history.txt is the older one, which the documentation still gives and which is still read where it exists. On Windows the state directory does not exist in the library this product builds its paths with, so state falls back to data and the one Windows path is the documented one.
+    Three current paths because the product reads two and writes one; the three legacy macOS spellings below are a separate question. crates/goose-cli/src/session/mod.rs sets history_file to Paths::state_dir().join('history.txt') and old_history_file to Paths::config_dir().join('history.txt'), then loads whichever of the two exists and always saves to the first. So the current Unix-like location is ~/.local/state/goose/history.txt and ~/.config/goose/history.txt is the older one, which the documentation still gives and which is still read where it exists. On Windows the state directory does not exist in the library this product builds its paths with, so state falls back to data and the one Windows path is the documented one.
 
     Written by rustyline, which is in the lockfile and whose API this file calls: add_history_entry while typing and save_history on exit. That library writes either plain lines or its escaped v2 format with a #V2 first line, and the reader here takes whichever the file is in.
+
+    The application support spelling is this product's legacy macOS tree and is collected beside the current one rather than instead of it. The reason is in this agent's description: the vendor's environment guide gives that directory as the macOS root and states that a root holds config, data and state subdirectories, while the code at the library version the lockfile pins resolves macOS to the same freedesktop directories as Linux. The leaf under the root is this catalogue's own join of the two documented facts, which is why it is marked unsourced, and an upgraded machine is the case where searching only the current tree finds nothing that is there.
+
+    Two macOS legacy spellings rather than one, and the reason is worth stating. This file lives in the state directory on Linux, and neither the application support layout nor the Windows one has a state directory at all: the code falls back to the data directory where the platform has none, which is where the data segment in the Windows path comes from, while the vendor's environment guide says a root holds a state subdirectory. Nobody has said which of the two an upgraded macOS machine has, so both are searched. At most one of them will exist and an empty search is the cheaper failure. This entry gets a third spelling, under config, because it already records that the product reads an older copy out of the configuration directory and writes the current one to the state directory, so a legacy tree can hold the file under either name.
   parser: prompt_history
 - id: goose.memory
   category: memory
@@ -254,17 +350,22 @@ artifacts:
   paths:
   - <project>/.goose/memory/
   - ~/.config/goose/memory/
+  - ~/Library/Application Support/Block/goose/config/memory/
   format: text
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/mcp/memory-mcp.md
   source_kind: official
+  unsourced_paths:
+  - ~/Library/Application Support/Block/goose/config/memory/
   volatility: Persists independently of sessions; not covered by session deletion.
   notes: |-
     Survives session deletion. Facts the agent chose to remember often summarise work whose transcript has since been purged - a reliable secondary source when sessions are missing.
 
     Record structure: Two scopes: global under the goose config dir, and local under .goose/memory/ in the working directory.
+
+    The application support spelling is this product's legacy macOS tree and is collected beside the current one rather than instead of it. The reason is in this agent's description: the vendor's environment guide gives that directory as the macOS root and states that a root holds config, data and state subdirectories, while the code at the library version the lockfile pins resolves macOS to the same freedesktop directories as Linux. The leaf under the root is this catalogue's own join of the two documented facts, which is why it is marked unsourced, and an upgraded machine is the case where searching only the current tree finds nothing that is there.
   parser: memory
 - id: goose.permissions
   category: permissions
@@ -277,18 +378,25 @@ artifacts:
   - '%APPDATA%\Block\goose\config\permission.yaml'
   - '%APPDATA%\Block\goose\config\permissions\tool_permissions.json'
   - ~/.config/goose/permission.yaml
+  - ~/Library/Application Support/Block/goose/config/permission.yaml
   - ~/.config/goose/permissions/tool_permissions.json
+  - ~/Library/Application Support/Block/goose/config/permissions/tool_permissions.json
   format: yaml
   sensitivity: normal
   collect_priority: normal
   status: verified
   source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/config-files.md
   source_kind: official
+  unsourced_paths:
+  - ~/Library/Application Support/Block/goose/config/permission.yaml
+  - ~/Library/Application Support/Block/goose/config/permissions/tool_permissions.json
   volatility: Persistent until edited.
   notes: |-
     Directly answers 'was the agent allowed to act without a human in the loop' - the central question in most agent-misuse investigations. A tool moved from 'ask' to 'always allow' with a recent mtime is a key finding.
 
     Record structure: permission.yaml is YAML; permissions/tool_permissions.json is JSON. Records per-tool allow/deny/ask decisions.
+
+    The application support spelling is this product's legacy macOS tree and is collected beside the current one rather than instead of it. The reason is in this agent's description: the vendor's environment guide gives that directory as the macOS root and states that a root holds config, data and state subdirectories, while the code at the library version the lockfile pins resolves macOS to the same freedesktop directories as Linux. The leaf under the root is this catalogue's own join of the two documented facts, which is why it is marked unsourced, and an upgraded machine is the case where searching only the current tree finds nothing that is there.
   parser: yaml_generic
 - id: goose.hints
   category: project_instructions
@@ -298,8 +406,13 @@ artifacts:
   - linux
   - windows
   paths:
+  - '%APPDATA%\Block\goose\config\.goosehints'
+  - <project>/**/.goosehints
+  - <project>/**/AGENTS.md
   - <project>/.goosehints
   - <project>/AGENTS.md
+  - ~/.config/goose/.goosehints
+  - ~/Library/Application Support/Block/goose/config/.goosehints
   format: text
   sensitivity: normal
   collect_priority: normal
@@ -307,11 +420,153 @@ artifacts:
   source: |-
     https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/context-engineering/using-goosehints.md
   source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Block\goose\config\.goosehints'
+  - ~/Library/Application Support/Block/goose/config/.goosehints
   volatility: Lives in the repo; recoverable from git history even when the working copy is clean.
   notes: |-
     Project-scoped standing instructions to the agent. Because they are usually committed, git history gives an authenticated timeline of who changed the agent's marching orders and when.
 
     Re-sourced by the verification pass: the page cited before lists the two filenames as the default of a context-file setting, with no directory and no statement that they are project-level. The hints guide states the project root and the per-level lookup.
+
+    Three things this entry did not have. There is a global hints file, at .goosehints in the configuration directory, which applies to every session in every directory and is untracked by any repository, so it is the copy nobody reviews. Hints are hierarchical: the product loads the configured filenames from the working directory up to the repository root, and then loads more from nested subdirectories as it reads files under them, which is how a standing instruction reaches a session from a directory a reviewer of the project root never opens. And the two filenames are not fixed. CONTEXT_FILE_NAMES, declared with this agent's other variables at the top of this file, replaces them with any JSON array of names, so a collection that searches for these two can find nothing on a host where the agent was reading its instructions out of a third.
+
+    The Windows and macOS spellings of the global file are this catalogue's join of the documented filename onto the documented configuration directory and are marked unsourced.
+  parser: instructions
+- id: goose.settings
+  category: config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\config\settings.json'
+  - <project>/.config/goose/settings.json
+  - <project>/.config/goose/settings.local.json
+  - ~/.config/goose/settings.json
+  - ~/Library/Application Support/Block/goose/config/settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/context-engineering/plugins.md
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Block\goose\config\settings.json'
+  - ~/Library/Application Support/Block/goose/config/settings.json
+  volatility: Persistent until edited. Not swept and not rotated.
+  notes: |-
+    The settings file, which this catalogue did not have at all until the pass that added the plugin and hook entries beside it. It is where plugins are switched off: disabledPlugins names the ones the product skips during discovery, so a plugin directory that is on disk and named here did not run, and one that is on disk and not named here did. That distinction is the whole question once a hook is found on a machine, and neither the plugin tree nor the session record answers it.
+
+    Three scopes, and the third is the one to look at. The vendor documents a user file, a project file that a team shares through the repository, and settings.local.json for project settings that are deliberately not shared with teammates. The last one is therefore normally untracked, which means it has no history behind it and a change to it is visible only as an mtime.
+
+    Note the directory. The project settings are under <project>/.config/goose/, not under the <project>/.goose/ that carries this product's other project state, so a collection that walks the product's own project directory does not reach them.
+
+    The Windows and macOS spellings are this catalogue's join of the documented user file onto the documented configuration directory for those platforms, so they are marked unsourced.
+  parser: json_generic
+- id: goose.skills
+  category: instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\config\skills\'
+  - '%USERPROFILE%\.agents\skills\'
+  - '%USERPROFILE%\.claude\skills\'
+  - <project>/.agents/skills/
+  - <project>/.claude/skills/
+  - <project>/.goose/skills/
+  - ~/.agents/skills/
+  - ~/.claude/skills/
+  - ~/.config/goose/skills/
+  - ~/Library/Application Support/Block/goose/config/skills/
+  format: markdown
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/context-engineering/using-skills.md
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Block\goose\config\skills\'
+  - ~/.config/goose/skills/
+  - ~/Library/Application Support/Block/goose/config/skills/
+  volatility: |-
+    Not swept. A skill installed from a plugin lives in the plugin directory instead and moves with it, so a skill can stop being at any of these paths while still being loaded.
+  notes: |-
+    A skill is a directory holding a SKILL.md with YAML frontmatter, and it enters the model's context when the agent decides it is relevant. That makes it an instruction surface that needs no user action at all, which is the property that matters here: nobody typed it and nobody approved it for that session.
+
+    The vendor documents three current locations, a global one, a project one and the ones plugins bring, and then a backward compatibility list of three more. Two of those three belong to other products, which has the consequence this catalogue keeps meeting: a skill file under another vendor's directory is not evidence that the other product ran, and a finding about this agent may have its cause in a directory nobody would think to attribute to it.
+
+    The configuration directory spellings are the vendor's phrase 'platform-specific config directories' joined onto the configuration directory documented elsewhere, so they are marked unsourced. The named ones are not.
+  parser: instructions
+- id: goose.agents
+  category: instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\Block\goose\config\agents\'
+  - '%USERPROFILE%\.agents\agents\'
+  - '%USERPROFILE%\.claude\agents\'
+  - '%USERPROFILE%\.goose\agents\'
+  - <project>/.agents/agents/
+  - <project>/.claude/agents/
+  - <project>/.goose/agents/
+  - ~/.agents/agents/
+  - ~/.claude/agents/
+  - ~/.config/goose/agents/
+  - ~/.goose/agents/
+  - ~/Library/Application Support/Block/goose/config/agents/
+  format: markdown
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/context-engineering/custom-agents.md
+  source_kind: official
+  unsourced_paths:
+  - '%APPDATA%\Block\goose\config\agents\'
+  - ~/.config/goose/agents/
+  - ~/Library/Application Support/Block/goose/config/agents/
+  volatility: Not swept. A project copy is usually committed, so git history carries its authorship and timing.
+  notes: |-
+    A custom agent is a markdown file with YAML frontmatter that the user delegates work to by name, so it is a named set of standing instructions plus whatever capability the frontmatter grants. The vendor names two current directories and then four compatibility ones, two of which are another product's, and the code confirms the shared pair: config/paths.rs builds the home directory joined with .agents and then agents or plugins.
+
+    Worth an explicit note for an investigation. The agent file is where an instruction the user never typed becomes the thing the agent was told to do, and delegation is how it reaches a session without appearing in the prompt history at all: the transcript shows a delegation by name and the words behind that name are only in this file.
+
+    ~/.agents is nobody's private directory. Several agents in this catalogue read it, so attributing a file there to one product by its path alone is wrong, and the same file may have steered more than one of them.
+  parser: instructions
+- id: goose.plugins
+  category: instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.agents\plugins\'
+  - <project>/.agents/plugins/
+  - ~/.agents/plugins/
+  format: text
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/context-engineering/hooks.md
+  source_kind: official
+  volatility: |-
+    Not swept. A plugin installed with auto-update is replaced from its git source before its skills are loaded, so the copy on disk can be newer than the one that ran and the older content exists only in that remote repository.
+  notes: |-
+    Executable content, and the highest-value entry of this group for that reason. A plugin directory may carry hooks/hooks.json, which registers commands the product runs on tool events, with a matcher regular expression deciding which tool calls they fire on. A hook can block a tool call outright, which means this is both a persistence mechanism and a control the agent's own record will not explain: the session shows a tool call that did not happen and the reason is in a JSON file somewhere else.
+
+    Where to look next once one is found. Whether it actually ran is in the settings file, which is a separate entry: a plugin named in disabledPlugins is skipped during discovery. Whether it came from outside the machine is in the plugin's own install metadata, written by the install command when the plugin was cloned from a git repository, which is also what the update command reads. A plugin copied in by hand has no such metadata and is discovered anyway.
+
+    The directory is shared with other products in this catalogue, so a plugin found there is not by itself evidence that this agent ran.
+
+    Not read as records. The tree holds JSON, markdown and shell scripts together, so it is collected whole and read as text, and the hook configuration inside it has no parser of its own yet.
   parser: instructions
 - id: goose.sessions_db
   category: transcript
@@ -380,6 +635,7 @@ artifacts:
   paths:
   - '%APPDATA%\Block\goose\data\sessions\*.jsonl'
   - ~/.local/share/goose/sessions/*.jsonl
+  - ~/Library/Application Support/Block/goose/data/sessions/*.jsonl
   format: jsonl
   sensitivity: normal
   collect_priority: normal
@@ -389,10 +645,13 @@ artifacts:
   source_kind: official
   unsourced_paths:
   - '%APPDATA%\Block\goose\data\sessions\*.jsonl'
+  - ~/Library/Application Support/Block/goose/data/sessions/*.jsonl
   volatility: |-
     Orphaned but NOT deleted. The doc states: 'Legacy .jsonl files remain on disk but are no longer managed by goose.' They therefore persist indefinitely and are never rotated, even after the SQLite import.
   notes: |-
     Forensically excellent: because goose stopped managing these files, they are a frozen snapshot of pre-1.10.0 activity that a user deleting sessions through the modern UI will NOT remove. Always collect them even when sessions.db is present.
 
     Re-sourced by the verification pass: the logs guide states the pre-1.10.0 per-session file layout and the directory it lived in. It carries no Windows path at all, so the Windows spelling is marked unsourced.
+
+    The application support spelling is this product's legacy macOS tree and is collected beside the current one rather than instead of it. The reason is in this agent's description: the vendor's environment guide gives that directory as the macOS root and states that a root holds config, data and state subdirectories, while the code at the library version the lockfile pins resolves macOS to the same freedesktop directories as Linux. The leaf under the root is this catalogue's own join of the two documented facts, which is why it is marked unsourced, and an upgraded machine is the case where searching only the current tree finds nothing that is there.
   parser: jsonl_generic

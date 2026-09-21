@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 598d9b9be0bd
+# Catalogue digest: a1a853fada8b
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -58,7 +58,6 @@
 #     cursor.project_instructions
 #     cursor.worktree_setup
 #     gemini_cli.project_config
-#     goose.hints
 #     goose.recipes
 #     junie.project_dir
 #     kilo_code.rules
@@ -142,7 +141,12 @@
 #     gemini_cli.agent_definitions
 #     gemini_cli.commands
 #     gemini_cli.policies
+#     goose.agents
+#     goose.hints
 #     goose.memory
+#     goose.plugins
+#     goose.settings
+#     goose.skills
 #     jetbrains_ai.mcp_config
 #     junie.mcp_config
 #     kilo_code.agents
@@ -802,13 +806,19 @@ sources:
     gemini_cli,gemini_cli.system_settings,C:/ProgramData/gemini-cli/system-defaults.json
     gemini_cli,gemini_cli.trusted_folders,C:/Users/*/.gemini/trustedFolders.json
     gemini_cli,gemini_cli.user_settings,C:/Users/*/.gemini/settings.json
+    goose,goose.agents,C:/Users/*/.agents/agents/**
+    goose,goose.agents,C:/Users/*/.claude/agents/**
+    goose,goose.agents,C:/Users/*/.goose/agents/**
+    goose,goose.agents,C:/Users/*/AppData/Roaming/Block/goose/config/agents/**
     goose,goose.cli_logs,C:/Users/*/AppData/Roaming/Block/goose/data/logs/cli/**
     goose,goose.command_history,C:/Users/*/AppData/Roaming/Block/goose/data/history.txt
     goose,goose.config,C:/Users/*/AppData/Roaming/Block/goose/config/config.yaml
     goose,goose.desktop_log,C:/Users/*/AppData/Roaming/Block/goose/logs/main.log
+    goose,goose.hints,C:/Users/*/AppData/Roaming/Block/goose/config/.goosehints
     goose,goose.llm_request_logs,C:/Users/*/AppData/Roaming/Block/goose/data/logs/llm_request.*.jsonl
     goose,goose.permissions,C:/Users/*/AppData/Roaming/Block/goose/config/permission.yaml
     goose,goose.permissions,C:/Users/*/AppData/Roaming/Block/goose/config/permissions/tool_permissions.json
+    goose,goose.plugins,C:/Users/*/.agents/plugins/**
     goose,goose.prompts,C:/Users/*/AppData/Roaming/Block/goose/config/prompts/**
     goose,goose.secrets,C:/Users/*/AppData/Roaming/Block/goose/config/secrets.yaml
     goose,goose.server_logs,C:/Users/*/AppData/Roaming/Block/goose/data/logs/server/**
@@ -816,6 +826,10 @@ sources:
     goose,goose.sessions_db_windows,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db-shm
     goose,goose.sessions_db_windows,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db-wal
     goose,goose.sessions_jsonl_legacy,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/*.jsonl
+    goose,goose.settings,C:/Users/*/AppData/Roaming/Block/goose/config/settings.json
+    goose,goose.skills,C:/Users/*/.agents/skills/**
+    goose,goose.skills,C:/Users/*/.claude/skills/**
+    goose,goose.skills,C:/Users/*/AppData/Roaming/Block/goose/config/skills/**
     hermes,hermes.a2a_audit,C:/Users/*/.hermes/a2a_audit.jsonl
     hermes,hermes.a2a_audit,C:/Users/*/.hermes/profiles/*/a2a_audit.jsonl
     hermes,hermes.a2a_audit,C:/Users/*/AppData/Local/hermes/a2a_audit.jsonl
@@ -3178,32 +3192,78 @@ sources:
     gemini_cli,gemini_cli.trusted_folders,/var/root/.gemini/trustedFolders.json
     gemini_cli,gemini_cli.user_settings,/Users/*/.gemini/settings.json
     gemini_cli,gemini_cli.user_settings,/var/root/.gemini/settings.json
+    goose,goose.agents,/Users/*/.agents/agents/**
+    goose,goose.agents,/Users/*/.claude/agents/**
+    goose,goose.agents,/Users/*/.config/goose/agents/**
+    goose,goose.agents,/Users/*/.goose/agents/**
+    goose,goose.agents,/Users/*/Library/Application Support/Block/goose/config/agents/**
+    goose,goose.agents,/var/root/.agents/agents/**
+    goose,goose.agents,/var/root/.claude/agents/**
+    goose,goose.agents,/var/root/.config/goose/agents/**
+    goose,goose.agents,/var/root/.goose/agents/**
+    goose,goose.agents,/var/root/Library/Application Support/Block/goose/config/agents/**
     goose,goose.cli_logs,/Users/*/.local/state/goose/logs/cli/**
     goose,goose.cli_logs,/Users/*/.local/state/goose/logs/cli/YYYY-MM-DD/**
+    goose,goose.cli_logs,/Users/*/Library/Application Support/Block/goose/data/logs/cli/**
+    goose,goose.cli_logs,/Users/*/Library/Application Support/Block/goose/state/logs/cli/**
     goose,goose.cli_logs,/var/root/.local/state/goose/logs/cli/**
     goose,goose.cli_logs,/var/root/.local/state/goose/logs/cli/YYYY-MM-DD/**
+    goose,goose.cli_logs,/var/root/Library/Application Support/Block/goose/data/logs/cli/**
+    goose,goose.cli_logs,/var/root/Library/Application Support/Block/goose/state/logs/cli/**
     goose,goose.command_history,/Users/*/.config/goose/history.txt
     goose,goose.command_history,/Users/*/.local/state/goose/history.txt
+    goose,goose.command_history,/Users/*/Library/Application Support/Block/goose/config/history.txt
+    goose,goose.command_history,/Users/*/Library/Application Support/Block/goose/data/history.txt
+    goose,goose.command_history,/Users/*/Library/Application Support/Block/goose/state/history.txt
     goose,goose.command_history,/var/root/.config/goose/history.txt
     goose,goose.command_history,/var/root/.local/state/goose/history.txt
+    goose,goose.command_history,/var/root/Library/Application Support/Block/goose/config/history.txt
+    goose,goose.command_history,/var/root/Library/Application Support/Block/goose/data/history.txt
+    goose,goose.command_history,/var/root/Library/Application Support/Block/goose/state/history.txt
     goose,goose.config,/Users/*/.config/goose/config.yaml
+    goose,goose.config,/Users/*/Library/Application Support/Block/goose/config/config.yaml
     goose,goose.config,/var/root/.config/goose/config.yaml
+    goose,goose.config,/var/root/Library/Application Support/Block/goose/config/config.yaml
     goose,goose.desktop_log,/Users/*/Library/Application Support/Goose/logs/main.log
     goose,goose.desktop_log,/var/root/Library/Application Support/Goose/logs/main.log
+    goose,goose.hints,/Users/*/.config/goose/.goosehints
+    goose,goose.hints,/Users/*/Library/Application Support/Block/goose/config/.goosehints
+    goose,goose.hints,/var/root/.config/goose/.goosehints
+    goose,goose.hints,/var/root/Library/Application Support/Block/goose/config/.goosehints
     goose,goose.llm_request_logs,/Users/*/.local/state/goose/logs/llm_request.*.jsonl
+    goose,goose.llm_request_logs,/Users/*/Library/Application Support/Block/goose/data/logs/llm_request.*.jsonl
+    goose,goose.llm_request_logs,/Users/*/Library/Application Support/Block/goose/state/logs/llm_request.*.jsonl
     goose,goose.llm_request_logs,/var/root/.local/state/goose/logs/llm_request.*.jsonl
+    goose,goose.llm_request_logs,/var/root/Library/Application Support/Block/goose/data/logs/llm_request.*.jsonl
+    goose,goose.llm_request_logs,/var/root/Library/Application Support/Block/goose/state/logs/llm_request.*.jsonl
     goose,goose.memory,/Users/*/.config/goose/memory/**
+    goose,goose.memory,/Users/*/Library/Application Support/Block/goose/config/memory/**
     goose,goose.memory,/var/root/.config/goose/memory/**
+    goose,goose.memory,/var/root/Library/Application Support/Block/goose/config/memory/**
     goose,goose.permissions,/Users/*/.config/goose/permission.yaml
     goose,goose.permissions,/Users/*/.config/goose/permissions/tool_permissions.json
+    goose,goose.permissions,/Users/*/Library/Application Support/Block/goose/config/permission.yaml
+    goose,goose.permissions,/Users/*/Library/Application Support/Block/goose/config/permissions/tool_permissions.json
     goose,goose.permissions,/var/root/.config/goose/permission.yaml
     goose,goose.permissions,/var/root/.config/goose/permissions/tool_permissions.json
+    goose,goose.permissions,/var/root/Library/Application Support/Block/goose/config/permission.yaml
+    goose,goose.permissions,/var/root/Library/Application Support/Block/goose/config/permissions/tool_permissions.json
+    goose,goose.plugins,/Users/*/.agents/plugins/**
+    goose,goose.plugins,/var/root/.agents/plugins/**
     goose,goose.prompts,/Users/*/.config/goose/prompts/**
+    goose,goose.prompts,/Users/*/Library/Application Support/Block/goose/config/prompts/**
     goose,goose.prompts,/var/root/.config/goose/prompts/**
+    goose,goose.prompts,/var/root/Library/Application Support/Block/goose/config/prompts/**
     goose,goose.secrets,/Users/*/.config/goose/secrets.yaml
+    goose,goose.secrets,/Users/*/Library/Application Support/Block/goose/config/secrets.yaml
     goose,goose.secrets,/var/root/.config/goose/secrets.yaml
+    goose,goose.secrets,/var/root/Library/Application Support/Block/goose/config/secrets.yaml
     goose,goose.server_logs,/Users/*/.local/state/goose/logs/server/**
+    goose,goose.server_logs,/Users/*/Library/Application Support/Block/goose/data/logs/server/**
+    goose,goose.server_logs,/Users/*/Library/Application Support/Block/goose/state/logs/server/**
     goose,goose.server_logs,/var/root/.local/state/goose/logs/server/**
+    goose,goose.server_logs,/var/root/Library/Application Support/Block/goose/data/logs/server/**
+    goose,goose.server_logs,/var/root/Library/Application Support/Block/goose/state/logs/server/**
     goose,goose.sessions_db,/Users/*/.local/share/goose/sessions/sessions.db
     goose,goose.sessions_db,/Users/*/.local/share/goose/sessions/sessions.db-shm
     goose,goose.sessions_db,/Users/*/.local/share/goose/sessions/sessions.db-wal
@@ -3217,7 +3277,21 @@ sources:
     goose,goose.sessions_db,/var/root/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
     goose,goose.sessions_db,/var/root/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
     goose,goose.sessions_jsonl_legacy,/Users/*/.local/share/goose/sessions/*.jsonl
+    goose,goose.sessions_jsonl_legacy,/Users/*/Library/Application Support/Block/goose/data/sessions/*.jsonl
     goose,goose.sessions_jsonl_legacy,/var/root/.local/share/goose/sessions/*.jsonl
+    goose,goose.sessions_jsonl_legacy,/var/root/Library/Application Support/Block/goose/data/sessions/*.jsonl
+    goose,goose.settings,/Users/*/.config/goose/settings.json
+    goose,goose.settings,/Users/*/Library/Application Support/Block/goose/config/settings.json
+    goose,goose.settings,/var/root/.config/goose/settings.json
+    goose,goose.settings,/var/root/Library/Application Support/Block/goose/config/settings.json
+    goose,goose.skills,/Users/*/.agents/skills/**
+    goose,goose.skills,/Users/*/.claude/skills/**
+    goose,goose.skills,/Users/*/.config/goose/skills/**
+    goose,goose.skills,/Users/*/Library/Application Support/Block/goose/config/skills/**
+    goose,goose.skills,/var/root/.agents/skills/**
+    goose,goose.skills,/var/root/.claude/skills/**
+    goose,goose.skills,/var/root/.config/goose/skills/**
+    goose,goose.skills,/var/root/Library/Application Support/Block/goose/config/skills/**
     hermes,hermes.a2a_audit,/Users/*/.hermes/a2a_audit.jsonl
     hermes,hermes.a2a_audit,/Users/*/.hermes/profiles/*/a2a_audit.jsonl
     hermes,hermes.a2a_audit,/var/root/.hermes/a2a_audit.jsonl
@@ -6173,30 +6247,76 @@ sources:
     gemini_cli,gemini_cli.trusted_folders,/root/.gemini/trustedFolders.json
     gemini_cli,gemini_cli.user_settings,/home/*/.gemini/settings.json
     gemini_cli,gemini_cli.user_settings,/root/.gemini/settings.json
+    goose,goose.agents,/home/*/.agents/agents/**
+    goose,goose.agents,/home/*/.claude/agents/**
+    goose,goose.agents,/home/*/.config/goose/agents/**
+    goose,goose.agents,/home/*/.goose/agents/**
+    goose,goose.agents,/home/*/Library/Application Support/Block/goose/config/agents/**
+    goose,goose.agents,/root/.agents/agents/**
+    goose,goose.agents,/root/.claude/agents/**
+    goose,goose.agents,/root/.config/goose/agents/**
+    goose,goose.agents,/root/.goose/agents/**
+    goose,goose.agents,/root/Library/Application Support/Block/goose/config/agents/**
     goose,goose.cli_logs,/home/*/.local/state/goose/logs/cli/**
     goose,goose.cli_logs,/home/*/.local/state/goose/logs/cli/YYYY-MM-DD/**
+    goose,goose.cli_logs,/home/*/Library/Application Support/Block/goose/data/logs/cli/**
+    goose,goose.cli_logs,/home/*/Library/Application Support/Block/goose/state/logs/cli/**
     goose,goose.cli_logs,/root/.local/state/goose/logs/cli/**
     goose,goose.cli_logs,/root/.local/state/goose/logs/cli/YYYY-MM-DD/**
+    goose,goose.cli_logs,/root/Library/Application Support/Block/goose/data/logs/cli/**
+    goose,goose.cli_logs,/root/Library/Application Support/Block/goose/state/logs/cli/**
     goose,goose.command_history,/home/*/.config/goose/history.txt
     goose,goose.command_history,/home/*/.local/state/goose/history.txt
+    goose,goose.command_history,/home/*/Library/Application Support/Block/goose/config/history.txt
+    goose,goose.command_history,/home/*/Library/Application Support/Block/goose/data/history.txt
+    goose,goose.command_history,/home/*/Library/Application Support/Block/goose/state/history.txt
     goose,goose.command_history,/root/.config/goose/history.txt
     goose,goose.command_history,/root/.local/state/goose/history.txt
+    goose,goose.command_history,/root/Library/Application Support/Block/goose/config/history.txt
+    goose,goose.command_history,/root/Library/Application Support/Block/goose/data/history.txt
+    goose,goose.command_history,/root/Library/Application Support/Block/goose/state/history.txt
     goose,goose.config,/home/*/.config/goose/config.yaml
+    goose,goose.config,/home/*/Library/Application Support/Block/goose/config/config.yaml
     goose,goose.config,/root/.config/goose/config.yaml
+    goose,goose.config,/root/Library/Application Support/Block/goose/config/config.yaml
+    goose,goose.hints,/home/*/.config/goose/.goosehints
+    goose,goose.hints,/home/*/Library/Application Support/Block/goose/config/.goosehints
+    goose,goose.hints,/root/.config/goose/.goosehints
+    goose,goose.hints,/root/Library/Application Support/Block/goose/config/.goosehints
     goose,goose.llm_request_logs,/home/*/.local/state/goose/logs/llm_request.*.jsonl
+    goose,goose.llm_request_logs,/home/*/Library/Application Support/Block/goose/data/logs/llm_request.*.jsonl
+    goose,goose.llm_request_logs,/home/*/Library/Application Support/Block/goose/state/logs/llm_request.*.jsonl
     goose,goose.llm_request_logs,/root/.local/state/goose/logs/llm_request.*.jsonl
+    goose,goose.llm_request_logs,/root/Library/Application Support/Block/goose/data/logs/llm_request.*.jsonl
+    goose,goose.llm_request_logs,/root/Library/Application Support/Block/goose/state/logs/llm_request.*.jsonl
     goose,goose.memory,/home/*/.config/goose/memory/**
+    goose,goose.memory,/home/*/Library/Application Support/Block/goose/config/memory/**
     goose,goose.memory,/root/.config/goose/memory/**
+    goose,goose.memory,/root/Library/Application Support/Block/goose/config/memory/**
     goose,goose.permissions,/home/*/.config/goose/permission.yaml
     goose,goose.permissions,/home/*/.config/goose/permissions/tool_permissions.json
+    goose,goose.permissions,/home/*/Library/Application Support/Block/goose/config/permission.yaml
+    goose,goose.permissions,/home/*/Library/Application Support/Block/goose/config/permissions/tool_permissions.json
     goose,goose.permissions,/root/.config/goose/permission.yaml
     goose,goose.permissions,/root/.config/goose/permissions/tool_permissions.json
+    goose,goose.permissions,/root/Library/Application Support/Block/goose/config/permission.yaml
+    goose,goose.permissions,/root/Library/Application Support/Block/goose/config/permissions/tool_permissions.json
+    goose,goose.plugins,/home/*/.agents/plugins/**
+    goose,goose.plugins,/root/.agents/plugins/**
     goose,goose.prompts,/home/*/.config/goose/prompts/**
+    goose,goose.prompts,/home/*/Library/Application Support/Block/goose/config/prompts/**
     goose,goose.prompts,/root/.config/goose/prompts/**
+    goose,goose.prompts,/root/Library/Application Support/Block/goose/config/prompts/**
     goose,goose.secrets,/home/*/.config/goose/secrets.yaml
+    goose,goose.secrets,/home/*/Library/Application Support/Block/goose/config/secrets.yaml
     goose,goose.secrets,/root/.config/goose/secrets.yaml
+    goose,goose.secrets,/root/Library/Application Support/Block/goose/config/secrets.yaml
     goose,goose.server_logs,/home/*/.local/state/goose/logs/server/**
+    goose,goose.server_logs,/home/*/Library/Application Support/Block/goose/data/logs/server/**
+    goose,goose.server_logs,/home/*/Library/Application Support/Block/goose/state/logs/server/**
     goose,goose.server_logs,/root/.local/state/goose/logs/server/**
+    goose,goose.server_logs,/root/Library/Application Support/Block/goose/data/logs/server/**
+    goose,goose.server_logs,/root/Library/Application Support/Block/goose/state/logs/server/**
     goose,goose.sessions_db,/home/*/.local/share/goose/sessions/sessions.db
     goose,goose.sessions_db,/home/*/.local/share/goose/sessions/sessions.db-shm
     goose,goose.sessions_db,/home/*/.local/share/goose/sessions/sessions.db-wal
@@ -6210,7 +6330,21 @@ sources:
     goose,goose.sessions_db,/root/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
     goose,goose.sessions_db,/root/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
     goose,goose.sessions_jsonl_legacy,/home/*/.local/share/goose/sessions/*.jsonl
+    goose,goose.sessions_jsonl_legacy,/home/*/Library/Application Support/Block/goose/data/sessions/*.jsonl
     goose,goose.sessions_jsonl_legacy,/root/.local/share/goose/sessions/*.jsonl
+    goose,goose.sessions_jsonl_legacy,/root/Library/Application Support/Block/goose/data/sessions/*.jsonl
+    goose,goose.settings,/home/*/.config/goose/settings.json
+    goose,goose.settings,/home/*/Library/Application Support/Block/goose/config/settings.json
+    goose,goose.settings,/root/.config/goose/settings.json
+    goose,goose.settings,/root/Library/Application Support/Block/goose/config/settings.json
+    goose,goose.skills,/home/*/.agents/skills/**
+    goose,goose.skills,/home/*/.claude/skills/**
+    goose,goose.skills,/home/*/.config/goose/skills/**
+    goose,goose.skills,/home/*/Library/Application Support/Block/goose/config/skills/**
+    goose,goose.skills,/root/.agents/skills/**
+    goose,goose.skills,/root/.claude/skills/**
+    goose,goose.skills,/root/.config/goose/skills/**
+    goose,goose.skills,/root/Library/Application Support/Block/goose/config/skills/**
     hermes,hermes.a2a_audit,/home/*/.hermes/a2a_audit.jsonl
     hermes,hermes.a2a_audit,/home/*/.hermes/profiles/*/a2a_audit.jsonl
     hermes,hermes.a2a_audit,/root/.hermes/a2a_audit.jsonl

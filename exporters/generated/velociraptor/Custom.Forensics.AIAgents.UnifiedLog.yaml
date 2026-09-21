@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 598d9b9be0bd
+# Catalogue digest: a1a853fada8b
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -9,7 +9,7 @@
 # relocation variables and the agents' own state files, which no static rule can.
 #
 # Scope: the 106 artifacts the catalogue files under transcript and prompt_history.
-# The other 499 are configuration, credentials, caches, logs and install
+# The other 503 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
 # credential store what an analyst wants is the file, which is what the Collect
@@ -1191,10 +1191,20 @@ sources:
       gemini_cli,gemini_cli.prompt_history_log,file_only,/var/root/.gemini/tmp/*/logs.json
       goose,goose.command_history,file_only,/Users/*/.config/goose/history.txt
       goose,goose.command_history,file_only,/Users/*/.local/state/goose/history.txt
+      goose,goose.command_history,file_only,/Users/*/Library/Application Support/Block/goose/config/history.txt
+      goose,goose.command_history,file_only,/Users/*/Library/Application Support/Block/goose/data/history.txt
+      goose,goose.command_history,file_only,/Users/*/Library/Application Support/Block/goose/state/history.txt
       goose,goose.command_history,file_only,/var/root/.config/goose/history.txt
       goose,goose.command_history,file_only,/var/root/.local/state/goose/history.txt
+      goose,goose.command_history,file_only,/var/root/Library/Application Support/Block/goose/config/history.txt
+      goose,goose.command_history,file_only,/var/root/Library/Application Support/Block/goose/data/history.txt
+      goose,goose.command_history,file_only,/var/root/Library/Application Support/Block/goose/state/history.txt
       goose,goose.llm_request_logs,generic_jsonl,/Users/*/.local/state/goose/logs/llm_request.*.jsonl
+      goose,goose.llm_request_logs,generic_jsonl,/Users/*/Library/Application Support/Block/goose/data/logs/llm_request.*.jsonl
+      goose,goose.llm_request_logs,generic_jsonl,/Users/*/Library/Application Support/Block/goose/state/logs/llm_request.*.jsonl
       goose,goose.llm_request_logs,generic_jsonl,/var/root/.local/state/goose/logs/llm_request.*.jsonl
+      goose,goose.llm_request_logs,generic_jsonl,/var/root/Library/Application Support/Block/goose/data/logs/llm_request.*.jsonl
+      goose,goose.llm_request_logs,generic_jsonl,/var/root/Library/Application Support/Block/goose/state/logs/llm_request.*.jsonl
       goose,goose.sessions_db,file_only,/Users/*/.local/share/goose/sessions/sessions.db
       goose,goose.sessions_db,file_only,/Users/*/.local/share/goose/sessions/sessions.db-shm
       goose,goose.sessions_db,file_only,/Users/*/.local/share/goose/sessions/sessions.db-wal
@@ -1208,7 +1218,9 @@ sources:
       goose,goose.sessions_db,file_only,/var/root/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
       goose,goose.sessions_db,file_only,/var/root/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
       goose,goose.sessions_jsonl_legacy,generic_jsonl,/Users/*/.local/share/goose/sessions/*.jsonl
+      goose,goose.sessions_jsonl_legacy,generic_jsonl,/Users/*/Library/Application Support/Block/goose/data/sessions/*.jsonl
       goose,goose.sessions_jsonl_legacy,generic_jsonl,/var/root/.local/share/goose/sessions/*.jsonl
+      goose,goose.sessions_jsonl_legacy,generic_jsonl,/var/root/Library/Application Support/Block/goose/data/sessions/*.jsonl
       hermes,hermes.a2a_conversations,generic_jsonl,/Users/*/.hermes/a2a_conversations/*.jsonl
       hermes,hermes.a2a_conversations,generic_jsonl,/Users/*/.hermes/profiles/*/a2a_conversations/*.jsonl
       hermes,hermes.a2a_conversations,generic_jsonl,/var/root/.hermes/a2a_conversations/*.jsonl
@@ -2211,10 +2223,20 @@ sources:
       gemini_cli,gemini_cli.prompt_history_log,file_only,/root/.gemini/tmp/*/logs.json
       goose,goose.command_history,file_only,/home/*/.config/goose/history.txt
       goose,goose.command_history,file_only,/home/*/.local/state/goose/history.txt
+      goose,goose.command_history,file_only,/home/*/Library/Application Support/Block/goose/config/history.txt
+      goose,goose.command_history,file_only,/home/*/Library/Application Support/Block/goose/data/history.txt
+      goose,goose.command_history,file_only,/home/*/Library/Application Support/Block/goose/state/history.txt
       goose,goose.command_history,file_only,/root/.config/goose/history.txt
       goose,goose.command_history,file_only,/root/.local/state/goose/history.txt
+      goose,goose.command_history,file_only,/root/Library/Application Support/Block/goose/config/history.txt
+      goose,goose.command_history,file_only,/root/Library/Application Support/Block/goose/data/history.txt
+      goose,goose.command_history,file_only,/root/Library/Application Support/Block/goose/state/history.txt
       goose,goose.llm_request_logs,generic_jsonl,/home/*/.local/state/goose/logs/llm_request.*.jsonl
+      goose,goose.llm_request_logs,generic_jsonl,/home/*/Library/Application Support/Block/goose/data/logs/llm_request.*.jsonl
+      goose,goose.llm_request_logs,generic_jsonl,/home/*/Library/Application Support/Block/goose/state/logs/llm_request.*.jsonl
       goose,goose.llm_request_logs,generic_jsonl,/root/.local/state/goose/logs/llm_request.*.jsonl
+      goose,goose.llm_request_logs,generic_jsonl,/root/Library/Application Support/Block/goose/data/logs/llm_request.*.jsonl
+      goose,goose.llm_request_logs,generic_jsonl,/root/Library/Application Support/Block/goose/state/logs/llm_request.*.jsonl
       goose,goose.sessions_db,file_only,/home/*/.local/share/goose/sessions/sessions.db
       goose,goose.sessions_db,file_only,/home/*/.local/share/goose/sessions/sessions.db-shm
       goose,goose.sessions_db,file_only,/home/*/.local/share/goose/sessions/sessions.db-wal
@@ -2228,7 +2250,9 @@ sources:
       goose,goose.sessions_db,file_only,/root/Library/Application Support/Block/goose/data/sessions/sessions.db-shm
       goose,goose.sessions_db,file_only,/root/Library/Application Support/Block/goose/data/sessions/sessions.db-wal
       goose,goose.sessions_jsonl_legacy,generic_jsonl,/home/*/.local/share/goose/sessions/*.jsonl
+      goose,goose.sessions_jsonl_legacy,generic_jsonl,/home/*/Library/Application Support/Block/goose/data/sessions/*.jsonl
       goose,goose.sessions_jsonl_legacy,generic_jsonl,/root/.local/share/goose/sessions/*.jsonl
+      goose,goose.sessions_jsonl_legacy,generic_jsonl,/root/Library/Application Support/Block/goose/data/sessions/*.jsonl
       hermes,hermes.a2a_conversations,generic_jsonl,/home/*/.hermes/a2a_conversations/*.jsonl
       hermes,hermes.a2a_conversations,generic_jsonl,/home/*/.hermes/profiles/*/a2a_conversations/*.jsonl
       hermes,hermes.a2a_conversations,generic_jsonl,/root/.hermes/a2a_conversations/*.jsonl

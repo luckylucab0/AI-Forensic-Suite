@@ -6528,6 +6528,33 @@ EMBEDDED_CATALOGUE_JSON = r"""
             "agent": "goose",
             "artifacts": [
                 {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "goose.agents",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\config\\agents\\",
+                        "%USERPROFILE%\\.agents\\agents\\",
+                        "%USERPROFILE%\\.claude\\agents\\",
+                        "%USERPROFILE%\\.goose\\agents\\",
+                        "<project>/.agents/agents/",
+                        "<project>/.claude/agents/",
+                        "<project>/.goose/agents/",
+                        "~/.agents/agents/",
+                        "~/.claude/agents/",
+                        "~/.config/goose/agents/",
+                        "~/.goose/agents/",
+                        "~/Library/Application Support/Block/goose/config/agents/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "log",
                     "collect_priority": "normal",
                     "id": "goose.cli_logs",
@@ -6539,7 +6566,9 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "%APPDATA%\\Block\\goose\\data\\logs\\cli\\",
                         "~/.local/state/goose/logs/cli/",
-                        "~/.local/state/goose/logs/cli/YYYY-MM-DD/"
+                        "~/.local/state/goose/logs/cli/YYYY-MM-DD/",
+                        "~/Library/Application Support/Block/goose/data/logs/cli/",
+                        "~/Library/Application Support/Block/goose/state/logs/cli/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6557,7 +6586,10 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "paths": [
                         "%APPDATA%\\Block\\goose\\data\\history.txt",
                         "~/.config/goose/history.txt",
-                        "~/.local/state/goose/history.txt"
+                        "~/.local/state/goose/history.txt",
+                        "~/Library/Application Support/Block/goose/config/history.txt",
+                        "~/Library/Application Support/Block/goose/data/history.txt",
+                        "~/Library/Application Support/Block/goose/state/history.txt"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6574,7 +6606,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "%APPDATA%\\Block\\goose\\config\\config.yaml",
-                        "~/.config/goose/config.yaml"
+                        "~/.config/goose/config.yaml",
+                        "~/Library/Application Support/Block/goose/config/config.yaml"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6606,8 +6639,13 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
+                        "%APPDATA%\\Block\\goose\\config\\.goosehints",
+                        "<project>/**/.goosehints",
+                        "<project>/**/AGENTS.md",
                         "<project>/.goosehints",
-                        "<project>/AGENTS.md"
+                        "<project>/AGENTS.md",
+                        "~/.config/goose/.goosehints",
+                        "~/Library/Application Support/Block/goose/config/.goosehints"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -6624,7 +6662,9 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "%APPDATA%\\Block\\goose\\data\\logs\\llm_request.*.jsonl",
-                        "~/.local/state/goose/logs/llm_request.*.jsonl"
+                        "~/.local/state/goose/logs/llm_request.*.jsonl",
+                        "~/Library/Application Support/Block/goose/data/logs/llm_request.*.jsonl",
+                        "~/Library/Application Support/Block/goose/state/logs/llm_request.*.jsonl"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6641,7 +6681,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "<project>/.goose/memory/",
-                        "~/.config/goose/memory/"
+                        "~/.config/goose/memory/",
+                        "~/Library/Application Support/Block/goose/config/memory/"
                     ],
                     "root": "project",
                     "sensitivity": "normal",
@@ -6660,9 +6701,29 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "%APPDATA%\\Block\\goose\\config\\permission.yaml",
                         "%APPDATA%\\Block\\goose\\config\\permissions\\tool_permissions.json",
                         "~/.config/goose/permission.yaml",
-                        "~/.config/goose/permissions/tool_permissions.json"
+                        "~/Library/Application Support/Block/goose/config/permission.yaml",
+                        "~/.config/goose/permissions/tool_permissions.json",
+                        "~/Library/Application Support/Block/goose/config/permissions/tool_permissions.json"
                     ],
                     "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "goose.plugins",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.agents\\plugins\\",
+                        "<project>/.agents/plugins/",
+                        "~/.agents/plugins/"
+                    ],
+                    "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -6677,7 +6738,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "%APPDATA%\\Block\\goose\\config\\prompts\\",
-                        "~/.config/goose/prompts/"
+                        "~/.config/goose/prompts/",
+                        "~/Library/Application Support/Block/goose/config/prompts/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6710,7 +6772,8 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "%APPDATA%\\Block\\goose\\config\\secrets.yaml",
-                        "~/.config/goose/secrets.yaml"
+                        "~/.config/goose/secrets.yaml",
+                        "~/Library/Application Support/Block/goose/config/secrets.yaml"
                     ],
                     "root": "user_profile",
                     "sensitivity": "secret",
@@ -6727,7 +6790,9 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "%APPDATA%\\Block\\goose\\data\\logs\\server\\",
-                        "~/.local/state/goose/logs/server/"
+                        "~/.local/state/goose/logs/server/",
+                        "~/Library/Application Support/Block/goose/data/logs/server/",
+                        "~/Library/Application Support/Block/goose/state/logs/server/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6780,9 +6845,55 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "paths": [
                         "%APPDATA%\\Block\\goose\\data\\sessions\\*.jsonl",
-                        "~/.local/share/goose/sessions/*.jsonl"
+                        "~/.local/share/goose/sessions/*.jsonl",
+                        "~/Library/Application Support/Block/goose/data/sessions/*.jsonl"
                     ],
                     "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "goose.settings",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\config\\settings.json",
+                        "<project>/.config/goose/settings.json",
+                        "<project>/.config/goose/settings.local.json",
+                        "~/.config/goose/settings.json",
+                        "~/Library/Application Support/Block/goose/config/settings.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "goose.skills",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Block\\goose\\config\\skills\\",
+                        "%USERPROFILE%\\.agents\\skills\\",
+                        "%USERPROFILE%\\.claude\\skills\\",
+                        "<project>/.agents/skills/",
+                        "<project>/.claude/skills/",
+                        "<project>/.goose/skills/",
+                        "~/.agents/skills/",
+                        "~/.claude/skills/",
+                        "~/.config/goose/skills/",
+                        "~/Library/Application Support/Block/goose/config/skills/"
+                    ],
+                    "root": "project",
                     "sensitivity": "normal",
                     "status": "verified"
                 }
@@ -11995,7 +12106,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "b3fea0e5c4c7b513c92fd13eb3c1ec7b46a63bee0b4df6484480eada69132f76"
+    "sha256": "f1ecc683bb25bb2e3ac44953bbf2bc3107b2b02c1afa7e05194b25155b5b7298"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

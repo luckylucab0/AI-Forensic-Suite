@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 598d9b9be0bd
+# Catalogue digest: a1a853fada8b
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -67,7 +67,6 @@
 #     cursor.project_instructions
 #     cursor.worktree_setup
 #     gemini_cli.project_config
-#     goose.hints
 #     goose.recipes
 #     junie.project_dir
 #     kilo_code.rules
@@ -141,6 +140,11 @@
 #     gemini_cli.agent_definitions
 #     gemini_cli.commands
 #     gemini_cli.policies
+#     goose.agents
+#     goose.hints
+#     goose.plugins
+#     goose.settings
+#     goose.skills
 #     jetbrains_ai.mcp_config
 #     junie.mcp_config
 #     kilo_code.agents
@@ -704,13 +708,19 @@ $targets = @(
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.system_settings'; Path = 'C:\ProgramData\gemini-cli\system-defaults.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.trusted_folders'; Path = '$profile\.gemini\trustedFolders.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.user_settings'; Path = '$profile\.gemini\settings.json' }
+    @{ Agent = 'goose'; Id = 'goose.agents'; Path = '$profile\.agents\agents' }
+    @{ Agent = 'goose'; Id = 'goose.agents'; Path = '$profile\.claude\agents' }
+    @{ Agent = 'goose'; Id = 'goose.agents'; Path = '$profile\.goose\agents' }
+    @{ Agent = 'goose'; Id = 'goose.agents'; Path = '$profile\AppData\Roaming\Block\goose\config\agents' }
     @{ Agent = 'goose'; Id = 'goose.cli_logs'; Path = '$profile\AppData\Roaming\Block\goose\data\logs\cli' }
     @{ Agent = 'goose'; Id = 'goose.command_history'; Path = '$profile\AppData\Roaming\Block\goose\data\history.txt' }
     @{ Agent = 'goose'; Id = 'goose.config'; Path = '$profile\AppData\Roaming\Block\goose\config\config.yaml' }
     @{ Agent = 'goose'; Id = 'goose.desktop_log'; Path = '$profile\AppData\Roaming\Block\goose\logs\main.log' }
+    @{ Agent = 'goose'; Id = 'goose.hints'; Path = '$profile\AppData\Roaming\Block\goose\config\.goosehints' }
     @{ Agent = 'goose'; Id = 'goose.llm_request_logs'; Path = '$profile\AppData\Roaming\Block\goose\data\logs\llm_request.' }
     @{ Agent = 'goose'; Id = 'goose.permissions'; Path = '$profile\AppData\Roaming\Block\goose\config\permission.yaml' }
     @{ Agent = 'goose'; Id = 'goose.permissions'; Path = '$profile\AppData\Roaming\Block\goose\config\permissions\tool_permissions.json' }
+    @{ Agent = 'goose'; Id = 'goose.plugins'; Path = '$profile\.agents\plugins' }
     @{ Agent = 'goose'; Id = 'goose.prompts'; Path = '$profile\AppData\Roaming\Block\goose\config\prompts' }
     @{ Agent = 'goose'; Id = 'goose.secrets'; Path = '$profile\AppData\Roaming\Block\goose\config\secrets.yaml' }
     @{ Agent = 'goose'; Id = 'goose.server_logs'; Path = '$profile\AppData\Roaming\Block\goose\data\logs\server' }
@@ -718,6 +728,10 @@ $targets = @(
     @{ Agent = 'goose'; Id = 'goose.sessions_db_windows'; Path = '$profile\AppData\Roaming\Block\goose\data\sessions\sessions.db-shm' }
     @{ Agent = 'goose'; Id = 'goose.sessions_db_windows'; Path = '$profile\AppData\Roaming\Block\goose\data\sessions\sessions.db-wal' }
     @{ Agent = 'goose'; Id = 'goose.sessions_jsonl_legacy'; Path = '$profile\AppData\Roaming\Block\goose\data\sessions' }
+    @{ Agent = 'goose'; Id = 'goose.settings'; Path = '$profile\AppData\Roaming\Block\goose\config\settings.json' }
+    @{ Agent = 'goose'; Id = 'goose.skills'; Path = '$profile\.agents\skills' }
+    @{ Agent = 'goose'; Id = 'goose.skills'; Path = '$profile\.claude\skills' }
+    @{ Agent = 'goose'; Id = 'goose.skills'; Path = '$profile\AppData\Roaming\Block\goose\config\skills' }
     @{ Agent = 'hermes'; Id = 'hermes.a2a_audit'; Path = '$profile\.hermes\a2a_audit.jsonl' }
     @{ Agent = 'hermes'; Id = 'hermes.a2a_audit'; Path = '$profile\.hermes\profiles' }
     @{ Agent = 'hermes'; Id = 'hermes.a2a_audit'; Path = '$profile\AppData\Local\hermes\a2a_audit.jsonl' }
