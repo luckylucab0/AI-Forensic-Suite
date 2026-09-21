@@ -6138,6 +6138,8 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "%USERPROFILE%\\.factory\\settings.json",
+                        "<project>/**/.factory/settings.json",
+                        "<project>/**/.factory/settings.local.json",
                         "<project>/.factory/settings.json",
                         "<project>/.factory/settings.local.json",
                         "~/.factory/config.json",
@@ -6166,6 +6168,24 @@ $EmbeddedCatalogueJson = @'
                     "status": "unverified"
                 },
                 {
+                    "category": "permissions",
+                    "collect_priority": "durable",
+                    "id": "factory_droid.managed_settings",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "C:\\Program Files\\Factory\\settings.json",
+                        "/Library/Application Support/Factory/settings.json",
+                        "/etc/factory/settings.json"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "mcp_config",
                     "collect_priority": "normal",
                     "id": "factory_droid.mcp_and_hooks",
@@ -6175,8 +6195,8 @@ $EmbeddedCatalogueJson = @'
                         "windows"
                     ],
                     "paths": [
+                        "<project>/**/.factory/mcp.json",
                         "<project>/.factory/mcp.json",
-                        "<project>/<folder>/.factory/mcp.json",
                         "~/.factory/hooks.json",
                         "~/.factory/mcp.json"
                     ],
@@ -6196,6 +6216,7 @@ $EmbeddedCatalogueJson = @'
                     "paths": [
                         "~/.factory/output-styles/*.md",
                         "%USERPROFILE%\\.factory\\output-styles\\*.md",
+                        "<project>/**/.factory/output-styles/*.md",
                         "<project>/.factory/output-styles/*.md"
                     ],
                     "root": "project",
@@ -6231,8 +6252,16 @@ $EmbeddedCatalogueJson = @'
                         "windows"
                     ],
                     "paths": [
+                        "<project>/**/.factory/commands/",
+                        "<project>/**/.factory/skills/",
+                        "<project>/.agent/skills/**/SKILL.md",
+                        "<project>/.agents/skills/**/SKILL.md",
                         "<project>/.claude/agents/*.md",
+                        "<project>/.factory/commands/",
+                        "<project>/.factory/skills/",
                         "<project>/AGENTS.md",
+                        "~/.agent/skills/**/SKILL.md",
+                        "~/.agents/skills/**/SKILL.md",
                         "~/.claude/agents/*.md",
                         "~/.factory/commands/",
                         "~/.factory/droids/",
@@ -12428,7 +12457,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "c50c8303f918bf7fd8520df9cb13f191bda5c7970122c70549f0041e9520fdd3"
+    "sha256": "3b6f56f91459658b64c8d77a9be3608caca5eb4e842553660a8e221208f4b9c0"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 5a705decad88
+# Catalogue digest: b550d61b348f
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -86,6 +86,7 @@
 #     claude_desktop.org_plugins
 #     cursor.retrieval_index
 #     cursor.worker_data
+#     factory_droid.managed_settings
 #     goose.memory
 #     kiro.managed_settings
 #     opencode.agents_commands
@@ -783,6 +784,8 @@ sources:
     factory_droid,factory_droid.sessions,C:/Users/*/.factory/sessions/**/settings.json
     factory_droid,factory_droid.sessions,C:/Users/*/.factory/sessions/*.json
     factory_droid,factory_droid.sessions,C:/Users/*/.factory/sessions/*/*.jsonl
+    factory_droid,factory_droid.skills_and_droids,C:/Users/*/.agent/skills/**/SKILL.md
+    factory_droid,factory_droid.skills_and_droids,C:/Users/*/.agents/skills/**/SKILL.md
     factory_droid,factory_droid.skills_and_droids,C:/Users/*/.claude/agents/*.md
     factory_droid,factory_droid.skills_and_droids,C:/Users/*/.factory/commands/**
     factory_droid,factory_droid.skills_and_droids,C:/Users/*/.factory/droids/**
@@ -3140,6 +3143,8 @@ sources:
     factory_droid,factory_droid.logs,/Users/*/.factory/logs/**
     factory_droid,factory_droid.logs,/var/root/.factory/bug-reports/**
     factory_droid,factory_droid.logs,/var/root/.factory/logs/**
+    factory_droid,factory_droid.managed_settings,/Library/Application Support/Factory/settings.json
+    factory_droid,factory_droid.managed_settings,/etc/factory/settings.json
     factory_droid,factory_droid.mcp_and_hooks,/Users/*/.factory/hooks.json
     factory_droid,factory_droid.mcp_and_hooks,/Users/*/.factory/mcp.json
     factory_droid,factory_droid.mcp_and_hooks,/var/root/.factory/hooks.json
@@ -3152,10 +3157,14 @@ sources:
     factory_droid,factory_droid.sessions,/var/root/.factory/sessions/**/settings.json
     factory_droid,factory_droid.sessions,/var/root/.factory/sessions/*.json
     factory_droid,factory_droid.sessions,/var/root/.factory/sessions/*/*.jsonl
+    factory_droid,factory_droid.skills_and_droids,/Users/*/.agent/skills/**/SKILL.md
+    factory_droid,factory_droid.skills_and_droids,/Users/*/.agents/skills/**/SKILL.md
     factory_droid,factory_droid.skills_and_droids,/Users/*/.claude/agents/*.md
     factory_droid,factory_droid.skills_and_droids,/Users/*/.factory/commands/**
     factory_droid,factory_droid.skills_and_droids,/Users/*/.factory/droids/**
     factory_droid,factory_droid.skills_and_droids,/Users/*/.factory/skills/**
+    factory_droid,factory_droid.skills_and_droids,/var/root/.agent/skills/**/SKILL.md
+    factory_droid,factory_droid.skills_and_droids,/var/root/.agents/skills/**/SKILL.md
     factory_droid,factory_droid.skills_and_droids,/var/root/.claude/agents/*.md
     factory_droid,factory_droid.skills_and_droids,/var/root/.factory/commands/**
     factory_droid,factory_droid.skills_and_droids,/var/root/.factory/droids/**
@@ -6248,6 +6257,8 @@ sources:
     factory_droid,factory_droid.logs,/home/*/.factory/logs/**
     factory_droid,factory_droid.logs,/root/.factory/bug-reports/**
     factory_droid,factory_droid.logs,/root/.factory/logs/**
+    factory_droid,factory_droid.managed_settings,/Library/Application Support/Factory/settings.json
+    factory_droid,factory_droid.managed_settings,/etc/factory/settings.json
     factory_droid,factory_droid.mcp_and_hooks,/home/*/.factory/hooks.json
     factory_droid,factory_droid.mcp_and_hooks,/home/*/.factory/mcp.json
     factory_droid,factory_droid.mcp_and_hooks,/root/.factory/hooks.json
@@ -6260,10 +6271,14 @@ sources:
     factory_droid,factory_droid.sessions,/root/.factory/sessions/**/settings.json
     factory_droid,factory_droid.sessions,/root/.factory/sessions/*.json
     factory_droid,factory_droid.sessions,/root/.factory/sessions/*/*.jsonl
+    factory_droid,factory_droid.skills_and_droids,/home/*/.agent/skills/**/SKILL.md
+    factory_droid,factory_droid.skills_and_droids,/home/*/.agents/skills/**/SKILL.md
     factory_droid,factory_droid.skills_and_droids,/home/*/.claude/agents/*.md
     factory_droid,factory_droid.skills_and_droids,/home/*/.factory/commands/**
     factory_droid,factory_droid.skills_and_droids,/home/*/.factory/droids/**
     factory_droid,factory_droid.skills_and_droids,/home/*/.factory/skills/**
+    factory_droid,factory_droid.skills_and_droids,/root/.agent/skills/**/SKILL.md
+    factory_droid,factory_droid.skills_and_droids,/root/.agents/skills/**/SKILL.md
     factory_droid,factory_droid.skills_and_droids,/root/.claude/agents/*.md
     factory_droid,factory_droid.skills_and_droids,/root/.factory/commands/**
     factory_droid,factory_droid.skills_and_droids,/root/.factory/droids/**

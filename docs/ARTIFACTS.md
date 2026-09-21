@@ -6,7 +6,7 @@ English | [Deutsch](ARTIFACTS.de.md)
 
 Generated from catalog/ by scripts/gen_artifact_docs.py. Do not edit by hand: CI regenerates this file and fails if it differs.
 
-623 artifacts across 31 agent(s), 498 of them resting on a fetched vendor source.
+624 artifacts across 31 agent(s), 499 of them resting on a fetched vendor source.
 
 Entries marked unverified are collected anyway, but no vendor source confirms the path. Treat the absence of such an artifact as inconclusive rather than as evidence that the agent was not used.
 
@@ -815,7 +815,7 @@ Vendor: Factory
 
 | Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `factory_droid.output_styles` | output styles | instructions | macOS, Linux, Windows | `~/.factory/output-styles/*.md`<br>`%USERPROFILE%\.factory\output-styles\*.md`<br>`<project>/.factory/output-styles/*.md` | markdown | normal | Persistent until removed. | verified | [official](https://docs.factory.ai/docs/droid-cli/output-styles) |
+| `factory_droid.output_styles` | output styles | instructions | macOS, Linux, Windows | `~/.factory/output-styles/*.md`<br>`%USERPROFILE%\.factory\output-styles\*.md`<br>`<project>/**/.factory/output-styles/*.md`<br>`<project>/.factory/output-styles/*.md` | markdown | normal | Persistent until removed. | verified | [official](https://docs.factory.ai/docs/droid-cli/output-styles) |
 
 ### normal
 
@@ -824,13 +824,21 @@ Vendor: Factory
 | Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `factory_droid.auth` | auth | config | macOS, Linux, Windows | `~/.factory/` | json | normal | Unknown. | **unverified** | recollection |
-| `factory_droid.config` | config | config | macOS, Linux, Windows | `%USERPROFILE%\.factory\settings.json`<br>`<project>/.factory/settings.json`<br>`<project>/.factory/settings.local.json`<br>`~/.factory/config.json` [unsourced]<br>`~/.factory/settings.json`<br>`~/.factory/settings.local.json` | json | normal | Persistent until edited. settings.json is created with defaults on first run of droid. | verified | [official](https://docs.factory.ai/cli/configuration/settings) |
+| `factory_droid.config` | config | config | macOS, Linux, Windows | `%USERPROFILE%\.factory\settings.json`<br>`<project>/**/.factory/settings.json`<br>`<project>/**/.factory/settings.local.json`<br>`<project>/.factory/settings.json`<br>`<project>/.factory/settings.local.json`<br>`~/.factory/config.json` [unsourced]<br>`~/.factory/settings.json`<br>`~/.factory/settings.local.json` | json | normal | Persistent until edited. settings.json is created with defaults on first run of droid. | verified | [official](https://docs.factory.ai/cli/configuration/settings) |
 | `factory_droid.logs` | logs | log | macOS, Linux, Windows | `~/.factory/bug-reports/`<br>`~/.factory/logs/` | text | normal | Unknown. | **unverified** | recollection |
-| `factory_droid.mcp_and_hooks` | mcp and hooks | mcp_config | macOS, Linux, Windows | `<project>/.factory/mcp.json`<br>`<project>/<folder>/.factory/mcp.json`<br>`~/.factory/hooks.json` [unsourced]<br>`~/.factory/mcp.json` | json | normal | Persistent until edited. | verified | [official](https://docs.factory.ai/cli/configuration/mcp) |
+| `factory_droid.mcp_and_hooks` | mcp and hooks | mcp_config | macOS, Linux, Windows | `<project>/**/.factory/mcp.json`<br>`<project>/.factory/mcp.json`<br>`~/.factory/hooks.json` [unsourced]<br>`~/.factory/mcp.json` | json | normal | Persistent until edited. | verified | [official](https://docs.factory.ai/cli/configuration/mcp) |
 | `factory_droid.sessions` | sessions | transcript | macOS, Linux, Windows | `<project>/.factory/sessions/`<br>`~/.factory/sessions/**/settings.json`<br>`~/.factory/sessions/*/*.jsonl`<br>`~/.factory/sessions/<uuid>.json` | jsonl | normal | No documented expiry. | **unverified** | [community](https://github.com/code-yeongyu/oh-my-openagent/blob/main/packages/shared-skills/skills/coding-agent-sessions/references/all-platforms.md) |
-| `factory_droid.skills_and_droids` | skills and droids | instructions | macOS, Linux, Windows | `<project>/.claude/agents/*.md`<br>`<project>/AGENTS.md` [unsourced]<br>`~/.claude/agents/*.md`<br>`~/.factory/commands/` [unsourced]<br>`~/.factory/droids/`<br>`~/.factory/skills/` [unsourced] | markdown | normal | Persistent until removed. | verified | [official](https://docs.factory.ai/cli/configuration/custom-droids) |
+| `factory_droid.skills_and_droids` | skills and droids | instructions | macOS, Linux, Windows | `<project>/**/.factory/commands/`<br>`<project>/**/.factory/skills/`<br>`<project>/.agent/skills/**/SKILL.md`<br>`<project>/.agents/skills/**/SKILL.md`<br>`<project>/.claude/agents/*.md`<br>`<project>/.factory/commands/`<br>`<project>/.factory/skills/`<br>`<project>/AGENTS.md` [unsourced]<br>`~/.agent/skills/**/SKILL.md`<br>`~/.agents/skills/**/SKILL.md`<br>`~/.claude/agents/*.md`<br>`~/.factory/commands/`<br>`~/.factory/droids/` [unsourced]<br>`~/.factory/skills/` | markdown | normal | Persistent until removed. | verified | [official](https://docs.factory.ai/harness/skills.md) |
 | `factory_droid.specs` | specs | transcript | macOS, Linux, Windows | `~/.factory/specs/**`<br>`%USERPROFILE%\.factory\specs\**` | markdown | normal | Written when a specification is saved and kept. The directory is a setting, so a host that changed it keeps these somewhere else entirely. | verified | [official](https://docs.factory.ai/cli/configuration/settings) |
 | `factory_droid.worktrees` | worktrees | file_snapshot | macOS, Linux, Windows | `~/.factory/worktrees/**`<br>`%USERPROFILE%\.factory\worktrees\**` | directory | normal | Created when the agent works in a worktree and left behind afterwards unless somebody removes it. The directory is a setting, so a host that changed it keeps them elsewhere. | verified | [official](https://docs.factory.ai/docs/droid-cli/cli-reference) |
+
+### durable
+
+**Usually still there.** Not covered by the retention sweep, so these routinely outlive the transcripts they describe. When the transcripts are already gone, this group is what is left, and it is often enough to establish that an agent ran, what it was allowed to do, and what the user asked.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `factory_droid.managed_settings` | managed settings | permissions | macOS, Linux, Windows | `C:\Program Files\Factory\settings.json`<br>`/Library/Application Support/Factory/settings.json`<br>`/etc/factory/settings.json` | json | normal | Deployed by a management channel rather than by the user and not rewritten by the product, so its mtime belongs to an image or an installer. | verified | [official](https://docs.factory.ai/enterprise/hierarchical-settings-and-org-control.md) |
 
 ## Gemini CLI
 

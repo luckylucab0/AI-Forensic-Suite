@@ -6,7 +6,7 @@ English | [Deutsch](SUPPORT.de.md)
 
 What this suite reads, per agent, counted from the catalogue and the reader registry rather than written down. The numbers move when the code does.
 
-31 catalogue files, 30 of them a product and one cross-cutting. 497 of 623 artifacts are read by 37 reader modules, into 23 event kinds. 498 artifacts rest on a fetched vendor source.
+31 catalogue files, 30 of them a product and one cross-cutting. 498 of 624 artifacts are read by 37 reader modules, into 23 event kinds. 499 artifacts rest on a fetched vendor source.
 
 **How to read an empty result.** An agent listed here with artifacts read means the paths were searched and the files that were there were parsed, so an empty result is evidence that those paths held nothing. It is never evidence that the agent was not used: the data tree may have been relocated by a variable, the retention period may have swept it, the paths may be the unverified ones, or the user may have worked in a profile nobody collected. Where an entry is unverified, `docs/ARTIFACTS.md` says so per artifact and the analyzer repeats it in its output.
 
@@ -27,7 +27,7 @@ What this suite reads, per agent, counted from the catalogue and the reader regi
 | Cross-cutting evidence | Linux, macOS, Windows | none | 20 / 27 | 6 | 7 |
 | Cursor | Linux, macOS, Windows | 9 / 9 | 43 / 50 | 32 | 7 |
 | Devin | Linux, macOS, Windows | 1 / 1 | 2 / 2 | 2 | 0 |
-| Factory Droid | Linux, macOS, Windows | 2 / 2 | 8 / 9 | 6 | 1 |
+| Factory Droid | Linux, macOS, Windows | 2 / 2 | 9 / 10 | 7 | 1 |
 | Gemini CLI | Linux, macOS, Windows | 1 / 1 | 15 / 19 | 8 | 4 |
 | GitHub Copilot CLI | Linux, macOS, Windows | 3 / 4 | 16 / 20 | 11 | 4 |
 | Goose | Linux, macOS, Windows | 4 / 4 | 18 / 19 | 11 | 1 |
@@ -169,7 +169,7 @@ None as of this generation. The check behind this section looks for a catalogue 
 
 ## Where the reading is thin
 
-299 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
+300 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
 
 ## Where to look next
 

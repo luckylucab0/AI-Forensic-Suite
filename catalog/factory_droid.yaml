@@ -38,6 +38,7 @@ artifacts:
   paths:
   - ~/.factory/output-styles/*.md
   - '%USERPROFILE%\.factory\output-styles\*.md'
+  - <project>/**/.factory/output-styles/*.md
   - <project>/.factory/output-styles/*.md
   format: markdown
   sensitivity: normal
@@ -140,6 +141,8 @@ artifacts:
   - windows
   paths:
   - '%USERPROFILE%\.factory\settings.json'
+  - <project>/**/.factory/settings.json
+  - <project>/**/.factory/settings.local.json
   - <project>/.factory/settings.json
   - <project>/.factory/settings.local.json
   - ~/.factory/config.json
@@ -158,6 +161,8 @@ artifacts:
     The allow/deny lists in settings.json are the permission record for Droid - collect both the global and every project-level copy, and diff them, since a project-local settings.local.json can quietly widen what the agent may do. Note that customModels entries can contain plaintext API keys even though this is catalogued as config.
 
     Record structure: config.json holds model configuration and BYOK settings; settings.json is the personal CLI configuration including allow/deny lists; a settings.local.json may sit alongside settings.json in any .factory/ folder for local overrides. Custom API keys are added to settings.json via a customModels array with provider types such as anthropic or openai, and are documented as staying local. Path strings retrieved via GitHub code search content fragments.
+
+    The folder spelling was added when the vendor's documentation became reachable. It describes project and folder directories as separate levels, the second for monorepos whose subsystems differ, and says the settings hierarchy applies at every one. A pattern that stops at the repository root therefore collects the file that lost to one nobody looked for.
   parser: json_generic
 - id: factory_droid.skills_and_droids
   category: instructions
@@ -167,8 +172,16 @@ artifacts:
   - linux
   - windows
   paths:
+  - <project>/**/.factory/commands/
+  - <project>/**/.factory/skills/
+  - <project>/.agent/skills/**/SKILL.md
+  - <project>/.agents/skills/**/SKILL.md
   - <project>/.claude/agents/*.md
+  - <project>/.factory/commands/
+  - <project>/.factory/skills/
   - <project>/AGENTS.md
+  - ~/.agent/skills/**/SKILL.md
+  - ~/.agents/skills/**/SKILL.md
   - ~/.claude/agents/*.md
   - ~/.factory/commands/
   - ~/.factory/droids/
@@ -177,18 +190,51 @@ artifacts:
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://docs.factory.ai/cli/configuration/custom-droids
+  source: https://docs.factory.ai/harness/skills.md
   source_kind: official
   unsourced_paths:
   - <project>/AGENTS.md
-  - ~/.factory/commands/
-  - ~/.factory/skills/
+  - ~/.factory/droids/
   volatility: Persistent until removed.
   notes: |-
-    Partially unverified: skills/ is corroborated, droids/ and commands/ are recollection, needs verification. Custom droid definitions are user-authored agent personas with their own tool grants and are a common vector for privilege widening.
+    Custom droid definitions are user-authored agent personas with their own tool grants, which is a common way a permission set gets widened without a setting changing.
+
+    Re-sourced and widened when the vendor's documentation became reachable. It gives a table of every scope a skill is loaded from: the repository, a folder inside the repository, the home directory, and four compatibility spellings under two agent-agnostic directory names, one of them without its plural. Six of those were in no entry. The vendor also states that the search is recursive and that the first directory holding a skill file is the skill, so a skill can be nested arbitrarily deep and a pattern that expects one level finds nothing.
+
+    The compatibility directories are not this vendor's. Several products in this catalogue read them, so a skill found there steered whichever of them ran.
+
+    Commands are an execution surface and not only an instruction one. The vendor states that a file in a commands directory is registered when it ends in .md or when its first line is a shebang, which means an executable script with any name at all is a slash command, and that they are discovered recursively. The directories are collected whole here for that reason rather than by extension.
 
     Record structure: ~/.factory/skills was observed in a code-search content fragment. droids/ and commands/ come only from a WebSearch summary of the Factory docs, which I could not fetch (docs.factory.ai is blocked from this environment) - treat those two as unconfirmed. Custom droid definitions carry their own instructions and tool sets.
   parser: instructions
+- id: factory_droid.managed_settings
+  category: permissions
+  root: system
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - C:\Program Files\Factory\settings.json
+  - /Library/Application Support/Factory/settings.json
+  - /etc/factory/settings.json
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://docs.factory.ai/enterprise/hierarchical-settings-and-org-control.md
+  source_kind: official
+  volatility: |-
+    Deployed by a management channel rather than by the user and not rewritten by the product, so its mtime belongs to an image or an installer.
+  notes: |-
+    The policy the user cannot weaken, and it was in no entry. The vendor documents a hardcoded path per platform where an administrator drops the organisation's settings so they apply before anybody signs in, and states that when the file is present it is the authoritative source for organisation-level settings on that machine and short-circuits the online fetch and the developer-mode overrides.
+
+    Why it is the first file to read in a permission question. The user settings and the project settings are both in this catalogue, and neither of them says what the ceiling was. This file carries the allowed models, the command allow, deny and block lists, the autonomy ceiling and the feature gates, and the vendor states that users cannot override or weaken it. So an agent that did something the user settings appear to forbid, or that was allowed something they appear to permit, is explained here and nowhere else.
+
+    An absence is not a clean answer. The vendor states that without this file the product falls back to fetching the policy from its own service, so on a machine that had no file the policy that was actually in force is not on the endpoint at all and has to come from the organisation. It also states that a file that is present but fails validation resolves to an empty policy and is logged rather than silently ignored, so the product's own logs, which this catalogue collects, are where a broken deployment shows up.
+
+    Outside the user profile on all three platforms, so a profile collection does not have it.
+  parser: json_generic
 - id: factory_droid.logs
   category: log
   root: user_profile
@@ -219,8 +265,8 @@ artifacts:
   - linux
   - windows
   paths:
+  - <project>/**/.factory/mcp.json
   - <project>/.factory/mcp.json
-  - <project>/<folder>/.factory/mcp.json
   - ~/.factory/hooks.json
   - ~/.factory/mcp.json
   format: json
@@ -236,6 +282,8 @@ artifacts:
     hooks.json is the standout: hooks are shell commands the harness runs automatically around agent events, so this file can contain arbitrary code execution that is attributable to configuration rather than to any prompt in a transcript. Always review it, and compare its mtime against session times.
 
     Record structure: ~/.factory/mcp.json and ~/.factory/hooks.json path strings retrieved via GitHub code search content fragments. A project-level .factory/mcp.json was also observed.
+
+    The folder-level pattern was a single placeholder segment and is now a recursive one, for the reason the settings entry gives: the vendor describes folder directories as a level of their own for monorepos, and nothing says they are exactly one directory below the root.
   parser: json_generic
 - id: factory_droid.sessions
   category: transcript

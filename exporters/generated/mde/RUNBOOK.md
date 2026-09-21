@@ -2,7 +2,7 @@
 
 <!-- Generated from the artifact catalogue. Do not edit by hand:
 <!-- run `afx export-collection` and commit the result.
-<!-- Catalogue digest: 5a705decad88
+<!-- Catalogue digest: b550d61b348f
 <!--
 <!-- An empty result from this rule means the paths it searched held nothing. It does
 <!-- not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -75,7 +75,7 @@ Windows-relevant catalogue entries, as a sense of what a collection will cover:
 | Cross-cutting evidence | `crosscutting` | 21 |
 | Cursor | `cursor` | 46 |
 | Devin | `devin` | 2 |
-| Factory Droid | `factory_droid` | 9 |
+| Factory Droid | `factory_droid` | 10 |
 | Gemini CLI | `gemini_cli` | 19 |
 | GitHub Copilot CLI | `copilot` | 20 |
 | Goose | `goose` | 18 |

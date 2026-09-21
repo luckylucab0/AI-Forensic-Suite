@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 5a705decad88
+# Catalogue digest: b550d61b348f
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -681,10 +681,13 @@ $targets = @(
     @{ Agent = 'factory_droid'; Id = 'factory_droid.config'; Path = '$profile\.factory\settings.local.json' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.logs'; Path = '$profile\.factory\bug-reports' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.logs'; Path = '$profile\.factory\logs' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.managed_settings'; Path = 'C:\Program Files\Factory\settings.json' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.mcp_and_hooks'; Path = '$profile\.factory\hooks.json' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.mcp_and_hooks'; Path = '$profile\.factory\mcp.json' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.output_styles'; Path = '$profile\.factory\output-styles' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.sessions'; Path = '$profile\.factory\sessions' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.skills_and_droids'; Path = '$profile\.agent\skills' }
+    @{ Agent = 'factory_droid'; Id = 'factory_droid.skills_and_droids'; Path = '$profile\.agents\skills' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.skills_and_droids'; Path = '$profile\.claude\agents' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.skills_and_droids'; Path = '$profile\.factory\commands' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.skills_and_droids'; Path = '$profile\.factory\droids' }

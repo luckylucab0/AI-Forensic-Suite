@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 5a705decad88
+// Catalogue digest: b550d61b348f
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1327,6 +1327,12 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "factory_droid", "factory_droid.logs", ".factory/logs",
     "factory_droid", "factory_droid.logs", ".factory\\bug-reports",
     "factory_droid", "factory_droid.logs", ".factory\\logs",
+    "factory_droid", "factory_droid.managed_settings", "/Library/Application Support/Factory/settings.json",
+    "factory_droid", "factory_droid.managed_settings", "/etc/factory/settings.json",
+    "factory_droid", "factory_droid.managed_settings", "C:/Program Files/Factory/settings.json",
+    "factory_droid", "factory_droid.managed_settings", "C:\\Program Files\\Factory\\settings.json",
+    "factory_droid", "factory_droid.managed_settings", "\\Library\\Application Support\\Factory\\settings.json",
+    "factory_droid", "factory_droid.managed_settings", "\\etc\\factory\\settings.json",
     "factory_droid", "factory_droid.mcp_and_hooks", ".factory/hooks.json",
     "factory_droid", "factory_droid.mcp_and_hooks", ".factory/mcp.json",
     "factory_droid", "factory_droid.mcp_and_hooks", ".factory\\hooks.json",
@@ -1335,6 +1341,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "factory_droid", "factory_droid.output_styles", ".factory\\output-styles",
     "factory_droid", "factory_droid.sessions", ".factory/sessions",
     "factory_droid", "factory_droid.sessions", ".factory\\sessions",
+    "factory_droid", "factory_droid.skills_and_droids", ".agent/skills",
+    "factory_droid", "factory_droid.skills_and_droids", ".agent\\skills",
+    "factory_droid", "factory_droid.skills_and_droids", ".agents/skills",
+    "factory_droid", "factory_droid.skills_and_droids", ".agents\\skills",
     "factory_droid", "factory_droid.skills_and_droids", ".claude/agents",
     "factory_droid", "factory_droid.skills_and_droids", ".claude\\agents",
     "factory_droid", "factory_droid.skills_and_droids", ".factory/commands",
