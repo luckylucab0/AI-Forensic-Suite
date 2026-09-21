@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: bcee70c6de2b
+// Catalogue digest: 5a705decad88
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -190,10 +190,20 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "amazonq", "amazonq.sso_token_cache", ".aws\\sso\\cache\\aws-toolkit-vscode-client-id-",
     "amp", "amp.continuations", ".local/share/amp/continuations",
     "amp", "amp.continuations", ".local\\share\\amp\\continuations",
+    "amp", "amp.global_instructions", ".config/AGENTS.md",
+    "amp", "amp.global_instructions", ".config/amp/AGENTS.md",
+    "amp", "amp.global_instructions", ".config\\AGENTS.md",
+    "amp", "amp.global_instructions", ".config\\amp\\AGENTS.md",
     "amp", "amp.ledger", ".local/share/amp/ledger.jsonl",
     "amp", "amp.ledger", ".local\\share\\amp\\ledger.jsonl",
     "amp", "amp.ledger", "amp/ledger.jsonl",
     "amp", "amp.ledger", "amp\\ledger.jsonl",
+    "amp", "amp.managed_instructions", "/Library/Application Support/ampcode/AGENTS.md",
+    "amp", "amp.managed_instructions", "/etc/ampcode/AGENTS.md",
+    "amp", "amp.managed_instructions", "\\Library\\Application Support\\ampcode\\AGENTS.md",
+    "amp", "amp.managed_instructions", "\\etc\\ampcode\\AGENTS.md",
+    "amp", "amp.plugins", ".config/amp/plugins",
+    "amp", "amp.plugins", ".config\\amp\\plugins",
     "amp", "amp.secrets", ".amp/oauth",
     "amp", "amp.secrets", ".amp\\oauth",
     "amp", "amp.secrets", ".local/share/amp/secrets.json",

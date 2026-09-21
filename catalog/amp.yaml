@@ -27,6 +27,19 @@ references:
 - https://github.com/Untrivial-ai/agent-orchestrator/blob/main/backend/internal/adapters/agent/amp/auth.go
 - https://github.com/plurigrid/asi/blob/main/skills/amp-continue/SKILL.md
 - https://raw.githubusercontent.com/janekbaraniewski/openusage/main/docs/site/docs/providers/amp.md
+env_overrides:
+- name: AMP_DISABLE_AMP_THREAD_TRAILER
+  effect: |-
+    Removes the thread identifier this agent otherwise writes into every commit it makes. That trailer is the link between a commit in a repository and the conversation that produced it, and it is frequently the only place that link exists, because the conversation itself is not necessarily on the endpoint. Set, the commits look like anybody's. An investigation that concludes from clean trailers that no agent touched a repository has to rule this variable out first, and the same switch exists as a setting in the configuration file this catalogue collects.
+  source: https://ampcode.com/manual/configuration.md
+- name: AMP_DISABLE_AMP_COAUTHOR_TRAILER
+  effect: |-
+    The same shape for the co-author trailer, which is the other half of the attribution this product writes into git history. Both default to on, so both being absent from a repository that the agent worked in is a question rather than an answer.
+  source: https://ampcode.com/manual/configuration.md
+- name: AMP_SKIP_UPDATE_CHECK
+  effect: |-
+    Turns off update checking, overriding the setting that does the same. It matters here only because the update path is one of the few things that write to the install tree, so a version that stopped moving while the agent kept running is explained by this rather than by the product being unused.
+  source: https://ampcode.com/manual/configuration.md
 artifacts:
 - id: amp.session_pointer
   category: config
@@ -64,6 +77,8 @@ artifacts:
   - '%PROGRAMDATA%\ampcode\managed-settings.json'
   - '%USERPROFILE%\.config\amp\settings.json'
   - '%USERPROFILE%\.config\amp\settings.jsonc'
+  - <project>/**/.amp/settings.json
+  - <project>/**/.amp/settings.jsonc
   - <project>/.amp/settings.json
   - <project>/.amp/settings.jsonc
   - ~/.config/amp/settings.json
@@ -82,6 +97,8 @@ artifacts:
     Carries the MCP inventory and, critically, amp.url - which can point the CLI at a self-hosted or proxied Amp server instead of ampcode.com. A non-default amp.url materially changes where the transcripts actually live.
 
     Re-sourced by the verification pass. The guide cited before states the user settings file only, and the vendor's own manual states the whole stack: the user file in both spellings and on both platforms, the nearest project file searched upward from the working directory to the repository root, and a machine-wide managed settings file per platform. The managed file is the one to read first in a policy question, because it is what an administrator uses to constrain the agent and it was missing from this catalogue entirely. The base directory variable spelling is how the collector reaches a relocated configuration directory and is not what the manual states, so it is marked unsourced.
+
+    The nested spelling was added when the manual was read again: the vendor describes the workspace file as the nearest one, searched upward from the working directory to the repository root, which means a file in a subdirectory is the one in force when the agent was started there. An entry that stops at the repository root collects the file that lost.
   parser: json_generic
 - id: amp.secrets
   category: credentials
@@ -106,6 +123,93 @@ artifacts:
 
     Record structure: Independently corroborated across many projects. Known key shape: 'apiKey@https://ampcode.com/'. A separate ~/.amp/oauth/ credential directory is also referenced. Not stored in the macOS Keychain. Path strings retrieved via GitHub code search content fragments.
   parser: null
+- id: amp.global_instructions
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_CONFIG_HOME/AGENTS.md
+  - $XDG_CONFIG_HOME/amp/AGENTS.md
+  - '%USERPROFILE%\.config\AGENTS.md'
+  - '%USERPROFILE%\.config\amp\AGENTS.md'
+  - ~/.config/AGENTS.md
+  - ~/.config/amp/AGENTS.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://ampcode.com/docs/markdown/customize/agents-md
+  source_kind: official
+  unsourced_paths:
+  - $XDG_CONFIG_HOME/AGENTS.md
+  - $XDG_CONFIG_HOME/amp/AGENTS.md
+  - '%USERPROFILE%\.config\AGENTS.md'
+  - '%USERPROFILE%\.config\amp\AGENTS.md'
+  volatility: |-
+    Not swept. In no repository, so nothing records who changed it and only the mtime says when.
+  notes: |-
+    Two files that are added to every conversation on the machine, and the vendor says so in as many words: they are always included if they exist, whatever directory the agent was started in and whatever repository it was working on. Neither was in this catalogue.
+
+    One of the two is not this product's file. The vendor gives both the product's own configuration directory and the bare configuration directory beside it, and the second is the agent-agnostic spelling that other tools use, so a file found there may have been written for something else and still reached this agent.
+
+    They carry more than their own text. The vendor documents an at-sign import inside these files, and states that an absolute path and a home-relative path are both supported, so a global instruction file can pull in any file on disk. What the agent was told is therefore not necessarily what is in this file, and the imports have to be followed.
+
+    The Windows and base-directory spellings are this catalogue's own: the page states the home-relative form, and both collectors resolve the other two to the same place.
+  parser: instructions
+- id: amp.managed_instructions
+  category: instructions
+  root: system
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%PROGRAMDATA%\ampcode\AGENTS.md'
+  - /Library/Application Support/ampcode/AGENTS.md
+  - /etc/ampcode/AGENTS.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://ampcode.com/docs/markdown/customize/agents-md
+  source_kind: official
+  volatility: |-
+    Deployed by whoever administers the machine rather than by the user, so its mtime belongs to a management channel and not to a session.
+  notes: |-
+    Machine-wide guidance, in the same three directories as this product's managed settings file, and always included in every conversation by the vendor's own statement. It sits outside the user's profile, so a collection of the profile alone does not have it, which is how a standing instruction that applied to every session on the endpoint goes unnoticed.
+
+    Read it first in two kinds of question. When the question is what the agent was told, this is the layer nobody logs in and edits. When the question is whether somebody planted an instruction, a file here reached every user on the machine rather than one, and writing it needs the privileges that directory needs, which narrows who could have.
+  parser: instructions
+- id: amp.plugins
+  category: instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_CONFIG_HOME/amp/plugins/
+  - '%USERPROFILE%\.config\amp\plugins\'
+  - <project>/.amp/plugins/
+  - ~/.config/amp/plugins/
+  format: text
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://ampcode.com/docs/markdown/customize/plugins
+  source_kind: official
+  volatility: |-
+    Not swept. A project plugin usually travels with the repository, so git history carries it; a machine-local one is untracked and carries only its mtime.
+  notes: |-
+    Executable extension that loads with the agent, and the vendor states both on-disk locations: a directory in the project that travels with the code, and a machine-local directory under the configuration directory. A plugin from a shared URL is installed into the machine-local one by a single command, which means a plugin can arrive on an endpoint from the internet without anybody editing a file.
+
+    Two more sources are not on disk here at all and the entry says so rather than leaving somebody to conclude from an empty directory that no plugin was loaded: the vendor documents personal and workspace plugins that are managed in the hosted product and apply everywhere the user works. So this entry answers what was installed on this machine and not what the agent could do.
+
+    Precedence is project, then machine-local, then personal, then workspace, which matters when two plugins share a name: the one in the repository wins, and a repository is the thing an attacker can put a file into.
+  parser: instructions
 - id: amp.ledger
   category: log
   root: user_profile

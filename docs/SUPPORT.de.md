@@ -6,7 +6,7 @@
 
 Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registrierung statt aufgeschrieben. Die Zahlen bewegen sich mit dem Code.
 
-31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 494 von 620 Artefakten werden von 37 Leser-Modulen gelesen, in 23 Ereignisarten. 495 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
+31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 497 von 623 Artefakten werden von 37 Leser-Modulen gelesen, in 23 Ereignisarten. 498 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
 
 **Wie ein leeres Ergebnis zu lesen ist.** Steht ein Agent hier mit gelesenen Artefakten, dann wurden die Pfade durchsucht und die vorhandenen Dateien ausgewertet, also ist ein leeres Ergebnis ein Befund über diese Pfade. Es ist nie ein Befund darüber, dass der Agent nicht benutzt wurde: der Datenbaum kann über eine Variable verschoben sein, die Aufbewahrungsfrist kann ihn gelöscht haben, die Pfade können die unverifizierten sein, oder die Person hat in einem Profil gearbeitet, das niemand gesammelt hat. Wo ein Eintrag unverifiziert ist, sagt `docs/ARTIFACTS.de.md` es pro Artefakt, und der Analyzer wiederholt es in seiner Ausgabe.
 
@@ -18,7 +18,7 @@ Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registri
 | --- | --- | --- | --- | --- | --- |
 | Aider | Linux, macOS, Windows | 2 / 2 | 11 / 13 | 8 | 2 |
 | Amazon Q Developer (CLI and IDE extension) | Linux, macOS, Windows | 3 / 3 | 17 / 20 | 9 | 3 |
-| Amp | Linux, macOS, Windows | 2 / 2 | 7 / 8 | 6 | 1 |
+| Amp | Linux, macOS, Windows | 2 / 2 | 10 / 11 | 6 | 1 |
 | ChatGPT Desktop | macOS, Windows | 2 / 5 | 3 / 11 | 3 | 8 |
 | Claude Code | Linux, macOS, Windows | 5 / 6 | 68 / 78 | 37 | 10 |
 | Claude Desktop | Linux, macOS, Windows | 1 / 2 | 18 / 29 | 11 | 11 |

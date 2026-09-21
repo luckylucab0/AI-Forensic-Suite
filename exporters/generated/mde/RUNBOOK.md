@@ -2,7 +2,7 @@
 
 <!-- Generated from the artifact catalogue. Do not edit by hand:
 <!-- run `afx export-collection` and commit the result.
-<!-- Catalogue digest: bcee70c6de2b
+<!-- Catalogue digest: 5a705decad88
 <!--
 <!-- An empty result from this rule means the paths it searched held nothing. It does
 <!-- not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -66,7 +66,7 @@ Windows-relevant catalogue entries, as a sense of what a collection will cover:
 | --- | --- | --- |
 | Aider | `aider` | 13 |
 | Amazon Q Developer (CLI and IDE extension) | `amazonq` | 20 |
-| Amp | `amp` | 7 |
+| Amp | `amp` | 10 |
 | ChatGPT Desktop | `chatgpt_desktop` | 1 |
 | Claude Code | `claude_code` | 75 |
 | Claude Desktop | `claude_desktop` | 25 |

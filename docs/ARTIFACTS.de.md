@@ -6,7 +6,7 @@
 
 Erzeugt aus catalog/ durch scripts/gen_artifact_docs.py. Nicht von Hand bearbeiten: die CI erzeugt diese Datei neu und schlägt fehl, wenn sie abweicht.
 
-620 Artefakte über 31 Agent(en), davon 495 auf einer abgerufenen Herstellerquelle beruhend.
+623 Artefakte über 31 Agent(en), davon 498 auf einer abgerufenen Herstellerquelle beruhend.
 
 Als unbestätigt markierte Einträge werden trotzdem gesammelt, aber keine Herstellerquelle bestätigt den Pfad. Das Fehlen eines solchen Artefakts ist daher kein Beweis dafür, dass der Agent nicht genutzt wurde, sondern unklar.
 
@@ -127,6 +127,12 @@ Vendor: Sourcegraph
 
 <https://github.com/Eric-Song-Nop/agentstat/blob/main/AGENTS_MONITORING_SOLUTIONS.md>, <https://github.com/Untrivial-ai/agent-orchestrator/blob/main/backend/internal/adapters/agent/amp/auth.go>, <https://github.com/plurigrid/asi/blob/main/skills/amp-continue/SKILL.md>, <https://raw.githubusercontent.com/janekbaraniewski/openusage/main/docs/site/docs/providers/amp.md>
 
+### Verschiebende Variablen
+
+- `AMP_DISABLE_AMP_THREAD_TRAILER`: [EN] Removes the thread identifier this agent otherwise writes into every commit it makes. That trailer is the link between a commit in a repository and the conversation that produced it, and it is frequently the only place that link exists, because the conversation itself is not necessarily on the endpoint. Set, the commits look like anybody's. An investigation that concludes from clean trailers that no agent touched a repository has to rule this variable out first, and the same switch exists as a setting in the configuration file this catalogue collects.
+- `AMP_DISABLE_AMP_COAUTHOR_TRAILER`: [EN] The same shape for the co-author trailer, which is the other half of the attribution this product writes into git history. Both default to on, so both being absent from a repository that the agent worked in is a question rather than an answer.
+- `AMP_SKIP_UPDATE_CHECK`: [EN] Turns off update checking, overriding the setting that does the same. It matters here only because the update path is one of the few things that write to the install tree, so a version that stopped moving while the agent kept running is explained by this rather than by the product being unused.
+
 ### first
 
 **Zuerst sichern.** Rotieren oder verfallen aggressiv, nach Anzahl oder bei jedem Aufräumlauf statt nach einer bequemen Frist. Einige davon zerstört die Benutzerin schon dadurch, dass sie eine weitere Sitzung startet.
@@ -144,10 +150,20 @@ Vendor: Sourcegraph
 | `amp.continuations` | continuations | transcript | macOS, Linux, Windows | `~/.local/share/amp/continuations/*.json` | json | normal | [EN] Unknown. | **unbestätigt** | [community](https://github.com/plurigrid/asi/blob/main/skills/amp-continue/SKILL.md) |
 | `amp.ledger` | ledger | log | macOS, Linux, Windows | `$XDG_DATA_HOME/amp/ledger.jsonl`<br>`%APPDATA%\amp\ledger.jsonl`<br>`~/.local/share/amp/ledger.jsonl` | jsonl | normal | [EN] Append-only; no documented rotation. | **unbestätigt** | [community](https://raw.githubusercontent.com/janekbaraniewski/openusage/main/docs/site/docs/providers/amp.md) |
 | `amp.secrets` | secrets | credentials | macOS, Linux, Windows | `%APPDATA%\amp\secrets.json`<br>`~/.amp/oauth/`<br>`~/.local/share/amp/secrets.json` | json | secret | [EN] Persistent until logout. One reviewed source notes the schema has changed across CLI releases. | **unbestätigt** | [community](https://github.com/Untrivial-ai/agent-orchestrator/blob/main/backend/internal/adapters/agent/amp/auth.go) |
-| `amp.settings` | settings | config | macOS, Linux, Windows | `$XDG_CONFIG_HOME/amp/settings.json` [unbelegt]<br>`$XDG_CONFIG_HOME/amp/settings.jsonc` [unbelegt]<br>`/Library/Application Support/ampcode/managed-settings.json`<br>`/etc/ampcode/managed-settings.json`<br>`%PROGRAMDATA%\ampcode\managed-settings.json`<br>`%USERPROFILE%\.config\amp\settings.json`<br>`%USERPROFILE%\.config\amp\settings.jsonc`<br>`<project>/.amp/settings.json`<br>`<project>/.amp/settings.jsonc`<br>`~/.config/amp/settings.json`<br>`~/.config/amp/settings.jsonc` | json | normal | [EN] Persistent until edited. | bestätigt | [official](https://ampcode.com/manual/configuration.md) |
+| `amp.settings` | settings | config | macOS, Linux, Windows | `$XDG_CONFIG_HOME/amp/settings.json` [unbelegt]<br>`$XDG_CONFIG_HOME/amp/settings.jsonc` [unbelegt]<br>`/Library/Application Support/ampcode/managed-settings.json`<br>`/etc/ampcode/managed-settings.json`<br>`%PROGRAMDATA%\ampcode\managed-settings.json`<br>`%USERPROFILE%\.config\amp\settings.json`<br>`%USERPROFILE%\.config\amp\settings.jsonc`<br>`<project>/**/.amp/settings.json`<br>`<project>/**/.amp/settings.jsonc`<br>`<project>/.amp/settings.json`<br>`<project>/.amp/settings.jsonc`<br>`~/.config/amp/settings.json`<br>`~/.config/amp/settings.jsonc` | json | normal | [EN] Persistent until edited. | bestätigt | [official](https://ampcode.com/manual/configuration.md) |
 | `amp.skills` | skills | project_instructions | macOS, Linux, Windows | `<project>/.agents/skills/`<br>`<project>/.claude/skills/`<br>`~/.agents/skills/`<br>`~/.claude/plugins/cache/`<br>`~/.claude/skills/`<br>`~/.config/agents/skills/`<br>`~/.config/amp/skills/` | markdown | normal | [EN] Version-controlled in the project case, so git history gives authorship and timing. The user-level and plugin cache directories are untracked and carry only their mtimes. | bestätigt | [official](https://ampcode.com/manual/configuration.md) |
 | `amp.thread_logs` | thread logs | log | macOS, Linux | `~/.cache/amp/logs/threads/*.log` | text | normal | [EN] Cache directory - expect OS and application cache eviction. Collect early. | **unbestätigt** | [community](https://raw.githubusercontent.com/jbdamask/john-claude-skills/main/.pass-along/2026-08-19-1157-PASS-ALONG.md) |
 | `amp.threads` | threads | transcript | macOS, Linux, Windows | `$XDG_DATA_HOME/amp/threads/T-*.json`<br>`%APPDATA%\amp\threads\T-*.json`<br>`~/.local/share/amp/threads/T-*.json`<br>`~/Library/Application Support/amp/threads/T-*.json` | json | normal | [EN] CAVEAT: the authoritative thread store is server-side. A fetched community playbook warns the local directory 'is only an offline fallback for that exact id, not a current inventory', so local files may be stale, partial, or absent for threads that certainly happened. | **unbestätigt** | [community](https://raw.githubusercontent.com/janekbaraniewski/openusage/main/docs/site/docs/providers/amp.md) |
+
+### durable
+
+**Meist noch vorhanden.** Vom Aufräumlauf nicht erfasst und überleben damit regelmässig die Transkripte, die sie beschreiben. Sind die Transkripte schon weg, ist diese Gruppe das, was bleibt, und sie genügt oft, um zu belegen, dass ein Agent lief, was er durfte und was gefragt wurde.
+
+| Kennung | Name | Kategorie | Betriebssysteme | Pfade | Format | Sensitivität | Aufbewahrung | Status | Quelle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `amp.global_instructions` | global instructions | instructions | macOS, Linux, Windows | `$XDG_CONFIG_HOME/AGENTS.md` [unbelegt]<br>`$XDG_CONFIG_HOME/amp/AGENTS.md` [unbelegt]<br>`%USERPROFILE%\.config\AGENTS.md` [unbelegt]<br>`%USERPROFILE%\.config\amp\AGENTS.md` [unbelegt]<br>`~/.config/AGENTS.md`<br>`~/.config/amp/AGENTS.md` | markdown | normal | [EN] Not swept. In no repository, so nothing records who changed it and only the mtime says when. | bestätigt | [official](https://ampcode.com/docs/markdown/customize/agents-md) |
+| `amp.managed_instructions` | managed instructions | instructions | macOS, Linux, Windows | `%PROGRAMDATA%\ampcode\AGENTS.md`<br>`/Library/Application Support/ampcode/AGENTS.md`<br>`/etc/ampcode/AGENTS.md` | markdown | normal | [EN] Deployed by whoever administers the machine rather than by the user, so its mtime belongs to a management channel and not to a session. | bestätigt | [official](https://ampcode.com/docs/markdown/customize/agents-md) |
+| `amp.plugins` | plugins | instructions | macOS, Linux, Windows | `$XDG_CONFIG_HOME/amp/plugins/`<br>`%USERPROFILE%\.config\amp\plugins\`<br>`<project>/.amp/plugins/`<br>`~/.config/amp/plugins/` | text | normal | [EN] Not swept. A project plugin usually travels with the repository, so git history carries it; a machine-local one is untracked and carries only its mtime. | bestätigt | [official](https://ampcode.com/docs/markdown/customize/plugins) |
 
 ## ChatGPT Desktop
 

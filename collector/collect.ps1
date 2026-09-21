@@ -748,6 +748,27 @@ $EmbeddedCatalogueJson = @'
                     "status": "unverified"
                 },
                 {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "amp.global_instructions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/AGENTS.md",
+                        "$XDG_CONFIG_HOME/amp/AGENTS.md",
+                        "%USERPROFILE%\\.config\\AGENTS.md",
+                        "%USERPROFILE%\\.config\\amp\\AGENTS.md",
+                        "~/.config/AGENTS.md",
+                        "~/.config/amp/AGENTS.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "log",
                     "collect_priority": "normal",
                     "id": "amp.ledger",
@@ -764,6 +785,43 @@ $EmbeddedCatalogueJson = @'
                     "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "unverified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "amp.managed_instructions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%PROGRAMDATA%\\ampcode\\AGENTS.md",
+                        "/Library/Application Support/ampcode/AGENTS.md",
+                        "/etc/ampcode/AGENTS.md"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "amp.plugins",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/amp/plugins/",
+                        "%USERPROFILE%\\.config\\amp\\plugins\\",
+                        "<project>/.amp/plugins/",
+                        "~/.config/amp/plugins/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 },
                 {
                     "category": "credentials",
@@ -816,6 +874,8 @@ $EmbeddedCatalogueJson = @'
                         "%PROGRAMDATA%\\ampcode\\managed-settings.json",
                         "%USERPROFILE%\\.config\\amp\\settings.json",
                         "%USERPROFILE%\\.config\\amp\\settings.jsonc",
+                        "<project>/**/.amp/settings.json",
+                        "<project>/**/.amp/settings.jsonc",
                         "<project>/.amp/settings.json",
                         "<project>/.amp/settings.jsonc",
                         "~/.config/amp/settings.json",
@@ -12368,7 +12428,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "4757a9fe239ce7f5e63adfeb7543a2739c212a52893becdb1438fde17ac8d173"
+    "sha256": "c50c8303f918bf7fd8520df9cb13f191bda5c7970122c70549f0041e9520fdd3"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

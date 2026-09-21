@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: bcee70c6de2b
+# Catalogue digest: 5a705decad88
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -110,6 +110,7 @@
 #     amazonq.cli_mcp_config
 #     amazonq.ide_agent_config
 #     amazonq.prompt_library
+#     amp.plugins
 #     amp.settings
 #     amp.skills
 #     claude_code.agent_memory
@@ -236,7 +237,11 @@ sources:
     amazonq,amazonq.prompt_library,C:/Users/*/.aws/amazonq/prompts/*.md
     amazonq,amazonq.sso_token_cache,C:/Users/*/.aws/sso/cache/*.json
     amazonq,amazonq.sso_token_cache,C:/Users/*/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
+    amp,amp.global_instructions,C:/Users/*/.config/AGENTS.md
+    amp,amp.global_instructions,C:/Users/*/.config/amp/AGENTS.md
     amp,amp.ledger,C:/Users/*/AppData/Roaming/amp/ledger.jsonl
+    amp,amp.managed_instructions,C:/ProgramData/ampcode/AGENTS.md
+    amp,amp.plugins,C:/Users/*/.config/amp/plugins/**
     amp,amp.secrets,C:/Users/*/.amp/oauth/**
     amp,amp.secrets,C:/Users/*/AppData/Roaming/amp/secrets.json
     amp,amp.settings,C:/ProgramData/ampcode/managed-settings.json
@@ -1826,8 +1831,16 @@ sources:
     amazonq,amazonq.sso_token_cache,/var/root/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
     amp,amp.continuations,/Users/*/.local/share/amp/continuations/*.json
     amp,amp.continuations,/var/root/.local/share/amp/continuations/*.json
+    amp,amp.global_instructions,/Users/*/.config/AGENTS.md
+    amp,amp.global_instructions,/Users/*/.config/amp/AGENTS.md
+    amp,amp.global_instructions,/var/root/.config/AGENTS.md
+    amp,amp.global_instructions,/var/root/.config/amp/AGENTS.md
     amp,amp.ledger,/Users/*/.local/share/amp/ledger.jsonl
     amp,amp.ledger,/var/root/.local/share/amp/ledger.jsonl
+    amp,amp.managed_instructions,/Library/Application Support/ampcode/AGENTS.md
+    amp,amp.managed_instructions,/etc/ampcode/AGENTS.md
+    amp,amp.plugins,/Users/*/.config/amp/plugins/**
+    amp,amp.plugins,/var/root/.config/amp/plugins/**
     amp,amp.secrets,/Users/*/.amp/oauth/**
     amp,amp.secrets,/Users/*/.local/share/amp/secrets.json
     amp,amp.secrets,/var/root/.amp/oauth/**
@@ -5039,8 +5052,16 @@ sources:
     amazonq,amazonq.sso_token_cache,/root/.aws/sso/cache/aws-toolkit-vscode-client-id-*.json
     amp,amp.continuations,/home/*/.local/share/amp/continuations/*.json
     amp,amp.continuations,/root/.local/share/amp/continuations/*.json
+    amp,amp.global_instructions,/home/*/.config/AGENTS.md
+    amp,amp.global_instructions,/home/*/.config/amp/AGENTS.md
+    amp,amp.global_instructions,/root/.config/AGENTS.md
+    amp,amp.global_instructions,/root/.config/amp/AGENTS.md
     amp,amp.ledger,/home/*/.local/share/amp/ledger.jsonl
     amp,amp.ledger,/root/.local/share/amp/ledger.jsonl
+    amp,amp.managed_instructions,/Library/Application Support/ampcode/AGENTS.md
+    amp,amp.managed_instructions,/etc/ampcode/AGENTS.md
+    amp,amp.plugins,/home/*/.config/amp/plugins/**
+    amp,amp.plugins,/root/.config/amp/plugins/**
     amp,amp.secrets,/home/*/.amp/oauth/**
     amp,amp.secrets,/home/*/.local/share/amp/secrets.json
     amp,amp.secrets,/root/.amp/oauth/**

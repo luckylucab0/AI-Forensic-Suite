@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: bcee70c6de2b
+# Catalogue digest: 5a705decad88
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -109,6 +109,7 @@
 #     amazonq.cli_mcp_config
 #     amazonq.ide_agent_config
 #     amazonq.prompt_library
+#     amp.plugins
 #     amp.settings
 #     amp.skills
 #     claude_code.agent_memory
@@ -219,7 +220,11 @@ $targets = @(
     @{ Agent = 'amazonq'; Id = 'amazonq.prompt_library'; Path = '$profile\.aws\amazonq\prompts' }
     @{ Agent = 'amazonq'; Id = 'amazonq.sso_token_cache'; Path = '$profile\.aws\sso\cache' }
     @{ Agent = 'amazonq'; Id = 'amazonq.sso_token_cache'; Path = '$profile\.aws\sso\cache\aws-toolkit-vscode-client-id-' }
+    @{ Agent = 'amp'; Id = 'amp.global_instructions'; Path = '$profile\.config\AGENTS.md' }
+    @{ Agent = 'amp'; Id = 'amp.global_instructions'; Path = '$profile\.config\amp\AGENTS.md' }
     @{ Agent = 'amp'; Id = 'amp.ledger'; Path = '$profile\AppData\Roaming\amp\ledger.jsonl' }
+    @{ Agent = 'amp'; Id = 'amp.managed_instructions'; Path = 'C:\ProgramData\ampcode\AGENTS.md' }
+    @{ Agent = 'amp'; Id = 'amp.plugins'; Path = '$profile\.config\amp\plugins' }
     @{ Agent = 'amp'; Id = 'amp.secrets'; Path = '$profile\.amp\oauth' }
     @{ Agent = 'amp'; Id = 'amp.secrets'; Path = '$profile\AppData\Roaming\amp\secrets.json' }
     @{ Agent = 'amp'; Id = 'amp.settings'; Path = '$profile\.config\amp\settings.json' }

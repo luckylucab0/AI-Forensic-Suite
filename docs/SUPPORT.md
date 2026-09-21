@@ -6,7 +6,7 @@ English | [Deutsch](SUPPORT.de.md)
 
 What this suite reads, per agent, counted from the catalogue and the reader registry rather than written down. The numbers move when the code does.
 
-31 catalogue files, 30 of them a product and one cross-cutting. 494 of 620 artifacts are read by 37 reader modules, into 23 event kinds. 495 artifacts rest on a fetched vendor source.
+31 catalogue files, 30 of them a product and one cross-cutting. 497 of 623 artifacts are read by 37 reader modules, into 23 event kinds. 498 artifacts rest on a fetched vendor source.
 
 **How to read an empty result.** An agent listed here with artifacts read means the paths were searched and the files that were there were parsed, so an empty result is evidence that those paths held nothing. It is never evidence that the agent was not used: the data tree may have been relocated by a variable, the retention period may have swept it, the paths may be the unverified ones, or the user may have worked in a profile nobody collected. Where an entry is unverified, `docs/ARTIFACTS.md` says so per artifact and the analyzer repeats it in its output.
 
@@ -18,7 +18,7 @@ What this suite reads, per agent, counted from the catalogue and the reader regi
 | --- | --- | --- | --- | --- | --- |
 | Aider | Linux, macOS, Windows | 2 / 2 | 11 / 13 | 8 | 2 |
 | Amazon Q Developer (CLI and IDE extension) | Linux, macOS, Windows | 3 / 3 | 17 / 20 | 9 | 3 |
-| Amp | Linux, macOS, Windows | 2 / 2 | 7 / 8 | 6 | 1 |
+| Amp | Linux, macOS, Windows | 2 / 2 | 10 / 11 | 6 | 1 |
 | ChatGPT Desktop | macOS, Windows | 2 / 5 | 3 / 11 | 3 | 8 |
 | Claude Code | Linux, macOS, Windows | 5 / 6 | 68 / 78 | 37 | 10 |
 | Claude Desktop | Linux, macOS, Windows | 1 / 2 | 18 / 29 | 11 | 11 |
