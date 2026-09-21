@@ -28,6 +28,43 @@ references:
 - https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts
 - https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/session/sql.ts
 - https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/web/src/content/docs/config.mdx
+env_overrides:
+- name: OPENCODE_DB
+  effect: |-
+    Moves or renames the conversation database. database.ts path() returns the value when it is absolute, joins it to the data directory when it is relative, and honours the literal ':memory:', which means the conversations of that run are never written to disk at all. A collection keyed on the documented filename finds nothing on such a host, and with ':memory:' there is nothing to find: the absence is the finding, and it has to be read off the environment rather than off the filesystem.
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/database/database.ts
+- name: OPENCODE_DISABLE_CHANNEL_DB
+  effect: |-
+    Decides which of two database filenames is in use. database.ts writes opencode.db for the release channels latest, beta and prod or when this variable is set, and opencode-<channel>.db otherwise, with every character outside a small set replaced by a dash. Both spellings are in this catalogue for that reason; the variable is what says which one a host should have.
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/database/database.ts
+- name: OPENCODE_CONFIG_DIR
+  effect: |-
+    Replaces the configuration directory outright, so the agent definitions, the commands and the configuration file are not under the documented path. global.ts make() takes the flag before the freedesktop configuration directory.
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts
+- name: OPENCODE_CONFIG
+  effect: |-
+    Names the configuration file itself, anywhere on disk, which is the file that carries the permission set and the MCP servers.
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/flag/flag.ts
+- name: OPENCODE_CONFIG_CONTENT
+  effect: |-
+    Carries the configuration in the environment rather than in a file. There is then no configuration file to collect at all, and what the agent was permitted to do exists only in the process environment of the run: look for it in shell profiles, service definitions and CI configuration.
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/flag/flag.ts
+- name: OPENCODE_TEST_HOME
+  effect: |-
+    Replaces the home directory the product resolves everything else from, so every path in this catalogue moves with it.
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts
+- name: OPENCODE_PLUGIN_META_FILE
+  effect: |-
+    Names the plugin metadata file, which says which plugin code the product loads.
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/flag/flag.ts
+- name: OPENCODE_MODELS_PATH
+  effect: |-
+    Names the model catalogue file, which says which providers and endpoints were available to the run.
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/flag/flag.ts
+- name: OPENCODE_TUI_CONFIG
+  effect: |-
+    Names the interface configuration file, which this catalogue otherwise expects in the configuration directory.
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/flag/flag.ts
 artifacts:
 - id: opencode.config
   category: config
@@ -342,3 +379,30 @@ artifacts:
 
     Record structure: Pre-1.2.0 layout: one JSON file per session under storage/session/<project>/ses_<id>.json plus per-message files under storage/message/<id>/. Observed on opencode 1.1.53. The part/ subtree is inferred from the session/message pattern and the modern schema - confirm by listing the storage/ tree rather than assuming.
   parser: json_generic
+- id: opencode.state_and_temp
+  title: State and temporary directories
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_STATE_HOME/opencode/
+  - '%USERPROFILE%\.local\state\opencode\'
+  - ~/.local/state/opencode/
+  format: directory
+  sensitivity: normal
+  collect_priority: live_only
+  status: verified
+  source: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/global.ts
+  source_kind: source_code
+  volatility: |-
+    The state directory holds the lock this product takes at startup, so its contents say whether an instance was running and are of no use once one is not. The temporary directory is under the operating system's own temporary root and is cleared by the platform rather than by the product, which is why it is not a path here: it has no stable spelling to glob.
+  notes: |-
+    global.ts creates seven directories at startup: data, config, state, tmp, log, bin and repos. Six of them are in this catalogue; the state directory was not, and the temporary one has no glob worth writing.
+
+    State is join(xdgState, 'opencode') and is where the global file lock lives, which is the evidence that an instance held it. Collected from a running machine or not at all, which is what the priority here says.
+
+    The temporary directory is join(os.tmpdir(), 'opencode'), so it is under whatever the platform's temporary root is for that user, which on macOS is a generated path per session. An examiner on a live host should look there by hand; a catalogue pattern for it would either miss it or match half the filesystem.
+  parser: null

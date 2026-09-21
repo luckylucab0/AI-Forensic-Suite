@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: f14125eb906f
+# Catalogue digest: 6d280a25de64
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -83,6 +83,7 @@
 #     qwen_code.project_settings
 #     roo_code.rules
 #     windsurf.project_instructions
+#     zed.task_definitions
 #   no Windows path with a testable fixed prefix
 #     amp.continuations
 #     amp.session_pointer
@@ -491,6 +492,7 @@ $targets = @(
     @{ Agent = 'continue'; Id = 'continue.aux_config'; Path = '$profile\.continue\.continueignore' }
     @{ Agent = 'continue'; Id = 'continue.aux_config'; Path = '$profile\.continue\.migrations' }
     @{ Agent = 'continue'; Id = 'continue.cli_auth'; Path = '$profile\.continue\auth.json' }
+    @{ Agent = 'continue'; Id = 'continue.compiled_config'; Path = '$profile\.continue\out\config.js' }
     @{ Agent = 'continue'; Id = 'continue.config'; Path = '$profile\.continue\config.json' }
     @{ Agent = 'continue'; Id = 'continue.config'; Path = '$profile\.continue\config.ts' }
     @{ Agent = 'continue'; Id = 'continue.config'; Path = '$profile\.continue\config.yaml' }
@@ -501,6 +503,8 @@ $targets = @(
     @{ Agent = 'continue'; Id = 'continue.dev_data_db'; Path = '$profile\.continue\dev_data\devdata.sqlite-wal' }
     @{ Agent = 'continue'; Id = 'continue.diffs'; Path = '$profile\.continue\.diffs' }
     @{ Agent = 'continue'; Id = 'continue.dotenv'; Path = '$profile\.continue\.env' }
+    @{ Agent = 'continue'; Id = 'continue.downloaded_binaries'; Path = '$profile\.continue\.utils\.chromium-browser-snapshots' }
+    @{ Agent = 'continue'; Id = 'continue.downloaded_binaries'; Path = '$profile\.continue\.utils\esbuild' }
     @{ Agent = 'continue'; Id = 'continue.environment_markers'; Path = '$profile\.continue\.continuerc.json' }
     @{ Agent = 'continue'; Id = 'continue.environment_markers'; Path = '$profile\.continue\.local' }
     @{ Agent = 'continue'; Id = 'continue.environment_markers'; Path = '$profile\.continue\.onboarding_complete' }
@@ -522,6 +526,7 @@ $targets = @(
     @{ Agent = 'continue'; Id = 'continue.input_history'; Path = '$profile\.continue\input_history.json' }
     @{ Agent = 'continue'; Id = 'continue.logs'; Path = '$profile\.continue\logs' }
     @{ Agent = 'continue'; Id = 'continue.permissions'; Path = '$profile\.continue\permissions.yaml' }
+    @{ Agent = 'continue'; Id = 'continue.prompt_log'; Path = '$profile\.continue\logs\prompt.log' }
     @{ Agent = 'continue'; Id = 'continue.rules_and_skills'; Path = '$profile\.continue\prompts' }
     @{ Agent = 'continue'; Id = 'continue.rules_and_skills'; Path = '$profile\.continue\rules' }
     @{ Agent = 'continue'; Id = 'continue.rules_and_skills'; Path = '$profile\.continue\skills' }
@@ -1093,6 +1098,7 @@ $targets = @(
     @{ Agent = 'opencode'; Id = 'opencode.install_and_runtime_trees'; Path = '$profile\.cache\opencode\bin' }
     @{ Agent = 'opencode'; Id = 'opencode.log'; Path = '$profile\.local\share\opencode\log' }
     @{ Agent = 'opencode'; Id = 'opencode.managed_config'; Path = 'C:\ProgramData\opencode' }
+    @{ Agent = 'opencode'; Id = 'opencode.state_and_temp'; Path = '$profile\.local\state\opencode' }
     @{ Agent = 'pi'; Id = 'pi.agents_skills'; Path = '$profile\.agents\skills' }
     @{ Agent = 'pi'; Id = 'pi.auth'; Path = '$profile\.pi\agent\auth.json' }
     @{ Agent = 'pi'; Id = 'pi.bin'; Path = '$profile\.pi\agent\bin' }
@@ -1348,17 +1354,31 @@ $targets = @(
     @{ Agent = 'windsurf'; Id = 'windsurf.workflows_and_skills'; Path = '$profile\.codeium\windsurf\skills' }
     @{ Agent = 'windsurf'; Id = 'windsurf.worktrees'; Path = '$profile\.devin\worktrees' }
     @{ Agent = 'windsurf'; Id = 'windsurf.worktrees'; Path = '$profile\.windsurf\worktrees' }
+    @{ Agent = 'zed'; Id = 'zed.extensions'; Path = '$profile\AppData\Local\Zed\copilot' }
     @{ Agent = 'zed'; Id = 'zed.extensions'; Path = '$profile\AppData\Local\Zed\debug_adapters' }
+    @{ Agent = 'zed'; Id = 'zed.extensions'; Path = '$profile\AppData\Local\Zed\devcontainer' }
     @{ Agent = 'zed'; Id = 'zed.extensions'; Path = '$profile\AppData\Local\Zed\extensions' }
     @{ Agent = 'zed'; Id = 'zed.extensions'; Path = '$profile\AppData\Local\Zed\external_agents' }
     @{ Agent = 'zed'; Id = 'zed.extensions'; Path = '$profile\AppData\Local\Zed\prompt_overrides' }
+    @{ Agent = 'zed'; Id = 'zed.extensions'; Path = '$profile\AppData\Local\Zed\remote_extensions' }
+    @{ Agent = 'zed'; Id = 'zed.extensions'; Path = '$profile\AppData\Local\Zed\remote_servers' }
+    @{ Agent = 'zed'; Id = 'zed.extensions'; Path = '$profile\AppData\Local\Zed\server_state' }
     @{ Agent = 'zed'; Id = 'zed.logs'; Path = '$profile\AppData\Local\Zed\logs' }
     @{ Agent = 'zed'; Id = 'zed.prompt_library'; Path = '$profile\AppData\Local\Zed\prompts' }
+    @{ Agent = 'zed'; Id = 'zed.semantic_index'; Path = '$profile\AppData\Local\Zed\embeddings' }
     @{ Agent = 'zed'; Id = 'zed.settings'; Path = '$profile\AppData\Roaming\Zed\settings.json' }
     @{ Agent = 'zed'; Id = 'zed.sidebar_threads'; Path = '$profile\AppData\Local\Zed\db\0-' }
+    @{ Agent = 'zed'; Id = 'zed.state_tree'; Path = '$profile\AppData\Local\Zed' }
     @{ Agent = 'zed'; Id = 'zed.threads_db'; Path = '$profile\AppData\Local\Zed\threads\threads.db' }
     @{ Agent = 'zed'; Id = 'zed.threads_db'; Path = '$profile\AppData\Local\Zed\threads\threads.db-shm' }
     @{ Agent = 'zed'; Id = 'zed.threads_db'; Path = '$profile\AppData\Local\Zed\threads\threads.db-wal' }
+    @{ Agent = 'zed'; Id = 'zed.user_agent_instructions'; Path = '$profile\AppData\Roaming\Zed\AGENTS.md' }
+    @{ Agent = 'zed'; Id = 'zed.user_configuration'; Path = '$profile\AppData\Roaming\Zed\debug.json' }
+    @{ Agent = 'zed'; Id = 'zed.user_configuration'; Path = '$profile\AppData\Roaming\Zed\global_settings.json' }
+    @{ Agent = 'zed'; Id = 'zed.user_configuration'; Path = '$profile\AppData\Roaming\Zed\keymap.json' }
+    @{ Agent = 'zed'; Id = 'zed.user_configuration'; Path = '$profile\AppData\Roaming\Zed\keymap_backup.json' }
+    @{ Agent = 'zed'; Id = 'zed.user_configuration'; Path = '$profile\AppData\Roaming\Zed\settings_backup.json' }
+    @{ Agent = 'zed'; Id = 'zed.user_configuration'; Path = '$profile\AppData\Roaming\Zed\tasks.json' }
 )
 
 $found = @{}

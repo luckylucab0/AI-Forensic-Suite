@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: f14125eb906f
+# Catalogue digest: 6d280a25de64
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,12 +8,14 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 39 of the 590 catalogue artifacts declare
+# KAPE is Windows only. 39 of the 599 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
 #
 # Not covered by this rule:
+#   anchored at a working copy, whose location only the agent's own state file gives: run the suite's collector, which reads it
+#     zed.task_definitions
 #   some of its paths are anchored at a working copy, whose location only the agent's own state file gives, so those are not in this rule. Its profile and system wide paths are. Run the suite's collector for the rest, which reads that state file
 #     zed.settings
 Description: AI coding agent artifacts, Zed
@@ -25,7 +27,19 @@ Targets:
     -
         Name: zed.extensions
         Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\Zed\copilot
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: zed.extensions
+        Category: install_evidence
         Path: C:\Users\%user%\AppData\Local\Zed\debug_adapters
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: zed.extensions
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\Zed\devcontainer
         FileMask: "*"
         Recursive: true
     -
@@ -47,6 +61,24 @@ Targets:
         FileMask: "*"
         Recursive: true
     -
+        Name: zed.extensions
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\Zed\remote_extensions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: zed.extensions
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\Zed\remote_servers
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: zed.extensions
+        Category: install_evidence
+        Path: C:\Users\%user%\AppData\Local\Zed\server_state
+        FileMask: "*"
+        Recursive: true
+    -
         Name: zed.logs
         Category: log
         Path: C:\Users\%user%\AppData\Local\Zed\logs
@@ -56,6 +88,12 @@ Targets:
         Name: zed.prompt_library
         Category: instructions
         Path: C:\Users\%user%\AppData\Local\Zed\prompts
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: zed.semantic_index
+        Category: cache
+        Path: C:\Users\%user%\AppData\Local\Zed\embeddings
         FileMask: "*"
         Recursive: true
     -
@@ -83,6 +121,12 @@ Targets:
         FileMask: "db.sqlite-wal"
         Recursive: false
     -
+        Name: zed.state_tree
+        Category: cache
+        Path: C:\Users\%user%\AppData\Local\Zed
+        FileMask: "*"
+        Recursive: true
+    -
         Name: zed.threads_db
         Category: transcript
         Path: C:\Users\%user%\AppData\Local\Zed\threads
@@ -99,4 +143,46 @@ Targets:
         Category: transcript
         Path: C:\Users\%user%\AppData\Local\Zed\threads
         FileMask: "threads.db-wal"
+        Recursive: false
+    -
+        Name: zed.user_agent_instructions
+        Category: instructions
+        Path: C:\Users\%user%\AppData\Roaming\Zed
+        FileMask: "AGENTS.md"
+        Recursive: false
+    -
+        Name: zed.user_configuration
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Zed
+        FileMask: "debug.json"
+        Recursive: false
+    -
+        Name: zed.user_configuration
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Zed
+        FileMask: "global_settings.json"
+        Recursive: false
+    -
+        Name: zed.user_configuration
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Zed
+        FileMask: "keymap.json"
+        Recursive: false
+    -
+        Name: zed.user_configuration
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Zed
+        FileMask: "keymap_backup.json"
+        Recursive: false
+    -
+        Name: zed.user_configuration
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Zed
+        FileMask: "settings_backup.json"
+        Recursive: false
+    -
+        Name: zed.user_configuration
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Zed
+        FileMask: "tasks.json"
         Recursive: false

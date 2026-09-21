@@ -234,6 +234,8 @@ DOCUMENTS = frozenset(
         "windsurf.ide_user_data",
         "windsurf.mcp_config",
         "zed.settings",
+        "zed.task_definitions",
+        "zed.user_configuration",
     }
 )
 
@@ -352,6 +354,8 @@ CONFIGURATIONS = frozenset(
         "windsurf.ide_user_data",
         "windsurf.mcp_config",
         "zed.settings",
+        "zed.task_definitions",
+        "zed.user_configuration",
     }
 )
 

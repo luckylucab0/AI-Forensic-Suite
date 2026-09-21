@@ -26,6 +26,19 @@ references:
 - https://raw.githubusercontent.com/zed-industries/zed/main/crates/agent_ui/src/thread_metadata_store.rs
 - https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs
 - https://raw.githubusercontent.com/zed-industries/zed/main/docs/src/ai/mcp.md
+env_overrides:
+- name: FLATPAK_XDG_CONFIG_HOME
+  effect: |-
+    Replaces the configuration directory outright when the editor runs as a Flatpak, so the settings file and the user-global AGENTS.md are not under the documented path at all. config_dir() in crates/paths/src/paths.rs reads it before falling back to the freedesktop directory.
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs
+- name: FLATPAK_XDG_DATA_HOME
+  effect: |-
+    The same for the data directory, which holds the conversation store, the prompt library and the semantic index. This catalogue already carries one Flatpak path for an older store, which is what makes the variable worth declaring: the current tree moves the same way.
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs
+- name: FLATPAK_XDG_STATE_HOME
+  effect: |-
+    The same for the state directory.
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs
 artifacts:
 - id: zed.threads_db
   category: transcript
@@ -77,16 +90,31 @@ artifacts:
   - linux
   - windows
   paths:
+  - $XDG_DATA_HOME/zed/copilot/
   - $XDG_DATA_HOME/zed/debug_adapters/
+  - $XDG_DATA_HOME/zed/devcontainer/
   - $XDG_DATA_HOME/zed/extensions/
   - $XDG_DATA_HOME/zed/external_agents/
   - $XDG_DATA_HOME/zed/prompt_overrides/
+  - $XDG_DATA_HOME/zed/remote_extensions/
+  - $XDG_DATA_HOME/zed/remote_servers/
+  - $XDG_DATA_HOME/zed/server_state/
+  - '%LOCALAPPDATA%\Zed\copilot\'
   - '%LOCALAPPDATA%\Zed\debug_adapters\'
+  - '%LOCALAPPDATA%\Zed\devcontainer\'
   - '%LOCALAPPDATA%\Zed\extensions\'
   - '%LOCALAPPDATA%\Zed\external_agents\'
   - '%LOCALAPPDATA%\Zed\prompt_overrides\'
+  - '%LOCALAPPDATA%\Zed\remote_extensions\'
+  - '%LOCALAPPDATA%\Zed\remote_servers\'
+  - '%LOCALAPPDATA%\Zed\server_state\'
+  - ~/Library/Application Support/Zed/copilot/
   - ~/Library/Application Support/Zed/debug_adapters/
+  - ~/Library/Application Support/Zed/devcontainer/
   - ~/Library/Application Support/Zed/extensions/
+  - ~/Library/Application Support/Zed/remote_extensions/
+  - ~/Library/Application Support/Zed/remote_servers/
+  - ~/Library/Application Support/Zed/server_state/
   - ~/.config/zed/prompt_overrides/
   - ~/Library/Application Support/Zed/external_agents/
   format: binary
@@ -101,7 +129,9 @@ artifacts:
 
     Path correction from the source verification pass: this entry rooted four of its five paths at a data directory environment variable that the editor does not read. The only override is a function call inside the process, so the variable is unset on every host and all four patterns resolved to nothing, on every platform, without any error. They are written out per platform now, from the defaults the path crate states.
 
-    The prompts directory used to be the fifth path here, with the macOS spelling only, on the reasoning that prompts_dir sits under the configuration directory. That is true on macOS and false everywhere else: prompts_dir is config_dir/prompts on macOS and data_dir/prompts on Linux and Windows, so the one spelling collected nothing on two platforms. It is zed.prompt_library now, in its own entry, because what is in it is the user's own instruction text rather than evidence that something was installed.
+    Five directories added by the pass that read the path crate end to end, all of them data_dir joins from crates/paths/src/paths.rs. copilot_dir is where this product downloads the language server of an AI completion service, which is install evidence for an AI feature rather than for an extension somebody chose. remote_servers_dir and remote_server_state_dir hold the server binaries and the state for this product's remote development, which means the agent's work can have happened on another machine entirely, and this is the local record that it did. devcontainer_dir and remote_extensions_dir are the same shape for a container and for extensions pushed to a remote host.
+
+        The prompts directory used to be the fifth path here, with the macOS spelling only, on the reasoning that prompts_dir sits under the configuration directory. That is true on macOS and false everywhere else: prompts_dir is config_dir/prompts on macOS and data_dir/prompts on Linux and Windows, so the one spelling collected nothing on two platforms. It is zed.prompt_library now, in its own entry, because what is in it is the user's own instruction text rather than evidence that something was installed.
 
     Checked helper by helper against the path crate at the same time, because that is where the mistake above came from: extensions_dir, debug_adapters_dir and external_agents_dir are all data_dir joins, so the three spellings of each are right. prompt_overrides_dir is not: like prompts_dir it is config_dir/prompt_overrides on macOS and data_dir/prompt_overrides elsewhere, and the macOS spelling here pointed at the data directory, where the editor never writes it. It is ~/.config/zed/prompt_overrides/ now. The directory matters because a file in it silently replaces one of the prompts the product ships.
   parser: null
@@ -238,3 +268,141 @@ artifacts:
 
     Re-sourced by the verification pass: the store cited before opens the shared database through a macro and names no path. This file holds the database filename and the release-channel directory name, and the path crate supplies the per-platform database directory.
   parser: zed_sidebar
+- id: zed.user_agent_instructions
+  title: User-global agent instructions (AGENTS.md)
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_CONFIG_HOME/zed/AGENTS.md
+  - '%APPDATA%\Zed\AGENTS.md'
+  - ~/.config/zed/AGENTS.md
+  format: markdown
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs
+  source_kind: source_code
+  volatility: |-
+    A file the user edits, not written by the product on a timer, so it persists until somebody changes it and it outlives every conversation it shaped.
+  notes: |-
+    THE INSTRUCTION SURFACE OF THIS PRODUCT AT PROFILE SCOPE, and it was in no entry of this catalogue. The vendor's own comment on agents_file() in crates/paths/src/paths.rs says what it is: 'This file holds personal agent instructions that apply to every project the user opens, and is loaded into the native Zed agent's system prompt.'
+
+    So it is the answer to what the agent was told to obey on this machine, for every project, and a conversation that looks inexplicable is often explained by it. A collection that missed it read the transcripts and not the standing orders behind them.
+
+    agents_file() = config_dir().join("AGENTS.md"). config_dir() is %APPDATA%\Zed on Windows, the freedesktop configuration directory joined with 'zed' on Linux and FreeBSD, and ~/.config/zed elsewhere, which includes macOS. The Flatpak variable above replaces it.
+  parser: instructions
+- id: zed.user_configuration
+  title: User configuration beside the settings file
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_CONFIG_HOME/zed/debug.json
+  - $XDG_CONFIG_HOME/zed/global_settings.json
+  - $XDG_CONFIG_HOME/zed/keymap.json
+  - $XDG_CONFIG_HOME/zed/keymap_backup.json
+  - $XDG_CONFIG_HOME/zed/settings_backup.json
+  - $XDG_CONFIG_HOME/zed/tasks.json
+  - '%APPDATA%\Zed\debug.json'
+  - '%APPDATA%\Zed\global_settings.json'
+  - '%APPDATA%\Zed\keymap.json'
+  - '%APPDATA%\Zed\keymap_backup.json'
+  - '%APPDATA%\Zed\settings_backup.json'
+  - '%APPDATA%\Zed\tasks.json'
+  - ~/.config/zed/debug.json
+  - ~/.config/zed/global_settings.json
+  - ~/.config/zed/keymap.json
+  - ~/.config/zed/keymap_backup.json
+  - ~/.config/zed/settings_backup.json
+  - ~/.config/zed/tasks.json
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs
+  source_kind: source_code
+  volatility: |-
+    The two backup files are the interesting ones: the product writes them when it rewrites the file beside them, so each holds a configuration that was in force before the current one. Nothing prunes them.
+  notes: |-
+    The settings file has its own entry; these are its siblings, each named by its own resolver in crates/paths/src/paths.rs: global_settings_file, settings_backup_file, keymap_file, keymap_backup_file, tasks_file and debug_scenarios_file, all joined to config_dir().
+
+    Two of them answer questions the settings file cannot. settings_backup.json is what the configuration was before the change that produced the current one, which is the closest thing this product has to a history of its own agent settings. And tasks.json is a list of commands the editor will run on request, user authored, which is executable content in a configuration file: a task added shortly before the period under investigation is worth reading in full.
+  parser: json_generic
+- id: zed.task_definitions
+  title: Project task and debug definitions
+  category: instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <project>/.vscode/launch.json
+  - <project>/.vscode/tasks.json
+  - <project>/.zed/debug.json
+  - <project>/.zed/tasks.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs
+  source_kind: source_code
+  volatility: |-
+    Committed with the repository as a rule, so a clone brings them back and the git history of the working copy says who added one and when. A task file that is present and in no commit was written locally.
+  notes: |-
+    Commands the editor runs, in a file that travels with the repository. local_tasks_file_relative_path() is '.zed/tasks.json' and debug_task_file_name() is 'debug.json' under the same folder, both from crates/paths/src/paths.rs.
+
+    The two .vscode paths are the same resolver's compatibility half: local_vscode_tasks_file_relative_path() is '.vscode/tasks.json' and local_vscode_launch_file_relative_path() is '.vscode/launch.json', so this product reads the other editor's task files as well. Two consequences, and the second is the one to be careful about. A task defined for one editor is runnable in the other, so the command surface of a checked-out repository is the union of the two. And the presence of a .vscode folder is not evidence that the other editor was used, which is the same trap the cross-cutting instruction files carry for the rule files of other agents.
+  parser: instructions
+- id: zed.semantic_index
+  title: Semantic index of the user's code
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_DATA_HOME/zed/embeddings/
+  - '%LOCALAPPDATA%\Zed\embeddings\'
+  - ~/Library/Application Support/Zed/embeddings/
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs
+  source_kind: source_code
+  notes: |-
+    embeddings_dir() in crates/paths/src/paths.rs, under the data directory on every platform this catalogue covers. What is in it is a derived index rather than the code itself, and it is here for one question: which files the product had indexed, which is a statement about what was in scope for the agent even after the working copy is gone. The index format is the product's own and is not read here.
+  parser: null
+- id: zed.state_tree
+  title: State directory
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $XDG_STATE_HOME/zed/
+  - '%LOCALAPPDATA%\Zed\'
+  - ~/.local/state/Zed/
+  - ~/.local/state/zed/
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/zed-industries/zed/main/crates/paths/src/paths.rs
+  source_kind: source_code
+  notes: |-
+    state_dir() in crates/paths/src/paths.rs, and the three platforms disagree about where it is: ~/.local/state/Zed on macOS, the freedesktop state directory joined with 'zed' on Linux and FreeBSD, and the local application data directory on Windows, where it is the same directory as the data tree.
+
+    What the product keeps in it is not stated in the module that names it, so this entry collects the tree and describes it as a tree. Both spellings of the macOS and Linux form are listed because the case of the last segment differs between them, which is exactly the kind of detail a hand-written glob gets wrong.
+  parser: null

@@ -6,7 +6,7 @@
 
 Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registrierung statt aufgeschrieben. Die Zahlen bewegen sich mit dem Code.
 
-31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 472 von 590 Artefakten werden von 37 Leser-Modulen gelesen, in 23 Ereignisarten. 465 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
+31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 477 von 599 Artefakten werden von 37 Leser-Modulen gelesen, in 23 Ereignisarten. 474 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
 
 **Wie ein leeres Ergebnis zu lesen ist.** Steht ein Agent hier mit gelesenen Artefakten, dann wurden die Pfade durchsucht und die vorhandenen Dateien ausgewertet, also ist ein leeres Ergebnis ein Befund über diese Pfade. Es ist nie ein Befund darüber, dass der Agent nicht benutzt wurde: der Datenbaum kann über eine Variable verschoben sein, die Aufbewahrungsfrist kann ihn gelöscht haben, die Pfade können die unverifizierten sein, oder die Person hat in einem Profil gearbeitet, das niemand gesammelt hat. Wo ein Eintrag unverifiziert ist, sagt `docs/ARTIFACTS.de.md` es pro Artefakt, und der Analyzer wiederholt es in seiner Ausgabe.
 
@@ -23,7 +23,7 @@ Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registri
 | Claude Code | Linux, macOS, Windows | 5 / 6 | 68 / 78 | 37 | 10 |
 | Claude Desktop | Linux, macOS, Windows | 1 / 2 | 18 / 29 | 11 | 11 |
 | Cline | Linux, macOS, Windows | 5 / 5 | 21 / 25 | 8 | 4 |
-| Continue | Linux, macOS, Windows | 1 / 1 | 15 / 18 | 10 | 3 |
+| Continue | Linux, macOS, Windows | 1 / 1 | 17 / 21 | 11 | 4 |
 | Cross-cutting evidence | Linux, macOS, Windows | keine | 20 / 27 | 6 | 7 |
 | Cursor | Linux, macOS, Windows | 9 / 9 | 43 / 50 | 32 | 7 |
 | Devin | Linux, macOS, Windows | 1 / 1 | 2 / 2 | 2 | 0 |
@@ -39,14 +39,14 @@ Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registri
 | LM Studio | Linux, macOS, Windows | 1 / 1 | 5 / 7 | 3 | 2 |
 | Ollama | Linux, macOS, Windows | 1 / 1 | 8 / 12 | 5 | 4 |
 | OpenAI Codex CLI | Linux, macOS, Windows | 6 / 6 | 11 / 13 | 5 | 2 |
-| OpenCode | Linux, macOS, Windows | 2 / 2 | 7 / 11 | 5 | 4 |
+| OpenCode | Linux, macOS, Windows | 2 / 2 | 7 / 12 | 5 | 5 |
 | pi | Linux, macOS, Windows | 1 / 1 | 8 / 10 | 3 | 2 |
 | Qwen Code | Linux, macOS, Windows | 2 / 2 | 29 / 33 | 16 | 4 |
 | Roo Code | Linux, macOS, Windows | 1 / 1 | 6 / 7 | 2 | 1 |
 | Visual Studio Code host storage | Linux, macOS, Windows | keine | 4 / 5 | 3 | 1 |
 | Warp | Linux, macOS, Windows | keine | 1 / 1 | 1 | 0 |
 | Windsurf | Linux, macOS, Windows | 6 / 6 | 30 / 40 | 16 | 10 |
-| Zed | Linux, macOS, Windows | 3 / 3 | 6 / 7 | 3 | 1 |
+| Zed | Linux, macOS, Windows | 3 / 3 | 9 / 12 | 4 | 3 |
 
 ## Was nicht gelesen wird, und warum
 
@@ -68,7 +68,7 @@ Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es 
 
 ### Container in einem Format, das hier niemand gelesen hat
 
-67 Einträge, binäre oder Verzeichnis-Layouts ohne dokumentiertes Format. Jeder wird ganz gesammelt und steht als Dateisystem-Ereignis auf der Zeitlinie. Einen davon zu lesen heisst, eine Formatimplementierung zu schreiben, und nicht, einen unfertigen Leser fertigzustellen.
+71 Einträge, binäre oder Verzeichnis-Layouts ohne dokumentiertes Format. Jeder wird ganz gesammelt und steht als Dateisystem-Ereignis auf der Zeitlinie. Einen davon zu lesen heisst, eine Formatimplementierung zu schreiben, und nicht, einen unfertigen Leser fertigzustellen.
 
 - `amazonq.cli_subagent_executions` (directory)
 - `amazonq.ide_extension_install` (directory)
@@ -95,6 +95,7 @@ Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es 
 - `claude_desktop.ssh_remote_artifacts` (directory)
 - `claude_desktop.user_output_folder` (directory)
 - `cline.chat_workspace` (directory)
+- `continue.downloaded_binaries` (binary)
 - `copilot.cache` (directory)
 - `copilot.extensions_and_plugins` (directory)
 - `copilot.session_state` (directory)
@@ -126,6 +127,7 @@ Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es 
 - `ollama.model_blobs` (binary)
 - `opencode.install_and_runtime_trees` (binary)
 - `opencode.repos_cache` (binary)
+- `opencode.state_and_temp` (directory)
 - `pi.bin` (binary)
 - `qwen_code.project_temp_spill` (directory)
 - `vscode.user_data_roots` (binary)
@@ -137,6 +139,8 @@ Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es 
 - `windsurf.server_data` (directory)
 - `windsurf.worktrees` (directory)
 - `zed.extensions` (binary)
+- `zed.semantic_index` (directory)
+- `zed.state_tree` (directory)
 
 ### Lesbare Formate mit einer Begründung
 
@@ -155,7 +159,7 @@ Zum Zeitpunkt dieser Generierung keine. Die Prüfung hinter diesem Abschnitt suc
 
 ## Wo die Lesung dünn ist
 
-288 Artefakte werden von einem generischen Leser gelesen. Die Datei wird vollständig gelesen und jeder Record steht mit seinem Inhalt im Fall; was der Record bedeutet, ist nicht entschieden, und jeder sagt das an sich selbst. Zwei Arten von Record tragen diese Aussage: `unparsed.record` für etwas, das niemand lesen konnte, und ein als uninterpretiert zurückgegebener Record für etwas Gelesenes, dessen Format niemand abgebildet hat. In jeder Zusammenfassung dieser Suite sind die beiden getrennt gezählt, denn ein Speicher ohne Schema und eine halb geschriebene Datei sind entgegengesetzte Probleme.
+290 Artefakte werden von einem generischen Leser gelesen. Die Datei wird vollständig gelesen und jeder Record steht mit seinem Inhalt im Fall; was der Record bedeutet, ist nicht entschieden, und jeder sagt das an sich selbst. Zwei Arten von Record tragen diese Aussage: `unparsed.record` für etwas, das niemand lesen konnte, und ein als uninterpretiert zurückgegebener Record für etwas Gelesenes, dessen Format niemand abgebildet hat. In jeder Zusammenfassung dieser Suite sind die beiden getrennt gezählt, denn ein Speicher ohne Schema und eine halb geschriebene Datei sind entgegengesetzte Probleme.
 
 ## Wo es weitergeht
 

@@ -120,13 +120,22 @@ def test_the_reader_claims_every_prose_transcript_in_the_catalogue() -> None:
     # One of them has a verified parser of its own and keeps it: that product's chat log is
     # a format somebody read against its source, and a floor under it would be a step back.
     assert prose - claimed == {"aider.chat_history"}
-    # The two paste stores are read here too and neither is a transcript. Each is the text
-    # behind a placeholder in a prompt, and they belong to this reader for the same reason
-    # the others do: one file holding text that has to stay in one piece. Their categories
-    # differ because their products treat them differently. One sweeps its store, so the
-    # entry is filed under cache; the other never removes a file, so its entry is filed as
-    # the prompt history it durably is.
-    assert claimed - prose == {"claude_code.paste_cache", "hermes.pastes"}
+    # The three that are read here and are not transcripts. Each is one file holding text
+    # that has to stay in one piece, which is the whole reason this reader exists.
+    #
+    # The two paste stores are the text behind a placeholder in a prompt. Their categories
+    # differ because their products treat them differently: one sweeps its store, so the
+    # entry is filed under cache, and the other never removes a file, so its entry is filed
+    # as the prompt history it durably is.
+    #
+    # The third is a log by category and prose by content: it holds each prompt as it was
+    # rendered and sent, context and all, and the entry beside it reads the rest of that
+    # directory line by line. A prompt split into lines is a prompt nobody can quote.
+    assert claimed - prose == {
+        "claude_code.paste_cache",
+        "continue.prompt_log",
+        "hermes.pastes",
+    }
 
 
 def test_a_spill_that_is_not_prose_is_recorded_as_bytes(tmp_path: Path) -> None:

@@ -2,7 +2,7 @@
 
 <!-- Generated from the artifact catalogue. Do not edit by hand:
 <!-- run `afx export-collection` and commit the result.
-<!-- Catalogue digest: f14125eb906f
+<!-- Catalogue digest: 6d280a25de64
 <!--
 <!-- An empty result from this rule means the paths it searched held nothing. It does
 <!-- not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -71,7 +71,7 @@ Windows-relevant catalogue entries, as a sense of what a collection will cover:
 | Claude Code | `claude_code` | 75 |
 | Claude Desktop | `claude_desktop` | 25 |
 | Cline | `cline` | 25 |
-| Continue | `continue` | 17 |
+| Continue | `continue` | 20 |
 | Cross-cutting evidence | `crosscutting` | 21 |
 | Cursor | `cursor` | 46 |
 | Devin | `devin` | 2 |
@@ -87,13 +87,13 @@ Windows-relevant catalogue entries, as a sense of what a collection will cover:
 | LM Studio | `lmstudio` | 6 |
 | Ollama | `ollama` | 11 |
 | OpenAI Codex CLI | `codex` | 13 |
-| OpenCode | `opencode` | 11 |
+| OpenCode | `opencode` | 12 |
 | Qwen Code | `qwen_code` | 33 |
 | Roo Code | `roo_code` | 7 |
 | Visual Studio Code host storage | `vscode` | 5 |
 | Warp | `warp` | 1 |
 | Windsurf | `windsurf` | 35 |
-| Zed | `zed` | 6 |
+| Zed | `zed` | 11 |
 | pi | `pi` | 10 |
 
 The count is entries, not files: one entry can be a directory holding a thousand

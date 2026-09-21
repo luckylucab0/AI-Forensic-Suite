@@ -114,7 +114,7 @@ ist, dass das nicht *unbemerkt* geht.
   Ereignisse verwandelt. Ein Parser wird über den Katalogeintrag gewählt, der die Datei
   beansprucht hat, also kann er dem Katalog nie widersprechen, was eine Datei ist. Eine
   Datei ohne Parser wird als nicht unterstützt vermerkt statt übersprungen, und der Fall
-  zählt diese Dateien und sagt, welche es sind. 37 Module lesen 472 der 590
+  zählt diese Dateien und sagt, welche es sind. 37 Module lesen 477 der 599
   Katalogartefakte, und was der Rest ist, wird behauptet und nicht angenommen: jeder Eintrag
   in einem Format, das diese Suite liest, wird entweder gelesen oder trägt einen
   aufgeschriebenen Grund, warum nicht, und die Anmeldedatenspeicher sind als Klasse

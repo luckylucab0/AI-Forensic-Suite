@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: f14125eb906f
+# Catalogue digest: 6d280a25de64
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 39 of the 590 catalogue artifacts declare
+# KAPE is Windows only. 39 of the 599 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -60,6 +60,12 @@ Targets:
         Category: credentials
         Path: C:\Users\%user%\.continue
         FileMask: "auth.json"
+        Recursive: false
+    -
+        Name: continue.compiled_config
+        Category: instructions
+        Path: C:\Users\%user%\.continue\out
+        FileMask: "config.js"
         Recursive: false
     -
         Name: continue.config
@@ -121,6 +127,18 @@ Targets:
         Path: C:\Users\%user%\.continue
         FileMask: ".env"
         Recursive: false
+    -
+        Name: continue.downloaded_binaries
+        Category: install_evidence
+        Path: C:\Users\%user%\.continue\.utils
+        FileMask: ".chromium-browser-snapshots"
+        Recursive: false
+    -
+        Name: continue.downloaded_binaries
+        Category: install_evidence
+        Path: C:\Users\%user%\.continue\.utils\esbuild
+        FileMask: "*"
+        Recursive: true
     -
         Name: continue.environment_markers
         Category: install_evidence
@@ -246,6 +264,12 @@ Targets:
         Category: permissions
         Path: C:\Users\%user%\.continue
         FileMask: "permissions.yaml"
+        Recursive: false
+    -
+        Name: continue.prompt_log
+        Category: log
+        Path: C:\Users\%user%\.continue\logs
+        FileMask: "prompt.log"
         Recursive: false
     -
         Name: continue.rules_and_skills

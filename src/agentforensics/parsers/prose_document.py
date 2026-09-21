@@ -50,6 +50,11 @@ SOURCES = {
     "claude_code.tool_result_spills": "unparsed.record",
     "factory_droid.specs": "plan.write",
     "cursor.subagent_output": "unparsed.record",
+    # The rendered prompt as it was sent, which is prose and not a line-oriented log: the
+    # entry beside it reads the rest of that directory line by line, and a prompt split
+    # into lines is a prompt nobody can quote. Filed as a prompt because that is what the
+    # file holds, with the context the product assembled into it.
+    "continue.prompt_log": "user.prompt",
     # The same shape as claude_code.paste_cache above, in a second product: a paste
     # longer than five lines or two thousand characters is written out and the prompt
     # keeps a placeholder naming it. Same reading, same reason.

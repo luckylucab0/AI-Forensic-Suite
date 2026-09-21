@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: f14125eb906f
+# Catalogue digest: 6d280a25de64
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -74,6 +74,7 @@
 #     qwen_code.project_settings
 #     roo_code.rules
 #     windsurf.project_instructions
+#     zed.task_definitions
 #   no path for this operating system that this target can express
 #     amp.continuations
 #     amp.session_pointer
@@ -563,6 +564,7 @@ sources:
     continue,continue.aux_config,C:/Users/*/.continue/.continueignore
     continue,continue.aux_config,C:/Users/*/.continue/.migrations/**
     continue,continue.cli_auth,C:/Users/*/.continue/auth.json
+    continue,continue.compiled_config,C:/Users/*/.continue/out/config.js
     continue,continue.config,C:/Users/*/.continue/config.json
     continue,continue.config,C:/Users/*/.continue/config.ts
     continue,continue.config,C:/Users/*/.continue/config.yaml
@@ -573,6 +575,8 @@ sources:
     continue,continue.dev_data_db,C:/Users/*/.continue/dev_data/devdata.sqlite-wal
     continue,continue.diffs,C:/Users/*/.continue/.diffs/**
     continue,continue.dotenv,C:/Users/*/.continue/.env
+    continue,continue.downloaded_binaries,C:/Users/*/.continue/.utils/.chromium-browser-snapshots/**
+    continue,continue.downloaded_binaries,C:/Users/*/.continue/.utils/esbuild
     continue,continue.environment_markers,C:/Users/*/.continue/.continuerc.json
     continue,continue.environment_markers,C:/Users/*/.continue/.local
     continue,continue.environment_markers,C:/Users/*/.continue/.onboarding_complete
@@ -594,6 +598,7 @@ sources:
     continue,continue.input_history,C:/Users/*/.continue/input_history.json
     continue,continue.logs,C:/Users/*/.continue/logs/**
     continue,continue.permissions,C:/Users/*/.continue/permissions.yaml
+    continue,continue.prompt_log,C:/Users/*/.continue/logs/prompt.log
     continue,continue.rules_and_skills,C:/Users/*/.continue/prompts/**
     continue,continue.rules_and_skills,C:/Users/*/.continue/rules/**
     continue,continue.rules_and_skills,C:/Users/*/.continue/skills/**
@@ -1293,6 +1298,7 @@ sources:
     opencode,opencode.install_and_runtime_trees,C:/Users/*/.cache/opencode/bin/**
     opencode,opencode.log,C:/Users/*/.local/share/opencode/log/**
     opencode,opencode.managed_config,C:/ProgramData/opencode
+    opencode,opencode.state_and_temp,C:/Users/*/.local/state/opencode/**
     pi,pi.agents_skills,C:/Users/*/.agents/skills/**
     pi,pi.auth,C:/Users/*/.pi/agent/auth.json
     pi,pi.bin,C:/Users/*/.pi/agent/bin/**
@@ -1607,19 +1613,33 @@ sources:
     windsurf,windsurf.workflows_and_skills,C:/Users/*/.codeium/windsurf/skills/**
     windsurf,windsurf.worktrees,C:/Users/*/.devin/worktrees/*
     windsurf,windsurf.worktrees,C:/Users/*/.windsurf/worktrees/*
+    zed,zed.extensions,C:/Users/*/AppData/Local/Zed/copilot/**
     zed,zed.extensions,C:/Users/*/AppData/Local/Zed/debug_adapters/**
+    zed,zed.extensions,C:/Users/*/AppData/Local/Zed/devcontainer/**
     zed,zed.extensions,C:/Users/*/AppData/Local/Zed/extensions/**
     zed,zed.extensions,C:/Users/*/AppData/Local/Zed/external_agents/**
     zed,zed.extensions,C:/Users/*/AppData/Local/Zed/prompt_overrides/**
+    zed,zed.extensions,C:/Users/*/AppData/Local/Zed/remote_extensions/**
+    zed,zed.extensions,C:/Users/*/AppData/Local/Zed/remote_servers/**
+    zed,zed.extensions,C:/Users/*/AppData/Local/Zed/server_state/**
     zed,zed.logs,C:/Users/*/AppData/Local/Zed/logs/**
     zed,zed.prompt_library,C:/Users/*/AppData/Local/Zed/prompts/**
+    zed,zed.semantic_index,C:/Users/*/AppData/Local/Zed/embeddings/**
     zed,zed.settings,C:/Users/*/AppData/Roaming/Zed/settings.json
     zed,zed.sidebar_threads,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite
     zed,zed.sidebar_threads,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite-shm
     zed,zed.sidebar_threads,C:/Users/*/AppData/Local/Zed/db/0-*/db.sqlite-wal
+    zed,zed.state_tree,C:/Users/*/AppData/Local/Zed/**
     zed,zed.threads_db,C:/Users/*/AppData/Local/Zed/threads/threads.db
     zed,zed.threads_db,C:/Users/*/AppData/Local/Zed/threads/threads.db-shm
     zed,zed.threads_db,C:/Users/*/AppData/Local/Zed/threads/threads.db-wal
+    zed,zed.user_agent_instructions,C:/Users/*/AppData/Roaming/Zed/AGENTS.md
+    zed,zed.user_configuration,C:/Users/*/AppData/Roaming/Zed/debug.json
+    zed,zed.user_configuration,C:/Users/*/AppData/Roaming/Zed/global_settings.json
+    zed,zed.user_configuration,C:/Users/*/AppData/Roaming/Zed/keymap.json
+    zed,zed.user_configuration,C:/Users/*/AppData/Roaming/Zed/keymap_backup.json
+    zed,zed.user_configuration,C:/Users/*/AppData/Roaming/Zed/settings_backup.json
+    zed,zed.user_configuration,C:/Users/*/AppData/Roaming/Zed/tasks.json
     ''')
     LET hits = SELECT * FROM foreach(row=targets, query={
         SELECT Agent, ArtifactId, OSPath, Size, Mode.String AS Mode,
@@ -2502,6 +2522,8 @@ sources:
     continue,continue.aux_config,/var/root/.continue/.migrations/**
     continue,continue.cli_auth,/Users/*/.continue/auth.json
     continue,continue.cli_auth,/var/root/.continue/auth.json
+    continue,continue.compiled_config,/Users/*/.continue/out/config.js
+    continue,continue.compiled_config,/var/root/.continue/out/config.js
     continue,continue.config,/Users/*/.continue/config.json
     continue,continue.config,/Users/*/.continue/config.ts
     continue,continue.config,/Users/*/.continue/config.yaml
@@ -2522,6 +2544,10 @@ sources:
     continue,continue.diffs,/var/root/.continue/.diffs/**
     continue,continue.dotenv,/Users/*/.continue/.env
     continue,continue.dotenv,/var/root/.continue/.env
+    continue,continue.downloaded_binaries,/Users/*/.continue/.utils/.chromium-browser-snapshots/**
+    continue,continue.downloaded_binaries,/Users/*/.continue/.utils/esbuild
+    continue,continue.downloaded_binaries,/var/root/.continue/.utils/.chromium-browser-snapshots/**
+    continue,continue.downloaded_binaries,/var/root/.continue/.utils/esbuild
     continue,continue.environment_markers,/Users/*/.continue/.continuerc.json
     continue,continue.environment_markers,/Users/*/.continue/.local
     continue,continue.environment_markers,/Users/*/.continue/.onboarding_complete
@@ -2564,6 +2590,8 @@ sources:
     continue,continue.logs,/var/root/.continue/logs/**
     continue,continue.permissions,/Users/*/.continue/permissions.yaml
     continue,continue.permissions,/var/root/.continue/permissions.yaml
+    continue,continue.prompt_log,/Users/*/.continue/logs/prompt.log
+    continue,continue.prompt_log,/var/root/.continue/logs/prompt.log
     continue,continue.rules_and_skills,/Users/*/.continue/prompts/**
     continue,continue.rules_and_skills,/Users/*/.continue/rules/**
     continue,continue.rules_and_skills,/Users/*/.continue/skills/**
@@ -3813,6 +3841,8 @@ sources:
     opencode,opencode.mcp_auth,/var/root/.local/share/opencode/mcp-auth.json
     opencode,opencode.repos_cache,/Users/*/.local/share/opencode/repos/**
     opencode,opencode.repos_cache,/var/root/.local/share/opencode/repos/**
+    opencode,opencode.state_and_temp,/Users/*/.local/state/opencode/**
+    opencode,opencode.state_and_temp,/var/root/.local/state/opencode/**
     opencode,opencode.tui_config,/Users/*/.config/opencode/tui.json
     opencode,opencode.tui_config,/var/root/.config/opencode/tui.json
     pi,pi.agents_skills,/Users/*/.agents/skills/**
@@ -4539,19 +4569,31 @@ sources:
     windsurf,windsurf.worktrees,/var/root/.devin/worktrees/*
     windsurf,windsurf.worktrees,/var/root/.windsurf/worktrees/*
     zed,zed.extensions,/Users/*/.config/zed/prompt_overrides/**
+    zed,zed.extensions,/Users/*/Library/Application Support/Zed/copilot/**
     zed,zed.extensions,/Users/*/Library/Application Support/Zed/debug_adapters/**
+    zed,zed.extensions,/Users/*/Library/Application Support/Zed/devcontainer/**
     zed,zed.extensions,/Users/*/Library/Application Support/Zed/extensions/**
     zed,zed.extensions,/Users/*/Library/Application Support/Zed/external_agents/**
+    zed,zed.extensions,/Users/*/Library/Application Support/Zed/remote_extensions/**
+    zed,zed.extensions,/Users/*/Library/Application Support/Zed/remote_servers/**
+    zed,zed.extensions,/Users/*/Library/Application Support/Zed/server_state/**
     zed,zed.extensions,/var/root/.config/zed/prompt_overrides/**
+    zed,zed.extensions,/var/root/Library/Application Support/Zed/copilot/**
     zed,zed.extensions,/var/root/Library/Application Support/Zed/debug_adapters/**
+    zed,zed.extensions,/var/root/Library/Application Support/Zed/devcontainer/**
     zed,zed.extensions,/var/root/Library/Application Support/Zed/extensions/**
     zed,zed.extensions,/var/root/Library/Application Support/Zed/external_agents/**
+    zed,zed.extensions,/var/root/Library/Application Support/Zed/remote_extensions/**
+    zed,zed.extensions,/var/root/Library/Application Support/Zed/remote_servers/**
+    zed,zed.extensions,/var/root/Library/Application Support/Zed/server_state/**
     zed,zed.logs,/Users/*/Library/Logs/Zed/**
     zed,zed.logs,/var/root/Library/Logs/Zed/**
     zed,zed.prompt_library,/Users/*/.config/zed/prompts/**
     zed,zed.prompt_library,/Users/*/.local/share/zed/prompts/**
     zed,zed.prompt_library,/var/root/.config/zed/prompts/**
     zed,zed.prompt_library,/var/root/.local/share/zed/prompts/**
+    zed,zed.semantic_index,/Users/*/Library/Application Support/Zed/embeddings/**
+    zed,zed.semantic_index,/var/root/Library/Application Support/Zed/embeddings/**
     zed,zed.settings,/Users/*/.config/zed/settings.json
     zed,zed.settings,/var/root/.config/zed/settings.json
     zed,zed.sidebar_threads,/Users/*/Library/Application Support/Zed/db/0-stable/db.sqlite
@@ -4560,6 +4602,10 @@ sources:
     zed,zed.sidebar_threads,/var/root/Library/Application Support/Zed/db/0-stable/db.sqlite
     zed,zed.sidebar_threads,/var/root/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
     zed,zed.sidebar_threads,/var/root/Library/Application Support/Zed/db/0-stable/db.sqlite-wal
+    zed,zed.state_tree,/Users/*/.local/state/Zed/**
+    zed,zed.state_tree,/Users/*/.local/state/zed/**
+    zed,zed.state_tree,/var/root/.local/state/Zed/**
+    zed,zed.state_tree,/var/root/.local/state/zed/**
     zed,zed.threads_db,/Users/*/.local/share/zed/threads/threads.db
     zed,zed.threads_db,/Users/*/.local/share/zed/threads/threads.db-shm
     zed,zed.threads_db,/Users/*/.local/share/zed/threads/threads.db-wal
@@ -4572,6 +4618,20 @@ sources:
     zed,zed.threads_db,/var/root/Library/Application Support/Zed/threads/threads.db
     zed,zed.threads_db,/var/root/Library/Application Support/Zed/threads/threads.db-shm
     zed,zed.threads_db,/var/root/Library/Application Support/Zed/threads/threads.db-wal
+    zed,zed.user_agent_instructions,/Users/*/.config/zed/AGENTS.md
+    zed,zed.user_agent_instructions,/var/root/.config/zed/AGENTS.md
+    zed,zed.user_configuration,/Users/*/.config/zed/debug.json
+    zed,zed.user_configuration,/Users/*/.config/zed/global_settings.json
+    zed,zed.user_configuration,/Users/*/.config/zed/keymap.json
+    zed,zed.user_configuration,/Users/*/.config/zed/keymap_backup.json
+    zed,zed.user_configuration,/Users/*/.config/zed/settings_backup.json
+    zed,zed.user_configuration,/Users/*/.config/zed/tasks.json
+    zed,zed.user_configuration,/var/root/.config/zed/debug.json
+    zed,zed.user_configuration,/var/root/.config/zed/global_settings.json
+    zed,zed.user_configuration,/var/root/.config/zed/keymap.json
+    zed,zed.user_configuration,/var/root/.config/zed/keymap_backup.json
+    zed,zed.user_configuration,/var/root/.config/zed/settings_backup.json
+    zed,zed.user_configuration,/var/root/.config/zed/tasks.json
     ''')
     LET hits = SELECT * FROM foreach(row=targets, query={
         SELECT Agent, ArtifactId, OSPath, Size, Mode.String AS Mode,
@@ -5374,6 +5434,8 @@ sources:
     continue,continue.aux_config,/root/.continue/.migrations/**
     continue,continue.cli_auth,/home/*/.continue/auth.json
     continue,continue.cli_auth,/root/.continue/auth.json
+    continue,continue.compiled_config,/home/*/.continue/out/config.js
+    continue,continue.compiled_config,/root/.continue/out/config.js
     continue,continue.config,/home/*/.continue/config.json
     continue,continue.config,/home/*/.continue/config.ts
     continue,continue.config,/home/*/.continue/config.yaml
@@ -5396,6 +5458,10 @@ sources:
     continue,continue.diffs,/root/.continue/.diffs/**
     continue,continue.dotenv,/home/*/.continue/.env
     continue,continue.dotenv,/root/.continue/.env
+    continue,continue.downloaded_binaries,/home/*/.continue/.utils/.chromium-browser-snapshots/**
+    continue,continue.downloaded_binaries,/home/*/.continue/.utils/esbuild
+    continue,continue.downloaded_binaries,/root/.continue/.utils/.chromium-browser-snapshots/**
+    continue,continue.downloaded_binaries,/root/.continue/.utils/esbuild
     continue,continue.environment_markers,/home/*/.continue/.continuerc.json
     continue,continue.environment_markers,/home/*/.continue/.local
     continue,continue.environment_markers,/home/*/.continue/.onboarding_complete
@@ -5438,6 +5504,8 @@ sources:
     continue,continue.logs,/root/.continue/logs/**
     continue,continue.permissions,/home/*/.continue/permissions.yaml
     continue,continue.permissions,/root/.continue/permissions.yaml
+    continue,continue.prompt_log,/home/*/.continue/logs/prompt.log
+    continue,continue.prompt_log,/root/.continue/logs/prompt.log
     continue,continue.rules_and_skills,/home/*/.continue/prompts/**
     continue,continue.rules_and_skills,/home/*/.continue/rules/**
     continue,continue.rules_and_skills,/home/*/.continue/skills/**
@@ -6628,6 +6696,8 @@ sources:
     opencode,opencode.mcp_auth,/root/.local/share/opencode/mcp-auth.json
     opencode,opencode.repos_cache,/home/*/.local/share/opencode/repos/**
     opencode,opencode.repos_cache,/root/.local/share/opencode/repos/**
+    opencode,opencode.state_and_temp,/home/*/.local/state/opencode/**
+    opencode,opencode.state_and_temp,/root/.local/state/opencode/**
     opencode,opencode.tui_config,/home/*/.config/opencode/tui.json
     opencode,opencode.tui_config,/root/.config/opencode/tui.json
     pi,pi.agents_skills,/home/*/.agents/skills/**
@@ -7332,13 +7402,23 @@ sources:
     windsurf,windsurf.worktrees,/root/.devin/worktrees/*
     windsurf,windsurf.worktrees,/root/.windsurf/worktrees/*
     zed,zed.extensions,/home/*/.config/zed/prompt_overrides/**
+    zed,zed.extensions,/home/*/Library/Application Support/Zed/copilot/**
     zed,zed.extensions,/home/*/Library/Application Support/Zed/debug_adapters/**
+    zed,zed.extensions,/home/*/Library/Application Support/Zed/devcontainer/**
     zed,zed.extensions,/home/*/Library/Application Support/Zed/extensions/**
     zed,zed.extensions,/home/*/Library/Application Support/Zed/external_agents/**
+    zed,zed.extensions,/home/*/Library/Application Support/Zed/remote_extensions/**
+    zed,zed.extensions,/home/*/Library/Application Support/Zed/remote_servers/**
+    zed,zed.extensions,/home/*/Library/Application Support/Zed/server_state/**
     zed,zed.extensions,/root/.config/zed/prompt_overrides/**
+    zed,zed.extensions,/root/Library/Application Support/Zed/copilot/**
     zed,zed.extensions,/root/Library/Application Support/Zed/debug_adapters/**
+    zed,zed.extensions,/root/Library/Application Support/Zed/devcontainer/**
     zed,zed.extensions,/root/Library/Application Support/Zed/extensions/**
     zed,zed.extensions,/root/Library/Application Support/Zed/external_agents/**
+    zed,zed.extensions,/root/Library/Application Support/Zed/remote_extensions/**
+    zed,zed.extensions,/root/Library/Application Support/Zed/remote_servers/**
+    zed,zed.extensions,/root/Library/Application Support/Zed/server_state/**
     zed,zed.flatpak_legacy_threads,/home/*/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/**
     zed,zed.flatpak_legacy_threads,/root/.var/app/dev.zed.Zed/data/zed/threads/threads-db.1.mdb/**
     zed,zed.logs,/home/*/Library/Logs/Zed/**
@@ -7347,6 +7427,8 @@ sources:
     zed,zed.prompt_library,/home/*/.local/share/zed/prompts/**
     zed,zed.prompt_library,/root/.config/zed/prompts/**
     zed,zed.prompt_library,/root/.local/share/zed/prompts/**
+    zed,zed.semantic_index,/home/*/Library/Application Support/Zed/embeddings/**
+    zed,zed.semantic_index,/root/Library/Application Support/Zed/embeddings/**
     zed,zed.settings,/home/*/.config/zed/settings.json
     zed,zed.settings,/root/.config/zed/settings.json
     zed,zed.sidebar_threads,/home/*/Library/Application Support/Zed/db/0-stable/db.sqlite
@@ -7355,6 +7437,10 @@ sources:
     zed,zed.sidebar_threads,/root/Library/Application Support/Zed/db/0-stable/db.sqlite
     zed,zed.sidebar_threads,/root/Library/Application Support/Zed/db/0-stable/db.sqlite-shm
     zed,zed.sidebar_threads,/root/Library/Application Support/Zed/db/0-stable/db.sqlite-wal
+    zed,zed.state_tree,/home/*/.local/state/Zed/**
+    zed,zed.state_tree,/home/*/.local/state/zed/**
+    zed,zed.state_tree,/root/.local/state/Zed/**
+    zed,zed.state_tree,/root/.local/state/zed/**
     zed,zed.threads_db,/home/*/.local/share/zed/threads/threads.db
     zed,zed.threads_db,/home/*/.local/share/zed/threads/threads.db-shm
     zed,zed.threads_db,/home/*/.local/share/zed/threads/threads.db-wal
@@ -7367,6 +7453,20 @@ sources:
     zed,zed.threads_db,/root/Library/Application Support/Zed/threads/threads.db
     zed,zed.threads_db,/root/Library/Application Support/Zed/threads/threads.db-shm
     zed,zed.threads_db,/root/Library/Application Support/Zed/threads/threads.db-wal
+    zed,zed.user_agent_instructions,/home/*/.config/zed/AGENTS.md
+    zed,zed.user_agent_instructions,/root/.config/zed/AGENTS.md
+    zed,zed.user_configuration,/home/*/.config/zed/debug.json
+    zed,zed.user_configuration,/home/*/.config/zed/global_settings.json
+    zed,zed.user_configuration,/home/*/.config/zed/keymap.json
+    zed,zed.user_configuration,/home/*/.config/zed/keymap_backup.json
+    zed,zed.user_configuration,/home/*/.config/zed/settings_backup.json
+    zed,zed.user_configuration,/home/*/.config/zed/tasks.json
+    zed,zed.user_configuration,/root/.config/zed/debug.json
+    zed,zed.user_configuration,/root/.config/zed/global_settings.json
+    zed,zed.user_configuration,/root/.config/zed/keymap.json
+    zed,zed.user_configuration,/root/.config/zed/keymap_backup.json
+    zed,zed.user_configuration,/root/.config/zed/settings_backup.json
+    zed,zed.user_configuration,/root/.config/zed/tasks.json
     ''')
     LET hits = SELECT * FROM foreach(row=targets, query={
         SELECT Agent, ArtifactId, OSPath, Size, Mode.String AS Mode,

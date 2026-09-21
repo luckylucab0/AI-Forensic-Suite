@@ -3740,6 +3740,24 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "continue.compiled_config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/out/config.js",
+                        "%USERPROFILE%\\.continue\\out\\config.js",
+                        "~/.continue/out/config.js"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "config",
                     "collect_priority": "normal",
                     "id": "continue.config",
@@ -3845,6 +3863,27 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "durable",
+                    "id": "continue.downloaded_binaries",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/.utils/.chromium-browser-snapshots/",
+                        "$CONTINUE_GLOBAL_DIR/.utils/esbuild",
+                        "%USERPROFILE%\\.continue\\.utils\\.chromium-browser-snapshots\\",
+                        "%USERPROFILE%\\.continue\\.utils\\esbuild",
+                        "~/.continue/.utils/.chromium-browser-snapshots/",
+                        "~/.continue/.utils/esbuild"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
                     "status": "verified"
                 },
                 {
@@ -3990,6 +4029,24 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "$CONTINUE_GLOBAL_DIR/permissions.yaml",
                         "~/.continue/permissions.yaml",
                         "%USERPROFILE%\\.continue\\permissions.yaml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "continue.prompt_log",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$CONTINUE_GLOBAL_DIR/logs/prompt.log",
+                        "%USERPROFILE%\\.continue\\logs\\prompt.log",
+                        "~/.continue/logs/prompt.log"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -9567,6 +9624,24 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "cache",
+                    "collect_priority": "live_only",
+                    "id": "opencode.state_and_temp",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_STATE_HOME/opencode/",
+                        "%USERPROFILE%\\.local\\state\\opencode\\",
+                        "~/.local/state/opencode/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "config",
                     "collect_priority": "normal",
                     "id": "opencode.tui_config",
@@ -11538,16 +11613,31 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
+                        "$XDG_DATA_HOME/zed/copilot/",
                         "$XDG_DATA_HOME/zed/debug_adapters/",
+                        "$XDG_DATA_HOME/zed/devcontainer/",
                         "$XDG_DATA_HOME/zed/extensions/",
                         "$XDG_DATA_HOME/zed/external_agents/",
                         "$XDG_DATA_HOME/zed/prompt_overrides/",
+                        "$XDG_DATA_HOME/zed/remote_extensions/",
+                        "$XDG_DATA_HOME/zed/remote_servers/",
+                        "$XDG_DATA_HOME/zed/server_state/",
+                        "%LOCALAPPDATA%\\Zed\\copilot\\",
                         "%LOCALAPPDATA%\\Zed\\debug_adapters\\",
+                        "%LOCALAPPDATA%\\Zed\\devcontainer\\",
                         "%LOCALAPPDATA%\\Zed\\extensions\\",
                         "%LOCALAPPDATA%\\Zed\\external_agents\\",
                         "%LOCALAPPDATA%\\Zed\\prompt_overrides\\",
+                        "%LOCALAPPDATA%\\Zed\\remote_extensions\\",
+                        "%LOCALAPPDATA%\\Zed\\remote_servers\\",
+                        "%LOCALAPPDATA%\\Zed\\server_state\\",
+                        "~/Library/Application Support/Zed/copilot/",
                         "~/Library/Application Support/Zed/debug_adapters/",
+                        "~/Library/Application Support/Zed/devcontainer/",
                         "~/Library/Application Support/Zed/extensions/",
+                        "~/Library/Application Support/Zed/remote_extensions/",
+                        "~/Library/Application Support/Zed/remote_servers/",
+                        "~/Library/Application Support/Zed/server_state/",
                         "~/.config/zed/prompt_overrides/",
                         "~/Library/Application Support/Zed/external_agents/"
                     ],
@@ -11607,6 +11697,24 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "zed.semantic_index",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_DATA_HOME/zed/embeddings/",
+                        "%LOCALAPPDATA%\\Zed\\embeddings\\",
+                        "~/Library/Application Support/Zed/embeddings/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "mcp_config",
                     "collect_priority": "normal",
                     "id": "zed.settings",
@@ -11650,6 +11758,44 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "zed.state_tree",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_STATE_HOME/zed/",
+                        "%LOCALAPPDATA%\\Zed\\",
+                        "~/.local/state/Zed/",
+                        "~/.local/state/zed/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "zed.task_definitions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<project>/.vscode/launch.json",
+                        "<project>/.vscode/tasks.json",
+                        "<project>/.zed/debug.json",
+                        "<project>/.zed/tasks.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "transcript",
                     "collect_priority": "live_only",
                     "id": "zed.threads_db",
@@ -11675,11 +11821,62 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "zed.user_agent_instructions",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/zed/AGENTS.md",
+                        "%APPDATA%\\Zed\\AGENTS.md",
+                        "~/.config/zed/AGENTS.md"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "zed.user_configuration",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "$XDG_CONFIG_HOME/zed/debug.json",
+                        "$XDG_CONFIG_HOME/zed/global_settings.json",
+                        "$XDG_CONFIG_HOME/zed/keymap.json",
+                        "$XDG_CONFIG_HOME/zed/keymap_backup.json",
+                        "$XDG_CONFIG_HOME/zed/settings_backup.json",
+                        "$XDG_CONFIG_HOME/zed/tasks.json",
+                        "%APPDATA%\\Zed\\debug.json",
+                        "%APPDATA%\\Zed\\global_settings.json",
+                        "%APPDATA%\\Zed\\keymap.json",
+                        "%APPDATA%\\Zed\\keymap_backup.json",
+                        "%APPDATA%\\Zed\\settings_backup.json",
+                        "%APPDATA%\\Zed\\tasks.json",
+                        "~/.config/zed/debug.json",
+                        "~/.config/zed/global_settings.json",
+                        "~/.config/zed/keymap.json",
+                        "~/.config/zed/keymap_backup.json",
+                        "~/.config/zed/settings_backup.json",
+                        "~/.config/zed/tasks.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
                 }
             ]
         }
     ],
-    "sha256": "2d2beca3d03ec582a6683be94bd276b3fa9dcc6936f5267b8f496d303b11a6c7"
+    "sha256": "7dd0b4cfcc1df3029d526bf1cdb4fc347deb0244246d89eee2451934c9029bd8"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

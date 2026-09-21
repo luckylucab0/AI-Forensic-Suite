@@ -516,3 +516,85 @@ artifacts:
 
     Record structure: paths.ts: sessions folder = join(getContinueGlobalPath(), 'sessions'); per-session file = join(getSessionsFolderPath(), `${sessionId}.json`); index/list file = join(getSessionsFolderPath(), 'sessions.json'). The CLI also treats a session file as a transcript_path (see extensions/cli). CONTINUE_GLOBAL_DIR relocates the whole tree (absolute, or resolved against cwd).
   parser: continue_sessions
+- id: continue.prompt_log
+  title: Rendered prompt log (prompt.log)
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/logs/prompt.log
+  - '%USERPROFILE%\.continue\logs\prompt.log'
+  - ~/.continue/logs/prompt.log
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts
+  source_kind: source_code
+  volatility: |-
+    Appended to on every request and not rotated by the product, so it grows without bound and is the kind of file a user deletes to reclaim space. Named separately from the log directory beside it because a general log sweep takes this with it.
+  notes: |-
+    THE CLOSEST THING ON DISK TO WHAT THE MODEL ACTUALLY SAW. getPromptLogsPath() = join(getLogsDirPath(), 'prompt.log') in core/util/paths.ts, where getLogsDirPath() is the logs directory under the global directory.
+
+    A transcript records the turns. This records the prompt as it was assembled and sent, which includes the context the product pulled in: file contents, the rules in force, the retrieved chunks. So it is where an injected instruction that reached the model is visible even when the file it came from has since been changed, and it is the one place the two halves can be compared.
+
+    The log directory as a whole has its own entry and is read line by line. This entry claims the one file inside it whose records are not lines but whole rendered prompts, so it is attributed to what it is rather than to a directory glob.
+  parser: prose_document
+- id: continue.compiled_config
+  title: Compiled configuration (out/config.js)
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/out/config.js
+  - '%USERPROFILE%\.continue\out\config.js'
+  - ~/.continue/out/config.js
+  format: text
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts
+  source_kind: source_code
+  volatility: |-
+    Rewritten whenever the TypeScript configuration beside it is compiled, so it reflects the last successful build rather than the current source. That gap is the point: it can hold code the source no longer contains.
+  notes: |-
+    getConfigJsPath() = join(getContinueGlobalPath(), 'out', 'config.js'), from core/util/paths.ts, which also builds the tsconfig.json, package.json and types/core/index.d.ts that compile it.
+
+    This product lets configuration be TypeScript, which it compiles and then executes. So this file is code the endpoint runs as part of the agent's own configuration, filed as an instruction rather than as configuration for the same reason a hook script is: an analyst asking what the agent was told to do has to be able to read it, and a function here can rewrite a request before it leaves the machine.
+
+    The source file config.ts is in the configuration entry beside this one. Both are collected: the compiled copy is what ran, and the difference between them is worth looking at.
+  parser: instructions
+- id: continue.downloaded_binaries
+  title: Downloaded helper binaries
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - $CONTINUE_GLOBAL_DIR/.utils/.chromium-browser-snapshots/
+  - $CONTINUE_GLOBAL_DIR/.utils/esbuild
+  - '%USERPROFILE%\.continue\.utils\.chromium-browser-snapshots\'
+  - '%USERPROFILE%\.continue\.utils\esbuild'
+  - ~/.continue/.utils/.chromium-browser-snapshots/
+  - ~/.continue/.utils/esbuild
+  format: binary
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/continuedev/continue/main/core/util/paths.ts
+  source_kind: source_code
+  notes: |-
+    getChromiumPath() = join(getContinueUtilsPath(), '.chromium-browser-snapshots') and getEsbuildBinaryPath() = join(getContinueUtilsPath(), 'esbuild'), both from core/util/paths.ts.
+
+    A downloaded browser is a capability rather than a cache: its presence says this installation was able to fetch and drive a browser, which is how a prompt in a repository reaches a network destination that no MCP server and no shell command in the transcript accounts for. The compiler beside it is what turns the TypeScript configuration into the file the product executes.
+
+    Recorded by size and hash rather than read. What matters here is that the binary was fetched and when, and the hash is what ties it to a known build.
+  parser: null

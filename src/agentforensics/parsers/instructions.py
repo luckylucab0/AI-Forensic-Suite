@@ -92,6 +92,7 @@ SOURCES = frozenset(
         "cline.rules_global",
         "cline.rules_project",
         "cline.workspace_config_tree",
+        "continue.compiled_config",
         "continue.rules_and_skills",
         "copilot.agents_skills_hooks",
         "copilot.instructions",
@@ -150,6 +151,8 @@ SOURCES = frozenset(
         "windsurf.project_instructions",
         "windsurf.system_config",
         "windsurf.workflows_and_skills",
+        "zed.task_definitions",
+        "zed.user_agent_instructions",
     }
 )
 

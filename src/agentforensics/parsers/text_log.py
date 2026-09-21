@@ -52,6 +52,11 @@ LOGS = frozenset(
         "cline.connector_settings_and_logs",
         "codex.log_dir",
         "continue.logs",
+        # Read by the prose reader, which sits ahead of this one, because the records in
+        # it are whole rendered prompts rather than lines. It stays in this set so that a
+        # text log added to the catalogue still fails the test that compares the two, which
+        # is the check this set exists for.
+        "continue.prompt_log",
         "copilot.logs",
         "crosscutting.npm_debug_logs",
         "cursor.agent_data_cleanup_marker",
