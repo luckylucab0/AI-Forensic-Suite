@@ -189,6 +189,37 @@ uv run python scripts/opsec_check.py --mode both
 
 uv run python scripts/gen_rule_docs.py gehört ebenfalls dazu, für docs/RULES{,.de}.md.
 
+Coverage, und die eine Stelle, die sie nicht erreicht. `uv run pytest --cov` misst das
+Analyzer-Paket und sonst nichts. Damit sind die Kollektoren unsichtbar, also ausgerechnet
+der Code, der auf den Beweismitteln von jemandem läuft: Sie laufen als Subprozess der
+Konformitätssuite, und die Messung endet an der Prozessgrenze. Um sie zu sehen, muss die
+Messung im Subprozess selbst starten:
+
+```bash
+mkdir -p /tmp/cov
+cat > /tmp/cov/sitecustomize.py <<'PY'
+import coverage
+coverage.process_startup()
+PY
+cat > /tmp/cov/cov.rc <<'RC'
+[run]
+branch = true
+parallel = true
+source = <Repository>/collector
+data_file = /tmp/cov/.data
+RC
+PYTHONPATH=/tmp/cov COVERAGE_PROCESS_START=/tmp/cov/cov.rc uv run pytest tests/conformance
+uv run coverage combine --rcfile=/tmp/cov/cov.rc
+uv run coverage report --rcfile=/tmp/cov/cov.rc -m
+```
+
+Es wird keine Zahl erzwungen, und eine Zahl wäre auch irreführend: Ein großer Teil von
+collect.py ist Windows-only und kann auf einem Linux-Runner gar nicht laufen, der Wert
+bedeutet also auf jeder Plattform etwas anderes. Zu lesen sind die fehlenden Zeilen, nicht
+der Prozentsatz. Nach einer Änderung am Kollektor lohnt es sich, denn was dort auftaucht,
+ist die Begründung des Kollektors dafür, warum eine Datei nicht im Bundle ist, und eine
+Begründung, die noch nie erzeugt wurde, ist eine, die noch nie jemand geprüft hat.
+
 Das Kommandozeilenwerkzeug selbst heisst `agentforensics`, mit `afx` als Kurzform:
 
 ```bash

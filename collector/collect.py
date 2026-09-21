@@ -12687,8 +12687,13 @@ def collect_file(
         return entry
 
     if files_dir is None:
-        entry["collected"] = True
-        return entry
+        # Unreachable, and said out loud rather than left as the branch that was here.
+        # A files directory is unset only for a dry run, and a dry run returned above, so
+        # reaching this means the two have come apart. What used to happen then was worse
+        # than a failure: the entry was marked collected with no bundle path in it, and a
+        # manifest that says a file was collected without saying where it is sends an
+        # analyst looking for bytes nobody ever wrote.
+        raise RuntimeError("a collection with no files directory, and not a dry run")
 
     relative = bundle_path_for(original, used, target_os)
     destination = os.path.join(files_dir, *relative.split("/"))

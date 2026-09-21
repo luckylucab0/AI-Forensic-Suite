@@ -169,6 +169,37 @@ uv run python scripts/opsec_check.py --mode both
 
 uv run python scripts/gen_rule_docs.py is in that list too, for docs/RULES{,.de}.md.
 
+Coverage, and the one place it does not reach. `uv run pytest --cov` measures the analyzer
+package and nothing else, so the collectors, which are the code that runs on somebody's
+evidence, are invisible to it: they execute as a subprocess of the conformance suite and
+the measurement stops at the process boundary. To see them, start coverage inside that
+subprocess:
+
+```bash
+mkdir -p /tmp/cov
+cat > /tmp/cov/sitecustomize.py <<'PY'
+import coverage
+coverage.process_startup()
+PY
+cat > /tmp/cov/cov.rc <<'RC'
+[run]
+branch = true
+parallel = true
+source = <repository>/collector
+data_file = /tmp/cov/.data
+RC
+PYTHONPATH=/tmp/cov COVERAGE_PROCESS_START=/tmp/cov/cov.rc uv run pytest tests/conformance
+uv run coverage combine --rcfile=/tmp/cov/cov.rc
+uv run coverage report --rcfile=/tmp/cov/cov.rc -m
+```
+
+No number is enforced, and one would be misleading: a large part of collect.py is Windows
+only and cannot run on a Linux runner at all, so the figure means something different on
+each platform. Read the missing lines rather than the percentage. It is worth doing after
+a change to the collector, because what turns up there is the collector's own account of
+why a file is not in a bundle, and a reason nobody has ever produced is a reason nobody
+has ever checked.
+
 The CLI itself is `agentforensics`, with `afx` as a shorter alias:
 
 ```bash

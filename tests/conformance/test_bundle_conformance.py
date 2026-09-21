@@ -799,3 +799,139 @@ def test_collecting_writes_nothing_outside_the_output_directory(
 
     strays = sorted(str(p.relative_to(elsewhere)) for p in elsewhere.rglob("*"))
     assert strays == ["home", "tmp"], f"the collection wrote outside its output: {strays}"
+
+
+# ------------------------------------------------- which profiles a run actually reads
+
+# Measured rather than assumed: the collector was run under coverage over this whole
+# suite, and the decisions below were among the ones no case had ever reached. They are
+# not obscure. Each of them is the collector saying why a file is not in the bundle, and
+# an analyst reads a file that is not in the bundle and not accounted for as a file that
+# was not on the host.
+
+
+def test_a_user_who_is_not_on_the_host_is_an_error_not_an_empty_collection(
+    windows_image: Path, tmp_path: Path
+) -> None:
+    """The one answer this tool must never give by accident.
+
+    A --user naming somebody who is not there, or a --all-users run on a platform whose
+    profile parent the collector had wrong, searches nothing. Without this the result is a
+    bundle with no files in it, which reads exactly like a host where no agent had ever
+    run. The collector's own comment says so, and nothing had ever run the branch.
+    """
+    out = tmp_path / "nobody"
+    result = run_collect_py(
+        ["--out", str(out), "--root", str(windows_image), "--os", "windows", "--user", "nobody"]
+    )
+    # One, the code for a run that recorded an error, and not three: three means a host
+    # with no agent artifacts on it, which is a real answer and not this one.
+    assert result.returncode == 1, describe_run(out, result)
+    manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["users"] == [], "nothing was searched, so no profile may be listed"
+    errors = [e for e in manifest["errors"] if e.get("error") == "no_profiles_found"]
+    assert errors, manifest["errors"]
+    assert "nobody" in errors[0]["detail"]
+    assert "no user profile was found" in result.stderr
+
+
+def test_naming_a_user_collects_that_profile_and_not_the_tree_around_it(
+    windows_image: Path, tmp_path: Path
+) -> None:
+    """A rooted run with --user has to filter, and this branch once kept a hardcoded POSIX
+    profile parent after the other one was fixed, so it found nobody on Windows."""
+    out = tmp_path / "just-alice"
+    result = run_collect_py(
+        ["--out", str(out), "--root", str(windows_image), "--os", "windows", "--user", "alice"]
+    )
+    assert result.returncode in (0, 1), describe_run(out, result)
+    manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+    assert [user["name"] for user in manifest["users"]] == ["alice"]
+    assert any(entry["collected"] for entry in manifest["files"]), (
+        "naming the user who is there must not come out the same as naming one who is not"
+    )
+
+
+def test_a_file_over_the_size_limit_says_so_rather_than_going_missing(
+    synthetic_home: Path, tmp_path: Path
+) -> None:
+    """The limit exists so one enormous store cannot turn a live response into an outage.
+    What it must not do is take a conversation database out of the bundle quietly."""
+    out = tmp_path / "tiny-limit"
+    result = run_collect_py(
+        [
+            "--out",
+            str(out),
+            "--root",
+            str(synthetic_home),
+            "--os",
+            "linux",
+            "--max-file-size",
+            "16",
+        ]
+    )
+    assert result.returncode in (0, 1, 3), describe_run(out, result)
+    manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+    oversize = [entry for entry in manifest["files"] if entry["reason"] == "too_large"]
+    assert oversize, "a 16 byte limit over this tree has to leave something behind"
+    for entry in oversize:
+        assert entry["collected"] is False
+        assert entry["sha256"] is None, "nothing was read, so nothing may claim a hash"
+        assert entry["size"] > 16, "the size is what makes the reason checkable"
+
+
+@pytest.mark.skipif(not hasattr(os, "mkfifo"), reason="this platform has no named pipes")
+def test_something_that_is_not_a_regular_file_is_recorded_as_one_that_is_not(
+    tmp_path: Path,
+) -> None:
+    """A path the catalogue claims can be a pipe, a socket or a device node.
+
+    Opening one can block forever, which is why the collector stats before it reads, and
+    the entry has to say which of the two happened. A silent skip here would be a settings
+    file that reads as absent on a host that has one.
+    """
+    home = tmp_path / "piped"
+    (home / ".claude").mkdir(parents=True)
+    os.mkfifo(home / ".claude" / "settings.json")
+
+    out = tmp_path / "pipe-bundle"
+    result = run_collect_py(["--out", str(out), "--root", str(home), "--os", "linux"])
+    assert result.returncode in (0, 1, 3), describe_run(out, result)
+    manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+    piped = [e for e in manifest["files"] if e["original_path"].endswith(".claude/settings.json")]
+    assert piped, [e["original_path"] for e in manifest["files"]]
+    assert piped[0]["reason"] == "not_a_file"
+    assert piped[0]["collected"] is False
+
+
+def test_a_profile_directory_that_is_a_link_is_refused_and_recorded(tmp_path: Path) -> None:
+    """A profile that is a link could take a collection anywhere on the disk.
+
+    Following it would read a tree the collection was never authorized to touch, and
+    skipping it without a word would leave a user out of the bundle with nothing saying a
+    user had been skipped. So it is refused and the refusal is in the manifest, where the
+    analyzer turns it into a gap in the case.
+    """
+    root = tmp_path / "image"
+    (root / "Users").mkdir(parents=True)
+    build_home(root / "Users" / "alice")
+    elsewhere = tmp_path / "somewhere-else"
+    build_home(elsewhere)
+    (root / "Users" / "bob").symlink_to(elsewhere, target_is_directory=True)
+
+    out = tmp_path / "linked-profile"
+    result = run_collect_py(["--out", str(out), "--root", str(root), "--os", "linux"])
+    assert result.returncode in (0, 1), describe_run(out, result)
+    manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+
+    assert [user["name"] for user in manifest["users"]] == ["alice"]
+    refused = [
+        entry
+        for entry in manifest["refused_patterns"]
+        if entry.get("reason") == "profile_is_a_symlink"
+    ]
+    assert refused, manifest["refused_patterns"]
+    assert any("bob" in str(entry) for entry in refused)
+    assert not any("bob" in entry["original_path"] for entry in manifest["files"]), (
+        "nothing behind the link may be read, whatever the link points at"
+    )
