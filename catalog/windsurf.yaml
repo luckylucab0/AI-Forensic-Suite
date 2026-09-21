@@ -1186,6 +1186,39 @@ artifacts:
 
     All four were still on disk after a normal uninstall on both measured operating systems, which is why they are collected at durable priority: on a machine where the product appears never to have been installed, these are what remains.
   parser: text_config
+- id: windsurf.local_file_history
+  title: Editor local file history
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\Devin\User\History\'
+  - '%APPDATA%\Windsurf\User\History\'
+  - ~/.config/Devin/User/History/
+  - ~/.config/Windsurf/User/History/
+  - ~/Library/Application Support/Devin/User/History/
+  - ~/Library/Application Support/Windsurf/User/History/
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: unverified
+  source: |-
+    https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts
+  source_kind: source_code
+  volatility: |-
+    Pruned by count and by age, both of them editor settings, so it holds the recent past rather than all of it. It survives a deleted working copy, which is why it is collected first.
+  notes: |-
+    What the agent changed, even where nothing was committed. This editor keeps a copy of a file from before each change it writes, in a directory per file named by a hash with an index inside naming the original path and listing the versions in order with their timestamps. An agent that edits through the editor's own interface lands here like anybody else, so on a working copy that was never committed, or one where the agent's changes were reverted, this is where the earlier text still is.
+
+    Found by comparing this family's three editors against each other rather than by reading a vendor page. The editor this product is built from has this entry, and so does the other fork in this catalogue; this one did not, so the same store was collected for two products and not for the third.
+
+    Unverified on purpose. The path is the upstream editor's, from its own environment service, and this product does not document its own spelling of it. Both of this product's directory names are here because it has been through a rename and the entries beside this one carry both.
+
+    Collected whole and not read, which is the same decision the upstream entry records: the index is JSON and the versions beside it are file contents, and reading the pair as a snapshot store is format work nobody here has done. It is named as unfinished work on the support page rather than left for somebody to infer.
+  parser: null
 - id: windsurf.macos_bundle_storage
   category: cache
   root: user_profile

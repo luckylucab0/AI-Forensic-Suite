@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: f07adc9c1624
+# Catalogue digest: a09e331a5a41
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1414,6 +1414,8 @@ $targets = @(
     @{ Agent = 'windsurf'; Id = 'windsurf.language_server_binaries_and_logs'; Path = '$profile\.windsurf-server\data\logs' }
     @{ Agent = 'windsurf'; Id = 'windsurf.language_server_binaries_and_logs'; Path = '$profile\AppData\Local\Programs\Windsurf' }
     @{ Agent = 'windsurf'; Id = 'windsurf.language_server_binaries_and_logs'; Path = 'C:\Program Files\Windsurf' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.local_file_history'; Path = '$profile\AppData\Roaming\Devin\User\History' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.local_file_history'; Path = '$profile\AppData\Roaming\Windsurf\User\History' }
     @{ Agent = 'windsurf'; Id = 'windsurf.mcp_config'; Path = '$profile\.codeium\windsurf\mcp_config.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.mcp_oauth_state'; Path = '$profile\AppData\Roaming\Devin\mcp\oauth' }
     @{ Agent = 'windsurf'; Id = 'windsurf.memories'; Path = '$profile\.codeium\windsurf-insiders\memories' }

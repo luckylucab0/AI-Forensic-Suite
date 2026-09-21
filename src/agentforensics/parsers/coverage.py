@@ -195,12 +195,27 @@ UNFINISHED = {
         "calls they fire on, so until something reads it as the registry it is, a case "
         "holds it as prose and no rule can ask what a hook was permitted to do"
     ),
+    "cursor.local_file_history": (
+        "the same store as the two entries below, in the second of the three editors of "
+        "that family, and the only one of the three with a reader. That reader claims the "
+        "index and returns it as a document, which puts the list of versions and their "
+        "times in the case and leaves the versions themselves as filesystem events. So the "
+        "question it answers is which files were replaced and when, not what they said "
+        "before"
+    ),
     "vscode.local_history": (
         "the editor's own copy of a file from before each change, which an agent's edits "
         "land in like anybody else's. The index inside is JSON and the versions beside it "
         "are the file contents, and reading the pair as a snapshot store is format work "
         "nobody here has done. The directory is collected and is on the timeline; the "
         "earlier text inside it is not on the timeline as anything"
+    ),
+    "windsurf.local_file_history": (
+        "the third copy of the same store, in the third editor of that family. One piece "
+        "of format work would finish all three, which is the argument for doing it: the "
+        "reader would have to understand one index format and one directory layout, and "
+        "three products in this catalogue would go from holding the fact that a file was "
+        "replaced to holding what it said before"
     ),
 }
 

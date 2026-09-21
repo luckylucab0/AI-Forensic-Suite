@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: f07adc9c1624
+// Catalogue digest: a09e331a5a41
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -2946,6 +2946,18 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "windsurf", "windsurf.language_server_binaries_and_logs", "\\usr\\share\\devin-desktop\\resources\\app\\extensions\\windsurf\\bin\\language_server_linux_x64",
     "windsurf", "windsurf.language_server_binaries_and_logs", "\\usr\\share\\devin-desktop\\resources\\app\\extensions\\windsurf\\devin\\bin\\devin",
     "windsurf", "windsurf.language_server_binaries_and_logs", "\\usr\\share\\windsurf\\resources\\app\\extensions\\windsurf\\bin\\language_server_linux_x64",
+    "windsurf", "windsurf.local_file_history", ".config/Devin/User/History",
+    "windsurf", "windsurf.local_file_history", ".config/Windsurf/User/History",
+    "windsurf", "windsurf.local_file_history", ".config\\Devin\\User\\History",
+    "windsurf", "windsurf.local_file_history", ".config\\Windsurf\\User\\History",
+    "windsurf", "windsurf.local_file_history", "Devin/User/History",
+    "windsurf", "windsurf.local_file_history", "Devin\\User\\History",
+    "windsurf", "windsurf.local_file_history", "Library/Application Support/Devin/User/History",
+    "windsurf", "windsurf.local_file_history", "Library/Application Support/Windsurf/User/History",
+    "windsurf", "windsurf.local_file_history", "Library\\Application Support\\Devin\\User\\History",
+    "windsurf", "windsurf.local_file_history", "Library\\Application Support\\Windsurf\\User\\History",
+    "windsurf", "windsurf.local_file_history", "Windsurf/User/History",
+    "windsurf", "windsurf.local_file_history", "Windsurf\\User\\History",
     "windsurf", "windsurf.macos_bundle_storage", "Library/Caches/com.exafunction.windsurf/Cache.db",
     "windsurf", "windsurf.macos_bundle_storage", "Library/Caches/com.exafunction.windsurf/Cache.db-shm",
     "windsurf", "windsurf.macos_bundle_storage", "Library/Caches/com.exafunction.windsurf/Cache.db-wal",

@@ -162,6 +162,7 @@ NOT_CLAIMED = {
     "file holding an index and the versions beside it. It is a copy of a file the agent "
     "replaced and reading it is format work nobody here has done, which the entry says "
     "rather than leaving the directory out of the catalogue",
+    "windsurf.local_file_history": "the editor's own version store, and the same decision as the upstream editor's entry above: a directory per file holding an index and the versions beside it, which reading as a snapshot store is format work nobody here has done",
     "windsurf.worktrees": "a whole working copy, not a copy of one file",
 }
 

@@ -6,7 +6,7 @@
 
 Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registrierung statt aufgeschrieben. Die Zahlen bewegen sich mit dem Code.
 
-31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 503 von 629 Artefakten werden von 37 Leser-Modulen gelesen, in 23 Ereignisarten. 504 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
+31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 503 von 630 Artefakten werden von 37 Leser-Modulen gelesen, in 23 Ereignisarten. 504 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
 
 **Wie ein leeres Ergebnis zu lesen ist.** Steht ein Agent hier mit gelesenen Artefakten, dann wurden die Pfade durchsucht und die vorhandenen Dateien ausgewertet, also ist ein leeres Ergebnis ein Befund über diese Pfade. Es ist nie ein Befund darüber, dass der Agent nicht benutzt wurde: der Datenbaum kann über eine Variable verschoben sein, die Aufbewahrungsfrist kann ihn gelöscht haben, die Pfade können die unverifizierten sein, oder die Person hat in einem Profil gearbeitet, das niemand gesammelt hat. Wo ein Eintrag unverifiziert ist, sagt `docs/ARTIFACTS.de.md` es pro Artefakt, und der Analyzer wiederholt es in seiner Ausgabe.
 
@@ -45,7 +45,7 @@ Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registri
 | Roo Code | Linux, macOS, Windows | 1 / 1 | 6 / 7 | 2 | 1 |
 | Visual Studio Code host storage | Linux, macOS, Windows | keine | 8 / 10 | 6 | 2 |
 | Warp | Linux, macOS, Windows | keine | 8 / 9 | 5 | 1 |
-| Windsurf | Linux, macOS, Windows | 6 / 6 | 30 / 40 | 16 | 10 |
+| Windsurf | Linux, macOS, Windows | 6 / 6 | 30 / 41 | 16 | 11 |
 | Zed | Linux, macOS, Windows | 3 / 3 | 9 / 12 | 4 | 3 |
 
 ## Was nicht gelesen wird, und warum
@@ -68,7 +68,7 @@ Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es 
 
 ### Container in einem Format, das hier niemand gelesen hat
 
-74 Einträge, binäre oder Verzeichnis-Layouts ohne dokumentiertes Format. Jeder wird ganz gesammelt und steht als Dateisystem-Ereignis auf der Zeitlinie. Einen davon zu lesen heisst, eine Formatimplementierung zu schreiben, und nicht, einen unfertigen Leser fertigzustellen.
+75 Einträge, binäre oder Verzeichnis-Layouts ohne dokumentiertes Format. Jeder wird ganz gesammelt und steht als Dateisystem-Ereignis auf der Zeitlinie. Einen davon zu lesen heisst, eine Formatimplementierung zu schreiben, und nicht, einen unfertigen Leser fertigzustellen.
 
 - `amazonq.cli_subagent_executions` (directory)
 - `amazonq.ide_extension_install` (directory)
@@ -138,6 +138,7 @@ Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es 
 - `windsurf.code_tracker_and_settings` (binary)
 - `windsurf.enterprise_policy_bundled` (directory)
 - `windsurf.language_server_binaries_and_logs` (binary)
+- `windsurf.local_file_history` (directory)
 - `windsurf.macos_update_state` (directory)
 - `windsurf.server_data` (directory)
 - `windsurf.worktrees` (directory)
@@ -162,10 +163,12 @@ Zum Zeitpunkt dieser Generierung keine. Die Prüfung hinter diesem Abschnitt suc
 
 ## Angefangen und nicht fertig
 
-2 Einträge, bei denen jemand aufgeschrieben hat, dass die Lesung unvollständig ist. Alles darüber ist eine Entscheidung; das hier ist eine Liste von Arbeit. Ein Eintrag kann zusätzlich oben stehen, in der Gruppe, in die sein jetziger Zustand ihn setzt, denn `Gelesen` ist auf dieser Seite ein Ja oder ein Nein, und wer entscheidet, ob ein Fall zitierbar ist, braucht die dritte Antwort. Die Deklaration steht in `src/agentforensics/parsers/coverage.py`, und ein Test hält jeden Eintrag daran fest, dass es ihn im Katalog noch gibt, damit diese Liste nicht überlebt, was sie zusagt.
+4 Einträge, bei denen jemand aufgeschrieben hat, dass die Lesung unvollständig ist. Alles darüber ist eine Entscheidung; das hier ist eine Liste von Arbeit. Ein Eintrag kann zusätzlich oben stehen, in der Gruppe, in die sein jetziger Zustand ihn setzt, denn `Gelesen` ist auf dieser Seite ein Ja oder ein Nein, und wer entscheidet, ob ein Fall zitierbar ist, braucht die dritte Antwort. Die Deklaration steht in `src/agentforensics/parsers/coverage.py`, und ein Test hält jeden Eintrag daran fest, dass es ihn im Katalog noch gibt, damit diese Liste nicht überlebt, was sie zusagt.
 
+- `cursor.local_file_history`: the same store as the two entries below, in the second of the three editors of that family, and the only one of the three with a reader. That reader claims the index and returns it as a document, which puts the list of versions and their times in the case and leaves the versions themselves as filesystem events. So the question it answers is which files were replaced and when, not what they said before
 - `goose.plugins`: the plugin tree is collected whole and read as text, which is right for the shell scripts in it and wrong for the hooks/hooks.json beside them. That file registers the commands the product runs on tool events, and the matcher that decides which calls they fire on, so until something reads it as the registry it is, a case holds it as prose and no rule can ask what a hook was permitted to do
 - `vscode.local_history`: the editor's own copy of a file from before each change, which an agent's edits land in like anybody else's. The index inside is JSON and the versions beside it are the file contents, and reading the pair as a snapshot store is format work nobody here has done. The directory is collected and is on the timeline; the earlier text inside it is not on the timeline as anything
+- `windsurf.local_file_history`: the third copy of the same store, in the third editor of that family. One piece of format work would finish all three, which is the argument for doing it: the reader would have to understand one index format and one directory layout, and three products in this catalogue would go from holding the fact that a file was replaced to holding what it said before
 
 ## Wo die Lesung dünn ist
 

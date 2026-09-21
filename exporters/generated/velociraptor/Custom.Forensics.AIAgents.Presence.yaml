@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: f07adc9c1624
+# Catalogue digest: a09e331a5a41
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1531,9 +1531,11 @@ sources:
     windsurf,/Users/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,/Users/*/.codeium/windsurf-next/memories/global_rules.md
     windsurf,/Users/*/.codeium/windsurf/memories/global_rules.md
+    windsurf,/Users/*/.config/Devin/User/History/**
     windsurf,/Users/*/.config/Devin/User/acp-messages/*.db
     windsurf,/Users/*/.config/Devin/User/acp-messages/*.db-shm
     windsurf,/Users/*/.config/Devin/User/acp-messages/*.db-wal
+    windsurf,/Users/*/.config/Windsurf/User/History/**
     windsurf,/Users/*/.devin-server/**
     windsurf,/Users/*/.devin/plans/**
     windsurf,/Users/*/.devin/plans/plan-*.md
@@ -1543,16 +1545,20 @@ sources:
     windsurf,/Users/*/.windsurf/plans/**
     windsurf,/Users/*/.windsurf/transcripts/*.jsonl
     windsurf,/Users/*/.windsurf/worktrees/*
+    windsurf,/Users/*/Library/Application Support/Devin/User/History/**
     windsurf,/Users/*/Library/Application Support/Devin/User/acp-messages/*.db
     windsurf,/Users/*/Library/Application Support/Devin/User/acp-messages/*.db-shm
     windsurf,/Users/*/Library/Application Support/Devin/User/acp-messages/*.db-wal
+    windsurf,/Users/*/Library/Application Support/Windsurf/User/History/**
     windsurf,/home/*/.codeium/codeium.log
     windsurf,/home/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,/home/*/.codeium/windsurf-next/memories/global_rules.md
     windsurf,/home/*/.codeium/windsurf/memories/global_rules.md
+    windsurf,/home/*/.config/Devin/User/History/**
     windsurf,/home/*/.config/Devin/User/acp-messages/*.db
     windsurf,/home/*/.config/Devin/User/acp-messages/*.db-shm
     windsurf,/home/*/.config/Devin/User/acp-messages/*.db-wal
+    windsurf,/home/*/.config/Windsurf/User/History/**
     windsurf,/home/*/.devin-server/**
     windsurf,/home/*/.devin/plans/**
     windsurf,/home/*/.devin/plans/plan-*.md
@@ -1562,16 +1568,20 @@ sources:
     windsurf,/home/*/.windsurf/plans/**
     windsurf,/home/*/.windsurf/transcripts/*.jsonl
     windsurf,/home/*/.windsurf/worktrees/*
+    windsurf,/home/*/Library/Application Support/Devin/User/History/**
     windsurf,/home/*/Library/Application Support/Devin/User/acp-messages/*.db
     windsurf,/home/*/Library/Application Support/Devin/User/acp-messages/*.db-shm
     windsurf,/home/*/Library/Application Support/Devin/User/acp-messages/*.db-wal
+    windsurf,/home/*/Library/Application Support/Windsurf/User/History/**
     windsurf,/root/.codeium/codeium.log
     windsurf,/root/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,/root/.codeium/windsurf-next/memories/global_rules.md
     windsurf,/root/.codeium/windsurf/memories/global_rules.md
+    windsurf,/root/.config/Devin/User/History/**
     windsurf,/root/.config/Devin/User/acp-messages/*.db
     windsurf,/root/.config/Devin/User/acp-messages/*.db-shm
     windsurf,/root/.config/Devin/User/acp-messages/*.db-wal
+    windsurf,/root/.config/Windsurf/User/History/**
     windsurf,/root/.devin-server/**
     windsurf,/root/.devin/plans/**
     windsurf,/root/.devin/plans/plan-*.md
@@ -1581,16 +1591,20 @@ sources:
     windsurf,/root/.windsurf/plans/**
     windsurf,/root/.windsurf/transcripts/*.jsonl
     windsurf,/root/.windsurf/worktrees/*
+    windsurf,/root/Library/Application Support/Devin/User/History/**
     windsurf,/root/Library/Application Support/Devin/User/acp-messages/*.db
     windsurf,/root/Library/Application Support/Devin/User/acp-messages/*.db-shm
     windsurf,/root/Library/Application Support/Devin/User/acp-messages/*.db-wal
+    windsurf,/root/Library/Application Support/Windsurf/User/History/**
     windsurf,/var/root/.codeium/codeium.log
     windsurf,/var/root/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,/var/root/.codeium/windsurf-next/memories/global_rules.md
     windsurf,/var/root/.codeium/windsurf/memories/global_rules.md
+    windsurf,/var/root/.config/Devin/User/History/**
     windsurf,/var/root/.config/Devin/User/acp-messages/*.db
     windsurf,/var/root/.config/Devin/User/acp-messages/*.db-shm
     windsurf,/var/root/.config/Devin/User/acp-messages/*.db-wal
+    windsurf,/var/root/.config/Windsurf/User/History/**
     windsurf,/var/root/.devin-server/**
     windsurf,/var/root/.devin/plans/**
     windsurf,/var/root/.devin/plans/plan-*.md
@@ -1600,9 +1614,11 @@ sources:
     windsurf,/var/root/.windsurf/plans/**
     windsurf,/var/root/.windsurf/transcripts/*.jsonl
     windsurf,/var/root/.windsurf/worktrees/*
+    windsurf,/var/root/Library/Application Support/Devin/User/History/**
     windsurf,/var/root/Library/Application Support/Devin/User/acp-messages/*.db
     windsurf,/var/root/Library/Application Support/Devin/User/acp-messages/*.db-shm
     windsurf,/var/root/Library/Application Support/Devin/User/acp-messages/*.db-wal
+    windsurf,/var/root/Library/Application Support/Windsurf/User/History/**
     windsurf,C:/Users/*/.codeium/codeium.log
     windsurf,C:/Users/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,C:/Users/*/.codeium/windsurf-next/memories/global_rules.md
@@ -1619,12 +1635,14 @@ sources:
     windsurf,C:/Users/*/AppData/Local/Temp/devin-inno-updater-*.log
     windsurf,C:/Users/*/AppData/Local/Temp/unleash-backup-codeium-extension.json
     windsurf,C:/Users/*/AppData/Local/Temp/unleash-repo-schema-v1-codeium-language-server.json
+    windsurf,C:/Users/*/AppData/Roaming/Devin/User/History/**
     windsurf,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db
     windsurf,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db-shm
     windsurf,C:/Users/*/AppData/Roaming/Devin/User/acp-messages/*.db-wal
     windsurf,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db
     windsurf,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db-shm
     windsurf,C:/Users/*/AppData/Roaming/Devin/cli/sessions.db-wal
+    windsurf,C:/Users/*/AppData/Roaming/Windsurf/User/History/**
     ''')
     LET hits = SELECT * FROM foreach(row=targets, query={
         SELECT Agent, OSPath, Mtime FROM glob(globs=glob)

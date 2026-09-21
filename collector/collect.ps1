@@ -11970,6 +11970,27 @@ $EmbeddedCatalogueJson = @'
                     "status": "unverified"
                 },
                 {
+                    "category": "file_snapshot",
+                    "collect_priority": "first",
+                    "id": "windsurf.local_file_history",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\Devin\\User\\History\\",
+                        "%APPDATA%\\Windsurf\\User\\History\\",
+                        "~/.config/Devin/User/History/",
+                        "~/.config/Windsurf/User/History/",
+                        "~/Library/Application Support/Devin/User/History/",
+                        "~/Library/Application Support/Windsurf/User/History/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
                     "category": "cache",
                     "collect_priority": "durable",
                     "id": "windsurf.macos_bundle_storage",
@@ -12554,7 +12575,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "113c51d8306ff8f9d6afcb699a9c897c43b43ad2d3d04eedae4215b26b405f7a"
+    "sha256": "d03c9305341cd5567dfe288a43e5c7db97762b0beeeec4346fba5d33ea1d4e64"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: f07adc9c1624
+# Catalogue digest: a09e331a5a41
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1702,6 +1702,8 @@ sources:
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/.devin-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/.windsurf-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,C:/Users/*/AppData/Local/Programs/Windsurf/**
+    windsurf,windsurf.local_file_history,C:/Users/*/AppData/Roaming/Devin/User/History/**
+    windsurf,windsurf.local_file_history,C:/Users/*/AppData/Roaming/Windsurf/User/History/**
     windsurf,windsurf.mcp_config,C:/Users/*/.codeium/windsurf/mcp_config.json
     windsurf,windsurf.mcp_oauth_state,C:/Users/*/AppData/Roaming/Devin/mcp/oauth/**
     windsurf,windsurf.memories,C:/Users/*/.codeium/windsurf-insiders/memories/*
@@ -4857,6 +4859,14 @@ sources:
     windsurf,windsurf.language_server_binaries_and_logs,/var/root/.codeium/*/language_server_windows_x64.exe
     windsurf,windsurf.language_server_binaries_and_logs,/var/root/.devin-server/data/logs/*/1-windsurf.log
     windsurf,windsurf.language_server_binaries_and_logs,/var/root/.windsurf-server/data/logs/*/1-windsurf.log
+    windsurf,windsurf.local_file_history,/Users/*/.config/Devin/User/History/**
+    windsurf,windsurf.local_file_history,/Users/*/.config/Windsurf/User/History/**
+    windsurf,windsurf.local_file_history,/Users/*/Library/Application Support/Devin/User/History/**
+    windsurf,windsurf.local_file_history,/Users/*/Library/Application Support/Windsurf/User/History/**
+    windsurf,windsurf.local_file_history,/var/root/.config/Devin/User/History/**
+    windsurf,windsurf.local_file_history,/var/root/.config/Windsurf/User/History/**
+    windsurf,windsurf.local_file_history,/var/root/Library/Application Support/Devin/User/History/**
+    windsurf,windsurf.local_file_history,/var/root/Library/Application Support/Windsurf/User/History/**
     windsurf,windsurf.macos_bundle_storage,/Users/*/Library/Caches/com.exafunction.windsurf/Cache.db
     windsurf,windsurf.macos_bundle_storage,/Users/*/Library/Caches/com.exafunction.windsurf/Cache.db-shm
     windsurf,windsurf.macos_bundle_storage,/Users/*/Library/Caches/com.exafunction.windsurf/Cache.db-wal
@@ -7961,6 +7971,14 @@ sources:
     windsurf,windsurf.language_server_binaries_and_logs,/usr/share/devin-desktop/resources/app/extensions/windsurf/bin/language_server_linux_x64
     windsurf,windsurf.language_server_binaries_and_logs,/usr/share/devin-desktop/resources/app/extensions/windsurf/devin/bin/devin
     windsurf,windsurf.language_server_binaries_and_logs,/usr/share/windsurf/resources/app/extensions/windsurf/bin/language_server_linux_x64
+    windsurf,windsurf.local_file_history,/home/*/.config/Devin/User/History/**
+    windsurf,windsurf.local_file_history,/home/*/.config/Windsurf/User/History/**
+    windsurf,windsurf.local_file_history,/home/*/Library/Application Support/Devin/User/History/**
+    windsurf,windsurf.local_file_history,/home/*/Library/Application Support/Windsurf/User/History/**
+    windsurf,windsurf.local_file_history,/root/.config/Devin/User/History/**
+    windsurf,windsurf.local_file_history,/root/.config/Windsurf/User/History/**
+    windsurf,windsurf.local_file_history,/root/Library/Application Support/Devin/User/History/**
+    windsurf,windsurf.local_file_history,/root/Library/Application Support/Windsurf/User/History/**
     windsurf,windsurf.mcp_config,/home/*/.codeium/windsurf/mcp_config.json
     windsurf,windsurf.mcp_config,/root/.codeium/windsurf/mcp_config.json
     windsurf,windsurf.mcp_oauth_state,/home/*/.config/Devin/mcp/oauth/**
