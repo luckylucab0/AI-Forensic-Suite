@@ -19,12 +19,21 @@ does not double a case, and a finding recorded last week still points at the sam
 agent records carry no timestamp at all, and the honest representation of that is an absent
 timestamp with a stated reason, not a zero, not the ingest time, and not the file's mtime
 silently presented as the event's own.
+
+Where it is present its shape is checked here rather than trusted, and the reason is one
+layer further out than this module. The timeline exports a sketch-compatible log, and the
+importer at the other end parses the date with a flexible parser and, when that fails,
+coerces the value to the Unix epoch rather than refusing it. So a timestamp this suite
+writes in some other shape does not arrive as an error anywhere: it arrives as an event
+dated 1970, sorted into the wrong place in somebody's timeline, with nothing saying so.
+A parser that produces one is wrong here, where it is a failing test, rather than there.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -87,6 +96,12 @@ TsPrecision = Literal["exact", "second", "minute", "hour", "day", "filesystem", 
 # on the actor: a file write by the agent is its work product, a file write by the user is
 # context the agent then read.
 Actor = Literal["user", "assistant", "tool", "system", "unknown"]
+
+
+# ISO 8601 with a zone, which is what the whole pipeline states it writes: a date, a time,
+# optional fractional seconds, and either Z or an explicit offset. Anything else is refused
+# at construction, for the reason in the module docstring.
+TIMESTAMP = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})")
 
 
 @dataclass(frozen=True, slots=True)
@@ -153,6 +168,11 @@ class Event:
             raise ValueError("a precision was given for a timestamp that is not there")
         if self.ts_utc is not None and self.ts_precision == "absent":
             raise ValueError("a timestamp was given with no precision")
+        if self.ts_utc is not None and not TIMESTAMP.fullmatch(self.ts_utc):
+            raise ValueError(
+                f"a timestamp that is not ISO 8601 with a zone: {self.ts_utc!r}. "
+                "It would reach a timeline as text and an importer as a date it guessed at"
+            )
 
     @property
     def event_id(self) -> str:

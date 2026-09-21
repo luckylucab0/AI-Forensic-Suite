@@ -213,3 +213,46 @@ def test_every_declared_format_writes_something(case: Case) -> None:
         written, _ = write(case, buffer, fmt)
         assert written > 0, fmt
         assert buffer.getvalue(), fmt
+
+
+# ------------------------------------------- the shape of a timestamp, and why it matters
+
+
+def test_a_timestamp_that_is_not_iso_is_refused_where_it_is_built() -> None:
+    """The importer at the other end would not refuse it, which is the whole reason.
+
+    Timesketch parses the date with pandas in mixed-format mode and falls back to coercing
+    what it cannot parse, so an event this suite wrote in some other shape arrives dated
+    1970 and sorted into the wrong place, with nothing anywhere saying so. Refusing it at
+    construction turns that into a failing test in whichever parser produced it.
+    """
+    from agentforensics.model.event import Event, Provenance
+
+    def build(when: str) -> Event:
+        return Event(
+            kind="user.prompt",
+            provenance=Provenance("b1", "/x", "aa", None, "line:1"),
+            agent="example",
+            raw={},
+            ts_utc=when,
+            ts_precision="second",
+            ts_source="timestamp",
+        )
+
+    for good in (
+        "2026-09-06T09:00:00Z",
+        "2026-09-06T09:00:00.123456Z",
+        "2026-09-06T09:00:00+00:00",
+        "2026-09-06T09:00:00.5-07:00",
+    ):
+        assert build(good).ts_utc == good
+
+    for bad in (
+        "2026-09-06 09:00:00",  # a space, which several agents write
+        "2026-09-06T09:00:00",  # no zone at all, so the reader has to guess one
+        "1788912000",  # an epoch, unconverted
+        "06/09/2026 09:00",  # a locale format, ambiguous by day and month
+        "",
+    ):
+        with pytest.raises(ValueError, match="ISO 8601"):
+            build(bad)

@@ -263,6 +263,16 @@ def _write_timesketch(case: Case, stream: TextIO, filters: Filters | None) -> tu
     inventing one, they are skipped from the import and counted in the return value, and
     the caller warns. Silently dropping them into a sketch with a fabricated date would put
     a wrong time in front of an analyst, which is worse than an honest gap.
+
+    The importer at the other end makes the same mistake this refuses to, which is why the
+    shape of a timestamp is checked where events are built rather than trusted here. It
+    parses the date with pandas in mixed-format mode and, when that fails, coerces the
+    value rather than refusing it, so an unparseable timestamp arrives as an event dated
+    1970 and sorted into the wrong place with nothing saying so. Read on 2026-09-21 from
+    the import client's own source, importer_client/python/timesketch_import_client:
+    `pandas.to_datetime(data_frame['datetime'], utc=True, format='mixed')` with a fallback
+    to `errors='coerce'`. Both spellings this suite can write, Z and an explicit offset,
+    parse there; the check exists so that no third spelling can appear.
     """
     written = undated = 0
     for row in rows(case, filters):
