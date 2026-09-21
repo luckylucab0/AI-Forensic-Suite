@@ -1197,3 +1197,200 @@ def test_the_cross_product_rule_fires_on_a_windows_image_too(tmp_path: Path) -> 
         "the drive letter arrives percent-encoded in the URI, so a reading that skipped the "
         "decoding would produce a path with an escape in it that no filesystem has"
     )
+
+
+# ------------------------------------------- what a rule author sees when a test fails
+
+# The self-test is how every rule in this repository is checked, and it runs in CI and
+# from the command line. What had never run is the message it prints when a rule test
+# fails: the whole explanation, and with it the rendering of a composite condition, was
+# reached only on failure and nothing in the suite had ever failed on purpose. An author
+# whose rule was wrong would have got a traceback out of the diagnostic instead of the
+# diagnostic, at the moment they were least able to tell the two apart.
+
+FAILING = """
+id: AFX-SECRETS-910
+pack: secrets
+title: A rule whose own test disagrees with it
+severity: low
+description: Long enough to satisfy the schema's minimum length for a description.
+rationale: Long enough to satisfy the schema's minimum length for a rationale field.
+redact: true
+match:
+  all:
+    - field: text
+      contains: needle
+    - any:
+        - field: text
+          contains: barn
+        - none:
+            - field: text
+              exists: false
+tests:
+  - name: this one is right
+    match: true
+    event: {payload: {text: a needle in a barn}}
+  - name: nothing to find
+    match: false
+    event: {payload: {text: an empty barn}}
+  - name: this one is wrong on purpose
+    match: true
+    event: {payload: {text: hay}}
+"""
+
+
+def test_a_failing_rule_test_explains_itself_rather_than_raising(tmp_path: Path) -> None:
+    """One line naming the test, then the condition as prose, composites included."""
+    rule = load_file(write(tmp_path, "secrets", "AFX-SECRETS-910.yaml", FAILING), pack="secrets")
+    problems = rule_testing.run(rule)
+
+    assert len(problems) == 1, problems
+    report = problems[0]
+    assert "'this one is wrong on purpose'" in report
+    assert "should match, and it does not" in report
+    # The composite renderers, which exist so the condition reads as a sentence and had
+    # never been called: an "and" joining the parts, an "or" in brackets, and "none of".
+    assert "condition: " in report
+    assert " and " in report
+    assert "(" in report and " or " in report
+    assert "none of (" in report
+
+
+SCOPED = """
+id: AFX-SECRETS-911
+pack: secrets
+title: A rule scoped to one kind and one agent
+severity: low
+description: Long enough to satisfy the schema's minimum length for a description.
+rationale: Long enough to satisfy the schema's minimum length for a rationale field.
+redact: true
+applies_to:
+  kinds: [prompt.user]
+  agents: [claude_code]
+match:
+  field: text
+  contains: needle
+tests:
+  - name: in scope
+    match: true
+    event: {kind: prompt.user, agent: claude_code, payload: {text: needle}}
+  - name: in scope and not a match
+    match: false
+    event: {kind: prompt.user, agent: claude_code, payload: {text: hay}}
+  - name: silent about its scope
+    match: true
+    event: {payload: {text: needle}}
+"""
+
+
+def test_a_test_that_is_silent_about_a_scoped_rules_scope_is_told_so(tmp_path: Path) -> None:
+    """The second of the two mistakes that produce a failing rule test.
+
+    A condition that is wrong and a scope that excludes the sample look identical from the
+    outside, and an author who reads "expected True, got False" goes looking in the
+    condition. The scope is not defaulted to anything plausible precisely so that this is
+    visible, which only helps if the message says it.
+    """
+    rule = load_file(write(tmp_path, "secrets", "AFX-SECRETS-911.yaml", SCOPED), pack="secrets")
+    problems = rule_testing.run(rule)
+
+    assert len(problems) == 1, problems
+    report = problems[0]
+    assert "does not look at this event at all" in report
+    assert "prompt.user" in report and "claude_code" in report
+    assert "silent about its scope" in report
+
+
+def test_a_test_event_naming_a_field_an_event_does_not_have_is_refused(
+    tmp_path: Path,
+) -> None:
+    """A sample that states a field nobody maps would pass or fail for the wrong reason,
+    so the self-test reports it as unusable rather than running it."""
+    body = MINIMAL.replace("900", "912").replace(
+        "event: {payload: {text: needle}}", "event: {payload: {text: needle}, nonesuch: 1}"
+    )
+    rule = load_file(write(tmp_path, "secrets", "AFX-SECRETS-912.yaml", body), pack="secrets")
+    problems = rule_testing.run(rule)
+    assert any("is not usable" in problem for problem in problems), problems
+    assert any("nonesuch" in problem for problem in problems), problems
+
+
+# --------------------------------------------------- every operator, at its boundary
+
+# A rule file is data, and the operators are the whole vocabulary an author writes it in.
+# Half of them had never been evaluated: `gt` had, `gte`, `lt` and `lte` had not, and of
+# the three length operators only one. An off-by-one in any of them is invisible, because
+# the rule still loads, still passes its own samples if those samples are not at the
+# boundary, and fires one value too wide or too narrow over a real case forever after.
+#
+# So one row per operator, each at the boundary where a confusion between < and <= shows,
+# and a guard that the table names every operator the condition language has.
+
+BOUNDARIES: dict[str, tuple[object, object, object]] = {
+    # operator: the rule's value, a value that must match, a value that must not
+    "equals": ("needle", "needle", "needles"),
+    "contains": ("needle", "a needle here", "a pin here"),
+    "startswith": ("needle", "needle in a barn", "a needle"),
+    "endswith": ("needle", "a needle", "needle in a barn"),
+    "regex": (r"^n\w+e$", "needle", "a needle"),
+    "glob": ("/home/*/.ssh/*", "/home/alice/.ssh/id_ed25519", "/home/alice/notes.txt"),
+    "equals_any": (["a", "needle"], "needle", "b"),
+    "contains_any": (["pin", "needle"], "a needle", "a nail"),
+    "startswith_any": (["pin", "needle"], "needle here", "a needle"),
+    "endswith_any": (["pin", "needle"], "a needle", "needle here"),
+    "regex_any": ([r"^pin$", r"^n\w+e$"], "needle", "a needle"),
+    "glob_any": (["/etc/*", "/home/*/.ssh/*"], "/etc/shadow", "/var/log/syslog"),
+    # The four numeric comparisons, each at the value that separates it from its sibling.
+    "gt": (10, 11, 10),
+    "gte": (10, 10, 9),
+    "lt": (10, 9, 10),
+    "lte": (10, 10, 11),
+    # The three length comparisons, likewise.
+    "length_gt": (4, "abcde", "abcd"),
+    "length_gte": (4, "abcd", "abc"),
+    "length_lt": (4, "abc", "abcd"),
+    "count_gte": (2, ["one", "two"], ["one"]),
+    "exists": (True, "anything", None),
+}
+
+
+def test_the_boundary_table_names_every_operator_there_is() -> None:
+    """Without this the table is a list somebody forgot to add to, and a new operator
+    would ship with nothing having evaluated it, which is the state most of them were in."""
+    from agentforensics.rules.conditions import OPERATORS
+
+    assert set(BOUNDARIES) == set(OPERATORS), {
+        "untested": sorted(set(OPERATORS) - set(BOUNDARIES)),
+        "not an operator": sorted(set(BOUNDARIES) - set(OPERATORS)),
+    }
+
+
+def _selector(operator: str) -> str:
+    """count_gte asks how many values the selector resolved to, so it needs a selector
+    that can resolve to more than one. Every other operator tests each value it finds."""
+    return "payload.value[]" if operator == "count_gte" else "payload.value"
+
+
+@pytest.mark.parametrize("operator", sorted(BOUNDARIES))
+def test_an_operator_draws_its_line_where_it_says_it_does(operator: str) -> None:
+    value, matching, missing = BOUNDARIES[operator]
+    condition = cond({"field": _selector(operator), operator: value})
+
+    assert condition.matches(event(payload={"value": matching})), (
+        f"{operator} did not match {matching!r}, which is on its inside edge"
+    )
+    view = event(payload={} if missing is None else {"value": missing})
+    assert not condition.matches(view), (
+        f"{operator} matched {missing!r}, which is one step outside it"
+    )
+
+
+@pytest.mark.parametrize("operator", sorted(BOUNDARIES))
+def test_every_operator_renders_itself_as_prose(operator: str) -> None:
+    """The text a finding carries as its reason. An operator with no rendering would put
+    an unreadable condition in front of the analyst deciding what the finding means."""
+    value, _, _ = BOUNDARIES[operator]
+    selector = _selector(operator)
+    rendered = cond({"field": selector, operator: value}).describe()
+    assert rendered.startswith(f"{selector} ")
+    assert len(rendered) > len(selector) + 2
