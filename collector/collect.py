@@ -3851,6 +3851,38 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "codex.macos_managed_preferences",
+                    "os": [
+                        "macos"
+                    ],
+                    "paths": [
+                        "/Library/Managed Preferences/com.openai.codex.plist",
+                        "/Library/Managed Preferences/<user>/com.openai.codex.plist"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "codex.managed_config_legacy",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\managed_config.toml",
+                        "/etc/codex/managed_config.toml"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "mcp_config",
                     "collect_priority": "normal",
                     "id": "codex.mcp_and_notify",
@@ -3949,12 +3981,10 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "linux"
                     ],
                     "paths": [
-                        "%USERPROFILE%\\.codex\\permissions.toml",
-                        "%USERPROFILE%\\.codex\\requirements.toml",
-                        "~/.codex/permissions.toml",
-                        "~/.codex/requirements.toml"
+                        "%PROGRAMDATA%\\OpenAI\\Codex\\requirements.toml",
+                        "/etc/codex/requirements.toml"
                     ],
-                    "root": "user_profile",
+                    "root": "system",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -4112,6 +4142,23 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.codex/thread_history_1.sqlite"
                     ],
                     "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "codex.system_config",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%PROGRAMDATA%\\OpenAI\\Codex\\config.toml",
+                        "/etc/codex/config.toml"
+                    ],
+                    "root": "system",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -12987,7 +13034,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "821d8ae5d65eb0273121868b05334bc18ab8b17d0f4447ae537043bfa77c45df"
+    "sha256": "e8b0a375eade8c07116b647fe3c9f097f916cc36108faeb1341e22f5f549d76b"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

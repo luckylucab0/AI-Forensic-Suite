@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 16c37468105d
+# Catalogue digest: 92f793851e33
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -577,6 +577,7 @@ sources:
     codex,codex.external_agent_imports,C:/Users/*/.codex/external_agent_session_imports.json
     codex,codex.installation_id,C:/Users/*/.codex/installation_id
     codex,codex.log_dir,C:/Users/*/.codex/log/**
+    codex,codex.managed_config_legacy,C:/Users/*/.codex/managed_config.toml
     codex,codex.mcp_and_notify,C:/Users/*/.codex/config.toml
     codex,codex.mcp_oauth_credentials,C:/Users/*/.codex/.credentials.json
     codex,codex.models_cache,C:/Users/*/.codex/models_cache.json
@@ -586,8 +587,7 @@ sources:
     codex,codex.plugin_store,C:/Users/*/.codex/plugins/cache/**
     codex,codex.plugin_store,C:/Users/*/.codex/plugins/data/**
     codex,codex.prompt_history,C:/Users/*/.codex/history.jsonl
-    codex,codex.requirements_and_permissions,C:/Users/*/.codex/permissions.toml
-    codex,codex.requirements_and_permissions,C:/Users/*/.codex/requirements.toml
+    codex,codex.requirements_and_permissions,C:/ProgramData/OpenAI/Codex/requirements.toml
     codex,codex.rollouts,C:/Users/*/.codex/sessions/**
     codex,codex.rollouts,C:/Users/*/.codex/sessions/*/*/*/**
     codex,codex.rollouts_compressed,C:/Users/*/.codex/sessions/**/rollout-*.jsonl.*.tmp
@@ -606,6 +606,7 @@ sources:
     codex,codex.state_databases,C:/Users/*/.codex/queue_1.sqlite
     codex,codex.state_databases,C:/Users/*/.codex/state_5.sqlite
     codex,codex.state_databases,C:/Users/*/.codex/thread_history_1.sqlite
+    codex,codex.system_config,C:/ProgramData/OpenAI/Codex/config.toml
     codex,codex.system_skills,C:/Users/*/.codex/skills/.system/**
     codex,codex.system_skills,C:/Users/*/.codex/skills/.system/.codex-system-skills.marker
     codex,codex.thread_writer_locks,C:/Users/*/.codex/thread-writer-locks/**
@@ -2731,6 +2732,9 @@ sources:
     codex,codex.installation_id,/var/root/.codex/installation_id
     codex,codex.log_dir,/Users/*/.codex/log/**
     codex,codex.log_dir,/var/root/.codex/log/**
+    codex,codex.macos_managed_preferences,/Library/Managed Preferences/*/com.openai.codex.plist
+    codex,codex.macos_managed_preferences,/Library/Managed Preferences/com.openai.codex.plist
+    codex,codex.managed_config_legacy,/etc/codex/managed_config.toml
     codex,codex.mcp_and_notify,/Users/*/.codex/config.toml
     codex,codex.mcp_and_notify,/var/root/.codex/config.toml
     codex,codex.mcp_oauth_credentials,/Users/*/.codex/.credentials.json
@@ -2749,10 +2753,7 @@ sources:
     codex,codex.plugin_store,/var/root/.codex/plugins/data/**
     codex,codex.prompt_history,/Users/*/.codex/history.jsonl
     codex,codex.prompt_history,/var/root/.codex/history.jsonl
-    codex,codex.requirements_and_permissions,/Users/*/.codex/permissions.toml
-    codex,codex.requirements_and_permissions,/Users/*/.codex/requirements.toml
-    codex,codex.requirements_and_permissions,/var/root/.codex/permissions.toml
-    codex,codex.requirements_and_permissions,/var/root/.codex/requirements.toml
+    codex,codex.requirements_and_permissions,/etc/codex/requirements.toml
     codex,codex.rollouts,/Users/*/.codex/sessions/**
     codex,codex.rollouts,/Users/*/.codex/sessions/*/*/*/**
     codex,codex.rollouts,/var/root/.codex/sessions/**
@@ -2795,6 +2796,7 @@ sources:
     codex,codex.state_databases,/var/root/.codex/queue_1.sqlite
     codex,codex.state_databases,/var/root/.codex/state_5.sqlite
     codex,codex.state_databases,/var/root/.codex/thread_history_1.sqlite
+    codex,codex.system_config,/etc/codex/config.toml
     codex,codex.system_skills,/Users/*/.codex/skills/.system/**
     codex,codex.system_skills,/Users/*/.codex/skills/.system/.codex-system-skills.marker
     codex,codex.system_skills,/var/root/.codex/skills/.system/**
@@ -5992,6 +5994,7 @@ sources:
     codex,codex.installation_id,/root/.codex/installation_id
     codex,codex.log_dir,/home/*/.codex/log/**
     codex,codex.log_dir,/root/.codex/log/**
+    codex,codex.managed_config_legacy,/etc/codex/managed_config.toml
     codex,codex.mcp_and_notify,/home/*/.codex/config.toml
     codex,codex.mcp_and_notify,/root/.codex/config.toml
     codex,codex.mcp_oauth_credentials,/home/*/.codex/.credentials.json
@@ -6010,10 +6013,7 @@ sources:
     codex,codex.plugin_store,/root/.codex/plugins/data/**
     codex,codex.prompt_history,/home/*/.codex/history.jsonl
     codex,codex.prompt_history,/root/.codex/history.jsonl
-    codex,codex.requirements_and_permissions,/home/*/.codex/permissions.toml
-    codex,codex.requirements_and_permissions,/home/*/.codex/requirements.toml
-    codex,codex.requirements_and_permissions,/root/.codex/permissions.toml
-    codex,codex.requirements_and_permissions,/root/.codex/requirements.toml
+    codex,codex.requirements_and_permissions,/etc/codex/requirements.toml
     codex,codex.rollouts,/home/*/.codex/sessions/**
     codex,codex.rollouts,/home/*/.codex/sessions/*/*/*/**
     codex,codex.rollouts,/root/.codex/sessions/**
@@ -6056,6 +6056,7 @@ sources:
     codex,codex.state_databases,/root/.codex/queue_1.sqlite
     codex,codex.state_databases,/root/.codex/state_5.sqlite
     codex,codex.state_databases,/root/.codex/thread_history_1.sqlite
+    codex,codex.system_config,/etc/codex/config.toml
     codex,codex.system_skills,/home/*/.codex/skills/.system/**
     codex,codex.system_skills,/home/*/.codex/skills/.system/.codex-system-skills.marker
     codex,codex.system_skills,/root/.codex/skills/.system/**

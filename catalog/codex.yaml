@@ -299,34 +299,106 @@ artifacts:
     The notify hook also lives here and runs an external program on agent events, which makes it an execution path configured by a text file.
   parser: toml_generic
 - id: codex.requirements_and_permissions
+  title: Administrator requirements
   category: permissions
-  root: user_profile
+  root: system
   os:
   - macos
   - windows
   - linux
   paths:
-  - '%USERPROFILE%\.codex\permissions.toml'
-  - '%USERPROFILE%\.codex\requirements.toml'
-  - ~/.codex/permissions.toml
-  - ~/.codex/requirements.toml
+  - '%PROGRAMDATA%\OpenAI\Codex\requirements.toml'
+  - /etc/codex/requirements.toml
   format: toml
   sensitivity: normal
   collect_priority: normal
   status: verified
-  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/config/mod.rs
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/config/src/loader/mod.rs
   source_kind: source_code
-  unsourced_paths:
-  - '%USERPROFILE%\.codex\permissions.toml'
-  - '%USERPROFILE%\.codex\requirements.toml'
-  - ~/.codex/permissions.toml
-  - ~/.codex/requirements.toml
-  volatility: Persistent until edited.
+  volatility: Persistent until edited by whoever administers the machine.
   notes: |-
-    The two files that decide what the agent was allowed to do without asking. allow_managed_hooks_only is honoured only in requirements.toml and is ignored in config.toml, so a control that looks configured can have no effect: check which file a restriction is written in before reporting that it was in force.
+    The file that decides what the agent was allowed to do without asking, and it is not the user's. allow_managed_hooks_only is honoured only here and is ignored in config.toml, so a control that looks configured can have no effect: check which file a restriction is written in before reporting that it was in force. The loader also refuses an allow decision in the rules of this file and merges its rules with the rest of the configuration taking the most restrictive result, so a permissive rule here does not widen anything.
 
-    The verification pass found neither filename resolved to a location in the cited source. The permissions spelling occurs there only as part of a module path, which is the likely origin of the filename, and the requirements file appears in prose and error strings with no directory ever given, described as a layer an administrator sets rather than a per-user file. All four paths are marked unsourced, and the placement under the user's configuration directory is the part to distrust most.
+    THIS ENTRY WAS IN THE WRONG PLACE, and the correction is the reason to read the rest of this note carefully. It claimed the file under the user's own agent directory, with a second filename, permissions.toml, beside it. A full read of the loader says the requirements file is a system path: /etc/codex/requirements.toml on macOS and Linux, and the requirements file under the vendor's directory in the program data folder on Windows, resolved through the known folder rather than assumed. Collecting the user's home for it finds nothing, which reads as no administrator policy having been in force.
+
+    The second filename is gone rather than marked. A search of the whole source tree for permissions.toml finds it nowhere, tests included, and the entry's own note already recorded that the spelling occurs in the cited file only as part of a module path. A plausible filename that no code builds is the worst thing this catalogue can carry, because a collection that searches for it and comes back empty looks like an answer.
+
+    Two sibling entries carry the rest of this layer: the system configuration file next to this one, and the deprecated managed configuration file that the user's own directory did hold on Windows before the vendor stopped supporting it there.
   parser: toml_generic
+- id: codex.system_config
+  title: System configuration
+  category: config
+  root: system
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%PROGRAMDATA%\OpenAI\Codex\config.toml'
+  - /etc/codex/config.toml
+  format: toml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/config/src/loader/mod.rs
+  source_kind: source_code
+  volatility: Persistent until edited by whoever administers the machine.
+  notes: |-
+    The defaults an administrator sets for every user on the machine, in the same directory as the requirements file and with a different standing: this layer sets defaults and the requirements file enforces. So a setting found here was the starting point and a setting found there could not be overridden, and reporting one as the other misstates whether the user had a choice.
+
+    Every other agent family in this catalogue already carried its system policy path and this one did not, which is why the entry is new rather than corrected. The Windows spelling resolves the program data directory through the known folder API, falling back to the literal default, so a machine with a relocated program data directory has this file somewhere else and the catalogue's spelling is the ordinary case.
+  parser: toml_generic
+- id: codex.managed_config_legacy
+  title: Deprecated managed configuration
+  category: permissions
+  root: system
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\managed_config.toml'
+  - /etc/codex/managed_config.toml
+  format: toml
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/config/src/loader/layer_io.rs
+  source_kind: source_code
+  legacy: true
+  volatility: |-
+    Still read on macOS and Linux from the system path. The copy in the user's own directory is no longer read on Windows, so what is there is residue that continues to describe a policy nobody is enforcing.
+  notes: |-
+    The managed configuration layer, which is where the per-user placement in the entry above came from. On macOS and Linux the loader reads it from the system directory. On Windows it used to be read from the agent's home directory and is not any more: the loader logs that it is ignoring a deprecated managed config file there and names the requirements file as the replacement.
+
+    Collect both spellings and read the Windows one as history rather than as state. A file whose settings are no longer applied is still evidence of what somebody intended to enforce and of when they intended it, and mistaking it for current policy is the error this entry exists to prevent.
+  parser: toml_generic
+- id: codex.macos_managed_preferences
+  title: Managed preferences set by device management
+  category: permissions
+  root: system
+  os:
+  - macos
+  paths:
+  - /Library/Managed Preferences/com.openai.codex.plist
+  - /Library/Managed Preferences/<user>/com.openai.codex.plist
+  format: plist
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/config/src/loader/macos.rs
+  source_kind: source_code
+  volatility: |-
+    Written and replaced by the management system rather than by the product, so it holds the currently pushed policy and its modification time belongs to the management system's last check-in.
+  notes: |-
+    The policy an enterprise pushes to a managed Mac, and the third place this agent's rules can come from. The loader reads forced preferences in the vendor's own application domain and takes two keys from them, one holding the configuration and one holding the requirements, each as base64-encoded TOML in a string.
+
+    So the administrator's whole policy can be in a plist and not in any file under /etc, which is why an examiner asking what the agent was permitted to do has to look here before concluding from an absent requirements file. Decode the two values and read them as the TOML they are.
+
+    The module is explicit that only forced values count: an ordinary user default in the same domain is never treated as managed configuration. That distinction matters in a report, because the user's own preferences file for this domain exists as well and says nothing about enforcement.
+
+    The path is the standard location the operating system writes forced preferences to, which is what makes this collectable at all; the source cited here is what establishes the domain and the two keys.
+  parser: plist_generic
 - id: codex.auth
   category: credentials
   root: user_profile

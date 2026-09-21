@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 16c37468105d
+# Catalogue digest: 92f793851e33
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 51 of the 656 catalogue artifacts declare
+# KAPE is Windows only. 52 of the 659 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -177,6 +177,12 @@ Targets:
         FileMask: "*"
         Recursive: true
     -
+        Name: codex.managed_config_legacy
+        Category: permissions
+        Path: C:\Users\%user%\.codex
+        FileMask: "managed_config.toml"
+        Recursive: false
+    -
         Name: codex.mcp_and_notify
         Category: mcp_config
         Path: C:\Users\%user%\.codex
@@ -233,13 +239,7 @@ Targets:
     -
         Name: codex.requirements_and_permissions
         Category: permissions
-        Path: C:\Users\%user%\.codex
-        FileMask: "permissions.toml"
-        Recursive: false
-    -
-        Name: codex.requirements_and_permissions
-        Category: permissions
-        Path: C:\Users\%user%\.codex
+        Path: C:\ProgramData\OpenAI\Codex
         FileMask: "requirements.toml"
         Recursive: false
     -
@@ -349,6 +349,12 @@ Targets:
         Category: transcript
         Path: C:\Users\%user%\.codex
         FileMask: "thread_history_1.sqlite"
+        Recursive: false
+    -
+        Name: codex.system_config
+        Category: config
+        Path: C:\ProgramData\OpenAI\Codex
+        FileMask: "config.toml"
         Recursive: false
     -
         Name: codex.system_skills

@@ -151,7 +151,7 @@ measure() {
 #     27 path(s) a registry key
 #    368 path(s) anchored in a working copy
 #    336 path(s) anchored in an environment variable
-#    820 path(s) for the other platform
+#    821 path(s) for the other platform
 #      1 path(s) in a scratch directory shared with every process on the machine
 probes_for() {
     case "$1" in
@@ -518,7 +518,13 @@ PROBES
         ;;
     codex)
         cat <<'PROBES'
-walk codex.app_global_state,codex.app_side_database,codex.app_side_stores,codex.archived_sessions,codex.auth,codex.config,codex.connector_caches,codex.curated_plugin_clone,codex.external_agent_imports,codex.ide_context_socket,codex.installation_id,codex.log_dir,codex.mcp_and_notify,codex.mcp_oauth_credentials,codex.models_cache,codex.plugin_store,codex.prompt_history,codex.requirements_and_permissions,codex.rollouts,codex.rollouts_compressed,codex.sandbox_migration_marker,codex.session_index,codex.shell_snapshots,codex.state_databases,codex.system_skills,codex.thread_writer_locks,codex.visualizations ~/.codex
+walk codex.macos_managed_preferences /Library/Managed Preferences
+check codex.macos_managed_preferences /Library/Managed Preferences/com.openai.codex.plist
+walk codex.managed_config_legacy,codex.requirements_and_permissions,codex.system_config /etc/codex
+check codex.system_config /etc/codex/config.toml
+check codex.managed_config_legacy /etc/codex/managed_config.toml
+check codex.requirements_and_permissions /etc/codex/requirements.toml
+walk codex.app_global_state,codex.app_side_database,codex.app_side_stores,codex.archived_sessions,codex.auth,codex.config,codex.connector_caches,codex.curated_plugin_clone,codex.external_agent_imports,codex.ide_context_socket,codex.installation_id,codex.log_dir,codex.mcp_and_notify,codex.mcp_oauth_credentials,codex.models_cache,codex.plugin_store,codex.prompt_history,codex.rollouts,codex.rollouts_compressed,codex.sandbox_migration_marker,codex.session_index,codex.shell_snapshots,codex.state_databases,codex.system_skills,codex.thread_writer_locks,codex.visualizations ~/.codex
 check codex.config ~/.codex/*.config.toml
 check codex.sqlite_glob ~/.codex/*.sqlite
 check codex.sqlite_write_ahead_logs ~/.codex/*.sqlite-shm
@@ -554,14 +560,12 @@ check codex.state_databases ~/.codex/logs_2.sqlite
 check codex.state_databases ~/.codex/memories_1.sqlite
 check codex.state_databases ~/.codex/memories_v2_1.sqlite
 check codex.models_cache ~/.codex/models_cache.json
-check codex.requirements_and_permissions ~/.codex/permissions.toml
 check codex.plugin_store ~/.codex/plugins
 check codex.plugin_store ~/.codex/plugins/.codex-remote-plugin-install.json
 check codex.plugin_store ~/.codex/plugins/.remote-plugin-install-staging
 check codex.plugin_store ~/.codex/plugins/cache
 check codex.plugin_store ~/.codex/plugins/data
 check codex.state_databases ~/.codex/queue_1.sqlite
-check codex.requirements_and_permissions ~/.codex/requirements.toml
 check codex.session_index ~/.codex/session_index.jsonl
 check codex.session_index ~/.codex/session_index.jsonl.tmp
 check codex.rollouts,codex.rollouts_compressed ~/.codex/sessions

@@ -149,7 +149,7 @@ function Measure-Family($name) {
 #     27 path(s) a registry key
 #    361 path(s) anchored in a working copy
 #    336 path(s) anchored in an environment variable
-#   1502 path(s) for the other platform
+#   1505 path(s) for the other platform
 $Probes = @{
     'amazonq' = @(
         'walk amazonq.cli_settings,amazonq.cli_state_database %LOCALAPPDATA%\amazon-q'
@@ -294,7 +294,10 @@ $Probes = @{
         'walk cline.data_dir_root %USERPROFILE%\.cline\data'
     )
     'codex' = @(
-        'walk codex.app_global_state,codex.app_side_database,codex.app_side_stores,codex.archived_sessions,codex.auth,codex.config,codex.connector_caches,codex.curated_plugin_clone,codex.external_agent_imports,codex.installation_id,codex.log_dir,codex.mcp_and_notify,codex.mcp_oauth_credentials,codex.models_cache,codex.plugin_store,codex.prompt_history,codex.requirements_and_permissions,codex.rollouts,codex.rollouts_compressed,codex.sandbox_migration_marker,codex.session_index,codex.state_databases,codex.system_skills,codex.thread_writer_locks,codex.visualizations %USERPROFILE%\.codex'
+        'walk codex.requirements_and_permissions,codex.system_config %PROGRAMDATA%\OpenAI'
+        'check codex.system_config %PROGRAMDATA%\OpenAI\Codex\config.toml'
+        'check codex.requirements_and_permissions %PROGRAMDATA%\OpenAI\Codex\requirements.toml'
+        'walk codex.app_global_state,codex.app_side_database,codex.app_side_stores,codex.archived_sessions,codex.auth,codex.config,codex.connector_caches,codex.curated_plugin_clone,codex.external_agent_imports,codex.installation_id,codex.log_dir,codex.managed_config_legacy,codex.mcp_and_notify,codex.mcp_oauth_credentials,codex.models_cache,codex.plugin_store,codex.prompt_history,codex.rollouts,codex.rollouts_compressed,codex.sandbox_migration_marker,codex.session_index,codex.state_databases,codex.system_skills,codex.thread_writer_locks,codex.visualizations %USERPROFILE%\.codex'
         'check codex.config %USERPROFILE%\.codex\*.config.toml'
         'check codex.sqlite_glob %USERPROFILE%\.codex\*.sqlite'
         'check codex.sqlite_write_ahead_logs %USERPROFILE%\.codex\*.sqlite-shm'
@@ -315,13 +318,12 @@ $Probes = @{
         'check codex.installation_id %USERPROFILE%\.codex\installation_id'
         'check codex.log_dir %USERPROFILE%\.codex\log'
         'check codex.state_databases %USERPROFILE%\.codex\logs_2.sqlite'
+        'check codex.managed_config_legacy %USERPROFILE%\.codex\managed_config.toml'
         'check codex.state_databases %USERPROFILE%\.codex\memories_1.sqlite'
         'check codex.state_databases %USERPROFILE%\.codex\memories_v2_1.sqlite'
         'check codex.models_cache %USERPROFILE%\.codex\models_cache.json'
-        'check codex.requirements_and_permissions %USERPROFILE%\.codex\permissions.toml'
         'check codex.plugin_store %USERPROFILE%\.codex\plugins'
         'check codex.state_databases %USERPROFILE%\.codex\queue_1.sqlite'
-        'check codex.requirements_and_permissions %USERPROFILE%\.codex\requirements.toml'
         'check codex.session_index %USERPROFILE%\.codex\session_index.jsonl'
         'check codex.session_index %USERPROFILE%\.codex\session_index.jsonl.tmp'
         'check codex.rollouts,codex.rollouts_compressed %USERPROFILE%\.codex\sessions'

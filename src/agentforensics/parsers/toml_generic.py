@@ -46,8 +46,10 @@ NOT_READ = frozenset({"crosscutting.uv_tool_dir", "gemini_cli.commands"})
 DOCUMENTS = frozenset(
     {
         "codex.config",
+        "codex.managed_config_legacy",
         "codex.mcp_and_notify",
         "codex.requirements_and_permissions",
+        "codex.system_config",
         "gemini_cli.policies",
         "warp.cli_settings",
     }
@@ -58,8 +60,10 @@ DOCUMENTS = frozenset(
 CONFIGURATIONS = frozenset(
     {
         "codex.config",
+        "codex.managed_config_legacy",
         "codex.mcp_and_notify",
         "codex.requirements_and_permissions",
+        "codex.system_config",
         "gemini_cli.policies",
         "warp.cli_settings",
     }

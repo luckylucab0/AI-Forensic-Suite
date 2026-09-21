@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 16c37468105d
+# Catalogue digest: 92f793851e33
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -507,6 +507,7 @@ $targets = @(
     @{ Agent = 'codex'; Id = 'codex.external_agent_imports'; Path = '$profile\.codex\external_agent_session_imports.json' }
     @{ Agent = 'codex'; Id = 'codex.installation_id'; Path = '$profile\.codex\installation_id' }
     @{ Agent = 'codex'; Id = 'codex.log_dir'; Path = '$profile\.codex\log' }
+    @{ Agent = 'codex'; Id = 'codex.managed_config_legacy'; Path = '$profile\.codex\managed_config.toml' }
     @{ Agent = 'codex'; Id = 'codex.mcp_and_notify'; Path = '$profile\.codex\config.toml' }
     @{ Agent = 'codex'; Id = 'codex.mcp_oauth_credentials'; Path = '$profile\.codex\.credentials.json' }
     @{ Agent = 'codex'; Id = 'codex.models_cache'; Path = '$profile\.codex\models_cache.json' }
@@ -516,8 +517,7 @@ $targets = @(
     @{ Agent = 'codex'; Id = 'codex.plugin_store'; Path = '$profile\.codex\plugins\cache' }
     @{ Agent = 'codex'; Id = 'codex.plugin_store'; Path = '$profile\.codex\plugins\data' }
     @{ Agent = 'codex'; Id = 'codex.prompt_history'; Path = '$profile\.codex\history.jsonl' }
-    @{ Agent = 'codex'; Id = 'codex.requirements_and_permissions'; Path = '$profile\.codex\permissions.toml' }
-    @{ Agent = 'codex'; Id = 'codex.requirements_and_permissions'; Path = '$profile\.codex\requirements.toml' }
+    @{ Agent = 'codex'; Id = 'codex.requirements_and_permissions'; Path = 'C:\ProgramData\OpenAI\Codex\requirements.toml' }
     @{ Agent = 'codex'; Id = 'codex.rollouts'; Path = '$profile\.codex\sessions' }
     @{ Agent = 'codex'; Id = 'codex.rollouts_compressed'; Path = '$profile\.codex\sessions' }
     @{ Agent = 'codex'; Id = 'codex.sandbox_migration_marker'; Path = '$profile\.codex\.sandbox_migration' }
@@ -532,6 +532,7 @@ $targets = @(
     @{ Agent = 'codex'; Id = 'codex.state_databases'; Path = '$profile\.codex\queue_1.sqlite' }
     @{ Agent = 'codex'; Id = 'codex.state_databases'; Path = '$profile\.codex\state_5.sqlite' }
     @{ Agent = 'codex'; Id = 'codex.state_databases'; Path = '$profile\.codex\thread_history_1.sqlite' }
+    @{ Agent = 'codex'; Id = 'codex.system_config'; Path = 'C:\ProgramData\OpenAI\Codex\config.toml' }
     @{ Agent = 'codex'; Id = 'codex.system_skills'; Path = '$profile\.codex\skills\.system' }
     @{ Agent = 'codex'; Id = 'codex.system_skills'; Path = '$profile\.codex\skills\.system\.codex-system-skills.marker' }
     @{ Agent = 'codex'; Id = 'codex.thread_writer_locks'; Path = '$profile\.codex\thread-writer-locks' }

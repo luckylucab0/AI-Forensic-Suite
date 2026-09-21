@@ -2,7 +2,7 @@
 
 <!-- Generated from the artifact catalogue. Do not edit by hand:
 <!-- run `afx export-collection` and commit the result.
-<!-- Catalogue digest: 16c37468105d
+<!-- Catalogue digest: 92f793851e33
 <!--
 <!-- An empty result from this rule means the paths it searched held nothing. It does
 <!-- not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -86,7 +86,7 @@ Windows-relevant catalogue entries, as a sense of what a collection will cover:
 | Kiro | `kiro` | 21 |
 | LM Studio | `lmstudio` | 6 |
 | Ollama | `ollama` | 11 |
-| OpenAI Codex CLI | `codex` | 27 |
+| OpenAI Codex CLI | `codex` | 29 |
 | OpenCode | `opencode` | 12 |
 | Qwen Code | `qwen_code` | 36 |
 | Roo Code | `roo_code` | 7 |
