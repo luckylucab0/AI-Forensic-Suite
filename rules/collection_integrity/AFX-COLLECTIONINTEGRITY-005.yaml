@@ -1,0 +1,134 @@
+id: AFX-COLLECTIONINTEGRITY-005
+pack: collection_integrity
+title: A hook that looks like it applied to every tool call applied to none
+severity: low
+description: >
+  A hook rule in one product's plugin tree carries a matcher of a bare asterisk. In this
+  product the matcher is a regular expression and not a glob, and the vendor states that a
+  bare "*" is an invalid expression, so the whole rule is skipped: the product logs a
+  warning and moves on. The expression that does match everything there is ".*". The rule
+  reads only that one spelling, because a rule file is data and cannot evaluate an
+  expression to decide whether it compiles.
+rationale: >
+  The pack is the argument here, so it is worth making. This finding is not about conduct
+  on the endpoint: nothing ran, nothing was blocked, nobody turned a control off. It is
+  about the reading of a file the case already holds, and it corrects that reading in both
+  directions at once. A hooks file is otherwise read twice over. The supply chain pack
+  reports the command a hook runs, which for this rule never ran. And a PreToolUse rule
+  that denies is the explanation an analyst reaches for when a transcript shows a tool call
+  that did not happen, which for this rule cannot be the explanation. So a hook written
+  this way turns into a control that was in force and a reason a call was refused, and it
+  was neither. That is a part of the collection answering a different question than the one
+  it looks like it answered, which is what this pack is for.
+  .
+  It is also a pointer at the one artifact that dates the mistake. The vendor documents the
+  skip as a warning in the product's log, and this catalogue collects those logs, so how
+  often the rule was skipped and when is there rather than in the hooks file, which says
+  only what was configured.
+  .
+  Low, because on its own it says that nothing happened. What makes it worth reporting at
+  all is that the absence it explains is one somebody would otherwise explain wrongly.
+applies_to:
+  # The hooks file is read as configuration. The second kind is for the case where it did
+  # not parse, since the vendor documents strict JSON here and a broken file still carries
+  # its text, which is the only place the matcher then exists.
+  kinds: [config.snapshot, unparsed.record]
+match:
+  all:
+    - field: event_text
+      # [^\S\n] rather than \s: the text views emit a record's leaves one per line, so \s
+      # would let the name on one line pair with a value on the next. The lookahead at the
+      # end is what keeps this to a whole value: a matcher of "*.py" or ".*" has something
+      # after or before the asterisk and is not this finding. The trailing comma is for the
+      # unparsed case, where the text is still JSON. Not anchored at a line start, because
+      # a record that did not parse carries the whole line behind a field name of its own
+      # and an anchored pattern would go blind on exactly that case.
+      regex: '"?\bmatcher\b"?[^\S\n]*[:=][^\S\n]*"?\*"?,?[^\S\n]*(?=\n|\Z)'
+    - any:
+        # Deliberately narrowed to the product the behaviour is documented for. The same
+        # spelling in another product's hook configuration can mean the opposite, and a
+        # finding that says a hook did nothing must not fire where the hook did everything.
+        # The cost is stated in the false positives: a hooks file that reached the case
+        # unattributed is not reported by this rule, only carried by the case.
+        - field: provenance.artifact_id
+          equals: goose.hooks
+        - field: agent
+          equals: goose
+tags:
+  - collection-integrity
+  - hooks
+  - silently-skipped
+false_positives:
+  - >-
+    A hook that was meant to be narrow and got its expression wrong, which is the same
+    file on disk and is a mistake rather than a misleading record. The finding is the same
+    either way: this rule did not run.
+  - >-
+    A newer version of the product that accepts the expression. The rule reports what the
+    vendor documents today, and a file says what was configured rather than which build
+    read it.
+  - >-
+    The value quoted in a plugin's own documentation or in an example that happens to be
+    filed as configuration, since the text a record holds is what is searched.
+  - >-
+    The mirror image, which is a miss rather than a false positive and belongs here so it
+    is not discovered by surprise: an invalid expression spelled any other way, and a
+    hooks file the case could not attribute to this product, are both outside what this
+    rule claims.
+references:
+  - https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/context-engineering/hooks.md
+tests:
+  - name: a deny hook whose matcher is a bare asterisk
+    match: true
+    event:
+      kind: config.snapshot
+      agent: goose
+      provenance: {artifact_id: goose.hooks}
+      raw:
+        hooks:
+          PreToolUse:
+            - matcher: "*"
+              hooks:
+                - type: command
+                  command: "${PLUGIN_ROOT}/scripts/guard.sh"
+                  timeout: 30
+  - name: the same file as text because it did not parse
+    match: true
+    event:
+      kind: unparsed.record
+      agent: goose
+      provenance: {artifact_id: goose.hooks}
+      payload: {text: '    "matcher": "*",'}
+  - name: the expression that really does match everything
+    match: false
+    event:
+      kind: config.snapshot
+      agent: goose
+      provenance: {artifact_id: goose.hooks}
+      raw:
+        hooks:
+          PreToolUse:
+            - matcher: ".*"
+              hooks: [{type: command, command: "${PLUGIN_ROOT}/scripts/guard.sh"}]
+  - name: a narrow expression that compiles
+    match: false
+    event:
+      kind: config.snapshot
+      agent: goose
+      provenance: {artifact_id: goose.hooks}
+      raw:
+        hooks:
+          PreToolUse:
+            - matcher: "^(shell|text_editor)$"
+              hooks: [{type: command, command: "${PLUGIN_ROOT}/scripts/guard.sh"}]
+  - name: another product's hook configuration, where the asterisk means what it looks like
+    match: false
+    event:
+      kind: config.snapshot
+      agent: claude_code
+      provenance: {artifact_id: claude_code.user_settings}
+      raw:
+        hooks:
+          PreToolUse:
+            - matcher: "*"
+              hooks: [{type: command, command: "/usr/local/bin/guard.sh"}]

@@ -31,8 +31,9 @@ produces, because that number changes whenever the fixture grows.
 Three tables, and together they have to name every shipped rule. EXPECTED is the floor
 above. FROM_A_BUNDLE is the one shape a profile tree cannot hold, because a registry key is
 not a path and reaches a case as a document the collector wrote. SILENT is for a rule the
-fixtures do not exercise at all, with a sentence saying what they would have to carry; it
-is empty today and the sentence is the work item whenever it is not.
+fixtures do not exercise at all, with a sentence saying what they would have to carry, and
+that sentence is the work item. One rule is in it, about a machine-wide policy file: every
+fixture here is rooted at one user's profile and that file sits above such a root.
 
 The pair of guards at the end is what makes the tables worth having. Without them a rule
 can be added to a pack, pass its own samples, and never meet a collection, with nothing in
@@ -136,6 +137,14 @@ EXPECTED = {
     "AFX-SUPPLYCHAIN-002": "~/.claude/settings.json configures a PreToolUse hook",
     "AFX-SUPPLYCHAIN-003": "a hook script on the endpoint fetches code and runs it",
     "AFX-SUPPLYCHAIN-004": "~/.claude/settings.json names a command that produces the credential",
+    "AFX-COLLECTIONINTEGRITY-005": "~/.agents/plugins/example-guard/hooks/hooks.json carries a "
+    "hook whose matcher is a bare asterisk, which in that product is an invalid expression "
+    "rather than a wildcard, so the rule that looks like it applied to every tool call was "
+    "skipped and applied to none",
+    "AFX-COLLECTIONINTEGRITY-006": "~/.qwen/arena/<session>/worktrees/ holds two abandoned "
+    "head-to-head worktrees, each a copy of the working directory with a file the repository "
+    "never tracked in it, which is a copy of somebody's uncommitted work outside the "
+    "repository and a task that went to two providers at once",
     "AFX-THIRDPARTYENDPOINTS-001": "~/.claude/settings.json points the model endpoint at a gateway",
     "AFX-THIRDPARTYENDPOINTS-002": "~/src/app/.mcp.json also configures a server that runs "
     "somewhere else",
@@ -153,7 +162,15 @@ EXPECTED = {
 # events somebody wrote by hand. AFX-COLLECTIONINTEGRITY-004 was in that state days ago,
 # and when the evidence was finally put in front of it, two things between the catalogue
 # and the parser turned out to be wrong.
-SILENT: dict[str, str] = {}
+SILENT: dict[str, str] = {
+    "AFX-THIRDPARTYENDPOINTS-003": "the policy this rule is about is machine-wide, and all "
+    "three of its documented locations sit above the profile the fixture builds. A "
+    "profile-rooted tree records its paths relative to that home and says so in a gap of "
+    "its own: the machine-wide configuration is outside the root and was not collected. So "
+    "the profile cannot hold this file at any path, and exercising the rule needs a fixture "
+    "with a machine root above the profile, or a bundle whose manifest carries a system "
+    "path the way the registry bundle carries a key",
+}
 
 # The rules a profile tree cannot exercise, with the bundle that does. A registry key is
 # not a path, so no directory of files can hold one, and the two rules that are about keys

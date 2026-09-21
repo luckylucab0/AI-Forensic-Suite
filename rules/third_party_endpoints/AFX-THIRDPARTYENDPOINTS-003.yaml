@@ -1,0 +1,111 @@
+id: AFX-THIRDPARTYENDPOINTS-003
+pack: third_party_endpoints
+title: A machine-wide policy names the installation the conversations went to
+severity: medium
+description: >
+  A machine-wide policy file for one agent's command line product is in the case. The
+  vendor documents it as pinning authentication to an enterprise host and an account, with
+  the fields enterprise_host and account_id, and as optionally forcing an outbound proxy
+  for the agent and its updater through a proxy section carrying a mode, a url and a
+  no_proxy list.
+rationale: >
+  The two rules before this one answer where the conversation went and where the tools ran
+  from what a user could set. This one answers the same question from what the machine was
+  given, and it is the only place that answer exists: nothing in the user's profile names
+  the installation of the vendor's service that served a session, so a case collected from
+  a profile alone cannot say which server held the conversations. The absence of the file
+  is an answer too, and a usable one: with no policy the product talked to the vendor's
+  public service.
+  .
+  The route is the other half. The vendor documents the enterprise proxy as taking
+  precedence over the user's own setting, and documents the product as exiting at startup
+  if the user configured one as well, so on a machine where the agent ran at all, the
+  traffic went out through the proxy named here. An examination answering what left the
+  device and by which path has both ends of it in this one file.
+  .
+  Medium rather than high, and the reason is in the false positives below: this file is a
+  managed deployment doing its job, and most machines that have one are enterprise
+  machines rather than interesting ones. What the finding buys is the destination, in a
+  form a report can name. It is also evidence about itself: the vendor states the file is
+  meant to be deployed root owned and read only to the user because the product reads it
+  wherever it finds it, so a copy that is user writable is a policy anybody on the machine
+  could have written and its ownership and mode belong in the finding beside its contents.
+applies_to:
+  # A policy that parsed is configuration. The second kind is the broken deployment: the
+  # vendor documents strict JSON here, unlike the user's own file, so a policy that does
+  # not parse reaches the case as text and the host it names is still in that text.
+  kinds: [config.snapshot, unparsed.record]
+match:
+  any:
+    # The catalogue entry is the primary route, because the finding is that this file
+    # exists on this machine and everything in it follows from that.
+    - field: provenance.artifact_id
+      equals: devin.cli_system_policy
+    # And the content, for the copy that arrived by another path: a policy somebody kept
+    # beside an image, or a machine-wide file a profile-rooted collection could not
+    # attribute. [^\S\n] rather than \s, because the text views emit a record's leaves one
+    # per line and a pattern written with \s pairs a name on one line with the value on the
+    # next. A word boundary rather than a line start: a record that did not parse carries
+    # the whole line behind a field name of its own, so an anchored pattern would go blind
+    # on the broken deployment this alternative exists for.
+    - field: event_text
+      regex: '(?i)"?\benterprise_host\b"?[^\S\n]*[:=][^\S\n]*"?[A-Za-z0-9]'
+tags:
+  - third-party-endpoint
+  - managed-policy
+  - egress-route
+false_positives:
+  - >-
+    An ordinary managed deployment, which is what the file is for and the common case by
+    some distance. The finding names the destination and the route; it says nothing about
+    whether either was allowed, and on a corporate machine both usually were.
+  - >-
+    A policy deployed by an image onto a machine where the product was never run, in which
+    case the host is where traffic would have gone rather than where anything went. The
+    transcripts, and their absence, are what settle that.
+  - >-
+    A stale or superseded policy. The file says what is in force when it is read, and its
+    modification time belongs to the management channel that deployed it rather than to
+    any session, so it cannot date what it applied to.
+  - >-
+    A machine where the user's own configuration also set a proxy, which the vendor
+    documents as an error that stops the product starting. Such a pair is a product that
+    refused to run rather than a route anything went through.
+references:
+  - https://cli.devin.ai/docs/enterprise/system-config.md
+tests:
+  - name: the policy as the vendor documents it
+    match: true
+    event:
+      kind: config.snapshot
+      agent: devin
+      provenance: {artifact_id: devin.cli_system_policy}
+      raw:
+        enterprise_host: agents.acme.example.org
+        account_id: acct-acme
+        proxy:
+          mode: manual
+          url: http://proxy.acme.example.org:8080
+          no_proxy: localhost,127.0.0.1
+  - name: the same document with nothing to attribute it to
+    match: true
+    event:
+      kind: unparsed.record
+      agent: unknown
+      # No artifact id, which is what a machine-wide file looks like in a collection rooted
+      # at one profile, or in a copy somebody kept beside an image.
+      payload: {text: '  "enterprise_host": "agents.acme.example.org",'}
+  - name: the user's own configuration, which pins nothing
+    match: false
+    event:
+      kind: config.snapshot
+      agent: devin
+      provenance: {artifact_id: devin.cli_config}
+      raw: {model: example-model, editor: vim}
+  - name: the field named in a comment rather than set
+    match: false
+    event:
+      kind: config.snapshot
+      agent: devin
+      provenance: {artifact_id: devin.cli_config}
+      raw: {note: "no enterprise_host is deployed on this machine"}

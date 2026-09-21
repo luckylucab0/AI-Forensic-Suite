@@ -26,6 +26,8 @@ Findings are written into the case database next to the events they rest on, and
 |  | [AFX-COLLECTIONINTEGRITY-002](#afx-collectionintegrity-002) | info |
 |  | [AFX-COLLECTIONINTEGRITY-003](#afx-collectionintegrity-003) | low |
 |  | [AFX-COLLECTIONINTEGRITY-004](#afx-collectionintegrity-004) | low |
+|  | [AFX-COLLECTIONINTEGRITY-005](#afx-collectionintegrity-005) | low |
+|  | [AFX-COLLECTIONINTEGRITY-006](#afx-collectionintegrity-006) | medium |
 | [`dangerous_commands`](#dangerous-commands) | [AFX-DANGEROUSCOMMANDS-001](#afx-dangerouscommands-001) | high |
 |  | [AFX-DANGEROUSCOMMANDS-002](#afx-dangerouscommands-002) | high |
 |  | [AFX-DANGEROUSCOMMANDS-003](#afx-dangerouscommands-003) | medium |
@@ -65,6 +67,7 @@ Findings are written into the case database next to the events they rest on, and
 |  | [AFX-SUPPLYCHAIN-004](#afx-supplychain-004) | high |
 | [`third_party_endpoints`](#third-party-endpoints) | [AFX-THIRDPARTYENDPOINTS-001](#afx-thirdpartyendpoints-001) | high |
 |  | [AFX-THIRDPARTYENDPOINTS-002](#afx-thirdpartyendpoints-002) | medium |
+|  | [AFX-THIRDPARTYENDPOINTS-003](#afx-thirdpartyendpoints-003) | medium |
 
 Rules are listed by pack, and within a pack by id.
 
@@ -368,6 +371,70 @@ The same project folder appears in the per-workspace state of two or more differ
 - A folder path that two products resolved differently, for example one through a symbolic link and one not. Those group as different folders and this rule will miss the pair rather than invent one, which is the right way round.
 
 *Samples in the rule file:* 2 / 1 (+/-)
+
+#### AFX-COLLECTIONINTEGRITY-005
+
+**A hook that looks like it applied to every tool call applied to none**
+
+| | |
+| --- | --- |
+| Severity | low |
+| Pack | `collection_integrity` |
+| Agents | `any` |
+| Event kinds | `config.snapshot`, `unparsed.record` |
+| Fields read | `event_text`, `provenance.artifact_id`, `agent` |
+| Tags | `collection-integrity`, `hooks`, `silently-skipped` |
+
+A hook rule in one product's plugin tree carries a matcher of a bare asterisk. In this product the matcher is a regular expression and not a glob, and the vendor states that a bare "*" is an invalid expression, so the whole rule is skipped: the product logs a warning and moves on. The expression that does match everything there is ".*". The rule reads only that one spelling, because a rule file is data and cannot evaluate an expression to decide whether it compiles.
+
+*What it matches:* `event_text matches /"?\bmatcher\b"?[^\S\n]*[:=][^\S\n]*"?\*"?,?[^\S\n]*(?=\n\|\Z)/ and (provenance.artifact_id is 'goose.hooks' or agent is 'goose')`
+
+*Why an analyst cares:* The pack is the argument here, so it is worth making. This finding is not about conduct on the endpoint: nothing ran, nothing was blocked, nobody turned a control off. It is about the reading of a file the case already holds, and it corrects that reading in both directions at once. A hooks file is otherwise read twice over. The supply chain pack reports the command a hook runs, which for this rule never ran. And a PreToolUse rule that denies is the explanation an analyst reaches for when a transcript shows a tool call that did not happen, which for this rule cannot be the explanation. So a hook written this way turns into a control that was in force and a reason a call was refused, and it was neither. That is a part of the collection answering a different question than the one it looks like it answered, which is what this pack is for. . It is also a pointer at the one artifact that dates the mistake. The vendor documents the skip as a warning in the product's log, and this catalogue collects those logs, so how often the rule was skipped and when is there rather than in the hooks file, which says only what was configured. . Low, because on its own it says that nothing happened. What makes it worth reporting at all is that the absence it explains is one somebody would otherwise explain wrongly.
+
+*Known false positives:*
+
+- A hook that was meant to be narrow and got its expression wrong, which is the same file on disk and is a mistake rather than a misleading record. The finding is the same either way: this rule did not run.
+- A newer version of the product that accepts the expression. The rule reports what the vendor documents today, and a file says what was configured rather than which build read it.
+- The value quoted in a plugin's own documentation or in an example that happens to be filed as configuration, since the text a record holds is what is searched.
+- The mirror image, which is a miss rather than a false positive and belongs here so it is not discovered by surprise: an invalid expression spelled any other way, and a hooks file the case could not attribute to this product, are both outside what this rule claims.
+
+*References:*
+
+- <https://raw.githubusercontent.com/block/goose/main/documentation/docs/guides/context-engineering/hooks.md>
+
+*Samples in the rule file:* 2 / 3 (+/-)
+
+#### AFX-COLLECTIONINTEGRITY-006
+
+**A head-to-head run left a copy of uncommitted work outside the repository**
+
+| | |
+| --- | --- |
+| Severity | medium |
+| Pack | `collection_integrity` |
+| Agents | `any` |
+| Event kinds | `artifact.fs` |
+| Fields read | `payload.path` |
+| Tags | `collection-integrity`, `uncommitted-work`, `multi-provider` |
+
+A collected file sits inside one product's head-to-head worktree tree, under ~/.qwen/arena/<session-id>/worktrees/<model-name>/. The vendor states that each competing agent gets its own git worktree mirroring the working directory exactly, including staged changes, unstaged changes and untracked files, and that selecting a winner applies that agent's diff and then cleans up every worktree automatically.
+
+*What it matches:* `payload.path matches path **/.qwen/arena/*/worktrees/*/**`
+
+*Why an analyst cares:* Three things follow from a tree that is still there, and each of them changes where an examination looks rather than saying somebody did something wrong. . It is a copy of somebody's working directory outside the repository. Untracked files are in it by the vendor's own description, so a file that was never committed and later deleted, or a change that was never staged, can survive here and nowhere else. A tree that is present is also a run that was abandoned, crashed or is still going, because a finished run deletes its worktrees: this is material the product intended to remove. . One task went to several providers at once. Each directory under worktrees is a different model, and all of them were given the same task and the same repository content, so the answer to which providers received this work is the list of those directory names rather than the one model a settings file names. . And the sessions are filed somewhere an analyst will not look. This is an inference rather than a vendor statement, and the catalogue entry says so: each competing agent is a full session whose working directory is its worktree, and this product keys its transcript tree by working directory, so those conversations are expected under a project directory carrying the worktree path rather than the repository. Check that before reporting a session as missing. . Two limits worth stating. The absence of any such tree says nothing at all, because the product deletes them on a win. And the base directory moves: the agents.arena worktreeBaseDir setting replaces it with any absolute path, the vendor states a leading tilde is not expanded there, and a relocated tree is outside what this rule can see, so the settings file is what has to be read before an empty result is believed. . It reports once per collected file rather than once per tree. That is deliberate: the only thing a worktree is guaranteed to hold is its files, and a pattern narrowed to the top of the tree would go blind on the first layout that nests. The count is the size of the copy and the model directories in the findings are the providers.
+
+*Known false positives:*
+
+- A run that is still going, which is the feature working as documented. The tree is a copy of uncommitted work either way, so the finding is true and the reading is different: check the timestamps against the session times before calling it abandoned.
+- A tree left by a crash rather than by anybody's choice, which is the most likely cause and is not misconduct. What the finding asserts is that the copy exists, not how it came to.
+- A directory somebody created by hand at that path, or a copy of one restored from a backup onto a machine where the feature was never used, which would put a run on the timeline of the wrong host.
+- A worktree of a repository that holds nothing sensitive and nothing uncommitted, where the copy is a duplicate of what the repository already has. The finding is the same shape and the analyst's next step is what differs.
+
+*References:*
+
+- <https://github.com/QwenLM/qwen-code/blob/main/docs/users/features/arena.md>
+
+*Samples in the rule file:* 2 / 3 (+/-)
 
 ## dangerous commands
 
@@ -1536,5 +1603,37 @@ An MCP server is configured with a remote transport: an entry carrying a url tog
 *References:*
 
 - <https://code.claude.com/docs/en/mcp>
+
+*Samples in the rule file:* 2 / 2 (+/-)
+
+#### AFX-THIRDPARTYENDPOINTS-003
+
+**A machine-wide policy names the installation the conversations went to**
+
+| | |
+| --- | --- |
+| Severity | medium |
+| Pack | `third_party_endpoints` |
+| Agents | `any` |
+| Event kinds | `config.snapshot`, `unparsed.record` |
+| Fields read | `provenance.artifact_id`, `event_text` |
+| Tags | `third-party-endpoint`, `managed-policy`, `egress-route` |
+
+A machine-wide policy file for one agent's command line product is in the case. The vendor documents it as pinning authentication to an enterprise host and an account, with the fields enterprise_host and account_id, and as optionally forcing an outbound proxy for the agent and its updater through a proxy section carrying a mode, a url and a no_proxy list.
+
+*What it matches:* `(provenance.artifact_id is 'devin.cli_system_policy' or event_text matches /(?i)"?\benterprise_host\b"?[^\S\n]*[:=][^\S\n]*"?[A-Za-z0-9]/)`
+
+*Why an analyst cares:* The two rules before this one answer where the conversation went and where the tools ran from what a user could set. This one answers the same question from what the machine was given, and it is the only place that answer exists: nothing in the user's profile names the installation of the vendor's service that served a session, so a case collected from a profile alone cannot say which server held the conversations. The absence of the file is an answer too, and a usable one: with no policy the product talked to the vendor's public service. . The route is the other half. The vendor documents the enterprise proxy as taking precedence over the user's own setting, and documents the product as exiting at startup if the user configured one as well, so on a machine where the agent ran at all, the traffic went out through the proxy named here. An examination answering what left the device and by which path has both ends of it in this one file. . Medium rather than high, and the reason is in the false positives below: this file is a managed deployment doing its job, and most machines that have one are enterprise machines rather than interesting ones. What the finding buys is the destination, in a form a report can name. It is also evidence about itself: the vendor states the file is meant to be deployed root owned and read only to the user because the product reads it wherever it finds it, so a copy that is user writable is a policy anybody on the machine could have written and its ownership and mode belong in the finding beside its contents.
+
+*Known false positives:*
+
+- An ordinary managed deployment, which is what the file is for and the common case by some distance. The finding names the destination and the route; it says nothing about whether either was allowed, and on a corporate machine both usually were.
+- A policy deployed by an image onto a machine where the product was never run, in which case the host is where traffic would have gone rather than where anything went. The transcripts, and their absence, are what settle that.
+- A stale or superseded policy. The file says what is in force when it is read, and its modification time belongs to the management channel that deployed it rather than to any session, so it cannot date what it applied to.
+- A machine where the user's own configuration also set a proxy, which the vendor documents as an error that stops the product starting. Such a pair is a product that refused to run rather than a route anything went through.
+
+*References:*
+
+- <https://cli.devin.ai/docs/enterprise/system-config.md>
 
 *Samples in the rule file:* 2 / 2 (+/-)

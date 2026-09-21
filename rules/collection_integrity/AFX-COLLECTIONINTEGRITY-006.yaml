@@ -1,0 +1,110 @@
+id: AFX-COLLECTIONINTEGRITY-006
+pack: collection_integrity
+title: A head-to-head run left a copy of uncommitted work outside the repository
+severity: medium
+description: >
+  A collected file sits inside one product's head-to-head worktree tree, under
+  ~/.qwen/arena/<session-id>/worktrees/<model-name>/. The vendor states that each competing
+  agent gets its own git worktree mirroring the working directory exactly, including staged
+  changes, unstaged changes and untracked files, and that selecting a winner applies that
+  agent's diff and then cleans up every worktree automatically.
+rationale: >
+  Three things follow from a tree that is still there, and each of them changes where an
+  examination looks rather than saying somebody did something wrong.
+  .
+  It is a copy of somebody's working directory outside the repository. Untracked files are
+  in it by the vendor's own description, so a file that was never committed and later
+  deleted, or a change that was never staged, can survive here and nowhere else. A tree
+  that is present is also a run that was abandoned, crashed or is still going, because a
+  finished run deletes its worktrees: this is material the product intended to remove.
+  .
+  One task went to several providers at once. Each directory under worktrees is a different
+  model, and all of them were given the same task and the same repository content, so the
+  answer to which providers received this work is the list of those directory names rather
+  than the one model a settings file names.
+  .
+  And the sessions are filed somewhere an analyst will not look. This is an inference
+  rather than a vendor statement, and the catalogue entry says so: each competing agent is
+  a full session whose working directory is its worktree, and this product keys its
+  transcript tree by working directory, so those conversations are expected under a
+  project directory carrying the worktree path rather than the repository. Check that
+  before reporting a session as missing.
+  .
+  Two limits worth stating. The absence of any such tree says nothing at all, because the
+  product deletes them on a win. And the base directory moves: the agents.arena
+  worktreeBaseDir setting replaces it with any absolute path, the vendor states a leading
+  tilde is not expanded there, and a relocated tree is outside what this rule can see, so
+  the settings file is what has to be read before an empty result is believed.
+  .
+  It reports once per collected file rather than once per tree. That is deliberate: the
+  only thing a worktree is guaranteed to hold is its files, and a pattern narrowed to the
+  top of the tree would go blind on the first layout that nests. The count is the size of
+  the copy and the model directories in the findings are the providers.
+applies_to:
+  # The filesystem event, because the finding is that the directory was collected at all.
+  # Nothing inside it is read: the catalogue entry records it as a working copy rather than
+  # a file with records in it.
+  kinds: [artifact.fs]
+match:
+  field: payload.path
+  # One pattern for both platforms: a glob here matches either separator with either, and
+  # ** crosses separators where * does not, so the session and the model are one segment
+  # each and the copy below them is any depth.
+  glob: '**/.qwen/arena/*/worktrees/*/**'
+tags:
+  - collection-integrity
+  - uncommitted-work
+  - multi-provider
+false_positives:
+  - >-
+    A run that is still going, which is the feature working as documented. The tree is a
+    copy of uncommitted work either way, so the finding is true and the reading is
+    different: check the timestamps against the session times before calling it abandoned.
+  - >-
+    A tree left by a crash rather than by anybody's choice, which is the most likely cause
+    and is not misconduct. What the finding asserts is that the copy exists, not how it
+    came to.
+  - >-
+    A directory somebody created by hand at that path, or a copy of one restored from a
+    backup onto a machine where the feature was never used, which would put a run on the
+    timeline of the wrong host.
+  - >-
+    A worktree of a repository that holds nothing sensitive and nothing uncommitted, where
+    the copy is a duplicate of what the repository already has. The finding is the same
+    shape and the analyst's next step is what differs.
+references:
+  - https://github.com/QwenLM/qwen-code/blob/main/docs/users/features/arena.md
+tests:
+  - name: a file inside one competing model's worktree
+    match: true
+    event:
+      kind: artifact.fs
+      agent: qwen_code
+      payload:
+        path: /Users/alice/.qwen/arena/4f8c1e2a-0000-4000-8000-000000000002/worktrees/example-model-a/src/app/notes.md
+  - name: the same tree in a Windows profile
+    match: true
+    event:
+      kind: artifact.fs
+      agent: qwen_code
+      payload:
+        path: 'C:\Users\alice\.qwen\arena\4f8c1e2a-0000-4000-8000-000000000002\worktrees\example-model-b\README.md'
+  - name: the product's ordinary transcript tree
+    match: false
+    event:
+      kind: artifact.fs
+      agent: qwen_code
+      payload: {path: /Users/alice/.qwen/projects/-Users-alice-src-app/chats/session.jsonl}
+  - name: a directory in the working copy that happens to be called arena
+    match: false
+    event:
+      kind: artifact.fs
+      agent: qwen_code
+      payload: {path: /Users/alice/src/app/arena/README.md}
+  - name: a file directly under the worktrees directory, which is not one of the copies
+    match: false
+    event:
+      kind: artifact.fs
+      agent: qwen_code
+      payload:
+        path: /Users/alice/.qwen/arena/4f8c1e2a-0000-4000-8000-000000000002/worktrees/.keep

@@ -3083,6 +3083,59 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
         RECENT,
     )
 
+    # The head-to-head mode's worktrees, from a run nobody ever picked a winner for. Two
+    # models, because the whole point of the feature is that one task goes to several
+    # providers at once, and the vendor states every worktree is deleted when a winner is
+    # selected: a tree that is still here is an abandoned or a crashed run. Each holds a
+    # copy of the working directory including files the repository never tracked, which is
+    # why this is the one thing in this family collected first.
+    arena = qwen / "arena" / SESSION_B / "worktrees"
+    for model in ("example-model-a", "example-model-b"):
+        write(arena / model / "README.md", "# app\n\nthe copy the run started from\n", RECENT)
+        # Untracked in the repository, so this copy is the only place it exists at all.
+        write(
+            arena / model / "notes-not-committed.md",
+            "reorder the retry loop before anybody reviews this\n",
+            RECENT,
+        )
+
+    # One plugin's hook rules, in the tree several products share, with the matcher that
+    # reads as broad and is not. The vendor states this matcher is a regular expression and
+    # that a bare asterisk is an invalid one, so the product skips the whole rule and logs a
+    # warning: the guard below never ran and nothing it names was ever denied.
+    plugin = home / ".agents" / "plugins" / "example-guard"
+    write(
+        plugin / "hooks" / "hooks.json",
+        json.dumps(
+            {
+                "hooks": {
+                    "PreToolUse": [
+                        {
+                            "matcher": "*",
+                            "hooks": [
+                                {
+                                    "type": "command",
+                                    "command": "${PLUGIN_ROOT}/scripts/guard.sh",
+                                    "timeout": 30,
+                                }
+                            ],
+                        }
+                    ]
+                }
+            },
+            indent=2,
+            sort_keys=True,
+        ),
+        RECENT,
+    )
+    # The manifest beside it, because it is the only thing that names and versions the
+    # plugin a hook rule belongs to.
+    write(
+        plugin / "plugin.json",
+        json.dumps({"name": "example-guard", "version": "0.1.0"}, indent=2, sort_keys=True),
+        RECENT,
+    )
+
     # One editor's prompt library, which is the only instruction artifact in this catalogue
     # that is not a file: an LMDB store holding the prompts a user wrote for the agent. The
     # store here is in the state a real one is in after an edit and a deletion, so the
@@ -3114,6 +3167,7 @@ def build_home(home: Path, *, with_edge_cases: bool = True) -> dict:
             "copilot",
             "crosscutting",
             "gemini_cli",
+            "goose",
             "ollama",
             "pi",
             "qwen_code",
