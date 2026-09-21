@@ -6,7 +6,7 @@ English | [Deutsch](SUPPORT.de.md)
 
 What this suite reads, per agent, counted from the catalogue and the reader registry rather than written down. The numbers move when the code does.
 
-31 catalogue files, 30 of them a product and one cross-cutting. 503 of 630 artifacts are read by 37 reader modules, into 23 event kinds. 504 artifacts rest on a fetched vendor source.
+31 catalogue files, 30 of them a product and one cross-cutting. 505 of 630 artifacts are read by 37 reader modules, into 23 event kinds. 504 artifacts rest on a fetched vendor source.
 
 **How to read an empty result.** An agent listed here with artifacts read means the paths were searched and the files that were there were parsed, so an empty result is evidence that those paths held nothing. It is never evidence that the agent was not used: the data tree may have been relocated by a variable, the retention period may have swept it, the paths may be the unverified ones, or the user may have worked in a profile nobody collected. Where an entry is unverified, `docs/ARTIFACTS.md` says so per artifact and the analyzer repeats it in its output.
 
@@ -25,7 +25,7 @@ What this suite reads, per agent, counted from the catalogue and the reader regi
 | Cline | Linux, macOS, Windows | 5 / 5 | 21 / 25 | 8 | 4 |
 | Continue | Linux, macOS, Windows | 1 / 1 | 17 / 21 | 11 | 4 |
 | Cross-cutting evidence | Linux, macOS, Windows | none | 20 / 27 | 6 | 7 |
-| Cursor | Linux, macOS, Windows | 9 / 9 | 43 / 50 | 32 | 7 |
+| Cursor | Linux, macOS, Windows | 9 / 9 | 43 / 50 | 31 | 7 |
 | Devin | Linux, macOS, Windows | 1 / 1 | 6 / 6 | 5 | 0 |
 | Factory Droid | Linux, macOS, Windows | 2 / 2 | 9 / 10 | 7 | 1 |
 | Gemini CLI | Linux, macOS, Windows | 1 / 1 | 15 / 19 | 8 | 4 |
@@ -43,9 +43,9 @@ What this suite reads, per agent, counted from the catalogue and the reader regi
 | pi | Linux, macOS, Windows | 1 / 1 | 8 / 10 | 3 | 2 |
 | Qwen Code | Linux, macOS, Windows | 2 / 2 | 30 / 36 | 17 | 6 |
 | Roo Code | Linux, macOS, Windows | 1 / 1 | 6 / 7 | 2 | 1 |
-| Visual Studio Code host storage | Linux, macOS, Windows | none | 8 / 10 | 6 | 2 |
+| Visual Studio Code host storage | Linux, macOS, Windows | none | 9 / 10 | 6 | 1 |
 | Warp | Linux, macOS, Windows | none | 8 / 9 | 5 | 1 |
-| Windsurf | Linux, macOS, Windows | 6 / 6 | 30 / 41 | 16 | 11 |
+| Windsurf | Linux, macOS, Windows | 6 / 6 | 31 / 41 | 16 | 10 |
 | Zed | Linux, macOS, Windows | 3 / 3 | 9 / 12 | 4 | 3 |
 
 ## What is not read, and why
@@ -68,7 +68,7 @@ Every artifact in the catalogue is collected and appears in a case, whether a re
 
 ### Containers in a format nobody here has read
 
-75 entries, binary or directory layouts with no documented format. Each one is collected whole and is on the timeline as a filesystem event. Reading one means writing a format implementation, not finishing an unfinished reader.
+73 entries, binary or directory layouts with no documented format. Each one is collected whole and is on the timeline as a filesystem event. Reading one means writing a format implementation, not finishing an unfinished reader.
 
 - `amazonq.cli_subagent_executions` (directory)
 - `amazonq.ide_extension_install` (directory)
@@ -132,13 +132,11 @@ Every artifact in the catalogue is collected and appears in a case, whether a re
 - `qwen_code.arena_worktrees` (directory)
 - `qwen_code.audit_landing` (directory)
 - `qwen_code.project_temp_spill` (directory)
-- `vscode.local_history` (directory)
 - `vscode.user_data_roots` (binary)
 - `windsurf.cli_feature_state` (binary)
 - `windsurf.code_tracker_and_settings` (binary)
 - `windsurf.enterprise_policy_bundled` (directory)
 - `windsurf.language_server_binaries_and_logs` (binary)
-- `windsurf.local_file_history` (directory)
 - `windsurf.macos_update_state` (directory)
 - `windsurf.server_data` (directory)
 - `windsurf.worktrees` (directory)
@@ -163,16 +161,13 @@ None as of this generation. The check behind this section looks for a catalogue 
 
 ## Started and not finished
 
-4 entries where somebody wrote down that the reading is incomplete. Everything above is a decision; this is a list of work. An entry here may also appear above, in whichever group its current state puts it, because `read` on this page is a yes or a no and an analyst deciding whether a case can be quoted needs the third answer. The declaration lives in `src/agentforensics/parsers/coverage.py` and a test holds each entry to still existing in the catalogue, so this list cannot outlive what it promises.
+One entry where somebody wrote down that the reading is incomplete. Everything above is a decision; this is a list of work. It may also appear above, in whichever group its current state puts it, because `read` on this page is a yes or a no and an analyst deciding whether a case can be quoted needs the third answer. The declaration lives in `src/agentforensics/parsers/coverage.py` and a test holds it to still existing in the catalogue, so this list cannot outlive what it promises.
 
-- `cursor.local_file_history`: the same store as the two entries below, in the second of the three editors of that family, and the only one of the three with a reader. That reader claims the index and returns it as a document, which puts the list of versions and their times in the case and leaves the versions themselves as filesystem events. So the question it answers is which files were replaced and when, not what they said before
 - `goose.plugins`: the plugin tree is collected whole and read as text, which is right for the shell scripts in it and wrong for the hooks/hooks.json beside them. That file registers the commands the product runs on tool events, and the matcher that decides which calls they fire on, so until something reads it as the registry it is, a case holds it as prose and no rule can ask what a hook was permitted to do
-- `vscode.local_history`: the editor's own copy of a file from before each change, which an agent's edits land in like anybody else's. The index inside is JSON and the versions beside it are the file contents, and reading the pair as a snapshot store is format work nobody here has done. The directory is collected and is on the timeline; the earlier text inside it is not on the timeline as anything
-- `windsurf.local_file_history`: the third copy of the same store, in the third editor of that family. One piece of format work would finish all three, which is the argument for doing it: the reader would have to understand one index format and one directory layout, and three products in this catalogue would go from holding the fact that a file was replaced to holding what it said before
 
 ## Where the reading is thin
 
-303 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
+302 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
 
 ## Where to look next
 

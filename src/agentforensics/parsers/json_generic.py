@@ -150,7 +150,6 @@ DOCUMENTS = frozenset(
         "cursor.feature_flag_cache",
         "cursor.global_prompt_history",
         "cursor.hooks",
-        "cursor.local_file_history",
         "cursor.machine_identity_storage",
         "cursor.mcp_config",
         "cursor.mdm_policy",

@@ -26,6 +26,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Protocol
+from urllib.parse import unquote, urlsplit
 
 from agentforensics.model import Event, Provenance, TsPrecision, unparsed
 
@@ -524,6 +525,33 @@ def text_of(value: Any) -> str:
     return str(value)
 
 
+def uri_as_path(uri: str | None) -> tuple[str | None, bool]:
+    """A URI as a path, and whether it names another machine.
+
+    Shared because two readers need the same answer about the same editor family: one reads
+    the file that says which folder a per-workspace store belongs to, and one reads the
+    index that says which file a local-history copy was taken from. Both get the location
+    as a URI and both would be wrong in the same way if they decoded it differently.
+
+    A `file:` URI is percent-encoded, and on Windows the drive letter is encoded too, so
+    `file:///c%3A/Users/alice` is `c:/Users/alice` and a reader that skipped the decoding
+    would produce a path no filesystem has. Anything else is returned whole: a remote URI is
+    a path on another host, and shortening it to its path component would claim a local
+    directory that was never here.
+    """
+    if not uri:
+        return None, False
+    parts = urlsplit(uri)
+    if parts.scheme in ("", "file"):
+        path = unquote(parts.path)
+        # file:///c%3A/... decodes to /c:/..., and the leading separator is the URI's, not
+        # the path's.
+        if len(path) > 2 and path[0] == "/" and path[2] == ":":
+            path = path[1:]
+        return (path or None), False
+    return uri, True
+
+
 __all__ = [
     "BINARY_SHARE",
     "BINARY_SNIFF_BYTES",
@@ -541,4 +569,5 @@ __all__ = [
     "text_lines",
     "text_of",
     "unreadable_lines",
+    "uri_as_path",
 ]

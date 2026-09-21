@@ -158,11 +158,6 @@ NOT_CLAIMED = {
     "qwen_code.arena_worktrees": "one whole working copy per model, which is what the "
     "head-to-head mode makes rather than a copy of one file. The copies matter and are "
     "collected: each mirrors the working directory including what was never committed",
-    "vscode.local_history": "the editor's own version store, which is a directory per "
-    "file holding an index and the versions beside it. It is a copy of a file the agent "
-    "replaced and reading it is format work nobody here has done, which the entry says "
-    "rather than leaving the directory out of the catalogue",
-    "windsurf.local_file_history": "the editor's own version store, and the same decision as the upstream editor's entry above: a directory per file holding an index and the versions beside it, which reading as a snapshot store is format work nobody here has done",
     "windsurf.worktrees": "a whole working copy, not a copy of one file",
 }
 
@@ -189,3 +184,173 @@ def test_every_snapshot_store_is_either_read_or_declared_unread() -> None:
     }
     for artifact_id, reason in NOT_CLAIMED.items():
         assert reason.strip(), artifact_id
+
+
+# ------------------------------------------- the editor family's local history
+
+# The layout, from the editor's own source: a directory per file named by a hash of the
+# file's URI, an index naming the original resource and listing each copy with the moment
+# it was taken and the save source that caused it, and the copies themselves named by four
+# random characters plus the original extension. This is the only snapshot store in the
+# catalogue where the attribution exists on disk, which is what these tests are about.
+HISTORY_DIR = "/home/alice/.config/Code/User/History/1f2e3d4c"
+
+
+def history(path: Path, name: str, artifact_id: str = "vscode.local_history") -> list:
+    return parse(path, artifact_id, f"{HISTORY_DIR}/{name}")
+
+
+def with_index(tmp_path: Path, *entries: dict, resource: str | None = "file:///srv/app/api.ts"):
+    """A history directory with an index and nothing else in it yet."""
+    import json as _json
+
+    document: dict = {"version": 1, "entries": list(entries)}
+    if resource is not None:
+        document["resource"] = resource
+    (tmp_path / "entries.json").write_text(_json.dumps(document), encoding="utf-8", newline="")
+
+
+def test_a_copy_is_attributed_from_the_index_beside_it(tmp_path: Path) -> None:
+    """The point of reading this layout at all.
+
+    Every other snapshot store in this catalogue produces content nobody can attribute.
+    Here the original path and the moment the copy was taken are one file away, so a case
+    that reported the copy as unnamed would be throwing away an answer the collection
+    already had.
+    """
+    with_index(tmp_path, {"id": "ab12.ts", "timestamp": 1764547200000, "source": "undoRedo.source"})
+    copy = tmp_path / "ab12.ts"
+    copy.write_text("const token = 'sk_live_examplekey0123456789'\n", encoding="utf-8", newline="")
+
+    events = history(copy, "ab12.ts")
+    assert len(events) == 1
+    event = events[0]
+    assert event.kind == "file.snapshot"
+    assert event.raw["original_path"] == "/srv/app/api.ts"
+    assert event.raw["version_source"] == "undoRedo.source"
+    assert "sk_live_examplekey0123456789" in event.payload["text"]
+    # The time came out of the index rather than off the file, and the event says which.
+    assert event.ts_utc is not None and event.ts_utc.startswith("2025-12-01")
+    assert event.ts_source is not None and "index" in event.ts_source
+    # The only note is how the number was read, which is provenance rather than a gap.
+    assert event.parse_problem == "read as epoch milliseconds"
+
+
+def test_a_copy_with_no_index_says_so_and_still_carries_its_content(tmp_path: Path) -> None:
+    """A collection that took the copies and not the index still has the content.
+
+    The directory name is a hash of the file's URI and cannot be reversed, so without the
+    index there is no path and no time. What must not happen is the content going missing
+    as well, or the event implying an attribution it does not have.
+    """
+    copy = tmp_path / "cd34.ts"
+    copy.write_text("export const answer = 42\n", encoding="utf-8", newline="")
+
+    events = history(copy, "cd34.ts")
+    assert len(events) == 1
+    assert "export const answer = 42" in events[0].payload["text"]
+    assert "original_path" not in events[0].raw
+    assert events[0].ts_utc is None
+    assert "index" in (events[0].parse_problem or "")
+
+
+def test_a_copy_the_index_has_forgotten_is_reported_rather_than_attributed(
+    tmp_path: Path,
+) -> None:
+    """The editor prunes the index and the copies on different schedules.
+
+    So a copy with no row is a real state rather than a corrupt one, and it is the
+    interesting one: content on the endpoint that nothing else accounts for. Attributing it
+    to whatever the index does name would be the wrong answer rather than no answer.
+    """
+    with_index(tmp_path, {"id": "ab12.ts", "timestamp": 1764547200000})
+    orphan = tmp_path / "zz99.ts"
+    orphan.write_text("old contents\n", encoding="utf-8", newline="")
+
+    events = history(orphan, "zz99.ts")
+    assert len(events) == 1
+    assert "old contents" in events[0].payload["text"]
+    assert "original_path" not in events[0].raw
+    assert "does not list it" in (events[0].parse_problem or "")
+
+
+def test_the_index_is_an_event_of_its_own(tmp_path: Path) -> None:
+    """Because it is the only thing that maps the directory's hash back to a path.
+
+    It also names copies that may have been pruned before the collection, so the index is
+    evidence that a version existed even where the version itself is gone.
+    """
+    with_index(
+        tmp_path,
+        {"id": "ab12.ts", "timestamp": 1764547200000, "source": "default.source"},
+        {"id": "cd34.ts", "timestamp": 1764550800000, "source": "searchReplace.source"},
+    )
+    events = history(tmp_path / "entries.json", "entries.json")
+    assert len(events) == 1
+    event = events[0]
+    assert event.raw["index"] is True
+    assert event.raw["original_path"] == "/srv/app/api.ts"
+    assert [row["id"] for row in event.raw["versions"]] == ["ab12.ts", "cd34.ts"]
+    assert [row["source"] for row in event.raw["versions"]] == [
+        "default.source",
+        "searchReplace.source",
+    ]
+    # The index is rewritten on every copy, so its own time would be the last copy's.
+    assert event.ts_utc is None
+
+
+def test_an_index_that_names_no_resource_does_not_get_one_invented(tmp_path: Path) -> None:
+    with_index(tmp_path, {"id": "ab12.ts", "timestamp": 1764547200000}, resource=None)
+    events = history(tmp_path / "entries.json", "entries.json")
+    assert events[0].raw["original_path"] is None
+    assert "does not name the file" in (events[0].parse_problem or "")
+
+
+def test_a_remote_resource_is_not_reported_as_a_local_path(tmp_path: Path) -> None:
+    """The copy is local and the file it came from never was, which changes the finding."""
+    with_index(
+        tmp_path,
+        {"id": "ab12.ts", "timestamp": 1764547200000},
+        resource="vscode-remote://ssh-remote+buildhost/srv/app/api.ts",
+    )
+    copy = tmp_path / "ab12.ts"
+    copy.write_text("x\n", encoding="utf-8", newline="")
+    events = history(copy, "ab12.ts")
+    assert events[0].raw["original_path"].startswith("vscode-remote://")
+    assert "another machine" in (events[0].parse_problem or "")
+
+
+def test_an_unreadable_index_is_surfaced_and_not_skipped(tmp_path: Path) -> None:
+    """Without it nothing in the directory can be attributed, so it is a finding."""
+    (tmp_path / "entries.json").write_text("{not json", encoding="utf-8", newline="")
+    events = history(tmp_path / "entries.json", "entries.json")
+    assert len(events) == 1
+    assert events[0].kind == "unparsed.record"
+    assert "could not be read as JSON" in (events[0].parse_problem or "")
+
+
+def test_a_copy_that_is_not_text_is_recorded_by_hash(tmp_path: Path) -> None:
+    """A page of replacement characters reads as content, so it is refused."""
+    with_index(tmp_path, {"id": "ab12.png", "timestamp": 1764547200000})
+    copy = tmp_path / "ab12.png"
+    copy.write_bytes(b"\x89PNG\r\n\x1a\n" + bytes(range(64)))
+    events = history(copy, "ab12.png")
+    assert "content" not in events[0].raw
+    assert events[0].raw["sha256"]
+    assert events[0].raw["original_path"] == "/srv/app/api.ts"
+
+
+def test_all_three_editors_of_the_family_use_the_same_reading(tmp_path: Path) -> None:
+    """One layout, three products, one reader, which was the argument for writing it."""
+    with_index(tmp_path, {"id": "ab12.ts", "timestamp": 1764547200000})
+    copy = tmp_path / "ab12.ts"
+    copy.write_text("shared\n", encoding="utf-8", newline="")
+    for artifact_id in (
+        "vscode.local_history",
+        "cursor.local_file_history",
+        "windsurf.local_file_history",
+    ):
+        events = history(copy, "ab12.ts", artifact_id)
+        assert len(events) == 1, artifact_id
+        assert events[0].raw["original_path"] == "/srv/app/api.ts", artifact_id
+        assert events[0].agent == artifact_id.split(".")[0], artifact_id

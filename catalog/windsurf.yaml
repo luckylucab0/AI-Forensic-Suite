@@ -1217,8 +1217,8 @@ artifacts:
 
     Unverified on purpose. The path is the upstream editor's, from its own environment service, and this product does not document its own spelling of it. Both of this product's directory names are here because it has been through a rename and the entries beside this one carry both.
 
-    Collected whole and not read, which is the same decision the upstream entry records: the index is JSON and the versions beside it are file contents, and reading the pair as a snapshot store is format work nobody here has done. It is named as unfinished work on the support page rather than left for somebody to infer.
-  parser: null
+    Read, and completely, which it was not until the reader for this layout was written. The index names the file the copies were taken from, as a URI, and lists each copy with the moment the editor took it and the save source that caused it, so a copy here is attributable in a way no other snapshot store in this catalogue is: the content, the original path and the time all reach the case. The index is also an event of its own, because the directory is named by a hash of the file's URI and the index is the only thing that reverses it, and because the editor prunes the index and the copies separately, so a copy the index has forgotten is content nothing else accounts for.
+  parser: file_snapshot
 - id: windsurf.macos_bundle_storage
   category: cache
   root: user_profile

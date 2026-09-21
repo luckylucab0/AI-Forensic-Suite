@@ -69,10 +69,9 @@ import sqlite3
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
-from urllib.parse import unquote, urlsplit
 
 from agentforensics.model import Event
-from agentforensics.parsers.base import ParseContext
+from agentforensics.parsers.base import ParseContext, uri_as_path
 from agentforensics.parsers.sqlite_generic import rows_as_events
 from agentforensics.parsers.sqlite_store import (
     BLOB_NOTE,
@@ -312,7 +311,7 @@ def _workspace_document(context: ParseContext) -> Event:
     else:
         problem = None
     uri = _uri(document)
-    project, remote = _folder(uri)
+    project, remote = uri_as_path(uri)
     return Event(
         kind="config.snapshot",
         provenance=context.provenance("file"),
@@ -354,7 +353,7 @@ def _folder_beside(context: ParseContext) -> tuple[str | None, str | None]:
         document = json.loads(beside.read_text(encoding="utf-8", errors="replace"))
     except OSError, ValueError:
         return None, NO_WORKSPACE_FILE
-    project, remote = _folder(_uri(document))
+    project, remote = uri_as_path(_uri(document))
     if project is None:
         return None, NO_WORKSPACE_FILE
     return project, REMOTE_URI if remote else None
@@ -369,28 +368,6 @@ def _uri(document: Any) -> str | None:
         if isinstance(value, str) and value.strip():
             return value
     return None
-
-
-def _folder(uri: str | None) -> tuple[str | None, bool]:
-    """A URI as a path, and whether it names another machine.
-
-    A `file:` URI is percent-encoded, and on Windows the drive letter is encoded too, so
-    `file:///c%3A/Users/alice` is `c:/Users/alice` and a reader that skipped the decoding
-    would produce a path no filesystem has. Anything else is returned whole: a remote URI is
-    a path on another host and shortening it to its path component would claim a local
-    directory that was never here.
-    """
-    if not uri:
-        return None, False
-    parts = urlsplit(uri)
-    if parts.scheme in ("", "file"):
-        path = unquote(parts.path)
-        # file:///c%3A/... decodes to /c:/..., and the leading separator is the URI's, not
-        # the path's.
-        if len(path) > 2 and path[0] == "/" and path[2] == ":":
-            path = path[1:]
-        return (path or None), False
-    return uri, True
 
 
 def _read(value: Any) -> tuple[str, Any, str | None]:

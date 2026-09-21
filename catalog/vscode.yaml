@@ -240,8 +240,10 @@ artifacts:
 
     WHAT AN AGENT CHANGED, EVEN WHERE NOTHING WAS COMMITTED. An agent extension edits through the editor's own API, so its edits land here like anybody else's, with a timestamp per version. On a working copy that was never committed, or where the agent's changes were reverted, this is where the earlier text still is.
 
-    Collected whole and not read: the index inside is JSON and the versions beside it are the file contents, and reading the pair as a snapshot store is format work nobody here has done. The entry says so rather than leaving the directory out.
-  parser: null
+    Read, and completely, which it was not until the reader for this layout was written. The index names the file the copies were taken from, as a URI, and lists each copy with the moment the editor took it and the save source that caused it, so a copy here is attributable in a way no other snapshot store in this catalogue is: the content, the original path and the time all reach the case. The index is also an event of its own, because the directory is named by a hash of the file's URI and the index is the only thing that reverses it, and because the editor prunes the index and the copies separately, so a copy the index has forgotten is content nothing else accounts for.
+
+    Two limits worth stating before quoting a timeline from it. The editor merges a save into the previous entry when the source is the same and the gap is under workbench.localHistory.mergeWindow, so the entries are not every save; and it prunes by workbench.localHistory.maxFileEntries, so the oldest copies of a busy file are gone. Both are settings, and both are in the settings file this catalogue collects.
+  parser: file_snapshot
 - id: vscode.agent_sessions_workspace
   title: Agent sessions workspace file
   category: config

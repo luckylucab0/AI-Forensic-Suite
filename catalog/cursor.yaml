@@ -430,7 +430,7 @@ artifacts:
   - '%APPDATA%\Cursor\User\History\'
   - ~/.config/Cursor/User/History/
   - ~/Library/Application Support/Cursor/User/History/
-  format: json
+  format: directory
   sensitivity: normal
   collect_priority: normal
   status: unverified
@@ -443,7 +443,9 @@ artifacts:
     Inherited VS Code artifact, NOT AI-specific — but it is the fallback record of agent-driven edits when Cursor's own checkpoints have aged out. Explicitly named as a collection target by the UAC Cursor artifact file.
 
     Record structure: Standard VS Code local-history layout: one directory per tracked resource containing an entries.json manifest (resource URI + timestamped entry list) plus the numbered content snapshots themselves.
-  parser: json_generic
+
+    The reader changed with the pass that wrote one for this layout. It used to be claimed by the generic document reader, which read the manifest and returned it as a document and left the copies themselves as file names. Now the manifest is read for the mapping it is, and each copy reaches the case with its content, the original path the manifest names and the time the editor took it. The same reader serves the two other editors of this family, which is why the work was worth doing once.
+  parser: file_snapshot
 - id: cursor.extensions
   category: install_evidence
   root: user_profile

@@ -140,6 +140,15 @@ TEXT = {
             "for somebody to infer from a thin case:"
         ),
         "started_title": "## Started and not finished",
+        "started_one": (
+            "One entry where somebody wrote down that the reading is incomplete. "
+            "Everything above is a decision; this is a list of work. It may also appear "
+            "above, in whichever group its current state puts it, because `read` on this "
+            "page is a yes or a no and an analyst deciding whether a case can be quoted "
+            "needs the third answer. The declaration lives in "
+            "`src/agentforensics/parsers/coverage.py` and a test holds it to still existing "
+            "in the catalogue, so this list cannot outlive what it promises."
+        ),
         "started_some": (
             "%(count)d entries where somebody wrote down that the reading is incomplete. "
             "Everything above is a decision; this is a list of work. An entry here may also "
@@ -255,6 +264,16 @@ TEXT = {
             "hier, statt dass jemand sie aus einem dünnen Fall erschliessen muss:"
         ),
         "started_title": "## Angefangen und nicht fertig",
+        "started_one": (
+            "Ein Eintrag, bei dem jemand aufgeschrieben hat, dass die Lesung unvollständig "
+            "ist. Alles darüber ist eine Entscheidung; das hier ist eine Liste von Arbeit. "
+            "Er kann zusätzlich oben stehen, in der Gruppe, in die sein jetziger Zustand "
+            "ihn setzt, denn `Gelesen` ist auf dieser Seite ein Ja oder ein Nein, und wer "
+            "entscheidet, ob ein Fall zitierbar ist, braucht die dritte Antwort. Die "
+            "Deklaration steht in `src/agentforensics/parsers/coverage.py`, und ein Test "
+            "hält ihn daran fest, dass es ihn im Katalog noch gibt, damit diese Liste nicht "
+            "überlebt, was sie zusagt."
+        ),
         "started_some": (
             "%(count)d Einträge, bei denen jemand aufgeschrieben hat, dass die Lesung "
             "unvollständig ist. Alles darüber ist eine Entscheidung; das hier ist eine Liste "
@@ -432,7 +451,11 @@ def render(catalogue: Catalogue, lang: str) -> str:
         out.append(text["unfinished_none"])
     out.extend(["", text["started_title"], ""])
     started = sorted(UNFINISHED)
-    if started:
+    if len(started) == 1:
+        out.append(text["started_one"])
+        out.append("")
+        out.append("- `%s`: %s" % (started[0], UNFINISHED[started[0]]))
+    elif started:
         out.append(text["started_some"] % {"count": len(started)})
         out.append("")
         for artifact_id in started:
