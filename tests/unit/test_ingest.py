@@ -1023,3 +1023,64 @@ def test_a_path_says_which_account_it_belongs_to(tmp_path: Path) -> None:
     assert _user_from_path("/root/.claude/settings.json") == "root"
     assert _user_from_path("/var/root/.claude/settings.json") == "root"
     assert _user_from_path("/opt/agent/state.json") is None
+
+
+# --------------------------------------------------- which adapter reads which source
+
+# The first decision an ingest makes, and the one every later decision rests on. A
+# Velociraptor container read as a plain tree keeps its container directory on every
+# path; a KAPE output read as a plain tree keeps the drive letter as a folder; and a
+# native bundle read as a tree throws away the only record of what the endpoint knew,
+# replacing the collector's own attributions, hashes and timestamps with guesses made
+# afterwards. Only two of the four answers had ever been asked for.
+
+SOURCES: dict[str, tuple[tuple[str, ...], str]] = {
+    # name: directories to create, the answer detect has to give
+    "a bundle from this suite": (("files",), "native"),
+    "a velociraptor container": (("uploads", "uploads/C%3A"), "velociraptor"),
+    "a kape output tree": (("C", "C/Users"), "kape"),
+    "a mounted image or an exported profile": ((".claude", ".codex"), "directory"),
+}
+
+
+@pytest.mark.parametrize("shape", sorted(SOURCES))
+def test_a_source_is_named_for_what_it_is(tmp_path: Path, shape: str) -> None:
+    directories, expected = SOURCES[shape]
+    root = tmp_path / "source"
+    for name in directories:
+        (root / name).mkdir(parents=True)
+    if expected == "native":
+        (root / "manifest.json").write_text('{"files": [], "collection": {}}', encoding="utf-8")
+    if expected == "velociraptor":
+        # The container carries its own metadata beside the uploads directory, and that
+        # pair is what tells it apart from any other tree with an uploads folder in it.
+        (root / "collection.json").write_text("{}", encoding="utf-8")
+    assert detect(root) == expected
+
+
+def test_a_manifest_wins_over_everything_that_looks_like_a_tree(tmp_path: Path) -> None:
+    """A bundle that also has the shape of a container is still a bundle.
+
+    The manifest is the only record of what the endpoint knew, and reading it as a tree
+    would replace the collector's attributions, hashes and timestamps with inferences made
+    afterwards. The order of the checks is what guarantees that, so it is asserted rather
+    than left to whoever edits the function next.
+    """
+    root = tmp_path / "both"
+    (root / "files").mkdir(parents=True)
+    (root / "uploads").mkdir()
+    (root / "C").mkdir()
+    (root / "manifest.json").write_text('{"files": [], "collection": {}}', encoding="utf-8")
+    assert detect(root) == "native"
+
+
+def test_a_path_that_cannot_be_listed_is_a_tree_rather_than_an_error(tmp_path: Path) -> None:
+    """A directory of collected files is what a mounted image and an exported profile look
+    like, so the fallback has to be the reading that leaves their paths as they were
+    found. A path that is not a directory at all takes the same route rather than
+    raising, because refusing here would rule out the two sources an analyst most often
+    has over a spelling mistake."""
+    assert detect(tmp_path / "does-not-exist") == "directory"
+    a_file = tmp_path / "a-file"
+    a_file.write_text("not a directory", encoding="utf-8")
+    assert detect(a_file) == "directory"
