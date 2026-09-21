@@ -151,7 +151,7 @@ measure() {
 #     27 path(s) a registry key
 #    368 path(s) anchored in a working copy
 #    336 path(s) anchored in an environment variable
-#    800 path(s) for the other platform
+#    820 path(s) for the other platform
 #      1 path(s) in a scratch directory shared with every process on the machine
 probes_for() {
     case "$1" in
@@ -518,27 +518,68 @@ PROBES
         ;;
     codex)
         cat <<'PROBES'
-walk codex.archived_sessions,codex.auth,codex.config,codex.log_dir,codex.mcp_and_notify,codex.mcp_oauth_credentials,codex.prompt_history,codex.requirements_and_permissions,codex.rollouts,codex.rollouts_compressed,codex.state_databases ~/.codex
+walk codex.app_global_state,codex.app_side_database,codex.app_side_stores,codex.archived_sessions,codex.auth,codex.config,codex.connector_caches,codex.curated_plugin_clone,codex.external_agent_imports,codex.ide_context_socket,codex.installation_id,codex.log_dir,codex.mcp_and_notify,codex.mcp_oauth_credentials,codex.models_cache,codex.plugin_store,codex.prompt_history,codex.requirements_and_permissions,codex.rollouts,codex.rollouts_compressed,codex.sandbox_migration_marker,codex.session_index,codex.shell_snapshots,codex.state_databases,codex.system_skills,codex.thread_writer_locks,codex.visualizations ~/.codex
 check codex.config ~/.codex/*.config.toml
 check codex.sqlite_glob ~/.codex/*.sqlite
 check codex.sqlite_write_ahead_logs ~/.codex/*.sqlite-shm
 check codex.sqlite_write_ahead_logs ~/.codex/*.sqlite-wal
+check codex.app_global_state ~/.codex/.codex-global-state.json
+check codex.app_global_state ~/.codex/.codex-global-state.json.bak
 check codex.mcp_oauth_credentials ~/.codex/.credentials.json
+check codex.sandbox_migration_marker ~/.codex/.sandbox_migration
+check codex.curated_plugin_clone ~/.codex/.tmp/marketplaces
+check codex.curated_plugin_clone ~/.codex/.tmp/plugins
+check codex.curated_plugin_clone ~/.codex/.tmp/plugins.sha
+check codex.curated_plugin_clone ~/.codex/.tmp/plugins.sync.lock
+check codex.curated_plugin_clone ~/.codex/.tmp/plugins/.git/FETCH_HEAD
+check codex.curated_plugin_clone ~/.codex/.tmp/plugins/.git/shallow
 check codex.archived_sessions ~/.codex/archived_sessions
 check codex.auth ~/.codex/auth.json
+check codex.connector_caches ~/.codex/cache
+check codex.connector_caches ~/.codex/cache/bundled_plugin_exclusions
+check codex.connector_caches ~/.codex/cache/codex_apps_server_info
+check codex.connector_caches ~/.codex/cache/codex_apps_tools
+check codex.connector_caches ~/.codex/cache/remote_plugin_catalog
+check codex.app_side_stores ~/.codex/computer-use
 check codex.config,codex.mcp_and_notify ~/.codex/config.toml
+check codex.external_agent_imports ~/.codex/external_agent_session_imports.json
 check codex.state_databases ~/.codex/goals_1.sqlite
 check codex.prompt_history ~/.codex/history.jsonl
+check codex.installation_id ~/.codex/installation_id
+check codex.ide_context_socket ~/.codex/ipc
+check codex.ide_context_socket ~/.codex/ipc/ipc-0.sock
+check codex.ide_context_socket ~/.codex/ipc/ipc.sock
 check codex.log_dir ~/.codex/log
 check codex.state_databases ~/.codex/logs_2.sqlite
 check codex.state_databases ~/.codex/memories_1.sqlite
 check codex.state_databases ~/.codex/memories_v2_1.sqlite
+check codex.models_cache ~/.codex/models_cache.json
 check codex.requirements_and_permissions ~/.codex/permissions.toml
+check codex.plugin_store ~/.codex/plugins
+check codex.plugin_store ~/.codex/plugins/.codex-remote-plugin-install.json
+check codex.plugin_store ~/.codex/plugins/.remote-plugin-install-staging
+check codex.plugin_store ~/.codex/plugins/cache
+check codex.plugin_store ~/.codex/plugins/data
 check codex.state_databases ~/.codex/queue_1.sqlite
 check codex.requirements_and_permissions ~/.codex/requirements.toml
+check codex.session_index ~/.codex/session_index.jsonl
+check codex.session_index ~/.codex/session_index.jsonl.tmp
 check codex.rollouts,codex.rollouts_compressed ~/.codex/sessions
+check codex.shell_snapshots ~/.codex/shell_snapshots
+check codex.shell_snapshots ~/.codex/shell_snapshots/<thread-id>.<nanos>.sh
+check codex.shell_snapshots ~/.codex/shell_snapshots/<thread-id>.tmp-<nanos>
+check codex.system_skills ~/.codex/skills/.system
+check codex.system_skills ~/.codex/skills/.system/.codex-system-skills.marker
+check codex.app_side_stores ~/.codex/sqlite
+check codex.app_side_database ~/.codex/sqlite/codex-dev.db
+check codex.app_side_database ~/.codex/sqlite/codex-dev.db-shm
+check codex.app_side_database ~/.codex/sqlite/codex-dev.db-wal
 check codex.state_databases ~/.codex/state_5.sqlite
+check codex.thread_writer_locks ~/.codex/thread-writer-locks
 check codex.state_databases ~/.codex/thread_history_1.sqlite
+check codex.app_side_stores ~/.codex/vendor_imports
+check codex.visualizations ~/.codex/visualization-viewers/<thread-id>
+check codex.visualizations ~/.codex/visualizations
 PROBES
         ;;
     continue)

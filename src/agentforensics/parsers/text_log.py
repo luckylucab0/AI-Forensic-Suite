@@ -42,6 +42,7 @@ from agentforensics.parsers.base import ParseContext, normalise_ts, text_lines
 # is listed here.
 LOGS = frozenset(
     {
+        "codex.shell_snapshots",
         "amazonq.cli_logs",
         "amp.thread_logs",
         "claude_code.debug_logs",

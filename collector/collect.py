@@ -3626,6 +3626,66 @@ EMBEDDED_CATALOGUE_JSON = r"""
             "agent": "codex",
             "artifacts": [
                 {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "codex.app_global_state",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\.codex-global-state.json",
+                        "%USERPROFILE%\\.codex\\.codex-global-state.json.bak",
+                        "~/.codex/.codex-global-state.json",
+                        "~/.codex/.codex-global-state.json.bak"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "codex.app_side_database",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\sqlite\\codex-dev.db",
+                        "%USERPROFILE%\\.codex\\sqlite\\codex-dev.db-shm",
+                        "%USERPROFILE%\\.codex\\sqlite\\codex-dev.db-wal",
+                        "~/.codex/sqlite/codex-dev.db",
+                        "~/.codex/sqlite/codex-dev.db-shm",
+                        "~/.codex/sqlite/codex-dev.db-wal"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "normal",
+                    "id": "codex.app_side_stores",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\sqlite\\",
+                        "%USERPROFILE%\\.codex\\vendor_imports\\",
+                        "~/.codex/computer-use/",
+                        "~/.codex/sqlite/",
+                        "~/.codex/vendor_imports/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "unverified"
+                },
+                {
                     "category": "transcript",
                     "collect_priority": "first",
                     "id": "codex.archived_sessions",
@@ -3673,6 +3733,101 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "%USERPROFILE%\\.codex\\config.toml",
                         "~/.codex/*.config.toml",
                         "~/.codex/config.toml"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "normal",
+                    "id": "codex.connector_caches",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\cache\\",
+                        "~/.codex/cache/",
+                        "~/.codex/cache/bundled_plugin_exclusions/",
+                        "~/.codex/cache/codex_apps_server_info/",
+                        "~/.codex/cache/codex_apps_tools/",
+                        "~/.codex/cache/remote_plugin_catalog/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "codex.curated_plugin_clone",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\.tmp\\marketplaces\\",
+                        "%USERPROFILE%\\.codex\\.tmp\\plugins\\",
+                        "~/.codex/.tmp/marketplaces/",
+                        "~/.codex/.tmp/plugins/",
+                        "~/.codex/.tmp/plugins.sha",
+                        "~/.codex/.tmp/plugins.sync.lock",
+                        "~/.codex/.tmp/plugins/.git/FETCH_HEAD",
+                        "~/.codex/.tmp/plugins/.git/shallow"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "codex.external_agent_imports",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\external_agent_session_imports.json",
+                        "~/.codex/external_agent_session_imports.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "codex.ide_context_socket",
+                    "os": [
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.codex/ipc/",
+                        "~/.codex/ipc/ipc-0.sock",
+                        "~/.codex/ipc/ipc.sock"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "codex.installation_id",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\installation_id",
+                        "~/.codex/installation_id"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -3727,6 +3882,44 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     ],
                     "root": "user_profile",
                     "sensitivity": "secret",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "codex.models_cache",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\models_cache.json",
+                        "~/.codex/models_cache.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "codex.plugin_store",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\plugins\\",
+                        "~/.codex/plugins/",
+                        "~/.codex/plugins/.codex-remote-plugin-install.json",
+                        "~/.codex/plugins/.remote-plugin-install-staging/",
+                        "~/.codex/plugins/cache/",
+                        "~/.codex/plugins/data/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
                     "status": "verified"
                 },
                 {
@@ -3805,6 +3998,59 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "verified"
                 },
                 {
+                    "category": "install_evidence",
+                    "collect_priority": "normal",
+                    "id": "codex.sandbox_migration_marker",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\.sandbox_migration",
+                        "~/.codex/.sandbox_migration"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "transcript",
+                    "collect_priority": "first",
+                    "id": "codex.session_index",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\session_index.jsonl",
+                        "%USERPROFILE%\\.codex\\session_index.jsonl.tmp",
+                        "~/.codex/session_index.jsonl",
+                        "~/.codex/session_index.jsonl.tmp"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "first",
+                    "id": "codex.shell_snapshots",
+                    "os": [
+                        "macos",
+                        "linux"
+                    ],
+                    "paths": [
+                        "~/.codex/shell_snapshots/",
+                        "~/.codex/shell_snapshots/<thread-id>.<nanos>.sh",
+                        "~/.codex/shell_snapshots/<thread-id>.tmp-<nanos>"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "transcript",
                     "collect_priority": "first",
                     "id": "codex.sqlite_glob",
@@ -3864,6 +4110,60 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "~/.codex/queue_1.sqlite",
                         "~/.codex/state_5.sqlite",
                         "~/.codex/thread_history_1.sqlite"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "normal",
+                    "id": "codex.system_skills",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\skills\\.system\\",
+                        "~/.codex/skills/.system/",
+                        "~/.codex/skills/.system/.codex-system-skills.marker"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "codex.thread_writer_locks",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\thread-writer-locks\\",
+                        "~/.codex/thread-writer-locks/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "codex.visualizations",
+                    "os": [
+                        "macos",
+                        "windows",
+                        "linux"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.codex\\visualizations\\",
+                        "~/.codex/visualizations/",
+                        "~/.codex/visualizations/<year>/<month>/<day>/<thread-id>/",
+                        "~/.codex/visualization-viewers/<thread-id>/"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -12687,7 +12987,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "f4ba4ac6c03a9e16003e419bd64f31ad46c8f4bf2e624d61ca317b6f70cdec92"
+    "sha256": "821d8ae5d65eb0273121868b05334bc18ab8b17d0f4447ae537043bfa77c45df"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

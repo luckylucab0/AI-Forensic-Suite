@@ -59,6 +59,7 @@ STORES = frozenset(
         "chatgpt_desktop.macos_httpstorages_db",
         "chatgpt_desktop.macos_url_cache",
         "cline.sqlite_dbs",
+        "codex.app_side_database",
         "codex.sqlite_glob",
         "codex.state_databases",
         "continue.dev_data_db",

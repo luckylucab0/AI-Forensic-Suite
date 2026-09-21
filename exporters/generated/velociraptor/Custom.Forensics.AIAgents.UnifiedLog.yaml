@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 61e249833468
+# Catalogue digest: 16c37468105d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,8 +8,8 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# Scope: the 108 artifacts the catalogue files under transcript and prompt_history.
-# The other 532 are configuration, credentials, caches, logs and install
+# Scope: the 111 artifacts the catalogue files under transcript and prompt_history.
+# The other 545 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
 # credential store what an analyst wants is the file, which is what the Collect
@@ -235,12 +235,20 @@ sources:
       cline,cline.vscode_task_transcripts,file_only,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/context_history.json
       cline,cline.vscode_task_transcripts,file_only,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/task_metadata.json
       cline,cline.vscode_task_transcripts,file_only,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/ui_messages.json
+      codex,codex.app_side_database,file_only,C:/Users/*/.codex/sqlite/codex-dev.db
+      codex,codex.app_side_database,file_only,C:/Users/*/.codex/sqlite/codex-dev.db-shm
+      codex,codex.app_side_database,file_only,C:/Users/*/.codex/sqlite/codex-dev.db-wal
+      codex,codex.app_side_stores,file_only,C:/Users/*/.codex/computer-use/**
+      codex,codex.app_side_stores,file_only,C:/Users/*/.codex/sqlite/**
+      codex,codex.app_side_stores,file_only,C:/Users/*/.codex/vendor_imports/**
       codex,codex.archived_sessions,codex_rollout,C:/Users/*/.codex/archived_sessions/**/*.jsonl
       codex,codex.prompt_history,codex_history,C:/Users/*/.codex/history.jsonl
       codex,codex.rollouts,codex_rollout,C:/Users/*/.codex/sessions/**/*.jsonl
       codex,codex.rollouts_compressed,file_only,C:/Users/*/.codex/sessions/**/rollout-*.jsonl.*.tmp
       codex,codex.rollouts_compressed,file_only,C:/Users/*/.codex/sessions/**/rollout-*.jsonl.zst
       codex,codex.rollouts_compressed,file_only,C:/Users/*/.codex/sessions/**/rollout-compress-*.tmp
+      codex,codex.session_index,generic_jsonl,C:/Users/*/.codex/session_index.jsonl
+      codex,codex.session_index,generic_jsonl,C:/Users/*/.codex/session_index.jsonl.tmp
       codex,codex.sqlite_glob,file_only,C:/Users/*/.codex/*.sqlite
       codex,codex.sqlite_write_ahead_logs,file_only,C:/Users/*/.codex/*.sqlite-shm
       codex,codex.sqlite_write_ahead_logs,file_only,C:/Users/*/.codex/*.sqlite-wal
@@ -1039,6 +1047,18 @@ sources:
       cline,cline.vscode_task_transcripts,file_only,/var/root/Library/Application Support/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/context_history.json
       cline,cline.vscode_task_transcripts,file_only,/var/root/Library/Application Support/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/task_metadata.json
       cline,cline.vscode_task_transcripts,file_only,/var/root/Library/Application Support/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/ui_messages.json
+      codex,codex.app_side_database,file_only,/Users/*/.codex/sqlite/codex-dev.db
+      codex,codex.app_side_database,file_only,/Users/*/.codex/sqlite/codex-dev.db-shm
+      codex,codex.app_side_database,file_only,/Users/*/.codex/sqlite/codex-dev.db-wal
+      codex,codex.app_side_database,file_only,/var/root/.codex/sqlite/codex-dev.db
+      codex,codex.app_side_database,file_only,/var/root/.codex/sqlite/codex-dev.db-shm
+      codex,codex.app_side_database,file_only,/var/root/.codex/sqlite/codex-dev.db-wal
+      codex,codex.app_side_stores,file_only,/Users/*/.codex/computer-use/**
+      codex,codex.app_side_stores,file_only,/Users/*/.codex/sqlite/**
+      codex,codex.app_side_stores,file_only,/Users/*/.codex/vendor_imports/**
+      codex,codex.app_side_stores,file_only,/var/root/.codex/computer-use/**
+      codex,codex.app_side_stores,file_only,/var/root/.codex/sqlite/**
+      codex,codex.app_side_stores,file_only,/var/root/.codex/vendor_imports/**
       codex,codex.archived_sessions,codex_rollout,/Users/*/.codex/archived_sessions/**/*.jsonl
       codex,codex.archived_sessions,codex_rollout,/var/root/.codex/archived_sessions/**/*.jsonl
       codex,codex.prompt_history,codex_history,/Users/*/.codex/history.jsonl
@@ -1051,6 +1071,10 @@ sources:
       codex,codex.rollouts_compressed,file_only,/var/root/.codex/sessions/**/rollout-*.jsonl.*.tmp
       codex,codex.rollouts_compressed,file_only,/var/root/.codex/sessions/**/rollout-*.jsonl.zst
       codex,codex.rollouts_compressed,file_only,/var/root/.codex/sessions/**/rollout-compress-*.tmp
+      codex,codex.session_index,generic_jsonl,/Users/*/.codex/session_index.jsonl
+      codex,codex.session_index,generic_jsonl,/Users/*/.codex/session_index.jsonl.tmp
+      codex,codex.session_index,generic_jsonl,/var/root/.codex/session_index.jsonl
+      codex,codex.session_index,generic_jsonl,/var/root/.codex/session_index.jsonl.tmp
       codex,codex.sqlite_glob,file_only,/Users/*/.codex/*.sqlite
       codex,codex.sqlite_glob,file_only,/var/root/.codex/*.sqlite
       codex,codex.sqlite_write_ahead_logs,file_only,/Users/*/.codex/*.sqlite-shm
@@ -2071,6 +2095,18 @@ sources:
       cline,cline.vscode_task_transcripts,file_only,/root/.config/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/context_history.json
       cline,cline.vscode_task_transcripts,file_only,/root/.config/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/task_metadata.json
       cline,cline.vscode_task_transcripts,file_only,/root/.config/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/ui_messages.json
+      codex,codex.app_side_database,file_only,/home/*/.codex/sqlite/codex-dev.db
+      codex,codex.app_side_database,file_only,/home/*/.codex/sqlite/codex-dev.db-shm
+      codex,codex.app_side_database,file_only,/home/*/.codex/sqlite/codex-dev.db-wal
+      codex,codex.app_side_database,file_only,/root/.codex/sqlite/codex-dev.db
+      codex,codex.app_side_database,file_only,/root/.codex/sqlite/codex-dev.db-shm
+      codex,codex.app_side_database,file_only,/root/.codex/sqlite/codex-dev.db-wal
+      codex,codex.app_side_stores,file_only,/home/*/.codex/computer-use/**
+      codex,codex.app_side_stores,file_only,/home/*/.codex/sqlite/**
+      codex,codex.app_side_stores,file_only,/home/*/.codex/vendor_imports/**
+      codex,codex.app_side_stores,file_only,/root/.codex/computer-use/**
+      codex,codex.app_side_stores,file_only,/root/.codex/sqlite/**
+      codex,codex.app_side_stores,file_only,/root/.codex/vendor_imports/**
       codex,codex.archived_sessions,codex_rollout,/home/*/.codex/archived_sessions/**/*.jsonl
       codex,codex.archived_sessions,codex_rollout,/root/.codex/archived_sessions/**/*.jsonl
       codex,codex.prompt_history,codex_history,/home/*/.codex/history.jsonl
@@ -2083,6 +2119,10 @@ sources:
       codex,codex.rollouts_compressed,file_only,/root/.codex/sessions/**/rollout-*.jsonl.*.tmp
       codex,codex.rollouts_compressed,file_only,/root/.codex/sessions/**/rollout-*.jsonl.zst
       codex,codex.rollouts_compressed,file_only,/root/.codex/sessions/**/rollout-compress-*.tmp
+      codex,codex.session_index,generic_jsonl,/home/*/.codex/session_index.jsonl
+      codex,codex.session_index,generic_jsonl,/home/*/.codex/session_index.jsonl.tmp
+      codex,codex.session_index,generic_jsonl,/root/.codex/session_index.jsonl
+      codex,codex.session_index,generic_jsonl,/root/.codex/session_index.jsonl.tmp
       codex,codex.sqlite_glob,file_only,/home/*/.codex/*.sqlite
       codex,codex.sqlite_glob,file_only,/root/.codex/*.sqlite
       codex,codex.sqlite_write_ahead_logs,file_only,/home/*/.codex/*.sqlite-shm

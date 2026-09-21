@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 61e249833468
+# Catalogue digest: 16c37468105d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -481,18 +481,48 @@ $targets = @(
     @{ Agent = 'cline'; Id = 'cline.vscode_task_transcripts'; Path = '$profile\AppData\Roaming\Trae\User\globalStorage\saoudrizwan.claude-dev\tasks' }
     @{ Agent = 'cline'; Id = 'cline.vscode_task_transcripts'; Path = '$profile\AppData\Roaming\VSCodium\User\globalStorage\saoudrizwan.claude-dev\tasks' }
     @{ Agent = 'cline'; Id = 'cline.vscode_task_transcripts'; Path = '$profile\AppData\Roaming\Windsurf\User\globalStorage\saoudrizwan.claude-dev\tasks' }
+    @{ Agent = 'codex'; Id = 'codex.app_global_state'; Path = '$profile\.codex\.codex-global-state.json' }
+    @{ Agent = 'codex'; Id = 'codex.app_global_state'; Path = '$profile\.codex\.codex-global-state.json.bak' }
+    @{ Agent = 'codex'; Id = 'codex.app_side_database'; Path = '$profile\.codex\sqlite\codex-dev.db' }
+    @{ Agent = 'codex'; Id = 'codex.app_side_database'; Path = '$profile\.codex\sqlite\codex-dev.db-shm' }
+    @{ Agent = 'codex'; Id = 'codex.app_side_database'; Path = '$profile\.codex\sqlite\codex-dev.db-wal' }
+    @{ Agent = 'codex'; Id = 'codex.app_side_stores'; Path = '$profile\.codex\computer-use' }
+    @{ Agent = 'codex'; Id = 'codex.app_side_stores'; Path = '$profile\.codex\sqlite' }
+    @{ Agent = 'codex'; Id = 'codex.app_side_stores'; Path = '$profile\.codex\vendor_imports' }
     @{ Agent = 'codex'; Id = 'codex.archived_sessions'; Path = '$profile\.codex\archived_sessions' }
     @{ Agent = 'codex'; Id = 'codex.auth'; Path = '$profile\.codex\auth.json' }
     @{ Agent = 'codex'; Id = 'codex.config'; Path = '$profile\.codex' }
     @{ Agent = 'codex'; Id = 'codex.config'; Path = '$profile\.codex\config.toml' }
+    @{ Agent = 'codex'; Id = 'codex.connector_caches'; Path = '$profile\.codex\cache' }
+    @{ Agent = 'codex'; Id = 'codex.connector_caches'; Path = '$profile\.codex\cache\bundled_plugin_exclusions' }
+    @{ Agent = 'codex'; Id = 'codex.connector_caches'; Path = '$profile\.codex\cache\codex_apps_server_info' }
+    @{ Agent = 'codex'; Id = 'codex.connector_caches'; Path = '$profile\.codex\cache\codex_apps_tools' }
+    @{ Agent = 'codex'; Id = 'codex.connector_caches'; Path = '$profile\.codex\cache\remote_plugin_catalog' }
+    @{ Agent = 'codex'; Id = 'codex.curated_plugin_clone'; Path = '$profile\.codex\.tmp\marketplaces' }
+    @{ Agent = 'codex'; Id = 'codex.curated_plugin_clone'; Path = '$profile\.codex\.tmp\plugins' }
+    @{ Agent = 'codex'; Id = 'codex.curated_plugin_clone'; Path = '$profile\.codex\.tmp\plugins.sha' }
+    @{ Agent = 'codex'; Id = 'codex.curated_plugin_clone'; Path = '$profile\.codex\.tmp\plugins.sync.lock' }
+    @{ Agent = 'codex'; Id = 'codex.curated_plugin_clone'; Path = '$profile\.codex\.tmp\plugins\.git\FETCH_HEAD' }
+    @{ Agent = 'codex'; Id = 'codex.curated_plugin_clone'; Path = '$profile\.codex\.tmp\plugins\.git\shallow' }
+    @{ Agent = 'codex'; Id = 'codex.external_agent_imports'; Path = '$profile\.codex\external_agent_session_imports.json' }
+    @{ Agent = 'codex'; Id = 'codex.installation_id'; Path = '$profile\.codex\installation_id' }
     @{ Agent = 'codex'; Id = 'codex.log_dir'; Path = '$profile\.codex\log' }
     @{ Agent = 'codex'; Id = 'codex.mcp_and_notify'; Path = '$profile\.codex\config.toml' }
     @{ Agent = 'codex'; Id = 'codex.mcp_oauth_credentials'; Path = '$profile\.codex\.credentials.json' }
+    @{ Agent = 'codex'; Id = 'codex.models_cache'; Path = '$profile\.codex\models_cache.json' }
+    @{ Agent = 'codex'; Id = 'codex.plugin_store'; Path = '$profile\.codex\plugins' }
+    @{ Agent = 'codex'; Id = 'codex.plugin_store'; Path = '$profile\.codex\plugins\.codex-remote-plugin-install.json' }
+    @{ Agent = 'codex'; Id = 'codex.plugin_store'; Path = '$profile\.codex\plugins\.remote-plugin-install-staging' }
+    @{ Agent = 'codex'; Id = 'codex.plugin_store'; Path = '$profile\.codex\plugins\cache' }
+    @{ Agent = 'codex'; Id = 'codex.plugin_store'; Path = '$profile\.codex\plugins\data' }
     @{ Agent = 'codex'; Id = 'codex.prompt_history'; Path = '$profile\.codex\history.jsonl' }
     @{ Agent = 'codex'; Id = 'codex.requirements_and_permissions'; Path = '$profile\.codex\permissions.toml' }
     @{ Agent = 'codex'; Id = 'codex.requirements_and_permissions'; Path = '$profile\.codex\requirements.toml' }
     @{ Agent = 'codex'; Id = 'codex.rollouts'; Path = '$profile\.codex\sessions' }
     @{ Agent = 'codex'; Id = 'codex.rollouts_compressed'; Path = '$profile\.codex\sessions' }
+    @{ Agent = 'codex'; Id = 'codex.sandbox_migration_marker'; Path = '$profile\.codex\.sandbox_migration' }
+    @{ Agent = 'codex'; Id = 'codex.session_index'; Path = '$profile\.codex\session_index.jsonl' }
+    @{ Agent = 'codex'; Id = 'codex.session_index'; Path = '$profile\.codex\session_index.jsonl.tmp' }
     @{ Agent = 'codex'; Id = 'codex.sqlite_glob'; Path = '$profile\.codex' }
     @{ Agent = 'codex'; Id = 'codex.sqlite_write_ahead_logs'; Path = '$profile\.codex' }
     @{ Agent = 'codex'; Id = 'codex.state_databases'; Path = '$profile\.codex\goals_1.sqlite' }
@@ -502,6 +532,11 @@ $targets = @(
     @{ Agent = 'codex'; Id = 'codex.state_databases'; Path = '$profile\.codex\queue_1.sqlite' }
     @{ Agent = 'codex'; Id = 'codex.state_databases'; Path = '$profile\.codex\state_5.sqlite' }
     @{ Agent = 'codex'; Id = 'codex.state_databases'; Path = '$profile\.codex\thread_history_1.sqlite' }
+    @{ Agent = 'codex'; Id = 'codex.system_skills'; Path = '$profile\.codex\skills\.system' }
+    @{ Agent = 'codex'; Id = 'codex.system_skills'; Path = '$profile\.codex\skills\.system\.codex-system-skills.marker' }
+    @{ Agent = 'codex'; Id = 'codex.thread_writer_locks'; Path = '$profile\.codex\thread-writer-locks' }
+    @{ Agent = 'codex'; Id = 'codex.visualizations'; Path = '$profile\.codex\visualization-viewers' }
+    @{ Agent = 'codex'; Id = 'codex.visualizations'; Path = '$profile\.codex\visualizations' }
     @{ Agent = 'continue'; Id = 'continue.agents'; Path = '$profile\.continue\agents' }
     @{ Agent = 'continue'; Id = 'continue.agents'; Path = '$profile\.continue\assistants' }
     @{ Agent = 'continue'; Id = 'continue.aux_config'; Path = '$profile\.continue\.configs' }

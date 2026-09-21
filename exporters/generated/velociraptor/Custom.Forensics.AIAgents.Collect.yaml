@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 61e249833468
+# Catalogue digest: 16c37468105d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -551,13 +551,40 @@ sources:
     cline,cline.vscode_task_transcripts,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/context_history.json
     cline,cline.vscode_task_transcripts,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/task_metadata.json
     cline,cline.vscode_task_transcripts,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/ui_messages.json
+    codex,codex.app_global_state,C:/Users/*/.codex/.codex-global-state.json
+    codex,codex.app_global_state,C:/Users/*/.codex/.codex-global-state.json.bak
+    codex,codex.app_side_database,C:/Users/*/.codex/sqlite/codex-dev.db
+    codex,codex.app_side_database,C:/Users/*/.codex/sqlite/codex-dev.db-shm
+    codex,codex.app_side_database,C:/Users/*/.codex/sqlite/codex-dev.db-wal
+    codex,codex.app_side_stores,C:/Users/*/.codex/computer-use/**
+    codex,codex.app_side_stores,C:/Users/*/.codex/sqlite/**
+    codex,codex.app_side_stores,C:/Users/*/.codex/vendor_imports/**
     codex,codex.archived_sessions,C:/Users/*/.codex/archived_sessions/**
     codex,codex.auth,C:/Users/*/.codex/auth.json
     codex,codex.config,C:/Users/*/.codex/*.config.toml
     codex,codex.config,C:/Users/*/.codex/config.toml
+    codex,codex.connector_caches,C:/Users/*/.codex/cache/**
+    codex,codex.connector_caches,C:/Users/*/.codex/cache/bundled_plugin_exclusions/**
+    codex,codex.connector_caches,C:/Users/*/.codex/cache/codex_apps_server_info/**
+    codex,codex.connector_caches,C:/Users/*/.codex/cache/codex_apps_tools/**
+    codex,codex.connector_caches,C:/Users/*/.codex/cache/remote_plugin_catalog/**
+    codex,codex.curated_plugin_clone,C:/Users/*/.codex/.tmp/marketplaces/**
+    codex,codex.curated_plugin_clone,C:/Users/*/.codex/.tmp/plugins.sha
+    codex,codex.curated_plugin_clone,C:/Users/*/.codex/.tmp/plugins.sync.lock
+    codex,codex.curated_plugin_clone,C:/Users/*/.codex/.tmp/plugins/**
+    codex,codex.curated_plugin_clone,C:/Users/*/.codex/.tmp/plugins/.git/FETCH_HEAD
+    codex,codex.curated_plugin_clone,C:/Users/*/.codex/.tmp/plugins/.git/shallow
+    codex,codex.external_agent_imports,C:/Users/*/.codex/external_agent_session_imports.json
+    codex,codex.installation_id,C:/Users/*/.codex/installation_id
     codex,codex.log_dir,C:/Users/*/.codex/log/**
     codex,codex.mcp_and_notify,C:/Users/*/.codex/config.toml
     codex,codex.mcp_oauth_credentials,C:/Users/*/.codex/.credentials.json
+    codex,codex.models_cache,C:/Users/*/.codex/models_cache.json
+    codex,codex.plugin_store,C:/Users/*/.codex/plugins/**
+    codex,codex.plugin_store,C:/Users/*/.codex/plugins/.codex-remote-plugin-install.json
+    codex,codex.plugin_store,C:/Users/*/.codex/plugins/.remote-plugin-install-staging/**
+    codex,codex.plugin_store,C:/Users/*/.codex/plugins/cache/**
+    codex,codex.plugin_store,C:/Users/*/.codex/plugins/data/**
     codex,codex.prompt_history,C:/Users/*/.codex/history.jsonl
     codex,codex.requirements_and_permissions,C:/Users/*/.codex/permissions.toml
     codex,codex.requirements_and_permissions,C:/Users/*/.codex/requirements.toml
@@ -566,6 +593,9 @@ sources:
     codex,codex.rollouts_compressed,C:/Users/*/.codex/sessions/**/rollout-*.jsonl.*.tmp
     codex,codex.rollouts_compressed,C:/Users/*/.codex/sessions/**/rollout-*.jsonl.zst
     codex,codex.rollouts_compressed,C:/Users/*/.codex/sessions/**/rollout-compress-*.tmp
+    codex,codex.sandbox_migration_marker,C:/Users/*/.codex/.sandbox_migration
+    codex,codex.session_index,C:/Users/*/.codex/session_index.jsonl
+    codex,codex.session_index,C:/Users/*/.codex/session_index.jsonl.tmp
     codex,codex.sqlite_glob,C:/Users/*/.codex/*.sqlite
     codex,codex.sqlite_write_ahead_logs,C:/Users/*/.codex/*.sqlite-shm
     codex,codex.sqlite_write_ahead_logs,C:/Users/*/.codex/*.sqlite-wal
@@ -576,6 +606,12 @@ sources:
     codex,codex.state_databases,C:/Users/*/.codex/queue_1.sqlite
     codex,codex.state_databases,C:/Users/*/.codex/state_5.sqlite
     codex,codex.state_databases,C:/Users/*/.codex/thread_history_1.sqlite
+    codex,codex.system_skills,C:/Users/*/.codex/skills/.system/**
+    codex,codex.system_skills,C:/Users/*/.codex/skills/.system/.codex-system-skills.marker
+    codex,codex.thread_writer_locks,C:/Users/*/.codex/thread-writer-locks/**
+    codex,codex.visualizations,C:/Users/*/.codex/visualization-viewers/*/**
+    codex,codex.visualizations,C:/Users/*/.codex/visualizations/**
+    codex,codex.visualizations,C:/Users/*/.codex/visualizations/*/*/*/*/**
     continue,continue.agents,C:/Users/*/.continue/agents/*.yaml
     continue,continue.agents,C:/Users/*/.continue/assistants/*.yaml
     continue,continue.aux_config,C:/Users/*/.continue/.configs/**
@@ -2637,6 +2673,22 @@ sources:
     cline,cline.vscode_task_transcripts,/var/root/Library/Application Support/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/context_history.json
     cline,cline.vscode_task_transcripts,/var/root/Library/Application Support/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/task_metadata.json
     cline,cline.vscode_task_transcripts,/var/root/Library/Application Support/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/ui_messages.json
+    codex,codex.app_global_state,/Users/*/.codex/.codex-global-state.json
+    codex,codex.app_global_state,/Users/*/.codex/.codex-global-state.json.bak
+    codex,codex.app_global_state,/var/root/.codex/.codex-global-state.json
+    codex,codex.app_global_state,/var/root/.codex/.codex-global-state.json.bak
+    codex,codex.app_side_database,/Users/*/.codex/sqlite/codex-dev.db
+    codex,codex.app_side_database,/Users/*/.codex/sqlite/codex-dev.db-shm
+    codex,codex.app_side_database,/Users/*/.codex/sqlite/codex-dev.db-wal
+    codex,codex.app_side_database,/var/root/.codex/sqlite/codex-dev.db
+    codex,codex.app_side_database,/var/root/.codex/sqlite/codex-dev.db-shm
+    codex,codex.app_side_database,/var/root/.codex/sqlite/codex-dev.db-wal
+    codex,codex.app_side_stores,/Users/*/.codex/computer-use/**
+    codex,codex.app_side_stores,/Users/*/.codex/sqlite/**
+    codex,codex.app_side_stores,/Users/*/.codex/vendor_imports/**
+    codex,codex.app_side_stores,/var/root/.codex/computer-use/**
+    codex,codex.app_side_stores,/var/root/.codex/sqlite/**
+    codex,codex.app_side_stores,/var/root/.codex/vendor_imports/**
     codex,codex.archived_sessions,/Users/*/.codex/archived_sessions/**
     codex,codex.archived_sessions,/var/root/.codex/archived_sessions/**
     codex,codex.auth,/Users/*/.codex/auth.json
@@ -2645,12 +2697,56 @@ sources:
     codex,codex.config,/Users/*/.codex/config.toml
     codex,codex.config,/var/root/.codex/*.config.toml
     codex,codex.config,/var/root/.codex/config.toml
+    codex,codex.connector_caches,/Users/*/.codex/cache/**
+    codex,codex.connector_caches,/Users/*/.codex/cache/bundled_plugin_exclusions/**
+    codex,codex.connector_caches,/Users/*/.codex/cache/codex_apps_server_info/**
+    codex,codex.connector_caches,/Users/*/.codex/cache/codex_apps_tools/**
+    codex,codex.connector_caches,/Users/*/.codex/cache/remote_plugin_catalog/**
+    codex,codex.connector_caches,/var/root/.codex/cache/**
+    codex,codex.connector_caches,/var/root/.codex/cache/bundled_plugin_exclusions/**
+    codex,codex.connector_caches,/var/root/.codex/cache/codex_apps_server_info/**
+    codex,codex.connector_caches,/var/root/.codex/cache/codex_apps_tools/**
+    codex,codex.connector_caches,/var/root/.codex/cache/remote_plugin_catalog/**
+    codex,codex.curated_plugin_clone,/Users/*/.codex/.tmp/marketplaces/**
+    codex,codex.curated_plugin_clone,/Users/*/.codex/.tmp/plugins.sha
+    codex,codex.curated_plugin_clone,/Users/*/.codex/.tmp/plugins.sync.lock
+    codex,codex.curated_plugin_clone,/Users/*/.codex/.tmp/plugins/**
+    codex,codex.curated_plugin_clone,/Users/*/.codex/.tmp/plugins/.git/FETCH_HEAD
+    codex,codex.curated_plugin_clone,/Users/*/.codex/.tmp/plugins/.git/shallow
+    codex,codex.curated_plugin_clone,/var/root/.codex/.tmp/marketplaces/**
+    codex,codex.curated_plugin_clone,/var/root/.codex/.tmp/plugins.sha
+    codex,codex.curated_plugin_clone,/var/root/.codex/.tmp/plugins.sync.lock
+    codex,codex.curated_plugin_clone,/var/root/.codex/.tmp/plugins/**
+    codex,codex.curated_plugin_clone,/var/root/.codex/.tmp/plugins/.git/FETCH_HEAD
+    codex,codex.curated_plugin_clone,/var/root/.codex/.tmp/plugins/.git/shallow
+    codex,codex.external_agent_imports,/Users/*/.codex/external_agent_session_imports.json
+    codex,codex.external_agent_imports,/var/root/.codex/external_agent_session_imports.json
+    codex,codex.ide_context_socket,/Users/*/.codex/ipc/**
+    codex,codex.ide_context_socket,/Users/*/.codex/ipc/ipc-0.sock
+    codex,codex.ide_context_socket,/Users/*/.codex/ipc/ipc.sock
+    codex,codex.ide_context_socket,/var/root/.codex/ipc/**
+    codex,codex.ide_context_socket,/var/root/.codex/ipc/ipc-0.sock
+    codex,codex.ide_context_socket,/var/root/.codex/ipc/ipc.sock
+    codex,codex.installation_id,/Users/*/.codex/installation_id
+    codex,codex.installation_id,/var/root/.codex/installation_id
     codex,codex.log_dir,/Users/*/.codex/log/**
     codex,codex.log_dir,/var/root/.codex/log/**
     codex,codex.mcp_and_notify,/Users/*/.codex/config.toml
     codex,codex.mcp_and_notify,/var/root/.codex/config.toml
     codex,codex.mcp_oauth_credentials,/Users/*/.codex/.credentials.json
     codex,codex.mcp_oauth_credentials,/var/root/.codex/.credentials.json
+    codex,codex.models_cache,/Users/*/.codex/models_cache.json
+    codex,codex.models_cache,/var/root/.codex/models_cache.json
+    codex,codex.plugin_store,/Users/*/.codex/plugins/**
+    codex,codex.plugin_store,/Users/*/.codex/plugins/.codex-remote-plugin-install.json
+    codex,codex.plugin_store,/Users/*/.codex/plugins/.remote-plugin-install-staging/**
+    codex,codex.plugin_store,/Users/*/.codex/plugins/cache/**
+    codex,codex.plugin_store,/Users/*/.codex/plugins/data/**
+    codex,codex.plugin_store,/var/root/.codex/plugins/**
+    codex,codex.plugin_store,/var/root/.codex/plugins/.codex-remote-plugin-install.json
+    codex,codex.plugin_store,/var/root/.codex/plugins/.remote-plugin-install-staging/**
+    codex,codex.plugin_store,/var/root/.codex/plugins/cache/**
+    codex,codex.plugin_store,/var/root/.codex/plugins/data/**
     codex,codex.prompt_history,/Users/*/.codex/history.jsonl
     codex,codex.prompt_history,/var/root/.codex/history.jsonl
     codex,codex.requirements_and_permissions,/Users/*/.codex/permissions.toml
@@ -2667,6 +2763,18 @@ sources:
     codex,codex.rollouts_compressed,/var/root/.codex/sessions/**/rollout-*.jsonl.*.tmp
     codex,codex.rollouts_compressed,/var/root/.codex/sessions/**/rollout-*.jsonl.zst
     codex,codex.rollouts_compressed,/var/root/.codex/sessions/**/rollout-compress-*.tmp
+    codex,codex.sandbox_migration_marker,/Users/*/.codex/.sandbox_migration
+    codex,codex.sandbox_migration_marker,/var/root/.codex/.sandbox_migration
+    codex,codex.session_index,/Users/*/.codex/session_index.jsonl
+    codex,codex.session_index,/Users/*/.codex/session_index.jsonl.tmp
+    codex,codex.session_index,/var/root/.codex/session_index.jsonl
+    codex,codex.session_index,/var/root/.codex/session_index.jsonl.tmp
+    codex,codex.shell_snapshots,/Users/*/.codex/shell_snapshots/**
+    codex,codex.shell_snapshots,/Users/*/.codex/shell_snapshots/*.*.sh
+    codex,codex.shell_snapshots,/Users/*/.codex/shell_snapshots/*.tmp-*
+    codex,codex.shell_snapshots,/var/root/.codex/shell_snapshots/**
+    codex,codex.shell_snapshots,/var/root/.codex/shell_snapshots/*.*.sh
+    codex,codex.shell_snapshots,/var/root/.codex/shell_snapshots/*.tmp-*
     codex,codex.sqlite_glob,/Users/*/.codex/*.sqlite
     codex,codex.sqlite_glob,/var/root/.codex/*.sqlite
     codex,codex.sqlite_write_ahead_logs,/Users/*/.codex/*.sqlite-shm
@@ -2687,6 +2795,18 @@ sources:
     codex,codex.state_databases,/var/root/.codex/queue_1.sqlite
     codex,codex.state_databases,/var/root/.codex/state_5.sqlite
     codex,codex.state_databases,/var/root/.codex/thread_history_1.sqlite
+    codex,codex.system_skills,/Users/*/.codex/skills/.system/**
+    codex,codex.system_skills,/Users/*/.codex/skills/.system/.codex-system-skills.marker
+    codex,codex.system_skills,/var/root/.codex/skills/.system/**
+    codex,codex.system_skills,/var/root/.codex/skills/.system/.codex-system-skills.marker
+    codex,codex.thread_writer_locks,/Users/*/.codex/thread-writer-locks/**
+    codex,codex.thread_writer_locks,/var/root/.codex/thread-writer-locks/**
+    codex,codex.visualizations,/Users/*/.codex/visualization-viewers/*/**
+    codex,codex.visualizations,/Users/*/.codex/visualizations/**
+    codex,codex.visualizations,/Users/*/.codex/visualizations/*/*/*/*/**
+    codex,codex.visualizations,/var/root/.codex/visualization-viewers/*/**
+    codex,codex.visualizations,/var/root/.codex/visualizations/**
+    codex,codex.visualizations,/var/root/.codex/visualizations/*/*/*/*/**
     continue,continue.agents,/Users/*/.continue/agents/*.yaml
     continue,continue.agents,/Users/*/.continue/assistants/*.yaml
     continue,continue.agents,/var/root/.continue/agents/*.yaml
@@ -5814,6 +5934,22 @@ sources:
     cline,cline.vscode_task_transcripts,/root/.config/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/context_history.json
     cline,cline.vscode_task_transcripts,/root/.config/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/task_metadata.json
     cline,cline.vscode_task_transcripts,/root/.config/Windsurf/User/globalStorage/saoudrizwan.claude-dev/tasks/*/ui_messages.json
+    codex,codex.app_global_state,/home/*/.codex/.codex-global-state.json
+    codex,codex.app_global_state,/home/*/.codex/.codex-global-state.json.bak
+    codex,codex.app_global_state,/root/.codex/.codex-global-state.json
+    codex,codex.app_global_state,/root/.codex/.codex-global-state.json.bak
+    codex,codex.app_side_database,/home/*/.codex/sqlite/codex-dev.db
+    codex,codex.app_side_database,/home/*/.codex/sqlite/codex-dev.db-shm
+    codex,codex.app_side_database,/home/*/.codex/sqlite/codex-dev.db-wal
+    codex,codex.app_side_database,/root/.codex/sqlite/codex-dev.db
+    codex,codex.app_side_database,/root/.codex/sqlite/codex-dev.db-shm
+    codex,codex.app_side_database,/root/.codex/sqlite/codex-dev.db-wal
+    codex,codex.app_side_stores,/home/*/.codex/computer-use/**
+    codex,codex.app_side_stores,/home/*/.codex/sqlite/**
+    codex,codex.app_side_stores,/home/*/.codex/vendor_imports/**
+    codex,codex.app_side_stores,/root/.codex/computer-use/**
+    codex,codex.app_side_stores,/root/.codex/sqlite/**
+    codex,codex.app_side_stores,/root/.codex/vendor_imports/**
     codex,codex.archived_sessions,/home/*/.codex/archived_sessions/**
     codex,codex.archived_sessions,/root/.codex/archived_sessions/**
     codex,codex.auth,/home/*/.codex/auth.json
@@ -5822,12 +5958,56 @@ sources:
     codex,codex.config,/home/*/.codex/config.toml
     codex,codex.config,/root/.codex/*.config.toml
     codex,codex.config,/root/.codex/config.toml
+    codex,codex.connector_caches,/home/*/.codex/cache/**
+    codex,codex.connector_caches,/home/*/.codex/cache/bundled_plugin_exclusions/**
+    codex,codex.connector_caches,/home/*/.codex/cache/codex_apps_server_info/**
+    codex,codex.connector_caches,/home/*/.codex/cache/codex_apps_tools/**
+    codex,codex.connector_caches,/home/*/.codex/cache/remote_plugin_catalog/**
+    codex,codex.connector_caches,/root/.codex/cache/**
+    codex,codex.connector_caches,/root/.codex/cache/bundled_plugin_exclusions/**
+    codex,codex.connector_caches,/root/.codex/cache/codex_apps_server_info/**
+    codex,codex.connector_caches,/root/.codex/cache/codex_apps_tools/**
+    codex,codex.connector_caches,/root/.codex/cache/remote_plugin_catalog/**
+    codex,codex.curated_plugin_clone,/home/*/.codex/.tmp/marketplaces/**
+    codex,codex.curated_plugin_clone,/home/*/.codex/.tmp/plugins.sha
+    codex,codex.curated_plugin_clone,/home/*/.codex/.tmp/plugins.sync.lock
+    codex,codex.curated_plugin_clone,/home/*/.codex/.tmp/plugins/**
+    codex,codex.curated_plugin_clone,/home/*/.codex/.tmp/plugins/.git/FETCH_HEAD
+    codex,codex.curated_plugin_clone,/home/*/.codex/.tmp/plugins/.git/shallow
+    codex,codex.curated_plugin_clone,/root/.codex/.tmp/marketplaces/**
+    codex,codex.curated_plugin_clone,/root/.codex/.tmp/plugins.sha
+    codex,codex.curated_plugin_clone,/root/.codex/.tmp/plugins.sync.lock
+    codex,codex.curated_plugin_clone,/root/.codex/.tmp/plugins/**
+    codex,codex.curated_plugin_clone,/root/.codex/.tmp/plugins/.git/FETCH_HEAD
+    codex,codex.curated_plugin_clone,/root/.codex/.tmp/plugins/.git/shallow
+    codex,codex.external_agent_imports,/home/*/.codex/external_agent_session_imports.json
+    codex,codex.external_agent_imports,/root/.codex/external_agent_session_imports.json
+    codex,codex.ide_context_socket,/home/*/.codex/ipc/**
+    codex,codex.ide_context_socket,/home/*/.codex/ipc/ipc-0.sock
+    codex,codex.ide_context_socket,/home/*/.codex/ipc/ipc.sock
+    codex,codex.ide_context_socket,/root/.codex/ipc/**
+    codex,codex.ide_context_socket,/root/.codex/ipc/ipc-0.sock
+    codex,codex.ide_context_socket,/root/.codex/ipc/ipc.sock
+    codex,codex.installation_id,/home/*/.codex/installation_id
+    codex,codex.installation_id,/root/.codex/installation_id
     codex,codex.log_dir,/home/*/.codex/log/**
     codex,codex.log_dir,/root/.codex/log/**
     codex,codex.mcp_and_notify,/home/*/.codex/config.toml
     codex,codex.mcp_and_notify,/root/.codex/config.toml
     codex,codex.mcp_oauth_credentials,/home/*/.codex/.credentials.json
     codex,codex.mcp_oauth_credentials,/root/.codex/.credentials.json
+    codex,codex.models_cache,/home/*/.codex/models_cache.json
+    codex,codex.models_cache,/root/.codex/models_cache.json
+    codex,codex.plugin_store,/home/*/.codex/plugins/**
+    codex,codex.plugin_store,/home/*/.codex/plugins/.codex-remote-plugin-install.json
+    codex,codex.plugin_store,/home/*/.codex/plugins/.remote-plugin-install-staging/**
+    codex,codex.plugin_store,/home/*/.codex/plugins/cache/**
+    codex,codex.plugin_store,/home/*/.codex/plugins/data/**
+    codex,codex.plugin_store,/root/.codex/plugins/**
+    codex,codex.plugin_store,/root/.codex/plugins/.codex-remote-plugin-install.json
+    codex,codex.plugin_store,/root/.codex/plugins/.remote-plugin-install-staging/**
+    codex,codex.plugin_store,/root/.codex/plugins/cache/**
+    codex,codex.plugin_store,/root/.codex/plugins/data/**
     codex,codex.prompt_history,/home/*/.codex/history.jsonl
     codex,codex.prompt_history,/root/.codex/history.jsonl
     codex,codex.requirements_and_permissions,/home/*/.codex/permissions.toml
@@ -5844,6 +6024,18 @@ sources:
     codex,codex.rollouts_compressed,/root/.codex/sessions/**/rollout-*.jsonl.*.tmp
     codex,codex.rollouts_compressed,/root/.codex/sessions/**/rollout-*.jsonl.zst
     codex,codex.rollouts_compressed,/root/.codex/sessions/**/rollout-compress-*.tmp
+    codex,codex.sandbox_migration_marker,/home/*/.codex/.sandbox_migration
+    codex,codex.sandbox_migration_marker,/root/.codex/.sandbox_migration
+    codex,codex.session_index,/home/*/.codex/session_index.jsonl
+    codex,codex.session_index,/home/*/.codex/session_index.jsonl.tmp
+    codex,codex.session_index,/root/.codex/session_index.jsonl
+    codex,codex.session_index,/root/.codex/session_index.jsonl.tmp
+    codex,codex.shell_snapshots,/home/*/.codex/shell_snapshots/**
+    codex,codex.shell_snapshots,/home/*/.codex/shell_snapshots/*.*.sh
+    codex,codex.shell_snapshots,/home/*/.codex/shell_snapshots/*.tmp-*
+    codex,codex.shell_snapshots,/root/.codex/shell_snapshots/**
+    codex,codex.shell_snapshots,/root/.codex/shell_snapshots/*.*.sh
+    codex,codex.shell_snapshots,/root/.codex/shell_snapshots/*.tmp-*
     codex,codex.sqlite_glob,/home/*/.codex/*.sqlite
     codex,codex.sqlite_glob,/root/.codex/*.sqlite
     codex,codex.sqlite_write_ahead_logs,/home/*/.codex/*.sqlite-shm
@@ -5864,6 +6056,18 @@ sources:
     codex,codex.state_databases,/root/.codex/queue_1.sqlite
     codex,codex.state_databases,/root/.codex/state_5.sqlite
     codex,codex.state_databases,/root/.codex/thread_history_1.sqlite
+    codex,codex.system_skills,/home/*/.codex/skills/.system/**
+    codex,codex.system_skills,/home/*/.codex/skills/.system/.codex-system-skills.marker
+    codex,codex.system_skills,/root/.codex/skills/.system/**
+    codex,codex.system_skills,/root/.codex/skills/.system/.codex-system-skills.marker
+    codex,codex.thread_writer_locks,/home/*/.codex/thread-writer-locks/**
+    codex,codex.thread_writer_locks,/root/.codex/thread-writer-locks/**
+    codex,codex.visualizations,/home/*/.codex/visualization-viewers/*/**
+    codex,codex.visualizations,/home/*/.codex/visualizations/**
+    codex,codex.visualizations,/home/*/.codex/visualizations/*/*/*/*/**
+    codex,codex.visualizations,/root/.codex/visualization-viewers/*/**
+    codex,codex.visualizations,/root/.codex/visualizations/**
+    codex,codex.visualizations,/root/.codex/visualizations/*/*/*/*/**
     continue,continue.agents,/home/*/.continue/agents/*.yaml
     continue,continue.agents,/home/*/.continue/assistants/*.yaml
     continue,continue.agents,/root/.continue/agents/*.yaml

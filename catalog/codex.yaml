@@ -349,6 +349,448 @@ artifacts:
 
     Mode "keyring" puts the same credential in the operating system keystore instead and "auto" prefers the keyring when one is available, so an absent auth.json does not mean the user was not signed in.
   parser: null
+- id: codex.session_index
+  title: Session index
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\session_index.jsonl'
+  - '%USERPROFILE%\.codex\session_index.jsonl.tmp'
+  - ~/.codex/session_index.jsonl
+  - ~/.codex/session_index.jsonl.tmp
+  format: jsonl
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/session_index.rs
+  source_kind: source_code
+  volatility: |-
+    Append-only in normal use, so it grows and keeps superseded lines. It is rewritten whole in one place only, when a thread is deleted through the product, and that rewrite goes through a temporary file and a rename, which leaves the previous index in unallocated space.
+  notes: |-
+    An index of the conversations, one JSON object per line, with a thread id, a thread name and an update time. Small, and worth more than its size: it is the one file in this tree that says a conversation existed without holding it.
+
+    Why it is collected first. Name updates are append-only, so a thread renamed three times has three lines and the newest wins, which means the index carries names a user replaced and the product no longer shows. And an id in the index with no rollout file beside it in sessions is a transcript that left the disk: delete_thread removes the matching lines, so a missing rollout with its index line intact is a file removed outside the product rather than a conversation deleted through it.
+
+    The temporary file is in this entry for the same reason. The delete path writes session_index.jsonl.tmp and renames it, so a crash mid-delete leaves the pre-delete index on disk under that name.
+  parser: jsonl_generic
+- id: codex.external_agent_imports
+  title: Imported sessions of other agents
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\external_agent_session_imports.json'
+  - ~/.codex/external_agent_session_imports.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/external-agent-migration/src/sessions/ledger.rs
+  source_kind: source_code
+  volatility: |-
+    Rewritten in place as imports happen, so it holds the current ledger and one modification time rather than a history of when each import ran. The per-record import time inside it is what dates them.
+  notes: |-
+    A ledger of conversations this product took from another agent, and there is nothing else like it in this catalogue. Per imported session it records the source path on disk, the SHA-256 of that file's content, the thread id it became here, when it was imported, the source file's own modification time, the connector names found in it and its title.
+
+    What that answers. It proves another agent's transcript was read and copied into this one, names the file it came from, and hashes it, so the copy in this product can be tied to the original even after the original is deleted. An examiner who finds a conversation here that predates this product's installation should look here first.
+
+    A second list beside the imports records sources that were detected and not imported, with the connector names seen in them, so the file also says which other agents' data the product found on the machine.
+  parser: json_generic
+- id: codex.shell_snapshots
+  title: Captured shell environments
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  paths:
+  - ~/.codex/shell_snapshots/
+  - ~/.codex/shell_snapshots/<thread-id>.<nanos>.sh
+  - ~/.codex/shell_snapshots/<thread-id>.tmp-<nanos>
+  format: text
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/shell_snapshot.rs
+  source_kind: source_code
+  volatility: |-
+    Three days, and it is enforced rather than incidental: SNAPSHOT_RETENTION is 3 * 24 hours and a background cleanup deletes every snapshot older than that except the active session's. So an absent snapshot for a session from last week is the documented default and not a sign that anybody removed it.
+  notes: |-
+    A shell script per session, capturing the environment the agent's commands ran in. The name is the thread id, a nanosecond nonce and the shell's extension, so a snapshot ties an environment to a conversation and to a moment.
+
+    Why this is evidence rather than housekeeping. A command in a transcript is only half the answer; what it did depends on the aliases, functions, PATH and exported variables in force, and this file is that half. It is also the only place in this tree where the agent records the machine's own shell configuration as it found it.
+
+    Read it as potentially holding secrets even though this entry is not marked secret. The capture substitutes dummy values for credentials it brokers, and the module asserts that a brokered credential never reaches the file outside the exported environment, which says nothing about an API key the user exported themselves.
+
+    Windows is not in the os list on purpose. write_shell_snapshot refuses PowerShell and cmd with a not-supported-yet error, so an absent snapshot directory on Windows means the feature does not run there rather than that the agent was not used.
+  parser: text_log
+- id: codex.installation_id
+  title: Installation identifier
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\installation_id'
+  - ~/.codex/installation_id
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/installation_id.rs
+  source_kind: source_code
+  volatility: |-
+    Written once and kept. resolve_installation_id creates the file if it is missing and returns what is in it otherwise, so the value survives upgrades and is only lost if the codex home is removed.
+  notes: |-
+    One UUID, in one file, created the first time the product needed it. Two things follow and both matter to an examiner.
+
+    It dates first use. The file is created on the first run that resolves it and never rewritten, so its creation time is the earliest evidence in this tree of the product running on this machine, and it is a cheaper answer than reasoning about the oldest conversation.
+
+    It correlates this machine with server-side records. The same value is sent as installation_id in the metadata of the product's requests, so it is a durable pseudonymous handle for this install rather than a local detail, and it is what ties a device to whatever the vendor holds.
+  parser: null
+- id: codex.thread_writer_locks
+  title: Thread writer locks
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\thread-writer-locks\'
+  - ~/.codex/thread-writer-locks/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/rollout/src/writer_lock.rs
+  source_kind: source_code
+  volatility: |-
+    A lock file exists while a thread is being written and is cleaned up afterwards, so what is here on a live endpoint is roughly what is being written now, and what is here on an image is what was open when the machine stopped.
+  notes: |-
+    One lock file per thread the product is writing, plus a coordination lock. The contents are not the point; the names are, because a lock file is named for its thread id.
+
+    Forensically this is a small but hard statement: a lock left behind names a conversation that was being written when the process died, which is where a truncated rollout comes from. On a live endpoint it also says which conversations are open right now, which is the difference between collecting a complete transcript and collecting one mid-write.
+  parser: null
+- id: codex.plugin_store
+  title: Installed plugins and their staging
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\plugins\'
+  - ~/.codex/plugins/
+  - ~/.codex/plugins/.codex-remote-plugin-install.json
+  - ~/.codex/plugins/.remote-plugin-install-staging/
+  - ~/.codex/plugins/cache/
+  - ~/.codex/plugins/data/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core-plugins/src/store.rs
+  source_kind: source_code
+  volatility: |-
+    Install-time state. A plugin removed through the product leaves its cache directory behind in the general case, so this tree tends to over-report rather than under-report what was installed.
+  notes: |-
+    Which extra capabilities the agent had, which is the same question this catalogue asks of an MCP configuration and a different answer: a plugin here brings its own hooks, skills, MCP servers and commands with it, so the inventory of installed plugins is an inventory of what the agent could do beyond its defaults.
+
+    The cache directory holds one directory per marketplace and one per plugin under it, so the layout alone names the plugins and where they came from without anything being parsed. The install metadata file beside it records a remote install with its schema version, and the staging directory is where a remote plugin is unpacked, so a directory left there is an install that did not finish.
+
+    The data directory is the plugins' own writable state, which means a plugin's records of what it did are here rather than in the conversation.
+  parser: json_generic
+- id: codex.curated_plugin_clone
+  title: The curated plugin marketplace, as a git clone
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\.tmp\marketplaces\'
+  - '%USERPROFILE%\.codex\.tmp\plugins\'
+  - ~/.codex/.tmp/marketplaces/
+  - ~/.codex/.tmp/plugins/
+  - ~/.codex/.tmp/plugins.sha
+  - ~/.codex/.tmp/plugins.sync.lock
+  - ~/.codex/.tmp/plugins/.git/FETCH_HEAD
+  - ~/.codex/.tmp/plugins/.git/shallow
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core-plugins/src/startup_sync.rs
+  source_kind: source_code
+  volatility: |-
+    Refreshed on startup when it is stale, and a stale temporary directory is removed after ten minutes. The git metadata inside is what keeps the history: FETCH_HEAD is rewritten on every fetch, so it dates the last sync.
+  notes: |-
+    The product keeps the curated plugin catalogue as a shallow git clone on disk, fetched from a named remote at startup. That makes this an unusual artifact for this catalogue: a network destination recorded in a file rather than inferred.
+
+    Three things come out of it. The remote is in the clone's own config, so the file says where the catalogue came from. FETCH_HEAD and the recorded commit in plugins.sha date the last successful sync, which dates a startup with network access. And the lock file beside them is what a concurrent or interrupted sync leaves behind.
+
+    The clone is the whole catalogue rather than a selection, so its plugin directories are the vendor's list and not a statement about this user. What the user installed is in codex.plugin_store beside this.
+  parser: null
+- id: codex.connector_caches
+  title: Cached tool and catalogue responses
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\cache\'
+  - ~/.codex/cache/
+  - ~/.codex/cache/bundled_plugin_exclusions/
+  - ~/.codex/cache/codex_apps_server_info/
+  - ~/.codex/cache/codex_apps_tools/
+  - ~/.codex/cache/remote_plugin_catalog/
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/connectors/src/connector_runtime/persistence.rs
+  source_kind: source_code
+  unsourced_paths: []
+  volatility: |-
+    Caches with their own schema versions and, for the remote catalogue, a three hour time to live. The tool cache is capped at 32 MB. So what is here is the last refresh rather than a series of them.
+  notes: |-
+    What the agent was told it could call. The tool cache holds the tool lists the connectors advertised, keyed by a hash of the connector identity, which makes it the on-disk record of the tool surface a conversation had available, including tools that have since been withdrawn.
+
+    The server info cache beside it holds what each connector said about itself. The remote catalogue cache holds the plugin catalogue as fetched, and on the measured machine it was the largest single file in the tree at twenty-three megabytes, which is worth knowing before a collection is sized.
+
+    The exclusion cache is the fourth: it records which bundled plugins were held back, so it says what the agent did not have as well as what it did.
+  parser: json_generic
+- id: codex.system_skills
+  title: Bundled system skills
+  category: instructions
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\skills\.system\'
+  - ~/.codex/skills/.system/
+  - ~/.codex/skills/.system/.codex-system-skills.marker
+  format: markdown
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/skills/src/lib.rs
+  source_kind: source_code
+  volatility: |-
+    Reinstalled from the binary when the marker does not match, so the tree is a copy of what the installed version ships and a modification to it is undone on the next start.
+  notes: |-
+    Instructions the product installs for itself, unpacked from the binary into the skills directory under a dot-system name, with a marker file that records which version is unpacked.
+
+    Why an instruction entry rather than a cache. These are instructions the agent obeys, and the question this suite asks about any instruction is who wrote it. Here the answer is the vendor, and that is worth being able to say: a skill under this directory is not something the user or a repository introduced, so an examiner comparing the instruction surface can set these aside and look at the rest.
+
+    The marker is how a modified copy shows up. It is a hash with a salt rather than a version string, so a system skill that was edited in place stops matching and is replaced, which means an edit here is short-lived and its trace is the replacement.
+  parser: instructions
+- id: codex.visualizations
+  title: Generated visualizations
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\visualizations\'
+  - ~/.codex/visualizations/
+  - ~/.codex/visualizations/<year>/<month>/<day>/<thread-id>/
+  - ~/.codex/visualization-viewers/<thread-id>/
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/tui/src/inline_visualization.rs
+  source_kind: source_code
+  volatility: |-
+    No expiry was found in the module that builds these paths, so what is here is every visualization the product has written unless somebody removed it.
+  notes: |-
+    Output the agent produced for the user to look at, filed by date and thread. The date is not the file's own: it comes from the timestamp inside the thread id, which is a version 7 UUID, so the directory tree dates the conversation even if every file under it is unreadable and even if the file times were changed.
+
+    That makes this a cross-check on the transcript tree. A thread id here with no rollout under sessions is the same finding as one in the session index without a rollout, from a second direction.
+
+    The viewer directory is a sibling of the visualizations directory rather than a child, which a pattern that stops at the first tree misses.
+  parser: null
+- id: codex.sandbox_migration_marker
+  title: Sandbox migration marker
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\.sandbox_migration'
+  - ~/.codex/.sandbox_migration
+  format: text
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/execpolicy/src/sandbox_migration.rs
+  source_kind: source_code
+  volatility: Written once when the migration runs and then left alone.
+  notes: |-
+    Three bytes that say the sandbox policy was migrated to a newer form, and which form. It is here because a marker is the cheapest possible statement about which policy the agent was running under, and the policy is what decides whether a command the transcript shows could actually touch the filesystem.
+
+    Read it together with the permission and requirement files this catalogue already carries: those say what the rules are now, and this says which generation of the rules the install has been through.
+  parser: null
+- id: codex.models_cache
+  title: Cached model list
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\models_cache.json'
+  - ~/.codex/models_cache.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/models-manager/src/manager.rs
+  source_kind: source_code
+  volatility: |-
+    Replaced when the product refreshes the list, so it holds the state at the last refresh and its modification time dates a startup with network access.
+  notes: |-
+    The models the account was offered, cached locally. This is the file to check against a claim about which model produced something: a conversation names a model, and this says which names the product could have used at that time and what each one's advertised limits were.
+
+    It is also a dating artifact for the same reason as the caches beside it. The list comes from the server, so a modification time here is a moment when this machine reached the vendor.
+  parser: json_generic
+- id: codex.ide_context_socket
+  title: Editor pairing socket
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - linux
+  paths:
+  - ~/.codex/ipc/
+  - ~/.codex/ipc/ipc-0.sock
+  - ~/.codex/ipc/ipc.sock
+  format: binary
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/openai/codex/main/codex-rs/tui/src/ide_context/ipc.rs
+  source_kind: source_code
+  volatility: |-
+    A socket exists while the pairing runs. It is not a file with contents, so an image records that it existed and nothing about what went through it.
+  notes: |-
+    The socket the terminal agent and an editor use to share context. Its presence is the evidence: it means the agent was wired into an editor rather than run on its own, which changes what the agent could see of the working copy.
+
+    A collector must not try to read it, and this one does not: a socket is not a regular file, so the manifest records it with that reason and moves on. The entry exists so that the reason is recorded rather than the path being absent from the catalogue altogether.
+
+    A second spelling with a zero suffix is in the module beside the first, for a second concurrent pairing.
+  parser: null
+- id: codex.app_global_state
+  title: Application global state
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\.codex-global-state.json'
+  - '%USERPROFILE%\.codex\.codex-global-state.json.bak'
+  - ~/.codex/.codex-global-state.json
+  - ~/.codex/.codex-global-state.json.bak
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on macOS 26.5.2 in the codex home of a current install
+  source_kind: observed
+  volatility: |-
+    Rewritten in place with a backup copy kept beside it, so there are two generations on disk and the backup is the previous one rather than an archive.
+  notes: |-
+    Half a megabyte of state under a name the command line product does not build. It was measured in the codex home of a current install, and a search of the vendor's open source repository for this filename finds nothing, so it is written by the desktop application or by a plugin rather than by the code this catalogue can read.
+
+    Collect the backup as well as the file. They were the same size on the measured machine, which is what a rewrite-then-replace leaves, and the backup is therefore the state before the last change: the one comparison in this tree that can show what a setting used to be.
+
+    What is inside it is not established. Nothing was read from it, and this entry claims no structure.
+  parser: json_generic
+- id: codex.app_side_database
+  title: Side database of the desktop application
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\sqlite\codex-dev.db'
+  - '%USERPROFILE%\.codex\sqlite\codex-dev.db-shm'
+  - '%USERPROFILE%\.codex\sqlite\codex-dev.db-wal'
+  - ~/.codex/sqlite/codex-dev.db
+  - ~/.codex/sqlite/codex-dev.db-shm
+  - ~/.codex/sqlite/codex-dev.db-wal
+  format: sqlite
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on macOS 26.5.2 in the codex home of a current install
+  source_kind: observed
+  volatility: |-
+    In write-ahead log mode, so the newest records are in the log rather than the database and the three files have to be taken together.
+  notes: |-
+    A database in a subdirectory of the codex home, under a name that suggests a development build. Nothing in the vendor's open source repository creates it, so it belongs to the desktop application and its schema rests on nothing this catalogue can read.
+
+    It is filed as a transcript on the measured evidence of its location rather than on its contents, which is a claim worth being explicit about: it sits beside the conversation stores in a tree whose other databases hold threads, and the generic SQLite reader states the schema it actually finds. If that schema turns out to be something else, this entry is what has to change.
+
+    One observed filename from one machine. A different build may name it differently, which is why the directory around it is claimed by the entry beside this one: a store under another name is still collected, and is still reported as unread rather than missed.
+  parser: sqlite_generic
+- id: codex.app_side_stores
+  title: Side stores of the desktop application
+  category: transcript
+  root: user_profile
+  os:
+  - macos
+  - windows
+  - linux
+  paths:
+  - '%USERPROFILE%\.codex\sqlite\'
+  - '%USERPROFILE%\.codex\vendor_imports\'
+  - ~/.codex/computer-use/
+  - ~/.codex/sqlite/
+  - ~/.codex/vendor_imports/
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: unverified
+  source: observed on macOS 26.5.2 in the codex home of a current install
+  source_kind: observed
+  volatility: |-
+    Unknown. These were measured rather than read out of code, so nothing here rests on a documented lifetime.
+  notes: |-
+    Three directories in the codex home that the open source command line product does not create, grouped in one entry because they share exactly that: they were measured, and the code this catalogue can read does not build them.
+
+    The first held a signed application bundle with an embedded provisioning profile and a small configuration file beside it. An executable application placed inside the user's home directory by an agent is install evidence of the strongest kind, and its name says it is the computer-use component, so its presence is evidence that a component able to drive the machine's own interface was installed.
+
+    The second held a database and its write-ahead log under a name suggesting a development build. It matters because it is a database in a subdirectory: the glob this catalogue already has for the state databases does not descend, so without this entry a store in here is collected by nothing. The database itself has an entry of its own, codex.app_side_database, because a directory entry has no format a reader can dispatch on and a store claimed only by one arrives in a case as a file nobody could open.
+
+    The third held a cache of curated skills. It is here rather than with the skills entry because nothing in the vendor's source names it, and a guess about which component owns it would be worse than the gap.
+  parser: null
 - id: codex.mcp_oauth_credentials
   category: credentials
   root: user_profile

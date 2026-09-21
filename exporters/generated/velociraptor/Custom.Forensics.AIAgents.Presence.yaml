@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 61e249833468
+# Catalogue digest: 16c37468105d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -432,6 +432,7 @@ sources:
     cline,C:/Users/*/.cline/schedules/**
     codex,/Users/*/.codex/*.sqlite
     codex,/Users/*/.codex/archived_sessions/**
+    codex,/Users/*/.codex/external_agent_session_imports.json
     codex,/Users/*/.codex/goals_1.sqlite
     codex,/Users/*/.codex/history.jsonl
     codex,/Users/*/.codex/log/**
@@ -439,15 +440,21 @@ sources:
     codex,/Users/*/.codex/memories_1.sqlite
     codex,/Users/*/.codex/memories_v2_1.sqlite
     codex,/Users/*/.codex/queue_1.sqlite
+    codex,/Users/*/.codex/session_index.jsonl
+    codex,/Users/*/.codex/session_index.jsonl.tmp
     codex,/Users/*/.codex/sessions/**
     codex,/Users/*/.codex/sessions/**/rollout-*.jsonl.*.tmp
     codex,/Users/*/.codex/sessions/**/rollout-*.jsonl.zst
     codex,/Users/*/.codex/sessions/**/rollout-compress-*.tmp
     codex,/Users/*/.codex/sessions/*/*/*/**
+    codex,/Users/*/.codex/shell_snapshots/**
+    codex,/Users/*/.codex/shell_snapshots/*.*.sh
+    codex,/Users/*/.codex/shell_snapshots/*.tmp-*
     codex,/Users/*/.codex/state_5.sqlite
     codex,/Users/*/.codex/thread_history_1.sqlite
     codex,/home/*/.codex/*.sqlite
     codex,/home/*/.codex/archived_sessions/**
+    codex,/home/*/.codex/external_agent_session_imports.json
     codex,/home/*/.codex/goals_1.sqlite
     codex,/home/*/.codex/history.jsonl
     codex,/home/*/.codex/log/**
@@ -455,15 +462,21 @@ sources:
     codex,/home/*/.codex/memories_1.sqlite
     codex,/home/*/.codex/memories_v2_1.sqlite
     codex,/home/*/.codex/queue_1.sqlite
+    codex,/home/*/.codex/session_index.jsonl
+    codex,/home/*/.codex/session_index.jsonl.tmp
     codex,/home/*/.codex/sessions/**
     codex,/home/*/.codex/sessions/**/rollout-*.jsonl.*.tmp
     codex,/home/*/.codex/sessions/**/rollout-*.jsonl.zst
     codex,/home/*/.codex/sessions/**/rollout-compress-*.tmp
     codex,/home/*/.codex/sessions/*/*/*/**
+    codex,/home/*/.codex/shell_snapshots/**
+    codex,/home/*/.codex/shell_snapshots/*.*.sh
+    codex,/home/*/.codex/shell_snapshots/*.tmp-*
     codex,/home/*/.codex/state_5.sqlite
     codex,/home/*/.codex/thread_history_1.sqlite
     codex,/root/.codex/*.sqlite
     codex,/root/.codex/archived_sessions/**
+    codex,/root/.codex/external_agent_session_imports.json
     codex,/root/.codex/goals_1.sqlite
     codex,/root/.codex/history.jsonl
     codex,/root/.codex/log/**
@@ -471,15 +484,21 @@ sources:
     codex,/root/.codex/memories_1.sqlite
     codex,/root/.codex/memories_v2_1.sqlite
     codex,/root/.codex/queue_1.sqlite
+    codex,/root/.codex/session_index.jsonl
+    codex,/root/.codex/session_index.jsonl.tmp
     codex,/root/.codex/sessions/**
     codex,/root/.codex/sessions/**/rollout-*.jsonl.*.tmp
     codex,/root/.codex/sessions/**/rollout-*.jsonl.zst
     codex,/root/.codex/sessions/**/rollout-compress-*.tmp
     codex,/root/.codex/sessions/*/*/*/**
+    codex,/root/.codex/shell_snapshots/**
+    codex,/root/.codex/shell_snapshots/*.*.sh
+    codex,/root/.codex/shell_snapshots/*.tmp-*
     codex,/root/.codex/state_5.sqlite
     codex,/root/.codex/thread_history_1.sqlite
     codex,/var/root/.codex/*.sqlite
     codex,/var/root/.codex/archived_sessions/**
+    codex,/var/root/.codex/external_agent_session_imports.json
     codex,/var/root/.codex/goals_1.sqlite
     codex,/var/root/.codex/history.jsonl
     codex,/var/root/.codex/log/**
@@ -487,15 +506,21 @@ sources:
     codex,/var/root/.codex/memories_1.sqlite
     codex,/var/root/.codex/memories_v2_1.sqlite
     codex,/var/root/.codex/queue_1.sqlite
+    codex,/var/root/.codex/session_index.jsonl
+    codex,/var/root/.codex/session_index.jsonl.tmp
     codex,/var/root/.codex/sessions/**
     codex,/var/root/.codex/sessions/**/rollout-*.jsonl.*.tmp
     codex,/var/root/.codex/sessions/**/rollout-*.jsonl.zst
     codex,/var/root/.codex/sessions/**/rollout-compress-*.tmp
     codex,/var/root/.codex/sessions/*/*/*/**
+    codex,/var/root/.codex/shell_snapshots/**
+    codex,/var/root/.codex/shell_snapshots/*.*.sh
+    codex,/var/root/.codex/shell_snapshots/*.tmp-*
     codex,/var/root/.codex/state_5.sqlite
     codex,/var/root/.codex/thread_history_1.sqlite
     codex,C:/Users/*/.codex/*.sqlite
     codex,C:/Users/*/.codex/archived_sessions/**
+    codex,C:/Users/*/.codex/external_agent_session_imports.json
     codex,C:/Users/*/.codex/goals_1.sqlite
     codex,C:/Users/*/.codex/history.jsonl
     codex,C:/Users/*/.codex/log/**
@@ -503,6 +528,8 @@ sources:
     codex,C:/Users/*/.codex/memories_1.sqlite
     codex,C:/Users/*/.codex/memories_v2_1.sqlite
     codex,C:/Users/*/.codex/queue_1.sqlite
+    codex,C:/Users/*/.codex/session_index.jsonl
+    codex,C:/Users/*/.codex/session_index.jsonl.tmp
     codex,C:/Users/*/.codex/sessions/**
     codex,C:/Users/*/.codex/sessions/**/rollout-*.jsonl.*.tmp
     codex,C:/Users/*/.codex/sessions/**/rollout-*.jsonl.zst

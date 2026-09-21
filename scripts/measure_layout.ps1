@@ -149,7 +149,7 @@ function Measure-Family($name) {
 #     27 path(s) a registry key
 #    361 path(s) anchored in a working copy
 #    336 path(s) anchored in an environment variable
-#   1460 path(s) for the other platform
+#   1502 path(s) for the other platform
 $Probes = @{
     'amazonq' = @(
         'walk amazonq.cli_settings,amazonq.cli_state_database %LOCALAPPDATA%\amazon-q'
@@ -294,27 +294,47 @@ $Probes = @{
         'walk cline.data_dir_root %USERPROFILE%\.cline\data'
     )
     'codex' = @(
-        'walk codex.archived_sessions,codex.auth,codex.config,codex.log_dir,codex.mcp_and_notify,codex.mcp_oauth_credentials,codex.prompt_history,codex.requirements_and_permissions,codex.rollouts,codex.rollouts_compressed,codex.state_databases %USERPROFILE%\.codex'
+        'walk codex.app_global_state,codex.app_side_database,codex.app_side_stores,codex.archived_sessions,codex.auth,codex.config,codex.connector_caches,codex.curated_plugin_clone,codex.external_agent_imports,codex.installation_id,codex.log_dir,codex.mcp_and_notify,codex.mcp_oauth_credentials,codex.models_cache,codex.plugin_store,codex.prompt_history,codex.requirements_and_permissions,codex.rollouts,codex.rollouts_compressed,codex.sandbox_migration_marker,codex.session_index,codex.state_databases,codex.system_skills,codex.thread_writer_locks,codex.visualizations %USERPROFILE%\.codex'
         'check codex.config %USERPROFILE%\.codex\*.config.toml'
         'check codex.sqlite_glob %USERPROFILE%\.codex\*.sqlite'
         'check codex.sqlite_write_ahead_logs %USERPROFILE%\.codex\*.sqlite-shm'
         'check codex.sqlite_write_ahead_logs %USERPROFILE%\.codex\*.sqlite-wal'
+        'check codex.app_global_state %USERPROFILE%\.codex\.codex-global-state.json'
+        'check codex.app_global_state %USERPROFILE%\.codex\.codex-global-state.json.bak'
         'check codex.mcp_oauth_credentials %USERPROFILE%\.codex\.credentials.json'
+        'check codex.sandbox_migration_marker %USERPROFILE%\.codex\.sandbox_migration'
+        'check codex.curated_plugin_clone %USERPROFILE%\.codex\.tmp\marketplaces'
+        'check codex.curated_plugin_clone %USERPROFILE%\.codex\.tmp\plugins'
         'check codex.archived_sessions %USERPROFILE%\.codex\archived_sessions'
         'check codex.auth %USERPROFILE%\.codex\auth.json'
+        'check codex.connector_caches %USERPROFILE%\.codex\cache'
         'check codex.config,codex.mcp_and_notify %USERPROFILE%\.codex\config.toml'
+        'check codex.external_agent_imports %USERPROFILE%\.codex\external_agent_session_imports.json'
         'check codex.state_databases %USERPROFILE%\.codex\goals_1.sqlite'
         'check codex.prompt_history %USERPROFILE%\.codex\history.jsonl'
+        'check codex.installation_id %USERPROFILE%\.codex\installation_id'
         'check codex.log_dir %USERPROFILE%\.codex\log'
         'check codex.state_databases %USERPROFILE%\.codex\logs_2.sqlite'
         'check codex.state_databases %USERPROFILE%\.codex\memories_1.sqlite'
         'check codex.state_databases %USERPROFILE%\.codex\memories_v2_1.sqlite'
+        'check codex.models_cache %USERPROFILE%\.codex\models_cache.json'
         'check codex.requirements_and_permissions %USERPROFILE%\.codex\permissions.toml'
+        'check codex.plugin_store %USERPROFILE%\.codex\plugins'
         'check codex.state_databases %USERPROFILE%\.codex\queue_1.sqlite'
         'check codex.requirements_and_permissions %USERPROFILE%\.codex\requirements.toml'
+        'check codex.session_index %USERPROFILE%\.codex\session_index.jsonl'
+        'check codex.session_index %USERPROFILE%\.codex\session_index.jsonl.tmp'
         'check codex.rollouts,codex.rollouts_compressed %USERPROFILE%\.codex\sessions'
+        'check codex.system_skills %USERPROFILE%\.codex\skills\.system'
+        'check codex.app_side_stores %USERPROFILE%\.codex\sqlite'
+        'check codex.app_side_database %USERPROFILE%\.codex\sqlite\codex-dev.db'
+        'check codex.app_side_database %USERPROFILE%\.codex\sqlite\codex-dev.db-shm'
+        'check codex.app_side_database %USERPROFILE%\.codex\sqlite\codex-dev.db-wal'
         'check codex.state_databases %USERPROFILE%\.codex\state_5.sqlite'
+        'check codex.thread_writer_locks %USERPROFILE%\.codex\thread-writer-locks'
         'check codex.state_databases %USERPROFILE%\.codex\thread_history_1.sqlite'
+        'check codex.app_side_stores %USERPROFILE%\.codex\vendor_imports'
+        'check codex.visualizations %USERPROFILE%\.codex\visualizations'
     )
     'continue' = @(
         'walk continue.cli_auth,continue.compiled_config,continue.dev_data_db,continue.dotenv,continue.downloaded_binaries,continue.environment_markers,continue.global_context,continue.hook_settings,continue.input_history,continue.permissions,continue.prompt_log %USERPROFILE%\.continue'

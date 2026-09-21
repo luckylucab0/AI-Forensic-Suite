@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 61e249833468
+# Catalogue digest: 16c37468105d
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 49 of the 640 catalogue artifacts declare
+# KAPE is Windows only. 51 of the 656 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -20,6 +20,54 @@ Version: 1.0
 Id: 62660cfd-1f41-7cc6-2896-bb1b436468b1
 RecreateDirectories: true
 Targets:
+    -
+        Name: codex.app_global_state
+        Category: config
+        Path: C:\Users\%user%\.codex
+        FileMask: ".codex-global-state.json"
+        Recursive: false
+    -
+        Name: codex.app_global_state
+        Category: config
+        Path: C:\Users\%user%\.codex
+        FileMask: ".codex-global-state.json.bak"
+        Recursive: false
+    -
+        Name: codex.app_side_database
+        Category: transcript
+        Path: C:\Users\%user%\.codex\sqlite
+        FileMask: "codex-dev.db"
+        Recursive: false
+    -
+        Name: codex.app_side_database
+        Category: transcript
+        Path: C:\Users\%user%\.codex\sqlite
+        FileMask: "codex-dev.db-shm"
+        Recursive: false
+    -
+        Name: codex.app_side_database
+        Category: transcript
+        Path: C:\Users\%user%\.codex\sqlite
+        FileMask: "codex-dev.db-wal"
+        Recursive: false
+    -
+        Name: codex.app_side_stores
+        Category: transcript
+        Path: C:\Users\%user%\.codex\computer-use
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.app_side_stores
+        Category: transcript
+        Path: C:\Users\%user%\.codex\sqlite
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.app_side_stores
+        Category: transcript
+        Path: C:\Users\%user%\.codex\vendor_imports
+        FileMask: "*"
+        Recursive: true
     -
         Name: codex.archived_sessions
         Category: transcript
@@ -45,6 +93,84 @@ Targets:
         FileMask: "config.toml"
         Recursive: false
     -
+        Name: codex.connector_caches
+        Category: cache
+        Path: C:\Users\%user%\.codex\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.connector_caches
+        Category: cache
+        Path: C:\Users\%user%\.codex\cache\bundled_plugin_exclusions
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.connector_caches
+        Category: cache
+        Path: C:\Users\%user%\.codex\cache\codex_apps_server_info
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.connector_caches
+        Category: cache
+        Path: C:\Users\%user%\.codex\cache\codex_apps_tools
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.connector_caches
+        Category: cache
+        Path: C:\Users\%user%\.codex\cache\remote_plugin_catalog
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.curated_plugin_clone
+        Category: install_evidence
+        Path: C:\Users\%user%\.codex\.tmp
+        FileMask: "plugins.sha"
+        Recursive: false
+    -
+        Name: codex.curated_plugin_clone
+        Category: install_evidence
+        Path: C:\Users\%user%\.codex\.tmp
+        FileMask: "plugins.sync.lock"
+        Recursive: false
+    -
+        Name: codex.curated_plugin_clone
+        Category: install_evidence
+        Path: C:\Users\%user%\.codex\.tmp\marketplaces
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.curated_plugin_clone
+        Category: install_evidence
+        Path: C:\Users\%user%\.codex\.tmp\plugins
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.curated_plugin_clone
+        Category: install_evidence
+        Path: C:\Users\%user%\.codex\.tmp\plugins\.git\FETCH_HEAD
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.curated_plugin_clone
+        Category: install_evidence
+        Path: C:\Users\%user%\.codex\.tmp\plugins\.git\shallow
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.external_agent_imports
+        Category: log
+        Path: C:\Users\%user%\.codex
+        FileMask: "external_agent_session_imports.json"
+        Recursive: false
+    -
+        Name: codex.installation_id
+        Category: install_evidence
+        Path: C:\Users\%user%\.codex\installation_id
+        FileMask: "*"
+        Recursive: true
+    -
         Name: codex.log_dir
         Category: log
         Path: C:\Users\%user%\.codex\log
@@ -62,6 +188,42 @@ Targets:
         Path: C:\Users\%user%\.codex
         FileMask: ".credentials.json"
         Recursive: false
+    -
+        Name: codex.models_cache
+        Category: config
+        Path: C:\Users\%user%\.codex
+        FileMask: "models_cache.json"
+        Recursive: false
+    -
+        Name: codex.plugin_store
+        Category: config
+        Path: C:\Users\%user%\.codex\plugins
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.plugin_store
+        Category: config
+        Path: C:\Users\%user%\.codex\plugins
+        FileMask: ".codex-remote-plugin-install.json"
+        Recursive: false
+    -
+        Name: codex.plugin_store
+        Category: config
+        Path: C:\Users\%user%\.codex\plugins
+        FileMask: ".remote-plugin-install-staging"
+        Recursive: false
+    -
+        Name: codex.plugin_store
+        Category: config
+        Path: C:\Users\%user%\.codex\plugins\cache
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.plugin_store
+        Category: config
+        Path: C:\Users\%user%\.codex\plugins\data
+        FileMask: "*"
+        Recursive: true
     -
         Name: codex.prompt_history
         Category: prompt_history
@@ -110,6 +272,24 @@ Targets:
         Path: C:\Users\%user%\.codex\sessions
         FileMask: "rollout-compress-*.tmp"
         Recursive: true
+    -
+        Name: codex.sandbox_migration_marker
+        Category: install_evidence
+        Path: C:\Users\%user%\.codex
+        FileMask: ".sandbox_migration"
+        Recursive: false
+    -
+        Name: codex.session_index
+        Category: transcript
+        Path: C:\Users\%user%\.codex
+        FileMask: "session_index.jsonl"
+        Recursive: false
+    -
+        Name: codex.session_index
+        Category: transcript
+        Path: C:\Users\%user%\.codex
+        FileMask: "session_index.jsonl.tmp"
+        Recursive: false
     -
         Name: codex.sqlite_glob
         Category: transcript
@@ -169,4 +349,40 @@ Targets:
         Category: transcript
         Path: C:\Users\%user%\.codex
         FileMask: "thread_history_1.sqlite"
+        Recursive: false
+    -
+        Name: codex.system_skills
+        Category: instructions
+        Path: C:\Users\%user%\.codex\skills
+        FileMask: ".system"
+        Recursive: false
+    -
+        Name: codex.system_skills
+        Category: instructions
+        Path: C:\Users\%user%\.codex\skills\.system
+        FileMask: ".codex-system-skills.marker"
+        Recursive: false
+    -
+        Name: codex.thread_writer_locks
+        Category: log
+        Path: C:\Users\%user%\.codex\thread-writer-locks
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.visualizations
+        Category: log
+        Path: C:\Users\%user%\.codex\visualization-viewers
+        FileMask: "*"
+        Recursive: false
+    -
+        Name: codex.visualizations
+        Category: log
+        Path: C:\Users\%user%\.codex\visualizations
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: codex.visualizations
+        Category: log
+        Path: C:\Users\%user%\.codex\visualizations\*\*\*
+        FileMask: "*"
         Recursive: false
