@@ -51,3 +51,4 @@ Add one with the next free number, using [0000-template.md](0000-template.md).
 | [0041](0041-a-patterns-anchor-is-a-property-of-the-pattern.md) | A pattern's anchor is a property of the pattern, not of its entry |
 | [0042](0042-a-view-names-the-field-the-evidence-does-not-hold.md) | A view names the field the design asked for and the evidence does not hold, rather than leaving it blank |
 | [0043](0043-a-filter-applies-as-it-is-set.md) | A filter applies as it is set, so the count of what it hides is never stale |
+| [0044](0044-an-env-override-is-one-of-several-kinds-and-the-rule-does-not-say-which.md) | An env_override is one of several kinds, and the generated rule does not say which |
