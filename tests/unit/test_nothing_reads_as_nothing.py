@@ -69,19 +69,37 @@ SILENT = {
 CATALOGUE = load_catalogue(REPO_ROOT / "catalog")
 
 
-def _leaves() -> dict[str, str]:
-    """For each artifact with a reader, a filename its own pattern produces.
+# Characters a filesystem will not hold in a name. The list is Windows', because it is
+# the strict one and these files have to be creatable on every runner: a catalogue
+# spelling holds a colon in a drive letter, a star in a glob and angle brackets around
+# every placeholder, and a test that wrote those names verbatim would fail there and
+# nowhere else, which is where every silent defect in this project has been found.
+_NOT_IN_A_NAME = ':<>"|?*\\'
 
-    The name matters: several readers dispatch on it, so a file called something else
-    would take a branch a collection never takes.
+
+def _leaf(spelling: str) -> str:
+    """The filename part of a catalogue spelling, in a form a filesystem will hold.
+
+    The name matters rather than the path: several readers dispatch on it, so a file
+    called something else would take a branch a collection never takes. What has to
+    survive is the extension and the distinctive part of the stem, which is why the
+    substitution is per character and not a fresh name.
     """
-    out = {}
-    for artifact in CATALOGUE.artifacts:
-        if for_artifact(artifact.id) is None:
-            continue
-        spelling = artifact.paths[0] if artifact.paths else "file"
-        out[artifact.id] = spelling.rstrip("/").split("/")[-1].replace("*", "x") or "file"
-    return out
+    for separator in ("/", "\\"):
+        spelling = spelling.rstrip(separator)
+        spelling = spelling.rsplit(separator, 1)[-1]
+    for character in _NOT_IN_A_NAME:
+        spelling = spelling.replace(character, "-")
+    return spelling.strip(". ") or "file"
+
+
+def _leaves() -> dict[str, str]:
+    """One such name per artifact that has a reader."""
+    return {
+        artifact.id: _leaf(artifact.paths[0] if artifact.paths else "file")
+        for artifact in CATALOGUE.artifacts
+        if for_artifact(artifact.id) is not None
+    }
 
 
 LEAVES = _leaves()
