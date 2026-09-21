@@ -935,3 +935,91 @@ def test_every_optional_section_renders_when_they_all_apply() -> None:
     text = _report(**everything).summary()
     for _, expected in SECTIONS.values():
         assert expected in text, text
+
+
+# ------------------------------------- putting an endpoint path back together again
+
+# A collection taken with another tool arrives as a tree with the endpoint's paths buried
+# under whatever that tool wraps them in, and this is what digs them back out. Everything
+# downstream rests on the answer: the catalogue matches on the path, the user is read out
+# of the path, and a rule about a project file asks where the path was. A prefix left on,
+# or a drive directory read as a folder, moves every path in the case one level down and
+# the catalogue then claims none of them, which looks exactly like a host with no agents.
+#
+# None of it had ever run. One row per layout, and a guard that the table names every
+# container prefix this reader strips.
+
+LAYOUTS: dict[str, tuple[str, str]] = {
+    # name: the path inside the tree, the endpoint path it has to come back as
+    "this suite's own bundle": (
+        "files/C/Users/alice/.claude/settings.json",
+        "C:/Users/alice/.claude/settings.json",
+    ),
+    # Velociraptor writes the drive with its colon percent-encoded, because a colon is not
+    # a character a filesystem will hold in a name on every platform.
+    "velociraptor offline container": (
+        "uploads/C%3A/Users/alice/.claude/settings.json",
+        "C:/Users/alice/.claude/settings.json",
+    ),
+    "collection directory": (
+        "collection/D/Users/alice/.claude/settings.json",
+        "D:/Users/alice/.claude/settings.json",
+    ),
+    # KAPE writes the drive letter as the top directory with no container above it.
+    "drive directory at the root": (
+        "C/Users/alice/.claude/settings.json",
+        "C:/Users/alice/.claude/settings.json",
+    ),
+    "no container and no drive": (
+        "Users/alice/.claude/settings.json",
+        "/Users/alice/.claude/settings.json",
+    ),
+}
+
+
+@pytest.mark.parametrize("layout", sorted(LAYOUTS))
+def test_a_container_layout_gives_back_the_path_the_endpoint_had(
+    tmp_path: Path, catalogue: Catalogue, layout: str
+) -> None:
+    inside, expected = LAYOUTS[layout]
+    root = tmp_path / "tree"
+    local = root / inside
+    local.parent.mkdir(parents=True)
+    local.write_text("{}", encoding="utf-8")
+    assert CollectedTree(root, Matcher(catalogue)).original_path(local) == expected
+
+
+def test_the_layout_table_names_every_container_this_reader_strips() -> None:
+    """A prefix added to the reader and not to the table is one nothing has ever undone."""
+    from agentforensics.ingest.tree import _ROOT_PREFIXES
+
+    covered = {inside.split("/")[0].lower() for inside, _ in LAYOUTS.values()}
+    assert set(_ROOT_PREFIXES) <= covered, sorted(set(_ROOT_PREFIXES) - covered)
+
+
+def test_a_profile_rooted_tree_says_so_rather_than_inventing_a_filesystem_root(
+    tmp_path: Path, catalogue: Catalogue
+) -> None:
+    """An exported profile has no drive and no Users above it. Presenting its paths as
+    absolute would assert a filesystem root that is not in the collection, so they are
+    profile-relative, which is also the spelling the catalogue is written in."""
+    root = tmp_path / "alice"
+    (root / ".claude").mkdir(parents=True)
+    (root / ".codex").mkdir()
+    local = root / ".claude" / "settings.json"
+    local.write_text("{}", encoding="utf-8")
+    assert CollectedTree(root, Matcher(catalogue)).original_path(local) == (
+        "~/.claude/settings.json"
+    )
+
+
+def test_a_path_says_which_account_it_belongs_to(tmp_path: Path) -> None:
+    """Recovered from the path because a tree has nothing else to say it, and almost every
+    question in a case is asked about one user. A path outside a profile gets no guess."""
+    from agentforensics.ingest.tree import _user_from_path
+
+    assert _user_from_path("C:/Users/alice/.claude/settings.json") == "alice"
+    assert _user_from_path("/home/alice/.codex/config.toml") == "alice"
+    assert _user_from_path("/root/.claude/settings.json") == "root"
+    assert _user_from_path("/var/root/.claude/settings.json") == "root"
+    assert _user_from_path("/opt/agent/state.json") is None

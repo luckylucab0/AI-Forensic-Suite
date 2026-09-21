@@ -507,7 +507,7 @@ Zeitstempel in UTC nach ISO 8601 und die Zeitzone des Endgeräts einmal im Manif
 Durchläufe mit unterschiedlichen Bytes würden einen Vergleich sinnlos und einen Hash als
 Bezugspunkt unbrauchbar machen. Die Zusage wird geprüft und nicht nur beabsichtigt, und
 die Prüfung muss dafür den Prozess verlassen: Python setzt den Seed für String-Hashes beim
-Start des Interpreters, also unterscheidet sich die Iterationsreihenfolge eines Set
+Start des Interpreters, also unterscheidet sich die Iterationsreihenfolge eines Sets
 zwischen zwei Durchläufen, und eine Pipeline, die diese Reihenfolge in ihre Ausgabe
 durchreichen lässt, bleibt nichtdeterministisch, während eine Testsuite in einem einzigen
 Prozess grün bleibt. Also wird ein Profil zweimal gelesen, in zwei Prozessen mit
