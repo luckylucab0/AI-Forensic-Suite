@@ -10034,6 +10034,40 @@ $EmbeddedCatalogueJson = @'
             "agent": "qwen_code",
             "artifacts": [
                 {
+                    "category": "file_snapshot",
+                    "collect_priority": "first",
+                    "id": "qwen_code.arena_worktrees",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\arena\\<session-id>\\worktrees\\<model-name>\\**",
+                        "~/.qwen/arena/<session-id>/worktrees/<model-name>/**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "log",
+                    "collect_priority": "normal",
+                    "id": "qwen_code.audit_landing",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.qwen\\audits\\<project-hash>\\**",
+                        "~/.qwen/audits/<project-hash>/**"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "memory",
                     "collect_priority": "normal",
                     "id": "qwen_code.auto_memory",
@@ -10148,6 +10182,26 @@ $EmbeddedCatalogueJson = @'
                     "paths": [
                         "%USERPROFILE%\\.qwen\\file-history\\<session-id>\\<hash>@v<version>",
                         "~/.qwen/file-history/<session-id>/<hash>@v<version>"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "qwen_code.ide_connection_locks",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%TEMP%\\qwen-code-ide-server-*.json",
+                        "%USERPROFILE%\\.qwen\\ide\\*.lock",
+                        "$TMPDIR/qwen-code-ide-server-*.json",
+                        "/tmp/qwen-code-ide-server-*.json",
+                        "~/.qwen/ide/*.lock"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -12160,7 +12214,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "f1ecc683bb25bb2e3ac44953bbf2bc3107b2b02c1afa7e05194b25155b5b7298"
+    "sha256": "3b7f79c09cb33d772e32586682311688c3303b52784ba631d930163d3dfcc9f0"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

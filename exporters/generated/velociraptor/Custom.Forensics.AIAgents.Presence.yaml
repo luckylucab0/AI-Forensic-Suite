@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: a1a853fada8b
+# Catalogue digest: dd8dcc055775
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1151,6 +1151,7 @@ sources:
     qwen_code,/Users/*/.qwen/AGENTS.md
     qwen_code,/Users/*/.qwen/QWEN.md
     qwen_code,/Users/*/.qwen/agents/*.md
+    qwen_code,/Users/*/.qwen/arena/*/worktrees/*/**
     qwen_code,/Users/*/.qwen/channels/cron.json
     qwen_code,/Users/*/.qwen/channels/daemon/*/*
     qwen_code,/Users/*/.qwen/channels/service.pid
@@ -1186,6 +1187,7 @@ sources:
     qwen_code,/home/*/.qwen/AGENTS.md
     qwen_code,/home/*/.qwen/QWEN.md
     qwen_code,/home/*/.qwen/agents/*.md
+    qwen_code,/home/*/.qwen/arena/*/worktrees/*/**
     qwen_code,/home/*/.qwen/channels/cron.json
     qwen_code,/home/*/.qwen/channels/daemon/*/*
     qwen_code,/home/*/.qwen/channels/service.pid
@@ -1221,6 +1223,7 @@ sources:
     qwen_code,/root/.qwen/AGENTS.md
     qwen_code,/root/.qwen/QWEN.md
     qwen_code,/root/.qwen/agents/*.md
+    qwen_code,/root/.qwen/arena/*/worktrees/*/**
     qwen_code,/root/.qwen/channels/cron.json
     qwen_code,/root/.qwen/channels/daemon/*/*
     qwen_code,/root/.qwen/channels/service.pid
@@ -1256,6 +1259,7 @@ sources:
     qwen_code,/var/root/.qwen/AGENTS.md
     qwen_code,/var/root/.qwen/QWEN.md
     qwen_code,/var/root/.qwen/agents/*.md
+    qwen_code,/var/root/.qwen/arena/*/worktrees/*/**
     qwen_code,/var/root/.qwen/channels/cron.json
     qwen_code,/var/root/.qwen/channels/daemon/*/*
     qwen_code,/var/root/.qwen/channels/service.pid
@@ -1291,6 +1295,7 @@ sources:
     qwen_code,C:/Users/*/.qwen/AGENTS.md
     qwen_code,C:/Users/*/.qwen/QWEN.md
     qwen_code,C:/Users/*/.qwen/agents/*.md
+    qwen_code,C:/Users/*/.qwen/arena/*/worktrees/*/**
     qwen_code,C:/Users/*/.qwen/channels/cron.json
     qwen_code,C:/Users/*/.qwen/channels/daemon/*/*
     qwen_code,C:/Users/*/.qwen/channels/service.pid

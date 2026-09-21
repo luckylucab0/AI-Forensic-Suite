@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: a1a853fada8b
+# Catalogue digest: dd8dcc055775
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1129,6 +1129,8 @@ $targets = @(
     @{ Agent = 'pi'; Id = 'pi.sessions'; Path = '$profile\.pi\agent\sessions\--' }
     @{ Agent = 'pi'; Id = 'pi.settings'; Path = '$profile\.pi\agent\settings.json' }
     @{ Agent = 'pi'; Id = 'pi.skills'; Path = '$profile\.pi\agent\skills' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.arena_worktrees'; Path = '$profile\.qwen\arena' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.audit_landing'; Path = '$profile\.qwen\audits' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.auto_memory'; Path = '$profile\.qwen\memories' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.auto_memory'; Path = '$profile\.qwen\memories\MEMORY.md' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.auto_memory'; Path = '$profile\.qwen\projects' }
@@ -1141,6 +1143,8 @@ $targets = @(
     @{ Agent = 'qwen_code'; Id = 'qwen_code.env_files'; Path = '$profile\.env' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.env_files'; Path = '$profile\.qwen\.env' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.file_history_backups'; Path = '$profile\.qwen\file-history' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.ide_connection_locks'; Path = '$profile\.qwen\ide' }
+    @{ Agent = 'qwen_code'; Id = 'qwen_code.ide_connection_locks'; Path = '$profile\AppData\Local\Temp\qwen-code-ide-server-' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.install_evidence'; Path = '$profile\.qwen\bin' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.install_evidence'; Path = '$profile\.qwen\installation_id' }
     @{ Agent = 'qwen_code'; Id = 'qwen_code.install_evidence'; Path = '$profile\.qwen\source.json' }

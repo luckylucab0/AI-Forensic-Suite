@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: a1a853fada8b
+// Catalogue digest: dd8dcc055775
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -2422,6 +2422,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "pi", "pi.settings", ".pi\\agent\\settings.json",
     "pi", "pi.skills", ".pi/agent/skills",
     "pi", "pi.skills", ".pi\\agent\\skills",
+    "qwen_code", "qwen_code.arena_worktrees", ".qwen/arena",
+    "qwen_code", "qwen_code.arena_worktrees", ".qwen\\arena",
+    "qwen_code", "qwen_code.audit_landing", ".qwen/audits",
+    "qwen_code", "qwen_code.audit_landing", ".qwen\\audits",
     "qwen_code", "qwen_code.auto_memory", ".qwen/memories",
     "qwen_code", "qwen_code.auto_memory", ".qwen/memories/MEMORY.md",
     "qwen_code", "qwen_code.auto_memory", ".qwen/projects",
@@ -2444,6 +2448,10 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "qwen_code", "qwen_code.env_files", ".qwen\\.env",
     "qwen_code", "qwen_code.file_history_backups", ".qwen/file-history",
     "qwen_code", "qwen_code.file_history_backups", ".qwen\\file-history",
+    "qwen_code", "qwen_code.ide_connection_locks", ".qwen/ide",
+    "qwen_code", "qwen_code.ide_connection_locks", ".qwen\\ide",
+    "qwen_code", "qwen_code.ide_connection_locks", "/tmp/qwen-code-ide-server-",
+    "qwen_code", "qwen_code.ide_connection_locks", "\\tmp\\qwen-code-ide-server-",
     "qwen_code", "qwen_code.install_evidence", ".qwen/bin",
     "qwen_code", "qwen_code.install_evidence", ".qwen/installation_id",
     "qwen_code", "qwen_code.install_evidence", ".qwen/source.json",

@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: a1a853fada8b
+# Catalogue digest: dd8dcc055775
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1330,6 +1330,8 @@ sources:
     pi,pi.sessions,C:/Users/*/.pi/agent/sessions/--*--/*_*.jsonl
     pi,pi.settings,C:/Users/*/.pi/agent/settings.json
     pi,pi.skills,C:/Users/*/.pi/agent/skills/**
+    qwen_code,qwen_code.arena_worktrees,C:/Users/*/.qwen/arena/*/worktrees/*/**
+    qwen_code,qwen_code.audit_landing,C:/Users/*/.qwen/audits/*/**
     qwen_code,qwen_code.auto_memory,C:/Users/*/.qwen/memories/*
     qwen_code,qwen_code.auto_memory,C:/Users/*/.qwen/memories/MEMORY.md
     qwen_code,qwen_code.auto_memory,C:/Users/*/.qwen/projects/*/memory/*
@@ -1347,6 +1349,8 @@ sources:
     qwen_code,qwen_code.env_files,C:/Users/*/.env
     qwen_code,qwen_code.env_files,C:/Users/*/.qwen/.env
     qwen_code,qwen_code.file_history_backups,C:/Users/*/.qwen/file-history/*/*@v*
+    qwen_code,qwen_code.ide_connection_locks,C:/Users/*/.qwen/ide/*.lock
+    qwen_code,qwen_code.ide_connection_locks,C:/Users/*/AppData/Local/Temp/qwen-code-ide-server-*.json
     qwen_code,qwen_code.install_evidence,C:/Users/*/.qwen/bin/**
     qwen_code,qwen_code.install_evidence,C:/Users/*/.qwen/installation_id
     qwen_code,qwen_code.install_evidence,C:/Users/*/.qwen/source.json
@@ -4013,6 +4017,10 @@ sources:
     pi,pi.settings,/var/root/.pi/agent/settings.json
     pi,pi.skills,/Users/*/.pi/agent/skills/**
     pi,pi.skills,/var/root/.pi/agent/skills/**
+    qwen_code,qwen_code.arena_worktrees,/Users/*/.qwen/arena/*/worktrees/*/**
+    qwen_code,qwen_code.arena_worktrees,/var/root/.qwen/arena/*/worktrees/*/**
+    qwen_code,qwen_code.audit_landing,/Users/*/.qwen/audits/*/**
+    qwen_code,qwen_code.audit_landing,/var/root/.qwen/audits/*/**
     qwen_code,qwen_code.auto_memory,/Users/*/.qwen/memories/*
     qwen_code,qwen_code.auto_memory,/Users/*/.qwen/memories/MEMORY.md
     qwen_code,qwen_code.auto_memory,/Users/*/.qwen/projects/*/memory/MEMORY.md
@@ -4045,6 +4053,9 @@ sources:
     qwen_code,qwen_code.env_files,/var/root/.qwen/.env
     qwen_code,qwen_code.file_history_backups,/Users/*/.qwen/file-history/*/*@v*
     qwen_code,qwen_code.file_history_backups,/var/root/.qwen/file-history/*/*@v*
+    qwen_code,qwen_code.ide_connection_locks,/Users/*/.qwen/ide/*.lock
+    qwen_code,qwen_code.ide_connection_locks,/tmp/qwen-code-ide-server-*.json
+    qwen_code,qwen_code.ide_connection_locks,/var/root/.qwen/ide/*.lock
     qwen_code,qwen_code.install_evidence,/Users/*/.qwen/bin/**
     qwen_code,qwen_code.install_evidence,/Users/*/.qwen/installation_id
     qwen_code,qwen_code.install_evidence,/Users/*/.qwen/source.json
@@ -7044,6 +7055,10 @@ sources:
     pi,pi.settings,/root/.pi/agent/settings.json
     pi,pi.skills,/home/*/.pi/agent/skills/**
     pi,pi.skills,/root/.pi/agent/skills/**
+    qwen_code,qwen_code.arena_worktrees,/home/*/.qwen/arena/*/worktrees/*/**
+    qwen_code,qwen_code.arena_worktrees,/root/.qwen/arena/*/worktrees/*/**
+    qwen_code,qwen_code.audit_landing,/home/*/.qwen/audits/*/**
+    qwen_code,qwen_code.audit_landing,/root/.qwen/audits/*/**
     qwen_code,qwen_code.auto_memory,/home/*/.qwen/memories/*
     qwen_code,qwen_code.auto_memory,/home/*/.qwen/memories/MEMORY.md
     qwen_code,qwen_code.auto_memory,/home/*/.qwen/projects/*/memory/MEMORY.md
@@ -7076,6 +7091,9 @@ sources:
     qwen_code,qwen_code.env_files,/root/.qwen/.env
     qwen_code,qwen_code.file_history_backups,/home/*/.qwen/file-history/*/*@v*
     qwen_code,qwen_code.file_history_backups,/root/.qwen/file-history/*/*@v*
+    qwen_code,qwen_code.ide_connection_locks,/home/*/.qwen/ide/*.lock
+    qwen_code,qwen_code.ide_connection_locks,/root/.qwen/ide/*.lock
+    qwen_code,qwen_code.ide_connection_locks,/tmp/qwen-code-ide-server-*.json
     qwen_code,qwen_code.install_evidence,/home/*/.qwen/bin/**
     qwen_code,qwen_code.install_evidence,/home/*/.qwen/installation_id
     qwen_code,qwen_code.install_evidence,/home/*/.qwen/source.json

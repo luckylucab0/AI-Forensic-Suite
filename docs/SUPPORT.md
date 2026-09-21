@@ -6,7 +6,7 @@ English | [Deutsch](SUPPORT.de.md)
 
 What this suite reads, per agent, counted from the catalogue and the reader registry rather than written down. The numbers move when the code does.
 
-31 catalogue files, 30 of them a product and one cross-cutting. 486 of 609 artifacts are read by 37 reader modules, into 23 event kinds. 484 artifacts rest on a fetched vendor source.
+31 catalogue files, 30 of them a product and one cross-cutting. 487 of 612 artifacts are read by 37 reader modules, into 23 event kinds. 487 artifacts rest on a fetched vendor source.
 
 **How to read an empty result.** An agent listed here with artifacts read means the paths were searched and the files that were there were parsed, so an empty result is evidence that those paths held nothing. It is never evidence that the agent was not used: the data tree may have been relocated by a variable, the retention period may have swept it, the paths may be the unverified ones, or the user may have worked in a profile nobody collected. Where an entry is unverified, `docs/ARTIFACTS.md` says so per artifact and the analyzer repeats it in its output.
 
@@ -41,7 +41,7 @@ What this suite reads, per agent, counted from the catalogue and the reader regi
 | OpenAI Codex CLI | Linux, macOS, Windows | 6 / 6 | 11 / 13 | 5 | 2 |
 | OpenCode | Linux, macOS, Windows | 2 / 2 | 7 / 12 | 5 | 5 |
 | pi | Linux, macOS, Windows | 1 / 1 | 8 / 10 | 3 | 2 |
-| Qwen Code | Linux, macOS, Windows | 2 / 2 | 29 / 33 | 16 | 4 |
+| Qwen Code | Linux, macOS, Windows | 2 / 2 | 30 / 36 | 17 | 6 |
 | Roo Code | Linux, macOS, Windows | 1 / 1 | 6 / 7 | 2 | 1 |
 | Visual Studio Code host storage | Linux, macOS, Windows | none | 8 / 10 | 6 | 2 |
 | Warp | Linux, macOS, Windows | none | 1 / 1 | 1 | 0 |
@@ -68,7 +68,7 @@ Every artifact in the catalogue is collected and appears in a case, whether a re
 
 ### Containers in a format nobody here has read
 
-72 entries, binary or directory layouts with no documented format. Each one is collected whole and is on the timeline as a filesystem event. Reading one means writing a format implementation, not finishing an unfinished reader.
+74 entries, binary or directory layouts with no documented format. Each one is collected whole and is on the timeline as a filesystem event. Reading one means writing a format implementation, not finishing an unfinished reader.
 
 - `amazonq.cli_subagent_executions` (directory)
 - `amazonq.ide_extension_install` (directory)
@@ -129,6 +129,8 @@ Every artifact in the catalogue is collected and appears in a case, whether a re
 - `opencode.repos_cache` (binary)
 - `opencode.state_and_temp` (directory)
 - `pi.bin` (binary)
+- `qwen_code.arena_worktrees` (directory)
+- `qwen_code.audit_landing` (directory)
 - `qwen_code.project_temp_spill` (directory)
 - `vscode.local_history` (directory)
 - `vscode.user_data_roots` (binary)
@@ -167,7 +169,7 @@ None as of this generation. The check behind this section looks for a catalogue 
 
 ## Where the reading is thin
 
-294 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
+295 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
 
 ## Where to look next
 

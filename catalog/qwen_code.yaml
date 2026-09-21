@@ -88,6 +88,10 @@ env_overrides:
   effect: |-
     Do not move artifacts but decide whether confinement ran at all and with which profile or image, including a custom profile read from <project>/.qwen/sandbox-macos-<name>.sb. Needed to answer whether a safety control was in place, and the project rejects all four from project-scoped .env files for exactly that reason.
   source: https://github.com/QwenLM/qwen-code/blob/12b8cbc4de2a237e01a0ab0c81d2da254b27e435/docs/users/configuration/settings.md
+- name: TMPDIR
+  effect: |-
+    The platform temporary directory, which this product reaches for in two places. The editor companion's older port files are written there and named by the editor's process id or by the port, and getGlobalQwenDir() falls back to a .qwen directory inside it when the process has no home directory at all, which is the shape a service account or a container run has. On such a host every path in this file is wrong and the whole tree is in the temporary directory instead, where the next reboot may take it.
+  source: https://github.com/QwenLM/qwen-code/blob/main/packages/core/src/config/storage.ts
 artifacts:
 - id: qwen_code.conversation_transcript
   title: Conversation transcript (per session JSONL)
@@ -931,6 +935,96 @@ artifacts:
   notes: |-
     Records are keyed by PID and carry identity fields (pidNs and a boot-derived prefix) precisely because PIDs collide across namespaces, machines and reboots. Treat a record as a claim about a process, not proof one is running. Collect live: this is how you enumerate the agent processes that were active at the moment of collection and tie each to its session id.
   parser: json_generic
+- id: qwen_code.arena_worktrees
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.qwen\arena\<session-id>\worktrees\<model-name>\**'
+  - ~/.qwen/arena/<session-id>/worktrees/<model-name>/**
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/main/docs/users/features/arena.md
+  source_kind: official
+  volatility: |-
+    Deleted by the product itself. The vendor states that selecting a winner applies that agent's diff to the working directory and then cleans up all worktrees and temporary branches automatically. So a tree that is present is a run that was abandoned, crashed or is still going, and a tree that is absent says nothing at all about whether the feature was used. Collect first.
+  notes: |-
+    A copy of the user's working directory that the agent made outside the repository, which is what makes this worth collecting before anything else in this family. The product's head-to-head mode runs several complete agent instances on one task, each with its own model and its own git worktree, and the vendor states that each worktree mirrors the working directory exactly, including staged changes, unstaged changes and untracked files. An untracked file that was later deleted, or a change that was never committed, can survive here and nowhere else.
+
+    One task, several providers. Each agent in a run uses a different model, so a single command sends the same task and the same repository content to more than one provider. Which ones is in the command the user typed and in the run's own records, and it is the kind of thing an analyst asking what left the device has to be told rather than left to infer from a directory name.
+
+    Attribution, and it is an inference rather than a vendor statement. Each agent here is a full independent session whose working directory is its worktree, and this product keys its transcript tree by the working directory, so an arena agent's conversation is expected under a projects directory whose sanitised name carries the worktree path rather than the user's repository. Check that before concluding a session is missing.
+
+    The base directory moves. The agents.arena.worktreeBaseDir setting replaces it with any absolute path, and the vendor states that a leading tilde is not expanded there, so the value is read out of the settings file rather than guessed.
+
+    Not read, and it is the same decision as every other whole working copy in this catalogue: the directory is collected and is on the timeline, and what is inside it is a repository rather than one file an agent replaced.
+  parser: null
+- id: qwen_code.ide_connection_locks
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%TEMP%\qwen-code-ide-server-*.json'
+  - '%USERPROFILE%\.qwen\ide\*.lock'
+  - $TMPDIR/qwen-code-ide-server-*.json
+  - /tmp/qwen-code-ide-server-*.json
+  - ~/.qwen/ide/*.lock
+  format: json
+  sensitivity: normal
+  contains_credentials:
+  - authToken
+  collect_priority: normal
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/main/packages/core/src/ide/ide-client.ts
+  source_kind: source_code
+  unsourced_paths:
+  - '%TEMP%\qwen-code-ide-server-*.json'
+  - $TMPDIR/qwen-code-ide-server-*.json
+  - /tmp/qwen-code-ide-server-*.json
+  volatility: |-
+    Written while an editor companion is running and left behind when it is not shut down cleanly, so a stale file is common and its mtime is the last time that editor window and this agent were paired. The temporary-directory spellings go with whatever sweeps that directory, which on some platforms is a reboot.
+  notes: |-
+    The file that says which folder was open. Each lock is the connection between the command line agent and its editor companion, and the type in the cited source gives its fields: port, authToken, a stdio entry with the command and its arguments, workspacePath, ideInfo and the editor process's ppid. workspacePath is the interesting one, because it names a directory on the endpoint that this agent was attached to, which attributes activity to a project even when the transcript tree has been swept or relocated.
+
+    It does not move with the runtime variable, and that is deliberate rather than an oversight. The cited source pins this directory to the global configuration directory with the comment that the editor companion sees environment variables and not settings, so it has to find the same location as the command line side. Everything else this product calls runtime output follows QWEN_RUNTIME_DIR; this does not. A collection that follows that variable and stops there comes back without the one file that names the workspace.
+
+    The temporary-directory spellings are the older scheme, kept here because they are still read: the cited source falls back to a file named after the editor's process id, and then to one named after the port, before giving up. They are marked unsourced because the file names come from the code and the directory comes from the platform rather than from a stated path.
+
+    The token in it is a local loopback credential and the file is collected whole anyway, because the rest of the file is the evidence. It is named in contains_credentials so a report can say what is in the bundle.
+  parser: json_generic
+- id: qwen_code.audit_landing
+  category: log
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.qwen\audits\<project-hash>\**'
+  - ~/.qwen/audits/<project-hash>/**
+  format: directory
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://github.com/QwenLM/qwen-code/blob/main/packages/core/src/config/storage.ts
+  source_kind: source_code
+  volatility: |-
+    No expiry is stated. The directory is created once per project and adopted on later runs rather than replaced, so what is in it accumulates.
+  notes: |-
+    Where the product puts an audit's reports when it decides they must not end up in version control. The cited source builds it as the audits directory under the global configuration directory with a hash of the audited project root below it, creates it 0700 on POSIX, and says in its own comment that the reason is that the quoted and possibly exploitable module content has to stay private to the user. So this is agent output about somebody's code, held outside the repository it is about, and a review of the repository alone will not find it.
+
+    Two things this entry does not claim. The layout inside is not stated anywhere this pass could reach, which is why the format here is a directory and nothing parses it: it is collected whole and is on the timeline, and what the reports say is read by a person. And the in-repository location the fallback exists to replace is not stated either, so it is not in this catalogue as a path. Somebody who finds a report in a working copy should come back and add it.
+
+    The project hash is the product's own hash of the resolved project root, with symbolic links resolved first and the spelling lower-cased on the two platforms whose filesystems fold case. It is the same hash the temporary tree and the transcript tree use, so a directory here can be matched to those without knowing which repository it stands for.
+  parser: null
 - id: qwen_code.install_evidence
   title: Installation identity, install source and downloaded versions
   category: install_evidence

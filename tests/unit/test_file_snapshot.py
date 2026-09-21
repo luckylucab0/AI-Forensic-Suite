@@ -155,6 +155,9 @@ NOT_CLAIMED = {
     "readable member has an entry and a reader of its own",
     "ollama.backup_dir": "a backup of the product's own data, not of a user's file",
     "opencode.repos_cache": "a clone the agent made, not a copy of a file it replaced",
+    "qwen_code.arena_worktrees": "one whole working copy per model, which is what the "
+    "head-to-head mode makes rather than a copy of one file. The copies matter and are "
+    "collected: each mirrors the working directory including what was never committed",
     "vscode.local_history": "the editor's own version store, which is a directory per "
     "file holding an index and the versions beside it. It is a copy of a file the agent "
     "replaced and reading it is format work nobody here has done, which the entry says "
