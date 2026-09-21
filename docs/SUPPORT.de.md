@@ -6,7 +6,7 @@
 
 Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registrierung statt aufgeschrieben. Die Zahlen bewegen sich mit dem Code.
 
-31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 478 von 600 Artefakten werden von 37 Leser-Modulen gelesen, in 23 Ereignisarten. 475 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
+31 Katalogdateien, davon 30 ein Produkt und eine übergreifende. 482 von 605 Artefakten werden von 37 Leser-Modulen gelesen, in 23 Ereignisarten. 480 Artefakte beruhen auf einer abgerufenen Herstellerquelle.
 
 **Wie ein leeres Ergebnis zu lesen ist.** Steht ein Agent hier mit gelesenen Artefakten, dann wurden die Pfade durchsucht und die vorhandenen Dateien ausgewertet, also ist ein leeres Ergebnis ein Befund über diese Pfade. Es ist nie ein Befund darüber, dass der Agent nicht benutzt wurde: der Datenbaum kann über eine Variable verschoben sein, die Aufbewahrungsfrist kann ihn gelöscht haben, die Pfade können die unverifizierten sein, oder die Person hat in einem Profil gearbeitet, das niemand gesammelt hat. Wo ein Eintrag unverifiziert ist, sagt `docs/ARTIFACTS.de.md` es pro Artefakt, und der Analyzer wiederholt es in seiner Ausgabe.
 
@@ -43,7 +43,7 @@ Was diese Suite pro Agent liest, gezählt aus dem Katalog und der Leser-Registri
 | pi | Linux, macOS, Windows | 1 / 1 | 8 / 10 | 3 | 2 |
 | Qwen Code | Linux, macOS, Windows | 2 / 2 | 29 / 33 | 16 | 4 |
 | Roo Code | Linux, macOS, Windows | 1 / 1 | 6 / 7 | 2 | 1 |
-| Visual Studio Code host storage | Linux, macOS, Windows | keine | 4 / 5 | 3 | 1 |
+| Visual Studio Code host storage | Linux, macOS, Windows | keine | 8 / 10 | 6 | 2 |
 | Warp | Linux, macOS, Windows | keine | 1 / 1 | 1 | 0 |
 | Windsurf | Linux, macOS, Windows | 6 / 6 | 30 / 40 | 16 | 10 |
 | Zed | Linux, macOS, Windows | 3 / 3 | 9 / 12 | 4 | 3 |
@@ -68,7 +68,7 @@ Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es 
 
 ### Container in einem Format, das hier niemand gelesen hat
 
-71 Einträge, binäre oder Verzeichnis-Layouts ohne dokumentiertes Format. Jeder wird ganz gesammelt und steht als Dateisystem-Ereignis auf der Zeitlinie. Einen davon zu lesen heisst, eine Formatimplementierung zu schreiben, und nicht, einen unfertigen Leser fertigzustellen.
+72 Einträge, binäre oder Verzeichnis-Layouts ohne dokumentiertes Format. Jeder wird ganz gesammelt und steht als Dateisystem-Ereignis auf der Zeitlinie. Einen davon zu lesen heisst, eine Formatimplementierung zu schreiben, und nicht, einen unfertigen Leser fertigzustellen.
 
 - `amazonq.cli_subagent_executions` (directory)
 - `amazonq.ide_extension_install` (directory)
@@ -130,6 +130,7 @@ Jedes Artefakt im Katalog wird gesammelt und erscheint im Fall, ob ein Leser es 
 - `opencode.state_and_temp` (directory)
 - `pi.bin` (binary)
 - `qwen_code.project_temp_spill` (directory)
+- `vscode.local_history` (directory)
 - `vscode.user_data_roots` (binary)
 - `windsurf.cli_feature_state` (binary)
 - `windsurf.code_tracker_and_settings` (binary)
@@ -159,7 +160,7 @@ Zum Zeitpunkt dieser Generierung keine. Die Prüfung hinter diesem Abschnitt suc
 
 ## Wo die Lesung dünn ist
 
-290 Artefakte werden von einem generischen Leser gelesen. Die Datei wird vollständig gelesen und jeder Record steht mit seinem Inhalt im Fall; was der Record bedeutet, ist nicht entschieden, und jeder sagt das an sich selbst. Zwei Arten von Record tragen diese Aussage: `unparsed.record` für etwas, das niemand lesen konnte, und ein als uninterpretiert zurückgegebener Record für etwas Gelesenes, dessen Format niemand abgebildet hat. In jeder Zusammenfassung dieser Suite sind die beiden getrennt gezählt, denn ein Speicher ohne Schema und eine halb geschriebene Datei sind entgegengesetzte Probleme.
+293 Artefakte werden von einem generischen Leser gelesen. Die Datei wird vollständig gelesen und jeder Record steht mit seinem Inhalt im Fall; was der Record bedeutet, ist nicht entschieden, und jeder sagt das an sich selbst. Zwei Arten von Record tragen diese Aussage: `unparsed.record` für etwas, das niemand lesen konnte, und ein als uninterpretiert zurückgegebener Record für etwas Gelesenes, dessen Format niemand abgebildet hat. In jeder Zusammenfassung dieser Suite sind die beiden getrennt gezählt, denn ein Speicher ohne Schema und eine halb geschriebene Datei sind entgegengesetzte Probleme.
 
 ## Wo es weitergeht
 

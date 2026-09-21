@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 82ef38d79ba0
+# Catalogue digest: 598d9b9be0bd
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1481,6 +1481,14 @@ sources:
     roo_code,roo_code.tasks,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/history_item.json
     roo_code,roo_code.tasks,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/task_metadata.json
     roo_code,roo_code.tasks,C:/Users/*/AppData/Roaming/Windsurf/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/ui_messages.json
+    vscode,vscode.agent_sessions_workspace,C:/Users/*/AppData/Roaming/Code - Insiders/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,C:/Users/*/AppData/Roaming/Code/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,C:/Users/*/AppData/Roaming/Cursor/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,C:/Users/*/AppData/Roaming/Kiro/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,C:/Users/*/AppData/Roaming/Positron/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,C:/Users/*/AppData/Roaming/Trae/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,C:/Users/*/AppData/Roaming/VSCodium/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,C:/Users/*/AppData/Roaming/Windsurf/User/agent-sessions.code-workspace
     vscode,vscode.extension_dirs,C:/Users/*/.cursor/extensions/**
     vscode,vscode.extension_dirs,C:/Users/*/.vscode-insiders/extensions/**
     vscode,vscode.extension_dirs,C:/Users/*/.vscode-server/extensions/**
@@ -1492,6 +1500,16 @@ sources:
     vscode,vscode.extension_install_evidence,C:/Users/*/.vscode/extensions/kilocode.kilo-code-*/**
     vscode,vscode.extension_install_evidence,C:/Users/*/.vscode/extensions/rooveterinaryinc.roo-cline-*/**
     vscode,vscode.extension_install_evidence,C:/Users/*/.vscode/extensions/saoudrizwan.claude-dev-*/**
+    vscode,vscode.file_policy,C:/Users/*/.vscode-insiders/policy.json
+    vscode,vscode.file_policy,C:/Users/*/.vscode/policy.json
+    vscode,vscode.local_history,C:/Users/*/AppData/Roaming/Code - Insiders/User/History/**
+    vscode,vscode.local_history,C:/Users/*/AppData/Roaming/Code/User/History/**
+    vscode,vscode.local_history,C:/Users/*/AppData/Roaming/Cursor/User/History/**
+    vscode,vscode.local_history,C:/Users/*/AppData/Roaming/Kiro/User/History/**
+    vscode,vscode.local_history,C:/Users/*/AppData/Roaming/Positron/User/History/**
+    vscode,vscode.local_history,C:/Users/*/AppData/Roaming/Trae/User/History/**
+    vscode,vscode.local_history,C:/Users/*/AppData/Roaming/VSCodium/User/History/**
+    vscode,vscode.local_history,C:/Users/*/AppData/Roaming/Windsurf/User/History/**
     vscode,vscode.mcp_config,C:/Users/*/AppData/Roaming/Code - Insiders/User/mcp.json
     vscode,vscode.mcp_config,C:/Users/*/AppData/Roaming/Code/User/mcp.json
     vscode,vscode.mcp_config,C:/Users/*/AppData/Roaming/Cursor/User/mcp.json
@@ -1500,11 +1518,45 @@ sources:
     vscode,vscode.mcp_config,C:/Users/*/AppData/Roaming/Trae/User/mcp.json
     vscode,vscode.mcp_config,C:/Users/*/AppData/Roaming/VSCodium/User/mcp.json
     vscode,vscode.mcp_config,C:/Users/*/AppData/Roaming/Windsurf/User/mcp.json
+    vscode,vscode.runtime_arguments,C:/Users/*/.vscode-insiders/argv.json
+    vscode,vscode.runtime_arguments,C:/Users/*/.vscode/argv.json
     vscode,vscode.state_vscdb,C:/Users/*/AppData/Roaming/Code/User/globalStorage/state.vscdb
     vscode,vscode.state_vscdb,C:/Users/*/AppData/Roaming/Code/User/globalStorage/state.vscdb-shm
     vscode,vscode.state_vscdb,C:/Users/*/AppData/Roaming/Code/User/globalStorage/state.vscdb-wal
     vscode,vscode.user_data_roots,C:/Users/*/.vscode-server/data/User/globalStorage/**
     vscode,vscode.user_data_roots,C:/Users/*/AppData/Roaming/Code/User/globalStorage/**
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Code - Insiders/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Code - Insiders/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Code - Insiders/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Code - Insiders/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Code/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Code/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Code/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Code/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Kiro/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Kiro/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Kiro/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Kiro/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Positron/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Positron/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Positron/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Positron/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Trae/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Trae/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Trae/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Trae/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/VSCodium/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/VSCodium/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/VSCodium/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/VSCodium/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/workspace.json
     warp,warp.sqlite,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite
     warp,warp.sqlite,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite-shm
     warp,warp.sqlite,C:/Users/*/AppData/Local/warp/Warp/data/warp.sqlite-wal
@@ -4219,6 +4271,22 @@ sources:
     roo_code,roo_code.tasks,/var/root/Library/Application Support/Windsurf/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/history_item.json
     roo_code,roo_code.tasks,/var/root/Library/Application Support/Windsurf/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/task_metadata.json
     roo_code,roo_code.tasks,/var/root/Library/Application Support/Windsurf/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/ui_messages.json
+    vscode,vscode.agent_sessions_workspace,/Users/*/Library/Application Support/Code - Insiders/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/Users/*/Library/Application Support/Code/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/Users/*/Library/Application Support/Cursor/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/Users/*/Library/Application Support/Kiro/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/Users/*/Library/Application Support/Positron/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/Users/*/Library/Application Support/Trae/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/Users/*/Library/Application Support/VSCodium/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/Users/*/Library/Application Support/Windsurf/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/var/root/Library/Application Support/Code - Insiders/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/var/root/Library/Application Support/Code/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/var/root/Library/Application Support/Cursor/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/var/root/Library/Application Support/Kiro/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/var/root/Library/Application Support/Positron/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/var/root/Library/Application Support/Trae/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/var/root/Library/Application Support/VSCodium/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/var/root/Library/Application Support/Windsurf/User/agent-sessions.code-workspace
     vscode,vscode.extension_dirs,/Users/*/.cursor/extensions/**
     vscode,vscode.extension_dirs,/Users/*/.vscode-insiders/extensions/**
     vscode,vscode.extension_dirs,/Users/*/.vscode-server/extensions/**
@@ -4239,6 +4307,26 @@ sources:
     vscode,vscode.extension_install_evidence,/var/root/.vscode/extensions/kilocode.kilo-code-*/**
     vscode,vscode.extension_install_evidence,/var/root/.vscode/extensions/rooveterinaryinc.roo-cline-*/**
     vscode,vscode.extension_install_evidence,/var/root/.vscode/extensions/saoudrizwan.claude-dev-*/**
+    vscode,vscode.file_policy,/Users/*/.vscode-insiders/policy.json
+    vscode,vscode.file_policy,/Users/*/.vscode/policy.json
+    vscode,vscode.file_policy,/var/root/.vscode-insiders/policy.json
+    vscode,vscode.file_policy,/var/root/.vscode/policy.json
+    vscode,vscode.local_history,/Users/*/Library/Application Support/Code - Insiders/User/History/**
+    vscode,vscode.local_history,/Users/*/Library/Application Support/Code/User/History/**
+    vscode,vscode.local_history,/Users/*/Library/Application Support/Cursor/User/History/**
+    vscode,vscode.local_history,/Users/*/Library/Application Support/Kiro/User/History/**
+    vscode,vscode.local_history,/Users/*/Library/Application Support/Positron/User/History/**
+    vscode,vscode.local_history,/Users/*/Library/Application Support/Trae/User/History/**
+    vscode,vscode.local_history,/Users/*/Library/Application Support/VSCodium/User/History/**
+    vscode,vscode.local_history,/Users/*/Library/Application Support/Windsurf/User/History/**
+    vscode,vscode.local_history,/var/root/Library/Application Support/Code - Insiders/User/History/**
+    vscode,vscode.local_history,/var/root/Library/Application Support/Code/User/History/**
+    vscode,vscode.local_history,/var/root/Library/Application Support/Cursor/User/History/**
+    vscode,vscode.local_history,/var/root/Library/Application Support/Kiro/User/History/**
+    vscode,vscode.local_history,/var/root/Library/Application Support/Positron/User/History/**
+    vscode,vscode.local_history,/var/root/Library/Application Support/Trae/User/History/**
+    vscode,vscode.local_history,/var/root/Library/Application Support/VSCodium/User/History/**
+    vscode,vscode.local_history,/var/root/Library/Application Support/Windsurf/User/History/**
     vscode,vscode.mcp_config,/Users/*/Library/Application Support/Code - Insiders/User/mcp.json
     vscode,vscode.mcp_config,/Users/*/Library/Application Support/Code/User/mcp.json
     vscode,vscode.mcp_config,/Users/*/Library/Application Support/Cursor/User/mcp.json
@@ -4255,6 +4343,10 @@ sources:
     vscode,vscode.mcp_config,/var/root/Library/Application Support/Trae/User/mcp.json
     vscode,vscode.mcp_config,/var/root/Library/Application Support/VSCodium/User/mcp.json
     vscode,vscode.mcp_config,/var/root/Library/Application Support/Windsurf/User/mcp.json
+    vscode,vscode.runtime_arguments,/Users/*/.vscode-insiders/argv.json
+    vscode,vscode.runtime_arguments,/Users/*/.vscode/argv.json
+    vscode,vscode.runtime_arguments,/var/root/.vscode-insiders/argv.json
+    vscode,vscode.runtime_arguments,/var/root/.vscode/argv.json
     vscode,vscode.state_vscdb,/Users/*/.config/Code/User/globalStorage/state.vscdb
     vscode,vscode.state_vscdb,/Users/*/.config/Code/User/globalStorage/state.vscdb-shm
     vscode,vscode.state_vscdb,/Users/*/.config/Code/User/globalStorage/state.vscdb-wal
@@ -4279,6 +4371,70 @@ sources:
     vscode,vscode.user_data_roots,/var/root/.vscode-server/data/User/globalStorage/**
     vscode,vscode.user_data_roots,/var/root/Library/Application Support/Code - Insiders/User/globalStorage/**
     vscode,vscode.user_data_roots,/var/root/Library/Application Support/Code/User/globalStorage/**
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Code - Insiders/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Code - Insiders/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Code - Insiders/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Code - Insiders/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Code/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Code/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Code/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Code/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Kiro/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Kiro/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Kiro/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Kiro/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Positron/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Positron/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Positron/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Positron/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Trae/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Trae/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Trae/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Trae/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/VSCodium/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/VSCodium/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/VSCodium/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/VSCodium/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Code - Insiders/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Code - Insiders/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Code - Insiders/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Code - Insiders/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Code/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Code/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Code/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Code/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Kiro/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Kiro/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Kiro/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Kiro/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Positron/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Positron/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Positron/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Positron/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Trae/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Trae/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Trae/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Trae/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/VSCodium/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/VSCodium/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/VSCodium/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/VSCodium/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/workspace.json
     warp,warp.sqlite,/Users/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite
     warp,warp.sqlite,/Users/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm
     warp,warp.sqlite,/Users/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal
@@ -7086,6 +7242,22 @@ sources:
     roo_code,roo_code.tasks,/root/.config/Windsurf/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/history_item.json
     roo_code,roo_code.tasks,/root/.config/Windsurf/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/task_metadata.json
     roo_code,roo_code.tasks,/root/.config/Windsurf/User/globalStorage/rooveterinaryinc.roo-cline/tasks/*/ui_messages.json
+    vscode,vscode.agent_sessions_workspace,/home/*/.config/Code - Insiders/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/home/*/.config/Code/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/home/*/.config/Cursor/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/home/*/.config/Kiro/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/home/*/.config/Positron/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/home/*/.config/Trae/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/home/*/.config/VSCodium/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/home/*/.config/Windsurf/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/root/.config/Code - Insiders/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/root/.config/Code/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/root/.config/Cursor/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/root/.config/Kiro/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/root/.config/Positron/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/root/.config/Trae/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/root/.config/VSCodium/User/agent-sessions.code-workspace
+    vscode,vscode.agent_sessions_workspace,/root/.config/Windsurf/User/agent-sessions.code-workspace
     vscode,vscode.extension_dirs,/home/*/.cursor/extensions/**
     vscode,vscode.extension_dirs,/home/*/.vscode-insiders/extensions/**
     vscode,vscode.extension_dirs,/home/*/.vscode-server/extensions/**
@@ -7106,6 +7278,26 @@ sources:
     vscode,vscode.extension_install_evidence,/root/.vscode/extensions/kilocode.kilo-code-*/**
     vscode,vscode.extension_install_evidence,/root/.vscode/extensions/rooveterinaryinc.roo-cline-*/**
     vscode,vscode.extension_install_evidence,/root/.vscode/extensions/saoudrizwan.claude-dev-*/**
+    vscode,vscode.file_policy,/home/*/.vscode-insiders/policy.json
+    vscode,vscode.file_policy,/home/*/.vscode/policy.json
+    vscode,vscode.file_policy,/root/.vscode-insiders/policy.json
+    vscode,vscode.file_policy,/root/.vscode/policy.json
+    vscode,vscode.local_history,/home/*/.config/Code - Insiders/User/History/**
+    vscode,vscode.local_history,/home/*/.config/Code/User/History/**
+    vscode,vscode.local_history,/home/*/.config/Cursor/User/History/**
+    vscode,vscode.local_history,/home/*/.config/Kiro/User/History/**
+    vscode,vscode.local_history,/home/*/.config/Positron/User/History/**
+    vscode,vscode.local_history,/home/*/.config/Trae/User/History/**
+    vscode,vscode.local_history,/home/*/.config/VSCodium/User/History/**
+    vscode,vscode.local_history,/home/*/.config/Windsurf/User/History/**
+    vscode,vscode.local_history,/root/.config/Code - Insiders/User/History/**
+    vscode,vscode.local_history,/root/.config/Code/User/History/**
+    vscode,vscode.local_history,/root/.config/Cursor/User/History/**
+    vscode,vscode.local_history,/root/.config/Kiro/User/History/**
+    vscode,vscode.local_history,/root/.config/Positron/User/History/**
+    vscode,vscode.local_history,/root/.config/Trae/User/History/**
+    vscode,vscode.local_history,/root/.config/VSCodium/User/History/**
+    vscode,vscode.local_history,/root/.config/Windsurf/User/History/**
     vscode,vscode.mcp_config,/home/*/.config/Code - Insiders/User/mcp.json
     vscode,vscode.mcp_config,/home/*/.config/Code/User/mcp.json
     vscode,vscode.mcp_config,/home/*/.config/Cursor/User/mcp.json
@@ -7122,6 +7314,10 @@ sources:
     vscode,vscode.mcp_config,/root/.config/Trae/User/mcp.json
     vscode,vscode.mcp_config,/root/.config/VSCodium/User/mcp.json
     vscode,vscode.mcp_config,/root/.config/Windsurf/User/mcp.json
+    vscode,vscode.runtime_arguments,/home/*/.vscode-insiders/argv.json
+    vscode,vscode.runtime_arguments,/home/*/.vscode/argv.json
+    vscode,vscode.runtime_arguments,/root/.vscode-insiders/argv.json
+    vscode,vscode.runtime_arguments,/root/.vscode/argv.json
     vscode,vscode.state_vscdb,/home/*/.config/Code/User/globalStorage/state.vscdb
     vscode,vscode.state_vscdb,/home/*/.config/Code/User/globalStorage/state.vscdb-shm
     vscode,vscode.state_vscdb,/home/*/.config/Code/User/globalStorage/state.vscdb-wal
@@ -7146,6 +7342,70 @@ sources:
     vscode,vscode.user_data_roots,/root/.vscode-server/data/User/globalStorage/**
     vscode,vscode.user_data_roots,/root/Library/Application Support/Code - Insiders/User/globalStorage/**
     vscode,vscode.user_data_roots,/root/Library/Application Support/Code/User/globalStorage/**
+    vscode,vscode.workspace_storage,/home/*/.config/Code - Insiders/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/home/*/.config/Code - Insiders/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/home/*/.config/Code - Insiders/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/home/*/.config/Code - Insiders/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/home/*/.config/Code/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/home/*/.config/Code/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/home/*/.config/Code/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/home/*/.config/Code/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/home/*/.config/Cursor/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/home/*/.config/Kiro/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/home/*/.config/Kiro/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/home/*/.config/Kiro/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/home/*/.config/Kiro/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/home/*/.config/Positron/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/home/*/.config/Positron/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/home/*/.config/Positron/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/home/*/.config/Positron/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/home/*/.config/Trae/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/home/*/.config/Trae/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/home/*/.config/Trae/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/home/*/.config/Trae/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/home/*/.config/VSCodium/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/home/*/.config/VSCodium/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/home/*/.config/VSCodium/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/home/*/.config/VSCodium/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/home/*/.config/Windsurf/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/root/.config/Code - Insiders/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/root/.config/Code - Insiders/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/root/.config/Code - Insiders/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/root/.config/Code - Insiders/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/root/.config/Code/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/root/.config/Code/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/root/.config/Code/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/root/.config/Code/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/root/.config/Cursor/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/root/.config/Kiro/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/root/.config/Kiro/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/root/.config/Kiro/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/root/.config/Kiro/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/root/.config/Positron/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/root/.config/Positron/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/root/.config/Positron/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/root/.config/Positron/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/root/.config/Trae/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/root/.config/Trae/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/root/.config/Trae/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/root/.config/Trae/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/root/.config/VSCodium/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/root/.config/VSCodium/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/root/.config/VSCodium/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/root/.config/VSCodium/User/workspaceStorage/*/workspace.json
+    vscode,vscode.workspace_storage,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb
+    vscode,vscode.workspace_storage,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    vscode,vscode.workspace_storage,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    vscode,vscode.workspace_storage,/root/.config/Windsurf/User/workspaceStorage/*/workspace.json
     warp,warp.sqlite,/home/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite
     warp,warp.sqlite,/home/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-shm
     warp,warp.sqlite,/home/*/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite-wal

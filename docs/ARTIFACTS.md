@@ -6,7 +6,7 @@ English | [Deutsch](ARTIFACTS.de.md)
 
 Generated from catalog/ by scripts/gen_artifact_docs.py. Do not edit by hand: CI regenerates this file and fails if it differs.
 
-600 artifacts across 31 agent(s), 475 of them resting on a fetched vendor source.
+605 artifacts across 31 agent(s), 480 of them resting on a fetched vendor source.
 
 Entries marked unverified are collected anyway, but no vendor source confirms the path. Treat the absence of such an artifact as inconclusive rather than as evidence that the agent was not used.
 
@@ -1479,12 +1479,27 @@ Visual Studio Code and its forks, as a storage host rather than as an agent. A d
 
 <https://github.com/microsoft/vscode-discussions/discussions/748>, <https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/configure/settings.md>, <https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/configure/extensions/extension-marketplace.md>
 
+### Relocating variables
+
+- `VSCODE_PORTABLE`: Turns the whole installation portable: the extensions directory becomes <value>/extensions, the shared data directory <value>/shared-data and the file policy <value>/policy.json, from environmentService.ts. A portable installation therefore keeps its data beside the application rather than in the profile, and every profile-rooted path in this catalogue's entries for this family finds nothing on such a host.
+- `VSCODE_EXTENSIONS`: Replaces the extensions directory on its own, which is where every agent extension of this family lives. extensionsPath in environmentService.ts reads it before the portable variable and before the default under the profile.
+
+### first
+
+**Collect first.** Rotated or swept aggressively, by count or on every sweep rather than after a comfortable interval. Some of these can be destroyed by the user simply starting another session.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `vscode.local_history` | Editor local file history | file_snapshot | macOS, Linux, Windows | `<vscode-user>/History/` | directory | normal | The editor prunes it by count and by age, both configurable, so it holds the recent past rather than the whole of it. It survives a deleted working copy, which is what makes it worth taking first. | verified | [source_code](https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts) |
+| `vscode.workspace_storage` | Per-workspace storage | config | macOS, Linux, Windows | `<vscode-user>/workspaceStorage/<workspace-hash>/state.vscdb`<br>`<vscode-user>/workspaceStorage/<workspace-hash>/state.vscdb-shm`<br>`<vscode-user>/workspaceStorage/<workspace-hash>/state.vscdb-wal`<br>`<vscode-user>/workspaceStorage/<workspace-hash>/workspace.json` | sqlite | normal | Written continuously while a window is open and in write-ahead-log mode, so the newest state is in the log file rather than in the database until the editor closes cleanly. Collect all three files or read a window short. | verified | [source_code](https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts) |
+
 ### normal
 
 **Collect normally.** Subject to the agent's ordinary retention period, which for several agents defaults to 30 days.
 
 | Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `vscode.agent_sessions_workspace` | Agent sessions workspace file | config | macOS, Linux, Windows | `<vscode-user>/agent-sessions.code-workspace` | json | normal |  | verified | [source_code](https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts) |
 | `vscode.extension_dirs` | extension dirs | install_evidence | Windows, macOS, Linux | `%USERPROFILE%\.vscode\extensions\`<br>`~/.cursor/extensions/`<br>`~/.vscode-insiders/extensions/`<br>`~/.vscode-server/extensions/`<br>`~/.vscode/extensions/`<br>`~/.windsurf/extensions/` | json | normal | Old versions are removed on update, but extensions.json in the parent directory retains install/update bookkeeping. | verified | [official](https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/configure/extensions/extension-marketplace.md) |
 | `vscode.extension_install_evidence` | extension install evidence | install_evidence | macOS, Windows, Linux | `%USERPROFILE%\.vscode\extensions\`<br>`~/.vscode-server/extensions/`<br>`~/.vscode/extensions/extensions.json`<br>`~/.vscode/extensions/kilocode.kilo-code-*/`<br>`~/.vscode/extensions/rooveterinaryinc.roo-cline-*/`<br>`~/.vscode/extensions/saoudrizwan.claude-dev-*/` | json | normal | Removed on uninstall, but extensions.json often retains stale entries and the versioned directory name preserves the exact version that ran. | **unverified** | recollection |
 | `vscode.mcp_config` | MCP server configuration | mcp_config | macOS, Linux, Windows | `<project>/.vscode/mcp.json`<br>`<vscode-user>/mcp.json` | json | normal | Persistent until edited. The workspace file is usually version-controlled, so git history gives authorship and timing for it. | verified | [official](https://code.visualstudio.com/docs/copilot/customization/mcp-servers) |
@@ -1496,6 +1511,8 @@ Visual Studio Code and its forks, as a storage host rather than as an agent. A d
 
 | Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `vscode.file_policy` | File-based policy | permissions | macOS, Linux, Windows | `%USERPROFILE%\.vscode-insiders\policy.json`<br>`%USERPROFILE%\.vscode\policy.json`<br>`~/.vscode-insiders/policy.json`<br>`~/.vscode/policy.json` | json | normal |  | verified | [source_code](https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts) |
+| `vscode.runtime_arguments` | Runtime arguments (argv.json) | config | macOS, Linux, Windows | `%USERPROFILE%\.vscode-insiders\argv.json`<br>`%USERPROFILE%\.vscode\argv.json`<br>`~/.vscode-insiders/argv.json`<br>`~/.vscode/argv.json` | json | normal |  | verified | [source_code](https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts) |
 | `vscode.user_data_roots` | user data roots | config | macOS, Windows, Linux | `%APPDATA%\Code\User\globalStorage\`<br>`~/.config/Code/User/globalStorage/`<br>`~/.config/VSCodium/User/globalStorage/`<br>`~/.vscode-server/data/User/globalStorage/`<br>`~/Library/Application Support/Code - Insiders/User/globalStorage/`<br>`~/Library/Application Support/Code/User/globalStorage/` | binary | normal | Persists until the editor variant's user-data dir is deleted; survives extension uninstall in most cases. | verified | [source_code](https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts) |
 
 ### Legacy paths

@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 82ef38d79ba0
+// Catalogue digest: 598d9b9be0bd
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -101,7 +101,10 @@
 //     roo_code.extension_id
 //     roo_code.settings
 //     roo_code.tasks
+//     vscode.agent_sessions_workspace
+//     vscode.local_history
 //     vscode.mcp_config
+//     vscode.workspace_storage
 //     windsurf.server_data
 //   reachable only through a relocation variable, which is not in the event data: read the variable off the endpoint
 //     claude_code.global_config
@@ -2480,6 +2483,14 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "vscode", "vscode.extension_install_evidence", ".vscode\\extensions\\kilocode.kilo-code-",
     "vscode", "vscode.extension_install_evidence", ".vscode\\extensions\\rooveterinaryinc.roo-cline-",
     "vscode", "vscode.extension_install_evidence", ".vscode\\extensions\\saoudrizwan.claude-dev-",
+    "vscode", "vscode.file_policy", ".vscode-insiders/policy.json",
+    "vscode", "vscode.file_policy", ".vscode-insiders\\policy.json",
+    "vscode", "vscode.file_policy", ".vscode/policy.json",
+    "vscode", "vscode.file_policy", ".vscode\\policy.json",
+    "vscode", "vscode.runtime_arguments", ".vscode-insiders/argv.json",
+    "vscode", "vscode.runtime_arguments", ".vscode-insiders\\argv.json",
+    "vscode", "vscode.runtime_arguments", ".vscode/argv.json",
+    "vscode", "vscode.runtime_arguments", ".vscode\\argv.json",
     "vscode", "vscode.state_vscdb", ".config/Code/User/globalStorage/state.vscdb",
     "vscode", "vscode.state_vscdb", ".config/Code/User/globalStorage/state.vscdb-shm",
     "vscode", "vscode.state_vscdb", ".config/Code/User/globalStorage/state.vscdb-wal",

@@ -32,6 +32,15 @@ references:
   https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/configure/settings.md
 - |-
   https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/configure/extensions/extension-marketplace.md
+env_overrides:
+- name: VSCODE_PORTABLE
+  effect: |-
+    Turns the whole installation portable: the extensions directory becomes <value>/extensions, the shared data directory <value>/shared-data and the file policy <value>/policy.json, from environmentService.ts. A portable installation therefore keeps its data beside the application rather than in the profile, and every profile-rooted path in this catalogue's entries for this family finds nothing on such a host.
+  source: https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts
+- name: VSCODE_EXTENSIONS
+  effect: |-
+    Replaces the extensions directory on its own, which is where every agent extension of this family lives. extensionsPath in environmentService.ts reads it before the portable variable and before the default under the profile.
+  source: https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts
 artifacts:
 - id: vscode.state_vscdb
   category: config
@@ -180,3 +189,119 @@ artifacts:
 
     Record structure: every Cline-family extension hangs its tree off <vscode-user>/globalStorage/<publisher.extension-lowercased>/.
   parser: null
+- id: vscode.workspace_storage
+  title: Per-workspace storage
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <vscode-user>/workspaceStorage/<workspace-hash>/state.vscdb
+  - <vscode-user>/workspaceStorage/<workspace-hash>/state.vscdb-shm
+  - <vscode-user>/workspaceStorage/<workspace-hash>/state.vscdb-wal
+  - <vscode-user>/workspaceStorage/<workspace-hash>/workspace.json
+  format: sqlite
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts
+  source_kind: source_code
+  volatility: |-
+    Written continuously while a window is open and in write-ahead-log mode, so the newest state is in the log file rather than in the database until the editor closes cleanly. Collect all three files or read a window short.
+  notes: |-
+    workspaceStorageHome in environmentService.ts is join(appSettingsHome, 'workspaceStorage'), one directory per workspace named by a hash of its path. The editor's own per-workspace store was in no entry, while the two forks that inherited it had theirs: the whole shape was catalogued twice for two products and not once for the product they forked.
+
+    What is in it that matters here: an agent extension keeps its per-workspace state in this database, which for several of them is the task index, the last session and the state a resumed conversation picks up. The workspace.json beside it names the folder the hash stands for, which is the only thing that turns a directory of hashes into evidence somebody can quote, and it is a path of this entry for that reason.
+
+    The placeholder expands to every editor of this family the collectors know, so the paths of the two products that have their own entries are matched by this one as well. That is the documented behaviour rather than a collision: one path is one manifest entry and the most specific claim decides which entry it is filed under, which is the more literal product path in those two cases.
+  parser: vscode_state
+- id: vscode.local_history
+  title: Editor local file history
+  category: file_snapshot
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <vscode-user>/History/
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts
+  source_kind: source_code
+  volatility: |-
+    The editor prunes it by count and by age, both configurable, so it holds the recent past rather than the whole of it. It survives a deleted working copy, which is what makes it worth taking first.
+  notes: |-
+    localHistoryHome in environmentService.ts is join(appSettingsHome, 'History'). The editor keeps a copy of a file before each change it writes, in a directory per file named by a hash, with an entries.json inside naming the original path and listing the versions in order with their timestamps.
+
+    WHAT AN AGENT CHANGED, EVEN WHERE NOTHING WAS COMMITTED. An agent extension edits through the editor's own API, so its edits land here like anybody else's, with a timestamp per version. On a working copy that was never committed, or where the agent's changes were reverted, this is where the earlier text still is.
+
+    Collected whole and not read: the index inside is JSON and the versions beside it are the file contents, and reading the pair as a snapshot store is format work nobody here has done. The entry says so rather than leaving the directory out.
+  parser: null
+- id: vscode.agent_sessions_workspace
+  title: Agent sessions workspace file
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - <vscode-user>/agent-sessions.code-workspace
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts
+  source_kind: source_code
+  notes: |-
+    agentSessionsWorkspace in environmentService.ts is joinPath(appSettingsHome, 'agent-sessions.code-workspace'). A workspace file the editor itself writes for agent sessions, which is the editor's own agent surface rather than an extension's, and which names the folders such a session was opened against.
+  parser: json_generic
+- id: vscode.runtime_arguments
+  title: Runtime arguments (argv.json)
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.vscode-insiders\argv.json'
+  - '%USERPROFILE%\.vscode\argv.json'
+  - ~/.vscode-insiders/argv.json
+  - ~/.vscode/argv.json
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts
+  source_kind: source_code
+  notes: |-
+    argvResource in environmentService.ts is joinPath(userHome, dataFolderName, 'argv.json'), where the data folder name is .vscode for the stable build and .vscode-insiders for the other. Arguments the editor applies to itself at every start, which is where a disabled feature, a forced runtime flag or a changed crash-reporter destination is visible. The portable variable moves it beside the application instead, which the variable's own declaration says.
+  parser: json_generic
+- id: vscode.file_policy
+  title: File-based policy
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.vscode-insiders\policy.json'
+  - '%USERPROFILE%\.vscode\policy.json'
+  - ~/.vscode-insiders/policy.json
+  - ~/.vscode/policy.json
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/platform/environment/common/environmentService.ts
+  source_kind: source_code
+  notes: |-
+    policyFile in environmentService.ts is joinPath(userHome, dataFolderName, 'policy.json'), read when the file-policy switch is on, and <portable>/policy.json under a portable installation. It is the file form of the machine policy this editor family otherwise takes from the platform's own policy store, so it is one of the places an answer to what the editor and its agent extensions were allowed to do can be, and an absent file is not the same as an absent policy.
+  parser: json_generic

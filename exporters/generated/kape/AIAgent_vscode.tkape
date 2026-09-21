@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 82ef38d79ba0
+# Catalogue digest: 598d9b9be0bd
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,7 +8,7 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# KAPE is Windows only. 39 of the 600 catalogue artifacts declare
+# KAPE is Windows only. 39 of the 605 catalogue artifacts declare
 # no Windows path and are therefore outside this target's scope entirely, which is a
 # different thing from the per-artifact gaps listed below. For a macOS or Linux
 # endpoint use the Velociraptor artifact or this suite's own collector.
@@ -22,6 +22,54 @@ Version: 1.0
 Id: 1bbb5781-49e4-d309-f98f-2299fc1ff892
 RecreateDirectories: true
 Targets:
+    -
+        Name: vscode.agent_sessions_workspace
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User
+        FileMask: "agent-sessions.code-workspace"
+        Recursive: false
+    -
+        Name: vscode.agent_sessions_workspace
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code\User
+        FileMask: "agent-sessions.code-workspace"
+        Recursive: false
+    -
+        Name: vscode.agent_sessions_workspace
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User
+        FileMask: "agent-sessions.code-workspace"
+        Recursive: false
+    -
+        Name: vscode.agent_sessions_workspace
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User
+        FileMask: "agent-sessions.code-workspace"
+        Recursive: false
+    -
+        Name: vscode.agent_sessions_workspace
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User
+        FileMask: "agent-sessions.code-workspace"
+        Recursive: false
+    -
+        Name: vscode.agent_sessions_workspace
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User
+        FileMask: "agent-sessions.code-workspace"
+        Recursive: false
+    -
+        Name: vscode.agent_sessions_workspace
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User
+        FileMask: "agent-sessions.code-workspace"
+        Recursive: false
+    -
+        Name: vscode.agent_sessions_workspace
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User
+        FileMask: "agent-sessions.code-workspace"
+        Recursive: false
     -
         Name: vscode.extension_dirs
         Category: install_evidence
@@ -89,6 +137,66 @@ Targets:
         FileMask: "saoudrizwan.claude-dev-*"
         Recursive: false
     -
+        Name: vscode.file_policy
+        Category: permissions
+        Path: C:\Users\%user%\.vscode
+        FileMask: "policy.json"
+        Recursive: false
+    -
+        Name: vscode.file_policy
+        Category: permissions
+        Path: C:\Users\%user%\.vscode-insiders
+        FileMask: "policy.json"
+        Recursive: false
+    -
+        Name: vscode.local_history
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\History
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.local_history
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\History
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.local_history
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\History
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.local_history
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\History
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.local_history
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\History
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.local_history
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\History
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.local_history
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\History
+        FileMask: "*"
+        Recursive: true
+    -
+        Name: vscode.local_history
+        Category: file_snapshot
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\History
+        FileMask: "*"
+        Recursive: true
+    -
         Name: vscode.mcp_config
         Category: mcp_config
         Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User
@@ -137,6 +245,18 @@ Targets:
         FileMask: "mcp.json"
         Recursive: false
     -
+        Name: vscode.runtime_arguments
+        Category: config
+        Path: C:\Users\%user%\.vscode
+        FileMask: "argv.json"
+        Recursive: false
+    -
+        Name: vscode.runtime_arguments
+        Category: config
+        Path: C:\Users\%user%\.vscode-insiders
+        FileMask: "argv.json"
+        Recursive: false
+    -
         Name: vscode.state_vscdb
         Category: config
         Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage
@@ -166,3 +286,195 @@ Targets:
         Path: C:\Users\%user%\AppData\Roaming\Code\User\globalStorage
         FileMask: "*"
         Recursive: true
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\workspaceStorage\*
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\workspaceStorage\*
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\workspaceStorage\*
+        FileMask: "state.vscdb-wal"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code - Insiders\User\workspaceStorage\*
+        FileMask: "workspace.json"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\workspaceStorage\*
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\workspaceStorage\*
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\workspaceStorage\*
+        FileMask: "state.vscdb-wal"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Code\User\workspaceStorage\*
+        FileMask: "workspace.json"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\workspaceStorage\*
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\workspaceStorage\*
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\workspaceStorage\*
+        FileMask: "state.vscdb-wal"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Cursor\User\workspaceStorage\*
+        FileMask: "workspace.json"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\workspaceStorage\*
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\workspaceStorage\*
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\workspaceStorage\*
+        FileMask: "state.vscdb-wal"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Kiro\User\workspaceStorage\*
+        FileMask: "workspace.json"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\workspaceStorage\*
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\workspaceStorage\*
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\workspaceStorage\*
+        FileMask: "state.vscdb-wal"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Positron\User\workspaceStorage\*
+        FileMask: "workspace.json"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\workspaceStorage\*
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\workspaceStorage\*
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\workspaceStorage\*
+        FileMask: "state.vscdb-wal"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Trae\User\workspaceStorage\*
+        FileMask: "workspace.json"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\workspaceStorage\*
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\workspaceStorage\*
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\workspaceStorage\*
+        FileMask: "state.vscdb-wal"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\VSCodium\User\workspaceStorage\*
+        FileMask: "workspace.json"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\workspaceStorage\*
+        FileMask: "state.vscdb"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\workspaceStorage\*
+        FileMask: "state.vscdb-shm"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\workspaceStorage\*
+        FileMask: "state.vscdb-wal"
+        Recursive: false
+    -
+        Name: vscode.workspace_storage
+        Category: config
+        Path: C:\Users\%user%\AppData\Roaming\Windsurf\User\workspaceStorage\*
+        FileMask: "workspace.json"
+        Recursive: false

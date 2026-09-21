@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 82ef38d79ba0
+# Catalogue digest: 598d9b9be0bd
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1231,6 +1231,14 @@ $targets = @(
     @{ Agent = 'roo_code'; Id = 'roo_code.tasks'; Path = '$profile\AppData\Roaming\Trae\User\globalStorage\rooveterinaryinc.roo-cline\tasks' }
     @{ Agent = 'roo_code'; Id = 'roo_code.tasks'; Path = '$profile\AppData\Roaming\VSCodium\User\globalStorage\rooveterinaryinc.roo-cline\tasks' }
     @{ Agent = 'roo_code'; Id = 'roo_code.tasks'; Path = '$profile\AppData\Roaming\Windsurf\User\globalStorage\rooveterinaryinc.roo-cline\tasks' }
+    @{ Agent = 'vscode'; Id = 'vscode.agent_sessions_workspace'; Path = '$profile\AppData\Roaming\Code - Insiders\User\agent-sessions.code-workspace' }
+    @{ Agent = 'vscode'; Id = 'vscode.agent_sessions_workspace'; Path = '$profile\AppData\Roaming\Code\User\agent-sessions.code-workspace' }
+    @{ Agent = 'vscode'; Id = 'vscode.agent_sessions_workspace'; Path = '$profile\AppData\Roaming\Cursor\User\agent-sessions.code-workspace' }
+    @{ Agent = 'vscode'; Id = 'vscode.agent_sessions_workspace'; Path = '$profile\AppData\Roaming\Kiro\User\agent-sessions.code-workspace' }
+    @{ Agent = 'vscode'; Id = 'vscode.agent_sessions_workspace'; Path = '$profile\AppData\Roaming\Positron\User\agent-sessions.code-workspace' }
+    @{ Agent = 'vscode'; Id = 'vscode.agent_sessions_workspace'; Path = '$profile\AppData\Roaming\Trae\User\agent-sessions.code-workspace' }
+    @{ Agent = 'vscode'; Id = 'vscode.agent_sessions_workspace'; Path = '$profile\AppData\Roaming\VSCodium\User\agent-sessions.code-workspace' }
+    @{ Agent = 'vscode'; Id = 'vscode.agent_sessions_workspace'; Path = '$profile\AppData\Roaming\Windsurf\User\agent-sessions.code-workspace' }
     @{ Agent = 'vscode'; Id = 'vscode.extension_dirs'; Path = '$profile\.cursor\extensions' }
     @{ Agent = 'vscode'; Id = 'vscode.extension_dirs'; Path = '$profile\.vscode-insiders\extensions' }
     @{ Agent = 'vscode'; Id = 'vscode.extension_dirs'; Path = '$profile\.vscode-server\extensions' }
@@ -1242,6 +1250,16 @@ $targets = @(
     @{ Agent = 'vscode'; Id = 'vscode.extension_install_evidence'; Path = '$profile\.vscode\extensions\kilocode.kilo-code-' }
     @{ Agent = 'vscode'; Id = 'vscode.extension_install_evidence'; Path = '$profile\.vscode\extensions\rooveterinaryinc.roo-cline-' }
     @{ Agent = 'vscode'; Id = 'vscode.extension_install_evidence'; Path = '$profile\.vscode\extensions\saoudrizwan.claude-dev-' }
+    @{ Agent = 'vscode'; Id = 'vscode.file_policy'; Path = '$profile\.vscode-insiders\policy.json' }
+    @{ Agent = 'vscode'; Id = 'vscode.file_policy'; Path = '$profile\.vscode\policy.json' }
+    @{ Agent = 'vscode'; Id = 'vscode.local_history'; Path = '$profile\AppData\Roaming\Code - Insiders\User\History' }
+    @{ Agent = 'vscode'; Id = 'vscode.local_history'; Path = '$profile\AppData\Roaming\Code\User\History' }
+    @{ Agent = 'vscode'; Id = 'vscode.local_history'; Path = '$profile\AppData\Roaming\Cursor\User\History' }
+    @{ Agent = 'vscode'; Id = 'vscode.local_history'; Path = '$profile\AppData\Roaming\Kiro\User\History' }
+    @{ Agent = 'vscode'; Id = 'vscode.local_history'; Path = '$profile\AppData\Roaming\Positron\User\History' }
+    @{ Agent = 'vscode'; Id = 'vscode.local_history'; Path = '$profile\AppData\Roaming\Trae\User\History' }
+    @{ Agent = 'vscode'; Id = 'vscode.local_history'; Path = '$profile\AppData\Roaming\VSCodium\User\History' }
+    @{ Agent = 'vscode'; Id = 'vscode.local_history'; Path = '$profile\AppData\Roaming\Windsurf\User\History' }
     @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\Code - Insiders\User\mcp.json' }
     @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\Code\User\mcp.json' }
     @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\Cursor\User\mcp.json' }
@@ -1250,11 +1268,21 @@ $targets = @(
     @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\Trae\User\mcp.json' }
     @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\VSCodium\User\mcp.json' }
     @{ Agent = 'vscode'; Id = 'vscode.mcp_config'; Path = '$profile\AppData\Roaming\Windsurf\User\mcp.json' }
+    @{ Agent = 'vscode'; Id = 'vscode.runtime_arguments'; Path = '$profile\.vscode-insiders\argv.json' }
+    @{ Agent = 'vscode'; Id = 'vscode.runtime_arguments'; Path = '$profile\.vscode\argv.json' }
     @{ Agent = 'vscode'; Id = 'vscode.state_vscdb'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\state.vscdb' }
     @{ Agent = 'vscode'; Id = 'vscode.state_vscdb'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\state.vscdb-shm' }
     @{ Agent = 'vscode'; Id = 'vscode.state_vscdb'; Path = '$profile\AppData\Roaming\Code\User\globalStorage\state.vscdb-wal' }
     @{ Agent = 'vscode'; Id = 'vscode.user_data_roots'; Path = '$profile\.vscode-server\data\User\globalStorage' }
     @{ Agent = 'vscode'; Id = 'vscode.user_data_roots'; Path = '$profile\AppData\Roaming\Code\User\globalStorage' }
+    @{ Agent = 'vscode'; Id = 'vscode.workspace_storage'; Path = '$profile\AppData\Roaming\Code - Insiders\User\workspaceStorage' }
+    @{ Agent = 'vscode'; Id = 'vscode.workspace_storage'; Path = '$profile\AppData\Roaming\Code\User\workspaceStorage' }
+    @{ Agent = 'vscode'; Id = 'vscode.workspace_storage'; Path = '$profile\AppData\Roaming\Cursor\User\workspaceStorage' }
+    @{ Agent = 'vscode'; Id = 'vscode.workspace_storage'; Path = '$profile\AppData\Roaming\Kiro\User\workspaceStorage' }
+    @{ Agent = 'vscode'; Id = 'vscode.workspace_storage'; Path = '$profile\AppData\Roaming\Positron\User\workspaceStorage' }
+    @{ Agent = 'vscode'; Id = 'vscode.workspace_storage'; Path = '$profile\AppData\Roaming\Trae\User\workspaceStorage' }
+    @{ Agent = 'vscode'; Id = 'vscode.workspace_storage'; Path = '$profile\AppData\Roaming\VSCodium\User\workspaceStorage' }
+    @{ Agent = 'vscode'; Id = 'vscode.workspace_storage'; Path = '$profile\AppData\Roaming\Windsurf\User\workspaceStorage' }
     @{ Agent = 'warp'; Id = 'warp.sqlite'; Path = '$profile\AppData\Local\warp\Warp\data\warp.sqlite' }
     @{ Agent = 'warp'; Id = 'warp.sqlite'; Path = '$profile\AppData\Local\warp\Warp\data\warp.sqlite-shm' }
     @{ Agent = 'warp'; Id = 'warp.sqlite'; Path = '$profile\AppData\Local\warp\Warp\data\warp.sqlite-wal' }

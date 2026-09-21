@@ -155,6 +155,10 @@ NOT_CLAIMED = {
     "readable member has an entry and a reader of its own",
     "ollama.backup_dir": "a backup of the product's own data, not of a user's file",
     "opencode.repos_cache": "a clone the agent made, not a copy of a file it replaced",
+    "vscode.local_history": "the editor's own version store, which is a directory per "
+    "file holding an index and the versions beside it. It is a copy of a file the agent "
+    "replaced and reading it is format work nobody here has done, which the entry says "
+    "rather than leaving the directory out of the catalogue",
     "windsurf.worktrees": "a whole working copy, not a copy of one file",
 }
 

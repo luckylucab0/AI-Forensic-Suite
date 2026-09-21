@@ -10703,6 +10703,22 @@ $EmbeddedCatalogueJson = @'
             "agent": "vscode",
             "artifacts": [
                 {
+                    "category": "config",
+                    "collect_priority": "normal",
+                    "id": "vscode.agent_sessions_workspace",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<vscode-user>/agent-sessions.code-workspace"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "install_evidence",
                     "collect_priority": "normal",
                     "id": "vscode.extension_dirs",
@@ -10745,6 +10761,41 @@ $EmbeddedCatalogueJson = @'
                     "status": "unverified"
                 },
                 {
+                    "category": "permissions",
+                    "collect_priority": "durable",
+                    "id": "vscode.file_policy",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.vscode-insiders\\policy.json",
+                        "%USERPROFILE%\\.vscode\\policy.json",
+                        "~/.vscode-insiders/policy.json",
+                        "~/.vscode/policy.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "file_snapshot",
+                    "collect_priority": "first",
+                    "id": "vscode.local_history",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<vscode-user>/History/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "mcp_config",
                     "collect_priority": "normal",
                     "id": "vscode.mcp_config",
@@ -10758,6 +10809,25 @@ $EmbeddedCatalogueJson = @'
                         "<vscode-user>/mcp.json"
                     ],
                     "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "vscode.runtime_arguments",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.vscode-insiders\\argv.json",
+                        "%USERPROFILE%\\.vscode\\argv.json",
+                        "~/.vscode-insiders/argv.json",
+                        "~/.vscode/argv.json"
+                    ],
+                    "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -10802,6 +10872,25 @@ $EmbeddedCatalogueJson = @'
                         "~/.vscode-server/data/User/globalStorage/",
                         "~/Library/Application Support/Code - Insiders/User/globalStorage/",
                         "~/Library/Application Support/Code/User/globalStorage/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "first",
+                    "id": "vscode.workspace_storage",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "<vscode-user>/workspaceStorage/<workspace-hash>/state.vscdb",
+                        "<vscode-user>/workspaceStorage/<workspace-hash>/state.vscdb-shm",
+                        "<vscode-user>/workspaceStorage/<workspace-hash>/state.vscdb-wal",
+                        "<vscode-user>/workspaceStorage/<workspace-hash>/workspace.json"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -11960,7 +12049,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "4ab1501239b8134f16efb1d29b6c496eaf514e392027ff909ebd8b1363d882a5"
+    "sha256": "b3fea0e5c4c7b513c92fd13eb3c1ec7b46a63bee0b4df6484480eada69132f76"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

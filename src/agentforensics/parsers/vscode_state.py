@@ -138,6 +138,7 @@ class VscodeStateParser:
     _STORES = frozenset(
         {
             "vscode.state_vscdb",
+            "vscode.workspace_storage",
             "cursor.global_state_vscdb",
             "cursor.workspace_state_vscdb",
             "windsurf.ide_global_state_vscdb",

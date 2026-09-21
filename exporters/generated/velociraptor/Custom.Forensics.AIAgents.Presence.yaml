@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 82ef38d79ba0
+# Catalogue digest: 598d9b9be0bd
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -1312,6 +1312,206 @@ sources:
     qwen_code,C:/Users/*/.qwen/trustedFolders.json
     qwen_code,C:/Users/*/.qwen/usage_record.jsonl
     qwen_code,C:/Users/*/.qwen/workflows/*.js
+    vscode,/Users/*/Library/Application Support/Code - Insiders/User/History/**
+    vscode,/Users/*/Library/Application Support/Code - Insiders/User/workspaceStorage/*/state.vscdb
+    vscode,/Users/*/Library/Application Support/Code - Insiders/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/Users/*/Library/Application Support/Code - Insiders/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/Users/*/Library/Application Support/Code - Insiders/User/workspaceStorage/*/workspace.json
+    vscode,/Users/*/Library/Application Support/Code/User/History/**
+    vscode,/Users/*/Library/Application Support/Code/User/workspaceStorage/*/state.vscdb
+    vscode,/Users/*/Library/Application Support/Code/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/Users/*/Library/Application Support/Code/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/Users/*/Library/Application Support/Code/User/workspaceStorage/*/workspace.json
+    vscode,/Users/*/Library/Application Support/Cursor/User/History/**
+    vscode,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
+    vscode,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/Users/*/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
+    vscode,/Users/*/Library/Application Support/Kiro/User/History/**
+    vscode,/Users/*/Library/Application Support/Kiro/User/workspaceStorage/*/state.vscdb
+    vscode,/Users/*/Library/Application Support/Kiro/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/Users/*/Library/Application Support/Kiro/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/Users/*/Library/Application Support/Kiro/User/workspaceStorage/*/workspace.json
+    vscode,/Users/*/Library/Application Support/Positron/User/History/**
+    vscode,/Users/*/Library/Application Support/Positron/User/workspaceStorage/*/state.vscdb
+    vscode,/Users/*/Library/Application Support/Positron/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/Users/*/Library/Application Support/Positron/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/Users/*/Library/Application Support/Positron/User/workspaceStorage/*/workspace.json
+    vscode,/Users/*/Library/Application Support/Trae/User/History/**
+    vscode,/Users/*/Library/Application Support/Trae/User/workspaceStorage/*/state.vscdb
+    vscode,/Users/*/Library/Application Support/Trae/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/Users/*/Library/Application Support/Trae/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/Users/*/Library/Application Support/Trae/User/workspaceStorage/*/workspace.json
+    vscode,/Users/*/Library/Application Support/VSCodium/User/History/**
+    vscode,/Users/*/Library/Application Support/VSCodium/User/workspaceStorage/*/state.vscdb
+    vscode,/Users/*/Library/Application Support/VSCodium/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/Users/*/Library/Application Support/VSCodium/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/Users/*/Library/Application Support/VSCodium/User/workspaceStorage/*/workspace.json
+    vscode,/Users/*/Library/Application Support/Windsurf/User/History/**
+    vscode,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
+    vscode,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/Users/*/Library/Application Support/Windsurf/User/workspaceStorage/*/workspace.json
+    vscode,/home/*/.config/Code - Insiders/User/History/**
+    vscode,/home/*/.config/Code - Insiders/User/workspaceStorage/*/state.vscdb
+    vscode,/home/*/.config/Code - Insiders/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/home/*/.config/Code - Insiders/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/home/*/.config/Code - Insiders/User/workspaceStorage/*/workspace.json
+    vscode,/home/*/.config/Code/User/History/**
+    vscode,/home/*/.config/Code/User/workspaceStorage/*/state.vscdb
+    vscode,/home/*/.config/Code/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/home/*/.config/Code/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/home/*/.config/Code/User/workspaceStorage/*/workspace.json
+    vscode,/home/*/.config/Cursor/User/History/**
+    vscode,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb
+    vscode,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/home/*/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/home/*/.config/Cursor/User/workspaceStorage/*/workspace.json
+    vscode,/home/*/.config/Kiro/User/History/**
+    vscode,/home/*/.config/Kiro/User/workspaceStorage/*/state.vscdb
+    vscode,/home/*/.config/Kiro/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/home/*/.config/Kiro/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/home/*/.config/Kiro/User/workspaceStorage/*/workspace.json
+    vscode,/home/*/.config/Positron/User/History/**
+    vscode,/home/*/.config/Positron/User/workspaceStorage/*/state.vscdb
+    vscode,/home/*/.config/Positron/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/home/*/.config/Positron/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/home/*/.config/Positron/User/workspaceStorage/*/workspace.json
+    vscode,/home/*/.config/Trae/User/History/**
+    vscode,/home/*/.config/Trae/User/workspaceStorage/*/state.vscdb
+    vscode,/home/*/.config/Trae/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/home/*/.config/Trae/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/home/*/.config/Trae/User/workspaceStorage/*/workspace.json
+    vscode,/home/*/.config/VSCodium/User/History/**
+    vscode,/home/*/.config/VSCodium/User/workspaceStorage/*/state.vscdb
+    vscode,/home/*/.config/VSCodium/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/home/*/.config/VSCodium/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/home/*/.config/VSCodium/User/workspaceStorage/*/workspace.json
+    vscode,/home/*/.config/Windsurf/User/History/**
+    vscode,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb
+    vscode,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/home/*/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/home/*/.config/Windsurf/User/workspaceStorage/*/workspace.json
+    vscode,/root/.config/Code - Insiders/User/History/**
+    vscode,/root/.config/Code - Insiders/User/workspaceStorage/*/state.vscdb
+    vscode,/root/.config/Code - Insiders/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/root/.config/Code - Insiders/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/root/.config/Code - Insiders/User/workspaceStorage/*/workspace.json
+    vscode,/root/.config/Code/User/History/**
+    vscode,/root/.config/Code/User/workspaceStorage/*/state.vscdb
+    vscode,/root/.config/Code/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/root/.config/Code/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/root/.config/Code/User/workspaceStorage/*/workspace.json
+    vscode,/root/.config/Cursor/User/History/**
+    vscode,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb
+    vscode,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/root/.config/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/root/.config/Cursor/User/workspaceStorage/*/workspace.json
+    vscode,/root/.config/Kiro/User/History/**
+    vscode,/root/.config/Kiro/User/workspaceStorage/*/state.vscdb
+    vscode,/root/.config/Kiro/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/root/.config/Kiro/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/root/.config/Kiro/User/workspaceStorage/*/workspace.json
+    vscode,/root/.config/Positron/User/History/**
+    vscode,/root/.config/Positron/User/workspaceStorage/*/state.vscdb
+    vscode,/root/.config/Positron/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/root/.config/Positron/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/root/.config/Positron/User/workspaceStorage/*/workspace.json
+    vscode,/root/.config/Trae/User/History/**
+    vscode,/root/.config/Trae/User/workspaceStorage/*/state.vscdb
+    vscode,/root/.config/Trae/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/root/.config/Trae/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/root/.config/Trae/User/workspaceStorage/*/workspace.json
+    vscode,/root/.config/VSCodium/User/History/**
+    vscode,/root/.config/VSCodium/User/workspaceStorage/*/state.vscdb
+    vscode,/root/.config/VSCodium/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/root/.config/VSCodium/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/root/.config/VSCodium/User/workspaceStorage/*/workspace.json
+    vscode,/root/.config/Windsurf/User/History/**
+    vscode,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb
+    vscode,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/root/.config/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/root/.config/Windsurf/User/workspaceStorage/*/workspace.json
+    vscode,/var/root/Library/Application Support/Code - Insiders/User/History/**
+    vscode,/var/root/Library/Application Support/Code - Insiders/User/workspaceStorage/*/state.vscdb
+    vscode,/var/root/Library/Application Support/Code - Insiders/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/var/root/Library/Application Support/Code - Insiders/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/var/root/Library/Application Support/Code - Insiders/User/workspaceStorage/*/workspace.json
+    vscode,/var/root/Library/Application Support/Code/User/History/**
+    vscode,/var/root/Library/Application Support/Code/User/workspaceStorage/*/state.vscdb
+    vscode,/var/root/Library/Application Support/Code/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/var/root/Library/Application Support/Code/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/var/root/Library/Application Support/Code/User/workspaceStorage/*/workspace.json
+    vscode,/var/root/Library/Application Support/Cursor/User/History/**
+    vscode,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb
+    vscode,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/var/root/Library/Application Support/Cursor/User/workspaceStorage/*/workspace.json
+    vscode,/var/root/Library/Application Support/Kiro/User/History/**
+    vscode,/var/root/Library/Application Support/Kiro/User/workspaceStorage/*/state.vscdb
+    vscode,/var/root/Library/Application Support/Kiro/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/var/root/Library/Application Support/Kiro/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/var/root/Library/Application Support/Kiro/User/workspaceStorage/*/workspace.json
+    vscode,/var/root/Library/Application Support/Positron/User/History/**
+    vscode,/var/root/Library/Application Support/Positron/User/workspaceStorage/*/state.vscdb
+    vscode,/var/root/Library/Application Support/Positron/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/var/root/Library/Application Support/Positron/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/var/root/Library/Application Support/Positron/User/workspaceStorage/*/workspace.json
+    vscode,/var/root/Library/Application Support/Trae/User/History/**
+    vscode,/var/root/Library/Application Support/Trae/User/workspaceStorage/*/state.vscdb
+    vscode,/var/root/Library/Application Support/Trae/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/var/root/Library/Application Support/Trae/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/var/root/Library/Application Support/Trae/User/workspaceStorage/*/workspace.json
+    vscode,/var/root/Library/Application Support/VSCodium/User/History/**
+    vscode,/var/root/Library/Application Support/VSCodium/User/workspaceStorage/*/state.vscdb
+    vscode,/var/root/Library/Application Support/VSCodium/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/var/root/Library/Application Support/VSCodium/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/var/root/Library/Application Support/VSCodium/User/workspaceStorage/*/workspace.json
+    vscode,/var/root/Library/Application Support/Windsurf/User/History/**
+    vscode,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb
+    vscode,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    vscode,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    vscode,/var/root/Library/Application Support/Windsurf/User/workspaceStorage/*/workspace.json
+    vscode,C:/Users/*/AppData/Roaming/Code - Insiders/User/History/**
+    vscode,C:/Users/*/AppData/Roaming/Code - Insiders/User/workspaceStorage/*/state.vscdb
+    vscode,C:/Users/*/AppData/Roaming/Code - Insiders/User/workspaceStorage/*/state.vscdb-shm
+    vscode,C:/Users/*/AppData/Roaming/Code - Insiders/User/workspaceStorage/*/state.vscdb-wal
+    vscode,C:/Users/*/AppData/Roaming/Code - Insiders/User/workspaceStorage/*/workspace.json
+    vscode,C:/Users/*/AppData/Roaming/Code/User/History/**
+    vscode,C:/Users/*/AppData/Roaming/Code/User/workspaceStorage/*/state.vscdb
+    vscode,C:/Users/*/AppData/Roaming/Code/User/workspaceStorage/*/state.vscdb-shm
+    vscode,C:/Users/*/AppData/Roaming/Code/User/workspaceStorage/*/state.vscdb-wal
+    vscode,C:/Users/*/AppData/Roaming/Code/User/workspaceStorage/*/workspace.json
+    vscode,C:/Users/*/AppData/Roaming/Cursor/User/History/**
+    vscode,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb
+    vscode,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-shm
+    vscode,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/state.vscdb-wal
+    vscode,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/workspace.json
+    vscode,C:/Users/*/AppData/Roaming/Kiro/User/History/**
+    vscode,C:/Users/*/AppData/Roaming/Kiro/User/workspaceStorage/*/state.vscdb
+    vscode,C:/Users/*/AppData/Roaming/Kiro/User/workspaceStorage/*/state.vscdb-shm
+    vscode,C:/Users/*/AppData/Roaming/Kiro/User/workspaceStorage/*/state.vscdb-wal
+    vscode,C:/Users/*/AppData/Roaming/Kiro/User/workspaceStorage/*/workspace.json
+    vscode,C:/Users/*/AppData/Roaming/Positron/User/History/**
+    vscode,C:/Users/*/AppData/Roaming/Positron/User/workspaceStorage/*/state.vscdb
+    vscode,C:/Users/*/AppData/Roaming/Positron/User/workspaceStorage/*/state.vscdb-shm
+    vscode,C:/Users/*/AppData/Roaming/Positron/User/workspaceStorage/*/state.vscdb-wal
+    vscode,C:/Users/*/AppData/Roaming/Positron/User/workspaceStorage/*/workspace.json
+    vscode,C:/Users/*/AppData/Roaming/Trae/User/History/**
+    vscode,C:/Users/*/AppData/Roaming/Trae/User/workspaceStorage/*/state.vscdb
+    vscode,C:/Users/*/AppData/Roaming/Trae/User/workspaceStorage/*/state.vscdb-shm
+    vscode,C:/Users/*/AppData/Roaming/Trae/User/workspaceStorage/*/state.vscdb-wal
+    vscode,C:/Users/*/AppData/Roaming/Trae/User/workspaceStorage/*/workspace.json
+    vscode,C:/Users/*/AppData/Roaming/VSCodium/User/History/**
+    vscode,C:/Users/*/AppData/Roaming/VSCodium/User/workspaceStorage/*/state.vscdb
+    vscode,C:/Users/*/AppData/Roaming/VSCodium/User/workspaceStorage/*/state.vscdb-shm
+    vscode,C:/Users/*/AppData/Roaming/VSCodium/User/workspaceStorage/*/state.vscdb-wal
+    vscode,C:/Users/*/AppData/Roaming/VSCodium/User/workspaceStorage/*/workspace.json
+    vscode,C:/Users/*/AppData/Roaming/Windsurf/User/History/**
+    vscode,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb
+    vscode,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-shm
+    vscode,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/state.vscdb-wal
+    vscode,C:/Users/*/AppData/Roaming/Windsurf/User/workspaceStorage/*/workspace.json
     windsurf,/Users/*/.codeium/codeium.log
     windsurf,/Users/*/.codeium/windsurf-insiders/memories/global_rules.md
     windsurf,/Users/*/.codeium/windsurf-next/memories/global_rules.md

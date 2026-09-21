@@ -87,6 +87,7 @@ STORES = frozenset(
         "ollama.app_chat_database",
         "opencode.db",
         "vscode.state_vscdb",
+        "vscode.workspace_storage",
         "warp.sqlite",
         "windsurf.acp_message_stores",
         "windsurf.cli_sessions_db",
