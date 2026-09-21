@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 339bf7c9bec5
+# Catalogue digest: f07adc9c1624
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -86,6 +86,7 @@
 #     claude_desktop.org_plugins
 #     cursor.retrieval_index
 #     cursor.worker_data
+#     devin.cli_system_policy
 #     factory_droid.managed_settings
 #     goose.memory
 #     kiro.managed_settings
@@ -136,6 +137,9 @@
 #     cursor.mcp_config
 #     cursor.skills
 #     cursor.subagents
+#     devin.cli_config
+#     devin.cli_mcp_config
+#     devin.cli_subagents
 #     factory_droid.config
 #     factory_droid.mcp_and_hooks
 #     factory_droid.output_styles
@@ -769,6 +773,9 @@ sources:
     cursor,cursor.workspace_state_vscdb,C:/Users/*/AppData/Roaming/Cursor/User/workspaceStorage/*/workspace.json
     cursor,cursor.worktrees,C:/Users/*/.cursor/worktrees/*
     devin,devin.acp_events,C:/Users/*/AppData/Roaming/Devin/User/acp-events/**
+    devin,devin.cli_config,C:/Users/*/AppData/Roaming/devin/config.json
+    devin,devin.cli_mcp_config,C:/Users/*/AppData/Roaming/devin/mcp_config.json
+    devin,devin.cli_subagents,C:/Users/*/AppData/Roaming/devin/agents/**
     devin,devin.sessions_db,C:/Users/*/.local/share/devin/cli/sessions.db
     devin,devin.sessions_db,C:/Users/*/.local/share/devin/cli/sessions.db-shm
     devin,devin.sessions_db,C:/Users/*/.local/share/devin/cli/sessions.db-wal
@@ -3117,6 +3124,14 @@ sources:
     devin,devin.acp_events,/var/root/.config/Devin/User/acp-events/**
     devin,devin.acp_events,/var/root/.config/Devin/logs/*/window*/exthost/output_logging_*/1-Devin Desktop.log
     devin,devin.acp_events,/var/root/Library/Application Support/Devin/User/acp-events/**
+    devin,devin.cli_config,/Users/*/.config/devin/config.json
+    devin,devin.cli_config,/var/root/.config/devin/config.json
+    devin,devin.cli_mcp_config,/Users/*/.config/devin/mcp_config.json
+    devin,devin.cli_mcp_config,/var/root/.config/devin/mcp_config.json
+    devin,devin.cli_subagents,/Users/*/.config/devin/agents/**
+    devin,devin.cli_subagents,/var/root/.config/devin/agents/**
+    devin,devin.cli_system_policy,/Library/Application Support/Devin/system.json
+    devin,devin.cli_system_policy,/etc/devin/system.json
     devin,devin.sessions_db,/Users/*/.local/share/devin/cli/sessions.db
     devin,devin.sessions_db,/Users/*/.local/share/devin/cli/sessions.db-shm
     devin,devin.sessions_db,/Users/*/.local/share/devin/cli/sessions.db-wal
@@ -4898,10 +4913,12 @@ sources:
     windsurf,windsurf.shared_storage,/var/root/.devin-shared/sharedStorage/state.vscdb-shm
     windsurf,windsurf.shared_storage,/var/root/.devin-shared/sharedStorage/state.vscdb-wal
     windsurf,windsurf.shared_storage,/var/root/.devin-shared/sharedStorage/state.vscdb.backup
+    windsurf,windsurf.system_config,/Library/Application Support/Devin/rules/*.md
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/hooks.json
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/rules/*.md
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/skills/**
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/workflows/**
+    windsurf,windsurf.system_config,/etc/devin/rules/*.md
     windsurf,windsurf.system_config,/etc/windsurf/hooks.json
     windsurf,windsurf.system_config,/etc/windsurf/rules/*.md
     windsurf,windsurf.system_config,/etc/windsurf/skills/**
@@ -6237,6 +6254,14 @@ sources:
     devin,devin.acp_events,/root/.config/Devin/User/acp-events/**
     devin,devin.acp_events,/root/.config/Devin/logs/*/window*/exthost/output_logging_*/1-Devin Desktop.log
     devin,devin.acp_events,/root/Library/Application Support/Devin/User/acp-events/**
+    devin,devin.cli_config,/home/*/.config/devin/config.json
+    devin,devin.cli_config,/root/.config/devin/config.json
+    devin,devin.cli_mcp_config,/home/*/.config/devin/mcp_config.json
+    devin,devin.cli_mcp_config,/root/.config/devin/mcp_config.json
+    devin,devin.cli_subagents,/home/*/.config/devin/agents/**
+    devin,devin.cli_subagents,/root/.config/devin/agents/**
+    devin,devin.cli_system_policy,/Library/Application Support/Devin/system.json
+    devin,devin.cli_system_policy,/etc/devin/system.json
     devin,devin.sessions_db,/home/*/.local/share/devin/cli/sessions.db
     devin,devin.sessions_db,/home/*/.local/share/devin/cli/sessions.db-shm
     devin,devin.sessions_db,/home/*/.local/share/devin/cli/sessions.db-wal
@@ -7970,10 +7995,12 @@ sources:
     windsurf,windsurf.shared_storage,/root/.devin-shared/sharedStorage/state.vscdb-shm
     windsurf,windsurf.shared_storage,/root/.devin-shared/sharedStorage/state.vscdb-wal
     windsurf,windsurf.shared_storage,/root/.devin-shared/sharedStorage/state.vscdb.backup
+    windsurf,windsurf.system_config,/Library/Application Support/Devin/rules/*.md
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/hooks.json
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/rules/*.md
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/skills/**
     windsurf,windsurf.system_config,/Library/Application Support/Windsurf/workflows/**
+    windsurf,windsurf.system_config,/etc/devin/rules/*.md
     windsurf,windsurf.system_config,/etc/windsurf/hooks.json
     windsurf,windsurf.system_config,/etc/windsurf/rules/*.md
     windsurf,windsurf.system_config,/etc/windsurf/skills/**

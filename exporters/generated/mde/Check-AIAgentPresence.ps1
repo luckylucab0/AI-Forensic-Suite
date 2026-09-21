@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 339bf7c9bec5
+# Catalogue digest: f07adc9c1624
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -134,6 +134,9 @@
 #     cursor.mcp_config
 #     cursor.skills
 #     cursor.subagents
+#     devin.cli_config
+#     devin.cli_mcp_config
+#     devin.cli_subagents
 #     factory_droid.config
 #     factory_droid.mcp_and_hooks
 #     factory_droid.output_styles
@@ -672,6 +675,10 @@ $targets = @(
     @{ Agent = 'cursor'; Id = 'cursor.workspace_state_vscdb'; Path = '$profile\AppData\Roaming\Cursor\User\workspaceStorage' }
     @{ Agent = 'cursor'; Id = 'cursor.worktrees'; Path = '$profile\.cursor\worktrees' }
     @{ Agent = 'devin'; Id = 'devin.acp_events'; Path = '$profile\AppData\Roaming\Devin\User\acp-events' }
+    @{ Agent = 'devin'; Id = 'devin.cli_config'; Path = '$profile\AppData\Roaming\devin\config.json' }
+    @{ Agent = 'devin'; Id = 'devin.cli_mcp_config'; Path = '$profile\AppData\Roaming\devin\mcp_config.json' }
+    @{ Agent = 'devin'; Id = 'devin.cli_subagents'; Path = '$profile\AppData\Roaming\devin\agents' }
+    @{ Agent = 'devin'; Id = 'devin.cli_system_policy'; Path = 'C:\ProgramData\Devin\system.json' }
     @{ Agent = 'devin'; Id = 'devin.sessions_db'; Path = '$profile\.local\share\devin\cli\sessions.db' }
     @{ Agent = 'devin'; Id = 'devin.sessions_db'; Path = '$profile\.local\share\devin\cli\sessions.db-shm' }
     @{ Agent = 'devin'; Id = 'devin.sessions_db'; Path = '$profile\.local\share\devin\cli\sessions.db-wal' }
@@ -1422,6 +1429,7 @@ $targets = @(
     @{ Agent = 'windsurf'; Id = 'windsurf.shared_storage'; Path = '$profile\.devin-shared\sharedStorage\state.vscdb-shm' }
     @{ Agent = 'windsurf'; Id = 'windsurf.shared_storage'; Path = '$profile\.devin-shared\sharedStorage\state.vscdb-wal' }
     @{ Agent = 'windsurf'; Id = 'windsurf.shared_storage'; Path = '$profile\.devin-shared\sharedStorage\state.vscdb.backup' }
+    @{ Agent = 'windsurf'; Id = 'windsurf.system_config'; Path = 'C:\ProgramData\Devin\rules' }
     @{ Agent = 'windsurf'; Id = 'windsurf.system_config'; Path = 'C:\ProgramData\Windsurf\hooks.json' }
     @{ Agent = 'windsurf'; Id = 'windsurf.system_config'; Path = 'C:\ProgramData\Windsurf\rules' }
     @{ Agent = 'windsurf'; Id = 'windsurf.system_config'; Path = 'C:\ProgramData\Windsurf\skills' }

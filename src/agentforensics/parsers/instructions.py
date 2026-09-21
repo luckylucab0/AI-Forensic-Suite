@@ -110,6 +110,7 @@ SOURCES = frozenset(
         "crosscutting.instructions_junie_guidelines",
         "crosscutting.instructions_kiro_steering",
         "crosscutting.instructions_windsurf_rules",
+        "devin.cli_subagents",
         "cursor.bundled_skills",
         "cursor.commands_and_plans",
         "cursor.project_instructions",

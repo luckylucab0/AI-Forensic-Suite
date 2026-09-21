@@ -6,7 +6,7 @@ English | [Deutsch](ARTIFACTS.de.md)
 
 Generated from catalog/ by scripts/gen_artifact_docs.py. Do not edit by hand: CI regenerates this file and fails if it differs.
 
-625 artifacts across 31 agent(s), 500 of them resting on a fetched vendor source.
+629 artifacts across 31 agent(s), 504 of them resting on a fetched vendor source.
 
 Entries marked unverified are collected anyway, but no vendor source confirms the path. Treat the absence of such an artifact as inconclusive rather than as evidence that the agent was not used.
 
@@ -792,6 +792,14 @@ Paths below are no longer written or read by current versions. They are still co
 
 Vendor: Cognition
 
+Two products under one name and they do not share a tree. The cloud agent keeps its work
+on the vendor's servers and leaves almost nothing on the endpoint. The desktop editor is
+the rebranded Windsurf IDE and most of its on-disk names are still the old ones, which is
+why that family's entries carry them. The command line agent is the third, and it is the
+one with a documented local layout: a configuration directory holding the permission
+rules, a project directory holding the committed and the gitignored copy of the same, and
+a machine-wide policy file that names the server the conversations go to.
+
 <https://github.com/datadog-labs/trajectory/blob/9a96337689899dd4e6a0122a49cf4455d33cc58a/docs/SUPPORTED-CLIENTS.md>, <https://github.com/junhoyeo/tokscale/blob/4ee45700370461e337ebef4053dbdb04ae98299a/README.md>
 
 ### normal
@@ -801,7 +809,18 @@ Vendor: Cognition
 | Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `devin.acp_events` | acp events | log | macOS, Windows, Linux | `%APPDATA%\Devin\User\acp-events\`<br>`~/.config/Devin/User/acp-events/`<br>`~/.config/Devin/logs/<launch>/window*/exthost/output_logging_*/1-Devin Desktop.log`<br>`~/Library/Application Support/Devin/User/acp-events/` | jsonl | normal | Per-launch log directories rotate. acp-events retention unknown. | **unverified** | [community](https://github.com/junhoyeo/tokscale/blob/4ee45700370461e337ebef4053dbdb04ae98299a/README.md) |
+| `devin.cli_config` | cli config | permissions | macOS, Linux, Windows | `%APPDATA%\devin\config.json`<br>`<project>/.devin/config.json`<br>`<project>/.devin/config.local.json`<br>`~/.config/devin/config.json` | json | normal | Rewritten in place, so it holds the current state and one mtime. The vendor states that a version upgrade migrates the server entries out of this file into a dedicated one on startup, so an mtime here can belong to the product rather than to a person. | verified | [official](https://cli.devin.ai/docs/reference/configuration.md) |
+| `devin.cli_mcp_config` | cli mcp config | mcp_config | macOS, Linux, Windows | `%APPDATA%\devin\mcp_config.json`<br>`<project>/.devin/mcp_config.json`<br>`<project>/.devin/mcp_config.local.json`<br>`~/.config/devin/mcp_config.json` | json | normal | Written by the product itself on the upgrade that introduced these files, which moves the server list out of the main configuration and leaves that file without it. | verified | [official](https://cli.devin.ai/docs/reference/configuration.md) |
 | `devin.sessions_db` | sessions db | transcript | macOS, Windows, Linux | `%USERPROFILE%\.local\share\devin\cli\sessions.db`<br>`%USERPROFILE%\.local\share\devin\cli\sessions.db-shm`<br>`%USERPROFILE%\.local\share\devin\cli\sessions.db-wal`<br>`~/.local/share/devin/cli/sessions.db`<br>`~/.local/share/devin/cli/sessions.db-shm`<br>`~/.local/share/devin/cli/sessions.db-wal`<br>`~/.local/share/devin/cli/transcripts/<session-id>.json`<br>`~/Library/Application Support/devin/cli/sessions.db`<br>`~/Library/Application Support/devin/cli/sessions.db-shm`<br>`~/Library/Application Support/devin/cli/sessions.db-wal`<br>`~/Library/Application Support/devin/cli/transcripts/<session-id>.json` | sqlite | normal |  | **unverified** | [community](https://github.com/datadog-labs/trajectory/blob/9a96337689899dd4e6a0122a49cf4455d33cc58a/docs/SUPPORTED-CLIENTS.md) |
+
+### durable
+
+**Usually still there.** Not covered by the retention sweep, so these routinely outlive the transcripts they describe. When the transcripts are already gone, this group is what is left, and it is often enough to establish that an agent ran, what it was allowed to do, and what the user asked.
+
+| Id | Name | Category | Operating systems | Paths | Format | Sensitivity | Retention | Status | Source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `devin.cli_subagents` | cli subagents | instructions | macOS, Linux, Windows | `%APPDATA%\devin\agents\`<br>`<project>/.agents/agents/`<br>`~/.config/devin/agents/` | markdown | normal | Not swept. A project copy usually travels with the repository. | verified | [official](https://cli.devin.ai/docs/subagents.md) |
+| `devin.cli_system_policy` | cli system policy | permissions | macOS, Linux, Windows | `C:\ProgramData\Devin\system.json`<br>`/Library/Application Support/Devin/system.json`<br>`/etc/devin/system.json` | json | normal | Deployed by a management channel and documented as meant to be root-owned and read-only to the user, so its mtime belongs to an image or an administrator rather than to a session. | verified | [official](https://cli.devin.ai/docs/enterprise/system-config.md) |
 
 ## Factory Droid
 
@@ -1682,7 +1701,7 @@ The Codeium editor, renamed Devin Desktop in mid-2026, whose agent is called Cas
 | `windsurf.mcp_config` | mcp config | mcp_config | macOS, Windows, Linux | `%USERPROFILE%\.codeium\windsurf\mcp_config.json`<br>`<project>/.windsurf/mcp_config.json`<br>`~/.codeium/windsurf/mcp_config.json` | json | normal | Capture BEFORE remediation — a DFIR catalogue rates this P1 specifically because it records what the agent was authorised to run. Server entries are rewritten in place by the IDE's own SaveMcpServerToConfigFile RPC. | **unverified** | [community](https://raw.githubusercontent.com/depalmar/ai-dfir-toolkit/d3cf3577f6db374b3e196e1a05c0cd6708b9655d/artifacts/catalog/codeium-windsurf.yml) |
 | `windsurf.mcp_oauth_state` | mcp oauth state | credentials | macOS, Windows, Linux | `%APPDATA%\Devin\mcp\oauth\`<br>`~/.config/Devin/mcp/oauth/`<br>`~/Library/Application Support/Devin/mcp/oauth/` | json | secret | Authorisation material rotates, so what is here after the fact is not what was in use. Record metadata and a hash before any restart or sign-out. | **unverified** | observed on Windows 11 26200 |
 | `windsurf.project_instructions` | project instructions | project_instructions | macOS, Windows, Linux | `<project>/.windsurf/global_rules.md`<br>`<project>/.windsurf/rules/*.md`<br>`<project>/.windsurf/settings.json` [unsourced]<br>`<project>/.windsurfrules`<br>`<project>/AGENTS.md` | markdown | normal | Usually version-controlled — use git history for the change timeline. | verified | [official](https://docs.windsurf.com/windsurf/cascade/memories) |
-| `windsurf.system_config` | Machine-wide administrator configuration | instructions | macOS, Linux, Windows | `/Library/Application Support/Windsurf/hooks.json`<br>`/Library/Application Support/Windsurf/rules/*.md`<br>`/Library/Application Support/Windsurf/skills/`<br>`/Library/Application Support/Windsurf/workflows/`<br>`/etc/windsurf/hooks.json`<br>`/etc/windsurf/rules/*.md`<br>`/etc/windsurf/skills/`<br>`/etc/windsurf/workflows/`<br>`C:\ProgramData\Windsurf\hooks.json`<br>`C:\ProgramData\Windsurf\rules\*.md`<br>`C:\ProgramData\Windsurf\skills\`<br>`C:\ProgramData\Windsurf\workflows\` | markdown | normal | Deployed by administrators through endpoint management, so it persists and changes outside the user's control and without any trace in the user's own directories. | verified | [official](https://docs.devin.ai/desktop/devin-desktop-faq) |
+| `windsurf.system_config` | Machine-wide administrator configuration | instructions | macOS, Linux, Windows | `/Library/Application Support/Devin/rules/*.md`<br>`/Library/Application Support/Windsurf/hooks.json`<br>`/Library/Application Support/Windsurf/rules/*.md`<br>`/Library/Application Support/Windsurf/skills/`<br>`/Library/Application Support/Windsurf/workflows/`<br>`/etc/devin/rules/*.md`<br>`/etc/windsurf/hooks.json`<br>`/etc/windsurf/rules/*.md`<br>`/etc/windsurf/skills/`<br>`/etc/windsurf/workflows/`<br>`C:\ProgramData\Devin\rules\*.md`<br>`C:\ProgramData\Windsurf\hooks.json`<br>`C:\ProgramData\Windsurf\rules\*.md`<br>`C:\ProgramData\Windsurf\skills\`<br>`C:\ProgramData\Windsurf\workflows\` | markdown | normal | Deployed by administrators through endpoint management, so it persists and changes outside the user's control and without any trace in the user's own directories. | verified | [official](https://docs.devin.ai/desktop/devin-desktop-faq) |
 | `windsurf.workflows_and_skills` | workflows and skills | instructions | macOS, Windows, Linux | `<project>/.windsurf/skills/`<br>`<project>/.windsurf/workflows/*.md`<br>`~/.codeium/windsurf/global_workflows/*.md`<br>`~/.codeium/windsurf/skills/` | markdown | normal |  | verified | [official](https://docs.windsurf.com/windsurf/cascade/workflows) |
 
 ### durable

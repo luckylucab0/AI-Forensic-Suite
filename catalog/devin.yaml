@@ -12,6 +12,14 @@
 agent: devin
 title: Devin
 vendor: Cognition
+description: |-
+  Two products under one name and they do not share a tree. The cloud agent keeps its work
+  on the vendor's servers and leaves almost nothing on the endpoint. The desktop editor is
+  the rebranded Windsurf IDE and most of its on-disk names are still the old ones, which is
+  why that family's entries carry them. The command line agent is the third, and it is the
+  one with a documented local layout: a configuration directory holding the permission
+  rules, a project directory holding the committed and the gitignored copy of the same, and
+  a machine-wide policy file that names the server the conversations go to.
 # URL prefixes that count as first party for this agent. status: verified requires the
 # source to start with one of them, because a third party who reverse-engineered a path
 # writes it down just as confidently as the vendor does and an analyst cannot tell the
@@ -21,6 +29,9 @@ vendor_sources:
 - https://github.com/CognitionAI/
 - https://raw.githubusercontent.com/CognitionAI/
 - https://docs.devin.ai/
+# The command line agent's documentation is on its own host under the same domain as the
+# one above, and it is the only place this vendor states the configuration layout.
+- https://cli.devin.ai/
 - https://cognition.ai/
 references:
 - |-
@@ -55,6 +66,113 @@ artifacts:
 
         What was there, in the same parent directory, is a directory of per session databases with a different name, which this catalogue now carries as windsurf.acp_message_stores. The two are neighbours and they are not the same thing: that one holds the messages of a session, and this one is catalogued as an event log. Both stay, because one measurement of one version cannot tell whether the other name belongs to a different version, a different channel or a feature nobody used, and the cost of asking for both is two globs.
   parser: jsonl_generic
+- id: devin.cli_config
+  category: permissions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\devin\config.json'
+  - <project>/.devin/config.json
+  - <project>/.devin/config.local.json
+  - ~/.config/devin/config.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://cli.devin.ai/docs/reference/configuration.md
+  source_kind: official
+  volatility: |-
+    Rewritten in place, so it holds the current state and one mtime. The vendor states that a version upgrade migrates the server entries out of this file into a dedicated one on startup, so an mtime here can belong to the product rather than to a person.
+  notes: |-
+    What the agent was allowed to do. The permissions block is a list of allow, deny and ask rules over four kinds of action the vendor names: reading a path, writing a path, executing a command and fetching a URL. That last one is the interesting one for an exfiltration question, because it is the only place in this family that records which destinations the agent was permitted to reach.
+
+    Four files, and the fourth is the one to read. The user file carries the model and the machine's own rules; the project file is committed and is what a repository asks for; the local project file is documented as gitignored, so it is the copy with no history behind it and the one a reviewer of the repository never sees. The vendor states that only permissions, hooks and one further key may be set at project level, which is worth knowing before reading a project file as if it could have changed anything else.
+
+    The hooks key is executable content in a configuration file. It is in the same document as the permissions and is settable from a project, so a repository can carry commands that run around the agent's actions.
+  parser: json_generic
+- id: devin.cli_mcp_config
+  category: mcp_config
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\devin\mcp_config.json'
+  - <project>/.devin/mcp_config.json
+  - <project>/.devin/mcp_config.local.json
+  - ~/.config/devin/mcp_config.json
+  format: json
+  sensitivity: normal
+  collect_priority: normal
+  status: verified
+  source: https://cli.devin.ai/docs/reference/configuration.md
+  source_kind: official
+  volatility: |-
+    Written by the product itself on the upgrade that introduced these files, which moves the server list out of the main configuration and leaves that file without it.
+  notes: |-
+    Which external tools the agent could reach, with the command line or the endpoint of each. Local and remote servers are both documented here, so this is where a tool that talks to a network destination is named.
+
+    Read the main configuration too, and not only this file. The vendor states that these dedicated files arrived in a specific release and that before it the server list lived inside the main configuration file under its own key, with newer versions migrating it automatically on startup. So on a machine that has not been upgraded, or in a bundle taken from one, this file is absent and the evidence is in the other entry's files; and on one that has, the migration is why the main file no longer has the key.
+
+    The gitignored project copy has the same significance it has for the configuration: a server that a repository defined for everybody is in the committed file, and one that only this machine used is in the local one.
+  parser: json_generic
+- id: devin.cli_system_policy
+  category: permissions
+  root: system
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - C:\ProgramData\Devin\system.json
+  - /Library/Application Support/Devin/system.json
+  - /etc/devin/system.json
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://cli.devin.ai/docs/enterprise/system-config.md
+  source_kind: official
+  volatility: |-
+    Deployed by a management channel and documented as meant to be root-owned and read-only to the user, so its mtime belongs to an image or an administrator rather than to a session.
+  notes: |-
+    This file names the server. The vendor documents it as pinning authentication to an enterprise host and an account, which means it is the record of which installation of the vendor's service the conversations went to, and that is not knowable from anything in the user's profile. On a machine with no such file the agent talked to the vendor's public service, and the entry's absence is therefore an answer rather than a gap.
+
+    It can also force an outbound proxy for the agent and its updater, overriding the user's own setting and refusing to start if the user has one too. So the destination the traffic actually went through is here, which matters when the question is what left the device and by which route.
+
+    Outside the user profile on all three platforms, in the same directories the desktop product uses for its machine-wide rules and hooks, which this catalogue carries under that product. The vendor notes that a user-writable location defeats the purpose, so the ownership and mode of the file are part of the evidence and not only its content.
+
+    Strict JSON here, unlike the user configuration, which the vendor documents as accepting comments. A file that does not parse is therefore a broken deployment rather than a stylistic difference.
+  parser: json_generic
+- id: devin.cli_subagents
+  category: instructions
+  root: project
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%APPDATA%\devin\agents\'
+  - <project>/.agents/agents/
+  - ~/.config/devin/agents/
+  format: markdown
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://cli.devin.ai/docs/subagents.md
+  source_kind: official
+  volatility: Not swept. A project copy usually travels with the repository.
+  notes: |-
+    Subagent definitions, which are markdown files with frontmatter and a system prompt. The vendor documents two layouts in the same directory, a flat file whose name is the profile and a directory whose name is the profile with the definition inside it, so a pattern that expects one of the two finds half of them and the directories are collected whole for that reason.
+
+    Why it matters beyond being another instruction file: a subagent is a separate conversation chain with its own system prompt that the main agent starts on its own. What it was told is only in this file, and the main transcript shows a delegation rather than the words.
+
+    The project directory is the shared agent-agnostic one rather than this product's own, so a definition found there may have been written for a different agent and still ran here.
+  parser: instructions
 - id: devin.sessions_db
   category: transcript
   root: user_profile

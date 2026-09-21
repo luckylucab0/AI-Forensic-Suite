@@ -6027,6 +6027,80 @@ EMBEDDED_CATALOGUE_JSON = r"""
                     "status": "unverified"
                 },
                 {
+                    "category": "permissions",
+                    "collect_priority": "normal",
+                    "id": "devin.cli_config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\devin\\config.json",
+                        "<project>/.devin/config.json",
+                        "<project>/.devin/config.local.json",
+                        "~/.config/devin/config.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "mcp_config",
+                    "collect_priority": "normal",
+                    "id": "devin.cli_mcp_config",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\devin\\mcp_config.json",
+                        "<project>/.devin/mcp_config.json",
+                        "<project>/.devin/mcp_config.local.json",
+                        "~/.config/devin/mcp_config.json"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "instructions",
+                    "collect_priority": "durable",
+                    "id": "devin.cli_subagents",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%APPDATA%\\devin\\agents\\",
+                        "<project>/.agents/agents/",
+                        "~/.config/devin/agents/"
+                    ],
+                    "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "permissions",
+                    "collect_priority": "durable",
+                    "id": "devin.cli_system_policy",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "C:\\ProgramData\\Devin\\system.json",
+                        "/Library/Application Support/Devin/system.json",
+                        "/etc/devin/system.json"
+                    ],
+                    "root": "system",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "transcript",
                     "collect_priority": "normal",
                     "id": "devin.sessions_db",
@@ -12057,14 +12131,17 @@ EMBEDDED_CATALOGUE_JSON = r"""
                         "windows"
                     ],
                     "paths": [
+                        "/Library/Application Support/Devin/rules/*.md",
                         "/Library/Application Support/Windsurf/hooks.json",
                         "/Library/Application Support/Windsurf/rules/*.md",
                         "/Library/Application Support/Windsurf/skills/",
                         "/Library/Application Support/Windsurf/workflows/",
+                        "/etc/devin/rules/*.md",
                         "/etc/windsurf/hooks.json",
                         "/etc/windsurf/rules/*.md",
                         "/etc/windsurf/skills/",
                         "/etc/windsurf/workflows/",
+                        "C:\\ProgramData\\Devin\\rules\\*.md",
                         "C:\\ProgramData\\Windsurf\\hooks.json",
                         "C:\\ProgramData\\Windsurf\\rules\\*.md",
                         "C:\\ProgramData\\Windsurf\\skills\\",
@@ -12423,7 +12500,7 @@ EMBEDDED_CATALOGUE_JSON = r"""
             ]
         }
     ],
-    "sha256": "3dcee998050afbf142c890e9947e3c2574671f2b5310102a1e20058bb4ab356f"
+    "sha256": "113c51d8306ff8f9d6afcb699a9c897c43b43ad2d3d04eedae4215b26b405f7a"
 }
 """
 EMBEDDED_CATALOGUE = json.loads(EMBEDDED_CATALOGUE_JSON)

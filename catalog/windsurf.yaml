@@ -86,14 +86,17 @@ artifacts:
   - linux
   - windows
   paths:
+  - /Library/Application Support/Devin/rules/*.md
   - /Library/Application Support/Windsurf/hooks.json
   - /Library/Application Support/Windsurf/rules/*.md
   - /Library/Application Support/Windsurf/skills/
   - /Library/Application Support/Windsurf/workflows/
+  - /etc/devin/rules/*.md
   - /etc/windsurf/hooks.json
   - /etc/windsurf/rules/*.md
   - /etc/windsurf/skills/
   - /etc/windsurf/workflows/
+  - C:\ProgramData\Devin\rules\*.md
   - C:\ProgramData\Windsurf\hooks.json
   - C:\ProgramData\Windsurf\rules\*.md
   - C:\ProgramData\Windsurf\skills\
@@ -109,6 +112,10 @@ artifacts:
     Added by the vendor verification pass. An administrator can deploy rules, workflows, skills and hooks machine-wide, read-only to the user, and the vendor states that the hooks here run first in the merge order. That makes this the answer to a specific and otherwise unanswerable question: agent behaviour that nothing in the user's own directories accounts for. A blocking hook here can also stop an action the analyst would otherwise expect to see attempted, so an absent action is not proof the agent never tried.
 
     Collect it even when the user's own directories look complete, and read it before concluding that an instruction the agent followed came from the user.
+
+    A second directory name, and it wins. The vendor's rules page now gives the machine-wide rules under the successor product's name as well as this one, and states that the new directory is preferred and takes precedence with the old one kept as a fallback. So on a machine that has both, the rules that applied are the ones this entry did not collect until now.
+
+    Only the rules are stated under both names. The hooks page still gives the legacy directory alone, and the successor's own command line documentation says the two products share these directories for rules and hooks, which makes a hooks file under the new name likely and unstated. It is not in this entry for that reason: somebody who finds one should add it rather than have this catalogue assert it.
   parser: instructions
 - id: windsurf.worktrees
   title: Agent-created git worktrees
