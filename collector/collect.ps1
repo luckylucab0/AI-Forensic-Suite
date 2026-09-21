@@ -6165,6 +6165,23 @@ $EmbeddedCatalogueJson = @'
             "agent": "gemini_cli",
             "artifacts": [
                 {
+                    "category": "permissions",
+                    "collect_priority": "durable",
+                    "id": "gemini_cli.agent_acknowledgments",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\acknowledgments\\agents.json",
+                        "~/.gemini/acknowledgments/agents.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "instructions",
                     "collect_priority": "durable",
                     "id": "gemini_cli.agent_definitions",
@@ -6270,7 +6287,26 @@ $EmbeddedCatalogueJson = @'
                     ],
                     "paths": [
                         "%USERPROFILE%\\.gemini\\",
+                        "~/.cache/.gemini/",
                         "~/.gemini/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "install_evidence",
+                    "collect_priority": "durable",
+                    "id": "gemini_cli.install_evidence",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\installation_id",
+                        "~/.cache/.gemini/installation_id",
+                        "~/.gemini/installation_id"
                     ],
                     "root": "user_profile",
                     "sensitivity": "normal",
@@ -6317,6 +6353,24 @@ $EmbeddedCatalogueJson = @'
                     "status": "verified"
                 },
                 {
+                    "category": "permissions",
+                    "collect_priority": "durable",
+                    "id": "gemini_cli.policy_integrity",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\policy_integrity.json",
+                        "~/.cache/.gemini/policy_integrity.json",
+                        "~/.gemini/policy_integrity.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
                     "category": "project_instructions",
                     "collect_priority": "normal",
                     "id": "gemini_cli.project_config",
@@ -6333,6 +6387,63 @@ $EmbeddedCatalogueJson = @'
                         "<project>/GEMINI.md"
                     ],
                     "root": "project",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "config",
+                    "collect_priority": "durable",
+                    "id": "gemini_cli.project_registry",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\projects.json",
+                        "~/.cache/.gemini/projects.json",
+                        "~/.gemini/projects.json"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "cache",
+                    "collect_priority": "first",
+                    "id": "gemini_cli.project_runtime_trees",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\history\\<project-hash>\\",
+                        "%USERPROFILE%\\.gemini\\tmp\\<project-hash>\\",
+                        "~/.cache/.gemini/history/<project-hash>/",
+                        "~/.cache/.gemini/tmp/<project-hash>/",
+                        "~/.gemini/history/<project-hash>/",
+                        "~/.gemini/tmp/<project-hash>/"
+                    ],
+                    "root": "user_profile",
+                    "sensitivity": "normal",
+                    "status": "verified"
+                },
+                {
+                    "category": "prompt_history",
+                    "collect_priority": "first",
+                    "id": "gemini_cli.prompt_history_log",
+                    "os": [
+                        "macos",
+                        "linux",
+                        "windows"
+                    ],
+                    "paths": [
+                        "%USERPROFILE%\\.gemini\\tmp\\<project-hash>\\logs.json",
+                        "~/.cache/.gemini/tmp/<project-hash>/logs.json",
+                        "~/.gemini/tmp/<project-hash>/logs.json"
+                    ],
+                    "root": "user_profile",
                     "sensitivity": "normal",
                     "status": "verified"
                 },
@@ -11622,7 +11733,7 @@ $EmbeddedCatalogueJson = @'
             ]
         }
     ],
-    "sha256": "ea68296eb1a811b5818cc878682adefb2fab3f17b498c717d83d6f5651e2a42a"
+    "sha256": "2d2beca3d03ec582a6683be94bd276b3fa9dcc6936f5267b8f496d303b11a6c7"
 }
 '@
 $script:EmbeddedCatalogue = $EmbeddedCatalogueJson | ConvertFrom-Json

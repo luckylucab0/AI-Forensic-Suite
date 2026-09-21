@@ -59,6 +59,7 @@ SOURCES = frozenset(
         "claude_code.changelog_cache",
         "claude_code.git_global_excludes",
         "claude_code.worktreeinclude",
+        "gemini_cli.install_evidence",
         "claude_desktop.device_identifier",
         "claude_desktop.install_evidence_linux",
         "cline.data_dir_root",

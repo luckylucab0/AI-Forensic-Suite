@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 0b2cac47244d
+# Catalogue digest: f14125eb906f
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -674,6 +674,7 @@ $targets = @(
     @{ Agent = 'factory_droid'; Id = 'factory_droid.skills_and_droids'; Path = '$profile\.factory\skills' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.specs'; Path = '$profile\.factory\specs' }
     @{ Agent = 'factory_droid'; Id = 'factory_droid.worktrees'; Path = '$profile\.factory\worktrees' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.agent_acknowledgments'; Path = '$profile\.gemini\acknowledgments\agents.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.agent_definitions'; Path = '$profile\.agents\skills' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.agent_definitions'; Path = '$profile\.gemini\agents' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.agent_definitions'; Path = '$profile\.gemini\skills' }
@@ -683,10 +684,16 @@ $targets = @(
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.credentials'; Path = '$profile\.gemini\oauth_creds.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.google_accounts'; Path = '$profile\.gemini\google_accounts.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.home_tree'; Path = '$profile\.gemini' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.install_evidence'; Path = '$profile\.gemini\installation_id' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.mcp_oauth_tokens'; Path = '$profile\.gemini\a2a-oauth-tokens.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.mcp_oauth_tokens'; Path = '$profile\.gemini\mcp-oauth-tokens.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.policies'; Path = '$profile\.gemini\policies' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.policies'; Path = 'C:\ProgramData\gemini-cli\policies' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.policy_integrity'; Path = '$profile\.gemini\policy_integrity.json' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.project_registry'; Path = '$profile\.gemini\projects.json' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.project_runtime_trees'; Path = '$profile\.gemini\history' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.project_runtime_trees'; Path = '$profile\.gemini\tmp' }
+    @{ Agent = 'gemini_cli'; Id = 'gemini_cli.prompt_history_log'; Path = '$profile\.gemini\tmp' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.shell_history'; Path = '$profile\.gemini\tmp' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.system_settings'; Path = 'C:\ProgramData\gemini-cli\settings.json' }
     @{ Agent = 'gemini_cli'; Id = 'gemini_cli.system_settings'; Path = 'C:\ProgramData\gemini-cli\system-defaults.json' }

@@ -51,6 +51,10 @@ env_overrides:
   effect: |-
     Moves trustedFolders.json, the record of which directories the user allowed the agent to work in. That record is the answer to what the agent was permitted to touch.
   source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/reference/configuration.md
+- name: SANDBOX
+  effect: |-
+    Not a relocation variable the vendor offers, but the one that decides where the runtime state is. Storage.getGlobalRuntimeDir() in packages/core/src/config/storage.ts returns ~/.cache/.gemini when SANDBOX is 'sandbox-exec', which is macOS Seatbelt, and ~/.gemini otherwise, because the seatbelt profile blocks writes to the home directory. So on a sandboxed macOS host the chats, the prompt log, the project registry and the per-project temporary trees are all under ~/.cache/.gemini and a collection of ~/.gemini alone finds the configuration and none of the history. Any other value means a container, where the launcher mounts an ephemeral directory at the ordinary location.
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
 - name: GEMINI_SYSTEM_MD
   effect: |-
     Replaces the built-in system prompt with a file of the operator's choosing, anywhere on disk. Prompt-injection surface that lives outside every directory this catalogue names: follow the value.
@@ -95,6 +99,7 @@ artifacts:
   - linux
   paths:
   - '%USERPROFILE%\.gemini\'
+  - ~/.cache/.gemini/
   - ~/.gemini/
   format: directory
   sensitivity: normal
@@ -109,6 +114,8 @@ artifacts:
     GEMINI_DIR = '.gemini' in packages/core/src/utils/paths.ts. Claimed as a whole tree on purpose: the vendor documents the directory and several files in it, and not everything that lands here is documented anywhere. A glob over the tree means an undocumented file is still collected and still appears in the manifest, rather than being absent because nobody had written it down.
 
     Re-sourced by the verification pass: the file cited before declares the directory name as a constant and never joins it to a home directory. The storage module does. Forensically important and newly established by the pass: the runtime directory diverts to ~/.cache/.gemini when the sandbox variable is set to the macOS Seatbelt backend, so under that sandbox the account file, the trusted folder list, the temporary directory and the saved chats live there instead. The settings file and the cached credentials do not move.
+
+    The sandbox tree is a path of this entry as of this pass and was not before: the paragraph above described where the runtime state goes and the paths of this entry did not go there, so on a sandboxed macOS host everything but the saved chats, which have their own entry, was outside the collection. Storage.getGlobalRuntimeDir() states it, joining the home directory, '.cache' and the directory name.
   parser: null
 - id: gemini_cli.shell_history
   category: shell_history
@@ -400,3 +407,160 @@ artifacts:
 
     sandbox.Dockerfile defines the container the agent's commands run in, so it decides what the sandbox could reach.
   parser: instructions
+- id: gemini_cli.prompt_history_log
+  title: Cross-session prompt log (logs.json)
+  category: prompt_history
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.gemini\tmp\<project-hash>\logs.json'
+  - ~/.cache/.gemini/tmp/<project-hash>/logs.json
+  - ~/.gemini/tmp/<project-hash>/logs.json
+  format: json
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/core/logger.ts
+  source_kind: source_code
+  unsourced_paths:
+  - ~/.cache/.gemini/tmp/<project-hash>/logs.json
+  volatility: |-
+    One JSON array rewritten in place on every append, so a crash mid-write loses the whole file rather than one record, and the file is inside the temporary tree the product prunes. It is not covered by the thirty-day chat retention that deletes the conversations, which is what makes it outlast them.
+  notes: |-
+    EVERY PROMPT THE USER TYPED, ACROSS SESSIONS, IN ONE FILE PER PROJECT, and it was not in this catalogue while the same file of the fork of this product was. LOG_FILE_NAME = 'logs.json' in packages/core/src/core/logger.ts, written into storage.getProjectTempDir(), which is tmp/<project-hash> under the runtime directory.
+
+    Record structure: a JSON array of {sessionId, messageId, timestamp, type, message}, type being 'user' for a typed prompt. So it dates every prompt with the agent's own clock and names the session it belonged to, which is what lets a prompt with no surviving conversation still be attributed to one.
+
+    Read by the same reader as the fork's file, because it is the same code: qwen_code.prompt_history_log is the same array of the same records.
+  parser: gemini
+- id: gemini_cli.project_registry
+  title: Project registry (projects.json)
+  category: config
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.gemini\projects.json'
+  - ~/.cache/.gemini/projects.json
+  - ~/.gemini/projects.json
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
+  source_kind: source_code
+  unsourced_paths:
+  - ~/.cache/.gemini/projects.json
+  volatility: |-
+    Rewritten when a project is first seen and when an identifier migrates. It is not pruned with the temporary tree it describes, so it commonly names directories that are already gone, which is useful rather than a defect.
+  notes: |-
+    THE FILE THAT SAYS WHICH PROJECT EACH DIRECTORY BELONGS TO. Every per-project directory this product writes is keyed by a short identifier: the chats, the prompt log, the shell history, the checkpoints. Without this file those directories name nothing an analyst can put in a report, and the identifier is not reversible.
+
+    Storage.initialize() builds a ProjectRegistry at join(getGlobalRuntimeDir(), 'projects.json') and hands it the two directories it keeps in step, the temporary tree and the history tree, then asks it for the short id of the project root. So this file maps identifier to absolute working copy, and it is the counterpart of the file-that-names-the-workspace that this catalogue already requires beside every per-workspace store.
+  parser: json_generic
+- id: gemini_cli.project_runtime_trees
+  title: Per-project runtime trees (tmp and history)
+  category: cache
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.gemini\history\<project-hash>\'
+  - '%USERPROFILE%\.gemini\tmp\<project-hash>\'
+  - ~/.cache/.gemini/history/<project-hash>/
+  - ~/.cache/.gemini/tmp/<project-hash>/
+  - ~/.gemini/history/<project-hash>/
+  - ~/.gemini/tmp/<project-hash>/
+  format: directory
+  sensitivity: normal
+  collect_priority: first
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
+  source_kind: source_code
+  unsourced_paths:
+  - ~/.cache/.gemini/history/<project-hash>/
+  - ~/.cache/.gemini/tmp/<project-hash>/
+  volatility: |-
+    The temporary tree is the product's own scratch space and is pruned with the project identifier it is keyed by. Both trees are migrated rather than copied when an identifier changes, so the old directory disappears.
+  notes: |-
+    What the two trees hold, from the resolvers in packages/core/src/config/storage.ts: under tmp/<project-hash> the chats directory this catalogue reads separately, the prompt log beside it, checkpoint-<tag>.json files from packages/core/src/core/logger.ts, and the checkpoints, logs, plans, tracker and memory subdirectories, memory/skills among them. Under history/<project-hash> a second per-project tree that the same registry keeps in step with the first.
+
+    Catalogued as the two trees rather than as a path per file on purpose. The file names inside them are the product's own scratch vocabulary, several are keyed by a session id or a tag, and the entry that matters for reading is the chats directory, which has its own entry. What this one guarantees is that the rest is collected and hashed instead of being left behind because nobody enumerated it.
+
+    What is in history/<project-hash> is not stated in the file that defines it: storage.ts names the directory and hands it to the registry, and the writer is elsewhere. Collected and reported as a directory rather than described, which is the honest answer until somebody reads the writer.
+  parser: null
+- id: gemini_cli.agent_acknowledgments
+  title: Acknowledged agent definitions
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.gemini\acknowledgments\agents.json'
+  - ~/.gemini/acknowledgments/agents.json
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
+  source_kind: source_code
+  notes: |-
+    Which agent definitions the user has approved, from Storage.getAcknowledgedAgentsPath() = join(getGlobalGeminiDir(), 'acknowledgments', 'agents.json'). A subagent definition is executable instruction text, so the record that somebody accepted one is a permission decision and belongs beside the trusted-folders file rather than with the configuration.
+  parser: json_generic
+- id: gemini_cli.policy_integrity
+  title: Policy integrity state
+  category: permissions
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.gemini\policy_integrity.json'
+  - ~/.cache/.gemini/policy_integrity.json
+  - ~/.gemini/policy_integrity.json
+  format: json
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
+  source_kind: source_code
+  unsourced_paths:
+  - ~/.cache/.gemini/policy_integrity.json
+  notes: |-
+    Storage.getPolicyIntegrityStoragePath() = join(getGlobalRuntimeDir(), 'policy_integrity.json'). The product keeps integrity state for its own policy set, which makes this the place a tampered or replaced policy file would show up, and the policy set is what says which tool calls were allowed without asking.
+  parser: json_generic
+- id: gemini_cli.install_evidence
+  title: Installation identity
+  category: install_evidence
+  root: user_profile
+  os:
+  - macos
+  - linux
+  - windows
+  paths:
+  - '%USERPROFILE%\.gemini\installation_id'
+  - ~/.cache/.gemini/installation_id
+  - ~/.gemini/installation_id
+  format: text
+  sensitivity: normal
+  collect_priority: durable
+  status: verified
+  source: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/config/storage.ts
+  source_kind: source_code
+  unsourced_paths:
+  - ~/.cache/.gemini/installation_id
+  volatility: |-
+    Written once and not pruned with the temporary tree, so it outlives every conversation.
+  notes: |-
+    Storage.getInstallationIdPath() = join(getGlobalRuntimeDir(), 'installation_id'). One identifier per installation, which is what ties telemetry seen elsewhere to this host and what says the product was installed at all on a host whose history has been swept. The account file beside it has its own entry.
+  parser: text_config

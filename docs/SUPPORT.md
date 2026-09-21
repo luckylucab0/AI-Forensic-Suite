@@ -6,7 +6,7 @@ English | [Deutsch](SUPPORT.de.md)
 
 What this suite reads, per agent, counted from the catalogue and the reader registry rather than written down. The numbers move when the code does.
 
-31 catalogue files, 30 of them a product and one cross-cutting. 467 of 584 artifacts are read by 37 reader modules, into 23 event kinds. 459 artifacts rest on a fetched vendor source.
+31 catalogue files, 30 of them a product and one cross-cutting. 472 of 590 artifacts are read by 37 reader modules, into 23 event kinds. 465 artifacts rest on a fetched vendor source.
 
 **How to read an empty result.** An agent listed here with artifacts read means the paths were searched and the files that were there were parsed, so an empty result is evidence that those paths held nothing. It is never evidence that the agent was not used: the data tree may have been relocated by a variable, the retention period may have swept it, the paths may be the unverified ones, or the user may have worked in a profile nobody collected. Where an entry is unverified, `docs/ARTIFACTS.md` says so per artifact and the analyzer repeats it in its output.
 
@@ -28,7 +28,7 @@ What this suite reads, per agent, counted from the catalogue and the reader regi
 | Cursor | Linux, macOS, Windows | 9 / 9 | 43 / 50 | 32 | 7 |
 | Devin | Linux, macOS, Windows | 1 / 1 | 2 / 2 | 2 | 0 |
 | Factory Droid | Linux, macOS, Windows | 2 / 2 | 8 / 9 | 6 | 1 |
-| Gemini CLI | Linux, macOS, Windows | 1 / 1 | 10 / 13 | 5 | 3 |
+| Gemini CLI | Linux, macOS, Windows | 1 / 1 | 15 / 19 | 8 | 4 |
 | GitHub Copilot CLI | Linux, macOS, Windows | 3 / 4 | 16 / 20 | 11 | 4 |
 | Goose | Linux, macOS, Windows | 4 / 4 | 14 / 15 | 10 | 1 |
 | Hermes | Linux, macOS, Windows | 10 / 11 | 41 / 56 | 31 | 15 |
@@ -68,7 +68,7 @@ Every artifact in the catalogue is collected and appears in a case, whether a re
 
 ### Containers in a format nobody here has read
 
-66 entries, binary or directory layouts with no documented format. Each one is collected whole and is on the timeline as a filesystem event. Reading one means writing a format implementation, not finishing an unfinished reader.
+67 entries, binary or directory layouts with no documented format. Each one is collected whole and is on the timeline as a filesystem event. Reading one means writing a format implementation, not finishing an unfinished reader.
 
 - `amazonq.cli_subagent_executions` (directory)
 - `amazonq.ide_extension_install` (directory)
@@ -106,6 +106,7 @@ Every artifact in the catalogue is collected and appears in a case, whether a re
 - `cursor.worktrees` (directory)
 - `factory_droid.worktrees` (directory)
 - `gemini_cli.home_tree` (directory)
+- `gemini_cli.project_runtime_trees` (directory)
 - `hermes.backups` (binary)
 - `hermes.browser_agent_profiles` (directory)
 - `hermes.browser_media` (binary)
@@ -154,7 +155,7 @@ None as of this generation. The check behind this section looks for a catalogue 
 
 ## Where the reading is thin
 
-285 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
+288 artifacts are read by a generic reader. The file is read completely and every record is in the case with its content; what the record means is not decided, and each one says so on itself. Two kinds of record carry that statement: `unparsed.record` for something nothing could read, and a record marked as returned uninterpreted for something read whose format nobody has mapped. The counts are separate in every summary this suite prints, because a store nobody has a schema for and a half-written file are opposite problems.
 
 ## Where to look next
 

@@ -1,6 +1,6 @@
 // Generated from the artifact catalogue. Do not edit by hand:
 // run `afx export-collection` and commit the result.
-// Catalogue digest: 0b2cac47244d
+// Catalogue digest: f14125eb906f
 //
 // An empty result from this rule means the paths it searched held nothing. It does
 // not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -95,7 +95,6 @@
 //     crosscutting.mcp_config_files
 //     crosscutting.windows_execution_evidence_files
 //     factory_droid.auth
-//     gemini_cli.home_tree
 //     roo_code.checkpoints
 //     roo_code.custom_storage_path
 //     roo_code.extension_id
@@ -1325,6 +1324,8 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "factory_droid", "factory_droid.specs", ".factory\\specs",
     "factory_droid", "factory_droid.worktrees", ".factory/worktrees",
     "factory_droid", "factory_droid.worktrees", ".factory\\worktrees",
+    "gemini_cli", "gemini_cli.agent_acknowledgments", ".gemini/acknowledgments/agents.json",
+    "gemini_cli", "gemini_cli.agent_acknowledgments", ".gemini\\acknowledgments\\agents.json",
     "gemini_cli", "gemini_cli.agent_definitions", ".agents/skills",
     "gemini_cli", "gemini_cli.agent_definitions", ".agents\\skills",
     "gemini_cli", "gemini_cli.agent_definitions", ".gemini/agents",
@@ -1343,6 +1344,12 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "gemini_cli", "gemini_cli.credentials", ".gemini\\oauth_creds.json",
     "gemini_cli", "gemini_cli.google_accounts", ".gemini/google_accounts.json",
     "gemini_cli", "gemini_cli.google_accounts", ".gemini\\google_accounts.json",
+    "gemini_cli", "gemini_cli.home_tree", ".cache/.gemini",
+    "gemini_cli", "gemini_cli.home_tree", ".cache\\.gemini",
+    "gemini_cli", "gemini_cli.install_evidence", ".cache/.gemini/installation_id",
+    "gemini_cli", "gemini_cli.install_evidence", ".cache\\.gemini\\installation_id",
+    "gemini_cli", "gemini_cli.install_evidence", ".gemini/installation_id",
+    "gemini_cli", "gemini_cli.install_evidence", ".gemini\\installation_id",
     "gemini_cli", "gemini_cli.mcp_oauth_tokens", ".gemini/a2a-oauth-tokens.json",
     "gemini_cli", "gemini_cli.mcp_oauth_tokens", ".gemini/mcp-oauth-tokens.json",
     "gemini_cli", "gemini_cli.mcp_oauth_tokens", ".gemini\\a2a-oauth-tokens.json",
@@ -1353,6 +1360,26 @@ let AgentPaths = datatable(Agent: string, ArtifactId: string, Fragment: string)
     "gemini_cli", "gemini_cli.policies", "/etc/gemini-cli/policies",
     "gemini_cli", "gemini_cli.policies", "\\Library\\Application Support\\GeminiCli\\policies",
     "gemini_cli", "gemini_cli.policies", "\\etc\\gemini-cli\\policies",
+    "gemini_cli", "gemini_cli.policy_integrity", ".cache/.gemini/policy_integrity.json",
+    "gemini_cli", "gemini_cli.policy_integrity", ".cache\\.gemini\\policy_integrity.json",
+    "gemini_cli", "gemini_cli.policy_integrity", ".gemini/policy_integrity.json",
+    "gemini_cli", "gemini_cli.policy_integrity", ".gemini\\policy_integrity.json",
+    "gemini_cli", "gemini_cli.project_registry", ".cache/.gemini/projects.json",
+    "gemini_cli", "gemini_cli.project_registry", ".cache\\.gemini\\projects.json",
+    "gemini_cli", "gemini_cli.project_registry", ".gemini/projects.json",
+    "gemini_cli", "gemini_cli.project_registry", ".gemini\\projects.json",
+    "gemini_cli", "gemini_cli.project_runtime_trees", ".cache/.gemini/history",
+    "gemini_cli", "gemini_cli.project_runtime_trees", ".cache/.gemini/tmp",
+    "gemini_cli", "gemini_cli.project_runtime_trees", ".cache\\.gemini\\history",
+    "gemini_cli", "gemini_cli.project_runtime_trees", ".cache\\.gemini\\tmp",
+    "gemini_cli", "gemini_cli.project_runtime_trees", ".gemini/history",
+    "gemini_cli", "gemini_cli.project_runtime_trees", ".gemini/tmp",
+    "gemini_cli", "gemini_cli.project_runtime_trees", ".gemini\\history",
+    "gemini_cli", "gemini_cli.project_runtime_trees", ".gemini\\tmp",
+    "gemini_cli", "gemini_cli.prompt_history_log", ".cache/.gemini/tmp",
+    "gemini_cli", "gemini_cli.prompt_history_log", ".cache\\.gemini\\tmp",
+    "gemini_cli", "gemini_cli.prompt_history_log", ".gemini/tmp",
+    "gemini_cli", "gemini_cli.prompt_history_log", ".gemini\\tmp",
     "gemini_cli", "gemini_cli.shell_history", ".gemini/tmp",
     "gemini_cli", "gemini_cli.shell_history", ".gemini\\tmp",
     "gemini_cli", "gemini_cli.system_settings", "/Library/Application Support/GeminiCli/settings.json",

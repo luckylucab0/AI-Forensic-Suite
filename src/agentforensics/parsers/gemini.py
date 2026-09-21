@@ -76,18 +76,19 @@ class GeminiParser:
 
     _GEMINI = frozenset({"gemini_cli.chats"})
     _QWEN = frozenset({"qwen_code.conversation_transcript", "qwen_code.subagent_transcripts"})
-    _QWEN_HISTORY = frozenset({"qwen_code.prompt_history_log"})
+    # The prompt log, which is one file of the shared code and therefore one reading for
+    # both products. The upstream's copy of it was not in the catalogue at all until the
+    # pass that added it, so this reader claimed the fork's file and not the original's.
+    _HISTORY = frozenset({"gemini_cli.prompt_history_log", "qwen_code.prompt_history_log"})
 
     def handles(self, artifact_id: str | None) -> bool:
         return (
-            artifact_id in self._GEMINI
-            or artifact_id in self._QWEN
-            or artifact_id in self._QWEN_HISTORY
+            artifact_id in self._GEMINI or artifact_id in self._QWEN or artifact_id in self._HISTORY
         )
 
     def parse(self, context: ParseContext) -> Iterator[Event]:
-        if context.artifact_id in self._QWEN_HISTORY:
-            yield from self._qwen_history(context)
+        if context.artifact_id in self._HISTORY:
+            yield from self._prompt_log(context)
             return
         if context.artifact_id in self._QWEN:
             yield from self._qwen(context)
@@ -568,7 +569,7 @@ class GeminiParser:
                     session_id=record.get("sessionId"),
                 )
 
-    def _qwen_history(self, context: ParseContext) -> Iterator[Event]:
+    def _prompt_log(self, context: ParseContext) -> Iterator[Event]:
         """`logs.json`: one JSON array, rewritten in place on every append.
 
         Worth knowing while reading it: because the whole array is rewritten rather than

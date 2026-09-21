@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 0b2cac47244d
+# Catalogue digest: f14125eb906f
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -652,29 +652,60 @@ sources:
     factory_droid,/root/.factory/output-styles/*.md
     factory_droid,/var/root/.factory/output-styles/*.md
     factory_droid,C:/Users/*/.factory/output-styles/*.md
+    gemini_cli,/Users/*/.cache/.gemini/**
+    gemini_cli,/Users/*/.cache/.gemini/history/*/**
+    gemini_cli,/Users/*/.cache/.gemini/tmp/*/**
     gemini_cli,/Users/*/.cache/.gemini/tmp/*/chats/**
+    gemini_cli,/Users/*/.cache/.gemini/tmp/*/logs.json
     gemini_cli,/Users/*/.gemini/**
+    gemini_cli,/Users/*/.gemini/history/*/**
     gemini_cli,/Users/*/.gemini/sessions/**
+    gemini_cli,/Users/*/.gemini/tmp/*/**
     gemini_cli,/Users/*/.gemini/tmp/*/chats/**
+    gemini_cli,/Users/*/.gemini/tmp/*/logs.json
     gemini_cli,/Users/*/.gemini/tmp/*/shell_history
+    gemini_cli,/home/*/.cache/.gemini/**
+    gemini_cli,/home/*/.cache/.gemini/history/*/**
+    gemini_cli,/home/*/.cache/.gemini/tmp/*/**
     gemini_cli,/home/*/.cache/.gemini/tmp/*/chats/**
+    gemini_cli,/home/*/.cache/.gemini/tmp/*/logs.json
     gemini_cli,/home/*/.gemini/**
+    gemini_cli,/home/*/.gemini/history/*/**
     gemini_cli,/home/*/.gemini/sessions/**
+    gemini_cli,/home/*/.gemini/tmp/*/**
     gemini_cli,/home/*/.gemini/tmp/*/chats/**
+    gemini_cli,/home/*/.gemini/tmp/*/logs.json
     gemini_cli,/home/*/.gemini/tmp/*/shell_history
+    gemini_cli,/root/.cache/.gemini/**
+    gemini_cli,/root/.cache/.gemini/history/*/**
+    gemini_cli,/root/.cache/.gemini/tmp/*/**
     gemini_cli,/root/.cache/.gemini/tmp/*/chats/**
+    gemini_cli,/root/.cache/.gemini/tmp/*/logs.json
     gemini_cli,/root/.gemini/**
+    gemini_cli,/root/.gemini/history/*/**
     gemini_cli,/root/.gemini/sessions/**
+    gemini_cli,/root/.gemini/tmp/*/**
     gemini_cli,/root/.gemini/tmp/*/chats/**
+    gemini_cli,/root/.gemini/tmp/*/logs.json
     gemini_cli,/root/.gemini/tmp/*/shell_history
+    gemini_cli,/var/root/.cache/.gemini/**
+    gemini_cli,/var/root/.cache/.gemini/history/*/**
+    gemini_cli,/var/root/.cache/.gemini/tmp/*/**
     gemini_cli,/var/root/.cache/.gemini/tmp/*/chats/**
+    gemini_cli,/var/root/.cache/.gemini/tmp/*/logs.json
     gemini_cli,/var/root/.gemini/**
+    gemini_cli,/var/root/.gemini/history/*/**
     gemini_cli,/var/root/.gemini/sessions/**
+    gemini_cli,/var/root/.gemini/tmp/*/**
     gemini_cli,/var/root/.gemini/tmp/*/chats/**
+    gemini_cli,/var/root/.gemini/tmp/*/logs.json
     gemini_cli,/var/root/.gemini/tmp/*/shell_history
     gemini_cli,C:/Users/*/.gemini/**
+    gemini_cli,C:/Users/*/.gemini/history/*/**
     gemini_cli,C:/Users/*/.gemini/sessions/**
+    gemini_cli,C:/Users/*/.gemini/tmp/*/**
     gemini_cli,C:/Users/*/.gemini/tmp/*/chats/**
+    gemini_cli,C:/Users/*/.gemini/tmp/*/logs.json
     gemini_cli,C:/Users/*/.gemini/tmp/*/shell_history
     goose,/Users/*/.local/state/goose/logs/llm_request.*.jsonl
     goose,/home/*/.local/state/goose/logs/llm_request.*.jsonl

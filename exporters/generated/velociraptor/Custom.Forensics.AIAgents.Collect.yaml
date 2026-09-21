@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 0b2cac47244d
+# Catalogue digest: f14125eb906f
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -772,6 +772,7 @@ sources:
     factory_droid,factory_droid.skills_and_droids,C:/Users/*/.factory/skills/**
     factory_droid,factory_droid.specs,C:/Users/*/.factory/specs/**
     factory_droid,factory_droid.worktrees,C:/Users/*/.factory/worktrees/**
+    gemini_cli,gemini_cli.agent_acknowledgments,C:/Users/*/.gemini/acknowledgments/agents.json
     gemini_cli,gemini_cli.agent_definitions,C:/Users/*/.agents/skills/**
     gemini_cli,gemini_cli.agent_definitions,C:/Users/*/.gemini/agents/**
     gemini_cli,gemini_cli.agent_definitions,C:/Users/*/.gemini/skills/**
@@ -781,10 +782,16 @@ sources:
     gemini_cli,gemini_cli.credentials,C:/Users/*/.gemini/oauth_creds.json
     gemini_cli,gemini_cli.google_accounts,C:/Users/*/.gemini/google_accounts.json
     gemini_cli,gemini_cli.home_tree,C:/Users/*/.gemini/**
+    gemini_cli,gemini_cli.install_evidence,C:/Users/*/.gemini/installation_id
     gemini_cli,gemini_cli.mcp_oauth_tokens,C:/Users/*/.gemini/a2a-oauth-tokens.json
     gemini_cli,gemini_cli.mcp_oauth_tokens,C:/Users/*/.gemini/mcp-oauth-tokens.json
     gemini_cli,gemini_cli.policies,C:/ProgramData/gemini-cli/policies/**
     gemini_cli,gemini_cli.policies,C:/Users/*/.gemini/policies/**
+    gemini_cli,gemini_cli.policy_integrity,C:/Users/*/.gemini/policy_integrity.json
+    gemini_cli,gemini_cli.project_registry,C:/Users/*/.gemini/projects.json
+    gemini_cli,gemini_cli.project_runtime_trees,C:/Users/*/.gemini/history/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,C:/Users/*/.gemini/tmp/*/**
+    gemini_cli,gemini_cli.prompt_history_log,C:/Users/*/.gemini/tmp/*/logs.json
     gemini_cli,gemini_cli.shell_history,C:/Users/*/.gemini/tmp/*/shell_history
     gemini_cli,gemini_cli.system_settings,C:/ProgramData/gemini-cli/settings.json
     gemini_cli,gemini_cli.system_settings,C:/ProgramData/gemini-cli/system-defaults.json
@@ -3021,6 +3028,8 @@ sources:
     factory_droid,factory_droid.specs,/var/root/.factory/specs/**
     factory_droid,factory_droid.worktrees,/Users/*/.factory/worktrees/**
     factory_droid,factory_droid.worktrees,/var/root/.factory/worktrees/**
+    gemini_cli,gemini_cli.agent_acknowledgments,/Users/*/.gemini/acknowledgments/agents.json
+    gemini_cli,gemini_cli.agent_acknowledgments,/var/root/.gemini/acknowledgments/agents.json
     gemini_cli,gemini_cli.agent_definitions,/Users/*/.agents/skills/**
     gemini_cli,gemini_cli.agent_definitions,/Users/*/.gemini/agents/**
     gemini_cli,gemini_cli.agent_definitions,/Users/*/.gemini/skills/**
@@ -3039,8 +3048,14 @@ sources:
     gemini_cli,gemini_cli.credentials,/var/root/.gemini/oauth_creds.json
     gemini_cli,gemini_cli.google_accounts,/Users/*/.gemini/google_accounts.json
     gemini_cli,gemini_cli.google_accounts,/var/root/.gemini/google_accounts.json
+    gemini_cli,gemini_cli.home_tree,/Users/*/.cache/.gemini/**
     gemini_cli,gemini_cli.home_tree,/Users/*/.gemini/**
+    gemini_cli,gemini_cli.home_tree,/var/root/.cache/.gemini/**
     gemini_cli,gemini_cli.home_tree,/var/root/.gemini/**
+    gemini_cli,gemini_cli.install_evidence,/Users/*/.cache/.gemini/installation_id
+    gemini_cli,gemini_cli.install_evidence,/Users/*/.gemini/installation_id
+    gemini_cli,gemini_cli.install_evidence,/var/root/.cache/.gemini/installation_id
+    gemini_cli,gemini_cli.install_evidence,/var/root/.gemini/installation_id
     gemini_cli,gemini_cli.mcp_oauth_tokens,/Users/*/.gemini/a2a-oauth-tokens.json
     gemini_cli,gemini_cli.mcp_oauth_tokens,/Users/*/.gemini/mcp-oauth-tokens.json
     gemini_cli,gemini_cli.mcp_oauth_tokens,/var/root/.gemini/a2a-oauth-tokens.json
@@ -3049,6 +3064,26 @@ sources:
     gemini_cli,gemini_cli.policies,/Users/*/.gemini/policies/**
     gemini_cli,gemini_cli.policies,/etc/gemini-cli/policies/**
     gemini_cli,gemini_cli.policies,/var/root/.gemini/policies/**
+    gemini_cli,gemini_cli.policy_integrity,/Users/*/.cache/.gemini/policy_integrity.json
+    gemini_cli,gemini_cli.policy_integrity,/Users/*/.gemini/policy_integrity.json
+    gemini_cli,gemini_cli.policy_integrity,/var/root/.cache/.gemini/policy_integrity.json
+    gemini_cli,gemini_cli.policy_integrity,/var/root/.gemini/policy_integrity.json
+    gemini_cli,gemini_cli.project_registry,/Users/*/.cache/.gemini/projects.json
+    gemini_cli,gemini_cli.project_registry,/Users/*/.gemini/projects.json
+    gemini_cli,gemini_cli.project_registry,/var/root/.cache/.gemini/projects.json
+    gemini_cli,gemini_cli.project_registry,/var/root/.gemini/projects.json
+    gemini_cli,gemini_cli.project_runtime_trees,/Users/*/.cache/.gemini/history/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/Users/*/.cache/.gemini/tmp/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/Users/*/.gemini/history/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/Users/*/.gemini/tmp/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/var/root/.cache/.gemini/history/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/var/root/.cache/.gemini/tmp/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/var/root/.gemini/history/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/var/root/.gemini/tmp/*/**
+    gemini_cli,gemini_cli.prompt_history_log,/Users/*/.cache/.gemini/tmp/*/logs.json
+    gemini_cli,gemini_cli.prompt_history_log,/Users/*/.gemini/tmp/*/logs.json
+    gemini_cli,gemini_cli.prompt_history_log,/var/root/.cache/.gemini/tmp/*/logs.json
+    gemini_cli,gemini_cli.prompt_history_log,/var/root/.gemini/tmp/*/logs.json
     gemini_cli,gemini_cli.shell_history,/Users/*/.gemini/tmp/*/shell_history
     gemini_cli,gemini_cli.shell_history,/var/root/.gemini/tmp/*/shell_history
     gemini_cli,gemini_cli.system_settings,/Library/Application Support/GeminiCli/settings.json
@@ -5832,6 +5867,8 @@ sources:
     factory_droid,factory_droid.specs,/root/.factory/specs/**
     factory_droid,factory_droid.worktrees,/home/*/.factory/worktrees/**
     factory_droid,factory_droid.worktrees,/root/.factory/worktrees/**
+    gemini_cli,gemini_cli.agent_acknowledgments,/home/*/.gemini/acknowledgments/agents.json
+    gemini_cli,gemini_cli.agent_acknowledgments,/root/.gemini/acknowledgments/agents.json
     gemini_cli,gemini_cli.agent_definitions,/home/*/.agents/skills/**
     gemini_cli,gemini_cli.agent_definitions,/home/*/.gemini/agents/**
     gemini_cli,gemini_cli.agent_definitions,/home/*/.gemini/skills/**
@@ -5850,8 +5887,14 @@ sources:
     gemini_cli,gemini_cli.credentials,/root/.gemini/oauth_creds.json
     gemini_cli,gemini_cli.google_accounts,/home/*/.gemini/google_accounts.json
     gemini_cli,gemini_cli.google_accounts,/root/.gemini/google_accounts.json
+    gemini_cli,gemini_cli.home_tree,/home/*/.cache/.gemini/**
     gemini_cli,gemini_cli.home_tree,/home/*/.gemini/**
+    gemini_cli,gemini_cli.home_tree,/root/.cache/.gemini/**
     gemini_cli,gemini_cli.home_tree,/root/.gemini/**
+    gemini_cli,gemini_cli.install_evidence,/home/*/.cache/.gemini/installation_id
+    gemini_cli,gemini_cli.install_evidence,/home/*/.gemini/installation_id
+    gemini_cli,gemini_cli.install_evidence,/root/.cache/.gemini/installation_id
+    gemini_cli,gemini_cli.install_evidence,/root/.gemini/installation_id
     gemini_cli,gemini_cli.mcp_oauth_tokens,/home/*/.gemini/a2a-oauth-tokens.json
     gemini_cli,gemini_cli.mcp_oauth_tokens,/home/*/.gemini/mcp-oauth-tokens.json
     gemini_cli,gemini_cli.mcp_oauth_tokens,/root/.gemini/a2a-oauth-tokens.json
@@ -5860,6 +5903,26 @@ sources:
     gemini_cli,gemini_cli.policies,/etc/gemini-cli/policies/**
     gemini_cli,gemini_cli.policies,/home/*/.gemini/policies/**
     gemini_cli,gemini_cli.policies,/root/.gemini/policies/**
+    gemini_cli,gemini_cli.policy_integrity,/home/*/.cache/.gemini/policy_integrity.json
+    gemini_cli,gemini_cli.policy_integrity,/home/*/.gemini/policy_integrity.json
+    gemini_cli,gemini_cli.policy_integrity,/root/.cache/.gemini/policy_integrity.json
+    gemini_cli,gemini_cli.policy_integrity,/root/.gemini/policy_integrity.json
+    gemini_cli,gemini_cli.project_registry,/home/*/.cache/.gemini/projects.json
+    gemini_cli,gemini_cli.project_registry,/home/*/.gemini/projects.json
+    gemini_cli,gemini_cli.project_registry,/root/.cache/.gemini/projects.json
+    gemini_cli,gemini_cli.project_registry,/root/.gemini/projects.json
+    gemini_cli,gemini_cli.project_runtime_trees,/home/*/.cache/.gemini/history/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/home/*/.cache/.gemini/tmp/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/home/*/.gemini/history/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/home/*/.gemini/tmp/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/root/.cache/.gemini/history/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/root/.cache/.gemini/tmp/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/root/.gemini/history/*/**
+    gemini_cli,gemini_cli.project_runtime_trees,/root/.gemini/tmp/*/**
+    gemini_cli,gemini_cli.prompt_history_log,/home/*/.cache/.gemini/tmp/*/logs.json
+    gemini_cli,gemini_cli.prompt_history_log,/home/*/.gemini/tmp/*/logs.json
+    gemini_cli,gemini_cli.prompt_history_log,/root/.cache/.gemini/tmp/*/logs.json
+    gemini_cli,gemini_cli.prompt_history_log,/root/.gemini/tmp/*/logs.json
     gemini_cli,gemini_cli.shell_history,/home/*/.gemini/tmp/*/shell_history
     gemini_cli,gemini_cli.shell_history,/root/.gemini/tmp/*/shell_history
     gemini_cli,gemini_cli.system_settings,/Library/Application Support/GeminiCli/settings.json

@@ -1104,6 +1104,53 @@ def test_qwen_prompt_history_is_a_json_array_not_a_log(tmp_path: Path) -> None:
     assert events[0].provenance.locator == "index:0"
 
 
+def test_the_upstream_writes_the_same_prompt_log_and_is_read_the_same_way(
+    tmp_path: Path,
+) -> None:
+    """One file of shared code, and for a while only the fork's copy of it was read.
+
+    Gemini CLI writes logs.json from packages/core/src/core/logger.ts and Qwen Code, which
+    is a fork of it, writes the same array of the same records. The catalogue carried the
+    fork's path and not the original's, so every prompt a Gemini CLI user typed was
+    collected under a directory glob and read by nothing. This asserts the reading, in the
+    direction that was missing.
+    """
+    path = tmp_path / "logs.json"
+    path.write_text(
+        json.dumps(
+            [
+                {
+                    "sessionId": "s1",
+                    "messageId": 0,
+                    "timestamp": "2026-09-08T11:00:00.000Z",
+                    "type": "user",
+                    "message": "summarise the failing test",
+                },
+                {
+                    "sessionId": "s2",
+                    "messageId": 0,
+                    "timestamp": "2026-09-08T12:00:00.000Z",
+                    "type": "user",
+                    "message": "now open a pull request",
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    events = parse_as(path, "gemini_cli.prompt_history_log", "gemini_cli")
+
+    assert [event.kind for event in events] == ["prompt.history", "prompt.history"]
+    assert [event.payload["text"] for event in events] == [
+        "summarise the failing test",
+        "now open a pull request",
+    ]
+    # The session id and the agent's own clock, which is what lets a prompt whose
+    # conversation the thirty-day sweep has deleted still be attributed to a session.
+    assert [event.session_id for event in events] == ["s1", "s2"]
+    assert events[0].ts_utc == "2026-09-08T11:00:00.000000Z"
+
+
 def test_qwen_a_prompt_history_that_is_not_an_array_is_reported(tmp_path: Path) -> None:
     path = tmp_path / "logs.json"
     path.write_text('{"not": "an array"}', encoding="utf-8")

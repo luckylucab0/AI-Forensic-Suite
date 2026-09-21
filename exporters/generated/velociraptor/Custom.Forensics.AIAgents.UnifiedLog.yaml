@@ -1,6 +1,6 @@
 # Generated from the artifact catalogue. Do not edit by hand:
 # run `afx export-collection` and commit the result.
-# Catalogue digest: 0b2cac47244d
+# Catalogue digest: f14125eb906f
 #
 # An empty result from this rule means the paths it searched held nothing. It does
 # not mean the host is clean. Unverified catalogue entries, relocated data trees and
@@ -8,8 +8,8 @@
 # here. Where this matters, run the suite's own collector instead: it reads the
 # relocation variables and the agents' own state files, which no static rule can.
 #
-# Scope: the 105 artifacts the catalogue files under transcript and prompt_history.
-# The other 479 are configuration, credentials, caches, logs and install
+# Scope: the 106 artifacts the catalogue files under transcript and prompt_history.
+# The other 484 are configuration, credentials, caches, logs and install
 # traces. They are not left out by accident and they are not skipped for want of a
 # glob: this artifact returns a conversation, and for a settings file or a
 # credential store what an analyst wants is the file, which is what the Collect
@@ -294,6 +294,7 @@ sources:
       factory_droid,factory_droid.specs,file_only,C:/Users/*/.factory/specs/**
       gemini_cli,gemini_cli.chats,file_only,C:/Users/*/.gemini/sessions/**
       gemini_cli,gemini_cli.chats,file_only,C:/Users/*/.gemini/tmp/*/chats/**
+      gemini_cli,gemini_cli.prompt_history_log,file_only,C:/Users/*/.gemini/tmp/*/logs.json
       goose,goose.command_history,file_only,C:/Users/*/AppData/Roaming/Block/goose/data/history.txt
       goose,goose.llm_request_logs,generic_jsonl,C:/Users/*/AppData/Roaming/Block/goose/data/logs/llm_request.*.jsonl
       goose,goose.sessions_db_windows,file_only,C:/Users/*/AppData/Roaming/Block/goose/data/sessions/sessions.db
@@ -1184,6 +1185,10 @@ sources:
       gemini_cli,gemini_cli.chats,file_only,/var/root/.cache/.gemini/tmp/*/chats/**
       gemini_cli,gemini_cli.chats,file_only,/var/root/.gemini/sessions/**
       gemini_cli,gemini_cli.chats,file_only,/var/root/.gemini/tmp/*/chats/**
+      gemini_cli,gemini_cli.prompt_history_log,file_only,/Users/*/.cache/.gemini/tmp/*/logs.json
+      gemini_cli,gemini_cli.prompt_history_log,file_only,/Users/*/.gemini/tmp/*/logs.json
+      gemini_cli,gemini_cli.prompt_history_log,file_only,/var/root/.cache/.gemini/tmp/*/logs.json
+      gemini_cli,gemini_cli.prompt_history_log,file_only,/var/root/.gemini/tmp/*/logs.json
       goose,goose.command_history,file_only,/Users/*/.config/goose/history.txt
       goose,goose.command_history,file_only,/Users/*/.local/state/goose/history.txt
       goose,goose.command_history,file_only,/var/root/.config/goose/history.txt
@@ -2200,6 +2205,10 @@ sources:
       gemini_cli,gemini_cli.chats,file_only,/root/.cache/.gemini/tmp/*/chats/**
       gemini_cli,gemini_cli.chats,file_only,/root/.gemini/sessions/**
       gemini_cli,gemini_cli.chats,file_only,/root/.gemini/tmp/*/chats/**
+      gemini_cli,gemini_cli.prompt_history_log,file_only,/home/*/.cache/.gemini/tmp/*/logs.json
+      gemini_cli,gemini_cli.prompt_history_log,file_only,/home/*/.gemini/tmp/*/logs.json
+      gemini_cli,gemini_cli.prompt_history_log,file_only,/root/.cache/.gemini/tmp/*/logs.json
+      gemini_cli,gemini_cli.prompt_history_log,file_only,/root/.gemini/tmp/*/logs.json
       goose,goose.command_history,file_only,/home/*/.config/goose/history.txt
       goose,goose.command_history,file_only,/home/*/.local/state/goose/history.txt
       goose,goose.command_history,file_only,/root/.config/goose/history.txt
