@@ -64,11 +64,12 @@ def main(argv=None):
     try:
         with sync_playwright() as play:
             browser = play.chromium.launch(executable_path=args.chromium, args=["--no-sandbox"])
-            # Dark, because that is the viewer's own default and the theme the tool is read
-            # in. A headless browser reports a light preference and would otherwise
-            # photograph a theme nobody chose.
+            # Light, because that is the viewer's own default: the Evidence Desk palette
+            # is what an analyst opens. The dark theme is the same grid in the same
+            # meanings and is one click away, but a screenshot should be of the page
+            # somebody actually gets.
             page = browser.new_page(
-                viewport={"width": args.width, "height": args.height}, color_scheme="dark"
+                viewport={"width": args.width, "height": args.height}, color_scheme="light"
             )
             page.goto(url, wait_until="networkidle")
             page.wait_for_timeout(1500)
@@ -93,12 +94,12 @@ def main(argv=None):
             # The same session with its own filter set, which is the one screenshot that
             # has to show the hidden-row count: a filter that takes rows off the screen is
             # only honest while it says how many.
-            tools_chip = page.locator("#turn-filters .tfilter", has_text="tool use")
+            tools_chip = page.locator("#chip-bar .ttab", has_text="tool use")
             if tools_chip.count():
                 tools_chip.first.click()
                 page.wait_for_timeout(700)
                 page.screenshot(path=str(out / "webui-filter.png"))
-                page.locator("#turn-filters .tfilter", has_text="everything").first.click()
+                page.locator("#chip-bar .ttab", has_text="everything").first.click()
                 page.wait_for_timeout(400)
 
             for view in VIEWS:
@@ -107,7 +108,7 @@ def main(argv=None):
                 if view == "instructions":
                     # Filtered to the files that grant tools, hide characters or are
                     # executed rather than read, which is what an analyst opens this for.
-                    chips = page.locator("#instructions-filters .tfilter")
+                    chips = page.locator("#chip-bar .tfilter")
                     for index in range(chips.count()):
                         if chips.nth(index).inner_text().startswith("worth a look"):
                             chips.nth(index).click()
@@ -116,7 +117,7 @@ def main(argv=None):
                 if view == "artifacts":
                     # Filtered to the files a parser did not understand, which is the
                     # distinction this view exists for.
-                    chips = page.locator("#artifacts-filters .tfilter")
+                    chips = page.locator("#chip-bar .tfilter")
                     for index in range(chips.count()):
                         if chips.nth(index).inner_text().startswith("unsupported"):
                             chips.nth(index).click()

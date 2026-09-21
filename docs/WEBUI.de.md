@@ -5,11 +5,20 @@ die Ansicht für die Phase einer Untersuchung, in der die Frage nicht mehr "was 
 diesem Transcript" lautet, sondern "was ist auf diesem Gerät passiert, über alle Agenten
 hinweg, und was haben die Regeln gefunden".
 
-Der Viewer selbst bleibt unverändert. Er ist weiter die einzelne HTML-Datei, die eine
-Analystin auf einem USB-Stick mitnehmen und auf einem Rechner öffnen kann, auf dem nichts
-installiert werden darf, und er liest weiter ein Verzeichnis voller Transcripts oder ein
-einzelnes vereinheitlichtes Log ganz ohne Server. Von `afx serve` ausgeliefert bekommt er
-eine dritte Datenquelle und sechs zusätzliche Ansichten, und sonst verschiebt sich nichts.
+Der Viewer selbst ist weiter die einzelne HTML-Datei, die eine Analystin auf einem
+USB-Stick mitnehmen und auf einem Rechner öffnen kann, auf dem nichts installiert werden
+darf, und er liest weiter ein Verzeichnis voller Transcripts oder ein einzelnes
+vereinheitlichtes Log ganz ohne Server. Von `afx serve` ausgeliefert bekommt er eine dritte
+Datenquelle und sechs zusätzliche Ansichten, und sonst verschiebt sich nichts.
+
+Jede Ansicht ist gleich aufgebaut, denn wer zwischen neun Ansichten wechselt, soll die
+Evidenz lesen und nicht jedes Mal neu suchen, wo die Zahlen stehen: eine Leiste, die den
+Fall benennt, eine Schiene mit den Ansichten, der eigene Kopf der Ansicht, ihre Filter-Chips,
+eine Zeile, die sagt, was diese Filter ausblenden, eine Notiz, die sagt, was die Ansicht
+nicht wissen kann, dann eine dichte Tabelle und eine feste Beleg-Spalte. Diese Spalte ist
+der Teil, der keine Dekoration ist. Eine Zeile auf einem Bildschirm ist eine Beobachtung;
+eine Zeile mit der Datei, aus der sie stammt, der Stelle in dieser Datei und dem Hash dieser
+Bytes ist ein Beleg — und hinter einem Klick wird danach nicht mehr gefragt.
 
 ## Der Weg dorthin
 
@@ -75,9 +84,25 @@ handgepflegte Härtungsliste der Teil ist, der am ehesten verrottet.
 
 ## Die Ansichten
 
-Die drei Ansichten des eigenständigen Viewers bleiben unverändert: **Sessions** zeigt eine
-Konversation, **Tools** listet jeden Tool-Aufruf über alle hinweg, und **Security** ist der
-eingebaute Regex-Scan nach Zugangsdaten im Transcript-Text.
+Drei davon gibt es auch ohne Fall. **Sessions** zeigt eine Konversation, **Tools** listet
+jeden Tool-Aufruf über alle hinweg, und **Security** ist der eingebaute Regex-Scan nach
+Zugangsdaten im Transcript-Text. Hinter `afx serve` ändert sich bei zweien, woher ihre
+Zahlen kommen: **Tools** wird vom Fall beantwortet statt im Browser zusammengezählt, und
+beide sagen, welches von beidem sie gerade tun.
+
+Genau dieser Unterschied ist der Grund für den Endpunkt. Ein Browser kann nur die Sessions
+zusammenzählen, die er geholt hat; bei einem Fall mit hunderttausend Ereignissen war seine
+Tool-Tabelle — und die Summe darüber — in Wahrheit der Teil, der fertig geladen war, und
+eine Analystin liest das als Aussage über den Endpoint. Aus dem Fall beantwortet ist die
+Zahl eine Aussage über die Evidenz. Wie lange ein Aufruf gedauert hat, steht gar nicht da,
+weil kein Collector dieser Suite es aufzeichnet, und ein Aufruf, dessen Ergebnis nie in den
+Speicher geschrieben wurde, zeigt kein Ergebnis statt eines erfolgreichen.
+
+**Security** bleibt im Browser, denn das Regelpaket gehört zu der Datei, die eine Analystin
+auf dem USB-Stick mitnimmt. Die Treffer sind standardmäßig maskiert: Diese Ansicht landet
+als Screenshot in Berichten, und ein echtes Credential in einem Bericht ist ein zweiter
+Vorfall. Ein Treffer als echt, als Falsch-Positiv oder als unklar zu markieren, bleibt in
+dieser Browser-Sitzung und sonst nirgends, weil der Fall read-only geöffnet ist.
 
 Ein ausgelieferter Fall ergänzt sechs weitere, und das sind Fragen an einen Fall, nicht an
 ein Transcript:
@@ -233,17 +258,29 @@ Analystin, die gegen einen bereits offenen Fall skriptet, nicht den Quellcode le
 | `/api/sessions/<key>/events` | einer Seite einer Session, als vereinheitlichtes Log |
 | `/api/events/<event_id>` | einem Ereignis, als vereinheitlichtem Datensatz |
 | `/api/timeline` | einer Seite der geräteweiten Timeline, in der Zeilenform des Exports |
+| `/api/tools` | einer Seite aller Tool-Aufrufe im Fall, mit Ergebnis und den Zahlen, die die Filter-Chips brauchen |
 | `/api/findings` | den Funden, und der Tatsache, dass ein Scan gelaufen ist |
 | `/api/instructions` | dem Anweisungsbestand, mit seinen Scopes und dem, was einen Blick wert ist |
 | `/api/corroboration` | welcher Speicher eines Agenten welche Konversation benennt und welcher dazu schweigt |
 | `/api/artifacts` | jeder Datei, die die Sammlung mitgebracht hat, und den Lücken |
+| `/api/export/<view>.csv` | einer Ansicht, vollständig ausgeschrieben, zum Anhängen an einen Bericht |
 | `/api/health` | dass dies ein `afx serve` ist |
 
-Eine Session- oder Timeline-Seite nimmt `offset` und `limit`. Eine Session-Seite kündigt den
-nächsten Offset im Header `X-Afx-Next-Offset` an, statt die Datensätze in einen Umschlag zu
-packen; so bleibt ihr Body ein vereinheitlichtes Log, das eine Analystin direkt in eine
-Datei speichern und mit `afx scan` wieder einlesen kann. Die Timeline nimmt `agent`, `kind`,
-`since`, `until`, `session` und `no_fs`, dieselben Filter wie `afx timeline`.
+Eine Session-, Timeline- oder Tool-Seite nimmt `offset` und `limit`. Eine Session-Seite
+kündigt den nächsten Offset im Header `X-Afx-Next-Offset` an, statt die Datensätze in einen
+Umschlag zu packen; so bleibt ihr Body ein vereinheitlichtes Log, das eine Analystin direkt
+in eine Datei speichern und mit `afx scan` wieder einlesen kann. Die Timeline nimmt `agent`,
+`kind`, `since`, `until`, `session` und `no_fs`, dieselben Filter wie `afx timeline`. Die
+Tool-Seite nimmt `agent`, `tool`, `session`, `since`, `until`, `failed` und `q`; ihre Zahlen
+pro Tool werden ohne den Tool-Filter erhoben, damit ein Chip sagt, wie viele Zeilen er
+zeigen würde, und nicht, wie viele ohnehin schon auf dem Schirm stehen.
+
+Ein Export ist immer die ganze Ansicht und nie die Seite auf dem Schirm: `timeline`,
+`findings`, `instructions`, `conversations`, `artifacts` und `tools`. Den Timeline-Export
+schreibt das Timeline-Modul selbst — aus demselben Grund, aus dem auch seine Zeilen von dort
+kommen: Die Datei an einem Bericht und die Tabelle auf dem Schirm dürfen denselben Fall
+nicht verschieden beschreiben. Eine CSV, die stillschweigend nur enthielte, was gerade
+gefiltert war, wäre ein Dokument mit einer Behauptung, die niemand nachvollziehen kann.
 
 Jede JSON-Antwort trägt `afx_api`, die API-Version. Der Viewer prüft darauf, um überhaupt zu
 erkennen, ob hinter der Seite ein Fall liegt, und verweigert eine Version, für die er nicht
@@ -301,8 +338,8 @@ Der Anweisungsbestand, gefiltert auf die Dateien, die einen Blick wert sind:
 
 ![Der Anweisungsbestand](images/webui-instructions.png)
 
-Die Konversationen, mit den Speichern jedes Agenten einander gegenübergestellt. In diesem
-Fall ist jeder Speicher mit seinem Geschwister einig, und so sieht ein Fall aus, in dem
-nichts fehlt:
+Die Konversationen, eingegrenzt auf die, die genau ein Speicher benennt. Jede Zeile sagt,
+welcher Speicher eines Agenten die Konversation kennt und welche dazu schweigen, und die
+Spalte daneben sagt, warum Schweigen eine Spur ist und kein Befund:
 
 ![Konversationen über Speicher hinweg](images/webui-corroboration.png)

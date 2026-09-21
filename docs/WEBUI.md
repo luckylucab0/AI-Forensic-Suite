@@ -5,10 +5,18 @@ view for the phase of an investigation where the question is no longer "what doe
 transcript say" but "what happened on this device, across every agent, and what did the
 rules find".
 
-The viewer itself is unchanged. It is still the single HTML file an analyst can carry on a
-USB stick and open on a machine where nothing may be installed, and it still reads a
-directory of transcripts or a single unified log with no server at all. Served by `afx
-serve` it gains a third data source and four extra views, and nothing else about it moves.
+The viewer itself is still the single HTML file an analyst can carry on a USB stick and
+open on a machine where nothing may be installed, and it still reads a directory of
+transcripts or a single unified log with no server at all. Served by `afx serve` it gains a
+third data source and six extra views, and nothing else about it moves.
+
+Every view is laid out the same way, because an analyst moving between nine of them should
+be reading the evidence rather than relearning where the counts are: a bar naming the case,
+a rail of views, the view's own head, its filter chips, one line saying what those filters
+are hiding, one note saying what the view cannot tell you, then a dense table and a fixed
+evidence column. That column is the part that is not decoration. A row on a screen is an
+observation; a row with the file it came from, the place inside that file and the hash of
+those bytes is evidence, and putting that behind a click is how it stops being asked for.
 
 ## Getting there
 
@@ -71,9 +79,24 @@ hand-maintained hardening list is the part most likely to rot.
 
 ## The views
 
-The three views the standalone viewer has are unchanged: **Sessions** renders one
-conversation, **Tools** lists every tool call across all of them, and **Security** is the
-built-in regex scan for credentials in transcript text.
+Three of them exist without a case. **Sessions** renders one conversation, **Tools** lists
+every tool call across all of them, and **Security** is the built-in regex scan for
+credentials in transcript text. Behind `afx serve` two of those three change where their
+numbers come from: **Tools** is answered by the case rather than added up in the browser,
+and both say which of the two they are doing.
+
+That distinction is the reason for the endpoint. A browser can only aggregate the sessions
+it has fetched, so on a case of a hundred thousand events its tool table — and the total
+above it — were really the part that finished loading, which an analyst reads as a fact
+about the endpoint. Served from the case, the count is a fact about the evidence. How long
+a call took is not shown at all, because no collector in this suite records it, and a call
+whose result was never written to the store shows no result rather than a successful one.
+
+**Security** stays in the browser, because the rule pack it runs is part of the file an
+analyst carries on a USB stick. Its matches are masked by default: this view is
+screenshotted into reports, and a live credential in a report is a second incident. Marking
+a match as real, a false positive or unclear records it in that browser session and nowhere
+else, because the case is open read-only.
 
 Serving a case adds six more, and they are questions about a case rather than about a
 transcript:
@@ -215,17 +238,29 @@ scripting against a case they already have open should not have to read the sour
 | `/api/sessions/<key>/events` | one page of a session, as a unified log |
 | `/api/events/<event_id>` | one event, as a unified record |
 | `/api/timeline` | a page of the device-wide timeline, in the export's row shape |
+| `/api/tools` | a page of every tool call in the case, with its result and the counts the filter chips need |
 | `/api/findings` | the findings, and the fact of a scan having run |
 | `/api/instructions` | the instruction surface, with its scopes and what is worth a look |
 | `/api/corroboration` | which of an agent's stores name each conversation, and which stay silent |
 | `/api/artifacts` | every file the collection carried, and the gaps |
+| `/api/export/<view>.csv` | one view written out whole, for attaching to a report |
 | `/api/health` | that this is an `afx serve` |
 
-A session or timeline page carries `offset` and `limit`. A session page announces the next
-offset in the `X-Afx-Next-Offset` header rather than wrapping the records in an envelope,
-which keeps its body a unified log an analyst can save straight to a file and read back
-with `afx scan`. The timeline takes `agent`, `kind`, `since`, `until`, `session` and
-`no_fs`, the same filters `afx timeline` takes.
+A session, timeline or tool page carries `offset` and `limit`. A session page announces the
+next offset in the `X-Afx-Next-Offset` header rather than wrapping the records in an
+envelope, which keeps its body a unified log an analyst can save straight to a file and read
+back with `afx scan`. The timeline takes `agent`, `kind`, `since`, `until`, `session` and
+`no_fs`, the same filters `afx timeline` takes. The tool page takes `agent`, `tool`,
+`session`, `since`, `until`, `failed` and `q`, and its per-tool counts are taken with the
+tool filter left out, so a chip says how many rows it would show rather than how many are
+already on screen.
+
+An export is the whole view and never the page on screen: `timeline`, `findings`,
+`instructions`, `conversations`, `artifacts` and `tools`. The timeline export is written by
+the timeline module itself, which is the same reason its rows are read from there — the
+file attached to a report and the table read on screen must not be able to describe one
+case differently. A CSV that silently held whatever happened to be filtered when it was
+asked for would be a document making a claim nobody could reproduce.
 
 Every JSON response carries `afx_api`, the API version. The viewer probes for it to decide
 whether there is a case behind the page at all, and refuses a version it was not written
@@ -282,7 +317,8 @@ The instruction surface, filtered to the files worth a look:
 
 ![The instruction surface](images/webui-instructions.png)
 
-The conversations, with each agent's stores compared against each other. In this case every
-store agrees with its sibling, which is what a case looks like when nothing is missing:
+The conversations, narrowed to the ones exactly one store names. Each row says which of an
+agent's stores knows the conversation and which stay silent about it, and the panel beside
+it says why silence is a lead rather than a finding:
 
 ![Conversations across stores](images/webui-corroboration.png)
