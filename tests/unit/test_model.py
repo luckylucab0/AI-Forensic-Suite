@@ -246,3 +246,90 @@ def test_a_trimmed_listing_says_how_many_it_left_out(case: Case) -> None:
     out = case.unread_by_artifact(limit=2)
     assert out["listed"] == 2
     assert out["total"] == 5
+
+
+# ------------------------------------------- what happens when a write goes wrong
+
+# The guarantees in this module's docstrings, each of which had nothing running it. A
+# half-written case, a duplicate identity and a facet row invented out of a record that
+# does not have one are all failures an analyst cannot see from the outside: the case
+# opens, the counts look like counts, and the numbers are wrong.
+
+
+def test_an_ingest_that_fails_partway_leaves_no_trace_of_itself(case: Case) -> None:
+    """An ingest either lands or it does not.
+
+    A case half-populated by a crash would have counts nobody could trust, and a count is
+    what an analyst reads first: four hundred events out of a bundle that holds nine
+    hundred reads as an agent that did less, not as a run that stopped.
+    """
+    before = case.counts()["events"]
+    with pytest.raises(RuntimeError), case.transaction():
+        case.add_events([event(user="alice")])
+        raise RuntimeError("the parser died halfway through the file")
+    assert case.counts()["events"] == before
+    assert case.query("SELECT count(*) AS n FROM users WHERE name = 'alice'")[0]["n"] == 0
+
+
+def test_a_name_already_in_the_case_is_found_rather_than_added_twice(tmp_path: Path) -> None:
+    """The second reader of a case has an empty cache and inserts nothing new.
+
+    Re-ingesting a bundle into a case that already holds it is the ordinary way to rebuild
+    one after a parser is fixed, and it opens the database again. Identity is indirected
+    through its own tables so that pseudonymizing a case later is two updates rather than
+    a rewrite, and a second row for one name would make that rewrite silently partial.
+    """
+    path = tmp_path / "case.sqlite"
+    with Case.open(path) as first, first.transaction():
+        first.add_bundle(BundleRecord("bundle-1", "native", "/tmp/b"))
+        first.add_events([event(user="alice", host="workstation")])
+
+    with Case.open(path, create=False) as second:
+        with second.transaction():
+            second.add_events(
+                [event(user="alice", host="workstation", provenance=provenance("line:2"))]
+            )
+        rows = second.query("SELECT name FROM users")
+        hosts = second.query("SELECT name FROM hosts")
+        events = second.query("SELECT DISTINCT user_id, host_id FROM events")
+    assert [row["name"] for row in rows] == ["alice"]
+    assert [row["name"] for row in hosts] == ["workstation"]
+    assert len(events) == 1, "both events have to point at the one row each name has"
+
+
+def test_a_facet_entry_missing_the_field_it_is_about_is_left_out_not_invented(
+    case: Case,
+) -> None:
+    """A facet is an index into the record, not a second copy of it.
+
+    A command entry with no command, a network entry with no host: there is nothing to
+    index, and a row with an empty string in it would answer "which hosts did this agent
+    reach" with a blank. The record itself is kept whole, which is where the entry stays
+    visible, so nothing is hidden by leaving the index alone.
+    """
+    payload = {
+        "commands": [{"cwd": "/src", "exit_code": 0}],
+        "network": [{"url": "https://example.org/x"}],
+        "files": [{"operation": "write", "bytes": 12}],
+        "mcp": [{"tool": "read"}],
+        "models": [{"input_tokens": 10}],
+        "instructions": [{"scope": "project"}],
+    }
+    with case.transaction():
+        case.add_events([event("command.exec", payload=payload)])
+
+    for table in (
+        "facet_commands",
+        "facet_network",
+        "facet_files",
+        "facet_mcp",
+        "facet_models",
+        "facet_instructions",
+    ):
+        rows = case.query(f"SELECT count(*) AS n FROM {table}")  # noqa: S608
+        assert rows[0]["n"] == 0, f"{table} holds a row indexing nothing"
+
+    stored = case.query("SELECT payload FROM events")[0]["payload"]
+    assert "exit_code" in stored and "https://example.org/x" in stored, (
+        "the entry that could not be indexed still has to be in the record"
+    )
