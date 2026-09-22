@@ -161,8 +161,12 @@ def build_sandbox(root: Path, os_name: str) -> None:
             first = home
         else:
             # Copied rather than generated twice, so the two profiles are identical and a
-            # difference in the results can only come from the query.
-            shutil.copytree(first, home)
+            # difference in the results can only come from the query. symlinks=True copies
+            # each link as a link: the profile carries one pointing out of itself, at a
+            # path that exists on Linux and not on macOS, and following it would both
+            # crash the copy here and leave the copied profile without the edge case the
+            # first one has.
+            shutil.copytree(first, home, symlinks=True)
 
 
 def velociraptor_command(binary: Path, query: Path, out: Path) -> list[str]:
