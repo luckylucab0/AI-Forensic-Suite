@@ -1678,7 +1678,7 @@ sources:
     windsurf,C:/Users/*/AppData/Roaming/Windsurf/User/History/**
     ''')
     LET hits = SELECT * FROM foreach(row=targets, query={
-        SELECT Agent, OSPath, Mtime FROM glob(globs=glob)
-      }, column='glob')
+        SELECT agent AS Agent, OSPath, Mtime FROM glob(globs=glob)
+      })
     SELECT Agent, count() AS Files, max(item=Mtime) AS LastSeen
     FROM hits GROUP BY Agent ORDER BY Agent

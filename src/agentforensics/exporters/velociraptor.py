@@ -229,6 +229,7 @@ def _collection(catalogue: Catalogue, digest: str) -> Rendered:
     return Rendered(f"velociraptor/{NAMESPACE}.Collect.yaml", text, dedupe(skipped))
 
 
+
 def _source(os_name: str, precondition: str, rows: list[tuple[str, str, str]]) -> str:
     """One per-OS source: the glob rows as data, then one query over them."""
     lines = [
@@ -244,12 +245,19 @@ def _source(os_name: str, precondition: str, rows: list[tuple[str, str, str]]) -
     lines.extend(
         [
             "    ''')",
+            # No column= here. That parameter iterates a column holding a *list*;
+            # glob holds one string per row, so the loop body never ran and the
+            # artifact returned nothing at all, on every host. The column names are
+            # the CSV's own, lowercase, and aliased to the names the output has
+            # always used: VQL does not fold case, so selecting Agent against a
+            # column named agent bound null and lost the attribution silently.
             "    LET hits = SELECT * FROM foreach(row=targets, query={",
-            "        SELECT Agent, ArtifactId, OSPath, Size, Mode.String AS Mode,",
+            "        SELECT agent AS Agent, artifact_id AS ArtifactId,",
+            "               OSPath, Size, Mode.String AS Mode,",
             "               Mtime, Atime, Ctime, Btime",
             "        FROM glob(globs=glob)",
             "        WHERE NOT IsDir",
-            "      }, column='glob')",
+            "      })",
             "    SELECT *, if(condition=UploadFiles AND Size < atoi(string=MaxFileSize),",
             "                 then=upload(file=OSPath), else=NULL) AS Upload",
             "    FROM hits",
@@ -313,9 +321,10 @@ def _presence(catalogue: Catalogue, digest: str) -> Rendered:
     lines.extend(
         [
             "    ''')",
+            # Same two defects as the collection artifact above, same fix.
             "    LET hits = SELECT * FROM foreach(row=targets, query={",
-            "        SELECT Agent, OSPath, Mtime FROM glob(globs=glob)",
-            "      }, column='glob')",
+            "        SELECT agent AS Agent, OSPath, Mtime FROM glob(globs=glob)",
+            "      })",
             "    SELECT Agent, count() AS Files, max(item=Mtime) AS LastSeen",
             "    FROM hits GROUP BY Agent ORDER BY Agent",
             "",
