@@ -142,7 +142,13 @@ def test_a_missing_engine_is_an_error_and_not_a_skip(script) -> None:
 # start of the path a given occurrence sits in, which is the only way to judge it: the
 # profile roots overlap, and /root/ inside an already-moved /var/root/ is fine while /root/
 # on its own is a glob pointing at the machine this runs on.
-PATH_START = "'\",;= ^[(\n\t"
+#
+# Not a space. Paths contain them ("Group Containers", "Application Support"), and a
+# space counted as a boundary made the inner /Library/ of
+# /Users/*/Library/Group Containers/<id>/Library/... look like the start of a path, so a
+# glob that was correctly sandboxed was reported as escaping. It only surfaced once
+# /Library/ became a root of its own.
+PATH_START = "'\",;=^[(\n\t"
 
 
 def path_start(text: str, index: int) -> int:
@@ -164,35 +170,40 @@ def test_every_profile_glob_is_moved_under_the_sandbox(script) -> None:
     """
     import yaml
 
-    document = yaml.safe_load(script.ARTIFACT.read_text(encoding="utf-8"))
     sandbox = Path("/tmp/afx-sandbox")
     prefix = str(sandbox)
 
-    for os_name in sorted(script.PROFILE_PLACEMENTS):
-        query = script.sandbox_query(document, os_name, sandbox)
+    # Every artifact the script runs, not only the unified log. The other two were run
+    # against a real engine for the first time with this change, and their extra roots
+    # (/Library, /opt, /etc, /home/linuxbrew, /Applications, ...) were not in the list:
+    # the first run of Collect read the developer's real machine.
+    for artifact in (script.ARTIFACT, *script.SMOKE_ARTIFACTS):
+        document = yaml.safe_load(artifact.read_text(encoding="utf-8"))
+        for os_name in sorted(script.PROFILE_PLACEMENTS):
+            query = script.sandbox_query(document, os_name, sandbox)
 
-        # One: the prefix is a prefix. An occurrence in the middle of a path means a
-        # rewrite matched inside its own output, which is the bug this script's own comment
-        # records: /var/root/ was moved, then /root/ matched inside the result and left a
-        # path that is still under the sandbox and points at nothing. Under the sandbox and
-        # wrong is the harder failure to see, because the safety check still passes.
-        for found in re.finditer(re.escape(prefix), query):
-            assert path_start(query, found.start()) == found.start(), (
-                f"{os_name}: the sandbox appears inside a path rather than at its start, "
-                f"near {query[max(0, found.start() - 40) : found.start() + 40]!r}"
-            )
-
-        # Two: every profile root is under it. Judged from the start of the path the
-        # occurrence sits in, because the roots overlap.
-        for root in script.PROFILE_ROOTS:
-            for found in re.finditer(re.escape(root), query):
-                begins = path_start(query, found.start())
-                assert query[begins:].startswith(prefix), (
-                    f"{os_name}: the glob "
-                    f"{query[begins : found.end() + 30]!r} starts at the profile root "
-                    f"{root!r} and not under the sandbox, so it would read the machine "
-                    "this runs on"
+            # One: the prefix is a prefix. An occurrence in the middle of a path means a
+            # rewrite matched inside its own output, which is the bug this script's own comment
+            # records: /var/root/ was moved, then /root/ matched inside the result and left a
+            # path that is still under the sandbox and points at nothing. Under the sandbox and
+            # wrong is the harder failure to see, because the safety check still passes.
+            for found in re.finditer(re.escape(prefix), query):
+                assert path_start(query, found.start()) == found.start(), (
+                    f"{artifact.stem} {os_name}: the sandbox appears inside a path rather than at its start, "
+                    f"near {query[max(0, found.start() - 40) : found.start() + 40]!r}"
                 )
+
+            # Two: every profile root is under it. Judged from the start of the path the
+            # occurrence sits in, because the roots overlap.
+            for root in script.PROFILE_ROOTS:
+                for found in re.finditer(re.escape(root), query):
+                    begins = path_start(query, found.start())
+                    assert query[begins:].startswith(prefix), (
+                        f"{artifact.stem} {os_name}: the glob "
+                        f"{query[begins : found.end() + 30]!r} starts at the profile root "
+                        f"{root!r} and not under the sandbox, so it would read the machine "
+                        "this runs on"
+                    )
 
 
 def test_the_sandbox_rewrite_would_notice_a_new_profile_root(script) -> None:
@@ -200,7 +211,7 @@ def test_the_sandbox_rewrite_would_notice_a_new_profile_root(script) -> None:
     same failure, so the script refuses to run rather than rewriting nothing."""
     document = {
         "parameters": [],
-        "sources": [{"name": "linux", "query": "SELECT * FROM glob(globs='/opt/nothing/*')"}],
+        "sources": [{"name": "linux", "query": "SELECT * FROM glob(globs='/srv/nothing/*')"}],
     }
 
     with pytest.raises(SystemExit, match="none of the known profile roots"):

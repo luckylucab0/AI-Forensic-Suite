@@ -245,6 +245,7 @@ as rows in the vendor-neutral format documented in [docs/UNIFIED_FORMAT.md](UNIF
 Nothing is uploaded and nothing is shipped to the endpoint. Use it when you want the
 conversations from many hosts at once, or when uploading transcripts is not an option.
 
+
 What the unified-log artifact deliberately does less of, stated here because a collection
 tool that quietly does less than it appears to is worse than one that fails:
 
@@ -279,6 +280,13 @@ profile. CI has its own job for it, which downloads a release binary and runs al
 the artifact's per-platform sources. `--runner <program>` takes anything else that accepts a
 VQL file and an output path, such as a local build of the VQL library. With neither it does
 nothing and says so, so the script can sit in a pipeline that has no engine.
+
+The same run also executes the presence and collection artifacts against the same sandbox.
+It does not compare their records, because only the unified log has records to compare, but
+it fails either one that returns no rows, returns a row with no agent, or returns a path from
+outside the sandbox. Only the unified log used to be executed at all, and both of the others
+shipped a query whose loop never ran: they returned nothing on every host, which reads
+exactly like a host with no agent on it.
 
 The sandbox is the part of that script worth knowing about. A collection artifact's whole
 job is to go and find agent data wherever it lives, so running one unmodified would read the
