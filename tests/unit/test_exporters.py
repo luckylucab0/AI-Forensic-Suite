@@ -145,6 +145,27 @@ def test_velociraptor_artifacts_are_valid_yaml(rendered: list) -> None:
             assert "query" in source, item.path
 
 
+def test_every_velociraptor_artifact_asks_for_the_ticket_first(rendered: list) -> None:
+    """The reason a collection was made is recorded with it, whichever artifact was used.
+
+    First, because it is the question an operator should answer before anything else, and
+    all three the same, because an artifact that lacked it would be the one launched
+    without a ticket. No query may read it: it is recorded by the server with the
+    collection's parameters, and a query that wrote it into rows would be adding a field the
+    unified format does not have.
+    """
+    velociraptor = [item for item in rendered if item.path.startswith("velociraptor/")]
+    assert len(velociraptor) == 3
+    for item in velociraptor:
+        document = yaml.safe_load(item.text)
+        first = document["parameters"][0]
+        assert first["name"] == "Ticket", item.path
+        assert first.get("default") == "", item.path
+        assert "type" not in first, f"{item.path}: a ticket is free text"
+        for source in document["sources"]:
+            assert not re.search(r"\bTicket\b", source["query"]), item.path
+
+
 def test_velociraptor_globs_match_their_platform(rendered: list) -> None:
     """A Windows glob in the macOS source runs and matches nothing.
 

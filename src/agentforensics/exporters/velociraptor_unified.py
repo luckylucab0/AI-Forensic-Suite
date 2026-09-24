@@ -59,7 +59,7 @@ from agentforensics.exporters.common import (
 # Velociraptor glob, so the artifact that uploads files and the artifact that parses them
 # look in exactly the same places. A second copy would drift, and the drift would show up
 # as an agent that one artifact finds and the other does not.
-from agentforensics.exporters.velociraptor import NAMESPACE, _covered
+from agentforensics.exporters.velociraptor import NAMESPACE, TICKET_PARAMETER, _covered
 
 ARTIFACT = f"{NAMESPACE}.UnifiedLog"
 
@@ -473,6 +473,7 @@ def _header_notes(catalogue: Catalogue) -> list[str]:
 
 def _parameters() -> list[str]:
     return [
+        *TICKET_PARAMETER,
         "- name: CollectionName",
         "  description: An identifier for this collection, written into every record's",
         "    provenance. Leave empty to derive one from the hostname and the current time.",

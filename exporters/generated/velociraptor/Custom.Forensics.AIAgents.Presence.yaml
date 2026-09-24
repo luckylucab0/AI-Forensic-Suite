@@ -21,6 +21,12 @@ name: Custom.Forensics.AIAgents.Presence
 description: |
   Report which AI coding agents have left on-disk traces on this host.
 type: CLIENT
+parameters:
+- name: Ticket
+  description: The ticket this collection is for and any comment, for example
+    'INC-12345 suspected token exfiltration'. Stored with this collection's
+    parameters and shown with the collection; not written into the results.
+  default: ''
 sources:
 - query: |
     LET targets <= SELECT * FROM parse_csv(

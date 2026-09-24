@@ -245,6 +245,10 @@ as rows in the vendor-neutral format documented in [docs/UNIFIED_FORMAT.md](UNIF
 Nothing is uploaded and nothing is shipped to the endpoint. Use it when you want the
 conversations from many hosts at once, or when uploading transcripts is not an option.
 
+All three ask first for a `Ticket`: the ticket the collection is for and any comment, as one
+free-text field. Velociraptor stores it with the collection's parameters, so it is shown
+with the collection and exported with it. It is not written into the results, which keeps the
+unified format unchanged.
 
 What the unified-log artifact deliberately does less of, stated here because a collection
 tool that quietly does less than it appears to is worse than one that fails:

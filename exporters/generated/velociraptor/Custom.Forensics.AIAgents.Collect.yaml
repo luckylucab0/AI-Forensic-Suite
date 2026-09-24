@@ -193,6 +193,11 @@ description: |
   can be traced back to the catalogue entry that predicted the location.
 type: CLIENT
 parameters:
+- name: Ticket
+  description: The ticket this collection is for and any comment, for example
+    'INC-12345 suspected token exfiltration'. Stored with this collection's
+    parameters and shown with the collection; not written into the results.
+  default: ''
 - name: UploadFiles
   description: Upload file contents as well as metadata.
   type: bool

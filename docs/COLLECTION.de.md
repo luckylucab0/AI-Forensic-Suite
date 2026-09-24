@@ -261,6 +261,10 @@ als Zeilen im vendorneutralen Format aus, das in
 und nichts auf den Endpunkt gebracht. Das nimmt man, wenn man die Konversationen vieler Hosts
 auf einmal will, oder wenn das Hochladen von Transkripten nicht in Frage kommt.
 
+Alle drei fragen zuerst nach einem `Ticket`: das Ticket, für das gesammelt wird, und ein
+allfälliger Kommentar, als ein Freitextfeld. Velociraptor speichert es mit den Parametern der
+Sammlung, also wird es mit der Sammlung angezeigt und mit ihr exportiert. In die Ergebnisse
+wird es nicht geschrieben, damit das vereinheitlichte Format unverändert bleibt.
 
 Was das Unified-Log-Artefakt bewusst weniger tut, hier genannt, weil ein Sammelwerkzeug, das
 stillschweigend weniger tut als es scheint, schlimmer ist als eines, das scheitert:
