@@ -118,6 +118,11 @@ description: |
       disagree with.
 type: CLIENT
 parameters:
+- name: Ticket
+  description: The ticket this collection is for and any comment, for example
+    'INC-12345 suspected token exfiltration'. Stored with this collection's
+    parameters and shown with the collection; not written into the results.
+  default: ''
 - name: CollectionName
   description: An identifier for this collection, written into every record's
     provenance. Leave empty to derive one from the hostname and the current time.

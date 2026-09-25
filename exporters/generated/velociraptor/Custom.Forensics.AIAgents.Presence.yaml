@@ -21,6 +21,12 @@ name: Custom.Forensics.AIAgents.Presence
 description: |
   Report which AI coding agents have left on-disk traces on this host.
 type: CLIENT
+parameters:
+- name: Ticket
+  description: The ticket this collection is for and any comment, for example
+    'INC-12345 suspected token exfiltration'. Stored with this collection's
+    parameters and shown with the collection; not written into the results.
+  default: ''
 sources:
 - query: |
     LET targets <= SELECT * FROM parse_csv(
@@ -1678,7 +1684,7 @@ sources:
     windsurf,C:/Users/*/AppData/Roaming/Windsurf/User/History/**
     ''')
     LET hits = SELECT * FROM foreach(row=targets, query={
-        SELECT Agent, OSPath, Mtime FROM glob(globs=glob)
-      }, column='glob')
+        SELECT agent AS Agent, OSPath, Mtime FROM glob(globs=glob)
+      })
     SELECT Agent, count() AS Files, max(item=Mtime) AS LastSeen
     FROM hits GROUP BY Agent ORDER BY Agent

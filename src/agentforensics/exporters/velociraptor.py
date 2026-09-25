@@ -213,6 +213,7 @@ def _collection(catalogue: Catalogue, digest: str) -> Rendered:
             "  can be traced back to the catalogue entry that predicted the location.",
             "type: CLIENT",
             "parameters:",
+            *TICKET_PARAMETER,
             "- name: UploadFiles",
             "  description: Upload file contents as well as metadata.",
             "  type: bool",
@@ -227,6 +228,23 @@ def _collection(catalogue: Catalogue, digest: str) -> Rendered:
         ]
     )
     return Rendered(f"velociraptor/{NAMESPACE}.Collect.yaml", text, dedupe(skipped))
+
+
+# One field for the reason a collection was made: a ticket key, a comment, or both. Shared by
+# all three artifacts so an operator is asked the same question whichever one they launch.
+#
+# It is not read by any query and not written into any row. Velociraptor stores a
+# collection's parameters with the collection itself, so the value is already kept, shown in
+# the GUI and exported with the flow. Writing it into rows as well would mean a new field in
+# the unified format, whose records admit no keys beyond the ones it defines, for something
+# the flow already records.
+TICKET_PARAMETER = (
+    "- name: Ticket",
+    "  description: The ticket this collection is for and any comment, for example",
+    "    'INC-12345 suspected token exfiltration'. Stored with this collection's",
+    "    parameters and shown with the collection; not written into the results.",
+    "  default: ''",
+)
 
 
 def _source(os_name: str, precondition: str, rows: list[tuple[str, str, str]]) -> str:
@@ -244,12 +262,19 @@ def _source(os_name: str, precondition: str, rows: list[tuple[str, str, str]]) -
     lines.extend(
         [
             "    ''')",
+            # No column= here. That parameter iterates a column holding a *list*;
+            # glob holds one string per row, so the loop body never ran and the
+            # artifact returned nothing at all, on every host. The column names are
+            # the CSV's own, lowercase, and aliased to the names the output has
+            # always used: VQL does not fold case, so selecting Agent against a
+            # column named agent bound null and lost the attribution silently.
             "    LET hits = SELECT * FROM foreach(row=targets, query={",
-            "        SELECT Agent, ArtifactId, OSPath, Size, Mode.String AS Mode,",
+            "        SELECT agent AS Agent, artifact_id AS ArtifactId,",
+            "               OSPath, Size, Mode.String AS Mode,",
             "               Mtime, Atime, Ctime, Btime",
             "        FROM glob(globs=glob)",
             "        WHERE NOT IsDir",
-            "      }, column='glob')",
+            "      })",
             "    SELECT *, if(condition=UploadFiles AND Size < atoi(string=MaxFileSize),",
             "                 then=upload(file=OSPath), else=NULL) AS Upload",
             "    FROM hits",
@@ -302,6 +327,8 @@ def _presence(catalogue: Catalogue, digest: str) -> Rendered:
         "description: |",
         "  Report which AI coding agents have left on-disk traces on this host.",
         "type: CLIENT",
+        "parameters:",
+        *TICKET_PARAMETER,
         "sources:",
         "- query: |",
         "    LET targets <= SELECT * FROM parse_csv(",
@@ -313,9 +340,10 @@ def _presence(catalogue: Catalogue, digest: str) -> Rendered:
     lines.extend(
         [
             "    ''')",
+            # Same two defects as the collection artifact above, same fix.
             "    LET hits = SELECT * FROM foreach(row=targets, query={",
-            "        SELECT Agent, OSPath, Mtime FROM glob(globs=glob)",
-            "      }, column='glob')",
+            "        SELECT agent AS Agent, OSPath, Mtime FROM glob(globs=glob)",
+            "      })",
             "    SELECT Agent, count() AS Files, max(item=Mtime) AS LastSeen",
             "    FROM hits GROUP BY Agent ORDER BY Agent",
             "",
@@ -324,4 +352,4 @@ def _presence(catalogue: Catalogue, digest: str) -> Rendered:
     return Rendered(f"velociraptor/{NAMESPACE}.Presence.yaml", "\n".join(lines), dedupe(skipped))
 
 
-__all__ = ["NAMESPACE", "render"]
+__all__ = ["NAMESPACE", "TICKET_PARAMETER", "render"]

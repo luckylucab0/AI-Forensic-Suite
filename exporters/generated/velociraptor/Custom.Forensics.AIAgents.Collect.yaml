@@ -193,6 +193,11 @@ description: |
   can be traced back to the catalogue entry that predicted the location.
 type: CLIENT
 parameters:
+- name: Ticket
+  description: The ticket this collection is for and any comment, for example
+    'INC-12345 suspected token exfiltration'. Stored with this collection's
+    parameters and shown with the collection; not written into the results.
+  default: ''
 - name: UploadFiles
   description: Upload file contents as well as metadata.
   type: bool
@@ -1796,11 +1801,12 @@ sources:
     zed,zed.user_configuration,C:/Users/*/AppData/Roaming/Zed/tasks.json
     ''')
     LET hits = SELECT * FROM foreach(row=targets, query={
-        SELECT Agent, ArtifactId, OSPath, Size, Mode.String AS Mode,
+        SELECT agent AS Agent, artifact_id AS ArtifactId,
+               OSPath, Size, Mode.String AS Mode,
                Mtime, Atime, Ctime, Btime
         FROM glob(globs=glob)
         WHERE NOT IsDir
-      }, column='glob')
+      })
     SELECT *, if(condition=UploadFiles AND Size < atoi(string=MaxFileSize),
                  then=upload(file=OSPath), else=NULL) AS Upload
     FROM hits
@@ -5190,11 +5196,12 @@ sources:
     zed,zed.user_configuration,/var/root/.config/zed/tasks.json
     ''')
     LET hits = SELECT * FROM foreach(row=targets, query={
-        SELECT Agent, ArtifactId, OSPath, Size, Mode.String AS Mode,
+        SELECT agent AS Agent, artifact_id AS ArtifactId,
+               OSPath, Size, Mode.String AS Mode,
                Mtime, Atime, Ctime, Btime
         FROM glob(globs=glob)
         WHERE NOT IsDir
-      }, column='glob')
+      })
     SELECT *, if(condition=UploadFiles AND Size < atoi(string=MaxFileSize),
                  then=upload(file=OSPath), else=NULL) AS Upload
     FROM hits
@@ -8371,11 +8378,12 @@ sources:
     zed,zed.user_configuration,/root/.config/zed/tasks.json
     ''')
     LET hits = SELECT * FROM foreach(row=targets, query={
-        SELECT Agent, ArtifactId, OSPath, Size, Mode.String AS Mode,
+        SELECT agent AS Agent, artifact_id AS ArtifactId,
+               OSPath, Size, Mode.String AS Mode,
                Mtime, Atime, Ctime, Btime
         FROM glob(globs=glob)
         WHERE NOT IsDir
-      }, column='glob')
+      })
     SELECT *, if(condition=UploadFiles AND Size < atoi(string=MaxFileSize),
                  then=upload(file=OSPath), else=NULL) AS Upload
     FROM hits

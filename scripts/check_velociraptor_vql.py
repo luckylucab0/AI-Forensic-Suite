@@ -45,9 +45,24 @@ from typing import Any
 import yaml
 
 REPO = Path(__file__).resolve().parent.parent
-ARTIFACT = (
-    REPO / "exporters" / "generated" / "velociraptor" / "Custom.Forensics.AIAgents.UnifiedLog.yaml"
+VELOCIRAPTOR = REPO / "exporters" / "generated" / "velociraptor"
+ARTIFACT = VELOCIRAPTOR / "Custom.Forensics.AIAgents.UnifiedLog.yaml"
+
+# The other two generated artifacts. They get a smoke run rather than the differential
+# above: returning the right records is only meaningful for the unified log, but
+# returning *nothing* is a failure for all three and is what went unnoticed here.
+# Presence and Collect both shipped a foreach that iterated a column holding a string
+# as if it held a list, so both returned zero rows on every host, for every agent,
+# while reading like a clean result. Only UnifiedLog was ever run against an engine,
+# so nothing caught it.
+SMOKE_ARTIFACTS = (
+    VELOCIRAPTOR / "Custom.Forensics.AIAgents.Presence.yaml",
+    VELOCIRAPTOR / "Custom.Forensics.AIAgents.Collect.yaml",
 )
+
+# Uploading is meaningless outside a real flow, and a smoke run should not copy the
+# sandbox into a temporary directory to prove a glob matched.
+SMOKE_OVERRIDES = {"UploadFiles": "FALSE"}
 SCHEMA = REPO / "src" / "agentforensics" / "unified" / "agentlog.v1.schema.json"
 
 # One source record, as both producers name it: the file it came from and the line inside
@@ -62,12 +77,33 @@ EXIT_ERROR = 2
 # has to be rewritten, because a single one left alone is a glob pointing at the real
 # machine. The list is asserted against the artifact itself below, so a new root added to
 # the exporter fails here rather than quietly escaping the sandbox.
+# Not only the per-user profile roots. The collection artifact also globs system
+# locations — managed settings under /Library, package trees under /opt and /usr,
+# /etc, /tmp, C:/Windows, C:/ProgramData — and those are globs like any other: one
+# left unrewritten reads the machine this runs on. The list missing them is how a
+# smoke run of Collect came back with 464,886 paths from outside the sandbox,
+# including this developer's real /Library/Application Support/ClaudeCode. Missing
+# one is no longer silent: assert_globs_sandboxed below fails the run.
 PROFILE_ROOTS = (
     "/Users/*/",
     "/var/root/",
     "/home/*/",
+    # Also bare: Homebrew on Linux lives at the literal /home/linuxbrew, which the
+    # wildcard form above does not match, so it has to be a root of its own.
+    "/home/",
     "/root/",
     "C:/Users/*/",
+    "/Applications/",
+    # macOS keeps per-user system state under /private/var/folders (LaunchServices).
+    "/private/",
+    "/Library/",
+    "/etc/",
+    "/opt/",
+    "/usr/",
+    "/var/",
+    "/tmp/",  # noqa: S108 - a glob root to rewrite, not a temporary file
+    "C:/Windows/",
+    "C:/ProgramData/",
 )
 
 # Where the synthetic profile is placed inside the sandbox, one per platform root, so that
@@ -83,7 +119,7 @@ PROFILE_PLACEMENTS = {
 }
 
 
-def parameters(document: dict[str, Any]) -> str:
+def parameters(document: dict[str, Any], overrides: dict[str, str] | None = None) -> str:
     """The artifact's parameters as VQL, for a runner that evaluates a bare query.
 
     Read from the artifact rather than hardcoded, so a parameter added to the exporter
@@ -99,13 +135,33 @@ def parameters(document: dict[str, Any]) -> str:
             value = str(int(default or 0))
         else:
             value = "'" + str(default).replace("'", "") + "'"
+        if overrides and name in overrides:
+            value = overrides[name]
         lines.append(f"LET {name} = {value}")
     return "\n".join(lines)
 
 
-def sandbox_query(document: dict[str, Any], os_name: str, sandbox: Path) -> str:
+def sandbox_query(
+    document: dict[str, Any],
+    os_name: str,
+    sandbox: Path,
+    overrides: dict[str, str] | None = None,
+) -> str:
     """One platform's query, with every glob moved under the sandbox."""
-    source = next(s for s in document["sources"] if s["name"] == os_name)
+    sources = document["sources"]
+    named = [s for s in sources if s.get("name") == os_name]
+    if named:
+        source = named[0]
+    elif len(sources) == 1:
+        # Presence carries one source covering every platform, so there is nothing to
+        # select. Anything else with no matching name is a shape this script does not
+        # know, and guessing which source to run would test the wrong one silently.
+        source = sources[0]
+    else:
+        raise SystemExit(
+            f"{os_name}: this artifact has {len(sources)} sources and none named "
+            f"{os_name!r}, so there is no way to tell which one to run."
+        )
     query = str(source["query"])
 
     found = [root for root in PROFILE_ROOTS if root in query]
@@ -120,7 +176,19 @@ def sandbox_query(document: dict[str, Any], os_name: str, sandbox: Path) -> str:
     # result, and the next replacement then matched inside its own predecessor's output and
     # destroyed the path. The symptom was a macOS run that silently returned nothing for the
     # second profile, which is precisely the shape of failure this script exists to find.
-    pattern = re.compile("|".join(re.escape(root) for root in sorted(found, key=len, reverse=True)))
+    #
+    # Anchored at the start of a path. The roots now include /tmp/, /var/ and /etc/,
+    # which also occur *inside* paths (~/.cache/tmp/, a project named etc), and an
+    # unanchored match would splice the sandbox into the middle of one. A path in this
+    # text starts at a line start or after a CSV comma, a quote, whitespace or an
+    # opening bracket, and nowhere else.
+    pattern = re.compile(
+        r"(?:(?<=^)|(?<=[,'\"\s(\[=]))"
+        + "(?:"
+        + "|".join(re.escape(root) for root in sorted(found, key=len, reverse=True))
+        + ")",
+        re.MULTILINE,
+    )
 
     def move(match: re.Match[str]) -> str:
         root = match.group(0)
@@ -136,7 +204,36 @@ def sandbox_query(document: dict[str, Any], os_name: str, sandbox: Path) -> str:
     # has just moved. Anchor them after the sandbox instead so ProfileUser still resolves.
     query = query.replace("regex=['^/", f"regex=['^{sandbox}/")
     query = query.replace(r"regex=['(?i)^[A-Za-z]:", f"regex=['(?i)^{sandbox}/[A-Za-z]:")
-    return parameters(document) + "\n\n" + query
+    assert_globs_sandboxed(query, os_name, sandbox)
+    return parameters(document, overrides) + "\n\n" + query
+
+
+# The CSV target blocks are VQL triple-quoted strings.
+_TARGET_BLOCK = re.compile("filename=" + "'" * 3 + "(.*?)" + "'" * 3, re.DOTALL)
+
+
+def assert_globs_sandboxed(query: str, os_name: str, sandbox: Path) -> None:
+    """Refuse to run a query holding any glob that is not under the sandbox.
+
+    The root list above is a list, and a list can be incomplete; it was, for as long as
+    only the unified-log artifact was run. So the rewrite is checked on its output, not
+    trusted: every glob in the CSV target block has to start with the sandbox. A glob
+    that does not is a path on the real machine, and running it would read that machine.
+    """
+    prefix = str(sandbox)
+    escaped = []
+    for block in _TARGET_BLOCK.findall(query):
+        rows = [line.strip() for line in block.splitlines() if line.strip()]
+        for row in rows[1:]:  # the first row is the CSV header
+            glob = row.rsplit(",", 1)[-1]
+            if not glob.startswith(prefix):
+                escaped.append(glob)
+    if escaped:
+        raise SystemExit(
+            f"{os_name}: {len(escaped)} glob(s) are not under the sandbox after the "
+            f"rewrite, so running this would read the real machine. Add their roots to "
+            f"PROFILE_ROOTS. First few: {escaped[:5]}"
+        )
 
 
 def build_sandbox(root: Path, os_name: str) -> None:
@@ -384,6 +481,71 @@ def differential(
 MISSING_NOTES: dict[str, str] = {}
 
 
+def smoke(
+    path: Path,
+    os_name: str,
+    sandbox: Path,
+    work: Path,
+    runner: Path,
+    use_velociraptor: bool,
+) -> tuple[int, str | None]:
+    """Run one artifact against the sandbox and count what came back.
+
+    Returns (rows, error). A zero-row run is the caller's failure to report: the
+    sandbox holds a synthetic profile at every root these globs look at, so an
+    artifact that finds nothing there would find nothing on a real host either.
+    """
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    sources = document.get("sources", [])
+    if not any(s.get("name") in (None, os_name) for s in sources):
+        return 0, None  # nothing for this platform; not a failure
+
+    name = path.stem
+    query = work / f"{name}.{os_name}.vql"
+    query.write_text(sandbox_query(document, os_name, sandbox, SMOKE_OVERRIDES), encoding="utf-8")
+    out = work / f"{name}.{os_name}.jsonl"
+    command = (
+        velociraptor_command(runner, query, out)
+        if use_velociraptor
+        else [str(runner), str(query), str(out)]
+    )
+    result = run(command)
+    if result.returncode != 0:
+        return 0, f"{name}: the runner exited {result.returncode}\n{result.stderr[-2000:]}"
+    if not out.exists():
+        return 0, f"{name}: the runner wrote no output file"
+
+    rows = 0
+    for number, line in enumerate(out.read_text(encoding="utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        rows += 1
+        row = json.loads(line)
+        # A row that found a file but not the agent it belongs to is attribution lost,
+        # and that shipped too: the query selected Agent against a CSV column named
+        # agent, VQL does not fold case, and every row came back with Agent null.
+        if not row.get("Agent"):
+            return rows, (
+                f"{name}: row {number} has no Agent. The query selects a column the "
+                f"target list does not have, so every hit is unattributed."
+            )
+        hit = str(row.get("OSPath") or "")
+        # Presence aggregates and returns no paths; Collect returns one per file. A path
+        # from outside the sandbox means a glob escaped it, and the run is void.
+        if hit and not hit.startswith(str(sandbox)):
+            return rows, (
+                f"{name}: row {number} came from {hit!r}, outside the sandbox. The "
+                f"rewrite missed a glob and this run read the real machine."
+            )
+    if rows == 0:
+        return 0, (
+            f"{name}: returned no rows against a sandbox that holds a synthetic profile "
+            f"at every root its globs address. On a real host this reads as a clean "
+            f"result, which is the failure this check exists to catch."
+        )
+    return rows, None
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -506,6 +668,21 @@ def main(argv: list[str] | None = None) -> int:
                 MISSING_NOTES.get(args.os_name, ""),
             )
         )
+
+        # The other generated artifacts, against the same sandbox. Only that they
+        # returned something: a zero-row collection artifact is indistinguishable from a
+        # clean host, and that is exactly how two of these shipped broken.
+        for artifact in SMOKE_ARTIFACTS:
+            if not artifact.exists():
+                problems.append(f"{artifact.name} is missing. Run gen_collection_rules.py.")
+                continue
+            rows_returned, error = smoke(
+                artifact, args.os_name, sandbox, work, runner, bool(args.velociraptor)
+            )
+            if error:
+                problems.append(error)
+            else:
+                print(f"check-velociraptor-vql: {artifact.stem}: {rows_returned} row(s) returned")
 
         if problems:
             for problem in problems:

@@ -261,6 +261,11 @@ als Zeilen im vendorneutralen Format aus, das in
 und nichts auf den Endpunkt gebracht. Das nimmt man, wenn man die Konversationen vieler Hosts
 auf einmal will, oder wenn das Hochladen von Transkripten nicht in Frage kommt.
 
+Alle drei fragen zuerst nach einem `Ticket`: das Ticket, für das gesammelt wird, und ein
+allfälliger Kommentar, als ein Freitextfeld. Velociraptor speichert es mit den Parametern der
+Sammlung, also wird es mit der Sammlung angezeigt und mit ihr exportiert. In die Ergebnisse
+wird es nicht geschrieben, damit das vereinheitlichte Format unverändert bleibt.
+
 Was das Unified-Log-Artefakt bewusst weniger tut, hier genannt, weil ein Sammelwerkzeug, das
 stillschweigend weniger tut als es scheint, schlimmer ist als eines, das scheitert:
 
@@ -298,6 +303,14 @@ und alle drei plattformspezifischen Quellen des Artefakts ausführt. `--runner <
 nimmt alles andere, das eine VQL-Datei und einen Ausgabepfad annimmt, etwa einen lokalen Bau
 der VQL-Bibliothek. Ohne beides tut es nichts und sagt das, sodass das Skript in einer
 Pipeline ohne Engine stehen kann.
+
+Derselbe Lauf führt auch das Präsenz- und das Sammelartefakt gegen dieselbe Sandbox aus. Ihre
+Datensätze vergleicht er nicht, denn nur das vereinheitlichte Log hat Datensätze zum
+Vergleichen, aber er lässt jedes der beiden scheitern, das keine Zeilen zurückgibt, eine Zeile
+ohne Agent liefert oder einen Pfad von ausserhalb der Sandbox. Früher wurde überhaupt nur das
+vereinheitlichte Log ausgeführt, und beide anderen wurden mit einer Abfrage ausgeliefert, deren
+Schleife nie lief: Sie gaben auf jedem Host nichts zurück, was genau so aussieht wie ein Host
+ohne Agent.
 
 Die Sandbox ist der Teil dieses Skripts, den man kennen sollte. Die ganze Aufgabe eines
 Sammelartefakts ist es, Agentendaten zu finden, wo sie liegen; unverändert ausgeführt würde
